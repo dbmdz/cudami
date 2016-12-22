@@ -11,6 +11,10 @@ public class CategoryImpl extends EntityImpl implements Category {
   @Relationship(type = "HAS_LABEL")
   private Text label;
 
+  public CategoryImpl(Text label) {
+    this.label = label;
+  }
+
   @Override
   public Text getLabel() {
     return label;

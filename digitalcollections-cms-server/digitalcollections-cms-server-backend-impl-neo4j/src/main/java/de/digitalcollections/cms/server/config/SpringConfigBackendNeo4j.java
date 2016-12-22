@@ -42,7 +42,7 @@ public class SpringConfigBackendNeo4j extends Neo4jConfiguration {
   @Value("${database.username}")
   private String username;
 
-  private org.neo4j.ogm.config.Configuration getConfiguration() {
+  protected org.neo4j.ogm.config.Configuration getConfiguration() {
     org.neo4j.ogm.config.Configuration config = new org.neo4j.ogm.config.Configuration();
     if (port == 7474) {
       // HTTP
