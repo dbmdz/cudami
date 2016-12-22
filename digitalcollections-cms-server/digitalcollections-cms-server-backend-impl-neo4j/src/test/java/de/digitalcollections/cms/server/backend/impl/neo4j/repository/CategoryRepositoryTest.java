@@ -48,6 +48,20 @@ public class CategoryRepositoryTest {
     Category foundCategory = categoryRepository.findOne(graphId);
     Assert.assertEquals(uuid, foundCategory.getUuid());
     Assert.assertEquals("test category", foundCategory.getLabel().getText());
+  }
 
+  @Test
+  public void shouldCreateAndDeleteEntity() throws Exception {
+    Text label = new TextImpl("test category");
+    Category c = new CategoryImpl(label);
+    CategoryImpl savedCategory = (CategoryImpl) categoryRepository.save(c);
+
+    final Long graphId = savedCategory.getGraphId();
+    Assert.assertNotNull(graphId);
+
+    categoryRepository.delete(graphId);
+
+    Category foundCategory = categoryRepository.findOne(graphId);
+    Assert.assertNull(foundCategory);
   }
 }
