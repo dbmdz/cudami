@@ -24,22 +24,39 @@
       <version>1.0.0-SNAPSHOT</version>
     </dependency>
     <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.neo4j</groupId>
+      <artifactId>neo4j</artifactId>
+      <version>3.1.0</version>
+    </dependency>
+    <dependency>
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j-ogm-bolt-driver</artifactId>
-      <version>2.0.5</version>
+      <version>2.1.0</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j-ogm-embedded-driver</artifactId>
       <!-- version 2.1.0 does not work (Driver.newTransaction exception during tests) -->
-      <version>2.0.5</version>
+      <version>2.1.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j-ogm-test</artifactId>
-      <version>2.0.5</version>
+      <version>2.1.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.7.22</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -56,15 +73,19 @@
     <dependency>
       <groupId>org.springframework.data</groupId>
       <artifactId>spring-data-neo4j</artifactId>
-      <version>4.1.5.RELEASE</version>
-      <type>jar</type>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
-      <scope>test</scope>
-      <type>jar</type>
+      <version>4.2.0.BUILD-SNAPSHOT</version>
     </dependency>
   </dependencies>
+  
+  <repositories>
+    <!-- used for snapshot releases -->
+    <repository>
+      <id>spring-snapshots</id>
+      <name>Spring Snapshots</name>
+      <url>https://repo.spring.io/libs-snapshot</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
 </project>

@@ -9,7 +9,7 @@ public abstract class EntityImpl implements Entity {
   @GraphId
   private Long graphId;
 
-  final UUID uuid = UUID.randomUUID();
+  private String uuid = UUID.randomUUID().toString();
 
   public Long getGraphId() {
     return graphId;
@@ -20,8 +20,13 @@ public abstract class EntityImpl implements Entity {
   }
 
   @Override
-  public UUID getUuid() {
+  public String getUuid() {
     return uuid;
+  }
+
+  @Override
+  public void setUuid(String uuid) {
+    this.uuid = uuid;
   }
 
   @Override

@@ -5,7 +5,7 @@ import de.digitalcollections.cms.model.api.Text;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-@NodeEntity
+@NodeEntity(label = "Category")
 public class CategoryImpl extends EntityImpl implements Category {
 
   @Relationship(type = "HAS_LABEL")

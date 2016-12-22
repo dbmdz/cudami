@@ -5,7 +5,6 @@ import de.digitalcollections.cms.model.api.Text;
 import de.digitalcollections.cms.server.backend.impl.neo4j.model.CategoryImpl;
 import de.digitalcollections.cms.server.backend.impl.neo4j.model.TextImpl;
 import de.digitalcollections.cms.server.config.SpringConfigBackendNeo4jForTest;
-import java.util.UUID;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -36,16 +35,31 @@ public class CategoryRepositoryTest {
   }
 
   @Test
-  public void shouldCreateAndFindEntity() throws Exception {
+  public void shouldCreateAndFindByGraphidEntity() throws Exception {
     Text label = new TextImpl("test category");
     Category c = new CategoryImpl(label);
     CategoryImpl savedCategory = (CategoryImpl) categoryRepository.save(c);
 
-    final UUID uuid = savedCategory.getUuid();
+    final String uuid = savedCategory.getUuid();
     final Long graphId = savedCategory.getGraphId();
     Assert.assertNotNull(graphId);
 
     Category foundCategory = categoryRepository.findOne(graphId);
+    Assert.assertEquals(uuid, foundCategory.getUuid());
+    Assert.assertEquals("test category", foundCategory.getLabel().getText());
+  }
+
+  @Test
+  public void shouldCreateAndFindByUuidEntity() throws Exception {
+    Text label = new TextImpl("test category");
+    Category c = new CategoryImpl(label);
+    CategoryImpl savedCategory = (CategoryImpl) categoryRepository.save(c);
+
+    final String uuid = savedCategory.getUuid();
+    final Long graphId = savedCategory.getGraphId();
+    Assert.assertNotNull(graphId);
+
+    Category foundCategory = categoryRepository.findByUuid(uuid);
     Assert.assertEquals(uuid, foundCategory.getUuid());
     Assert.assertEquals("test category", foundCategory.getLabel().getText());
   }

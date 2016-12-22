@@ -1,9 +1,9 @@
 package de.digitalcollections.cms.model.api;
 
-import java.util.UUID;
-
 public interface Entity {
 
-  UUID getUuid();
+  String getUuid();
+
+  void setUuid(String uuid);
 
 }

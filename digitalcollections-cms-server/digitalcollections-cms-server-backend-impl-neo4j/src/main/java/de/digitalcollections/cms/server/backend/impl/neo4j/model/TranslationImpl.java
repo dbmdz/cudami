@@ -45,6 +45,7 @@ public class TranslationImpl extends EntityImpl implements Translation {
     this.lang = lang;
   }
 
+  @Override
   public boolean has(String lang) {
     return Objects.equals(this.lang, lang);
   }

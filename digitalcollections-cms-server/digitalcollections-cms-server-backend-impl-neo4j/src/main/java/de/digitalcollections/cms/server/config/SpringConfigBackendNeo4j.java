@@ -9,11 +9,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.support.PersistenceExceptionTranslator;
-import org.springframework.data.neo4j.config.Neo4jConfiguration;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
-import org.springframework.data.neo4j.template.Neo4jOgmExceptionTranslator;
+import org.springframework.data.neo4j.transaction.Neo4jTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
@@ -22,7 +19,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @PropertySource(
         "classpath:de/digitalcollections/cms/server/config/SpringConfigBackendNeo4j-${spring.profiles.active}.properties")
-public class SpringConfigBackendNeo4j extends Neo4jConfiguration {
+public class SpringConfigBackendNeo4j {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfigBackendNeo4j.class);
 
@@ -61,23 +58,15 @@ public class SpringConfigBackendNeo4j extends Neo4jConfiguration {
     return config;
   }
 
-  @Override
-  public SessionFactory getSessionFactory() {
+  @Bean
+  public SessionFactory sessionFactory() {
     return new SessionFactory(getConfiguration(),
             "de.digitalcollections.cms.server.backend.impl.neo4j.model",
             "de.digitalcollections.cms.model.api");
   }
 
   @Bean
-  @Override
-  public PersistenceExceptionTranslator persistenceExceptionTranslator() {
-    LOGGER.info("Initialising PersistenceExceptionTranslator");
-    return new PersistenceExceptionTranslator() {
-      @Override
-      public DataAccessException translateExceptionIfPossible(RuntimeException e) {
-        LOGGER.info("Intercepted exception", e);
-        throw Neo4jOgmExceptionTranslator.translateExceptionIfPossible(e);
-      }
-    };
+  public Neo4jTransactionManager transactionManager() {
+    return new Neo4jTransactionManager(sessionFactory());
   }
 }

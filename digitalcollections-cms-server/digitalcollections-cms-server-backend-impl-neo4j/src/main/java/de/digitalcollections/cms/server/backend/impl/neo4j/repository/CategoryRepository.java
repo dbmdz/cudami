@@ -5,4 +5,5 @@ import org.springframework.data.neo4j.repository.GraphRepository;
 
 public interface CategoryRepository extends GraphRepository<Category> {
 
+  Category findByUuid(String uuid);
 }
