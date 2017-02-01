@@ -4,12 +4,12 @@
   
   <parent>
     <groupId>de.digitalcollections.cms</groupId>
-    <artifactId>digitalcollections-cms-model</artifactId>
+    <artifactId>digitalcollections-cms-client</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
   
-  <name>DigitalCollections: CMS Model (Model API)</name>
-  <artifactId>digitalcollections-cms-model-api</artifactId>
+  <name>DigitalCollections: CMS Client (Business API)</name>
+  <artifactId>digitalcollections-cms-client-business-api</artifactId>
   <packaging>jar</packaging>
   
   <properties>
@@ -19,8 +19,8 @@
   
   <dependencies>
     <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-core</artifactId>
+      <groupId>de.digitalcollections.cms</groupId>
+      <artifactId>digitalcollections-cms-model-api</artifactId>
     </dependency>
   </dependencies>
 </project>

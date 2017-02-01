@@ -1,8 +1,8 @@
 package de.digitalcollections.cms.server.backend.impl.neo4j.repository;
 
-import de.digitalcollections.cms.model.api.Category;
+import de.digitalcollections.cms.model.api.entity.Category;
 import de.digitalcollections.cms.model.api.Text;
-import de.digitalcollections.cms.server.backend.impl.neo4j.model.CategoryImpl;
+import de.digitalcollections.cms.server.backend.impl.neo4j.model.entity.CategoryImpl;
 import de.digitalcollections.cms.server.backend.impl.neo4j.model.TextImpl;
 import de.digitalcollections.cms.server.config.SpringConfigBackendNeo4jForTest;
 import org.junit.Assert;
