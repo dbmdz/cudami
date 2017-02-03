@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -20,8 +19,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.format.FormatterRegistry;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -47,24 +44,20 @@ import org.thymeleaf.templateresolver.TemplateResolver;
 
 @Configuration
 @ComponentScan(basePackages = {
+  "de.digitalcollections.cms.client.webapp.controller",
   "org.mdz.cmon.frontend.view.model.impl",
   "org.mdz.dzp.cms.frontend.webapp.aop",
-  "org.mdz.dzp.cms.frontend.webapp.controller",
-  "org.mdz.dzp.cms.frontend.webapp.converter",
   "org.mdz.dzp.cms.frontend.webapp.propertyeditor",
   "org.mdz.common.frontend.webapp.controller"})
 // TODO GlobalExceptionController...
 @EnableAspectJAutoProxy
 @EnableWebMvc
 @PropertySource(value = {
-  "classpath:org/mdz/dzp/cms/config/SpringConfigWeb-${spring.profiles.active}.properties"
+  "classpath:de/digitalcollections/cms/config/SpringConfigWeb-${spring.profiles.active}.properties"
 })
 public class SpringConfigWeb extends WebMvcConfigurerAdapter {
 
   static final String ENCODING = "UTF-8";
-
-  @Autowired
-  List<Converter> converters;
 
   @Bean
   public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
@@ -200,13 +193,4 @@ public class SpringConfigWeb extends WebMvcConfigurerAdapter {
   public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
     configurer.enable();
   }
-
-  @Override
-  public void addFormatters(FormatterRegistry registry) {
-    super.addFormatters(registry);
-    for (Converter converter : converters) {
-      registry.addConverter(converter);
-    }
-  }
-
 }

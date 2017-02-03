@@ -15,5 +15,8 @@
   <modules>
     <module>digitalcollections-cms-client-webapp</module>
     <module>digitalcollections-cms-client-business-api</module>
+    <module>digitalcollections-cms-client-business-impl</module>
+    <module>digitalcollections-cms-client-backend-api</module>
+    <module>digitalcollections-cms-client-backend-impl-jpa</module>
   </modules>
 </project>
