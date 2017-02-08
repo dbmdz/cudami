@@ -14,13 +14,15 @@
     <title layout:title-pattern="$DECORATOR_TITLE: $CONTENT_TITLE">dicoCMS</title>
 
     <!-- Bootstrap core CSS -->
-    <link th:href="@{/css/bootstrap-yeti.min.css}" rel="stylesheet" />
+    <link th:href="@{/webjars/bootswatch-yeti/3.3.5+4/css/bootstrap.min.css}" rel="stylesheet" />
+
+    <!-- Font awesome CSS -->
+    <link th:href="@{/webjars/font-awesome/4.7.0/css/font-awesome.min.css}" rel="stylesheet" />
 
     <!-- Custom styles for this template -->
-    <link th:href="@{/css/font-awesome.min.css}" rel="stylesheet" />
     <link th:href="@{/css/main.css}" rel="stylesheet" />
 
-    <script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/webjars/jquery/3.1.1/jquery.min.js}"></script>
 
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="@{/js/ie8-responsive-file-warning.js}"></script><![endif]-->
@@ -28,8 +30,8 @@
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-    <script src="@{/js/html5shiv.min.js}"></script>
-    <script src="@{/js/respond.min.js}"></script>
+      <script th:src="@{/webjars/html5shiv/3.7.3/html5shiv.min.js}"></script>
+      <script th:src="@{/webjars/respond/1.4.2/dest/respond.min.js}"></script>
     <![endif]-->
   </head>
 
@@ -84,17 +86,15 @@
 
     <div class="container">
       <div th:replace="fragments/feedback-messages :: global"></div>
-      
+
       <section layout:fragment="content">
         ...
       </section>
 
     </div>
 
-    <script th:src="@{/js/bootstrap.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/3.3.7/js/bootstrap.min.js}"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script th:src="@{/js/ie10-viewport-bug-workaround.js}"></script>
+    <script th:src="@{/webjars/ie10-viewport-bug-workaround/1.0.3/dist/ie10-viewport-bug-workaround.min.js}"></script>
   </body>
 </html>
-
-

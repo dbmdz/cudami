@@ -67,12 +67,13 @@ public class SpringConfigWeb extends WebMvcConfigurerAdapter {
 
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    registry.addResourceHandler("/js/**").addResourceLocations("/js/");
     registry.addResourceHandler("/css/**").addResourceLocations("/css/");
     registry.addResourceHandler("/favicon.ico").addResourceLocations("/images/favicon.ico");
+    registry.addResourceHandler("/fonts/**").addResourceLocations("/fonts/");
     registry.addResourceHandler("/html/**").addResourceLocations("/html/");
     registry.addResourceHandler("/images/**").addResourceLocations("/images/");
-    registry.addResourceHandler("/fonts/**").addResourceLocations("/fonts/");
+    registry.addResourceHandler("/js/**").addResourceLocations("/js/");
+    registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
   }
 
   @Bean

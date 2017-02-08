@@ -92,7 +92,7 @@ public class SpringConfigSecurity extends WebSecurityConfigurerAdapter {
             permitAll();
     // Assets must be accessible to all, too
     http.authorizeRequests().
-            antMatchers("/favicon.ico", "/css/**", "/images/**", "/img/**", "/js/**", "/fonts/*", "/less/*").permitAll();
+            antMatchers("/css/**", "/favicon.ico", "/fonts/*", "/images/**", "/js/**", "/less/*", "/webjars/**").permitAll();
     http.authorizeRequests().antMatchers("/users/**").hasAnyAuthority(roleService.getAdminRole().getAuthority());
     // else: authenticate please
     http.authorizeRequests()
