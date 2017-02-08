@@ -13,7 +13,7 @@
 
   <!-- Application Loggers -->
   <logger name="de.digitalcollections.cms.client">
-    <level value="debug"/>
+    <level value="info"/>
   </logger>
 
   <logger name="org.springframework.core">
