@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorator="base">
+
+  <head>
+    <title th:text="#{websites}">Websites</title>
+  </head>
+  <body>
+    <section layout:fragment="content">
+      <h1><span th:text="#{websites}">Websites</span> <a class="btn btn-default" th:href="@{/websites/new}" th:text="#{btn_new}">New</a></h1>
+
+      <table class="table table-bordered table-condensed table-responsive">
+        <thead>
+          <tr>
+            <th class="center" th:text="#{title}">Title</th>
+            <th class="center" th:text="#{url}">URL</th>
+            <th class="center" th:text="#{action}">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="website: ${websites}">
+            <td><a th:href="@{'/websites/' + ${website.id}}" th:text="${website.title}">Periodikon</a></td>
+            <td><a th:href="@{'/websites/' + ${website.id}}" th:text="${website.url}">http://www.bavarikon.de/</a></td>          
+            <td class="center">
+              <a th:href="@{'/websites/' + ${website.id} + '/edit'}" th:title="#{tooltip_edit}"><span class="fa fa-pencil actionButton"></span></a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div th:replace="fragments/modals-confirmation :: confirmYesNoDialog"></div>
+    </section>
+  </body>
+</html>
+
+

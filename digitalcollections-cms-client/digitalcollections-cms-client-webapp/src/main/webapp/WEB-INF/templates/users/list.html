@@ -6,11 +6,11 @@
       layout:decorator="base">
 
   <head>
-    <title th:text="#{title_usermanagement}">User-Management</title>
+    <title th:text="#{users}">Users</title>
   </head>
   <body>
     <section layout:fragment="content">
-      <h1><span th:text="#{title_usermanagement}">User-Management</span> <a class="btn btn-default" th:href="@{/users/new}" th:text="#{btn_new}">Neu</a></h1>
+      <h1><span th:text="#{users}">Users</span> <a class="btn btn-default" th:href="@{/users/new}" th:text="#{btn_new}">New</a></h1>
 
       <table class="table table-bordered table-condensed table-responsive">
         <thead>

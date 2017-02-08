@@ -1,9 +1,9 @@
 package de.digitalcollections.cms.server.backend.impl.neo4j.repository;
 
-import de.digitalcollections.cms.model.api.entity.Category;
 import de.digitalcollections.cms.model.api.Text;
-import de.digitalcollections.cms.server.backend.impl.neo4j.model.entity.CategoryImpl;
+import de.digitalcollections.cms.model.api.entity.Category;
 import de.digitalcollections.cms.server.backend.impl.neo4j.model.TextImpl;
+import de.digitalcollections.cms.server.backend.impl.neo4j.model.entity.CategoryImpl;
 import de.digitalcollections.cms.server.config.SpringConfigBackendNeo4jForTest;
 import org.junit.Assert;
 import org.junit.Before;
@@ -41,7 +41,7 @@ public class CategoryRepositoryTest {
     CategoryImpl savedCategory = (CategoryImpl) categoryRepository.save(c);
 
     final String uuid = savedCategory.getUuid();
-    final Long graphId = savedCategory.getGraphId();
+    final Long graphId = savedCategory.getId();
     Assert.assertNotNull(graphId);
 
     Category foundCategory = categoryRepository.findOne(graphId);
@@ -56,7 +56,7 @@ public class CategoryRepositoryTest {
     CategoryImpl savedCategory = (CategoryImpl) categoryRepository.save(c);
 
     final String uuid = savedCategory.getUuid();
-    final Long graphId = savedCategory.getGraphId();
+    final Long graphId = savedCategory.getId();
     Assert.assertNotNull(graphId);
 
     Category foundCategory = categoryRepository.findByUuid(uuid);
@@ -70,7 +70,7 @@ public class CategoryRepositoryTest {
     Category c = new CategoryImpl(label);
     CategoryImpl savedCategory = (CategoryImpl) categoryRepository.save(c);
 
-    final Long graphId = savedCategory.getGraphId();
+    final Long graphId = savedCategory.getId();
     Assert.assertNotNull(graphId);
 
     categoryRepository.delete(graphId);

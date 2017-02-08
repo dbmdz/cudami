@@ -1,31 +1,21 @@
-package de.digitalcollections.cms.server.backend.impl.neo4j.model.entity;
+package de.digitalcollections.cms.client.backend.impl.jpa.entity;
 
 import com.google.gson.Gson;
 import de.digitalcollections.cms.model.api.Text;
 import de.digitalcollections.cms.model.api.entity.Entity;
 import java.util.UUID;
-import org.neo4j.ogm.annotation.GraphId;
-import org.neo4j.ogm.annotation.Relationship;
+import javax.persistence.Column;
+import javax.persistence.Transient;
+import org.hibernate.validator.constraints.NotEmpty;
 
-public class EntityImpl implements Entity<Long> {
+public abstract class EntityImplJpa implements Entity<Long> {
 
-  @GraphId
-  private Long graphId;
-
-  @Relationship(type = "HAS_LABEL")
+  @Transient
   private Text label;
 
+  @NotEmpty
+  @Column(name = "uuid", nullable = false, unique = true)
   private String uuid = UUID.randomUUID().toString();
-
-  @Override
-  public Long getId() {
-    return graphId;
-  }
-
-  @Override
-  public void setId(Long graphId) {
-    this.graphId = graphId;
-  }
 
   @Override
   public Text getLabel() {

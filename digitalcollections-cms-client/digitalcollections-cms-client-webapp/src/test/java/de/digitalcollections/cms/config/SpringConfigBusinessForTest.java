@@ -2,6 +2,7 @@ package de.digitalcollections.cms.config;
 
 import de.digitalcollections.cms.client.business.api.service.RoleService;
 import de.digitalcollections.cms.client.business.api.service.UserService;
+import de.digitalcollections.cms.client.business.api.service.WebsiteService;
 import de.digitalcollections.cms.model.api.security.Role;
 import java.io.Serializable;
 import java.util.List;
@@ -59,5 +60,10 @@ public class SpringConfigBusinessForTest {
   @Bean
   public UserService userService() {
     return Mockito.mock(UserService.class);
+  }
+
+  @Bean
+  public WebsiteService websiteService() {
+    return Mockito.mock(WebsiteService.class);
   }
 }

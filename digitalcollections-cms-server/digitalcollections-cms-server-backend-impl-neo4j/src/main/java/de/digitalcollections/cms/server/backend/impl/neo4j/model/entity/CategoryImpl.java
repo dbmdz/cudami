@@ -8,7 +8,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 @NodeEntity(label = "Category")
-public class CategoryImpl extends EntityImpl implements Category {
+public class CategoryImpl extends EntityImpl implements Category<Long> {
 
   List<Category> children;
 

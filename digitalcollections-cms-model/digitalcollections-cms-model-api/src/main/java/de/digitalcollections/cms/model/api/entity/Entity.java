@@ -1,8 +1,16 @@
 package de.digitalcollections.cms.model.api.entity;
 
 import de.digitalcollections.cms.model.api.Text;
+import java.io.Serializable;
 
-public interface Entity {
+/**
+ * @param <ID> unique id specifying instance
+ */
+public interface Entity<ID extends Serializable> {
+
+  ID getId();
+
+  void setId(ID id);
 
   Text getLabel();
 

@@ -7,7 +7,7 @@ import java.util.List;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 @NodeEntity(label = "Article")
-public class ArticleImpl extends EntityImpl implements Article {
+public class ArticleImpl extends EntityImpl implements Article<Long> {
 
   List<Category> categories;
 
