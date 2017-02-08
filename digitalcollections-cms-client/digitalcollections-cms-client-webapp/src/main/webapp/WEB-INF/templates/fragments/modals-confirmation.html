@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head lang="en">
+    <meta charset="UTF-8"></meta>
+    <title></title>
+  </head>
+  <body>
+    <div th:fragment="confirmYesNoDialog">
+      <!-- Modal Dialog -->
+      <div class="modal fade" id="confirmYesNoDialog" role="dialog" aria-labelledby="confirmDialogLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title">Delete permanently</h4>
+            </div>
+            <div class="modal-body">
+              <p>Are you sure about this ?</p>
+            </div>
+            <div class="modal-footer">
+              <a class="btn btn-danger" id="confirm" th:text="#{btn_yes}">Yes</a>
+              <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{btn_no}">No</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dialog show event handler -->
+      <script type="text/javascript" th:inline="javascript">
+        //<!--
+        $('#confirmYesNoDialog').on('show.bs.modal', function (e) {
+          $message = $(e.relatedTarget).attr('data-message');
+          $(this).find('.modal-body p').text($message);
+          
+          $title = $(e.relatedTarget).attr('data-title');
+          $(this).find('.modal-title').text($title);
+
+          // Pass form reference to modal for submission on yes/ok
+          // var form = $(e.relatedTarget).closest('form');
+          // $(this).find('.modal-footer #confirm').data('form', form);
+          var href = $(e.relatedTarget).data('href');
+          if (href == undefined) {
+            return;
+          }
+          $(this).find('.modal-footer #confirm').attr('href', href);
+        });
+
+        //Form confirm (yes/ok) handler, submits form
+        //        $('#confirmDialog').find('.modal-footer #confirm').on('click', function(){
+        //            // $(this).data('form').submit();
+        //        });
+        //-->
+      </script>
+    </div>
+  </body>
+</html>

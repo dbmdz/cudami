@@ -1,0 +1,69 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorator="base">
+
+  <head>
+    <title th:text="|#{title_usermanagement}: #{user} ${user.email}|">User-Management: user admin@unknown.org</title>
+  </head>
+  <body>
+    <section layout:fragment="content">
+
+      <div class="row mainContent">
+        <div id="sidebar" class="col-sm-3">
+          <a class="btn btn-default btn-block"
+             th:href="@{${user.id} + '/edit'}"
+             th:text="#{edit}">
+            edit
+          </a>
+          <a class="btn btn-danger btn-block"
+             th:if="${user.enabled}" href="#"
+             th:title="#{tooltip_deactivate_user}"
+             th:text="#{btn_deactivate_user}"
+             data:href="@{${user.id} + '/deactivate'}"
+             data:message="#{msg_confirmUserDeactivation(${user.email})}"
+             data:title="#{title_warning}"
+             data-target="#confirmYesNoDialog"
+             data-toggle="modal">
+            deactivate user
+          </a>
+          <a class="btn btn-success btn-block"
+             th:unless="${user.enabled}"
+             th:href="@{${user.id} + '/activate'}"
+             th:title="#{tooltip_activate_user}"
+             th:text="#{btn_activate_user}">
+            activate user
+          </a>
+        </div>
+
+        <div class="col-sm-9" th:object="${user}">
+          <div class="container-fluid rows-striped">
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{id}">ID</label></div>
+              <div class="col-md-9"><span th:text="*{id}">23</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{username}">Username / Email</label></div>
+              <div class="col-md-9"><span th:text="*{email}">email@email.de</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-3"><label th:text="|#{lastname}, #{firstname}">Lastname, Firstname</label></div>
+              <div class="col-md-9"><span th:text="*{lastname}">Lastname</span>, <span th:text="*{firstname}">Firstname</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{roles}">Role(s)</label></div>
+              <div class="col-md-9"><th:block th:each="role,rowStat : *{roles}"><span th:text="${role.name}">ROLE_CONTENT_MANAGER</span><span th:unless="${rowStat.last}">, </span></th:block></div>
+            </div>
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{status}">Status</label></div>
+              <div class="col-md-9"><span th:text="#{${'tooltip_enabled.' + user.enabled}}">active</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div th:replace="fragments/modals-confirmation :: confirmYesNoDialog"></div>
+    </section>
+  </body>
+</html>

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="base">
+  <body>
+    <section layout:fragment="content">
+      <div class="jumbotron">
+        <h1>MDZ<strong>WMS</strong></h1>
+        <p th:text="|#{time}: ${time}|">...</p>
+      </div>
+    </section>
+  </body>
+</html>
+

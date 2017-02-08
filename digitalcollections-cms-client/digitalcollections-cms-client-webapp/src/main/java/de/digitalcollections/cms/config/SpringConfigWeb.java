@@ -44,16 +44,14 @@ import org.thymeleaf.templateresolver.TemplateResolver;
 
 @Configuration
 @ComponentScan(basePackages = {
+  "de.digitalcollections.cms.client.webapp.aop",
   "de.digitalcollections.cms.client.webapp.controller",
-  "org.mdz.cmon.frontend.view.model.impl",
-  "org.mdz.dzp.cms.frontend.webapp.aop",
-  "org.mdz.dzp.cms.frontend.webapp.propertyeditor",
-  "org.mdz.common.frontend.webapp.controller"})
-// TODO GlobalExceptionController...
+  "de.digitalcollections.cms.client.webapp.propertyeditor",
+  "de.digitalcollections.commons.springmvc.controller"})
 @EnableAspectJAutoProxy
 @EnableWebMvc
 @PropertySource(value = {
-  "classpath:de/digitalcollections/cms/config/SpringConfigWeb-${spring.profiles.active}.properties"
+  "classpath:de/digitalcollections/cms/config/SpringConfigWeb-${spring.profiles.active:local}.properties"
 })
 public class SpringConfigWeb extends WebMvcConfigurerAdapter {
 

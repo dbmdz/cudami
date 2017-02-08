@@ -1,0 +1,51 @@
+.center {
+  text-align: center;
+}
+.alert {
+  font-size: 14px;
+  padding: 5px 15px;
+}
+h1 a.btn {
+  float: right;
+}
+label, .control-label {
+  font-size: inherit;
+}
+.navbar li a {
+  -webkit-transition: all .2s ease-out;
+  -moz-transition: all .2s ease-out;
+  -o-transition: all .2s ease-out;
+  transition: all .2s ease-out;
+}
+table {
+  font-size: 14px;
+}
+table .actionButton {
+  padding: 2px 3px;
+  -webkit-border-radius: 90px;
+  -moz-border-radius: 90px;
+  border-radius: 90px;
+  -webkit-transition: all .2s ease-out;
+  -moz-transition: all .2s ease-out;
+  -o-transition: all .2s ease-out;
+  transition: all .2s ease-out;
+}
+table .actionButton:hover {
+  background-color: #c7f1ff;
+}
+.checkbox-list {
+  margin: 0;
+  padding: 0;
+  padding-top: 12px;
+  list-style: none;
+}
+.has-error p {
+  font-size: 10px;
+  color:red;
+}
+.rows-striped .row:nth-child(odd) {
+  background-color:#c7f1ff;
+}
+.rows-striped .row:nth-child(even) {
+  background-color: white;
+}

@@ -1,0 +1,55 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="base">
+<head>
+  <title th:text="#{title_login}">Please log in</title>
+</head>
+<body>
+<div id="siteWrapper" class="container">
+  <th layout:fragment="navbar"></th>
+
+  <section layout:fragment="content">
+    <div class="row spacer">
+      <div class="col-md-6 col-md-offset-3">
+        <div class="panel panel-default loginForm">
+          <div class="panel-heading">
+            <h3 class="panel-title" th:text="#{title_login}">Please log in</h3>
+          </div>
+          <div class="panel-body">
+            <div class="alert alert-danger" th:if="${param.error}" th:text="#{login_failed}">Wrong username or password</div>
+            <form class="form-horizontal" role="form" name="input" th:action="@{/login}" method="post">
+              <div class="form-group">
+                <label for="j_username" class="col-sm-3 control-label" th:text="#{lbl_username}">Username</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="j_username" name="username" autofocus="autofocus"/>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="j_password" class="col-sm-3 control-label" th:text="#{lbl_password}">Password</label>
+                <div class="col-sm-9">
+                  <input type="password" class="form-control" id="j_password" name="password" />
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox" id="checkSave" name="remember-me" /> <span th:text="#{lbl_stay_logged_in}">stay logged in</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                  <button type="submit" class="btn btn-primary" th:text="#{btn_login}">Login</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+</body>
+</html>

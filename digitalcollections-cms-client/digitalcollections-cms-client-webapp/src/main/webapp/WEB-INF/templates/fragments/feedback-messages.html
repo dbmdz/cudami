@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head lang="en">
+    <meta charset="UTF-8"></meta>
+    <title></title>
+  </head>
+  <body>
+    <div th:fragment="global">
+      <div class="row" th:if="${error_message}">
+        <div class="alert alert-danger">
+          <span class="glyphicon glyphicon-exclamation-sign"></span> <span class="sr-only">Error:</span> <span th:text="${error_message}">Error message</span>
+        </div>
+      </div>
+      <div class="row" th:if="${info_message}">
+        <div class="alert alert-info">
+          <span class="glyphicon glyphicon-info-sign"></span> <span class="sr-only">Info:</span> <span th:text="${info_message}">Info message</span>
+        </div>
+      </div>
+      <div class="row" th:if="${success_message}">
+        <div class="alert alert-success">
+          <span class="glyphicon glyphicon-ok-sign"></span> <span class="sr-only">Success:</span> <span th:text="${success_message}">Success message</span>
+        </div>
+      </div>
+      <div class="row" th:if="${warning_message}">
+        <div class="alert alert-warning">
+          <span class="glyphicon glyphicon-warning-sign"></span> <span class="sr-only">Warning:</span> <span th:text="${warning_message}">Warning</span>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <div th:fragment="form">
+    <div class="alert alert-warning" th:if="${#fields.hasAnyErrors()}">
+      <span class="glyphicon glyphicon-warning-sign"></span> <span th:text="#{msg.correct_input_errors}">Correct invalid input, please.</span>
+      <ul th:if="${#fields.hasErrors('global')}">
+        <li th:each="err : ${#fields.errors('global')}" th:text="${err}">Input is incorrect</li>
+      </ul>
+    </div>
+  </div>
+</html>

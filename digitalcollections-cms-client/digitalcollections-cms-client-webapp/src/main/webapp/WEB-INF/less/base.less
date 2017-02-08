@@ -1,0 +1,46 @@
+.alert {
+  font-size: 14px;
+  padding: 5px 15px;
+}
+h1 a.btn {
+  float: right;
+}
+label, .control-label {
+  font-size: inherit;
+}
+.navbar{
+  li a{
+    .transition();
+  }
+}
+
+table{
+  font-size: 14px;
+
+  .actionButton{
+    padding: 2px 3px;
+    .border-radius(90px);
+    .transition();
+
+    &:hover{
+      background-color: lighten(@primaryColor, 60%);
+    }
+  }
+}
+
+.checkbox-list {
+  margin: 0;
+  padding: 0;
+  padding-top: 12px;
+  list-style: none;
+}
+.has-error p {
+  font-size: 10px;
+  color: red;
+}
+.rows-striped .row:nth-child(odd){
+  background-color: lighten(@primaryColor, 60%);
+}
+.rows-striped .row:nth-child(even){
+  background-color: white;
+}

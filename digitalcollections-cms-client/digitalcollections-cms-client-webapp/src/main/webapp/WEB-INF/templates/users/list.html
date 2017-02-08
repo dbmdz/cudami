@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorator="base">
+
+  <head>
+    <title th:text="#{title_usermanagement}">User-Management</title>
+  </head>
+  <body>
+    <section layout:fragment="content">
+      <h1><span th:text="#{title_usermanagement}">User-Management</span> <a class="btn btn-default" th:href="@{/users/new}" th:text="#{btn_new}">Neu</a></h1>
+
+      <table class="table table-bordered table-condensed table-responsive">
+        <thead>
+          <tr>
+            <th class="center" th:text="#{lastname}">Lastname</th>
+            <th class="center" th:text="#{firstname}">Firstname</th>
+            <th class="center" th:text="#{username}">Username / Email</th>
+            <th class="center" th:text="#{roles}">Role(s)</th>
+            <th class="center" th:text="#{status}">Status</th>
+            <th class="center" th:text="#{action}">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:remove="all">
+            <td>Meier</td>
+            <td>Hans</td>
+            <td>hans@meier.de</td>
+            <td>Administrator</td>
+            <td><span class="text-success fa fa-circle" title="active"></span></td>
+            <td>
+              <a href="#" title="edit"><span class="fa fa-pencil"></span></a>
+              <a class="option text-danger" href="#" title="deactivate user"><span class="fa fa-circle"></span></a>
+              <a class="option text-success" href="#" title="activate user"><span class="fa fa-circle"></span></a>
+            </td>
+          </tr>
+          <tr th:each="user: ${users}">
+            <td><span th:text="${user.lastname}">Meier</span></td>
+            <td><span th:text="${user.firstname}">Hans</span></td>
+            <td><a th:href="@{'/users/' + ${user.id}}" th:text="${user.email}">hans@meier.de</a></td>
+            <td><th:block th:each="role,rowStat : ${user.roles}"><span th:text="${role.name}">ROLE_CONTENT_MANAGER</span><span th:unless="${rowStat.last}">, </span></th:block></td>
+        <td class="center"><span th:title="#{${'tooltip_enabled.' + user.enabled}}" th:classappend="${user.enabled}? 'text-success' : 'text-danger'" class="fa fa-power-off"></span></td>
+        <td class="center">
+          <a th:href="@{'/users/' + ${user.id} + '/edit'}" th:title="#{tooltip_edit}"><span class="fa fa-pencil actionButton"></span></a>
+          <a th:if="${user.enabled}" href="#"
+             th:title="#{tooltip_deactivate_user}"
+             data:href="@{'/users/' + ${user.id} + '/deactivate'}"
+             data:message="#{msg_confirmUserDeactivation(${user.email})}"
+             data:title="#{title_warning}"
+             data-target="#confirmYesNoDialog"
+             data-toggle="modal">
+            <span class="fa fa-toggle-off actionButton"></span>
+          </a>
+          <a th:unless="${user.enabled}" th:href="@{'/users/' + ${user.id} + '/activate'}"
+             th:title="#{tooltip_activate_user}">
+            <span class="fa fa-toggle-on actionButton"></span>
+          </a>
+        </td>
+        </tr>
+        </tbody>
+      </table>
+
+      <div th:replace="fragments/modals-confirmation :: confirmYesNoDialog"></div>
+    </section>
+  </body>
+</html>
+
+

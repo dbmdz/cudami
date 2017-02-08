@@ -30,6 +30,7 @@ public class SpringConfigBackendNeo4j {
 
   @Value("${database.hostname}")
   private String hostname;
+
   @Value("${database.password}")
   private String password;
 
@@ -38,6 +39,16 @@ public class SpringConfigBackendNeo4j {
 
   @Value("${database.username}")
   private String username;
+
+  @Bean
+  public SessionFactory sessionFactory() {
+    return new SessionFactory(getConfiguration(), "de.digitalcollections.cms.server.backend.impl.neo4j.model", "de.digitalcollections.cms.model.api");
+  }
+
+  @Bean
+  public Neo4jTransactionManager transactionManager() {
+    return new Neo4jTransactionManager(sessionFactory());
+  }
 
   protected org.neo4j.ogm.config.Configuration getConfiguration() {
     org.neo4j.ogm.config.Configuration config = new org.neo4j.ogm.config.Configuration();
@@ -56,17 +67,5 @@ public class SpringConfigBackendNeo4j {
               .setURI(url);
     }
     return config;
-  }
-
-  @Bean
-  public SessionFactory sessionFactory() {
-    return new SessionFactory(getConfiguration(),
-            "de.digitalcollections.cms.server.backend.impl.neo4j.model",
-            "de.digitalcollections.cms.model.api");
-  }
-
-  @Bean
-  public Neo4jTransactionManager transactionManager() {
-    return new Neo4jTransactionManager(sessionFactory());
   }
 }
