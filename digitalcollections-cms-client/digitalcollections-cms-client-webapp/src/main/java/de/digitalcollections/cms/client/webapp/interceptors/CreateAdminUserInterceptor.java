@@ -47,7 +47,7 @@ public class CreateAdminUserInterceptor extends HandlerInterceptorAdapter implem
     if (doCreateAdminUser != null) {
       boolean createAdminUser = (boolean) doCreateAdminUser;
       if (createAdminUser) {
-        modelAndView.setView(new RedirectView("/setup/adminUser"));
+        modelAndView.setView(new RedirectView("/setup/adminUser", true));
         String message = messageSource.getMessage("msg.create_a_new_admin_user", null, LocaleContextHolder.getLocale());
         modelAndView.addObject("info_message", message);
         LOGGER.info("Admin user does not exist. Create a new administrator user.");

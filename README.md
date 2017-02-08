@@ -1,6 +1,6 @@
-# DigitalCollections CMS
+# dicoCMS (DigitalCollections CMS)
 
-The DigitalCollections CMS is a CMS for creating websites focussing on presenting digital objects.
+dicoCMS is a CMS for creating websites focussing on presenting digital objects.
 
 Technologies used:
 
@@ -38,13 +38,13 @@ Features:
 
         $ sudo su - postgres
     
-        ($ dropdb 'wms_db')
+        ($ dropdb 'dicocms')
     
-        $ psql -c "CREATE USER wms PASSWORD 'somepassword';"
+        $ psql -c "CREATE USER dico PASSWORD 'somepassword';"
     
         CREATE ROLE
     
-        $ createdb wms_db -O wms
+        $ createdb dicocms -O dico
 
     Check:
 
@@ -59,42 +59,42 @@ Features:
                    |          |          |             |             | postgres=CTc/postgres
          template1 | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =c/postgres          +
                    |          |          |             |             | postgres=CTc/postgres
-         wms_db    | wms      | UTF8     | en_US.UTF-8 | en_US.UTF-8 | 
+         dicocms   | dico     | UTF8     | en_US.UTF-8 | en_US.UTF-8 | 
          (4 rows)
 
-    List tables of database wms_db:
+    List tables of database dicocms:
 
-        $ psql -d wms_db
+        $ psql -d dicocms
         psql (9.4.1)
         Type "help" for help.
 
-        wms_db=# \d
+        dicocms=# \d
         No relations found.
-        wms_db=# \q
+        dicocms=# \q
 
 3. Put your database properties into configuration file(s):
 
-        $ cd <WMS source directory>
-        $ vi backend/src/main/resources/org/mdz/wms/config/SpringConfigBackend-<profile>.properties
+        $ cd <dicoCMS source directory>
+        $ vi digitalcollections-cms-client/digitalcollections-cms-client-backend-impl-jpa/src/main/resources/de/digitalcollections/cms/config/SpringConfigBackend-<profile>.properties
 
-        database.name=wms_db
+        database.name=dicocms
         database.hostname=localhost
         database.password=somepassword
         database.port=5432
-        database.username=wms
+        database.username=dico
 
 ## Build
 
 Build CMS:
 
-    $ cd <WMS source directory>
+    $ cd <dicoCMS source directory>
     $ mvn clean install
 
 ## Usage
 
 Run CMS (in development)
  
-    $ cd frontend
+    $ cd <dicoCMS source directory>/digitalcollections-cms-client/digitalcollections-cms-client-webapp
     $ mvn jetty:run
 
 Run CMS (in production)

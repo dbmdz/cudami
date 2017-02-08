@@ -23,7 +23,7 @@ public class SpringConfig implements EnvironmentAware {
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfig.class);
 
   /**
-   * Create a resource bundle for your messages ("messages.properties").<br/>
+   * Create a resource bundle for your messages ("messages.properties").<br>
    * This file goes in src/main/resources because you want it to appear at the root of the classpath on deployment.
    *
    * @return message source
@@ -31,7 +31,7 @@ public class SpringConfig implements EnvironmentAware {
   @Bean(name = "messageSource")
   public MessageSource configureMessageSource() {
     ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-    messageSource.setBasename("classpath:messages");
+    messageSource.setBasenames("classpath:messages", "classpath:messages-commons");
     messageSource.setCacheSeconds(5);
     messageSource.setDefaultEncoding("UTF-8");
     return messageSource;

@@ -108,6 +108,11 @@
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.cms</groupId>
+        <artifactId>digitalcollections-cms-client-business-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>de.digitalcollections.cms</groupId>
         <artifactId>digitalcollections-cms-model-api</artifactId>
         <version>${project.version}</version>
       </dependency>

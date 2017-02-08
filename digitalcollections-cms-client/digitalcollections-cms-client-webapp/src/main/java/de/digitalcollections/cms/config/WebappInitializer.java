@@ -9,6 +9,7 @@ import javax.servlet.ServletRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
+import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 /**
@@ -38,21 +39,13 @@ public class WebappInitializer extends AbstractAnnotationConfigDispatcherServlet
   protected Filter[] getServletFilters() {
     // FIXME remove this, when backend is replaced by rest client
     // jpa session
-//    OpenEntityManagerInViewFilter dzpAdminOpenEntityManagerInViewFilter = new OpenEntityManagerInViewFilter();
-//    dzpAdminOpenEntityManagerInViewFilter.setBeanName("dzp_admin");
-//    dzpAdminOpenEntityManagerInViewFilter.setEntityManagerFactoryBeanName("entityManagerFactoryDzpAdmin");
-//    dzpAdminOpenEntityManagerInViewFilter.setPersistenceUnitName("dzp_admin");
-//
-//    OpenEntityManagerInViewFilter cmonOpenEntityManagerInViewFilter = new OpenEntityManagerInViewFilter();
-//    cmonOpenEntityManagerInViewFilter.setBeanName("cmon");
-//    cmonOpenEntityManagerInViewFilter.setEntityManagerFactoryBeanName("entityManagerFactory");
-//    cmonOpenEntityManagerInViewFilter.setPersistenceUnitName("cmonPersistence");
+    OpenEntityManagerInViewFilter openEntityManagerInViewFilter = new OpenEntityManagerInViewFilter();
+    openEntityManagerInViewFilter.setEntityManagerFactoryBeanName("entityManagerFactory");
 
     // session id for logging, see log4j.xml
     final LogSessionIdFilter logSessionIdFilter = new LogSessionIdFilter();
 
-    return new Filter[]{logSessionIdFilter};
-    //, dzpAdminOpenEntityManagerInViewFilter, cmonOpenEntityManagerInViewFilter};
+    return new Filter[]{logSessionIdFilter, openEntityManagerInViewFilter};
   }
 
   @Override

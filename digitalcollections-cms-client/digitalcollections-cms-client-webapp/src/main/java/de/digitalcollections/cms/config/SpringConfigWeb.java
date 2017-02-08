@@ -78,7 +78,7 @@ public class SpringConfigWeb extends WebMvcConfigurerAdapter {
   @Bean
   public ClassLoaderTemplateResolver classLoaderTemplateResolver() {
     ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-    templateResolver.setPrefix("/org/mdz/common/frontend/webapp/thymeleaf/templates/");
+    templateResolver.setPrefix("/de/digitalcollections/commons/springmvc/thymeleaf/templates/");
     templateResolver.setSuffix(".html");
     templateResolver.setCharacterEncoding(ENCODING);
     templateResolver.setTemplateMode("HTML5");
