@@ -1,6 +1,7 @@
 package de.digitalcollections.cms.client.business.api.service;
 
 import de.digitalcollections.cms.client.business.api.service.exceptions.WebsiteServiceException;
+import de.digitalcollections.cms.model.api.entity.Category;
 import de.digitalcollections.cms.model.api.entity.Website;
 import java.io.Serializable;
 import java.util.List;
@@ -24,4 +25,6 @@ public interface WebsiteService<T extends Website, ID extends Serializable> {
   List<T> getAll();
 
 //  T find(UUID uuid);
+  
+  List<Category> getRootCategories(T website);
 }

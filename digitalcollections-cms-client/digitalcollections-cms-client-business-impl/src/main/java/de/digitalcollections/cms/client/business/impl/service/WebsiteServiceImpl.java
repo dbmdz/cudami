@@ -3,6 +3,7 @@ package de.digitalcollections.cms.client.business.impl.service;
 import de.digitalcollections.cms.client.backend.api.repository.WebsiteRepository;
 import de.digitalcollections.cms.client.business.api.service.WebsiteService;
 import de.digitalcollections.cms.client.business.api.service.exceptions.WebsiteServiceException;
+import de.digitalcollections.cms.model.api.entity.Category;
 import de.digitalcollections.cms.model.api.entity.Website;
 import java.util.List;
 import org.slf4j.Logger;
@@ -71,5 +72,10 @@ public class WebsiteServiceImpl implements WebsiteService<Website, Long> {
 //  }
   public void setWebsiteRepository(WebsiteRepository websiteRepository) {
     this.websiteRepository = websiteRepository;
+  }
+
+  @Override
+  public List<Category> getRootCategories(Website website) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 }
