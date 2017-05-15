@@ -12,9 +12,9 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <version.commons-dbcp2>2.1.1</version.commons-dbcp2>
-    <version.digitalcollections-commons-server>1.2.0</version.digitalcollections-commons-server>
-    <version.digitalcollections-commons-springaop>1.2.0</version.digitalcollections-commons-springaop>
-    <version.digitalcollections-commons-springmvc>1.2.0</version.digitalcollections-commons-springmvc>
+    <version.digitalcollections-commons-server>1.2.2-SNAPSHOT</version.digitalcollections-commons-server>
+    <version.digitalcollections-commons-springaop>1.2.2-SNAPSHOT</version.digitalcollections-commons-springaop>
+    <version.digitalcollections-commons-springmvc>1.2.2-SNAPSHOT</version.digitalcollections-commons-springmvc>
     <version.flyway-core>4.0.3</version.flyway-core>
     <version.gson>2.3.1</version.gson>
     <version.guava>20.0</version.guava>

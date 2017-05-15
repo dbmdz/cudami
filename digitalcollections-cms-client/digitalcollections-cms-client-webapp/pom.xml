@@ -51,20 +51,6 @@
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>digitalcollections-commons-server</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>ch.qos.logback</groupId>
-          <artifactId>logback-classic</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>ch.qos.logback</groupId>
-          <artifactId>logback-core</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>net.logstash.logback</groupId>
-          <artifactId>logstash-logback-encoder</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>

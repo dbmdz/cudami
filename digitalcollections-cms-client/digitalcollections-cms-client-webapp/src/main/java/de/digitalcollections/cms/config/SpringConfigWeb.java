@@ -7,16 +7,20 @@ import de.digitalcollections.cms.client.webapp.converter.GrantedAuthorityJsonFil
 import de.digitalcollections.cms.client.webapp.converter.UserJsonFilter;
 import de.digitalcollections.cms.client.webapp.interceptors.CreateAdminUserInterceptor;
 import de.digitalcollections.cms.model.api.security.User;
+import de.digitalcollections.commons.springmvc.config.SpringConfigCommonsMvc;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.http.MediaType;
@@ -53,6 +57,7 @@ import org.thymeleaf.templateresolver.TemplateResolver;
 @PropertySource(value = {
   "classpath:de/digitalcollections/cms/config/SpringConfigWeb-${spring.profiles.active:local}.properties"
 })
+@Import(SpringConfigCommonsMvc.class)
 public class SpringConfigWeb extends WebMvcConfigurerAdapter {
 
   static final String ENCODING = "UTF-8";
@@ -64,6 +69,10 @@ public class SpringConfigWeb extends WebMvcConfigurerAdapter {
 
   @Value("${cacheTemplates}")
   private boolean cacheTemplates;
+
+  @Autowired
+  @Qualifier("CommonsClasspathThymeleafResolver")
+  private ClassLoaderTemplateResolver commonsClasspathThymeleafResolver;
 
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -77,18 +86,6 @@ public class SpringConfigWeb extends WebMvcConfigurerAdapter {
   }
 
   @Bean
-  public ClassLoaderTemplateResolver classLoaderTemplateResolver() {
-    ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-    templateResolver.setPrefix("/de/digitalcollections/commons/springmvc/thymeleaf/templates/");
-    templateResolver.setSuffix(".html");
-    templateResolver.setCharacterEncoding(ENCODING);
-    templateResolver.setTemplateMode("HTML5");
-    templateResolver.setCacheable(cacheTemplates);
-    templateResolver.setOrder(1);
-    return templateResolver;
-  }
-
-  @Bean
   public TemplateResolver servletContextTemplateResolver() {
     ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver();
     templateResolver.setPrefix("/WEB-INF/templates/");
@@ -96,15 +93,18 @@ public class SpringConfigWeb extends WebMvcConfigurerAdapter {
     templateResolver.setCharacterEncoding(ENCODING);
     templateResolver.setTemplateMode("HTML5");
     templateResolver.setCacheable(cacheTemplates);
-    templateResolver.setOrder(2);
     return templateResolver;
   }
 
   @Bean
   public SpringTemplateEngine templateEngine() {
     SpringTemplateEngine templateEngine = new SpringTemplateEngine();
-    templateEngine.addTemplateResolver(classLoaderTemplateResolver());
-    templateEngine.addTemplateResolver(servletContextTemplateResolver());
+    commonsClasspathThymeleafResolver.setOrder(1);
+    final TemplateResolver servletContextTemplateResolver = servletContextTemplateResolver();
+    servletContextTemplateResolver.setOrder(2);
+
+    templateEngine.addTemplateResolver(commonsClasspathThymeleafResolver);
+    templateEngine.addTemplateResolver(servletContextTemplateResolver);
     // Activate Thymeleaf LayoutDialect[1] (for 'layout'-namespace)
     // [1] https://github.com/ultraq/thymeleaf-layout-dialect
     templateEngine.addDialect(new LayoutDialect());
