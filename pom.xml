@@ -43,6 +43,7 @@
     <version.thymeleaf-extras-springsecurity4>2.1.2.RELEASE</version.thymeleaf-extras-springsecurity4> <!-- TODO Upgrade -->
     <version.thymeleaf-layout-dialect>1.2.9</version.thymeleaf-layout-dialect> <!-- TODO Upgrade -->
     <version.thymeleaf-spring4>2.1.4.RELEASE</version.thymeleaf-spring4> <!-- TODO Upgrade -->
+    <version.unbescape>1.1.4.RELEASE</version.unbescape>
     <version.validation-api>1.0.0.GA</version.validation-api> <!-- TODO Upgrade -->
     
     <!-- webjars -->
@@ -288,6 +289,11 @@
         <groupId>org.thymeleaf.extras</groupId>
         <artifactId>thymeleaf-extras-springsecurity4</artifactId>
         <version>${version.thymeleaf-extras-springsecurity4}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.unbescape</groupId>
+        <artifactId>unbescape</artifactId>
+        <version>${version.unbescape}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
