@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <artifactId>digitalcollections-cms-server</artifactId>
+    <groupId>de.digitalcollections.cms</groupId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>de.digitalcollections.cms</groupId>
+  <artifactId>server-webapp</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>war</packaging>
+
+  <name>DigitalCollections: CMS Server (Webapp)</name>
+
+  <properties>
+    <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+    
+  <dependencies>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.1.8</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-core</artifactId>
+      <version>1.1.8</version>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.cms</groupId>
+      <artifactId>digitalcollections-cms-server-backend-impl-neo4j</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.cms</groupId>
+      <artifactId>digitalcollections-cms-server-business-api</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.cms</groupId>
+      <artifactId>digitalcollections-cms-server-business-impl</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>3.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>net.logstash.logback</groupId>
+      <artifactId>logstash-logback-encoder</artifactId>
+      <version>4.8</version>
+    </dependency>
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjweaver</artifactId>
+      <version>1.8.9</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.logback-extensions</groupId>
+      <artifactId>logback-ext-spring</artifactId>
+      <version>0.1.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.22</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-webmvc</artifactId>
+      <version>4.3.4.RELEASE</version>
+    </dependency>
+  </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.3</version>
+        <configuration>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>9.4.0.v20161208</version>
+        <configuration>
+          <classesDirectory>${project.build.directory}/classes</classesDirectory>
+          <scanIntervalSeconds>2</scanIntervalSeconds>
+          <webApp>
+            <contextPath>/cms</contextPath>
+            <allowDuplicateFragmentNames>true</allowDuplicateFragmentNames>
+            <resourceBases>
+              <resourceBase>src/main/webapp</resourceBase>
+              <!--<resourceBase>${project.build.directory}/${project.build.finalName}</resourceBase>-->
+            </resourceBases>
+            <webInfIncludeJarPattern>.*/.*(spring-security-web|spring-webmvc|spring-web).*\.jar$</webInfIncludeJarPattern>
+          </webApp>
+          <systemProperties>
+            <systemProperty>
+              <name>spring.profiles.active</name>
+              <value>local</value>
+            </systemProperty>
+          </systemProperties>
+          <httpConnector>
+            <port>8080</port>
+          </httpConnector>
+          <!--          <stopKey>foo</stopKey>
+          <stopPort>9000</stopPort>-->
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
+</project>
