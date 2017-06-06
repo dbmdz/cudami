@@ -7,6 +7,7 @@ import java.util.List;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import de.digitalcollections.cms.model.api.entity.ContentNode;
+import de.digitalcollections.cms.model.api.entity.IiifContent;
 import de.digitalcollections.cms.model.api.entity.TextContent;
 
 @NodeEntity(label = "Category")
@@ -79,6 +80,16 @@ public class CategoryImpl extends EntityImpl implements ContentNode<Long> {
 
   @Override
   public void setBinaryContents(List<BinaryContent> binaryContents) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
+  public List<IiifContent> getIiifContents() {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
+  public void setIiifContents(List<IiifContent> iiifContents) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 }

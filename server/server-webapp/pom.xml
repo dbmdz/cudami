@@ -3,133 +3,181 @@
   <modelVersion>4.0.0</modelVersion>
   
   <parent>
-    <artifactId>digitalcollections-cms-server</artifactId>
     <groupId>de.digitalcollections.cms</groupId>
+    <artifactId>server</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
   <groupId>de.digitalcollections.cms</groupId>
   <artifactId>server-webapp</artifactId>
   <version>1.0.0-SNAPSHOT</version>
-  <packaging>war</packaging>
+  <packaging>jar</packaging>
 
   <name>DigitalCollections: CMS Server (Webapp)</name>
 
   <properties>
-    <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
+    <!-- The spring-boot-starter-parent chooses fairly conservative Java compatibility. If you want to follow our recommendation and use a later Java version you can add a java.version property -->
+    <java.version>1.8</java.version>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+    <version.jsondoc-ui-webjar>1.2.17</version.jsondoc-ui-webjar>
+    <version.spring-boot-starter-jsondoc>1.2.17</version.spring-boot-starter-jsondoc>
+        
+<!--    <version.logstash-logback-encoder>4.8</version.logstash-logback-encoder>
+    <version.spring-boot>1.5.1.RELEASE</version.spring-boot>-->
     
+    <!-- plugins -->
+    <!--<version.exec-maven-plugin>1.5.0</version.exec-maven-plugin>-->
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <!-- Import dependency management from Spring Boot -->
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>1.5.3.RELEASE</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.1.8</version>
+      <groupId>de.digitalcollections.blueprints</groupId>
+      <artifactId>model</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-core</artifactId>
-      <version>1.1.8</version>
+      <groupId>org.jsondoc</groupId>
+      <artifactId>jsondoc-ui-webjar</artifactId>
+      <version>${version.jsondoc-ui-webjar}</version>
     </dependency>
     <dependency>
-      <groupId>de.digitalcollections.cms</groupId>
-      <artifactId>digitalcollections-cms-server-backend-impl-neo4j</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
-      <scope>runtime</scope>
+      <groupId>org.jsondoc</groupId>
+      <artifactId>spring-boot-starter-jsondoc</artifactId>
+      <version>${version.spring-boot-starter-jsondoc}</version>
     </dependency>
     <dependency>
-      <groupId>de.digitalcollections.cms</groupId>
-      <artifactId>digitalcollections-cms-server-business-api</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
     <dependency>
-      <groupId>de.digitalcollections.cms</groupId>
-      <artifactId>digitalcollections-cms-server-business-impl</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
-      <scope>runtime</scope>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <version>3.1.0</version>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-hateoas</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>hal-browser</artifactId>
+    </dependency>
+  </dependencies>
+  
+<!--  <dependencies>
     <dependency>
       <groupId>net.logstash.logback</groupId>
       <artifactId>logstash-logback-encoder</artifactId>
-      <version>4.8</version>
-    </dependency>
-    <dependency>
-      <groupId>org.aspectj</groupId>
-      <artifactId>aspectjweaver</artifactId>
-      <version>1.8.9</version>
+      <version>${version.logstash-logback-encoder}</version>
       <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.logback-extensions</groupId>
-      <artifactId>logback-ext-spring</artifactId>
-      <version>0.1.4</version>
+      <exclusions>
+        <exclusion>
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-core</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.7.22</version>
     </dependency>
     <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-webmvc</artifactId>
-      <version>4.3.4.RELEASE</version>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-dependencies</artifactId>
+      <version>${version.spring-boot}</version>
+      <type>pom</type>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-autoconfigure</artifactId>
+      <version>${version.spring-boot}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <version>${version.spring-boot}</version>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
   
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>${version.exec-maven-plugin}</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>
-        <version>2.3</version>
-        <configuration>
-          <failOnMissingWebXml>false</failOnMissingWebXml>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-maven-plugin</artifactId>
-        <version>9.4.0.v20161208</version>
-        <configuration>
-          <classesDirectory>${project.build.directory}/classes</classesDirectory>
-          <scanIntervalSeconds>2</scanIntervalSeconds>
-          <webApp>
-            <contextPath>/cms</contextPath>
-            <allowDuplicateFragmentNames>true</allowDuplicateFragmentNames>
-            <resourceBases>
-              <resourceBase>src/main/webapp</resourceBase>
-              <!--<resourceBase>${project.build.directory}/${project.build.finalName}</resourceBase>-->
-            </resourceBases>
-            <webInfIncludeJarPattern>.*/.*(spring-security-web|spring-webmvc|spring-web).*\.jar$</webInfIncludeJarPattern>
-          </webApp>
+          <mainClass>de.digitalcollections.template.rest.server.frontend.impl.springboot.Application</mainClass>
           <systemProperties>
             <systemProperty>
-              <name>spring.profiles.active</name>
+              <key>spring.profiles.active</key>
               <value>local</value>
             </systemProperty>
           </systemProperties>
-          <httpConnector>
-            <port>8080</port>
-          </httpConnector>
-          <!--          <stopKey>foo</stopKey>
-          <stopPort>9000</stopPort>-->
         </configuration>
       </plugin>
     </plugins>
+  </build>-->
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.7</version>
+        <configuration>
+          <delimiters>
+            <delimiter>@</delimiter>
+          </delimiters>
+          <useDefaultDelimiters>false</useDefaultDelimiters>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.6.1</version>
+        <configuration>
+          <source>${maven.compiler.source}</source>
+          <target>${maven.compiler.target}</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>1.5.3.RELEASE</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
-  
 </project>

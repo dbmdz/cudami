@@ -1,0 +1,55 @@
+spring:
+  profiles:
+    active: local
+
+# Activate /actuator
+endpoints:
+  hypermedia:
+    enabled: true
+
+# Application info /info
+info:
+  app:
+    encoding: @project.build.sourceEncoding@
+    java:
+      source: @maven.compiler.source@
+      target: @maven.compiler.target@
+    project:
+      name: '@project.name@'
+      groupId: @project.groupId@
+      artifactId: @project.artifactId@
+      version: @project.version@
+
+# mandatory configuration
+jsondoc:
+  version: 1.0
+  packages[0]: de.digitalcollections.cms.server.webapp.controller
+  #packages[1]: com.example.model
+  # optional configuration
+  playgroundEnabled: true
+  displayMethodAs: URI
+
+# Deactivate security for sensitive actuator endpoints (DO NOT USE ON A PUBLIC ACCESSIBLE SYSTEM!!!)
+management:
+  port: 9001
+
+server:
+  port: 9000
+---
+
+spring:
+  profiles: local
+jsondoc:
+  basePath: http://localhost:9000
+management:
+  security:
+    enabled: false
+---
+
+spring:
+  profiles: PROD
+jsondoc:
+  basePath: https://www.myrestserver.com:9000
+management:
+  security:
+    enabled: true

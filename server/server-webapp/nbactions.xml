@@ -1,13 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actions>
         <action>
-            <actionName>CUSTOM-mvn jetty:run (debug, 8080/cms)</actionName>
-            <displayName>mvn jetty:run (debug, 8080/cms)</displayName>
+            <actionName>run</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
             <goals>
-                <goal>jetty:run</goal>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <jpda.listen>maven</jpda.listen>
+                <exec.args>-classpath %classpath de.digitalcollections.cms.server.webapp.Application</exec.args>
+                <exec.executable>java</exec.executable>
+                
+                
+                
+            </properties>
+        </action>
+        <action>
+            <actionName>debug</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath de.digitalcollections.blueprints.rest.server.frontend.impl.springboot.Application</exec.args>
+                <exec.executable>java</exec.executable>
+                <jpda.listen>true</jpda.listen>
+            </properties>
+        </action>
+        <action>
+            <actionName>profile</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath de.digitalcollections.blueprints.rest.server.frontend.impl.springboot.Application</exec.args>
+                <exec.executable>java</exec.executable>
             </properties>
         </action>
     </actions>

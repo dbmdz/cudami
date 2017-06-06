@@ -48,4 +48,14 @@ public interface ContentNode<ID extends Serializable> extends Entity<ID> {
     getBinaryContents().add(binaryContent);
   }
 
+  List<IiifContent> getIiifContents();
+
+  void setIiifContents(List<IiifContent> iiifContents);
+
+  default void addIiifContent(IiifContent iiifContent) {
+    if (getIiifContents() == null) {
+      setIiifContents(new ArrayList<>());
+    }
+    getIiifContents().add(iiifContent);
+  }
 }

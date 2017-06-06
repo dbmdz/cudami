@@ -2,6 +2,7 @@ package de.digitalcollections.cms.model.impl.entity;
 
 import de.digitalcollections.cms.model.api.entity.BinaryContent;
 import de.digitalcollections.cms.model.api.entity.ContentNode;
+import de.digitalcollections.cms.model.api.entity.IiifContent;
 import de.digitalcollections.cms.model.api.entity.TextContent;
 import java.io.Serializable;
 import java.util.List;
@@ -10,6 +11,7 @@ public class ContentNodeImpl<ID extends Serializable> extends EntityImpl<ID> imp
 
   private ContentNode parent;
   private List<ContentNode> children;
+  private List<IiifContent> iiifContents;
   private List<TextContent> textContents;
   private List<BinaryContent> binaryContents;
 
@@ -51,6 +53,16 @@ public class ContentNodeImpl<ID extends Serializable> extends EntityImpl<ID> imp
   @Override
   public void setBinaryContents(List<BinaryContent> binaryContents) {
     this.binaryContents = binaryContents;
+  }
+
+  @Override
+  public List<IiifContent> getIiifContents() {
+    return iiifContents;
+  }
+
+  @Override
+  public void setIiifContents(List<IiifContent> iiifContents) {
+    this.iiifContents = iiifContents;
   }
 
 }
