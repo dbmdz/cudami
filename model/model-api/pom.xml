@@ -4,12 +4,13 @@
   
   <parent>
     <groupId>de.digitalcollections.cms</groupId>
-    <artifactId>digitalcollections-cms-model</artifactId>
+    <artifactId>model</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
   
   <name>DigitalCollections: CMS Model (Model API)</name>
-  <artifactId>digitalcollections-cms-model-api</artifactId>
+  <groupId>de.digitalcollections.cms</groupId>
+  <artifactId>model-api</artifactId>
   <packaging>jar</packaging>
   
   <properties>
@@ -27,14 +28,13 @@
       <artifactId>iiif-image-model-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-core</artifactId>
-    </dependency>
-    <dependency>
       <groupId>de.digitalcollections</groupId>
       <artifactId>iiif-presentation-model-api</artifactId>
       <version>3.2.5-SNAPSHOT</version>
-      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-core</artifactId>
     </dependency>
   </dependencies>
 </project>

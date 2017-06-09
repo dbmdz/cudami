@@ -4,16 +4,16 @@
 
   <parent>
     <groupId>de.digitalcollections.cms</groupId>
-    <artifactId>digitalcollections-cms-client</artifactId>
+    <artifactId>client</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
+  <name>DigitalCollections: CMS Client (Webapp)</name>
   <groupId>de.digitalcollections.cms</groupId>
   <artifactId>client-webapp</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>war</packaging>
 
-  <name>DigitalCollections: CMS Client (Webapp)</name>
 
   <properties>
     <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
@@ -27,26 +27,26 @@
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cms</groupId>
-      <artifactId>digitalcollections-cms-client-backend-api</artifactId>
+      <artifactId>client-backend-api</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+<!--    <dependency>
+      <groupId>de.digitalcollections.cms</groupId>
+      <artifactId>client-backend-impl-jpa</artifactId>
+      <scope>runtime</scope>
+    </dependency>-->
+    <dependency>
+      <groupId>de.digitalcollections.cms</groupId>
+      <artifactId>client-business-impl</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cms</groupId>
-      <artifactId>digitalcollections-cms-client-backend-impl-jpa</artifactId>
-      <scope>runtime</scope>
+      <artifactId>client-business-api</artifactId>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cms</groupId>
-      <artifactId>digitalcollections-cms-client-business-impl</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>de.digitalcollections.cms</groupId>
-      <artifactId>digitalcollections-cms-client-business-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>de.digitalcollections.cms</groupId>
-      <artifactId>digitalcollections-cms-model-api</artifactId>
+      <artifactId>model-api</artifactId>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>

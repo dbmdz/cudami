@@ -4,7 +4,7 @@
 
   <name>DigitalCollections: CMS</name>
   <groupId>de.digitalcollections.cms</groupId>
-  <artifactId>digitalcollections-cms</artifactId>
+  <artifactId>parent</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
@@ -121,32 +121,32 @@
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.cms</groupId>
-        <artifactId>digitalcollections-cms-client-backend-api</artifactId>
+        <artifactId>client-backend-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.cms</groupId>
-        <artifactId>digitalcollections-cms-client-backend-impl-jpa</artifactId>
+        <artifactId>client-backend-impl-jpa</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.cms</groupId>
-        <artifactId>digitalcollections-cms-client-business-api</artifactId>
+        <artifactId>client-business-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.cms</groupId>
-        <artifactId>digitalcollections-cms-client-business-impl</artifactId>
+        <artifactId>client-business-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.cms</groupId>
-        <artifactId>digitalcollections-cms-model-api</artifactId>
+        <artifactId>model-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.cms</groupId>
-        <artifactId>digitalcollections-cms-model-impl</artifactId>
+        <artifactId>model-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

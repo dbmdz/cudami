@@ -4,11 +4,12 @@
   
   <parent>
     <groupId>de.digitalcollections.cms</groupId>
-    <artifactId>digitalcollections-cms-client</artifactId>
+    <artifactId>client</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
   
   <name>DigitalCollections: CMS Client (Business IMPL)</name>
+  <groupId>de.digitalcollections.cms</groupId>
   <artifactId>client-business-impl</artifactId>
   <packaging>jar</packaging>
   
@@ -20,15 +21,15 @@
   <dependencies>
     <dependency>
       <groupId>de.digitalcollections.cms</groupId>
-      <artifactId>digitalcollections-cms-client-backend-api</artifactId>
+      <artifactId>client-backend-api</artifactId>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cms</groupId>
-      <artifactId>digitalcollections-cms-client-business-api</artifactId>
+      <artifactId>client-business-api</artifactId>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cms</groupId>
-      <artifactId>digitalcollections-cms-model-impl</artifactId>
+      <artifactId>model-impl</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

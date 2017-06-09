@@ -8,12 +8,11 @@
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
+  <name>DigitalCollections: CMS Server (Webapp)</name>
   <groupId>de.digitalcollections.cms</groupId>
   <artifactId>server-webapp</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
-
-  <name>DigitalCollections: CMS Server (Webapp)</name>
 
   <properties>
     <!-- The spring-boot-starter-parent chooses fairly conservative Java compatibility. If you want to follow our recommendation and use a later Java version you can add a java.version property -->
@@ -80,6 +79,18 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>hal-browser</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.cms</groupId>
+      <artifactId>model-api</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.cms</groupId>
+      <artifactId>client-business-api</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <type>jar</type>
     </dependency>
   </dependencies>
   

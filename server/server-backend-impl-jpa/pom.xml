@@ -4,11 +4,12 @@
   
   <parent>
     <groupId>de.digitalcollections.cms</groupId>
-    <artifactId>digitalcollections-cms-client</artifactId>
+    <artifactId>server</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
   
   <name>DigitalCollections: CMS Server (Backend IMPL JPA)</name>
+  <groupId>de.digitalcollections.cms</groupId>
   <artifactId>server-backend-impl-jpa</artifactId>
   <packaging>jar</packaging>
   
@@ -37,11 +38,11 @@
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cms</groupId>
-      <artifactId>digitalcollections-cms-client-backend-api</artifactId>
+      <artifactId>client-backend-api</artifactId>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cms</groupId>
-      <artifactId>digitalcollections-cms-model-api</artifactId>
+      <artifactId>model-api</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
