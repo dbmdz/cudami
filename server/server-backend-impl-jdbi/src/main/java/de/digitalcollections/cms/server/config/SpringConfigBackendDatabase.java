@@ -1,4 +1,4 @@
-package de.digitalcollections.cms.config;
+package de.digitalcollections.cms.server.config;
 
 import de.digitalcollections.cms.server.backend.impl.jdbi.FooRepository;
 import java.util.Collections;
@@ -54,7 +54,7 @@ public class SpringConfigBackendDatabase {
   public Flyway flyway() {
     Flyway flyway = new Flyway();
     flyway.setDataSource(pooledDataSource()); // could be another datasource with different user/pwd...
-    flyway.setLocations("classpath:/de/digitalcollections/cms/client/backend/impl/database/migration");
+    flyway.setLocations("classpath:/de/digitalcollections/cms/server/backend/impl/database/migration");
     flyway.setBaselineOnMigrate(true);
     return flyway;
   }

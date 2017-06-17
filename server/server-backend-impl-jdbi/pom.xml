@@ -27,6 +27,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>de.digitalcollections.cms</groupId>
+      <artifactId>server-backend-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-dbcp2</artifactId>
     </dependency>

@@ -1,4 +1,4 @@
-package de.digitalcollections.cms.config;
+package de.digitalcollections.cms.server.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,9 +14,9 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
  */
 @Configuration
 @Import({SpringConfigBackendDatabase.class})
-@ComponentScan(basePackages = {
-  "de.digitalcollections.cms.client.backend.impl.jpa.repository"
-})
+//@ComponentScan(basePackages = {
+//  "de.digitalcollections.cms.client.backend.impl.jpa.repository"
+//})
 @PropertySource(value = {
   "classpath:de/digitalcollections/cms/config/SpringConfigBackend-${spring.profiles.active:local}.properties"
 })
