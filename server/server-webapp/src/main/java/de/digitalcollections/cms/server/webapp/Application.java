@@ -17,11 +17,9 @@ import org.springframework.context.annotation.ComponentScan;
  - Normally you would add @EnableWebMvc for a Spring MVC app, but Spring Boot adds it automatically when it sees spring-webmvc on the classpath. This flags the application as a web application and activates key behaviors such as setting up a DispatcherServlet.
  - @ComponentScan tells Spring to look for other components, configurations, and services in the current package (and subpackages), allowing it to find controllers, too.
  */
-@ComponentScan(
-        basePackages = {
-          "de.digitalcollections.cms.server.webapp.controller"
-        }
-)
+@ComponentScan(basePackages = {
+  "de.digitalcollections.cms.server.config"
+})
 public class Application {
 
 //  private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
