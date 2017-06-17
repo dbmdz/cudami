@@ -156,7 +156,17 @@
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.cms</groupId>
+        <artifactId>server-backend-impl-jdbi</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>de.digitalcollections.cms</groupId>
         <artifactId>server-business-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>de.digitalcollections.cms</groupId>
+        <artifactId>server-business-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
