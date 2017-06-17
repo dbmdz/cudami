@@ -150,6 +150,11 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
+        <groupId>de.digitalcollections.cms</groupId>
+        <artifactId>server-business-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
         <groupId>de.digitalcollections.commons</groupId>
         <artifactId>digitalcollections-commons-server</artifactId>
         <version>${version.digitalcollections-commons-server}</version>

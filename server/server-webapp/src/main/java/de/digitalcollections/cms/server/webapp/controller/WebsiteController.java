@@ -1,6 +1,6 @@
 package de.digitalcollections.cms.server.webapp.controller;
 
-import de.digitalcollections.cms.client.business.api.service.WebsiteService;
+import de.digitalcollections.cms.server.business.api.service.WebsiteService;
 import de.digitalcollections.cms.model.api.entity.Website;
 import java.util.List;
 import org.jsondoc.core.annotation.Api;
