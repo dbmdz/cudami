@@ -20,6 +20,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    
     <version.jsondoc-ui-webjar>1.2.17</version.jsondoc-ui-webjar>
     <version.spring-boot-starter-jsondoc>1.2.17</version.spring-boot-starter-jsondoc>
         
@@ -44,11 +45,6 @@
   </dependencyManagement>
 
   <dependencies>
-    <dependency>
-      <groupId>de.digitalcollections.blueprints</groupId>
-      <artifactId>model</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.jsondoc</groupId>
       <artifactId>jsondoc-ui-webjar</artifactId>
