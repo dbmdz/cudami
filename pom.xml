@@ -15,7 +15,7 @@
     <version.digitalcollections-commons-server>1.2.2</version.digitalcollections-commons-server>
     <version.digitalcollections-commons-springaop>1.2.2</version.digitalcollections-commons-springaop>
     <version.digitalcollections-commons-springmvc>1.2.2</version.digitalcollections-commons-springmvc>
-    <version.digitalcollections-core-model-api>1.2.5-SNAPSHOT</version.digitalcollections-core-model-api>
+    <version.digitalcollections-core-model-api>1.2.5</version.digitalcollections-core-model-api>
     <version.flyway-core>4.0.3</version.flyway-core>
     <version.gson>2.3.1</version.gson>
     <version.guava>20.0</version.guava>
