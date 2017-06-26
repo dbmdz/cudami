@@ -24,6 +24,7 @@
     <version.hibernate-entitymanager>4.3.10.Final</version.hibernate-entitymanager> <!-- TODO Upgrade -->
     <version.hibernate-validator>4.3.2.Final</version.hibernate-validator> <!-- TODO Upgrade -->
     <version.iiif-image-model-api>2.2.6-SNAPSHOT</version.iiif-image-model-api>
+    <version.iiif-presentation-model-api>3.2.5</version.iiif-presentation-model-api>
     <version.javax.servlet-api>3.1.0</version.javax.servlet-api>
     <version.junit>4.12</version.junit>
     <version.mockito-core>1.10.19</version.mockito-core>
@@ -118,6 +119,11 @@
         <groupId>de.digitalcollections</groupId>
         <artifactId>iiif-image-model-api</artifactId>
         <version>${version.iiif-image-model-api}</version>
+      </dependency>
+      <dependency>
+        <groupId>de.digitalcollections</groupId>
+        <artifactId>iiif-presentation-model-api</artifactId>
+        <version>${version.iiif-presentation-model-api}</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.cms</groupId>

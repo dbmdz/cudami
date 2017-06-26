@@ -30,7 +30,6 @@
     <dependency>
       <groupId>de.digitalcollections</groupId>
       <artifactId>iiif-presentation-model-api</artifactId>
-      <version>3.2.5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
