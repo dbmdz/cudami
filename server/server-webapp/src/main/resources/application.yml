@@ -34,13 +34,13 @@ management:
   port: 9001
 
 server:
-  port: 9000
+  port: 8080
 ---
 
 spring:
   profiles: local
 jsondoc:
-  basePath: http://localhost:9000
+  basePath: http://localhost:8080
 management:
   security:
     enabled: false
@@ -49,7 +49,7 @@ management:
 spring:
   profiles: PROD
 jsondoc:
-  basePath: https://www.myrestserver.com:9000
+  basePath: https://www.myrestserver.com:8080
 management:
   security:
     enabled: true

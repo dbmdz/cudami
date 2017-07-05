@@ -10,7 +10,7 @@ public class EntityImpl<ID extends Serializable> implements Entity<ID> {
 
   private ID id;
   private Text label;
-  private Date lastModified;
+  private Date lastModified = new Date();
   private String uuid = UUID.randomUUID().toString();
 
   @Override

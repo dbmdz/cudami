@@ -12,6 +12,15 @@ public class WebsiteImpl<ID extends Serializable> extends EntityImpl<ID> impleme
   private String title;
   private URL url;
 
+  public WebsiteImpl() {
+  }
+
+  public WebsiteImpl(List<ContentNode> rootNodes, String title, URL url) {
+    this.rootNodes = rootNodes;
+    this.title = title;
+    this.url = url;
+  }
+
   @Override
   public URL getUrl() {
     return url;

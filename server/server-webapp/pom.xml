@@ -37,7 +37,7 @@
         <!-- Import dependency management from Spring Boot -->
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>1.5.3.RELEASE</version>
+        <version>1.5.4.RELEASE</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -49,9 +49,15 @@
       <groupId>de.digitalcollections.cms</groupId>
       <artifactId>model-api</artifactId>
     </dependency>
-    <dependency>
+<!--    <dependency>
       <groupId>de.digitalcollections.cms</groupId>
       <artifactId>server-backend-impl-jdbi</artifactId>
+      <scope>runtime</scope>
+    </dependency>-->
+    <dependency>
+      <groupId>de.digitalcollections.cms</groupId>
+      <artifactId>server-backend-impl-mock</artifactId>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -187,7 +193,7 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>1.5.3.RELEASE</version>
+        <version>1.5.4.RELEASE</version>
         <executions>
           <execution>
             <goals>

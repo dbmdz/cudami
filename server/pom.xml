@@ -21,5 +21,6 @@
     <module>server-business-impl</module>
     <module>server-webapp</module>
     <module>server-backend-impl-jdbi</module>
+    <module>server-backend-impl-mock</module>
   </modules>
 </project>

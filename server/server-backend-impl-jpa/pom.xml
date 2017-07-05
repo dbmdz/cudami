@@ -38,11 +38,11 @@
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cms</groupId>
-      <artifactId>client-backend-api</artifactId>
+      <artifactId>model-api</artifactId>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cms</groupId>
-      <artifactId>model-api</artifactId>
+      <artifactId>server-backend-api</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -133,9 +133,9 @@
           </execution>
         </executions>
         <configuration>
-          <mainClass>de.digitalcollections.cms.client.backend.impl.database.SchemaGenerator</mainClass>
+          <mainClass>de.digitalcollections.cms.server.backend.impl.database.SchemaGenerator</mainClass>
           <arguments>
-            <argument>de.digitalcollections.cms.client.backend.impl.jpa.entity</argument>
+            <argument>de.digitalcollections.cms.server.backend.impl.jpa.entity</argument>
             <argument>${project.basedir}/src/main/resources/sql/generated/</argument>
           </arguments>
         </configuration>

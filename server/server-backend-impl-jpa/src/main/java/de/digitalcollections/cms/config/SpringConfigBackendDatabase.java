@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @Configuration
 @EnableJpaRepositories(basePackages = {
-  "de.digitalcollections.cms.client.backend.impl.jpa.repository"
+  "de.digitalcollections.cms.server.backend.impl.jpa.repository"
 })
 @EnableTransactionManagement
 public class SpringConfigBackendDatabase {
@@ -61,7 +61,7 @@ public class SpringConfigBackendDatabase {
     LocalContainerEntityManagerFactoryBean lemfb = new LocalContainerEntityManagerFactoryBean();
     lemfb.setDataSource(pooledDataSource());
     lemfb.setPersistenceProvider(new HibernatePersistenceProvider());
-    lemfb.setPackagesToScan("de.digitalcollections.cms.client.backend.impl.jpa.entity");
+    lemfb.setPackagesToScan("de.digitalcollections.cms.server.backend.impl.jpa.entity");
     lemfb.setJpaVendorAdapter(jpaVendorAdapter());
     lemfb.setJpaProperties(jpaProperties());
     return lemfb;
@@ -71,7 +71,7 @@ public class SpringConfigBackendDatabase {
   public Flyway flyway() {
     Flyway flyway = new Flyway();
     flyway.setDataSource(pooledDataSource()); // could be another datasource with different user/pwd...
-    flyway.setLocations("classpath:/de/digitalcollections/cms/client/backend/impl/database/migration");
+    flyway.setLocations("classpath:/de/digitalcollections/cms/server/backend/impl/database/migration");
     flyway.setBaselineOnMigrate(true);
     return flyway;
   }

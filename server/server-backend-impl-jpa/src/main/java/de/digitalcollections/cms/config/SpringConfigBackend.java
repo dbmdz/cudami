@@ -15,7 +15,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 @Configuration
 @Import({SpringConfigBackendDatabase.class})
 @ComponentScan(basePackages = {
-  "de.digitalcollections.cms.client.backend.impl.jpa.repository"
+  "de.digitalcollections.cms.server.backend.impl.jpa.repository"
 })
 @PropertySource(value = {
   "classpath:de/digitalcollections/cms/config/SpringConfigBackend-${spring.profiles.active:local}.properties"

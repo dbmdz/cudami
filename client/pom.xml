@@ -18,5 +18,6 @@
     <module>client-business-api</module>
     <module>client-business-impl</module>
     <module>client-webapp</module>
+    <module>client-backend-impl-rest</module>
   </modules>
 </project>
