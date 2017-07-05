@@ -7,15 +7,16 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**
  * Repository for User persistence handling.
+ * @param <T> implementation of User interface
  */
-public interface UserRepository extends PagingAndSortingRepository<User, Long> {
+public interface UserRepository<T extends User> extends PagingAndSortingRepository<T, Long> {
 
   User create();
 
   @Override
-  List<User> findAll(Sort sort);
+  List<T> findAll(Sort sort);
 
-  User findByEmail(String email);
+  T findByEmail(String email);
 
-  List<User> findActiveAdminUsers();
+  List<T> findActiveAdminUsers();
 }

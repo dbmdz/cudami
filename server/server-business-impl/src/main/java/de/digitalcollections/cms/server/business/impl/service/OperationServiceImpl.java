@@ -21,4 +21,8 @@ public class OperationServiceImpl implements OperationService<Operation, Long> {
     return operationRepository.findAll(new Sort(Sort.Direction.ASC, "name"));
   }
 
+  @Override
+  public Operation findByName(String name) {
+    return operationRepository.findByName(name);
+  }
 }

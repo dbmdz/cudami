@@ -7,13 +7,14 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**
  * Repository for Website persistence handling.
+ * @param <T> implementation of Website interface
  */
-public interface WebsiteRepository extends PagingAndSortingRepository<Website, Long> {
+public interface WebsiteRepository<T extends Website> extends PagingAndSortingRepository<T, Long> {
 
-  Website create();
+  T create();
 
   @Override
-  List<Website> findAll(Sort sort);
+  List<T> findAll(Sort sort);
 
 //  T find(UUID uuid);
 }

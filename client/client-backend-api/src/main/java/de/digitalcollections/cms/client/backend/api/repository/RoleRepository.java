@@ -7,14 +7,15 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**
  * Repository for Role persistence handling.
+ * @param <T> implementation of Role interface
  */
-public interface RoleRepository extends PagingAndSortingRepository<Role, Long> {
+public interface RoleRepository<T extends Role> extends PagingAndSortingRepository<T, Long> {
 
-  Role create();
+  T create();
 
   @Override
-  List<Role> findAll(Sort sort);
+  List<T> findAll(Sort sort);
 
-  Role findByName(String name);
+  T findByName(String name);
 
 }

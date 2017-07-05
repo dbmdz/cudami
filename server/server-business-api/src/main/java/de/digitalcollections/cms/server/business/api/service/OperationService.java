@@ -10,5 +10,7 @@ import java.util.List;
  */
 public interface OperationService<T extends Operation, ID extends Serializable> {
 
+  public T findByName(String name);
+
   List<T> getAll();
 }

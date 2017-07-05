@@ -7,13 +7,14 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**
  * Repository for Operation persistence handling.
+ * @param <T> implementation of Operation interface
  */
-public interface OperationRepository extends PagingAndSortingRepository<Operation, Long> {
+public interface OperationRepository<T extends Operation> extends PagingAndSortingRepository<T, Long> {
 
-  Operation create();
+  T create();
 
   @Override
-  List<Operation> findAll(Sort sort);
+  List<T> findAll(Sort sort);
 
-  Operation findByName(String name);
+  T findByName(String name);
 }

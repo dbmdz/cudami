@@ -1,7 +1,7 @@
 package de.digitalcollections.cms.client.backend.impl.repository;
 
 import de.digitalcollections.cms.client.backend.api.repository.RoleRepository;
-import de.digitalcollections.cms.model.api.security.Role;
+import de.digitalcollections.cms.model.impl.security.RoleImpl;
 import feign.Feign;
 import feign.gson.GsonDecoder;
 import java.util.List;
@@ -11,44 +11,44 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class RoleRepositoryImpl implements RoleRepository {
+public class RoleRepositoryImpl implements RoleRepository<RoleImpl> {
 
   private final RoleRepositoryEndpoint endpoint = Feign.builder()
           .decoder(new GsonDecoder())
           .target(RoleRepositoryEndpoint.class, "http://localhost:8080");
 
   @Override
-  public Role create() {
+  public RoleImpl create() {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public List<Role> findAll(Sort sort) {
+  public List<RoleImpl> findAll(Sort sort) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public Role findByName(String name) {
+  public RoleImpl findByName(String name) {
     return endpoint.findByName(name);
   }
 
   @Override
-  public Page<Role> findAll(Pageable pgbl) {
+  public Page<RoleImpl> findAll(Pageable pgbl) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public <S extends Role> S save(S s) {
+  public <S extends RoleImpl> S save(S s) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public <S extends Role> Iterable<S> save(Iterable<S> itrbl) {
+  public <S extends RoleImpl> Iterable<S> save(Iterable<S> itrbl) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public Role findOne(Long id) {
+  public RoleImpl findOne(Long id) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
@@ -58,12 +58,12 @@ public class RoleRepositoryImpl implements RoleRepository {
   }
 
   @Override
-  public Iterable<Role> findAll() {
+  public Iterable<RoleImpl> findAll() {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public Iterable<Role> findAll(Iterable<Long> itrbl) {
+  public Iterable<RoleImpl> findAll(Iterable<Long> itrbl) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
@@ -78,12 +78,12 @@ public class RoleRepositoryImpl implements RoleRepository {
   }
 
   @Override
-  public void delete(Role t) {
+  public void delete(RoleImpl t) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public void delete(Iterable<? extends Role> itrbl) {
+  public void delete(Iterable<? extends RoleImpl> itrbl) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
