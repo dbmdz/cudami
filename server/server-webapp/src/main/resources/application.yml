@@ -23,7 +23,7 @@ info:
 # mandatory configuration
 jsondoc:
   version: 1.0
-  packages[0]: de.digitalcollections.cms.server.webapp.controller
+  packages[0]: de.digitalcollections.cudami.server.webapp.controller
   #packages[1]: com.example.model
   # optional configuration
   playgroundEnabled: true

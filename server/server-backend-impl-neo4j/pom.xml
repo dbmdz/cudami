@@ -3,13 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
   
   <parent>
-    <groupId>de.digitalcollections.cms</groupId>
+    <groupId>de.digitalcollections.cudami</groupId>
     <artifactId>server</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
   
-  <name>DigitalCollections: CMS Server (Backend IMPL Neo4j)</name>
-  <groupId>de.digitalcollections.cms</groupId>
+  <name>DigitalCollections: cudami Server (Backend IMPL Neo4j)</name>
+  <groupId>de.digitalcollections.cudami</groupId>
   <artifactId>server-backend-impl-neo4j</artifactId>
   <packaging>jar</packaging>
   
@@ -20,7 +20,7 @@
   
   <dependencies>
     <dependency>
-      <groupId>de.digitalcollections.cms</groupId>
+      <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>model-api</artifactId>
     </dependency>
     <dependency>

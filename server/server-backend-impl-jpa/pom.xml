@@ -3,13 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
   
   <parent>
-    <groupId>de.digitalcollections.cms</groupId>
+    <groupId>de.digitalcollections.cudami</groupId>
     <artifactId>server</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
   
-  <name>DigitalCollections: CMS Server (Backend IMPL JPA)</name>
-  <groupId>de.digitalcollections.cms</groupId>
+  <name>DigitalCollections: cudami Server (Backend IMPL JPA)</name>
+  <groupId>de.digitalcollections.cudami</groupId>
   <artifactId>server-backend-impl-jpa</artifactId>
   <packaging>jar</packaging>
   
@@ -37,11 +37,11 @@
       <artifactId>querydsl-jpa</artifactId>
     </dependency>
     <dependency>
-      <groupId>de.digitalcollections.cms</groupId>
+      <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>model-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>de.digitalcollections.cms</groupId>
+      <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>server-backend-api</artifactId>
     </dependency>
     <dependency>
@@ -133,9 +133,9 @@
           </execution>
         </executions>
         <configuration>
-          <mainClass>de.digitalcollections.cms.server.backend.impl.database.SchemaGenerator</mainClass>
+          <mainClass>de.digitalcollections.cudami.server.backend.impl.database.SchemaGenerator</mainClass>
           <arguments>
-            <argument>de.digitalcollections.cms.server.backend.impl.jpa.entity</argument>
+            <argument>de.digitalcollections.cudami.server.backend.impl.jpa.entity</argument>
             <argument>${project.basedir}/src/main/resources/sql/generated/</argument>
           </arguments>
         </configuration>

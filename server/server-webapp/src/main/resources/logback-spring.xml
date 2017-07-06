@@ -5,18 +5,18 @@
   <springProfile name="DEV, STG, PROD">
     <appender name="default" class="ch.qos.logback.core.rolling.RollingFileAppender">
       <!-- create directory /var/log/digitalcollections with proper permissions... -->
-      <file>/var/log/dico-cms-server.log</file>
+      <file>/var/log/cudami-server.log</file>
       <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-        <fileNamePattern>dico-cms-server.%d{yyyy-MM-dd}.log</fileNamePattern>
+        <fileNamePattern>cudami-server.%d{yyyy-MM-dd}.log</fileNamePattern>
       </rollingPolicy>
       <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-        <fileNamePattern>dico-cms-server.%d{yyyy-MM}.%i.log.gz</fileNamePattern>
+        <fileNamePattern>cudami-server.%d{yyyy-MM}.%i.log.gz</fileNamePattern>
         <maxFileSize>100MB</maxFileSize>
         <maxHistory>90</maxHistory>
         <totalSizeCap>5GB</totalSizeCap>
       </rollingPolicy>
       <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-        <customFields>{"service":"dico-cms-server", "group":"rest", "instance":"${instance.name:-default}"}</customFields>
+        <customFields>{"service":"cudami-server", "group":"rest", "instance":"${instance.name:-default}"}</customFields>
       </encoder>
     </appender>
   </springProfile>
@@ -42,7 +42,7 @@
   </springProfile>
   -->
     
-  <logger name="de.digitalcollections.cms" level="debug" />
+  <logger name="de.digitalcollections.cudami" level="debug" />
 
   <root level="info">
     <appender-ref ref="default" />

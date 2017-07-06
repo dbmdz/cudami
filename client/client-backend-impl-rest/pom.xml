@@ -3,22 +3,22 @@
   <modelVersion>4.0.0</modelVersion>
   
   <parent>
-    <groupId>de.digitalcollections.cms</groupId>
+    <groupId>de.digitalcollections.cudami</groupId>
     <artifactId>client</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
   
-  <name>DigitalCollections: CMS Client (Backend IMPL REST)</name>
+  <name>DigitalCollections: cudami Client (Backend IMPL REST)</name>
   <artifactId>client-backend-impl-rest</artifactId>
   <packaging>jar</packaging>
   
   <dependencies>
     <dependency>
-      <groupId>de.digitalcollections.cms</groupId>
+      <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>client-backend-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>de.digitalcollections.cms</groupId>
+      <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>model-impl</artifactId>
     </dependency>
     <dependency>

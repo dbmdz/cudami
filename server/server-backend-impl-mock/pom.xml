@@ -3,22 +3,22 @@
   <modelVersion>4.0.0</modelVersion>
   
   <parent>
-    <groupId>de.digitalcollections.cms</groupId>
+    <groupId>de.digitalcollections.cudami</groupId>
     <artifactId>server</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
   
-  <name>DigitalCollections: CMS Server (Backend IMPL MOCK)</name>
+  <name>DigitalCollections: cudami Server (Backend IMPL MOCK)</name>
   <artifactId>server-backend-impl-mock</artifactId>
   <packaging>jar</packaging>
   
   <dependencies>
     <dependency>
-      <groupId>de.digitalcollections.cms</groupId>
+      <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>model-impl</artifactId>
     </dependency>
     <dependency>
-      <groupId>de.digitalcollections.cms</groupId>
+      <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>server-backend-api</artifactId>
     </dependency>
   </dependencies>
