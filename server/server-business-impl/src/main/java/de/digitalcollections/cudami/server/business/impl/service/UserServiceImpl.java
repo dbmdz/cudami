@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.business.impl.service;
 
 import de.digitalcollections.cudami.server.business.impl.validator.PasswordsValidatorParams;
-import de.digitalcollections.cudami.model.api.security.Operation;
 import de.digitalcollections.cudami.model.api.security.Role;
 import de.digitalcollections.cudami.model.api.security.User;
 import de.digitalcollections.cudami.server.backend.api.repository.UserRepository;
@@ -12,9 +11,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -113,33 +109,12 @@ public class UserServiceImpl implements UserService<User, Long> {
    */
   @Override
   @Transactional(readOnly = true, noRollbackFor = UsernameNotFoundException.class)
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+  public User loadUserByUsername(String username) throws UsernameNotFoundException {
     User user = userRepository.findByEmail(username);
     if (user == null || !user.isEnabled()) {
       throw new UsernameNotFoundException(String.format("User \"%s\" was not found.", username));
     }
-    List<GrantedAuthority> authorities = collectUserAuthorities(user);
-
-    return buildUserForAuthentication(user, authorities);
-  }
-
-  private List<GrantedAuthority> collectUserAuthorities(User user) {
-    List<GrantedAuthority> result = new ArrayList<>();
-    // Build user's authorities
-    List<Role> userRoles = user.getRoles();
-    for (Role userRole : userRoles) {
-      result.add(new SimpleGrantedAuthority(userRole.getName()));
-      List<Operation> allowedOperations = userRole.getAllowedOperations();
-      for (Operation allowedOperation : allowedOperations) {
-        result.add(new SimpleGrantedAuthority(allowedOperation.getName()));
-      }
-    }
-    return result;
-  }
-
-  private org.springframework.security.core.userdetails.User buildUserForAuthentication(User user, List<GrantedAuthority> authorities) {
-    return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPasswordHash(),
-            user.isEnabled(), true, true, true, authorities);
+    return user;
   }
 
   @Override

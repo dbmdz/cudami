@@ -1,15 +1,10 @@
 package de.digitalcollections.cudami.server.backend.impl.mock;
 
 import de.digitalcollections.cudami.model.api.security.User;
-import de.digitalcollections.cudami.model.impl.entity.WebsiteImpl;
 import de.digitalcollections.cudami.model.impl.security.UserImpl;
 import de.digitalcollections.cudami.server.backend.api.repository.UserRepository;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -30,7 +25,10 @@ public class UserRepositoryImpl implements UserRepository<User, Long> {
 
   @Override
   public User findByEmail(String email) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    final UserImpl user = new UserImpl();
+    user.setEmail(email);
+    user.setPasswordHash("password");
+    return user;
   }
 
   @Override

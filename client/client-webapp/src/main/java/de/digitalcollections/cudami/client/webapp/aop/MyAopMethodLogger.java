@@ -6,9 +6,9 @@ import org.aspectj.lang.annotation.Pointcut;
 public class MyAopMethodLogger extends AbstractAopMethodLogger {
 
   // TODO change packagenames for business and backend
-  @Pointcut("execution(public * de.digitalcollections.cms.client.webapp.controller..*Controller.*(..)) || "
-          + "execution(public * org.mdz.dzp.admin.business.impl.service..*Service.*(..)) || "
-          + "execution(public * org.mdz.dzp.admin.backend.impl.jpa.repository..*.*Repository.*(..))")
+  @Pointcut("execution(public * de.digitalcollections.cudami.client.webapp.controller..*Controller.*(..)) || "
+          + "execution(public * de.digitalcollections.cudami.client.business.impl.service..*Service.*(..)) || "
+          + "execution(public * de.digitalcollections.cudami.client.backend.impl.repository..*.*Repository.*(..))")
   @Override
   public void methodsToBeLogged() {
   }

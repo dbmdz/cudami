@@ -29,7 +29,7 @@ public class UserRepositoryImpl implements UserRepository<UserImpl> {
 
   @Override
   public UserImpl findByEmail(String email) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return endpoint.findByEmail(email);
   }
 
   @Override

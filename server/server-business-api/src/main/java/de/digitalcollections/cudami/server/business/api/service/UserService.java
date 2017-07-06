@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.server.business.api.service;
 import de.digitalcollections.cudami.model.api.security.User;
 import java.io.Serializable;
 import java.util.List;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.Errors;
 
 /**
@@ -12,7 +12,7 @@ import org.springframework.validation.Errors;
  * @param <T> domain object
  * @param <ID> unique id
  */
-public interface UserService<T extends User, ID extends Serializable> extends UserDetailsService {
+public interface UserService<T extends User, ID extends Serializable> {
 
   T activate(ID id);
 
@@ -32,5 +32,7 @@ public interface UserService<T extends User, ID extends Serializable> extends Us
 
   boolean doesActiveAdminUserExist();
 
-  public List<User> findActiveAdminUsers();
+  public List<T> findActiveAdminUsers();
+
+  public T loadUserByUsername(String string) throws UsernameNotFoundException;
 }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actions>
         <action>
-            <actionName>CUSTOM-mvn jetty:run (debug, 9898/cms)</actionName>
-            <displayName>mvn jetty:run (debug, 9898/cms)</displayName>
+            <actionName>CUSTOM-mvn jetty:run (debug, 9898/cudami)</actionName>
+            <displayName>mvn jetty:run (debug, 9898/cudami)</displayName>
             <goals>
                 <goal>jetty:run</goal>
             </goals>

@@ -13,7 +13,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @EnableAspectJAutoProxy
 @EnableWebMvc
 //@PropertySource(value = {
-//  "classpath:de/digitalcollections/cms/server/config/SpringConfigWeb-${spring.profiles.active:PROD}.properties"
+//  "classpath:de/digitalcollections/cudami/server/config/SpringConfigWeb-${spring.profiles.active:PROD}.properties"
 //})
 public class SpringConfigWeb extends WebMvcConfigurerAdapter {
 

@@ -102,20 +102,21 @@ public class SpringConfigSecurity extends WebSecurityConfigurerAdapter {
             antMatchers("/css/**", "/favicon.ico", "/fonts/*", "/images/**", "/js/**", "/less/*", "/webjars/**").permitAll();
     http.authorizeRequests().antMatchers("/users/**").hasAnyAuthority(roleService.getAdminRole().getAuthority());
     // else: authenticate please
-    http.authorizeRequests()
-            .anyRequest().authenticated()
-            .and().formLogin()
-            .loginPage("/login")
-            .permitAll()
-            .and().logout()
-            .logoutUrl("/logout")
-            .permitAll()
-            .and().rememberMe()
-            .tokenRepository(persistentTokenRepository)
-            // 14 days = 14 * 24 h/d * 3600 s/h = 1209600 s
-            .tokenValiditySeconds(14 * 24 * 3600)
-            .userDetailsService(userDetailsService)
-            .and().httpBasic();
+    // FIXME: just for demo/mock !!!!
+//    http.authorizeRequests()
+//            .anyRequest().authenticated()
+//            .and().formLogin()
+//            .loginPage("/login")
+//            .permitAll()
+//            .and().logout()
+//            .logoutUrl("/logout")
+//            .permitAll()
+//            .and().rememberMe()
+//            .tokenRepository(persistentTokenRepository)
+//            // 14 days = 14 * 24 h/d * 3600 s/h = 1209600 s
+//            .tokenValiditySeconds(14 * 24 * 3600)
+//            .userDetailsService(userDetailsService)
+//            .and().httpBasic();
   }
 
   @Override

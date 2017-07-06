@@ -207,7 +207,7 @@
           <classesDirectory>${project.build.directory}/classes</classesDirectory>
           <scanIntervalSeconds>2</scanIntervalSeconds>
           <webApp>
-            <contextPath>/cms</contextPath>
+            <contextPath>/cudami</contextPath>
             <allowDuplicateFragmentNames>true</allowDuplicateFragmentNames>
             <resourceBases>
               <resourceBase>src/main/webapp</resourceBase>
