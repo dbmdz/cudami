@@ -28,6 +28,10 @@
   <dependencies>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
+      <artifactId>model-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>server-backend-api</artifactId>
     </dependency>
     <dependency>

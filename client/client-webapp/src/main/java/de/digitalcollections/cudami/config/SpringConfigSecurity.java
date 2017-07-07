@@ -47,7 +47,7 @@ public class SpringConfigSecurity extends WebSecurityConfigurerAdapter {
   public PersistentTokenRepository persistentTokenRepository() {
     return new InMemoryTokenRepositoryImpl();
   }
-  
+
   @Bean
   public AuthenticationProvider authProvider() {
     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -91,32 +91,35 @@ public class SpringConfigSecurity extends WebSecurityConfigurerAdapter {
     });
 
     // Login and error pages must be accessible to all
-    http.authorizeRequests().
-            antMatchers("/api/**/*", "/cudami/**/*", "/error*", "/oai*", "/object/**", "/login*", "/setup/**", "/uploads/**").
-            permitAll();
+    http.authorizeRequests()
+            .antMatchers("/api/**/*", "/cudami/**/*", "/error*", "/oai*", "/object/**", "/login*", "/setup/**", "/uploads/**")
+            .permitAll();
     // Needed for preview
-    http.authorizeRequests().antMatchers("/resource/**", "/iiif/**", "/pages/preview/**", "/resources/upload/**/*").
-            permitAll();
+    http.authorizeRequests()
+            .antMatchers("/resource/**", "/iiif/**", "/pages/preview/**", "/resources/upload/**/*")
+            .permitAll();
     // Assets must be accessible to all, too
-    http.authorizeRequests().
-            antMatchers("/css/**", "/favicon.ico", "/fonts/*", "/images/**", "/js/**", "/less/*", "/webjars/**").permitAll();
-    http.authorizeRequests().antMatchers("/users/**").hasAnyAuthority(roleService.getAdminRole().getAuthority());
+    http.authorizeRequests()
+            .antMatchers("/css/**", "/favicon.ico", "/fonts/*", "/images/**", "/js/**", "/less/*", "/webjars/**")
+            .permitAll();
+    http.authorizeRequests()
+            .antMatchers("/users/**")
+            .hasAnyAuthority(roleService.getAdminRole().getAuthority());
     // else: authenticate please
-    // FIXME: just for demo/mock !!!!
-//    http.authorizeRequests()
-//            .anyRequest().authenticated()
-//            .and().formLogin()
-//            .loginPage("/login")
-//            .permitAll()
-//            .and().logout()
-//            .logoutUrl("/logout")
-//            .permitAll()
-//            .and().rememberMe()
-//            .tokenRepository(persistentTokenRepository)
-//            // 14 days = 14 * 24 h/d * 3600 s/h = 1209600 s
-//            .tokenValiditySeconds(14 * 24 * 3600)
-//            .userDetailsService(userDetailsService)
-//            .and().httpBasic();
+    http.authorizeRequests()
+            .anyRequest().authenticated()
+            .and().formLogin()
+            .loginPage("/login")
+            .permitAll()
+            .and().logout()
+            .logoutUrl("/logout")
+            .permitAll()
+            .and().rememberMe()
+            .tokenRepository(persistentTokenRepository)
+            // 14 days = 14 * 24 h/d * 3600 s/h = 1209600 s
+            .tokenValiditySeconds(14 * 24 * 3600)
+            .userDetailsService(userDetailsService)
+            .and().httpBasic();
   }
 
   @Override

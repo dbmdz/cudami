@@ -73,8 +73,7 @@ public class UserController extends AbstractController implements MessageSourceA
   @RequestMapping(value = "/{id}/activate", method = RequestMethod.GET)
   public String activate(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
     User user = userService.activate(id);
-    String message = messageSource.getMessage("msg.user_activated", new Object[]{user.getEmail()}, LocaleContextHolder.
-            getLocale());
+    String message = messageSource.getMessage("msg.user_activated", new Object[]{user.getEmail()}, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
     return "redirect:/users";
   }
@@ -82,8 +81,7 @@ public class UserController extends AbstractController implements MessageSourceA
   @RequestMapping(value = "/{id}/deactivate", method = RequestMethod.GET)
   public String deactivate(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
     User user = userService.deactivate(id);
-    String message = messageSource.
-            getMessage("msg.user_deactivated", new Object[]{user.getEmail()}, LocaleContextHolder.getLocale());
+    String message = messageSource.getMessage("msg.user_deactivated", new Object[]{user.getEmail()}, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("warning_message", message);
     return "redirect:/users";
   }

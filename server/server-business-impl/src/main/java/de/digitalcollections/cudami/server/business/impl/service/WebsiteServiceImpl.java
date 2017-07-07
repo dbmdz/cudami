@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Service for Website handling.
  */
 @Service
-@Transactional(readOnly = true)
+//@Transactional(readOnly = true)
 public class WebsiteServiceImpl implements WebsiteService<Website, Long> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsiteServiceImpl.class);

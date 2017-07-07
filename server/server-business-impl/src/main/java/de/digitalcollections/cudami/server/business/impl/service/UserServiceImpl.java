@@ -1,11 +1,11 @@
 package de.digitalcollections.cudami.server.business.impl.service;
 
-import de.digitalcollections.cudami.server.business.impl.validator.PasswordsValidatorParams;
 import de.digitalcollections.cudami.model.api.security.Role;
 import de.digitalcollections.cudami.model.api.security.User;
 import de.digitalcollections.cudami.server.backend.api.repository.UserRepository;
 import de.digitalcollections.cudami.server.business.api.service.RoleService;
 import de.digitalcollections.cudami.server.business.api.service.UserService;
+import de.digitalcollections.cudami.server.business.impl.validator.PasswordsValidatorParams;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ import org.springframework.validation.Validator;
  * Service for User handling.
  */
 @Service
-@Transactional(readOnly = true)
+//@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService<User, Long> {
 
   @Autowired
@@ -125,7 +125,7 @@ public class UserServiceImpl implements UserService<User, Long> {
 
   private User save(String password1, String password2, User user, Errors results) {
     final PasswordsValidatorParams passwordsValidatorParams = new PasswordsValidatorParams(password1, password2, user.
-            getPasswordHash());
+                                                                                           getPasswordHash());
     passwordsValidator.validate(passwordsValidatorParams, results);
     if (!results.hasErrors()) {
       String password = passwordsValidatorParams.getPassword1();

@@ -3,11 +3,11 @@ package de.digitalcollections.cudami.config;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mxab.thymeleaf.extras.dataattribute.dialect.DataAttributeDialect;
+import de.digitalcollections.commons.springmvc.config.SpringConfigCommonsMvc;
 import de.digitalcollections.cudami.client.webapp.converter.GrantedAuthorityJsonFilter;
 import de.digitalcollections.cudami.client.webapp.converter.UserJsonFilter;
 import de.digitalcollections.cudami.client.webapp.interceptors.CreateAdminUserInterceptor;
 import de.digitalcollections.cudami.model.api.security.User;
-import de.digitalcollections.commons.springmvc.config.SpringConfigCommonsMvc;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -129,8 +129,7 @@ public class SpringConfigWeb extends WebMvcConfigurerAdapter {
     localeChangeInterceptor.setParamName("language");
     registry.addInterceptor(localeChangeInterceptor);
 
-    InterceptorRegistration createAdminUserInterceptorRegistration = registry.
-            addInterceptor(createAdminUserInterceptor());
+    InterceptorRegistration createAdminUserInterceptorRegistration = registry.addInterceptor(createAdminUserInterceptor());
     createAdminUserInterceptorRegistration.addPathPatterns("/login");
   }
 

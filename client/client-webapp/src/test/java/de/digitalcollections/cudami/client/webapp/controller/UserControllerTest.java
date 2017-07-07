@@ -20,20 +20,21 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * unit testing PageController
  *
- * see also: http://zjhzxhz.com/2014/05/unit-testing-of-spring-mvc-controllers/,
- * http://www.petrikainulainen.net/programming/spring-framework/integration-testing-of-spring-mvc-applications-security/
+ * <p>see also: http://zjhzxhz.com/2014/05/unit-testing-of-spring-mvc-controllers/,<br>
+ * http://www.petrikainulainen.net/programming/spring-framework/integration-testing-of-spring-mvc-applications-security/</p>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextConfiguration(classes = {SpringConfigWeb.class, SpringConfigSecurity.class, SpringConfigBusinessForTest.class,
-  SpringConfigBackendForTest.class})
+                                 SpringConfigBackendForTest.class})
 public class UserControllerTest {
 
   private MockMvc mockMvc;

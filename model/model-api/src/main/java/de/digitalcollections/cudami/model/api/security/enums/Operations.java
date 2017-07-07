@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.model.api.security.enums;
 
-public enum Roles {
-
-  ADMIN, CONTENT_MANAGER;
+public enum Operations {
+  ALL, WEBSITES_RW
 }

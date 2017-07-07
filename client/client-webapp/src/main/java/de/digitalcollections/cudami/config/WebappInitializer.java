@@ -9,7 +9,6 @@ import javax.servlet.ServletRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
-//import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 /**
@@ -37,7 +36,6 @@ public class WebappInitializer extends AbstractAnnotationConfigDispatcherServlet
 
   @Override
   protected Filter[] getServletFilters() {
-    // FIXME remove this, when backend is replaced by rest client
     // jpa session
 //    OpenEntityManagerInViewFilter openEntityManagerInViewFilter = new OpenEntityManagerInViewFilter();
 //    openEntityManagerInViewFilter.setEntityManagerFactoryBeanName("entityManagerFactory");
@@ -52,10 +50,8 @@ public class WebappInitializer extends AbstractAnnotationConfigDispatcherServlet
   public void onStartup(ServletContext servletContext) throws ServletException {
     super.onStartup(servletContext);
 
-    ServletRegistration.Dynamic servletRegistration = (ServletRegistration.Dynamic) servletContext.
-            getServletRegistration(DEFAULT_SERVLET_NAME);
-    servletRegistration.
-            setMultipartConfig(new MultipartConfigElement("/tmp", 1024 * 1024 * 5, 1024 * 1024 * 5 * 5, 1024 * 1024));
+    ServletRegistration.Dynamic servletRegistration = (ServletRegistration.Dynamic) servletContext.getServletRegistration(DEFAULT_SERVLET_NAME);
+    servletRegistration.setMultipartConfig(new MultipartConfigElement("/tmp", 1024 * 1024 * 5, 1024 * 1024 * 5 * 5, 1024 * 1024));
 
     // servletContext.addListener(new HttpSessionListenerImpl()); // session and servlet context config see now ServletContextListenerImpl
     System.setProperty("filter", "false");
