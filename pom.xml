@@ -226,7 +226,6 @@
         <groupId>org.aspectj</groupId>
         <artifactId>aspectjweaver</artifactId>
         <version>${version.aspectjweaver}</version>
-        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.flywaydb</groupId>
