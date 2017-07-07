@@ -33,9 +33,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @RequestMapping(value = {"/websites"})
 @SessionAttributes(value = {"website"})
-public class WebsiteController extends AbstractController implements MessageSourceAware {
+public class WebsitesController extends AbstractController implements MessageSourceAware {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(WebsiteController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(WebsitesController.class);
 
   private MessageSource messageSource;
 
