@@ -11,6 +11,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+    <version.aspectjweaver>1.8.10</version.aspectjweaver>
     <version.commons-dbcp2>2.1.1</version.commons-dbcp2>
     <version.digitalcollections-commons-server>1.2.2</version.digitalcollections-commons-server>
     <version.digitalcollections-commons-springaop>1.2.2</version.digitalcollections-commons-springaop>
@@ -220,6 +221,12 @@
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-dbcp2</artifactId>
         <version>${version.commons-dbcp2}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.aspectj</groupId>
+        <artifactId>aspectjweaver</artifactId>
+        <version>${version.aspectjweaver}</version>
+        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.flywaydb</groupId>

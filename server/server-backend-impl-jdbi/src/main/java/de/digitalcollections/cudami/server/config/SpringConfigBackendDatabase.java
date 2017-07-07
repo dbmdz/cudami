@@ -66,7 +66,7 @@ public class SpringConfigBackendDatabase {
 
   @Bean
   @DependsOn(value = "flyway")
-  public JdbiFactoryBean jdbi() {
+  public JdbiFactoryBean jdbi() throws Exception {
     JdbiFactoryBean jdbiFactoryBean = new JdbiFactoryBean(pooledDataSource());
     Set plugins = Collections.singleton(new SqlObjectPlugin());
     jdbiFactoryBean.setPlugins(plugins);
@@ -76,8 +76,7 @@ public class SpringConfigBackendDatabase {
   /*
    * Unpooled datasource.
    */
-  @Bean
-  public DataSource dataSource() {
+  private DataSource dataSource() {
     DriverManagerDataSource ds = new DriverManagerDataSource();
     ds.setDriverClassName("org.postgresql.Driver");
     ds.setUrl("jdbc:postgresql://" + databaseHostname + ":" + databasePort + "/" + databaseName);
