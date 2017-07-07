@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.server.config;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import javax.sql.DataSource;
 import org.apache.commons.dbcp2.DataSourceConnectionFactory;
 import org.apache.commons.dbcp2.PoolableConnection;
@@ -11,6 +11,7 @@ import org.apache.commons.dbcp2.PoolingDataSource;
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.flywaydb.core.Flyway;
+import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.spring4.JdbiFactoryBean;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.slf4j.Logger;
@@ -68,7 +69,9 @@ public class SpringConfigBackendDatabase {
   @DependsOn(value = "flyway")
   public JdbiFactoryBean jdbi() throws Exception {
     JdbiFactoryBean jdbiFactoryBean = new JdbiFactoryBean(pooledDataSource());
-    Set plugins = Collections.singleton(new SqlObjectPlugin());
+    List plugins = new ArrayList();
+    plugins.add(new SqlObjectPlugin());
+    plugins.add(new PostgresPlugin());
     jdbiFactoryBean.setPlugins(plugins);
     return jdbiFactoryBean;
   }
