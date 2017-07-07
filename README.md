@@ -1,13 +1,13 @@
-# dicoCMS (DigitalCollections CMS)
+# cudami (cultural digital asset management)
 
-dicoCMS is a CMS for creating websites focussing on presenting digital objects.
+cudami is an editorial backoffice for managing cultural digital assets like websites, articles, digitized objects, digital nativ objects and entities.
 
 Technologies used:
 
 * Overall: Java, Spring, Spring Security
 * Frontend: Spring MVC, Thymeleaf
 * Business: Java
-* Backend: JPA/Hibernate, Flyway
+* Backend: JDBI/PostgreSql, Flyway
 
 Features:
 
@@ -38,13 +38,13 @@ Features:
 
         $ sudo su - postgres
     
-        ($ dropdb 'dicocms')
+        ($ dropdb 'cudami')
     
-        $ psql -c "CREATE USER dico PASSWORD 'somepassword';"
+        $ psql -c "CREATE USER cudami PASSWORD 'somepassword';"
     
         CREATE ROLE
     
-        $ createdb dicocms -O dico
+        $ createdb cudami -O cudami
 
     Check:
 
@@ -59,29 +59,29 @@ Features:
                    |          |          |             |             | postgres=CTc/postgres
          template1 | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =c/postgres          +
                    |          |          |             |             | postgres=CTc/postgres
-         dicocms   | dico     | UTF8     | en_US.UTF-8 | en_US.UTF-8 | 
+         cudami    | cudami   | UTF8     | en_US.UTF-8 | en_US.UTF-8 | 
          (4 rows)
 
-    List tables of database dicocms:
+    List tables of database cudami:
 
-        $ psql -d dicocms
-        psql (9.4.1)
+        $ psql -d cudami
+        psql (9.5.7, server 9.4.8)
         Type "help" for help.
 
-        dicocms=# \d
+        cudami=# \d
         No relations found.
-        dicocms=# \q
+        cudami=# \q
 
 3. Put your database properties into configuration file(s):
 
-        $ cd <dicoCMS source directory>
-        $ vi digitalcollections-cms-client/digitalcollections-cms-client-backend-impl-jpa/src/main/resources/de/digitalcollections/cms/config/SpringConfigBackend-<profile>.properties
+        $ cd <cudami source directory>
+        $ vi server/server-backend-impl-jdbi/src/main/resources/de/digitalcollections/cudami/config/SpringConfigBackend-<profile>.properties
 
-        database.name=dicocms
+        database.name=cudami
         database.hostname=localhost
         database.password=somepassword
         database.port=5432
-        database.username=dico
+        database.username=cudami
 
 ## Build
 

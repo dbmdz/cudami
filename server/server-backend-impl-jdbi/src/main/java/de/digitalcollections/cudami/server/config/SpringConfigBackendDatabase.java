@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.config;
 
-import de.digitalcollections.cudami.server.backend.impl.jdbi.FooRepository;
 import java.util.Collections;
 import java.util.Properties;
 import java.util.Set;
@@ -12,7 +11,6 @@ import org.apache.commons.dbcp2.PoolingDataSource;
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.flywaydb.core.Flyway;
-import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.spring4.JdbiFactoryBean;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.slf4j.Logger;
@@ -67,12 +65,6 @@ public class SpringConfigBackendDatabase {
   }
 
   @Bean
-  public FooRepository fooRepository(Jdbi jdbi) {
-    FooRepository repo = jdbi.onDemand(FooRepository.class);
-    return repo;
-  }
-  
-  @Bean
   @DependsOn(value = "flyway")
   public JdbiFactoryBean jdbi() {
     JdbiFactoryBean jdbiFactoryBean = new JdbiFactoryBean(pooledDataSource());
@@ -82,7 +74,7 @@ public class SpringConfigBackendDatabase {
   }
 
   /*
-     * Unpooled datasource.
+   * Unpooled datasource.
    */
   @Bean
   public DataSource dataSource() {

@@ -49,17 +49,17 @@
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>model-api</artifactId>
     </dependency>
-<!--    <dependency>
+    <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>server-backend-impl-jdbi</artifactId>
       <scope>runtime</scope>
-    </dependency>-->
-    <dependency>
+    </dependency>
+<!--    <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>server-backend-impl-mock</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>server-business-api</artifactId>
