@@ -11,7 +11,7 @@ public class OperationImpl implements Operation<Long> {
   }
 
   public OperationImpl(String name) {
-
+    this.name = name;
   }
 
   @Override

@@ -15,7 +15,7 @@ public class RoleImpl implements Role<Long> {
   }
 
   public RoleImpl(String name) {
-
+    this.name = name;
   }
 
   @Override
