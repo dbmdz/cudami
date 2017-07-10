@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi;
 
+import de.digitalcollections.cudami.model.api.security.enums.Role;
 import de.digitalcollections.cudami.model.impl.security.UserImpl;
 import de.digitalcollections.cudami.server.backend.api.repository.UserRepository;
 import java.util.List;
@@ -53,14 +54,10 @@ public class UserRepositoryImpl implements UserRepository<UserImpl, Long> {
 
   @Override
   public List<UserImpl> findActiveAdminUsers() {
-//    Handle handle = dbi.open();
-    Jdbi jdbi = Jdbi.create("jdbc:postgresql://localhost:5432/cudami",
-                            "cudami", "somepassword");
-    return jdbi.withHandle(h -> h.createQuery(
-            //            "SELECT * FROM users WHERE '" + Role.ADMIN.getAuthority() + "' = any(roles)"))
-            "SELECT * FROM users"))
+    return dbi.withHandle(h -> h.createQuery(
+            "SELECT * FROM users WHERE '" + Role.ADMIN.getAuthority() + "' = any(roles)")
             .mapToBean(UserImpl.class)
-            .list();
+            .list());
   }
 
   @Override
