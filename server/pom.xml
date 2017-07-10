@@ -14,9 +14,7 @@
   <packaging>pom</packaging>
   
   <modules>
-    <module>server-backend-impl-jpa</module>
     <module>server-backend-api</module>
-    <module>server-backend-impl-neo4j</module>
     <module>server-business-api</module>
     <module>server-business-impl</module>
     <module>server-webapp</module>

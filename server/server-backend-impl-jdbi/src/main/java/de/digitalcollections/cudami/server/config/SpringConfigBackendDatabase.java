@@ -23,13 +23,12 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * Database configuration.
  */
 @Configuration
-@EnableTransactionManagement
+//@EnableTransactionManagement
 public class SpringConfigBackendDatabase {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfigBackendDatabase.class);

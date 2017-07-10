@@ -9,8 +9,7 @@ import java.util.Map;
 
 /**
  * TextContent is used for text content.
- *
- * @param <ID> unique id specifying instance
+ * @param <ID> unique serializable identifier
  */
 public interface TextContent<ID extends Serializable> extends Entity<ID> {
 

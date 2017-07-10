@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.model.impl.entity;
 
+import de.digitalcollections.core.model.api.MimeType;
 import de.digitalcollections.cudami.model.api.entity.BinaryContent;
 import de.digitalcollections.cudami.model.api.entity.ContentNode;
-import de.digitalcollections.core.model.api.MimeType;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.List;

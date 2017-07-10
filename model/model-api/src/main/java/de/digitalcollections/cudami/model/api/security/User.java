@@ -1,14 +1,15 @@
 package de.digitalcollections.cudami.model.api.security;
 
+import de.digitalcollections.cudami.model.api.Identifiable;
+import de.digitalcollections.cudami.model.api.security.enums.Role;
 import java.io.Serializable;
 import java.util.List;
 
 /**
  * An user of the system.
- *
- * @param <ID> unique id specifying instance
+ * @param <T> unique serializable identifier
  */
-public interface User<ID extends Serializable> extends Identifiable<ID> {
+public interface User<T extends Serializable> extends Identifiable<T> {
 
   String getEmail();
 

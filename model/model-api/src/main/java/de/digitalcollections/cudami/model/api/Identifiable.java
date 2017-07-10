@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.model.api.security;
+package de.digitalcollections.cudami.model.api;
 
 import java.io.Serializable;
 

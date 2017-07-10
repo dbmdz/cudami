@@ -1,11 +1,11 @@
 package de.digitalcollections.cudami.client.webapp.controller;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.client.business.api.service.RoleService;
 import de.digitalcollections.cudami.client.business.api.service.UserService;
 import de.digitalcollections.cudami.client.webapp.propertyeditor.RoleEditor;
-import de.digitalcollections.cudami.model.api.security.Role;
 import de.digitalcollections.cudami.model.api.security.User;
+import de.digitalcollections.cudami.model.api.security.enums.Role;
+import java.util.Arrays;
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,9 +39,6 @@ public class UserController extends AbstractController implements MessageSourceA
   private MessageSource messageSource;
 
   @Autowired
-  RoleService roleService;
-
-  @Autowired
   UserService userService;
 
   @Autowired
@@ -59,7 +56,7 @@ public class UserController extends AbstractController implements MessageSourceA
 
   @ModelAttribute("allRoles")
   protected List<Role> populateAllRoles() {
-    return roleService.getAll();
+    return Arrays.asList(Role.values());
   }
 
   @InitBinder("user")

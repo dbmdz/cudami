@@ -18,8 +18,8 @@ public interface Website<ID extends Serializable> extends Entity<ID> {
   void setTitle(String title);
 
   String getTitle();
-  
+
   List<ContentNode> getRootNodes();
-  
+
   void setRootNodes(List<ContentNode> rootNodes);
 }

@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi;
 
-import de.digitalcollections.cudami.model.api.security.User;
+import de.digitalcollections.cudami.model.impl.security.UserImpl;
 import de.digitalcollections.cudami.server.backend.api.repository.UserRepository;
 import java.util.List;
 import org.jdbi.v3.core.Jdbi;
@@ -11,7 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class UserRepositoryImpl implements UserRepository<User, Long> {
+public class UserRepositoryImpl implements UserRepository<UserImpl, Long> {
 
   @Autowired
   private Jdbi dbi;
@@ -22,8 +22,8 @@ public class UserRepositoryImpl implements UserRepository<User, Long> {
   }
 
   @Override
-  public User create() {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  public UserImpl create() {
+    return new UserImpl();
   }
 
   @Override
@@ -32,12 +32,12 @@ public class UserRepositoryImpl implements UserRepository<User, Long> {
   }
 
   @Override
-  public void delete(User t) {
+  public void delete(UserImpl t) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public void delete(Iterable<? extends User> itrbl) {
+  public void delete(Iterable<? extends UserImpl> itrbl) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
@@ -52,47 +52,54 @@ public class UserRepositoryImpl implements UserRepository<User, Long> {
   }
 
   @Override
-  public List<User> findActiveAdminUsers() {
+  public List<UserImpl> findActiveAdminUsers() {
+//    Handle handle = dbi.open();
+    Jdbi jdbi = Jdbi.create("jdbc:postgresql://localhost:5432/cudami",
+                            "cudami", "somepassword");
+    return jdbi.withHandle(h -> h.createQuery(
+            //            "SELECT * FROM users WHERE '" + Role.ADMIN.getAuthority() + "' = any(roles)"))
+            "SELECT * FROM users"))
+            .mapToBean(UserImpl.class)
+            .list();
+  }
+
+  @Override
+  public List<UserImpl> findAll(Sort sort) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public List<User> findAll(Sort sort) {
+  public Page<UserImpl> findAll(Pageable pgbl) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public Page<User> findAll(Pageable pgbl) {
+  public Iterable<UserImpl> findAll() {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public Iterable<User> findAll() {
+  public Iterable<UserImpl> findAll(Iterable<Long> itrbl) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public Iterable<User> findAll(Iterable<Long> itrbl) {
+  public UserImpl findByEmail(String email) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public User findByEmail(String email) {
+  public UserImpl findOne(Long id) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public User findOne(Long id) {
+  public <S extends UserImpl> S save(S s) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public <S extends User> S save(S s) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  }
-
-  @Override
-  public <S extends User> Iterable<S> save(Iterable<S> itrbl) {
+  public <S extends UserImpl> Iterable<S> save(Iterable<S> itrbl) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 

@@ -1,19 +1,16 @@
 package de.digitalcollections.cudami.server.business.impl.service;
 
-import de.digitalcollections.cudami.model.api.security.Role;
 import de.digitalcollections.cudami.model.api.security.User;
+import de.digitalcollections.cudami.model.api.security.enums.Role;
 import de.digitalcollections.cudami.server.backend.api.repository.UserRepository;
-import de.digitalcollections.cudami.server.business.api.service.RoleService;
 import de.digitalcollections.cudami.server.business.api.service.UserService;
 import de.digitalcollections.cudami.server.business.impl.validator.PasswordsValidatorParams;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -34,13 +31,10 @@ public class UserServiceImpl implements UserService<User, Long> {
   private Validator uniqueUsernameValidator;
 
   @Autowired
-  private RoleService roleService;
-
-  @Autowired
   private UserRepository userRepository;
 
   @Override
-  @Transactional(readOnly = false)
+  //  @Transactional(readOnly = false)
   public User activate(Long id) {
     User user = (User) userRepository.findOne(id);
     user.setEnabled(true);
@@ -54,7 +48,7 @@ public class UserServiceImpl implements UserService<User, Long> {
   }
 
   @Override
-  @Transactional(readOnly = false)
+  //  @Transactional(readOnly = false)
   public User create(User user, String password1, String password2, Errors results) {
     uniqueUsernameValidator.validate(user, results);
     if (!results.hasErrors()) {
@@ -66,15 +60,12 @@ public class UserServiceImpl implements UserService<User, Long> {
   @Override
   public User createAdminUser() {
     User user = create();
-    Role adminRole = roleService.getAdminRole();
-    List<Role> roles = new ArrayList<>();
-    roles.add(adminRole);
-    user.setRoles(roles);
+    user.getRoles().add(Role.ADMIN);
     return user;
   }
 
   @Override
-  @Transactional(readOnly = false)
+  //  @Transactional(readOnly = false)
   public User deactivate(Long id) {
     User user = (User) userRepository.findOne(id);
     user.setEnabled(false);
@@ -108,7 +99,7 @@ public class UserServiceImpl implements UserService<User, Long> {
      @Transactional(rollbackFor=MyException.class, noRollbackFor=MyException2.class)
    */
   @Override
-  @Transactional(readOnly = true, noRollbackFor = UsernameNotFoundException.class)
+  //  @Transactional(readOnly = true, noRollbackFor = UsernameNotFoundException.class)
   public User loadUserByUsername(String username) throws UsernameNotFoundException {
     User user = userRepository.findByEmail(username);
     if (user == null || !user.isEnabled()) {
@@ -118,7 +109,7 @@ public class UserServiceImpl implements UserService<User, Long> {
   }
 
   @Override
-  @Transactional(readOnly = false)
+  //  @Transactional(readOnly = false)
   public User update(User user, String password1, String password2, Errors results) {
     return save(password1, password2, user, results);
   }
@@ -138,6 +129,7 @@ public class UserServiceImpl implements UserService<User, Long> {
   }
 
   @Override
+  //  @Transactional(readOnly = true)
   public List<User> findActiveAdminUsers() {
     return userRepository.findActiveAdminUsers();
   }

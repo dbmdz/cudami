@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.client.webapp.controller;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.client.business.api.service.RoleService;
 import de.digitalcollections.cudami.client.business.api.service.UserService;
 import de.digitalcollections.cudami.model.api.security.User;
 import javax.validation.Valid;
@@ -30,9 +29,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class SetupController extends AbstractController implements MessageSourceAware {
 
   private MessageSource messageSource;
-
-  @Autowired
-  RoleService roleService;
 
   @Autowired
   UserService userService;

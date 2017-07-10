@@ -9,8 +9,7 @@ import java.util.Locale;
 
 /**
  * IiifContent is used for IIIF content specified by an IIIF manifest.
- *
- * @param <ID> unique id specifying instance
+ * @param <ID> unique serializable identifier
  */
 public interface IiifContent<ID extends Serializable> extends Entity<ID> {
 

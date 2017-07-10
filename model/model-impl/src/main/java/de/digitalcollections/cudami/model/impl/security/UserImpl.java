@@ -1,16 +1,13 @@
 package de.digitalcollections.cudami.model.impl.security;
 
-import de.digitalcollections.cudami.model.api.security.Role;
 import de.digitalcollections.cudami.model.api.security.User;
+import de.digitalcollections.cudami.model.api.security.enums.Role;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 
-/**
- * Sample implementation. Useful for unit tests...
- */
 public class UserImpl implements User<Long> {
 
   private String email;

@@ -1,19 +1,16 @@
 package de.digitalcollections.cudami.client.business.impl.service;
 
 import de.digitalcollections.cudami.client.backend.api.repository.UserRepository;
-import de.digitalcollections.cudami.client.business.api.service.RoleService;
 import de.digitalcollections.cudami.client.business.api.service.UserService;
 import de.digitalcollections.cudami.client.business.impl.validator.PasswordsValidatorParams;
-import de.digitalcollections.cudami.model.api.security.Operation;
-import de.digitalcollections.cudami.model.api.security.Role;
 import de.digitalcollections.cudami.model.api.security.User;
+import de.digitalcollections.cudami.model.api.security.enums.Role;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -36,9 +33,6 @@ public class UserServiceImpl implements UserService<User, Long> {
   @Autowired
   @Qualifier("uniqueUsernameValidator")
   private Validator uniqueUsernameValidator;
-
-  @Autowired
-  private RoleService roleService;
 
   @Autowired
   private UserRepository userRepository;
@@ -70,9 +64,8 @@ public class UserServiceImpl implements UserService<User, Long> {
   @Override
   public User createAdminUser() {
     User user = create();
-    Role adminRole = roleService.getAdminRole();
     List<Role> roles = new ArrayList<>();
-    roles.add(adminRole);
+    roles.add(Role.ADMIN);
     user.setRoles(roles);
     return user;
   }
@@ -118,28 +111,14 @@ public class UserServiceImpl implements UserService<User, Long> {
     if (user == null || !user.isEnabled()) {
       throw new UsernameNotFoundException(String.format("User \"%s\" was not found.", username));
     }
-    List<GrantedAuthority> authorities = collectUserAuthorities(user);
+    List<GrantedAuthority> authorities = user.getRoles();
 
     return buildUserForAuthentication(user, authorities);
   }
 
-  private List<GrantedAuthority> collectUserAuthorities(User user) {
-    List<GrantedAuthority> result = new ArrayList<>();
-    // Build user's authorities
-    List<Role> userRoles = user.getRoles();
-    for (Role userRole : userRoles) {
-      result.add(new SimpleGrantedAuthority(userRole.getName()));
-      List<Operation> allowedOperations = userRole.getAllowedOperations();
-      for (Operation allowedOperation : allowedOperations) {
-        result.add(new SimpleGrantedAuthority(allowedOperation.getName()));
-      }
-    }
-    return result;
-  }
-
   private org.springframework.security.core.userdetails.User buildUserForAuthentication(User user, List<GrantedAuthority> authorities) {
     return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPasswordHash(),
-            user.isEnabled(), true, true, true, authorities);
+                                                                  user.isEnabled(), true, true, true, authorities);
   }
 
   @Override
@@ -150,7 +129,7 @@ public class UserServiceImpl implements UserService<User, Long> {
 
   private User save(String password1, String password2, User user, Errors results) {
     final PasswordsValidatorParams passwordsValidatorParams = new PasswordsValidatorParams(password1, password2, user.
-            getPasswordHash());
+                                                                                           getPasswordHash());
     passwordsValidator.validate(passwordsValidatorParams, results);
     if (!results.hasErrors()) {
       String password = passwordsValidatorParams.getPassword1();

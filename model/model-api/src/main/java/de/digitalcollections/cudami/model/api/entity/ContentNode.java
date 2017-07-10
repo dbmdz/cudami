@@ -5,9 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Category is used to structure content hierarchically.
- *
- * @param <ID> unique id specifying instance
+ * ContentNode is used to structure content hierarchically.
+ * @param <ID> unique serializable identifier
  */
 public interface ContentNode<ID extends Serializable> extends Entity<ID> {
 
@@ -25,7 +24,7 @@ public interface ContentNode<ID extends Serializable> extends Entity<ID> {
     }
     getChildren().add(child);
   }
-  
+
   List<TextContent> getTextContents();
 
   void setTextContents(List<TextContent> textContents);
@@ -36,7 +35,7 @@ public interface ContentNode<ID extends Serializable> extends Entity<ID> {
     }
     getTextContents().add(textContent);
   }
-  
+
   List<BinaryContent> getBinaryContents();
 
   void setBinaryContents(List<BinaryContent> binaryContents);

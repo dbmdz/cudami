@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.config;
 
-import de.digitalcollections.cudami.client.business.api.service.RoleService;
+import de.digitalcollections.cudami.model.api.security.enums.Role;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -38,9 +38,6 @@ public class SpringConfigSecurity extends WebSecurityConfigurerAdapter {
 
   @Autowired(required = true)
   private UserDetailsService userDetailsService; // provided by component scan
-
-  @Autowired(required = true)
-  private RoleService roleService;
 
   // FIXME: replace with serverside token repository?
   @Bean
@@ -104,7 +101,7 @@ public class SpringConfigSecurity extends WebSecurityConfigurerAdapter {
             .permitAll();
     http.authorizeRequests()
             .antMatchers("/users/**")
-            .hasAnyAuthority(roleService.getAdminRole().getAuthority());
+            .hasAnyAuthority(Role.ADMIN.getAuthority());
     // else: authenticate please
     http.authorizeRequests()
             .anyRequest().authenticated()

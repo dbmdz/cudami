@@ -7,8 +7,7 @@ import java.util.List;
 
 /**
  * BinaryContent is used for binary content like PDF, video, audio, image.
- *
- * @param <ID> unique id specifying instance
+ * @param <ID> unique serializable identifier
  */
 public interface BinaryContent<ID extends Serializable> extends Entity<ID> {
 
@@ -17,14 +16,14 @@ public interface BinaryContent<ID extends Serializable> extends Entity<ID> {
   void setContentNodes(List<ContentNode> contentNodes);
 
   long getSizeInBytes();
-  
+
   void setSizeInBytes(long sizeInBytes);
-  
+
   URL getPreviewUrl();
-  
+
   void setPreviewUrl(URL previewUrl);
-  
+
   MimeType getMimeType();
-  
+
   void setMimeType(MimeType mimeType);
 }
