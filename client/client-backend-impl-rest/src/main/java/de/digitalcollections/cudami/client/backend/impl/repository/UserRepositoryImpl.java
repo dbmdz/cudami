@@ -1,6 +1,8 @@
 package de.digitalcollections.cudami.client.backend.impl.repository;
 
 import de.digitalcollections.cudami.client.backend.api.repository.UserRepository;
+import de.digitalcollections.cudami.client.backend.impl.repository.exceptionhandling.EndpointErrorDecoder;
+import de.digitalcollections.cudami.client.backend.impl.repository.exceptionhandling.client.ResourceNotFoundException;
 import de.digitalcollections.cudami.model.impl.security.UserImpl;
 import feign.Feign;
 import feign.gson.GsonDecoder;
@@ -15,11 +17,12 @@ public class UserRepositoryImpl implements UserRepository<UserImpl> {
 
   private final UserRepositoryEndpoint endpoint = Feign.builder()
           .decoder(new GsonDecoder())
+          .errorDecoder(new EndpointErrorDecoder())
           .target(UserRepositoryEndpoint.class, "http://localhost:8080");
 
   @Override
   public UserImpl create() {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return endpoint.create();
   }
 
   @Override
@@ -29,7 +32,14 @@ public class UserRepositoryImpl implements UserRepository<UserImpl> {
 
   @Override
   public UserImpl findByEmail(String email) {
-    return endpoint.findByEmail(email);
+    UserImpl user;
+    try {
+      user = endpoint.findByEmail(email);
+    } catch (ResourceNotFoundException e) {
+      // TODO may be throw a business exception instead returning null to make more clear what happened?
+      user = null;
+    }
+    return user;
   }
 
   @Override

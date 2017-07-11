@@ -7,6 +7,9 @@ import java.util.List;
 
 public interface UserRepositoryEndpoint {
 
+  @RequestLine("GET /user/v1/create")
+  UserImpl create();
+
   @RequestLine("GET /user/v1/findActiveAdminUsers")
   List<UserImpl> findActiveAdminUsers();
 
