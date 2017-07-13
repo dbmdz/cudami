@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.client.backend.impl.repository;
 
 import de.digitalcollections.cudami.model.impl.security.UserImpl;
+import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 import java.util.List;
@@ -15,4 +16,8 @@ public interface UserRepositoryEndpoint {
 
   @RequestLine("GET /user/v1/findByEmail/{email}")
   UserImpl findByEmail(@Param("email") String email);
+
+  @RequestLine("POST /user/v1/save")
+  @Headers("Content-Type: application/json")
+  UserImpl save(UserImpl user);
 }

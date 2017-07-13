@@ -6,15 +6,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
 
 @Configuration
-@ComponentScan(basePackages = {
-  "de.digitalcollections.cudami.server.config"
-}) // scans all frontend, business and backend configs
+//@ComponentScan(basePackages = {
+//  "de.digitalcollections.cudami.server.config"
+//}) // scans all frontend, business and backend configs
 public class SpringConfig implements EnvironmentAware {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfig.class);

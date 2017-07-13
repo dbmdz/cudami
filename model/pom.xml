@@ -16,5 +16,6 @@
   <modules>
     <module>model-api</module>
     <module>model-impl</module>
+    <module>model-jackson</module>
   </modules>
 </project>

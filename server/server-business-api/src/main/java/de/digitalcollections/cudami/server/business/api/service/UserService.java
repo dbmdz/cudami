@@ -18,7 +18,7 @@ public interface UserService<T extends User, ID extends Serializable> {
 
   T create();
 
-  T create(T user, String password1, String password2, Errors results);
+  T save(T user, Errors results);
 
   T createAdminUser();
 
@@ -28,7 +28,7 @@ public interface UserService<T extends User, ID extends Serializable> {
 
   List<T> getAll();
 
-  T update(T user, String password1, String password2, Errors results);
+  T update(T user, Errors results);
 
   boolean doesActiveAdminUserExist();
 

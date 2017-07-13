@@ -13,6 +13,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -134,9 +136,11 @@ public class UserServiceImpl implements UserService<User, Long> {
     if (!results.hasErrors()) {
       String password = passwordsValidatorParams.getPassword1();
       if (!StringUtils.isEmpty(password)) {
-        user.setPasswordHash(password);
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String passwordHash = passwordEncoder.encode(password);
+        user.setPasswordHash(passwordHash);
       }
-      userRepository.save(user);
+      user = (User) userRepository.save(user);
     }
     return user;
   }

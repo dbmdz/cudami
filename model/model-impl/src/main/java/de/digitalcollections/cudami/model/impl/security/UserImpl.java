@@ -4,8 +4,6 @@ import de.digitalcollections.cudami.model.api.security.User;
 import de.digitalcollections.cudami.model.api.security.enums.Role;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 
 public class UserImpl implements User<Long> {
@@ -16,7 +14,10 @@ public class UserImpl implements User<Long> {
   private Long id;
   private String lastname;
   private String passwordHash;
-  private List<Role> roles = new ArrayList<>(0);
+  private List<Role> roles = new ArrayList<>();
+
+  public UserImpl() {
+  }
 
   @Override
   public String getEmail() {
@@ -64,15 +65,14 @@ public class UserImpl implements User<Long> {
   }
 
   /**
-   * Sets password hash if password is not empty, otherwise no operation. Deleting of password is not possible.
+   * Sets password hash if password hash is not empty, otherwise no operation. Deleting of password is not possible.
    *
-   * @param password new password to be set hashed
+   * @param passwordHash new hashed password
    */
   @Override
-  public void setPasswordHash(String password) {
-    if (!StringUtils.isEmpty(password)) {
-      PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-      this.passwordHash = passwordEncoder.encode(password);
+  public void setPasswordHash(String passwordHash) {
+    if (!StringUtils.isEmpty(passwordHash)) {
+      this.passwordHash = passwordHash;
     }
   }
 

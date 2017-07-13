@@ -4,14 +4,12 @@ import de.digitalcollections.cudami.model.api.security.User;
 import de.digitalcollections.cudami.model.api.security.enums.Role;
 import de.digitalcollections.cudami.server.backend.api.repository.UserRepository;
 import de.digitalcollections.cudami.server.business.api.service.UserService;
-import de.digitalcollections.cudami.server.business.impl.validator.PasswordsValidatorParams;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -21,10 +19,6 @@ import org.springframework.validation.Validator;
 @Service
 //@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService<User, Long> {
-
-  @Autowired
-  @Qualifier("passwordsValidator")
-  private Validator passwordsValidator;
 
   @Autowired
   @Qualifier("uniqueUsernameValidator")
@@ -49,10 +43,10 @@ public class UserServiceImpl implements UserService<User, Long> {
 
   @Override
   //  @Transactional(readOnly = false)
-  public User create(User user, String password1, String password2, Errors results) {
+  public User save(User user, Errors results) {
     uniqueUsernameValidator.validate(user, results);
     if (!results.hasErrors()) {
-      return save(password1, password2, user, results);
+      return (User) userRepository.save(user);
     }
     return null;
   }
@@ -110,22 +104,8 @@ public class UserServiceImpl implements UserService<User, Long> {
 
   @Override
   //  @Transactional(readOnly = false)
-  public User update(User user, String password1, String password2, Errors results) {
-    return save(password1, password2, user, results);
-  }
-
-  private User save(String password1, String password2, User user, Errors results) {
-    final PasswordsValidatorParams passwordsValidatorParams = new PasswordsValidatorParams(password1, password2, user.
-                                                                                           getPasswordHash());
-    passwordsValidator.validate(passwordsValidatorParams, results);
-    if (!results.hasErrors()) {
-      String password = passwordsValidatorParams.getPassword1();
-      if (!StringUtils.isEmpty(password)) {
-        user.setPasswordHash(password);
-      }
-      userRepository.save(user);
-    }
-    return user;
+  public User update(User user, Errors results) {
+    return (User) userRepository.save(user);
   }
 
   @Override

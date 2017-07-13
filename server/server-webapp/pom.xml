@@ -51,6 +51,11 @@
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
+      <artifactId>model-jackson</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>server-backend-impl-jdbi</artifactId>
       <scope>runtime</scope>
     </dependency>
@@ -201,6 +206,9 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <classifier>exec</classifier>
+        </configuration>
       </plugin>
     </plugins>
   </build>

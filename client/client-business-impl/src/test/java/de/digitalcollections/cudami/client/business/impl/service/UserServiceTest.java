@@ -7,8 +7,6 @@ import de.digitalcollections.cudami.config.SpringConfigBusiness;
 import de.digitalcollections.cudami.model.api.security.User;
 import de.digitalcollections.cudami.model.impl.security.UserImpl;
 import org.junit.After;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +18,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {SpringConfigBusiness.class, SpringConfigBackendForTest.class})
@@ -37,7 +38,7 @@ public class UserServiceTest {
   public void setup() {
     user = new UserImpl();
     user.setEmail("foo@spar.org");
-    user.setPasswordHash("foobar");
+    user.setPasswordHash(new BCryptPasswordEncoder().encode("foobar"));
     Mockito.when(userRepository.findByEmail("foo@spar.org")).thenReturn(user);
   }
 

@@ -55,7 +55,7 @@ public class UserRepositoryImpl implements UserRepository<UserImpl, Long> {
   @Override
   public List<UserImpl> findActiveAdminUsers() {
     return dbi.withHandle(h -> h.createQuery(
-            "SELECT * FROM users WHERE '" + Role.ADMIN.getAuthority() + "' = any(roles)")
+            "SELECT * FROM users WHERE '" + Role.ADMIN.name() + "' = any(roles)")
             .mapToBean(UserImpl.class)
             .list());
   }
@@ -99,8 +99,14 @@ public class UserRepositoryImpl implements UserRepository<UserImpl, Long> {
   }
 
   @Override
-  public <S extends UserImpl> S save(S s) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  public <S extends UserImpl> S save(S user) {
+    UserImpl result = dbi.withHandle(h -> h.createQuery(
+            "INSERT INTO users(email, enabled, firstname, lastname, passwordHash, roles) VALUES (:email, :enabled, :firstname, :lastname, :passwordHash, :roles) RETURNING *")
+            .bindBean(user)
+            .bind("roles", user.getRoles().stream().map(Role::name).toArray(String[]::new))
+            .mapToBean(UserImpl.class)
+            .findOnly());
+    return (S) result;
   }
 
   @Override

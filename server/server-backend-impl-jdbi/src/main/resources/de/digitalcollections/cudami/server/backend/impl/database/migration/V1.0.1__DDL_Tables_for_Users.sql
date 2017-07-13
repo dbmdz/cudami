@@ -4,6 +4,6 @@ create table users (
   enabled boolean default true,
   firstname varchar(255),
   lastname varchar(255),
-  password varchar(255),
+  passwordHash varchar(255),
   roles varchar(255)[]
 );

@@ -43,6 +43,7 @@
   -->
     
   <logger name="de.digitalcollections.cudami" level="debug" />
+  <logger name="org.jdbi" level="debug" />
 
   <root level="info">
     <appender-ref ref="default" />

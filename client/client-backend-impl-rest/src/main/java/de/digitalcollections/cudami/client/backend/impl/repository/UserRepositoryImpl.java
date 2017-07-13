@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.client.backend.impl.repository.exceptionhand
 import de.digitalcollections.cudami.model.impl.security.UserImpl;
 import feign.Feign;
 import feign.gson.GsonDecoder;
+import feign.gson.GsonEncoder;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +18,7 @@ public class UserRepositoryImpl implements UserRepository<UserImpl> {
 
   private final UserRepositoryEndpoint endpoint = Feign.builder()
           .decoder(new GsonDecoder())
+          .encoder(new GsonEncoder())
           .errorDecoder(new EndpointErrorDecoder())
           .target(UserRepositoryEndpoint.class, "http://localhost:8080");
 
@@ -53,8 +55,8 @@ public class UserRepositoryImpl implements UserRepository<UserImpl> {
   }
 
   @Override
-  public <S extends UserImpl> S save(S s) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  public <S extends UserImpl> S save(S user) {
+    return (S) endpoint.save(user);
   }
 
   @Override
