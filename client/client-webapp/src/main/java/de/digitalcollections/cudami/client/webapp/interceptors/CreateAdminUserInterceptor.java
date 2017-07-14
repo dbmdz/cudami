@@ -9,8 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.web.servlet.FlashMap;
+import org.springframework.web.servlet.FlashMapManager;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.servlet.view.RedirectView;
 
 /**
@@ -49,7 +52,13 @@ public class CreateAdminUserInterceptor extends HandlerInterceptorAdapter implem
       if (createAdminUser) {
         modelAndView.setView(new RedirectView("/setup/adminUser", true));
         String message = messageSource.getMessage("msg.create_a_new_admin_user", null, LocaleContextHolder.getLocale());
-        modelAndView.addObject("info_message", message);
+
+        FlashMap flashMap = new FlashMap();
+        flashMap.put("info_message", message);
+        FlashMapManager flashMapManager = RequestContextUtils.getFlashMapManager(request);
+        flashMapManager.saveOutputFlashMap(flashMap, request, response);
+
+//        modelAndView.addObject("info_message", message);
         LOGGER.info("Admin user does not exist. Create a new administrator user.");
       }
     }
