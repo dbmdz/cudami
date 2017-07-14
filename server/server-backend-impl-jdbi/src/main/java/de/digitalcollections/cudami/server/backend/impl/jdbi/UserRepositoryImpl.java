@@ -100,10 +100,18 @@ public class UserRepositoryImpl implements UserRepository<UserImpl, Long> {
 
   @Override
   public <S extends UserImpl> S save(S user) {
-    UserImpl result = dbi.withHandle(h -> h.createQuery(
-            "INSERT INTO users(email, enabled, firstname, lastname, passwordHash, roles) VALUES (:email, :enabled, :firstname, :lastname, :passwordHash, :roles) RETURNING *")
+//    UserImpl result = dbi.withHandle(h -> h.createQuery(
+//            "INSERT INTO users(email, enabled, firstname, lastname, passwordHash, roles) VALUES (:email, :enabled, :firstname, :lastname, :passwordHash, :roles) RETURNING *")
+//            .bindBean(user)
+//            .bind("roles", user.getRoles().stream().map(Role::name).toArray(String[]::new))
+//            .mapToBean(UserImpl.class)
+//            .findOnly());
+//    return (S) result;
+
+    UserImpl result = dbi.withHandle(h -> h
+            .registerArrayType(Role.class, "varchar")
+            .createQuery("INSERT INTO users(email, enabled, firstname, lastname, passwordHash, roles) VALUES (:email, :enabled, :firstname, :lastname, :passwordHash, :roles) RETURNING *")
             .bindBean(user)
-            .bind("roles", user.getRoles().stream().map(Role::name).toArray(String[]::new))
             .mapToBean(UserImpl.class)
             .findOnly());
     return (S) result;
