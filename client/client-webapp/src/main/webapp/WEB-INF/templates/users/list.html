@@ -40,7 +40,7 @@
             <td><span th:text="${user.lastname}">Meier</span></td>
             <td><span th:text="${user.firstname}">Hans</span></td>
             <td><a th:href="@{'/users/' + ${user.id}}" th:text="${user.email}">hans@meier.de</a></td>
-            <td><th:block th:each="role,rowStat : ${user.roles}"><span th:text="${role.name}">ROLE_CONTENT_MANAGER</span><span th:unless="${rowStat.last}">, </span></th:block></td>
+            <td><th:block th:each="role,rowStat : ${user.roles}"><span th:text="${role.name()}">ROLE_CONTENT_MANAGER</span><span th:unless="${rowStat.last}">, </span></th:block></td>
         <td class="center"><span th:title="#{${'tooltip_enabled.' + user.enabled}}" th:classappend="${user.enabled}? 'text-success' : 'text-danger'" class="fa fa-power-off"></span></td>
         <td class="center">
           <a th:href="@{'/users/' + ${user.id} + '/edit'}" th:title="#{tooltip_edit}"><span class="fa fa-pencil actionButton"></span></a>

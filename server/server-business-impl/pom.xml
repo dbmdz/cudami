@@ -43,5 +43,11 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-tx</artifactId>
     </dependency>
+    <dependency>
+      <groupId>de.digitalcollections</groupId>
+      <artifactId>digitalcollections-core-model-impl</artifactId>
+      <version>1.2.6-SNAPSHOT</version>
+      <type>jar</type>
+    </dependency>
   </dependencies>
 </project>

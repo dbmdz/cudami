@@ -46,6 +46,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>de.digitalcollections</groupId>
+      <artifactId>digitalcollections-core-model-impl</artifactId>
+    </dependency>
+    <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>model-api</artifactId>
     </dependency>

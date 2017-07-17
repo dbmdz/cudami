@@ -1,5 +1,7 @@
 package de.digitalcollections.cudami.server.business.impl.service;
 
+import de.digitalcollections.core.model.api.Sorting;
+import de.digitalcollections.core.model.impl.SortingImpl;
 import de.digitalcollections.cudami.model.api.security.User;
 import de.digitalcollections.cudami.model.api.security.enums.Role;
 import de.digitalcollections.cudami.server.backend.api.repository.UserRepository;
@@ -7,7 +9,6 @@ import de.digitalcollections.cudami.server.business.api.service.UserService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
@@ -39,6 +40,11 @@ public class UserServiceImpl implements UserService<User, Long> {
   @Override
   public User create() {
     return userRepository.create();
+  }
+
+  @Override
+  public List<User> getAll(Sorting sorting) {
+    return userRepository.findAll(sorting);
   }
 
   @Override
@@ -83,7 +89,7 @@ public class UserServiceImpl implements UserService<User, Long> {
 
   @Override
   public List<User> getAll() {
-    return userRepository.findAll(new Sort(Sort.Direction.ASC, "lastname"));
+    return userRepository.findAll(new SortingImpl("lastname", Sorting.SortOrder.ASC, Sorting.SortType.ALPHANUMERICAL));
   }
 
   /*

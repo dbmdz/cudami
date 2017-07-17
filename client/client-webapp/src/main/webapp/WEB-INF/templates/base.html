@@ -53,15 +53,6 @@
           </a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-            <li sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_WEBSITE_MANAGER')" th:classappend="${menu == 'websites' ? 'active' : ''}">
-              <a href="/websites" th:href="@{/websites}" th:text="#{websites}">Websites</a>
-            </li>
-            <li sec:authorize="hasAuthority('ROLE_ADMIN')" th:classappend="${menu == 'users' ? 'active' : ''}">
-              <a href="/users" th:href="@{/users}" th:text="#{users}">Users</a>
-            </li>
-          </ul>
-
           <ul class="nav navbar-nav navbar-right" th:if="${#authorization.expression('isAuthenticated()')}">
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">

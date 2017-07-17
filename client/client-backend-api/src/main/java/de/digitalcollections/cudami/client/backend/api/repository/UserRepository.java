@@ -1,22 +1,26 @@
 package de.digitalcollections.cudami.client.backend.api.repository;
 
+import de.digitalcollections.core.model.api.Sorting;
 import de.digitalcollections.cudami.model.api.security.User;
+import java.io.Serializable;
 import java.util.List;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**
  * Repository for User persistence handling.
- * @param <T> implementation of User interface
+ * @param <U> implementation of User interface
+ * @param <S> unique identifier of user
  */
-public interface UserRepository<T extends User> extends PagingAndSortingRepository<T, Long> {
+public interface UserRepository<U extends User, S extends Serializable> {
 
   User create();
 
-  @Override
-  List<T> findAll(Sort sort);
+  List<U> findAll(Sorting sorting);
 
-  T findByEmail(String email);
+  List<U> findActiveAdminUsers();
 
-  List<T> findActiveAdminUsers();
+  U findByEmail(String email);
+
+  U findOne(S id);
+
+  U save(U user);
 }

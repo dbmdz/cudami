@@ -1,14 +1,17 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi;
 
+import de.digitalcollections.core.model.api.Sorting;
 import de.digitalcollections.cudami.model.api.security.enums.Role;
 import de.digitalcollections.cudami.model.impl.security.UserImpl;
 import de.digitalcollections.cudami.server.backend.api.repository.UserRepository;
+import java.util.Iterator;
 import java.util.List;
 import org.jdbi.v3.core.Jdbi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -62,7 +65,31 @@ public class UserRepositoryImpl implements UserRepository<UserImpl, Long> {
 
   @Override
   public List<UserImpl> findAll(Sort sort) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    StringBuilder query = new StringBuilder("SELECT * FROM users ORDER BY :order_field");
+
+    String sortField = null;
+    if (sort != null) {
+      Iterator<Sort.Order> iterator = sort.iterator();
+      if (iterator.hasNext()) { // just supporting one field sorting until now
+        Sort.Order order = iterator.next();
+        sortField = order.getProperty();
+        if (sortField != null) {
+          Direction sortDirection = order.getDirection();
+          if (sortDirection != null && sortDirection.isDescending()) {
+            query.append(" DESC");
+          }
+        }
+      }
+    }
+    if (sortField == null) {
+      sortField = "id";
+    }
+    final String finalSortField = sortField;
+
+    return dbi.withHandle(h -> h.createQuery(query.toString())
+            .bind("order_field", finalSortField)
+            .mapToBean(UserImpl.class)
+            .list());
   }
 
   @Override
@@ -78,6 +105,24 @@ public class UserRepositoryImpl implements UserRepository<UserImpl, Long> {
   @Override
   public Iterable<UserImpl> findAll(Iterable<Long> itrbl) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
+  public List<UserImpl> findAll(Sorting sorting) {
+    Sort sort = createSort(sorting);
+    return findAll(sort);
+  }
+
+  private static Sort createSort(Sorting sorting) {
+    final String sortField = sorting.getSortField();
+    if (sortField == null) {
+      return null;
+    }
+    Direction direction = Direction.ASC;
+    if (sorting.getSortOrder() != null) {
+      direction = Direction.fromStringOrNull(sorting.getSortOrder().name());
+    }
+    return new Sort(direction, sortField);
   }
 
   @Override

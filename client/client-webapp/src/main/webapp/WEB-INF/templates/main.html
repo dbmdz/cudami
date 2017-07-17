@@ -54,13 +54,27 @@
   <body>
     <section layout:fragment="content">
 
+      <th:block sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
+        <h3>cudami Administration</h3>
+        <div class="row">
+          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a th:href="@{/users}" title="...">
+              <div class="innerContent">
+                <div class="icon"><i class="fa fa-users"></i></div>
+                <span th:text="#{users}">Users</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </th:block>
+
       <h3>Digital Natives</h3>
       <div class="row">
-        <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-          <a th:href="@{/website}" title="...">
+        <div class="col-xs-4 col-sm-3 col-md-2 outerContent" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_CONTENT_MANAGER')">
+          <a th:href="@{/websites}" title="...">
             <div class="innerContent">
               <div class="icon"><i class="fa fa-globe"></i></div>
-              Websites
+              <span th:text="#{websites}">Websites</span>
             </div>
           </a>
         </div>

@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.mock;
 
+import de.digitalcollections.core.model.api.Sorting;
 import de.digitalcollections.cudami.model.api.security.User;
 import de.digitalcollections.cudami.model.api.security.enums.Role;
 import de.digitalcollections.cudami.model.impl.security.UserImpl;
@@ -21,6 +22,11 @@ public class UserRepositoryImpl implements UserRepository<User, Long> {
 
   @Override
   public List<User> findAll(Sort sort) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
+  public List<User> findAll(Sorting sorting) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 

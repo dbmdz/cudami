@@ -14,6 +14,9 @@ public interface UserRepositoryEndpoint {
   @RequestLine("GET /user/v1/findActiveAdminUsers")
   List<UserImpl> findActiveAdminUsers();
 
+  @RequestLine("GET /user/v1/findAll")
+  List<UserImpl> findAll(@Param("sortOrder") String sortOrder, @Param("sortField") String sortField, @Param("sortType") String sortType);
+
   @RequestLine("GET /user/v1/findByEmail/{email}")
   UserImpl findByEmail(@Param("email") String email);
 

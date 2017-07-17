@@ -20,6 +20,10 @@
   
   <dependencies>
     <dependency>
+      <groupId>de.digitalcollections</groupId>
+      <artifactId>digitalcollections-core-model-impl</artifactId>
+    </dependency>
+    <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>client-backend-api</artifactId>
     </dependency>
