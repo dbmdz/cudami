@@ -68,113 +68,123 @@
         </div>
       </th:block>
 
-      <h3>Digital Natives</h3>
-      <div class="row">
-        <div class="col-xs-4 col-sm-3 col-md-2 outerContent" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_CONTENT_MANAGER')">
-          <a th:href="@{/websites}" title="...">
-            <div class="innerContent">
-              <div class="icon"><i class="fa fa-globe"></i></div>
-              <span th:text="#{websites}">Websites</span>
-            </div>
-          </a>
+      <th:block sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_CONTENT_MANAGER')">
+        <h3>Digital Natives</h3>
+        <div class="row">
+          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a th:href="@{/websites}" title="...">
+              <div class="innerContent">
+                <div class="icon"><i class="fa fa-globe"></i></div>
+                <span th:text="#{websites}">Websites</span>
+              </div>
+            </a>
+          </div>
+          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a th:href="@{/microsites}" title="...">
+              <div class="innerContent">
+                <div class="icon"><i class="fa fa-share-alt"></i></div>
+                <span th:text="#{microsites}">Virtuelle Ausstellungen</span>
+              </div>
+            </a>
+          </div>
+          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a href="#" title="...">
+              <div class="innerContent">
+                <div class="icon"><i class="fa fa-file-text-o"></i></div>
+                Artikel
+              </div>
+            </a>
+          </div>
+          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a th:href="@{/collections}" title="...">
+              <div class="innerContent">
+                <div class="icon"><i class="fa fa-list"></i></div>
+                Sammlungen
+              </div>
+            </a>
+          </div>
         </div>
-        <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-          <a href="#" title="...">
-            <div class="innerContent">
-              <div class="icon"><i class="fa fa-file-text-o"></i></div>
-              Artikel
-            </div>
-          </a>
-        </div>
-        <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-          <a th:href="@{/collections}" title="...">
-            <div class="innerContent">
-              <div class="icon"><i class="fa fa-list"></i></div>
-              Sammlungen
-            </div>
-          </a>
-        </div>
-      </div>
 
-      <h3>(Retro) digitized objects</h3>
-      <div class="row">
-        <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-          <a th:href="@{/books}" title="...">
-            <div class="innerContent">
-              <div class="icon"><i class="fa fa-book"></i></div>
-              Bücher
-            </div>
-          </a>
+        <h3>(Retro) digitized objects</h3>
+        <div class="row">
+          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a th:href="@{/books}" title="...">
+              <div class="innerContent">
+                <div class="icon"><i class="fa fa-book"></i></div>
+                Bücher
+              </div>
+            </a>
+          </div>
+          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a href="#" title="...">
+              <div class="innerContent">
+                <div class="icon"><i class="fa fa-file-image-o"></i></div>
+                Bilder
+              </div>
+            </a>
+          </div>
+          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a href="#" title="...">
+              <div class="innerContent">
+                <div class="icon"><i class="fa fa-cube"></i></div>
+                3D Objekte
+              </div>
+            </a>
+          </div>
+          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a href="#" title="...">
+              <div class="innerContent">
+                <div class="icon"><i class="fa fa-file-audio-o"></i></div>
+                Audios
+              </div>
+            </a>
+          </div>
+          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a href="#" title="...">
+              <div class="innerContent">
+                <div class="icon"><i class="fa fa-file-video-o"></i></div>
+                Videos
+              </div>
+            </a>
+          </div>
         </div>
-        <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-          <a href="#" title="...">
-            <div class="innerContent">
-              <div class="icon"><i class="fa fa-file-image-o"></i></div>
-              Bilder
-            </div>
-          </a>
-        </div>
-        <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-          <a href="#" title="...">
-            <div class="innerContent">
-              <div class="icon"><i class="fa fa-cube"></i></div>
-              3D Objekte
-            </div>
-          </a>
-        </div>
-        <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-          <a href="#" title="...">
-            <div class="innerContent">
-              <div class="icon"><i class="fa fa-file-audio-o"></i></div>
-              Audios
-            </div>
-          </a>
-        </div>
-        <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-          <a href="#" title="...">
-            <div class="innerContent">
-              <div class="icon"><i class="fa fa-file-video-o"></i></div>
-              Videos
-            </div>
-          </a>
-        </div>
-      </div>
 
-      <h3>Entitäten</h3>
-      <div class="row">
-        <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-          <a href="#" title="...">
-            <div class="innerContent">
-              <div class="icon"><i class="fa fa-users"></i></div>
-              Personen
-            </div>
-          </a>
+        <h3>Entitäten</h3>
+        <div class="row">
+          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a href="#" title="...">
+              <div class="innerContent">
+                <div class="icon"><i class="fa fa-users"></i></div>
+                Personen
+              </div>
+            </a>
+          </div>
+          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a href="#" title="...">
+              <div class="innerContent">
+                <div class="icon"><i class="fa fa-institution"></i></div>
+                Körperschaften
+              </div>
+            </a>
+          </div>
+          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a href="#" title="...">
+              <div class="innerContent">
+                <div class="icon"><i class="fa fa-map-marker"></i></div>
+                Orte
+              </div>
+            </a>
+          </div>
+          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a href="#" title="...">
+              <div class="innerContent">
+                <div class="icon"><i class="fa fa-calendar"></i></div>
+                Ereignisse
+              </div>
+            </a>
+          </div>
         </div>
-        <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-          <a href="#" title="...">
-            <div class="innerContent">
-              <div class="icon"><i class="fa fa-institution"></i></div>
-              Körperschaften
-            </div>
-          </a>
-        </div>
-        <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-          <a href="#" title="...">
-            <div class="innerContent">
-              <div class="icon"><i class="fa fa-map-marker"></i></div>
-              Orte
-            </div>
-          </a>
-        </div>
-        <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-          <a href="#" title="...">
-            <div class="innerContent">
-              <div class="icon"><i class="fa fa-calendar"></i></div>
-              Ereignisse
-            </div>
-          </a>
-        </div>
-      </div>
+      </th:block>
     </section>
   </body>
 </html>
