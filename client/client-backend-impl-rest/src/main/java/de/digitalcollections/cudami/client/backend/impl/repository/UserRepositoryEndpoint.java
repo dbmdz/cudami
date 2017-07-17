@@ -20,6 +20,9 @@ public interface UserRepositoryEndpoint {
   @RequestLine("GET /user/v1/findByEmail/{email}")
   UserImpl findByEmail(@Param("email") String email);
 
+  @RequestLine("GET /user/v1/{id}")
+  UserImpl findOne(@Param("id") Long id);
+
   @RequestLine("POST /user/v1/save")
   @Headers("Content-Type: application/json")
   UserImpl save(UserImpl user);

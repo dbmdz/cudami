@@ -140,7 +140,15 @@ public class UserRepositoryImpl implements UserRepository<UserImpl, Long> {
 
   @Override
   public UserImpl findOne(Long id) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    List<UserImpl> users = dbi.withHandle(h -> h.createQuery(
+            "SELECT * FROM users WHERE id = :id")
+            .bind("id", id)
+            .mapToBean(UserImpl.class)
+            .list());
+    if (users.isEmpty()) {
+      return null;
+    }
+    return users.get(0);
   }
 
   @Override

@@ -46,7 +46,14 @@ public class UserController {
     return service.getAll(new SortingImpl(sortField, sortOrder, sortType));
   }
 
-  @ApiMethod(description = "get role by name")
+  @ApiMethod(description = "get user by id")
+  @RequestMapping(value = "/v1/{id}", produces = "application/json", method = RequestMethod.GET)
+  @ApiResponseObject
+  public User findById(@PathVariable Long id) {
+    return service.get(id);
+  }
+
+  @ApiMethod(description = "get user by email address")
   @RequestMapping(value = "/v1/findByEmail/{email}", produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public User findByName(@PathVariable String email) {

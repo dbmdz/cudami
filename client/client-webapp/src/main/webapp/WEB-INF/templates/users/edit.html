@@ -53,9 +53,9 @@
                 <div class="col-sm-5 col-md-4" th:classappend="${#fields.hasErrors('roles')}? has-error">
                   <ul class="checkbox-list">
                     <li th:each="userRole : ${allRoles}">
-                      <input type="checkbox" th:field="*{roles}" th:value="${userRole.id}" />
+                      <input type="checkbox" th:field="*{roles}" th:value="${userRole.name()}" />
                       <label th:for="${#ids.prev('roles')}" 
-                             th:text="${userRole.name}">Administrator</label>
+                             th:text="${userRole.name()}">Administrator</label>
                     </li>
                   </ul>
                 </div>
