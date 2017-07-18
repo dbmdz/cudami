@@ -4,16 +4,28 @@ import de.digitalcollections.cudami.model.api.security.User;
 import de.digitalcollections.cudami.model.api.security.enums.Role;
 import java.util.ArrayList;
 import java.util.List;
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.util.StringUtils;
 
 public class UserImpl implements User<Long> {
 
+  @NotBlank
+  @Email
   private String email;
+
   private boolean enabled = true;
+
+  @NotBlank
   private String firstname;
+
   private Long id;
+
+  @NotBlank
   private String lastname;
+
   private String passwordHash;
+
   private List<Role> roles = new ArrayList<>();
 
   public UserImpl() {

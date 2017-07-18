@@ -38,11 +38,6 @@ public class UserServiceImpl implements UserService<User, Long> {
   }
 
   @Override
-  public User create() {
-    return userRepository.create();
-  }
-
-  @Override
   public List<User> getAll(Sorting sorting) {
     return userRepository.findAll(sorting);
   }
@@ -59,7 +54,7 @@ public class UserServiceImpl implements UserService<User, Long> {
 
   @Override
   public User createAdminUser() {
-    User user = create();
+    User user = userRepository.create();
     user.getRoles().add(Role.ADMIN);
     return user;
   }

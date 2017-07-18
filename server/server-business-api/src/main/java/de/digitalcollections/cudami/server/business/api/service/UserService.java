@@ -17,8 +17,6 @@ public interface UserService<T extends User, ID extends Serializable> {
 
   T activate(ID id);
 
-  T create();
-
   T createAdminUser();
 
   T deactivate(ID id);

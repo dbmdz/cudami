@@ -22,7 +22,7 @@ public class UserRepositoryImpl implements UserRepository<UserImpl, Long> {
 
   @Override
   public UserImpl create() {
-    return endpoint.create();
+    return new UserImpl();
   }
 
   @Override
@@ -58,7 +58,7 @@ public class UserRepositoryImpl implements UserRepository<UserImpl, Long> {
 
   @Override
   public UserImpl update(UserImpl user) {
-    return (UserImpl) endpoint.update(user);
+    return (UserImpl) endpoint.update(user.getId(), user);
   }
 
 //  @Override

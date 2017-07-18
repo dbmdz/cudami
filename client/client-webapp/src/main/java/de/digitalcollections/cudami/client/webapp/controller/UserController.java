@@ -97,7 +97,7 @@ public class UserController extends AbstractController implements MessageSourceA
       model.addAttribute("isNew", true);
       return "users/edit";
     }
-    userService.create(user, password1, password2, (Errors) results);
+    user = userService.create(user, password1, password2, (Errors) results);
     if (results.hasErrors()) {
       model.addAttribute("isNew", true);
       return "users/edit";

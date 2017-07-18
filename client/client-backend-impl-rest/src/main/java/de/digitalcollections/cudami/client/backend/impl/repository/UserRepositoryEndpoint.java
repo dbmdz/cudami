@@ -8,26 +8,23 @@ import java.util.List;
 
 public interface UserRepositoryEndpoint {
 
-  @RequestLine("GET /user/v1/create")
-  UserImpl create();
-
-  @RequestLine("GET /user/v1/findActiveAdminUsers")
+  @RequestLine("GET /v1/users?role=ADMIN&enabled=true")
   List<UserImpl> findActiveAdminUsers();
 
-  @RequestLine("GET /user/v1/findAll")
+  @RequestLine("GET /v1/users?sortOrder={sortOrder}&sortField={sortField}&sortType={sortType}")
   List<UserImpl> findAll(@Param("sortOrder") String sortOrder, @Param("sortField") String sortField, @Param("sortType") String sortType);
 
-  @RequestLine("GET /user/v1/findByEmail/{email}")
+  @RequestLine("GET /v1/users?email={email}")
   UserImpl findByEmail(@Param("email") String email);
 
-  @RequestLine("GET /user/v1/{id}")
+  @RequestLine("GET /v1/users/{id}")
   UserImpl findOne(@Param("id") Long id);
 
-  @RequestLine("POST /user/v1/save")
+  @RequestLine("POST /v1/users")
   @Headers("Content-Type: application/json")
   UserImpl save(UserImpl user);
 
-  @RequestLine("PUT /user/v1/save")
+  @RequestLine("PUT /v1/users/{id}")
   @Headers("Content-Type: application/json")
-  UserImpl update(UserImpl user);
+  UserImpl update(@Param("id") Long id, UserImpl user);
 }
