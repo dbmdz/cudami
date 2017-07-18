@@ -9,16 +9,18 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 /**
  * Repository for User persistence handling.
  *
- * @param <T> entity instance
+ * @param <U> entity instance
  * @param <ID> unique id
  */
-public interface UserRepository<T extends User, ID extends Serializable> extends PagingAndSortingRepository<T, ID> {
+public interface UserRepository<U extends User, ID extends Serializable> extends PagingAndSortingRepository<U, ID> {
 
-  T create();
+  U create();
 
-  List<T> findAll(Sorting sorting);
+  List<U> findAll(Sorting sorting);
 
-  T findByEmail(String email);
+  U findByEmail(String email);
 
-  List<T> findActiveAdminUsers();
+  List<U> findActiveAdminUsers();
+
+  U update(U user);
 }

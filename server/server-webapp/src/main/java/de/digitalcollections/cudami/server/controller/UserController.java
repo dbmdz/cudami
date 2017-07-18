@@ -66,4 +66,11 @@ public class UserController {
   public User save(@RequestBody User user, BindingResult errors) {
     return service.save(user, errors);
   }
+
+  @ApiMethod(description = "save a newly created user")
+  @RequestMapping(value = "/v1/save", produces = "application/json", method = RequestMethod.PUT)
+  @ApiResponseObject
+  public User update(@RequestBody User user, BindingResult errors) {
+    return service.update(user, errors);
+  }
 }

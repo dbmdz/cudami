@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService<User, Long> {
   public User create(User user, String password1, String password2, Errors results) {
     uniqueUsernameValidator.validate(user, results);
     if (!results.hasErrors()) {
-      return save(password1, password2, user, results);
+      return save(password1, password2, user, results, false);
     }
     return null;
   }
@@ -127,10 +127,10 @@ public class UserServiceImpl implements UserService<User, Long> {
   @Override
   @Transactional(readOnly = false)
   public User update(User user, String password1, String password2, Errors results) {
-    return save(password1, password2, user, results);
+    return save(password1, password2, user, results, true);
   }
 
-  private User save(String password1, String password2, User user, Errors results) {
+  private User save(String password1, String password2, User user, Errors results, boolean isUpdate) {
     final PasswordsValidatorParams passwordsValidatorParams = new PasswordsValidatorParams(password1, password2, user.
                                                                                            getPasswordHash());
     passwordsValidator.validate(passwordsValidatorParams, results);
@@ -141,7 +141,11 @@ public class UserServiceImpl implements UserService<User, Long> {
         String passwordHash = passwordEncoder.encode(password);
         user.setPasswordHash(passwordHash);
       }
-      user = (User) userRepository.save(user);
+      if (isUpdate) {
+        user = (User) userRepository.update(user);
+      } else {
+        user = (User) userRepository.save(user);
+      }
     }
     return user;
   }

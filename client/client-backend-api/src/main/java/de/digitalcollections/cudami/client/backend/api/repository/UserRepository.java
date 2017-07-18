@@ -23,4 +23,6 @@ public interface UserRepository<U extends User, S extends Serializable> {
   U findOne(S id);
 
   U save(U user);
+
+  U update(U user);
 }

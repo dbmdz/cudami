@@ -175,4 +175,15 @@ public class UserRepositoryImpl implements UserRepository<UserImpl, Long> {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
+  @Override
+  public UserImpl update(UserImpl user) {
+    UserImpl result = dbi.withHandle(h -> h
+            .registerArrayType(Role.class, "varchar")
+            .createQuery("UPDATE users SET email=:email, enabled=:enabled, firstname=:firstname, lastname=:lastname, passwordHash=:passwordHash, roles=:roles WHERE id=:id RETURNING *")
+            .bindBean(user)
+            .mapToBean(UserImpl.class)
+            .findOnly());
+    return result;
+  }
+
 }

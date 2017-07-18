@@ -8,7 +8,13 @@ import org.springframework.stereotype.Component;
 public class RoleEditor extends PropertyEditorSupport {
 
   @Override
+  public String getAsText() {
+    Role role = (Role) getValue();
+    return role.name();
+  }
+
+  @Override
   public void setAsText(String roleName) {
-    setValue(Role.valueOf(roleName).getAuthority());
+    setValue(Role.valueOf(roleName));
   }
 }

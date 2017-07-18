@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService<User, Long> {
   @Override
   //  @Transactional(readOnly = false)
   public User update(User user, Errors results) {
-    return (User) userRepository.save(user);
+    return (User) userRepository.update(user);
   }
 
   @Override

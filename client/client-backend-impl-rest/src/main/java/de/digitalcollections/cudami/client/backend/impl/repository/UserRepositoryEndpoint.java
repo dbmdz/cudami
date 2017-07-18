@@ -26,4 +26,8 @@ public interface UserRepositoryEndpoint {
   @RequestLine("POST /user/v1/save")
   @Headers("Content-Type: application/json")
   UserImpl save(UserImpl user);
+
+  @RequestLine("PUT /user/v1/save")
+  @Headers("Content-Type: application/json")
+  UserImpl update(UserImpl user);
 }
