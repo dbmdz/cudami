@@ -13,6 +13,11 @@
       <div class="row mainContent">
         <div id="sidebar" class="col-sm-3">
           <a class="btn btn-default btn-block"
+             th:href="@{/users}"
+             th:text="#{back}">
+            back
+          </a>
+          <a class="btn btn-default btn-block"
              th:href="@{${user.id} + '/edit'}"
              th:text="#{edit}">
             edit
