@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService<User, Long> {
   public User activate(Long id) {
     User user = (User) userRepository.findOne(id);
     user.setEnabled(true);
-    userRepository.save(user);
+    user = userRepository.update(user);
     return user;
   }
 
@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService<User, Long> {
   public User deactivate(Long id) {
     User user = (User) userRepository.findOne(id);
     user.setEnabled(false);
-    userRepository.save(user);
+    user = userRepository.update(user);
     return user;
   }
 
