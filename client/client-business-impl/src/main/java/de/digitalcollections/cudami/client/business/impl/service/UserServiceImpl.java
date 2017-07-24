@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.client.business.impl.service;
 
-import de.digitalcollections.core.model.api.Sorting;
-import de.digitalcollections.core.model.impl.SortingImpl;
+import de.digitalcollections.core.model.api.paging.PageRequest;
+import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.cudami.client.backend.api.repository.UserRepository;
 import de.digitalcollections.cudami.client.business.api.service.UserService;
 import de.digitalcollections.cudami.client.business.impl.validator.PasswordsValidatorParams;
@@ -92,13 +92,18 @@ public class UserServiceImpl implements UserService<User, Long> {
   }
 
   @Override
+  public PageResponse<User> find(PageRequest pageRequest) {
+    return userRepository.find(pageRequest);
+  }
+
+  @Override
   public User get(Long id) {
     return (User) userRepository.findOne(id);
   }
 
   @Override
   public List<User> getAll() {
-    return userRepository.findAll(new SortingImpl("lastname", Sorting.SortOrder.ASC, Sorting.SortType.ALPHANUMERICAL));
+    return userRepository.findAll();
   }
 
   /*

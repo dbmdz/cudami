@@ -13,9 +13,10 @@
 
     <version.aspectjweaver>1.8.10</version.aspectjweaver>
     <version.commons-dbcp2>2.1.1</version.commons-dbcp2>
-    <version.digitalcollections-commons-server>1.2.2</version.digitalcollections-commons-server>
-    <version.digitalcollections-commons-springaop>1.2.2</version.digitalcollections-commons-springaop>
-    <version.digitalcollections-commons-springmvc>1.2.2</version.digitalcollections-commons-springmvc>
+    <version.digitalcollections-commons-server>1.2.4-SNAPSHOT</version.digitalcollections-commons-server>
+    <version.digitalcollections-commons-springaop>1.2.4-SNAPSHOT</version.digitalcollections-commons-springaop>
+    <version.digitalcollections-commons-springdata>1.2.4-SNAPSHOT</version.digitalcollections-commons-springdata>
+    <version.digitalcollections-commons-springmvc>1.2.4-SNAPSHOT</version.digitalcollections-commons-springmvc>
     <version.digitalcollections-core-model-api>1.2.6-SNAPSHOT</version.digitalcollections-core-model-api>
     <version.digitalcollections-core-model-impl>1.2.6-SNAPSHOT</version.digitalcollections-core-model-impl>
     <version.flyway-core>4.0.3</version.flyway-core>
@@ -136,6 +137,11 @@
         <groupId>de.digitalcollections.commons</groupId>
         <artifactId>digitalcollections-commons-springaop</artifactId>
         <version>${version.digitalcollections-commons-springaop}</version>
+      </dependency>
+      <dependency>
+        <groupId>de.digitalcollections.commons</groupId>
+        <artifactId>digitalcollections-commons-springdata</artifactId>
+        <version>${version.digitalcollections-commons-springdata}</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.commons</groupId>

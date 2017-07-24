@@ -1,6 +1,9 @@
 package de.digitalcollections.cudami.client.backend.impl.repository;
 
-import de.digitalcollections.core.model.api.Sorting;
+import de.digitalcollections.core.model.api.paging.Order;
+import de.digitalcollections.core.model.api.paging.PageRequest;
+import de.digitalcollections.core.model.api.paging.PageResponse;
+import de.digitalcollections.core.model.api.paging.Sorting;
 import de.digitalcollections.cudami.client.backend.api.repository.UserRepository;
 import de.digitalcollections.cudami.client.backend.impl.repository.exceptionhandling.EndpointErrorDecoder;
 import de.digitalcollections.cudami.client.backend.impl.repository.exceptionhandling.client.ResourceNotFoundException;
@@ -8,6 +11,7 @@ import de.digitalcollections.cudami.model.impl.security.UserImpl;
 import feign.Feign;
 import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
+import java.util.Iterator;
 import java.util.List;
 import org.springframework.stereotype.Repository;
 
@@ -26,8 +30,33 @@ public class UserRepositoryImpl implements UserRepository<UserImpl, Long> {
   }
 
   @Override
-  public List<UserImpl> findAll(Sorting sort) {
-    return endpoint.findAll(sort.getSortOrder().name(), sort.getSortField(), sort.getSortType().name());
+  public PageResponse<UserImpl> find(PageRequest pageRequest) {
+
+    int pageNumber = pageRequest.getPageNumber();
+    int pageSize = pageRequest.getPageSize();
+
+    Sorting sorting = pageRequest.getSorting();
+    Iterator<Order> iterator = sorting.iterator();
+
+    // FIXME add support for multiple sort fields
+    String sortField = "";
+    String sortDirection = "";
+    String nullHandling = "";
+//    while (iterator.hasNext()) {
+    if (iterator.hasNext()) {
+      Order order = iterator.next();
+      sortField = order.getProperty() == null ? "" : order.getProperty();
+      sortDirection = order.getDirection() == null ? "" : order.getDirection().name();
+      nullHandling = order.getNullHandling() == null ? "" : order.getNullHandling().name();
+    }
+
+    return endpoint.find(pageNumber, pageSize, sortField, sortDirection, nullHandling);
+  }
+
+  @Override
+  public List<UserImpl> findAll() {
+    PageResponse<UserImpl> response = endpoint.find(-1, -1, "", "", "");
+    return response.getContent();
   }
 
   @Override
@@ -48,7 +77,7 @@ public class UserRepositoryImpl implements UserRepository<UserImpl, Long> {
   }
 
 //  @Override
-//  public Page<UserImpl> findAll(Pageable pgbl) {
+//  public Page<UserImpl> find(Pageable pgbl) {
 //    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 //  }
   @Override
@@ -75,11 +104,11 @@ public class UserRepositoryImpl implements UserRepository<UserImpl, Long> {
 //    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 //  }
 //  @Override
-//  public Iterable<UserImpl> findAll() {
+//  public Iterable<UserImpl> find() {
 //    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 //  }
 //  @Override
-//  public Iterable<UserImpl> findAll(Iterable<Long> itrbl) {
+//  public Iterable<UserImpl> find(Iterable<Long> itrbl) {
 //    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 //  }
 //  @Override

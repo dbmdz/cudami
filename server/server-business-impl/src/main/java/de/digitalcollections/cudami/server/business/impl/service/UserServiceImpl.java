@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.business.impl.service;
 
-import de.digitalcollections.core.model.api.Sorting;
-import de.digitalcollections.core.model.impl.SortingImpl;
+import de.digitalcollections.core.model.api.paging.PageRequest;
+import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.cudami.model.api.security.User;
 import de.digitalcollections.cudami.model.api.security.enums.Role;
 import de.digitalcollections.cudami.server.backend.api.repository.UserRepository;
@@ -33,13 +33,13 @@ public class UserServiceImpl implements UserService<User, Long> {
   public User activate(Long id) {
     User user = (User) userRepository.findOne(id);
     user.setEnabled(true);
-    userRepository.save(user);
+    user = userRepository.save(user);
     return user;
   }
 
   @Override
-  public List<User> getAll(Sorting sorting) {
-    return userRepository.findAll(sorting);
+  public PageResponse<User> find(PageRequest pageRequest) {
+    return userRepository.find(pageRequest);
   }
 
   @Override
@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService<User, Long> {
   public User deactivate(Long id) {
     User user = (User) userRepository.findOne(id);
     user.setEnabled(false);
-    userRepository.save(user);
+    user = userRepository.save(user);
     return user;
   }
 
@@ -80,11 +80,6 @@ public class UserServiceImpl implements UserService<User, Long> {
   @Override
   public User get(Long id) {
     return (User) userRepository.findOne(id);
-  }
-
-  @Override
-  public List<User> getAll() {
-    return userRepository.findAll(new SortingImpl("lastname", Sorting.SortOrder.ASC, Sorting.SortType.ALPHANUMERICAL));
   }
 
   /*

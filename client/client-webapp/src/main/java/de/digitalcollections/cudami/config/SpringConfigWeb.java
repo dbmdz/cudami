@@ -54,6 +54,7 @@ import org.thymeleaf.templateresolver.TemplateResolver;
   "de.digitalcollections.commons.springmvc.controller"})
 @EnableAspectJAutoProxy
 @EnableWebMvc
+//@EnableSpringDataWebSupport // for getting support for sorting and paging params
 @PropertySource(value = {
   "classpath:de/digitalcollections/cudami/config/SpringConfigWeb-${spring.profiles.active:local}.properties"
 })
@@ -110,6 +111,7 @@ public class SpringConfigWeb extends WebMvcConfigurerAdapter {
     templateEngine.addDialect(new LayoutDialect());
     templateEngine.addDialect(new SpringSecurityDialect());
     templateEngine.addDialect(new DataAttributeDialect());
+//    templateEngine.addDialect(new SpringDataDialect());
     return templateEngine;
   }
 

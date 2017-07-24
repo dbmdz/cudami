@@ -1,6 +1,13 @@
 package de.digitalcollections.cudami.server.controller;
 
-import de.digitalcollections.core.model.impl.SortingImpl;
+import de.digitalcollections.core.model.api.paging.PageRequest;
+import de.digitalcollections.core.model.api.paging.PageResponse;
+import de.digitalcollections.core.model.api.paging.Sorting;
+import de.digitalcollections.core.model.api.paging.enums.Direction;
+import de.digitalcollections.core.model.api.paging.enums.NullHandling;
+import de.digitalcollections.core.model.impl.paging.OrderImpl;
+import de.digitalcollections.core.model.impl.paging.PageRequestImpl;
+import de.digitalcollections.core.model.impl.paging.SortingImpl;
 import de.digitalcollections.cudami.model.api.security.User;
 import de.digitalcollections.cudami.model.api.security.enums.Role;
 import de.digitalcollections.cudami.server.business.api.service.UserService;
@@ -34,11 +41,22 @@ public class UserController {
   }
 
   @ApiMethod(description = "get all users")
-  @RequestMapping(value = "/v1/users", params = {"sortOrder", "sortField", "sortType"}, produces = "application/json", method = {RequestMethod.GET, RequestMethod.POST})
+  @RequestMapping(value = "/v1/users",
+          params = {"pageNumber", "pageSize", "sortField", "sortDirection", "nullHandling"},
+          produces = "application/json", method = {RequestMethod.GET, RequestMethod.POST})
   @ApiResponseObject
-  public List<User> findAll(@RequestParam(name = "sortOrder", required = false) String sortOrder, @RequestParam(name = "sortField", required = false) String sortField, @RequestParam(name = "sortType",
-          required = false) String sortType) {
-    return service.getAll(new SortingImpl(sortField, sortOrder, sortType));
+  public PageResponse<User> findAll(
+          @RequestParam(name = "pageNumber", required = false) int pageNumber,
+          @RequestParam(name = "pageSize", required = false) int pageSize,
+          @RequestParam(name = "sortField", required = false) String sortField,
+          @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
+          @RequestParam(name = "nullHandling", required = false) NullHandling nullHandling
+  ) {
+    // FIXME add support for multiple sorting orders
+    OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
+    Sorting sorting = new SortingImpl(order);
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
+    return service.find(pageRequest);
   }
 
   @ApiMethod(description = "get user by id")

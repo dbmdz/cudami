@@ -1,5 +1,7 @@
 package de.digitalcollections.cudami.client.business.api.service;
 
+import de.digitalcollections.core.model.api.paging.PageRequest;
+import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.cudami.model.api.security.User;
 import java.io.Serializable;
 import java.util.List;
@@ -23,6 +25,8 @@ public interface UserService<T extends User, ID extends Serializable> extends Us
   T createAdminUser();
 
   T deactivate(ID id);
+
+  PageResponse<T> find(PageRequest page);
 
   T get(ID id);
 

@@ -18,6 +18,7 @@
   <properties>
     <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <version.thymeleaf-spring-data-dialect>3.3.0</version.thymeleaf-spring-data-dialect>
   </properties>
 
   <dependencies>
@@ -63,8 +64,18 @@
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
+      <artifactId>digitalcollections-commons-springdata</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.commons</groupId>
       <artifactId>digitalcollections-commons-springmvc</artifactId>
     </dependency>
+<!--    <dependency>
+       see https://github.com/jpenren/thymeleaf-spring-data-dialect 
+      <groupId>io.github.jpenren</groupId>
+      <artifactId>thymeleaf-spring-data-dialect</artifactId>
+      <version>${version.thymeleaf-spring-data-dialect}</version>
+    </dependency>-->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
@@ -135,6 +146,11 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-webmvc</artifactId>
     </dependency>
+    <!--    <dependency>
+       getting support for paging and sorting params 
+      <groupId>org.springframework.data</groupId>
+      <artifactId>spring-data-commons</artifactId>
+    </dependency>-->
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-web</artifactId>
@@ -154,7 +170,6 @@
     <dependency>
       <groupId>org.unbescape</groupId>
       <artifactId>unbescape</artifactId>
-      <version>1.1.4.RELEASE</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>

@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.api.service;
 
-import de.digitalcollections.core.model.api.Sorting;
+import de.digitalcollections.core.model.api.paging.PageRequest;
+import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.cudami.model.api.security.User;
 import java.io.Serializable;
 import java.util.List;
@@ -27,9 +28,7 @@ public interface UserService<T extends User, ID extends Serializable> {
 
   T get(ID id);
 
-  List<T> getAll(Sorting sorting);
-
-  List<T> getAll();
+  PageResponse<T> find(PageRequest pageRequest);
 
   T loadUserByUsername(String string) throws UsernameNotFoundException;
 

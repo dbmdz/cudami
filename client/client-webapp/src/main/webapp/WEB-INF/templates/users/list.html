@@ -12,12 +12,12 @@
     <section layout:fragment="content">
       <h1><span th:text="#{users}">Users</span> <a class="btn btn-default" th:href="@{/users/new}" th:text="#{btn_new}">New</a></h1>
 
-      <table class="table table-bordered table-condensed table-responsive">
+      <table class="table table-bordered table-condensed table-striped table-hover table-responsive">
         <thead>
           <tr>
             <th class="center" th:text="#{lastname}">Lastname</th>
             <th class="center" th:text="#{firstname}">Firstname</th>
-            <th class="center" th:text="#{username}">Username / Email</th>
+            <th class="center"><a class="sorted" sd:pagination-sort="email" th:text="#{username}">Username / Email</a></th>
             <th class="center" th:text="#{roles}">Role(s)</th>
             <th class="center" th:text="#{status}">Status</th>
             <th class="center" th:text="#{action}">Action</th>
@@ -36,7 +36,7 @@
               <a class="option text-success" href="#" title="activate user"><span class="fa fa-circle"></span></a>
             </td>
           </tr>
-          <tr th:each="user: ${users}">
+          <tr th:each="user: ${page}">
             <td><span th:text="${user.lastname}">Meier</span></td>
             <td><span th:text="${user.firstname}">Hans</span></td>
             <td><a th:href="@{'/users/' + ${user.id}}" th:text="${user.email}">hans@meier.de</a></td>
@@ -62,6 +62,21 @@
         </tbody>
       </table>
 
+      <div class="row">
+        <div class="col-sm-6">
+          <div sd:pagination-summary="">pagination info</div>
+        </div>
+        <div class="col-sm-6">
+          <nav class="pull-right">
+            <ul class="pagination" sd:pagination="full">
+              <!-- Pagination created by SpringDataDialect, this content is just for mockup -->
+              <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+              <li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+      
       <div th:replace="fragments/modals-confirmation :: confirmYesNoDialog"></div>
     </section>
   </body>

@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.client.backend.api.repository;
 
-import de.digitalcollections.core.model.api.Sorting;
+import de.digitalcollections.core.model.api.paging.PageRequest;
+import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.cudami.model.api.security.User;
 import java.io.Serializable;
 import java.util.List;
@@ -14,7 +15,9 @@ public interface UserRepository<U extends User, S extends Serializable> {
 
   User create();
 
-  List<U> findAll(Sorting sorting);
+  PageResponse<U> find(PageRequest pageRequest);
+
+  List<U> findAll();
 
   List<U> findActiveAdminUsers();
 

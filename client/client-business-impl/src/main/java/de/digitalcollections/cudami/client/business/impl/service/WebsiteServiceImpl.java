@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.client.business.impl.service;
 import de.digitalcollections.cudami.client.backend.api.repository.WebsiteRepository;
 import de.digitalcollections.cudami.client.business.api.service.WebsiteService;
 import de.digitalcollections.cudami.client.business.api.service.exceptions.WebsiteServiceException;
+import de.digitalcollections.cudami.model.api.entity.ContentNode;
 import de.digitalcollections.cudami.model.api.entity.Website;
 import java.util.List;
 import org.slf4j.Logger;
@@ -10,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import de.digitalcollections.cudami.model.api.entity.ContentNode;
 
 /**
  * Service for Website handling.
@@ -40,7 +40,7 @@ public class WebsiteServiceImpl implements WebsiteService<Website, Long> {
 
   @Override
   public List<Website> getAll() {
-    List<Website> websites = (List<Website>) websiteRepository.findAll();
+    List<Website> websites = websiteRepository.findAll();
     return websites;
   }
 

@@ -1,6 +1,10 @@
 package de.digitalcollections.cudami.client.webapp.controller;
 
+import de.digitalcollections.commons.springdata.domain.PageConverter;
+import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
+import de.digitalcollections.core.model.api.paging.PageRequest;
+import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.cudami.client.business.api.service.UserService;
 import de.digitalcollections.cudami.client.webapp.propertyeditor.RoleEditor;
 import de.digitalcollections.cudami.model.api.security.User;
@@ -13,6 +17,9 @@ import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.SortDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -134,9 +141,13 @@ public class UserController extends AbstractController implements MessageSourceA
   }
 
   @RequestMapping(method = RequestMethod.GET)
-  public String list(Model model) {
-    List<User> users = userService.getAll();
-    model.addAttribute("users", users);
+  public String list(Model model, @SortDefault("email") Pageable pageable) {
+//    List<User> users = userService.getAll();
+//    model.addAttribute("users", users);
+    final PageRequest pageRequest = PageableConverter.convert(pageable);
+    final PageResponse pageResponse = userService.find(pageRequest);
+    Page page = PageConverter.convert(pageResponse, pageRequest);
+    model.addAttribute("page", page);
     return "users/list";
   }
 
