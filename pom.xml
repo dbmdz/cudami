@@ -4,21 +4,26 @@
 
   <name>DigitalCollections: cudami</name>
   <groupId>de.digitalcollections.cudami</groupId>
-  <artifactId>parent</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <artifactId>dc-cudami</artifactId>
+  <version>1.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
+
+  <modules>
+    <module>dc-cudami-client</module>
+    <module>dc-cudami-model-parent</module>
+    <module>dc-cudami-server</module>
+  </modules>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <version.aspectjweaver>1.8.10</version.aspectjweaver>
     <version.commons-dbcp2>2.1.1</version.commons-dbcp2>
-    <version.digitalcollections-commons-server>1.2.4-SNAPSHOT</version.digitalcollections-commons-server>
-    <version.digitalcollections-commons-springaop>1.2.4-SNAPSHOT</version.digitalcollections-commons-springaop>
-    <version.digitalcollections-commons-springdata>1.2.4-SNAPSHOT</version.digitalcollections-commons-springdata>
-    <version.digitalcollections-commons-springmvc>1.2.4-SNAPSHOT</version.digitalcollections-commons-springmvc>
-    <version.digitalcollections-core-model-api>1.2.6-SNAPSHOT</version.digitalcollections-core-model-api>
-    <version.digitalcollections-core-model-impl>1.2.6-SNAPSHOT</version.digitalcollections-core-model-impl>
+    <version.dc-commons-server>1.2.4-SNAPSHOT</version.dc-commons-server>
+    <version.dc-commons-springaop>1.2.4-SNAPSHOT</version.dc-commons-springaop>
+    <version.dc-commons-springdata>1.2.4-SNAPSHOT</version.dc-commons-springdata>
+    <version.dc-commons-springmvc>1.2.4-SNAPSHOT</version.dc-commons-springmvc>
+    <version.dc-core-model>2.0.0-SNAPSHOT</version.dc-core-model>
     <version.flyway-core>4.0.3</version.flyway-core>
     <version.gson>2.3.1</version.gson>
     <version.guava>20.0</version.guava>
@@ -70,12 +75,6 @@
     <version.maven-war-plugin>2.3</version.maven-war-plugin>
   </properties>
 
-  <modules>
-    <module>client</module>
-    <module>model</module>
-    <module>server</module>
-  </modules>
-
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -115,11 +114,6 @@
       </dependency>
       <dependency>
         <groupId>de.digitalcollections</groupId>
-        <artifactId>digitalcollections-core-model-api</artifactId>
-        <version>${version.digitalcollections-core-model-api}</version>
-      </dependency>
-      <dependency>
-        <groupId>de.digitalcollections</groupId>
         <artifactId>iiif-image-model-api</artifactId>
         <version>${version.iiif-image-model-api}</version>
       </dependency>
@@ -130,82 +124,62 @@
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.commons</groupId>
-        <artifactId>digitalcollections-commons-server</artifactId>
-        <version>${version.digitalcollections-commons-server}</version>
+        <artifactId>dc-commons-server</artifactId>
+        <version>${version.dc-commons-server}</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.commons</groupId>
-        <artifactId>digitalcollections-commons-springaop</artifactId>
-        <version>${version.digitalcollections-commons-springaop}</version>
+        <artifactId>dc-commons-springaop</artifactId>
+        <version>${version.dc-commons-springaop}</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.commons</groupId>
-        <artifactId>digitalcollections-commons-springdata</artifactId>
-        <version>${version.digitalcollections-commons-springdata}</version>
+        <artifactId>dc-commons-springdata</artifactId>
+        <version>${version.dc-commons-springdata}</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.commons</groupId>
-        <artifactId>digitalcollections-commons-springmvc</artifactId>
-        <version>${version.digitalcollections-commons-springmvc}</version>
+        <artifactId>dc-commons-springmvc</artifactId>
+        <version>${version.dc-commons-springmvc}</version>
       </dependency>
       <dependency>
-        <groupId>de.digitalcollections</groupId>
-        <artifactId>digitalcollections-core-model-impl</artifactId>
-        <version>${version.digitalcollections-core-model-impl}</version>
+        <groupId>de.digitalcollections.core</groupId>
+        <artifactId>dc-core-model</artifactId>
+        <version>${version.dc-core-model}</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.cudami</groupId>
-        <artifactId>client-backend-api</artifactId>
+        <artifactId>dc-cudami-client-backend-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.cudami</groupId>
-        <artifactId>client-backend-impl-jpa</artifactId>
+        <artifactId>dc-cudami-client-backend-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.cudami</groupId>
-        <artifactId>client-backend-impl-rest</artifactId>
+        <artifactId>dc-cudami-client-business</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.cudami</groupId>
-        <artifactId>client-business-api</artifactId>
+        <artifactId>dc-cudami-model</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.cudami</groupId>
-        <artifactId>client-business-impl</artifactId>
+        <artifactId>dc-cudami-server-backend-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.cudami</groupId>
-        <artifactId>model-api</artifactId>
+        <artifactId>dc-cudami-server-backend-jdbi</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.cudami</groupId>
-        <artifactId>model-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>de.digitalcollections.cudami</groupId>
-        <artifactId>server-backend-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>de.digitalcollections.cudami</groupId>
-        <artifactId>server-backend-impl-jdbi</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>de.digitalcollections.cudami</groupId>
-        <artifactId>server-business-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>de.digitalcollections.cudami</groupId>
-        <artifactId>server-business-impl</artifactId>
+        <artifactId>dc-cudami-server-business</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
