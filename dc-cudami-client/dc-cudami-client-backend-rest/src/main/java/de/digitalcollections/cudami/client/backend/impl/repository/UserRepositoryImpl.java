@@ -5,24 +5,18 @@ import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.core.model.api.paging.Sorting;
 import de.digitalcollections.cudami.client.backend.api.repository.UserRepository;
-import de.digitalcollections.cudami.client.backend.impl.repository.exceptionhandling.EndpointErrorDecoder;
 import de.digitalcollections.cudami.client.backend.impl.repository.exceptionhandling.client.ResourceNotFoundException;
 import de.digitalcollections.cudami.model.impl.security.UserImpl;
-import feign.Feign;
-import feign.gson.GsonDecoder;
-import feign.gson.GsonEncoder;
 import java.util.Iterator;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository<UserImpl, Long> {
 
-  private final UserRepositoryEndpoint endpoint = Feign.builder()
-          .decoder(new GsonDecoder())
-          .encoder(new GsonEncoder())
-          .errorDecoder(new EndpointErrorDecoder())
-          .target(UserRepositoryEndpoint.class, "http://localhost:8080");
+  @Autowired
+  private UserRepositoryEndpoint endpoint;
 
   @Override
   public UserImpl create() {

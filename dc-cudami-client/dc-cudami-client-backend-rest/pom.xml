@@ -12,10 +12,18 @@
   <artifactId>dc-cudami-client-backend-rest</artifactId>
   <packaging>jar</packaging>
   
+  <properties>
+    <version.feign>9.5.0</version.feign>
+  </properties>
+  
   <dependencies>
     <dependency>
       <groupId>de.digitalcollections.core</groupId>
       <artifactId>dc-core-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.core</groupId>
+      <artifactId>dc-core-model-jackson</artifactId>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
@@ -26,14 +34,23 @@
       <artifactId>dc-cudami-model</artifactId>
     </dependency>
     <dependency>
+      <groupId>de.digitalcollections.cudami</groupId>
+      <artifactId>dc-cudami-model-jackson</artifactId>
+    </dependency>
+    <dependency>
       <groupId>io.github.openfeign</groupId>
       <artifactId>feign-core</artifactId>
-      <version>9.5.0</version>
+      <version>${version.feign}</version>
     </dependency>
     <dependency>
       <groupId>io.github.openfeign</groupId>
       <artifactId>feign-gson</artifactId>
-      <version>9.5.0</version>
+      <version>${version.feign}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.github.openfeign</groupId>
+      <artifactId>feign-jackson</artifactId>
+      <version>${version.feign}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>

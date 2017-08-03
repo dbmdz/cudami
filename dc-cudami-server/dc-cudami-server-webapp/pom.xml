@@ -50,6 +50,10 @@
       <artifactId>dc-core-model</artifactId>
     </dependency>
     <dependency>
+      <groupId>de.digitalcollections.core</groupId>
+      <artifactId>dc-core-model-jackson</artifactId>
+    </dependency>
+    <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-model</artifactId>
     </dependency>

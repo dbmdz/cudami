@@ -9,4 +9,12 @@
                 <goal>install</goal>
             </goals>
         </action>
+        <action>
+            <actionName>CUSTOM-mvn clean install -U</actionName>
+            <displayName>mvn clean install -U</displayName>
+            <goals>
+                <goal>clean</goal>
+                <goal>install</goal>
+            </goals>
+        </action>
     </actions>

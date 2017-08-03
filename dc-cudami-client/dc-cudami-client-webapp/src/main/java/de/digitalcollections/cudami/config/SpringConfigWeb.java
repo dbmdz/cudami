@@ -23,6 +23,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -54,7 +55,7 @@ import org.thymeleaf.templateresolver.TemplateResolver;
   "de.digitalcollections.commons.springmvc.controller"})
 @EnableAspectJAutoProxy
 @EnableWebMvc
-//@EnableSpringDataWebSupport // for getting support for sorting and paging params
+@EnableSpringDataWebSupport // for getting support for sorting and paging params
 @PropertySource(value = {
   "classpath:de/digitalcollections/cudami/config/SpringConfigWeb-${spring.profiles.active:local}.properties"
 })
