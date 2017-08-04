@@ -10,8 +10,21 @@ import java.util.Map;
 
 public abstract class AbstractPagingAndSortingRepositoryImpl {
 
-  protected Map<String, Object> addPageRequestParams(PageRequest pageRequest, StringBuilder query) {
-    Map<String, Object> params = new HashMap<>();
+  private void addLimit(PageRequest pageRequest, StringBuilder query) {
+    int pageSize = pageRequest.getPageSize();
+    if (pageSize > 0) {
+      query.append(" LIMIT ").append(pageSize);
+    }
+  }
+
+  private void addOffset(PageRequest pageRequest, StringBuilder query) {
+    int offset = pageRequest.getOffset();
+    if (offset >= 0) {
+      query.append(" OFFSET ").append(offset);
+    }
+  }
+
+  private void addOrderBy(PageRequest pageRequest, StringBuilder query, Map<String, Object> params) {
     // Sorting
     String sortDirection = null;
     String sortField = null;
@@ -40,14 +53,13 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
       sortDirection = " ASC";
     }
     query.append(sortDirection);
-    int pageSize = pageRequest.getPageSize();
-    if (pageSize > 0) {
-      query.append(" LIMIT ").append(pageSize);
-    }
-    int offset = pageRequest.getOffset();
-    if (offset >= 0) {
-      query.append(" OFFSET ").append(offset);
-    }
+  }
+
+  protected Map<String, Object> addPageRequestParams(PageRequest pageRequest, StringBuilder query) {
+    Map<String, Object> params = new HashMap<>();
+    addOrderBy(pageRequest, query, params);
+    addLimit(pageRequest, query);
+    addOffset(pageRequest, query);
     return params;
   }
 
