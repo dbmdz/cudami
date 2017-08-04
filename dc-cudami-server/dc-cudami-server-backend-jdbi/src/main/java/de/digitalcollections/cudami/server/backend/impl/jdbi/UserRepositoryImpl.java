@@ -1,22 +1,19 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi;
 
-import de.digitalcollections.core.model.api.paging.Order;
 import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
-import de.digitalcollections.core.model.api.paging.Sorting;
-import de.digitalcollections.core.model.api.paging.enums.Direction;
 import de.digitalcollections.core.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.cudami.model.api.security.enums.Role;
 import de.digitalcollections.cudami.model.impl.security.UserImpl;
 import de.digitalcollections.cudami.server.backend.api.repository.UserRepository;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.jdbi.v3.core.Jdbi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class UserRepositoryImpl implements UserRepository<UserImpl, Long> {
+public class UserRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl implements UserRepository<UserImpl, Long> {
 
   @Autowired
   private Jdbi dbi;
@@ -35,43 +32,15 @@ public class UserRepositoryImpl implements UserRepository<UserImpl, Long> {
 
   @Override
   public PageResponse<UserImpl> find(PageRequest pageRequest) {
-    StringBuilder query = new StringBuilder("SELECT * FROM users ORDER BY :order_field");
+    StringBuilder query = new StringBuilder("SELECT * FROM users");
 
-    // Sorting
-    Sorting sorting = pageRequest.getSorting();
-    String sortField = null;
-    if (sorting != null) {
-      Iterator<Order> iterator = sorting.iterator();
-      if (iterator.hasNext()) { // FIXME just supporting one field sorting until now
-        Order order = iterator.next();
-        sortField = order.getProperty();
-        if (sortField != null) {
-          Direction sortDirection = order.getDirection();
-          if (sortDirection != null && sortDirection.isDescending()) {
-            query.append(" DESC");
-          }
-        }
-      }
-    }
-    if (sortField == null) {
-      sortField = "id";
-    }
-    final String finalSortField = sortField;
-
-    int pageSize = pageRequest.getPageSize();
-    query.append(" LIMIT ").append(pageSize);
-
-    int offset = pageRequest.getOffset();
-    query.append(" OFFSET ").append(offset);
-
-    long total = count();
-
+    Map<String, Object> bindParams = addPageRequestParams(pageRequest, query);
     List<UserImpl> content = dbi.withHandle(h -> h.createQuery(query.toString())
-            .bind("order_field", finalSortField)
+            .bindMap(bindParams)
             .mapToBean(UserImpl.class)
             .list());
 
-    // TODO PageRequest
+    long total = count();
     PageResponse pageResponse = new PageResponseImpl(content, pageRequest, total);
     return pageResponse;
   }
