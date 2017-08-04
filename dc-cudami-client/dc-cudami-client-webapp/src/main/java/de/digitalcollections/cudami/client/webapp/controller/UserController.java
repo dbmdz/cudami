@@ -142,7 +142,7 @@ public class UserController extends AbstractController implements MessageSourceA
   }
 
   @RequestMapping(method = RequestMethod.GET)
-  public String list(Model model, @PageableDefault(sort = {"email"}, size = 2) Pageable pageable) {
+  public String list(Model model, @PageableDefault(sort = {"email"}, size = 25) Pageable pageable) {
 //    List<User> users = userService.getAll();
 //    model.addAttribute("users", users);
     final PageRequest pageRequest = PageableConverter.convert(pageable);

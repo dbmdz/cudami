@@ -2,7 +2,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
-      layout:decorator="base">
+      layout:decorate="~{base}">
 
   <head>
     <title th:if="${isNew}" th:text="|#{websites}: #{create_website}|">Websites: Create a new website</title>

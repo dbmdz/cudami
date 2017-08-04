@@ -60,12 +60,12 @@
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-model</artifactId>
     </dependency>
-    <!--    <dependency>
-       see https://github.com/jpenren/thymeleaf-spring-data-dialect 
+    <dependency>
+      <!--see https://github.com/jpenren/thymeleaf-spring-data-dialect--> 
       <groupId>io.github.jpenren</groupId>
       <artifactId>thymeleaf-spring-data-dialect</artifactId>
       <version>${version.thymeleaf-spring-data-dialect}</version>
-    </dependency>-->
+    </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
@@ -202,6 +202,11 @@
       <groupId>org.webjars.bower</groupId>
       <artifactId>ie10-viewport-bug-workaround</artifactId>
       <version>${version.webjar-ie10-viewport-bug-workaround}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.thymeleaf</groupId>
+      <artifactId>thymeleaf</artifactId>
+      <version>3.0.7.RELEASE</version>
     </dependency>
   </dependencies>
 

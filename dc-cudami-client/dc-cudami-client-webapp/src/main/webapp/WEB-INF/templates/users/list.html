@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
-      layout:decorator="base">
+      layout:decorate="~{base}">
 
   <head>
     <title th:text="#{users}">Users</title>
@@ -25,7 +25,7 @@
 
       <table class="table table-bordered table-condensed table-striped table-hover table-responsive">
         <thead>
-          <tr>
+          <tr sd:page-object="${page.page}">
             <th class="center" th:text="#{lastname}">Lastname</th>
             <th class="center" th:text="#{firstname}">Firstname</th>
             <th class="center"><a class="sorted" sd:pagination-sort="email" th:text="#{username}">Username / Email</a></th>

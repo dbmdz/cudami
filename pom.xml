@@ -21,10 +21,10 @@
     <version.assertj-core>3.7.0</version.assertj-core>
     <version.commons-beanutils>1.9.3</version.commons-beanutils>
     <version.commons-dbcp2>2.1.1</version.commons-dbcp2>
-    <version.dc-commons-server>1.2.4-SNAPSHOT</version.dc-commons-server>
-    <version.dc-commons-springaop>1.2.4-SNAPSHOT</version.dc-commons-springaop>
-    <version.dc-commons-springdata>1.2.4-SNAPSHOT</version.dc-commons-springdata>
-    <version.dc-commons-springmvc>1.2.4-SNAPSHOT</version.dc-commons-springmvc>
+    <version.dc-commons-server>1.2.5-SNAPSHOT</version.dc-commons-server>
+    <version.dc-commons-springaop>1.2.5-SNAPSHOT</version.dc-commons-springaop>
+    <version.dc-commons-springdata>1.2.5-SNAPSHOT</version.dc-commons-springdata>
+    <version.dc-commons-springmvc>1.2.5-SNAPSHOT</version.dc-commons-springmvc>
     <version.dc-core-model>2.0.0-SNAPSHOT</version.dc-core-model>
     <version.flyway-core>4.0.3</version.flyway-core>
     <version.gson>2.3.1</version.gson>
@@ -52,10 +52,10 @@
     <version.spring-tx>4.3.7.RELEASE</version.spring-tx>
     <version.spring-web>4.3.7.RELEASE</version.spring-web>
     <version.spring-webmvc>4.3.7.RELEASE</version.spring-webmvc>
-    <version.thymeleaf-extras-data-attribute>1.3</version.thymeleaf-extras-data-attribute> <!-- TODO Upgrade -->
-    <version.thymeleaf-extras-springsecurity4>2.1.2.RELEASE</version.thymeleaf-extras-springsecurity4> <!-- TODO Upgrade -->
-    <version.thymeleaf-layout-dialect>1.2.9</version.thymeleaf-layout-dialect> <!-- TODO Upgrade -->
-    <version.thymeleaf-spring4>2.1.4.RELEASE</version.thymeleaf-spring4> <!-- TODO Upgrade -->
+    <version.thymeleaf-extras-data-attribute>2.0.1</version.thymeleaf-extras-data-attribute>
+    <version.thymeleaf-extras-springsecurity4>3.0.2.RELEASE</version.thymeleaf-extras-springsecurity4>
+    <version.thymeleaf-layout-dialect>2.2.2</version.thymeleaf-layout-dialect>
+    <version.thymeleaf-spring4>3.0.7.RELEASE</version.thymeleaf-spring4>
     <version.unbescape>1.1.4.RELEASE</version.unbescape>
     <version.validation-api>1.0.0.GA</version.validation-api> <!-- TODO Upgrade -->
     
