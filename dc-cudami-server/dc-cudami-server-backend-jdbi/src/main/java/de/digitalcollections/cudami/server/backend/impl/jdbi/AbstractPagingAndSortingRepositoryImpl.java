@@ -4,9 +4,8 @@ import de.digitalcollections.core.model.api.paging.Order;
 import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.Sorting;
 import de.digitalcollections.core.model.api.paging.enums.Direction;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Map;
 
 public abstract class AbstractPagingAndSortingRepositoryImpl {
 
@@ -24,7 +23,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
     }
   }
 
-  private void addOrderBy(PageRequest pageRequest, StringBuilder query, Map<String, Object> params) {
+  private void addOrderBy(PageRequest pageRequest, StringBuilder query, String[] allowedOrderByFields) {
     // Sorting
     String sortDirection = null;
     String sortField = null;
@@ -46,21 +45,23 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
     if (sortField == null) {
       sortField = "id";
     }
-    // Do not just append sortFiels value (could be malicious SQL injection!!!), so using binding of jdbi
-    query.append(" ORDER BY :sortField");
-    params.put("sortField", sortField);
-    if (sortDirection == null) {
-      sortDirection = " ASC";
+
+    if ("id".equals(sortField) || (allowedOrderByFields != null && Arrays.asList(allowedOrderByFields).contains(sortField))) {
+      // Do not just append sortFiels value (check if is in allowed fields or equals "id")
+      // binding of jdbi/database does not work for order by!!!
+      query.append(" ORDER BY ").append(sortField);
+      if (sortDirection == null) {
+        sortDirection = " ASC";
+      }
+      query.append(sortDirection);
     }
-    query.append(sortDirection);
   }
 
-  protected Map<String, Object> addPageRequestParams(PageRequest pageRequest, StringBuilder query) {
-    Map<String, Object> params = new HashMap<>();
-    addOrderBy(pageRequest, query, params);
+  protected void addPageRequestParams(PageRequest pageRequest, StringBuilder query) {
+    addOrderBy(pageRequest, query, getAllowedOrderByFields());
     addLimit(pageRequest, query);
     addOffset(pageRequest, query);
-    return params;
   }
 
+  protected abstract String[] getAllowedOrderByFields();
 }

@@ -7,7 +7,6 @@ import de.digitalcollections.cudami.model.api.security.enums.Role;
 import de.digitalcollections.cudami.model.impl.security.UserImpl;
 import de.digitalcollections.cudami.server.backend.api.repository.UserRepository;
 import java.util.List;
-import java.util.Map;
 import org.jdbi.v3.core.Jdbi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -34,14 +33,12 @@ public class UserRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl i
   public PageResponse<UserImpl> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder("SELECT * FROM users");
 
-    Map<String, Object> bindParams = addPageRequestParams(pageRequest, query);
-    List<UserImpl> content = dbi.withHandle(h -> h.createQuery(query.toString())
-            .bindMap(bindParams)
+    addPageRequestParams(pageRequest, query);
+    List<UserImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
             .mapToBean(UserImpl.class)
             .list());
-
     long total = count();
-    PageResponse pageResponse = new PageResponseImpl(content, pageRequest, total);
+    PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
   }
 
@@ -77,6 +74,11 @@ public class UserRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl i
       return null;
     }
     return users.get(0);
+  }
+
+  @Override
+  protected String[] getAllowedOrderByFields() {
+    return new String[]{"email", "lastname", "firstname"};
   }
 
   @Override
