@@ -58,7 +58,12 @@ public class UserRepositoryImpl implements UserRepository<UserImpl, Long> {
     }
     final String finalSortField = sortField;
 
-    // TODO paging
+    int pageSize = pageRequest.getPageSize();
+    query.append(" LIMIT ").append(pageSize);
+
+    int offset = pageRequest.getOffset();
+    query.append(" OFFSET ").append(offset);
+
     long total = count();
 
     List<UserImpl> content = dbi.withHandle(h -> h.createQuery(query.toString())
