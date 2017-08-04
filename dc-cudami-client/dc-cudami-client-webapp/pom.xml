@@ -27,6 +27,22 @@
       <artifactId>thymeleaf-extras-data-attribute</artifactId>
     </dependency>
     <dependency>
+      <groupId>de.digitalcollections.commons</groupId>
+      <artifactId>dc-commons-server</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.commons</groupId>
+      <artifactId>dc-commons-springaop</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.commons</groupId>
+      <artifactId>dc-commons-springdata</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.commons</groupId>
+      <artifactId>dc-commons-springmvc</artifactId>
+    </dependency>
+    <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-client-backend-api</artifactId>
       <scope>runtime</scope>
@@ -44,23 +60,7 @@
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-model</artifactId>
     </dependency>
-    <dependency>
-      <groupId>de.digitalcollections.commons</groupId>
-      <artifactId>dc-commons-server</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>de.digitalcollections.commons</groupId>
-      <artifactId>dc-commons-springaop</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>de.digitalcollections.commons</groupId>
-      <artifactId>dc-commons-springdata</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>de.digitalcollections.commons</groupId>
-      <artifactId>dc-commons-springmvc</artifactId>
-    </dependency>
-<!--    <dependency>
+    <!--    <dependency>
        see https://github.com/jpenren/thymeleaf-spring-data-dialect 
       <groupId>io.github.jpenren</groupId>
       <artifactId>thymeleaf-spring-data-dialect</artifactId>
