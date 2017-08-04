@@ -46,7 +46,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
     if (sortField == null) {
       sortField = "id";
     }
-    // Do not just abbend sortFiels value (could be malicious SQL injection!!!), so using binding of jdbi
+    // Do not just append sortFiels value (could be malicious SQL injection!!!), so using binding of jdbi
     query.append(" ORDER BY :sortField");
     params.put("sortField", sortField);
     if (sortDirection == null) {
