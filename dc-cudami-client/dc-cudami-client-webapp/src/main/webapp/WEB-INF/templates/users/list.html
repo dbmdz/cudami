@@ -11,6 +11,17 @@
   <body>
     <section layout:fragment="content">
       <h1><span th:text="#{users}">Users</span> <a class="btn btn-default" th:href="@{/users/new}" th:text="#{btn_new}">New</a></h1>
+      
+      <div class="row">
+        <div class="col-sm-12" >
+          <div th:replace="fragments/pagination-navigation :: pagination">
+            ...
+          </div>
+<!--          <div class="objectCounter lighter">
+            <span class="message" th:text="${page.totalItems}">Found 17 books.</span>
+          </div>-->
+        </div>
+      </div>
 
       <table class="table table-bordered table-condensed table-striped table-hover table-responsive">
         <thead>
@@ -36,7 +47,7 @@
               <a class="option text-success" href="#" title="activate user"><span class="fa fa-circle"></span></a>
             </td>
           </tr>
-          <tr th:each="user: ${page}">
+          <tr th:each="user: ${page.content}">
             <td><span th:text="${user.lastname}">Meier</span></td>
             <td><span th:text="${user.firstname}">Hans</span></td>
             <td><a th:href="@{'/users/' + ${user.id}}" th:text="${user.email}">hans@meier.de</a></td>
@@ -63,17 +74,10 @@
       </table>
 
       <div class="row">
-        <div class="col-sm-6">
-          <div sd:pagination-summary="">pagination info</div>
-        </div>
-        <div class="col-sm-6">
-          <nav class="pull-right">
-            <ul class="pagination" sd:pagination="full">
-              <!-- Pagination created by SpringDataDialect, this content is just for mockup -->
-              <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
-              <li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>
-            </ul>
-          </nav>
+        <div class="col-sm-12" >
+          <div th:replace="fragments/pagination-navigation :: pagination">
+            ...
+          </div>
         </div>
       </div>
       
