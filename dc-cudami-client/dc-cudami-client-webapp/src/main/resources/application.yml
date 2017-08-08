@@ -1,0 +1,30 @@
+endpoints:
+  hypermedia:
+    enabled: true
+
+management:
+  context-path: /manage
+  port: 19898
+  security:
+    enabled: true
+#    roles: SUPERUSER
+# default role is "ACTUATOR"
+
+security:
+  user:
+    name: admin
+    password: secret
+
+server:
+  port: 9898
+
+# upload config: see org.springframework.boot.autoconfigure.web.MultipartProperties
+spring:
+  http:
+    multipart:
+      # Values can use the suffixes "MB" or "KB" to indicate megabytes or kilobytes respectively.
+      file-size-threshold: 1MB
+      location: /tmp
+      max-file-size: 5MB
+      max-request-size: 25MB
+      # resolve-lazily: false
