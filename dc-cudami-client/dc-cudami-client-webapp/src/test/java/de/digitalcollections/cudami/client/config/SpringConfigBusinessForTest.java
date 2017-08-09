@@ -16,7 +16,11 @@ public class SpringConfigBusinessForTest {
   @Primary
   @Bean
   public UserService userService() {
-    return Mockito.mock(UserService.class);
+    final UserService userservice = Mockito.mock(UserService.class);
+//    Mockito.when(userservice.doesActiveAdminUserExist()).thenReturn(Boolean.TRUE);
+//    User user = new User("admin", "secret", true, true, true, true, null);
+//    Mockito.when(userservice.loadUserByUsername(Mockito.anyString())).thenReturn(user);
+    return userservice;
   }
 
   @Primary
