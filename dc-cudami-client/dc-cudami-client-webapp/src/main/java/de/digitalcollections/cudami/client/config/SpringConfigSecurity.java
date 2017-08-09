@@ -61,14 +61,22 @@ public class SpringConfigSecurity extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    http.authorizeRequests().anyRequest().permitAll();
-    http.authorizeRequests().antMatchers("/manage/**").hasRole("ACTUATOR").and().httpBasic();
-    http.authorizeRequests().antMatchers("/users/**").hasAnyAuthority(Role.ADMIN.getAuthority()).and()
+//    http.authorizeRequests().anyRequest().permitAll();
+    http.authorizeRequests().antMatchers("/api/**", "/css/**").permitAll();
+//    http.authorizeRequests().antMatchers("/manage/**").hasRole("ACTUATOR").and().httpBasic();
+    http.authorizeRequests().antMatchers("/users/**").hasAnyAuthority(Role.ADMIN.getAuthority());
+    http.authorizeRequests().anyRequest().authenticated().and()
             // Possibly more configuration ...
             .formLogin() // enable form based log in
-            // set permitAll for all URLs associated with Form Login
-            .permitAll();
+            .loginPage("/login").permitAll().and()
+            .logout().logoutUrl("/logout").permitAll().and()
+            .rememberMe().tokenRepository(persistentTokenRepository)
+            // 14 days = 14 * 24 h/d * 3600 s/h = 1209600 s
+            .tokenValiditySeconds(14 * 24 * 3600)
+            .userDetailsService(userDetailsService).and()
+            .httpBasic();
 
+    // FIXME: add CSRF protection and test all static resources and unit tests (if /css is only web.ignoring()...)
 //    // http.csrf().disable();
 //    http.csrf().requireCsrfProtectionMatcher(new RequestMatcher() {
 //      private final Pattern allowedMethods = Pattern.compile("^(GET|HEAD|TRACE|OPTIONS)$");
