@@ -18,7 +18,7 @@
             back
           </a>
           <a class="btn btn-default btn-block"
-             th:href="@{${user.id} + '/edit'}"
+             th:href="@{${user.uuid} + '/edit'}"
              th:text="#{edit}">
             edit
           </a>
@@ -26,7 +26,7 @@
              th:if="${user.enabled}" href="#"
              th:title="#{tooltip_deactivate_user}"
              th:text="#{btn_deactivate_user}"
-             data:href="@{${user.id} + '/deactivate'}"
+             data:href="@{${user.uuid} + '/deactivate'}"
              data:message="#{msg_confirmUserDeactivation(${user.email})}"
              data:title="#{title_warning}"
              data-target="#confirmYesNoDialog"
@@ -35,7 +35,7 @@
           </a>
           <a class="btn btn-success btn-block"
              th:unless="${user.enabled}"
-             th:href="@{${user.id} + '/activate'}"
+             th:href="@{${user.uuid} + '/activate'}"
              th:title="#{tooltip_activate_user}"
              th:text="#{btn_activate_user}">
             activate user
@@ -45,8 +45,8 @@
         <div class="col-sm-9" th:object="${user}">
           <div class="container-fluid rows-striped">
             <div class="row">
-              <div class="col-md-3"><label th:text="#{id}">ID</label></div>
-              <div class="col-md-9"><span th:text="*{id}">23</span></div>
+              <div class="col-md-3"><label th:text="#{id}">UUID</label></div>
+              <div class="col-md-9"><span th:text="*{uuid}">23</span></div>
             </div>
             <div class="row">
               <div class="col-md-3"><label th:text="#{username}">Username / Email</label></div>

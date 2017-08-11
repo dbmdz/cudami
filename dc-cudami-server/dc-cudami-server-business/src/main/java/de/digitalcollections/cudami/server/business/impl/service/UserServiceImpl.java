@@ -7,6 +7,7 @@ import de.digitalcollections.cudami.model.api.security.enums.Role;
 import de.digitalcollections.cudami.server.backend.api.repository.UserRepository;
 import de.digitalcollections.cudami.server.business.api.service.UserService;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,7 +20,7 @@ import org.springframework.validation.Validator;
  */
 @Service
 //@Transactional(readOnly = true)
-public class UserServiceImpl implements UserService<User, Long> {
+public class UserServiceImpl implements UserService<User, UUID> {
 
   @Autowired
   @Qualifier("uniqueUsernameValidator")
@@ -30,8 +31,8 @@ public class UserServiceImpl implements UserService<User, Long> {
 
   @Override
   //  @Transactional(readOnly = false)
-  public User activate(Long id) {
-    User user = (User) userRepository.findOne(id);
+  public User activate(UUID uuid) {
+    User user = (User) userRepository.findOne(uuid);
     user.setEnabled(true);
     user = userRepository.save(user);
     return user;
@@ -61,8 +62,8 @@ public class UserServiceImpl implements UserService<User, Long> {
 
   @Override
   //  @Transactional(readOnly = false)
-  public User deactivate(Long id) {
-    User user = (User) userRepository.findOne(id);
+  public User deactivate(UUID uuid) {
+    User user = (User) userRepository.findOne(uuid);
     user.setEnabled(false);
     user = userRepository.save(user);
     return user;
@@ -78,8 +79,8 @@ public class UserServiceImpl implements UserService<User, Long> {
   }
 
   @Override
-  public User get(Long id) {
-    return (User) userRepository.findOne(id);
+  public User get(UUID uuid) {
+    return (User) userRepository.findOne(uuid);
   }
 
   /*

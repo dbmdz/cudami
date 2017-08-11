@@ -1,13 +1,18 @@
 # cudami (cultural digital asset management)
 
-cudami is an editorial backoffice for managing cultural digital assets like websites, articles, digitized objects, digital nativ objects and entities.
+cudami is an editorial backoffice for managing cultural digital assets like websites, articles, digitized objects, digital native objects and entities.
 
 Technologies used:
 
-* Overall: Java, Spring, Spring Security
+* Overall: Java, Spring Boot, Spring Security
 * Frontend: Spring MVC, Thymeleaf
 * Business: Java
 * Backend: JDBI/PostgreSql, Flyway
+
+Architecture:
+
+* Cudami repository server with REST-interface
+* Cudami webapp GUI connected over REST-Interface with cudami repository server as backend.
 
 Features:
 
@@ -17,8 +22,7 @@ Features:
 * User management (CRUD)
 * Session logging incl. AOP-logging
 * Layer modularization (Frontend, Business, Backend; each API and IMPL)
-
-* Maven Site
+* Completely REST-based repository
 
 ## Installation
 
@@ -75,7 +79,7 @@ Features:
 3. Put your database properties into configuration file(s):
 
         $ cd <cudami source directory>
-        $ vi server/server-backend-impl-jdbi/src/main/resources/de/digitalcollections/cudami/config/SpringConfigBackend-<profile>.properties
+        $ vi dc-cudami-server/dc-cudami-server-backend-jdbi/src/main/resources/de/digitalcollections/cudami/config/SpringConfigBackend-<profile>.properties
 
         database.name=cudami
         database.hostname=localhost
@@ -87,24 +91,34 @@ Features:
 
 Build CMS:
 
-    $ cd <dicoCMS source directory>
+    $ cd <cudami source directory>
     $ mvn clean install
 
 ## Usage
 
-Run CMS (in development)
- 
-    $ cd <dicoCMS source directory>/digitalcollections-cms-client/digitalcollections-cms-client-webapp
-    $ mvn jetty:run
+### Run cudami (with "local" profile = configuration for local test)
 
-Run CMS (in production)
+Start repository and then cudami GUI webapp:
 
-* Deploy WAR to Tomcat
-* Start with java environment variable "spring.profiles.active" set to "PROD" (-Dspring.profiles.active:PROD)
+```sh
+$ java -jar dc-cudami-server-webapp-1.1.0-SNAPSHOT-exec.jar --spring.profiles.active=local &
+$ java -jar dc-cudami-client-webapp-1.1.0-SNAPSHOT-exec.jar --spring.profiles.active=local &
+```
 
-Use CMS
+### Run cudami (with "PROD" profile = configuration for production)
 
-    Browser: http://localhost:9898
+Start repository and then cudami GUI webapp:
+
+```sh
+$ java -jar dc-cudami-server-webapp-1.1.0-SNAPSHOT-exec.jar --spring.profiles.active=PROD &
+$ java -jar dc-cudami-client-webapp-1.1.0-SNAPSHOT-exec.jar --spring.profiles.active=PROD &
+```
+
+### GUI
+
+Local running cudami: http://localhost:9898
 
 CMS connects to database and if no admin user exists, the admin user creation assistant is launched.
-Create an admin user.
+Create an admin user and log in.
+
+Enjoy!

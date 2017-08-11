@@ -15,21 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
@@ -38,7 +30,6 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -46,14 +37,8 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
-import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.dialect.springdata.SpringDataDialect;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
-import org.thymeleaf.spring4.SpringTemplateEngine;
-import org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver;
-import org.thymeleaf.spring4.view.ThymeleafViewResolver;
-import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 @Configuration
 @ComponentScan(basePackages = {
@@ -65,28 +50,24 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 )
 @EnableAspectJAutoProxy
 @EnableSpringDataWebSupport // for getting support for sorting and paging params
-@PropertySource(value = {
-  "classpath:de/digitalcollections/cudami/config/SpringConfigWeb-${spring.profiles.active:local}.properties"
-})
+//@PropertySource(value = {
+//  "classpath:de/digitalcollections/cudami/config/SpringConfigWeb-${spring.profiles.active:local}.properties"
+//})
 @Import(SpringConfigCommonsMvc.class)
-public class SpringConfigWeb extends WebMvcConfigurerAdapter implements ApplicationContextAware {
+public class SpringConfigWeb extends WebMvcConfigurerAdapter {
 
   static final String ENCODING = "UTF-8";
 
-  private ApplicationContext applicationContext;
-
-  @Bean
-  public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-    return new PropertySourcesPlaceholderConfigurer();
-  }
-
-  @Value("${cacheTemplates}")
-  private boolean cacheTemplates;
-
-  @Autowired
-  @Qualifier("CommonsClasspathThymeleafResolver")
-  private ClassLoaderTemplateResolver commonsClasspathThymeleafResolver;
-
+//  private ApplicationContext applicationContext;
+//  @Bean
+//  public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+//    return new PropertySourcesPlaceholderConfigurer();
+//  }
+//  @Value("${cacheTemplates}")
+//  private boolean cacheTemplates;
+//  @Autowired
+//  @Qualifier("CommonsClasspathThymeleafResolver")
+//  private ClassLoaderTemplateResolver commonsClasspathThymeleafResolver;
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
 //    registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
@@ -94,54 +75,70 @@ public class SpringConfigWeb extends WebMvcConfigurerAdapter implements Applicat
     registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
   }
 
-  @Override
-  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-    this.applicationContext = applicationContext;
+//  @Override
+//  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+//    this.applicationContext = applicationContext;
+//  }
+//  @Bean
+//  public SpringResourceTemplateResolver springResourceTemplateResolver() {
+//    SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
+//    templateResolver.setApplicationContext(applicationContext);
+//    templateResolver.setPrefix("/WEB-INF/templates/");
+//    templateResolver.setSuffix(".html");
+//    templateResolver.setCheckExistence(true);
+//    templateResolver.setCharacterEncoding(ENCODING);
+//    templateResolver.setTemplateMode(TemplateMode.HTML);
+//    templateResolver.setCacheable(cacheTemplates);
+//    return templateResolver;
+//  }
+//  @Bean
+//  public SpringTemplateEngine templateEngine() {
+//    SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+//    templateEngine.setEnableSpringELCompiler(true);
+//
+//    commonsClasspathThymeleafResolver.setOrder(1);
+//    SpringResourceTemplateResolver springResourceTemplateResolver = springResourceTemplateResolver();
+//    springResourceTemplateResolver.setOrder(2);
+//    templateEngine.addTemplateResolver(commonsClasspathThymeleafResolver);
+//    templateEngine.addTemplateResolver(springResourceTemplateResolver);
+//
+//    // Activate Thymeleaf LayoutDialect[1] (for 'layout'-namespace)
+//    // [1] https://github.com/ultraq/thymeleaf-layout-dialect
+//    templateEngine.addDialect(new LayoutDialect());
+//    templateEngine.addDialect(new SpringSecurityDialect());
+//    templateEngine.addDialect(new DataAttributeDialect());
+//    templateEngine.addDialect(new SpringDataDialect());
+//    return templateEngine;
+//  }
+  @Bean
+  public DataAttributeDialect dataAttributeDialect() {
+    return new DataAttributeDialect();
   }
 
   @Bean
-  public SpringResourceTemplateResolver springResourceTemplateResolver() {
-    SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
-    templateResolver.setApplicationContext(applicationContext);
-    templateResolver.setPrefix("/WEB-INF/templates/");
-    templateResolver.setSuffix(".html");
-    templateResolver.setCheckExistence(true);
-    templateResolver.setCharacterEncoding(ENCODING);
-    templateResolver.setTemplateMode(TemplateMode.HTML);
-    templateResolver.setCacheable(cacheTemplates);
-    return templateResolver;
+  public LayoutDialect layoutDialect() {
+    return new LayoutDialect();
   }
 
   @Bean
-  public TemplateEngine templateEngine() {
-    SpringTemplateEngine templateEngine = new SpringTemplateEngine();
-    templateEngine.setEnableSpringELCompiler(true);
-
-    commonsClasspathThymeleafResolver.setOrder(1);
-    SpringResourceTemplateResolver springResourceTemplateResolver = springResourceTemplateResolver();
-    springResourceTemplateResolver.setOrder(2);
-    templateEngine.addTemplateResolver(commonsClasspathThymeleafResolver);
-    templateEngine.addTemplateResolver(springResourceTemplateResolver);
-
-    // Activate Thymeleaf LayoutDialect[1] (for 'layout'-namespace)
-    // [1] https://github.com/ultraq/thymeleaf-layout-dialect
-    templateEngine.addDialect(new LayoutDialect());
-    templateEngine.addDialect(new SpringSecurityDialect());
-    templateEngine.addDialect(new DataAttributeDialect());
-    templateEngine.addDialect(new SpringDataDialect());
-    return templateEngine;
+  public SpringDataDialect springDataDialect() {
+    return new SpringDataDialect();
   }
 
   @Bean
-  public ViewResolver viewResolver() {
-    ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
-    viewResolver.setTemplateEngine(templateEngine());
-    viewResolver.setOrder(1);
-    viewResolver.setCharacterEncoding(ENCODING);
-
-    return viewResolver;
+  public SpringSecurityDialect springSecurityDialect() {
+    return new SpringSecurityDialect();
   }
 
+//  @Bean
+//  public ViewResolver viewResolver() {
+//    ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
+//    viewResolver.setTemplateEngine(templateEngine());
+//    viewResolver.setOrder(1);
+//    viewResolver.setCharacterEncoding(ENCODING);
+//
+//    return viewResolver;
+//  }
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
     LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();

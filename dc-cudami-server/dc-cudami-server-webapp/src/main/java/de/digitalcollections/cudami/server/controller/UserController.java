@@ -13,6 +13,7 @@ import de.digitalcollections.cudami.model.api.security.enums.Role;
 import de.digitalcollections.cudami.server.business.api.service.UserService;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
@@ -59,11 +60,11 @@ public class UserController {
     return service.find(pageRequest);
   }
 
-  @ApiMethod(description = "get user by id")
-  @RequestMapping(value = "/v1/users/{id}", produces = "application/json", method = RequestMethod.GET)
+  @ApiMethod(description = "get user by uuid")
+  @RequestMapping(value = "/v1/users/{uuid}", produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
-  public User findById(@PathVariable Long id) {
-    return service.get(id);
+  public User findById(@PathVariable UUID uuid) {
+    return service.get(uuid);
   }
 
   @ApiMethod(description = "get user by email address")
@@ -81,10 +82,10 @@ public class UserController {
   }
 
   @ApiMethod(description = "update a user")
-  @RequestMapping(value = "/v1/users/{id}", produces = "application/json", method = RequestMethod.PUT)
+  @RequestMapping(value = "/v1/users/{uuid}", produces = "application/json", method = RequestMethod.PUT)
   @ApiResponseObject
-  public User update(@PathVariable Long id, @RequestBody User user, BindingResult errors) {
-    assert Objects.equals(id, user.getId());
+  public User update(@PathVariable UUID uuid, @RequestBody User user, BindingResult errors) {
+    assert Objects.equals(uuid, user.getUuid());
     return service.update(user, errors);
   }
 }

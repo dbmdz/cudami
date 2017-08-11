@@ -32,7 +32,7 @@ public class SpringConfigSecurityWebapp extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    http.authorizeRequests().antMatchers("/api/**").permitAll();
+    http.authorizeRequests().antMatchers("/api/**", "/setup/**").permitAll();
     http.authorizeRequests().antMatchers("/users/**").hasAnyAuthority(Role.ADMIN.getAuthority());
     http.authorizeRequests().anyRequest().authenticated().and().formLogin() // enable form based log in
             .loginPage("/login").permitAll().and()

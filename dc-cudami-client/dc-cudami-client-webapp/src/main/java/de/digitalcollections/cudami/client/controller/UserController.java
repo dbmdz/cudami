@@ -12,6 +12,7 @@ import de.digitalcollections.cudami.model.api.security.User;
 import de.digitalcollections.cudami.model.api.security.enums.Role;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
@@ -75,17 +76,17 @@ public class UserController extends AbstractController implements MessageSourceA
 //        binder.addValidators(mySpecialUserValidator);
   }
 
-  @RequestMapping(value = "/{id}/activate", method = RequestMethod.GET)
-  public String activate(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
-    User user = userService.activate(id);
+  @RequestMapping(value = "/{uuid}/activate", method = RequestMethod.GET)
+  public String activate(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
+    User user = userService.activate(uuid);
     String message = messageSource.getMessage("msg.user_activated", new Object[]{user.getEmail()}, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
     return "redirect:/users";
   }
 
-  @RequestMapping(value = "/{id}/deactivate", method = RequestMethod.GET)
-  public String deactivate(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
-    User user = userService.deactivate(id);
+  @RequestMapping(value = "/{uuid}/deactivate", method = RequestMethod.GET)
+  public String deactivate(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
+    User user = userService.deactivate(uuid);
     String message = messageSource.getMessage("msg.user_deactivated", new Object[]{user.getEmail()}, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("warning_message", message);
     return "redirect:/users";
@@ -113,18 +114,18 @@ public class UserController extends AbstractController implements MessageSourceA
     status.setComplete();
     String message = messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
-    return "redirect:/users/" + user.getId();
+    return "redirect:/users/" + user.getUuid();
   }
 
-  @RequestMapping(value = "/{id}/edit", method = RequestMethod.GET)
-  public String edit(@PathVariable long id, Model model) {
-    model.addAttribute("user", userService.get(id));
+  @RequestMapping(value = "/{uuid}/edit", method = RequestMethod.GET)
+  public String edit(@PathVariable UUID uuid, Model model) {
+    model.addAttribute("user", userService.get(uuid));
     model.addAttribute("isNew", false);
     return "users/edit";
   }
 
-  @RequestMapping(value = "/{id}/edit", method = RequestMethod.POST)
-  public String edit(@PathVariable long id, @RequestParam("pwd1") String password1, @RequestParam("pwd2") String password2, @ModelAttribute @Valid User user, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  @RequestMapping(value = "/{uuid}/edit", method = RequestMethod.POST)
+  public String edit(@PathVariable UUID uuid, @RequestParam("pwd1") String password1, @RequestParam("pwd2") String password2, @ModelAttribute @Valid User user, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       model.addAttribute("isNew", false);
@@ -138,7 +139,7 @@ public class UserController extends AbstractController implements MessageSourceA
     status.setComplete();
     String message = messageSource.getMessage("msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
-    return "redirect:/users/" + id;
+    return "redirect:/users/" + uuid;
   }
 
   @RequestMapping(method = RequestMethod.GET)
@@ -152,9 +153,9 @@ public class UserController extends AbstractController implements MessageSourceA
     return "users/list";
   }
 
-  @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-  public String view(@PathVariable long id, Model model) {
-    model.addAttribute("user", userService.get(id));
+  @RequestMapping(value = "/{uuid}", method = RequestMethod.GET)
+  public String view(@PathVariable UUID uuid, Model model) {
+    model.addAttribute("user", userService.get(uuid));
     return "users/view";
   }
 }

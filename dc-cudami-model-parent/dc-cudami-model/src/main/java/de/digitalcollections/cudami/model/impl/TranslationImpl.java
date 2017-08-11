@@ -12,7 +12,7 @@ public class TranslationImpl implements Translation {
   private TranslationImpl() {
   }
 
-  public TranslationImpl(String text, String lang) {
+  public TranslationImpl(String lang, String text) {
     if (Strings.isNullOrEmpty(lang)) {
       throw new IllegalArgumentException("Language must not be null or empty!");
     }
@@ -21,7 +21,7 @@ public class TranslationImpl implements Translation {
   }
 
   public TranslationImpl(Translation translation) {
-    this(translation.getText(), translation.getLang());
+    this(translation.getLang(), translation.getText());
   }
 
   @Override

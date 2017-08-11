@@ -1,28 +1,28 @@
 package de.digitalcollections.cudami.model.impl;
 
-import de.digitalcollections.cudami.model.api.IiifThumbnail;
 import de.digitalcollections.iiif.image.model.api.enums.Version;
+import de.digitalcollections.cudami.model.api.Thumbnail;
 
-public class IiifThumbnailImpl implements IiifThumbnail {
+public class ThumbnailImpl implements Thumbnail {
 
   private Version iiifImageApiVersion;
   private String iiifImageServiceUri;
   private String url;
 
-  public IiifThumbnailImpl() {
+  public ThumbnailImpl() {
 
   }
 
-  public IiifThumbnailImpl(Version iiifImageApiVersion, String iiifImageServiceUri) {
+  public ThumbnailImpl(Version iiifImageApiVersion, String iiifImageServiceUri) {
     this.iiifImageApiVersion = iiifImageApiVersion;
     this.iiifImageServiceUri = iiifImageServiceUri;
   }
 
-  public IiifThumbnailImpl(String context, String iiifImageServiceUri) {
+  public ThumbnailImpl(String context, String iiifImageServiceUri) {
     this(Version.getVersion(context), iiifImageServiceUri);
   }
 
-  public IiifThumbnailImpl(String url) {
+  public ThumbnailImpl(String url) {
     this.url = url;
   }
 

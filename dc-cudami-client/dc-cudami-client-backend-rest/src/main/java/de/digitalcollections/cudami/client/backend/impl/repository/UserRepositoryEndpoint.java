@@ -6,6 +6,7 @@ import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 import java.util.List;
+import java.util.UUID;
 
 public interface UserRepositoryEndpoint {
 
@@ -21,14 +22,14 @@ public interface UserRepositoryEndpoint {
   @RequestLine("GET /v1/users?email={email}")
   UserImpl findByEmail(@Param("email") String email);
 
-  @RequestLine("GET /v1/users/{id}")
-  UserImpl findOne(@Param("id") Long id);
+  @RequestLine("GET /v1/users/{uuid}")
+  UserImpl findOne(@Param("uuid") UUID uuid);
 
   @RequestLine("POST /v1/users")
   @Headers("Content-Type: application/json")
   UserImpl save(UserImpl user);
 
-  @RequestLine("PUT /v1/users/{id}")
+  @RequestLine("PUT /v1/users/{uuid}")
   @Headers("Content-Type: application/json")
-  UserImpl update(@Param("id") Long id, UserImpl user);
+  UserImpl update(@Param("uuid") UUID uuid, UserImpl user);
 }

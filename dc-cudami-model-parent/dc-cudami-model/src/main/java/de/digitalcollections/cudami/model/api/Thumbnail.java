@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.model.api;
 
 import de.digitalcollections.iiif.image.model.api.enums.Version;
 
-public interface IiifThumbnail {
+public interface Thumbnail {
 
   Version getIiifImageApiVersion();
 

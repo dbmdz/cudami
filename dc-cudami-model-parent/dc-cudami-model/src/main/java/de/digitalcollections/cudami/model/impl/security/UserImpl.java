@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.model.api.security.User;
 import de.digitalcollections.cudami.model.api.security.enums.Role;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.util.StringUtils;
@@ -27,6 +28,8 @@ public class UserImpl implements User<Long> {
   private String passwordHash;
 
   private List<Role> roles = new ArrayList<>();
+
+  private UUID uuid = UUID.randomUUID();
 
   public UserImpl() {
   }
@@ -96,6 +99,16 @@ public class UserImpl implements User<Long> {
   @Override
   public void setRoles(List<Role> userRoles) {
     this.roles = userRoles;
+  }
+
+  @Override
+  public UUID getUuid() {
+    return uuid;
+  }
+
+  @Override
+  public void setUuid(UUID uuid) {
+    this.uuid = uuid;
   }
 
   @Override

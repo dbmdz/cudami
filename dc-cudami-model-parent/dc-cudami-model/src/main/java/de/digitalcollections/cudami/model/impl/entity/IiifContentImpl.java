@@ -1,12 +1,12 @@
 package de.digitalcollections.cudami.model.impl.entity;
 
-import de.digitalcollections.cudami.model.api.IiifThumbnail;
 import de.digitalcollections.cudami.model.api.entity.IiifContent;
 import de.digitalcollections.iiif.presentation.model.api.enums.Version;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Locale;
+import de.digitalcollections.cudami.model.api.Thumbnail;
 
 public class IiifContentImpl<ID extends Serializable> extends EntityImpl<ID> implements IiifContent<ID> {
 
@@ -16,15 +16,15 @@ public class IiifContentImpl<ID extends Serializable> extends EntityImpl<ID> imp
   private HashMap<Locale, String> manifestLabels;
   private URL manifestUrl;
   private Version manifestVersion;
-  private IiifThumbnail thumbnail;
+  private Thumbnail thumbnail;
 
   @Override
-  public IiifThumbnail getThumbnail() {
+  public Thumbnail getThumbnail() {
     return thumbnail;
   }
 
   @Override
-  public void setThumbnail(IiifThumbnail thumbnail) {
+  public void setThumbnail(Thumbnail thumbnail) {
     this.thumbnail = thumbnail;
   }
 

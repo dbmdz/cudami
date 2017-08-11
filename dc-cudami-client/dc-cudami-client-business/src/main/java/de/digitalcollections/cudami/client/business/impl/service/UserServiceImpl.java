@@ -9,6 +9,7 @@ import de.digitalcollections.cudami.model.api.security.User;
 import de.digitalcollections.cudami.model.api.security.enums.Role;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,7 +28,7 @@ import org.springframework.validation.Validator;
  */
 @Service
 @Transactional(readOnly = true)
-public class UserServiceImpl implements UserService<User, Long> {
+public class UserServiceImpl implements UserService<User, UUID> {
 
   @Autowired
   @Qualifier("passwordsValidator")
@@ -42,8 +43,8 @@ public class UserServiceImpl implements UserService<User, Long> {
 
   @Override
   @Transactional(readOnly = false)
-  public User activate(Long id) {
-    User user = (User) userRepository.findOne(id);
+  public User activate(UUID uuid) {
+    User user = (User) userRepository.findOne(uuid);
     user.setEnabled(true);
     user = userRepository.update(user);
     return user;
@@ -75,8 +76,8 @@ public class UserServiceImpl implements UserService<User, Long> {
 
   @Override
   @Transactional(readOnly = false)
-  public User deactivate(Long id) {
-    User user = (User) userRepository.findOne(id);
+  public User deactivate(UUID uuid) {
+    User user = (User) userRepository.findOne(uuid);
     user.setEnabled(false);
     user = userRepository.update(user);
     return user;
@@ -97,8 +98,8 @@ public class UserServiceImpl implements UserService<User, Long> {
   }
 
   @Override
-  public User get(Long id) {
-    return (User) userRepository.findOne(id);
+  public User get(UUID uuid) {
+    return (User) userRepository.findOne(uuid);
   }
 
   @Override
@@ -107,10 +108,11 @@ public class UserServiceImpl implements UserService<User, Long> {
   }
 
   /*
-     see: http://stackoverflow.com/questions/19302196/transaction-marked-as-rollback-only-how-do-i-find-the-cause
-     When you mark your method as @Transactional, occurrence of any exception inside your method will mark the surrounding TX as roll-back only (even if you catch them). You can use other attributes of @Transactional annotation to prevent it of rolling back like:
-
-     @Transactional(rollbackFor=MyException.class, noRollbackFor=MyException2.class)
+   * see: http://stackoverflow.com/questions/19302196/transaction-marked-as-rollback-only-how-do-i-find-the-cause
+   * When you mark your method as @Transactional, occurrence of any exception inside your method will mark the surrounding TX as roll-back only (even if you catch them).
+   * You can use other attributes of @Transactional annotation to prevent it of rolling back like:
+   *
+   * @Transactional(rollbackFor=MyException.class, noRollbackFor=MyException2.class)
    */
   @Override
   @Transactional(readOnly = true, noRollbackFor = UsernameNotFoundException.class)

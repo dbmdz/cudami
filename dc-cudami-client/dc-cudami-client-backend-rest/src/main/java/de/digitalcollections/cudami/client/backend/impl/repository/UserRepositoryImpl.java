@@ -9,11 +9,12 @@ import de.digitalcollections.cudami.client.backend.impl.repository.exceptionhand
 import de.digitalcollections.cudami.model.impl.security.UserImpl;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class UserRepositoryImpl implements UserRepository<UserImpl, Long> {
+public class UserRepositoryImpl implements UserRepository<UserImpl, UUID> {
 
   @Autowired
   private UserRepositoryEndpoint endpoint;
@@ -81,7 +82,7 @@ public class UserRepositoryImpl implements UserRepository<UserImpl, Long> {
 
   @Override
   public UserImpl update(UserImpl user) {
-    return (UserImpl) endpoint.update(user.getId(), user);
+    return (UserImpl) endpoint.update(user.getUuid(), user);
   }
 
 //  @Override
@@ -89,8 +90,8 @@ public class UserRepositoryImpl implements UserRepository<UserImpl, Long> {
 //    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 //  }
   @Override
-  public UserImpl findOne(Long id) {
-    return endpoint.findOne(id);
+  public UserImpl findOne(UUID uuid) {
+    return endpoint.findOne(uuid);
   }
 
 //  @Override

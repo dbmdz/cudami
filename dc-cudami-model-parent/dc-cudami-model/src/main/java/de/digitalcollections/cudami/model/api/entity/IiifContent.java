@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.model.api.entity;
 
-import de.digitalcollections.cudami.model.api.IiifThumbnail;
 import de.digitalcollections.iiif.presentation.model.api.enums.Version;
 import java.io.Serializable;
 import java.net.URL;
@@ -12,10 +11,6 @@ import java.util.Locale;
  * @param <ID> unique serializable identifier
  */
 public interface IiifContent<ID extends Serializable> extends Entity<ID> {
-
-  IiifThumbnail getThumbnail();
-
-  void setThumbnail(IiifThumbnail thumbnail);
 
   URL getManifestUrl();
 

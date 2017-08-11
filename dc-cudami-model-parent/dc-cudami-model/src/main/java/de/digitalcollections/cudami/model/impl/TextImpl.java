@@ -17,20 +17,20 @@ public class TextImpl implements Text {
 
   public TextImpl(String lang, String text) {
     this();
-    translations.add(new TranslationImpl(text, lang));
+    translations.add(new TranslationImpl(lang, text));
   }
 
   public TextImpl(List<String> languages, String text) {
     this();
     for (String lang : languages) {
-      translations.add(new TranslationImpl(text, lang));
+      translations.add(new TranslationImpl(lang, text));
     }
   }
 
   public TextImpl(Text text) {
     this();
     for (Translation translation : text.getTranslations()) {
-      translations.add(new TranslationImpl(translation.getText(), translation.getLang()));
+      translations.add(new TranslationImpl(translation.getLang(), translation.getText()));
     }
   }
 
@@ -74,7 +74,7 @@ public class TextImpl implements Text {
     if (translation != null) {
       translation.setText(text);
     } else {
-      translations.add(new TranslationImpl(text, DEFAULT_LANG));
+      translations.add(new TranslationImpl(DEFAULT_LANG, text));
     }
   }
 
@@ -105,7 +105,7 @@ public class TextImpl implements Text {
     if (translation != null) {
       translation.setText(text);
     } else {
-      translations.add(new TranslationImpl(text, lang));
+      translations.add(new TranslationImpl(lang, text));
     }
   }
 
