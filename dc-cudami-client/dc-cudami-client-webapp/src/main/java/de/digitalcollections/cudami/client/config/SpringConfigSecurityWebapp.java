@@ -16,7 +16,7 @@ import org.springframework.security.web.authentication.rememberme.InMemoryTokenR
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
 @Configuration
-@Order(value = 1)
+@Order(1)
 public class SpringConfigSecurityWebapp extends WebSecurityConfigurerAdapter {
 
   @Autowired(required = true)
@@ -24,12 +24,9 @@ public class SpringConfigSecurityWebapp extends WebSecurityConfigurerAdapter {
   @Autowired(required = true)
   private UserDetailsService userDetailsService; // provided by component scan
 
-  public SpringConfigSecurityWebapp() {
-    super();
-  }
-
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    auth.inMemoryAuthentication().withUser("monitoring").password("secret").roles("ACTUATOR");
     auth.authenticationProvider(authProvider());
   }
 
@@ -38,8 +35,11 @@ public class SpringConfigSecurityWebapp extends WebSecurityConfigurerAdapter {
     http.authorizeRequests().antMatchers("/api/**").permitAll();
     http.authorizeRequests().antMatchers("/users/**").hasAnyAuthority(Role.ADMIN.getAuthority());
     http.authorizeRequests().anyRequest().authenticated().and().formLogin() // enable form based log in
-    .loginPage("/login").permitAll().and().logout().logoutUrl("/logout").permitAll().and().rememberMe().tokenRepository(persistentTokenRepository).tokenValiditySeconds(14 * 24 * 3600)
-            .userDetailsService(userDetailsService).and().httpBasic();
+            .loginPage("/login").permitAll().and()
+            .logout().logoutUrl("/logout").permitAll().and()
+            .rememberMe().tokenRepository(persistentTokenRepository).tokenValiditySeconds(14 * 24 * 3600)
+            .userDetailsService(userDetailsService).and()
+            .httpBasic();
     // FIXME: add CSRF protection and test all static resources and unit tests (if /css is only web.ignoring()...)
     //    // http.csrf().disable();
     //    http.csrf().requireCsrfProtectionMatcher(new RequestMatcher() {
