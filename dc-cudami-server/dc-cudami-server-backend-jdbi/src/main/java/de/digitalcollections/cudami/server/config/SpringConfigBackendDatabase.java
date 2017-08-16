@@ -1,6 +1,8 @@
 package de.digitalcollections.cudami.server.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.commons.jdbi.DcCommonsJdbiPlugin;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.plugins.JsonbJdbiPlugin;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -17,6 +19,7 @@ import org.jdbi.v3.spring4.JdbiFactoryBean;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,6 +52,9 @@ public class SpringConfigBackendDatabase {
   @Value("${database.username}")
   private String databaseUsername;
 
+  @Autowired
+  ObjectMapper objectMapper;
+
   @Bean(initMethod = "migrate")
   public Flyway flyway() {
     Flyway flyway = new Flyway();
@@ -73,6 +79,7 @@ public class SpringConfigBackendDatabase {
     plugins.add(new SqlObjectPlugin());
     plugins.add(new PostgresPlugin());
     plugins.add(new DcCommonsJdbiPlugin());
+    plugins.add(new JsonbJdbiPlugin(objectMapper));
     jdbiFactoryBean.setPlugins(plugins);
     return jdbiFactoryBean;
   }

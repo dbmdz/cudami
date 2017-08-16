@@ -4,18 +4,29 @@ import de.digitalcollections.cudami.model.api.Text;
 import de.digitalcollections.cudami.model.api.Thumbnail;
 import de.digitalcollections.cudami.model.api.entity.Entity;
 import de.digitalcollections.cudami.model.api.enums.EntityType;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class EntityImpl implements Entity<Long> {
 
+  private LocalDateTime created;
   private Text description;
-  private EntityType entityType;
+  protected EntityType entityType;
   private Long id;
   private Text label;
-  private Date lastModified = new Date();
+  private LocalDateTime lastModified;
   private Thumbnail thumbnail;
   private UUID uuid = UUID.randomUUID();
+
+  @Override
+  public LocalDateTime getCreated() {
+    return created;
+  }
+
+  @Override
+  public void setCreated(LocalDateTime created) {
+    this.created = created;
+  }
 
   @Override
   public Text getDescription() {
@@ -29,9 +40,12 @@ public class EntityImpl implements Entity<Long> {
 
   @Override
   public EntityType getEntityType() {
-    // FIXME: Does it get in conflict with default method in interfaces?
-    // this method is needed to get a list of entities and their type from database and to disambiguate them afterwards
     return entityType;
+  }
+
+  @Override
+  public void setEntityType(EntityType entityType) {
+    this.entityType = entityType;
   }
 
   @Override
@@ -55,12 +69,12 @@ public class EntityImpl implements Entity<Long> {
   }
 
   @Override
-  public Date getLastModified() {
+  public LocalDateTime getLastModified() {
     return lastModified;
   }
 
   @Override
-  public void setLastModified(Date lastModified) {
+  public void setLastModified(LocalDateTime lastModified) {
     this.lastModified = lastModified;
   }
 

@@ -5,6 +5,7 @@ import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.core.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.cudami.model.api.entity.Website;
 import de.digitalcollections.cudami.model.impl.entity.WebsiteImpl;
+import de.digitalcollections.cudami.server.backend.api.repository.EntityRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.WebsiteRepository;
 import java.util.List;
 import java.util.UUID;
@@ -17,6 +18,9 @@ public class WebsiteRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
 
   @Autowired
   private Jdbi dbi;
+
+  @Autowired
+  private EntityRepository entityRepository;
 
   @Override
   public long count() {
@@ -63,6 +67,8 @@ public class WebsiteRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
 
   @Override
   public Website save(Website website) {
+    entityRepository.save(website);
+
     WebsiteImpl result = dbi.withHandle(h -> h
             .createQuery("INSERT INTO websites(url, registration_date, uuid) VALUES (:url, :registrationDate, :uuid) RETURNING *")
             .bindBean(website)
@@ -73,6 +79,8 @@ public class WebsiteRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
 
   @Override
   public Website update(Website website) {
+    entityRepository.update(website);
+
     WebsiteImpl result = dbi.withHandle(h -> h
             .createQuery("UPDATE websites SET url=:url, registration_date=:registrationDate, uuid=:uuid WHERE uuid=:uuid RETURNING *")
             .bindBean(website)

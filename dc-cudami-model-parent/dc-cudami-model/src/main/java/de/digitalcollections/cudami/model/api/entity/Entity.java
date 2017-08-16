@@ -5,7 +5,7 @@ import de.digitalcollections.cudami.model.api.Text;
 import de.digitalcollections.cudami.model.api.Thumbnail;
 import de.digitalcollections.cudami.model.api.enums.EntityType;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * An entity.
@@ -14,7 +14,13 @@ import java.util.Date;
  */
 public interface Entity<ID extends Serializable> extends Identifiable<ID> {
 
+  LocalDateTime getCreated();
+
+  void setCreated(LocalDateTime created);
+
   EntityType getEntityType();
+
+  void setEntityType(EntityType entityType);
 
   Text getDescription();
 
@@ -24,9 +30,9 @@ public interface Entity<ID extends Serializable> extends Identifiable<ID> {
 
   void setLabel(Text label);
 
-  Date getLastModified();
+  LocalDateTime getLastModified();
 
-  void setLastModified(Date lastModified);
+  void setLastModified(LocalDateTime lastModified);
 
   Thumbnail getThumbnail();
 

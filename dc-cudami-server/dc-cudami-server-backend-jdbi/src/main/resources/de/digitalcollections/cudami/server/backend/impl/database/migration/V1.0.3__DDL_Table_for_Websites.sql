@@ -1,6 +1,8 @@
-CREATE TABLE websites (
-  id SERIAL primary key,
-  url VARCHAR(255) not null unique,
-  registration_date DATE,
-  uuid UUID not null unique
+CREATE TABLE IF NOT EXISTS websites (
+  id SERIAL PRIMARY KEY NOT NULL,
+  uuid UUID NOT NULL UNIQUE,
+
+  url VARCHAR NOT NULL UNIQUE,
+  registration_date DATE
 );
+

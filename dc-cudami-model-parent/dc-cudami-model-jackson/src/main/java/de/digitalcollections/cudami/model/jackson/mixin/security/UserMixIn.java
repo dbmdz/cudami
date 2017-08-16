@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.model.jackson.mixin;
+package de.digitalcollections.cudami.model.jackson.mixin.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonTypeName;

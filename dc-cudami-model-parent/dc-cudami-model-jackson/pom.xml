@@ -15,6 +15,7 @@
   
   <properties>
     <version.jackson>2.8.8</version.jackson>
+    <version.jackson-datatype-jsr310>2.8.8</version.jackson-datatype-jsr310>
   </properties>
   
   <dependencies>
@@ -24,9 +25,18 @@
       <version>${version.jackson}</version>
     </dependency>
     <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+      <version>${version.jackson-datatype-jsr310}</version>
+    </dependency>
+    <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.core</groupId>
+      <artifactId>dc-core-model-jackson</artifactId>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>

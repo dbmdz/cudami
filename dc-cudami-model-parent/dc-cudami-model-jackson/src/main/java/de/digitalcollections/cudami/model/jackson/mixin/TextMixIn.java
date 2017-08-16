@@ -1,13 +1,11 @@
 package de.digitalcollections.cudami.model.jackson.mixin;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import de.digitalcollections.cudami.model.impl.entity.WebsiteImpl;
+import de.digitalcollections.cudami.model.impl.TextImpl;
 
-@JsonDeserialize(as = WebsiteImpl.class)
+@JsonDeserialize(as = TextImpl.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonTypeName("website")
-public interface WebsiteMixIn {
+public interface TextMixIn {
 
 }

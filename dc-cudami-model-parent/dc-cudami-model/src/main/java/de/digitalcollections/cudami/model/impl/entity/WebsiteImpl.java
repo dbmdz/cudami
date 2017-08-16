@@ -17,6 +17,7 @@ public class WebsiteImpl extends EntityImpl implements Website<Long> {
   private URL url;
 
   public WebsiteImpl() {
+    entityType = EntityType.WEBSITE;
   }
 
   public WebsiteImpl(URL url) {
@@ -24,14 +25,10 @@ public class WebsiteImpl extends EntityImpl implements Website<Long> {
   }
 
   public WebsiteImpl(List<ContentNode> rootNodes, URL url, LocalDate registrationDate) {
+    this();
     this.registrationDate = registrationDate;
     this.rootNodes = rootNodes;
     this.url = url;
-  }
-
-  @Override
-  public EntityType getEntityType() {
-    return EntityType.WEBSITE;
   }
 
   @Override
