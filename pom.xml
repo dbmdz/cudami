@@ -41,7 +41,6 @@
     <version.junit>4.12</version.junit>
     <version.mockito-core>1.10.19</version.mockito-core>
     <version.querydsl>4.1.4</version.querydsl>
-    <version.postgresql>9.4-1201-jdbc4</version.postgresql> <!-- TODO Upgrade -->
     <version.slf4j-api>1.7.24</version.slf4j-api>
     <version.slf4j-log4j12>1.7.24</version.slf4j-log4j12>
     <version.spring-aop>4.3.7.RELEASE</version.spring-aop>
@@ -263,11 +262,6 @@
         <artifactId>mockito-core</artifactId>
         <version>${version.mockito-core}</version>
         <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.postgresql</groupId>
-        <artifactId>postgresql</artifactId>
-        <version>${version.postgresql}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>

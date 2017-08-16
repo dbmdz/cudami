@@ -16,11 +16,11 @@
 
       <div class="row mainContent">
         <div class="col-sm-9">
-          <b th:text="#{website}">Website</b> <b th:text="${website.title}"/>  (<a th:href="${website.url}"><span th:text="${website.url}"/></a>)
+          <b th:text="#{website}">Website</b> <!-- <b thxx:text="${website.title}"/> --> TODO  (<a th:href="${website.url}"><span th:text="${website.url}"/></a>)
         </div>
         <div class="col-sm-3">
           <a class="btn btn-default btn-block"
-             th:href="@{${website.id} + '/edit'}" th:text="#{edit}">edit</a>
+             th:href="@{${website.uuid} + '/edit'}" th:text="#{edit}">edit</a>
         </div>
       </div>
 
@@ -35,12 +35,12 @@
           <div class="container-fluid rows-striped">
             <div class="row">
               <div class="col-md-3"><label th:text="#{id}">ID</label></div>
-              <div class="col-md-9"><span th:text="*{id}">50</span></div>
+              <div class="col-md-9"><span th:text="*{uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
             </div>
-            <div class="row">
-              <div class="col-md-3"><label th:text="#{title}">Title</label></div>
-              <div class="col-md-9"><span th:text="*{title}">Periodikon</span></div>
-            </div>
+<!--            <div class="row">
+              <div class="col-md-3"><label thxx:text="#{title}">Title</label></div>
+              <div class="col-md-9"><span thxx:text="*{title}">Periodikon</span></div>
+            </div>-->
             <div class="row">
               <div class="col-md-3"><label th:text="#{url}">URL</label></div>
               <div class="col-md-9"><span th:text="*{url}">http://www.example.de/</span></div>
@@ -52,7 +52,7 @@
       &nbsp;<br/>
       
       <div class="row mainContent">
-        <div id="tree1" class="col-sm-12" th:attr="data-url=${website.id + '/sitemap/do?operation=get_nodes'}"></div>
+        <div id="tree1" class="col-sm-12" th:attr="data-url=${website.uuid + '/sitemap/do?operation=get_nodes'}"></div>
       </div>
 
     </section>

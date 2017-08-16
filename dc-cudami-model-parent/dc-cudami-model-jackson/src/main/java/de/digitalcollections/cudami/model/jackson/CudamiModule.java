@@ -2,8 +2,10 @@ package de.digitalcollections.cudami.model.jackson;
 
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.Module;
+import de.digitalcollections.cudami.model.api.entity.Website;
 import de.digitalcollections.cudami.model.api.security.User;
 import de.digitalcollections.cudami.model.jackson.mixin.UserMixIn;
+import de.digitalcollections.cudami.model.jackson.mixin.WebsiteMixIn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +21,9 @@ public class CudamiModule extends Module {
   @Override
   public void setupModule(SetupContext context) {
     LOGGER.info("Using CudamiModule");
+//    context.setMixInAnnotations(Entity.class, EntityMixIn.class); // FIXME not needed/working, switched back to wrapper info...
     context.setMixInAnnotations(User.class, UserMixIn.class);
+    context.setMixInAnnotations(Website.class, WebsiteMixIn.class);
   }
 
   @Override

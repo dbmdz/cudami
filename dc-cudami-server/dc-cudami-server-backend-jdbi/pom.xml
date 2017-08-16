@@ -13,19 +13,28 @@
   <artifactId>dc-cudami-server-backend-jdbi</artifactId>
   <packaging>jar</packaging>
 
+  <properties>
+    <version.dc-commons-jdbi>1.2.5-SNAPSHOT</version.dc-commons-jdbi>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>org.jdbi</groupId>
         <artifactId>jdbi3-parent</artifactId>
         <type>pom</type>
-        <version>3.0.0-beta1</version>
+        <version>3.0.0-beta2</version>
         <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
 
   <dependencies>
+    <dependency>
+      <groupId>de.digitalcollections.commons</groupId>
+      <artifactId>dc-commons-jdbi</artifactId>
+      <version>${version.dc-commons-jdbi}</version>
+    </dependency>
     <dependency>
       <groupId>de.digitalcollections.core</groupId>
       <artifactId>dc-core-model</artifactId>
@@ -71,6 +80,7 @@
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <scope>runtime</scope>
+      <version>42.1.4</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

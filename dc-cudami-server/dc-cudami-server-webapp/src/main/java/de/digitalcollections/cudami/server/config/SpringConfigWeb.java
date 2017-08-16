@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.config;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.digitalcollections.core.model.jackson.DcCoreModelModule;
 import de.digitalcollections.cudami.model.jackson.CudamiModule;
 import org.springframework.beans.factory.InitializingBean;
@@ -27,6 +28,7 @@ public class SpringConfigWeb extends WebMvcConfigurerAdapter implements Initiali
   @Override
   public void afterPropertiesSet() throws Exception {
     // customize default spring boot jackson objectmapper
+    objectMapper.registerModule(new JavaTimeModule());
     objectMapper.registerModule(new DcCoreModelModule());
     objectMapper.registerModule(new CudamiModule());
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

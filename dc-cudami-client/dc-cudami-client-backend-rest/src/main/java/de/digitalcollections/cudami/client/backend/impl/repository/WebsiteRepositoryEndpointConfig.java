@@ -10,18 +10,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class UserRepositoryEndpointConfig {
+public class WebsiteRepositoryEndpointConfig {
 
   @Autowired
   ObjectMapper objectMapper;
 
   @Bean
-  public UserRepositoryEndpoint userRepositoryEndpoint() {
-    UserRepositoryEndpoint endpoint = Feign.builder()
+  public WebsiteRepositoryEndpoint websiteRepositoryEndpoint() {
+    WebsiteRepositoryEndpoint endpoint = Feign.builder()
             .decoder(new JacksonDecoder(objectMapper))
             .encoder(new JacksonEncoder(objectMapper))
             .errorDecoder(new EndpointErrorDecoder())
-            .target(UserRepositoryEndpoint.class, "http://localhost:8080");
+            .target(WebsiteRepositoryEndpoint.class, "http://localhost:8080");
     return endpoint;
   }
 }

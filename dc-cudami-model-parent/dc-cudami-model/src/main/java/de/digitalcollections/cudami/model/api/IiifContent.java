@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.model.api.entity;
+package de.digitalcollections.cudami.model.api;
 
 import de.digitalcollections.iiif.presentation.model.api.enums.Version;
 import java.io.Serializable;
@@ -10,7 +10,7 @@ import java.util.Locale;
  * IiifContent is used for IIIF content specified by an IIIF manifest.
  * @param <ID> unique serializable identifier
  */
-public interface IiifContent<ID extends Serializable> extends Entity<ID> {
+public interface IiifContent<ID extends Serializable> {
 
   URL getManifestUrl();
 

@@ -1,5 +1,8 @@
 package de.digitalcollections.cudami.model.api.entity;
 
+import de.digitalcollections.cudami.model.api.BinaryContent;
+import de.digitalcollections.cudami.model.api.IiifContent;
+import de.digitalcollections.cudami.model.api.enums.EntityType;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +12,11 @@ import java.util.List;
  * @param <ID> unique serializable identifier
  */
 public interface ContentNode<ID extends Serializable> extends Entity<ID> {
+
+  @Override
+  default EntityType getEntityType() {
+    return EntityType.CONTENT_NODE;
+  }
 
   ContentNode getParent();
 

@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.config;
 
+import de.digitalcollections.commons.jdbi.DcCommonsJdbiPlugin;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -71,6 +72,7 @@ public class SpringConfigBackendDatabase {
     List plugins = new ArrayList();
     plugins.add(new SqlObjectPlugin());
     plugins.add(new PostgresPlugin());
+    plugins.add(new DcCommonsJdbiPlugin());
     jdbiFactoryBean.setPlugins(plugins);
     return jdbiFactoryBean;
   }

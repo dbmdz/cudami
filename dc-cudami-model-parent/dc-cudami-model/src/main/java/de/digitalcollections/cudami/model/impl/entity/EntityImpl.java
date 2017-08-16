@@ -3,14 +3,15 @@ package de.digitalcollections.cudami.model.impl.entity;
 import de.digitalcollections.cudami.model.api.Text;
 import de.digitalcollections.cudami.model.api.Thumbnail;
 import de.digitalcollections.cudami.model.api.entity.Entity;
-import java.io.Serializable;
+import de.digitalcollections.cudami.model.api.enums.EntityType;
 import java.util.Date;
 import java.util.UUID;
 
-public class EntityImpl<ID extends Serializable> implements Entity<ID> {
+public class EntityImpl implements Entity<Long> {
 
   private Text description;
-  private ID id;
+  private EntityType entityType;
+  private Long id;
   private Text label;
   private Date lastModified = new Date();
   private Thumbnail thumbnail;
@@ -27,12 +28,19 @@ public class EntityImpl<ID extends Serializable> implements Entity<ID> {
   }
 
   @Override
-  public ID getId() {
+  public EntityType getEntityType() {
+    // FIXME: Does it get in conflict with default method in interfaces?
+    // this method is needed to get a list of entities and their type from database and to disambiguate them afterwards
+    return entityType;
+  }
+
+  @Override
+  public Long getId() {
     return id;
   }
 
   @Override
-  public void setId(ID id) {
+  public void setId(Long id) {
     this.id = id;
   }
 

@@ -1,23 +1,27 @@
 package de.digitalcollections.cudami.client.business.impl.service;
 
+import de.digitalcollections.core.model.api.paging.PageRequest;
+import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.cudami.client.backend.api.repository.WebsiteRepository;
 import de.digitalcollections.cudami.client.business.api.service.WebsiteService;
-import de.digitalcollections.cudami.client.business.api.service.exceptions.WebsiteServiceException;
+import de.digitalcollections.cudami.client.business.api.service.exceptions.EntityServiceException;
 import de.digitalcollections.cudami.model.api.entity.ContentNode;
 import de.digitalcollections.cudami.model.api.entity.Website;
 import java.util.List;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Errors;
 
 /**
  * Service for Website handling.
  */
 @Service
-@Transactional(readOnly = true)
-public class WebsiteServiceImpl implements WebsiteService<Website, Long> {
+//@Transactional(readOnly = true)
+public class WebsiteServiceImpl implements WebsiteService<Website, UUID> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsiteServiceImpl.class);
 
@@ -25,45 +29,51 @@ public class WebsiteServiceImpl implements WebsiteService<Website, Long> {
   private WebsiteRepository websiteRepository;
 
   @Override
-  public Website create() {
-    return websiteRepository.create();
+  public long count() {
+    return websiteRepository.count();
   }
 
   @Override
-  public Website get(Long id) throws WebsiteServiceException {
-    Website website = (Website) websiteRepository.findOne(id);
-    if (website == null) {
-      return null;
+  public Website create() {
+    return (Website) websiteRepository.create();
+  }
+
+  @Override
+  public PageResponse<Website> find(PageRequest pageRequest) {
+    return websiteRepository.find(pageRequest);
+  }
+
+  @Override
+  public Website get(UUID uuid) {
+    return (Website) websiteRepository.findOne(uuid);
+  }
+
+  @Override
+  @Transactional(readOnly = false)
+  public Website save(Website website, Errors results) throws EntityServiceException {
+    if (!results.hasErrors()) {
+      try {
+        website = (Website) websiteRepository.save(website);
+      } catch (Exception e) {
+        LOGGER.error("Cannot save website " + website + ": ", e);
+        throw new EntityServiceException(e.getMessage());
+      }
     }
     return website;
   }
 
   @Override
-  public List<Website> getAll() {
-    List<Website> websites = websiteRepository.findAll();
-    return websites;
-  }
-
-  @Override
   @Transactional(readOnly = false)
-  public Website save(Website website) throws WebsiteServiceException {
-    try {
-      return (Website) websiteRepository.save(website);
-    } catch (Exception e) {
-      LOGGER.error("Cannot save website " + website + ": ", e);
-      throw new WebsiteServiceException(e.getMessage());
+  public Website update(Website website, Errors results) throws EntityServiceException {
+    if (!results.hasErrors()) {
+      try {
+        website = (Website) websiteRepository.update(website);
+      } catch (Exception e) {
+        LOGGER.error("Cannot update website " + website + ": ", e);
+        throw new EntityServiceException(e.getMessage());
+      }
     }
-  }
-
-  @Override
-  @Transactional(readOnly = false)
-  public Website update(Website website) throws WebsiteServiceException {
-    try {
-      return (Website) websiteRepository.save(website);
-    } catch (Exception e) {
-      LOGGER.error("Cannot save website " + website + ": ", e);
-      throw new WebsiteServiceException(e.getMessage());
-    }
+    return website;
   }
 
 //  @Override

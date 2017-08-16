@@ -19,7 +19,7 @@
           <div th:replace="fragments/feedback-messages :: form"></div>
 
           <div class="col-sm-8">
-            <b th:text="#{website}">Website</b> <b th:text="${website.title}"></b>  (<a th:href="${website.url}"><span th:text="${website.url}"/></a>)
+            <b th:text="#{website}">Website</b> <!-- <b thxx:text="${website.title}"></b> --> TODO  (<a th:href="${website.url}"><span th:text="${website.url}"/></a>)
           </div>
           <div class="col-sm-4">
             <span class="col-sm-6"><button class="btn btn-default btn-block" type="button" th:text="abort"
@@ -39,7 +39,7 @@
             <span class="col-sm-2">
               <label for="id" class="col-sm-1 control-label" th:text="#{id}">ID</label>
               <div class="col-sm-9">
-                <input id="id" th:field="*{id}" type="text" class="form-control" readonly="readonly" th:placeholder="*{id}"/>
+                <input id="id" th:field="*{uuid}" type="text" class="form-control" readonly="readonly" th:placeholder="*{id}"/>
               </div>
             </span>
             <span class="col-sm-5">
@@ -49,13 +49,13 @@
                 <p th:if="${#fields.hasErrors('url')}" th:errors="*{url}">...</p>
               </div>
             </span>
-            <span class="col-sm-5">
-              <label for="url" class="col-sm-3 control-label" th:text="#{title}">Title</label>
-              <div class="col-sm-9" th:classappend="${#fields.hasErrors('title')}? has-error">
-                <input id="url" th:field="*{title}" type="text" class="form-control" th:placeholder="#{websiteTitle_placeholder}"/>
-                <p th:if="${#fields.hasErrors('title')}" th:errors="*{title}">...</p>
+<!--            <span class="col-sm-5">
+              <label for="url" class="col-sm-3 control-label" thxx:text="#{title}">Title</label>
+              <div class="col-sm-9" thxx:classappend="${#fields.hasErrors('title')}? has-error">
+                <input id="url" thxx:field="*{title}" type="text" class="form-control" thxx:placeholder="#{websiteTitle_placeholder}"/>
+                <p thxx:if="${#fields.hasErrors('title')}" thxx:errors="*{title}">...</p>
               </div>
-            </span>
+            </span>-->
           </div>
         </div>
         

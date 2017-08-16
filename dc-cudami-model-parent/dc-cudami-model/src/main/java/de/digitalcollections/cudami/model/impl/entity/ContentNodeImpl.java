@@ -1,13 +1,12 @@
 package de.digitalcollections.cudami.model.impl.entity;
 
-import de.digitalcollections.cudami.model.api.entity.BinaryContent;
+import de.digitalcollections.cudami.model.api.BinaryContent;
+import de.digitalcollections.cudami.model.api.IiifContent;
 import de.digitalcollections.cudami.model.api.entity.ContentNode;
-import de.digitalcollections.cudami.model.api.entity.IiifContent;
 import de.digitalcollections.cudami.model.api.entity.TextContent;
-import java.io.Serializable;
 import java.util.List;
 
-public class ContentNodeImpl<ID extends Serializable> extends EntityImpl<ID> implements ContentNode<ID> {
+public class ContentNodeImpl extends EntityImpl implements ContentNode<Long> {
 
   private ContentNode parent;
   private List<ContentNode> children;

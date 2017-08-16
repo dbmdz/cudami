@@ -1,13 +1,13 @@
-package de.digitalcollections.cudami.model.impl.entity;
+package de.digitalcollections.cudami.model.impl;
 
 import de.digitalcollections.core.model.api.MimeType;
-import de.digitalcollections.cudami.model.api.entity.BinaryContent;
+import de.digitalcollections.cudami.model.api.BinaryContent;
 import de.digitalcollections.cudami.model.api.entity.ContentNode;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.List;
 
-public class BinaryContentImpl<ID extends Serializable> extends EntityImpl<ID> implements BinaryContent<ID> {
+public class BinaryContentImpl<ID extends Serializable> implements BinaryContent<ID> {
 
   private List<ContentNode> contentNodes;
   private MimeType mimeType;

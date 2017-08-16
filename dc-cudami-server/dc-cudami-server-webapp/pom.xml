@@ -46,6 +46,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+    </dependency>
+    <dependency>
       <groupId>de.digitalcollections.core</groupId>
       <artifactId>dc-core-model</artifactId>
     </dependency>
@@ -60,7 +64,6 @@
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-model-jackson</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
@@ -106,6 +109,12 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>hal-browser</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.1.4</version>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
   
