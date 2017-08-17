@@ -10,6 +10,7 @@ h1 a.btn {
 }
 label, .control-label {
   font-size: inherit;
+  font-weight: bold;
 }
 .navbar li a {
   -webkit-transition: all .2s ease-out;
