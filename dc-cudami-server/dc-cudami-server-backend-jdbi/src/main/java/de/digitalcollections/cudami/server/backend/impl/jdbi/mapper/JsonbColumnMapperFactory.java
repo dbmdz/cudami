@@ -9,8 +9,12 @@ import java.util.Optional;
 import org.jdbi.v3.core.config.ConfigRegistry;
 import org.jdbi.v3.core.mapper.ColumnMapper;
 import org.jdbi.v3.core.mapper.ColumnMapperFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JsonbColumnMapperFactory implements ColumnMapperFactory {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(JsonbColumnMapperFactory.class);
 
   private final ObjectMapper objectMapper;
 
@@ -26,8 +30,10 @@ public class JsonbColumnMapperFactory implements ColumnMapperFactory {
         String jsonb = r.getString(i);
 
         try {
-          return objectMapper.readValue(jsonb, type.getClass());
+          Object obj = objectMapper.readValue(jsonb, (Class) type);
+          return obj;
         } catch (IOException ex) {
+          LOGGER.error("Error deserializing JSON", ex);
           return null;
         }
       });

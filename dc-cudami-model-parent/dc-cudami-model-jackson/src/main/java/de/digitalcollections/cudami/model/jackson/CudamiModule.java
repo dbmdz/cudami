@@ -4,10 +4,12 @@ import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.Module;
 import de.digitalcollections.cudami.model.api.Text;
 import de.digitalcollections.cudami.model.api.Thumbnail;
+import de.digitalcollections.cudami.model.api.Translation;
 import de.digitalcollections.cudami.model.api.entity.Website;
 import de.digitalcollections.cudami.model.api.security.User;
 import de.digitalcollections.cudami.model.jackson.mixin.TextMixIn;
 import de.digitalcollections.cudami.model.jackson.mixin.ThumbnailMixIn;
+import de.digitalcollections.cudami.model.jackson.mixin.TranslationMixIn;
 import de.digitalcollections.cudami.model.jackson.mixin.entity.WebsiteMixIn;
 import de.digitalcollections.cudami.model.jackson.mixin.security.UserMixIn;
 import org.slf4j.Logger;
@@ -28,6 +30,7 @@ public class CudamiModule extends Module {
 //    context.setMixInAnnotations(Entity.class, EntityMixIn.class); // FIXME not needed/working, switched back to wrapper info...
     context.setMixInAnnotations(Text.class, TextMixIn.class);
     context.setMixInAnnotations(Thumbnail.class, ThumbnailMixIn.class);
+    context.setMixInAnnotations(Translation.class, TranslationMixIn.class);
     context.setMixInAnnotations(User.class, UserMixIn.class);
     context.setMixInAnnotations(Website.class, WebsiteMixIn.class);
   }
