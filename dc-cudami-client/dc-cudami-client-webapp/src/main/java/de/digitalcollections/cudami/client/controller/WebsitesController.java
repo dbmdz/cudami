@@ -114,8 +114,8 @@ public class WebsitesController extends AbstractController implements MessageSou
     return "websites/edit";
   }
 
-  @RequestMapping(value = "/{uuid}/edit", method = RequestMethod.POST)
-  public String edit(@PathVariable UUID uuid, @ModelAttribute @Valid Website website, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  @RequestMapping(value = "/{pathUuid}/edit", method = RequestMethod.POST)
+  public String edit(@PathVariable UUID pathUuid, @ModelAttribute @Valid Website website, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       model.addAttribute("isNew", false);
@@ -123,14 +123,17 @@ public class WebsitesController extends AbstractController implements MessageSou
     }
 
     try {
-      LOGGER.info("URL before=" + website.getUrl() + " uuid=" + website.getUuid());
-      website = (Website) websiteService.update(website, results);
-      LOGGER.info("URL after=" + website.getUrl() + ", uuid=" + website.getUuid());
+      // get website from db
+      Website websiteDb = (Website) websiteService.get(pathUuid);
+      // just update the fields, that were editable
+      websiteDb.setUrl(website.getUrl());
+
+      website = (Website) websiteService.update(websiteDb, results);
     } catch (EntityServiceException e) {
-      String message = "Cannot save website with uuid=" + uuid + ": " + e;
+      String message = "Cannot save website with uuid=" + pathUuid + ": " + e;
       LOGGER.error(message, e);
       redirectAttributes.addFlashAttribute("error_message", message);
-      return "redirect:/websites/" + uuid;
+      return "redirect:/websites/" + pathUuid;
     }
 
     if (results.hasErrors()) {
@@ -140,7 +143,7 @@ public class WebsitesController extends AbstractController implements MessageSou
     status.setComplete();
     String message = messageSource.getMessage("msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
-    return "redirect:/websites/" + uuid + "/edit";
+    return "redirect:/websites/" + pathUuid + "/edit";
   }
 
   @RequestMapping(method = RequestMethod.GET)
