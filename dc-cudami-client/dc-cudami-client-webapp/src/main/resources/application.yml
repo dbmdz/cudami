@@ -28,7 +28,8 @@ spring:
       max-file-size: 5MB
       max-request-size: 25MB
       # resolve-lazily: false
-
+  profiles:
+    active: PROD
   thymeleaf:
     # Order of the template resolver in the chain. (order 1 is the common classpath resolver)
     template-resolver-order: 2

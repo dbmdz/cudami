@@ -1,6 +1,3 @@
-spring:
-  profiles:
-    active: local
 
 # Activate /actuator
 endpoints:
@@ -22,6 +19,7 @@ info:
 
 # mandatory configuration
 jsondoc:
+  basePath: https://www.myrestserver.com:8080
   version: 1.0
   packages[0]: de.digitalcollections.cudami.server.webapp.controller
   #packages[1]: com.example.model
@@ -29,27 +27,27 @@ jsondoc:
   playgroundEnabled: true
   displayMethodAs: URI
 
-# Deactivate security for sensitive actuator endpoints (DO NOT USE ON A PUBLIC ACCESSIBLE SYSTEM!!!)
 management:
   port: 9001
-
+  security:
+    enabled: true
+    
 server:
   port: 8080
+
+spring:
+  profiles:
+    active: PROD
+
 ---
 
 spring:
   profiles: local
+
 jsondoc:
   basePath: http://localhost:8080
-management:
-  security:
-    enabled: false
----
 
-spring:
-  profiles: PROD
-jsondoc:
-  basePath: https://www.myrestserver.com:8080
+# Deactivate security for sensitive actuator endpoints (DO NOT USE ON A PUBLIC ACCESSIBLE SYSTEM!!!)
 management:
   security:
-    enabled: true
+    enabled: false    
