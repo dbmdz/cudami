@@ -36,7 +36,7 @@ public class WebsiteRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
 
   @Override
   public PageResponse<Website> find(PageRequest pageRequest) {
-    StringBuilder query = new StringBuilder("SELECT * FROM websites");
+    StringBuilder query = new StringBuilder("SELECT * FROM websites INNER JOIN entities ON websites.uuid=entities.uuid");
 
     addPageRequestParams(pageRequest, query);
     List<WebsiteImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
@@ -50,7 +50,7 @@ public class WebsiteRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
   @Override
   public Website findOne(UUID uuid) {
     List<WebsiteImpl> list = dbi.withHandle(h -> h.createQuery(
-            "SELECT * FROM websites WHERE uuid = :uuid")
+            "SELECT * FROM websites INNER JOIN entities ON websites.uuid=entities.uuid WHERE websites.uuid = :uuid")
             .bind("uuid", uuid)
             .mapToBean(WebsiteImpl.class)
             .list());
