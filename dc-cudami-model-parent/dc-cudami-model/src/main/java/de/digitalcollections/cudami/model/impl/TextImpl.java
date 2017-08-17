@@ -93,14 +93,12 @@ public class TextImpl implements Text {
   }
 
   @Override
-  public void setTranslations(Set<Translation> translations
-  ) {
+  public void setTranslations(Set<Translation> translations) {
     this.translations = translations;
   }
 
   @Override
-  public void setText(String lang, String text
-  ) {
+  public void setText(String lang, String text) {
     Translation translation = findTranslation(lang);
     if (translation != null) {
       translation.setText(text);
