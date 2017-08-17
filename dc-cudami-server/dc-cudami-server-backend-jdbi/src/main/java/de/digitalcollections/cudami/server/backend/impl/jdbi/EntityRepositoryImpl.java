@@ -5,9 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.core.model.impl.paging.PageResponseImpl;
-import de.digitalcollections.cudami.model.api.Text;
 import de.digitalcollections.cudami.model.api.entity.Entity;
-import de.digitalcollections.cudami.model.impl.TextImpl;
 import de.digitalcollections.cudami.model.impl.entity.EntityImpl;
 import de.digitalcollections.cudami.server.backend.api.repository.EntityRepository;
 import java.time.LocalDateTime;
@@ -76,9 +74,6 @@ public class EntityRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl
     entity.setCreated(LocalDateTime.now());
     entity.setLastModified(LocalDateTime.now());
 
-    // Test
-    entity.setDescription(new TextImpl(Text.DEFAULT_LANG, "Das ist ein deutscher Test-Text."));
-
     EntityImpl result = null;
     try {
       result = dbi.withHandle(h -> h
@@ -98,6 +93,7 @@ public class EntityRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl
   @Override
   public Entity update(Entity entity) {
     entity.setLastModified(LocalDateTime.now());
+
     EntityImpl result = null;
     try {
       // do not update/left out from statement: created, uuid
