@@ -127,6 +127,7 @@ public class WebsitesController extends AbstractController implements MessageSou
       Website websiteDb = (Website) websiteService.get(pathUuid);
       // just update the fields, that were editable
       websiteDb.setUrl(website.getUrl());
+      websiteDb.setDescription(website.getDescription());
 
       website = (Website) websiteService.update(websiteDb, results);
     } catch (EntityServiceException e) {
