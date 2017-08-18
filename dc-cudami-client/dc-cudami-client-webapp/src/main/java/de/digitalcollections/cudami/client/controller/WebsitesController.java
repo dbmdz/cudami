@@ -6,6 +6,7 @@ import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
+import de.digitalcollections.cudami.client.business.api.service.LocaleService;
 import de.digitalcollections.cudami.client.business.api.service.WebsiteService;
 import de.digitalcollections.cudami.client.business.api.service.exceptions.EntityServiceException;
 import de.digitalcollections.cudami.client.propertyeditor.RoleEditor;
@@ -48,6 +49,9 @@ public class WebsitesController extends AbstractController implements MessageSou
   private MessageSource messageSource;
 
   @Autowired
+  LocaleService localeService;
+
+  @Autowired
   WebsiteService websiteService;
 
   @Autowired
@@ -72,6 +76,8 @@ public class WebsitesController extends AbstractController implements MessageSou
   public String create(Model model) {
     model.addAttribute("website", websiteService.create());
     model.addAttribute("isNew", true);
+    model.addAttribute("locales", localeService.findAll());
+    model.addAttribute("defaultLocale", localeService.getDefault());
     return "websites/edit";
   }
 
@@ -111,6 +117,9 @@ public class WebsitesController extends AbstractController implements MessageSou
 //      redirectAttributes.addFlashAttribute("error_message", message);
 //      return "redirect:/websites";
     model.addAttribute("isNew", false);
+    model.addAttribute("locales", localeService.findAll());
+    model.addAttribute("defaultLocale", localeService.getDefault());
+
     return "websites/edit";
   }
 
