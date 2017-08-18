@@ -59,6 +59,12 @@
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
+      <artifactId>dc-cudami-server-backend-inmemory</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-server-backend-jdbi</artifactId>
       <scope>runtime</scope>
     </dependency>

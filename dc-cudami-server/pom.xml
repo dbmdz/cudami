@@ -14,9 +14,10 @@
   <packaging>pom</packaging>
   
   <modules>
-    <module>dc-cudami-server-backend-api</module>
-    <module>dc-cudami-server-backend-jdbi</module>
-    <module>dc-cudami-server-business</module>
     <module>dc-cudami-server-webapp</module>
+    <module>dc-cudami-server-business</module>
+    <module>dc-cudami-server-backend-api</module>
+    <module>dc-cudami-server-backend-inmemory</module>
+    <module>dc-cudami-server-backend-jdbi</module>
   </modules>
 </project>

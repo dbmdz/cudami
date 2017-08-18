@@ -31,7 +31,10 @@ management:
   port: 9001
   security:
     enabled: true
-    
+
+locales:
+  default: "en_US"
+
 server:
   port: 8080
 
