@@ -27,13 +27,13 @@ jsondoc:
   playgroundEnabled: true
   displayMethodAs: URI
 
+locales:
+  default: "en_US"
+
 management:
   port: 9001
   security:
     enabled: true
-
-locales:
-  default: "en_US"
 
 server:
   port: 8080
