@@ -23,6 +23,7 @@
     <version.assertj-core>3.7.0</version.assertj-core>
     <version.commons-beanutils>1.9.3</version.commons-beanutils>
     <version.commons-dbcp2>2.1.1</version.commons-dbcp2>
+    <version.commons-lang3>3.4</version.commons-lang3>
     <version.dc-commons-server>1.2.5-SNAPSHOT</version.dc-commons-server>
     <version.dc-commons-springaop>1.2.5-SNAPSHOT</version.dc-commons-springaop>
     <version.dc-commons-springdata>1.2.5-SNAPSHOT</version.dc-commons-springdata>
@@ -225,6 +226,11 @@
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-dbcp2</artifactId>
         <version>${version.commons-dbcp2}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>${version.commons-lang3}</version>
       </dependency>
       <dependency>
         <groupId>org.aspectj</groupId>
