@@ -6,11 +6,15 @@ import feign.Feign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class WebsiteRepositoryEndpointConfig {
+
+  @Value(value = "${cudami.server.address}")
+  private String cudamiServerAddress;
 
   @Autowired
   ObjectMapper objectMapper;
@@ -21,7 +25,7 @@ public class WebsiteRepositoryEndpointConfig {
             .decoder(new JacksonDecoder(objectMapper))
             .encoder(new JacksonEncoder(objectMapper))
             .errorDecoder(new EndpointErrorDecoder())
-            .target(WebsiteRepositoryEndpoint.class, "http://localhost:8080");
+            .target(WebsiteRepositoryEndpoint.class, cudamiServerAddress);
     return endpoint;
   }
 }

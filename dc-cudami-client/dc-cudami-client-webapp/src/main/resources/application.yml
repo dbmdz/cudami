@@ -1,3 +1,7 @@
+cudami:
+  server:
+    address: http://localhost:8080
+  
 endpoints:
   hypermedia:
     enabled: true
