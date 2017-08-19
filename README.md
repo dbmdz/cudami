@@ -118,7 +118,7 @@ $ java -jar dc-cudami-client-webapp-1.1.0-SNAPSHOT-exec.jar --spring.profiles.ac
 
 Local running cudami: http://localhost:9898
 
-CMS connects to database and if no admin user exists, the admin user creation assistant is launched.
+cudami GUI webapp connects to cudami repository server and if no admin user exists, the admin user creation assistant is launched.
 Create an admin user and log in.
 
 Enjoy!
