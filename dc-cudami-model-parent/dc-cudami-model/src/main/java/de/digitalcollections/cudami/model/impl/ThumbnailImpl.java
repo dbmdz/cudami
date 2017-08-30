@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.model.impl;
 
-import de.digitalcollections.iiif.image.model.api.enums.Version;
 import de.digitalcollections.cudami.model.api.Thumbnail;
+import de.digitalcollections.iiif.image.model.api.enums.Version;
 
 public class ThumbnailImpl implements Thumbnail {
 

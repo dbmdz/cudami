@@ -9,10 +9,10 @@ public class ContentBlockImpl implements ContentBlock {
 
   private ContentBlockType type;
   private final Map<String, Object> data = new HashMap<>();
-  
+
   @Override
   public Object getData(String key) {
-     return data.get(key);
+    return data.get(key);
   }
 
   @Override
@@ -44,5 +44,5 @@ public class ContentBlockImpl implements ContentBlock {
   public void setData(String key, Object value) {
     data.put(key, value);
   }
-  
+
 }

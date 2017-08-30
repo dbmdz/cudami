@@ -85,7 +85,8 @@ public class UserServiceImpl implements UserService<User, UUID> {
 
   /*
      see: http://stackoverflow.com/questions/19302196/transaction-marked-as-rollback-only-how-do-i-find-the-cause
-     When you mark your method as @Transactional, occurrence of any exception inside your method will mark the surrounding TX as roll-back only (even if you catch them). You can use other attributes of @Transactional annotation to prevent it of rolling back like:
+     When you mark your method as @Transactional, occurrence of any exception inside your method will mark the surrounding TX as roll-back only (even if you catch them). You can use other attributes of
+     @Transactional annotation to prevent it of rolling back like:
 
      @Transactional(rollbackFor=MyException.class, noRollbackFor=MyException2.class)
    */

@@ -128,7 +128,7 @@ public class UserServiceImpl implements UserService<User, UUID> {
 
   private org.springframework.security.core.userdetails.User buildUserForAuthentication(User user, List<GrantedAuthority> authorities) {
     return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPasswordHash(),
-                                                                  user.isEnabled(), true, true, true, authorities);
+            user.isEnabled(), true, true, true, authorities);
   }
 
   @Override
@@ -138,8 +138,8 @@ public class UserServiceImpl implements UserService<User, UUID> {
   }
 
   private User save(String password1, String password2, User user, Errors results, boolean isUpdate) {
-    final PasswordsValidatorParams passwordsValidatorParams = new PasswordsValidatorParams(password1, password2, user.
-                                                                                           getPasswordHash());
+    final PasswordsValidatorParams passwordsValidatorParams = new PasswordsValidatorParams(password1, password2, user
+            .getPasswordHash());
     passwordsValidator.validate(passwordsValidatorParams, results);
     if (!results.hasErrors()) {
       String password = passwordsValidatorParams.getPassword1();

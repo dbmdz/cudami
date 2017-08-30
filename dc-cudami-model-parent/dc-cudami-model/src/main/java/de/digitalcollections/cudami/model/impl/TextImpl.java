@@ -69,6 +69,15 @@ public class TextImpl implements Text {
   }
 
   @Override
+  public String getText(String lang) {
+    Translation translation = findTranslation(lang);
+    if (translation != null) {
+      return translation.getText();
+    }
+    return null;
+  }
+
+  @Override
   public void setText(String text) {
     Translation translation = findTranslation(DEFAULT_LANG);
     if (translation != null) {
@@ -79,12 +88,13 @@ public class TextImpl implements Text {
   }
 
   @Override
-  public String getText(String lang) {
+  public void setText(String lang, String text) {
     Translation translation = findTranslation(lang);
     if (translation != null) {
-      return translation.getText();
+      translation.setText(text);
+    } else {
+      translations.add(new TranslationImpl(lang, text));
     }
-    return null;
   }
 
   @Override
@@ -95,16 +105,6 @@ public class TextImpl implements Text {
   @Override
   public void setTranslations(Set<Translation> translations) {
     this.translations = translations;
-  }
-
-  @Override
-  public void setText(String lang, String text) {
-    Translation translation = findTranslation(lang);
-    if (translation != null) {
-      translation.setText(text);
-    } else {
-      translations.add(new TranslationImpl(lang, text));
-    }
   }
 
 }

@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.model.impl;
 
-import de.digitalcollections.cudami.model.api.Thumbnail;
 import de.digitalcollections.cudami.model.api.IiifContent;
+import de.digitalcollections.cudami.model.api.Thumbnail;
 import de.digitalcollections.iiif.presentation.model.api.enums.Version;
 import java.io.Serializable;
 import java.net.URL;

@@ -19,21 +19,17 @@ public interface Text {
   String getText();
 
   /**
-   * sets (means: "add" or "replace") a text with the default locale ("de")
-   *
-   * @param text the text for default locale.
-   */
-  void setText(String text);
-
-  /**
    * @param lang the desired language.
    * @return text with the given lang
    */
   String getText(String lang);
 
-  Set<Translation> getTranslations();
-
-  void setTranslations(Set<Translation> translations);
+  /**
+   * sets (means: "add" or "replace") a text with the default locale ("de")
+   *
+   * @param text the text for default locale.
+   */
+  void setText(String text);
 
   /**
    * sets (means: "add" or "replace") a text with a given locale, which is calculated out of the lang string
@@ -42,4 +38,9 @@ public interface Text {
    * @param text the text content
    */
   void setText(String lang, String text);
+
+  Set<Translation> getTranslations();
+
+  void setTranslations(Set<Translation> translations);
+
 }
