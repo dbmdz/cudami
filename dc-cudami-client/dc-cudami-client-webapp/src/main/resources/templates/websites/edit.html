@@ -22,9 +22,17 @@
             <b th:text="#{website}">Website</b> <!-- <b thxx:text="${website.title}"></b> --> TODO  (<a th:href="${website.url}"><span th:text="${website.url}"/></a>)
           </div>
           <div class="col-sm-4">
-            <span class="col-sm-6"><button class="btn btn-default btn-block" type="button" th:text="abort"
-                                           th:onclick="'javascript:document.location.href=getViewUrl(document.location.href);return false;'">abort</button></span>
-            <span class="col-sm-6"><button class="btn btn-primary btn-block" type="submit" th:text="save">save</button></span>
+            <span class="col-sm-6">
+              <button class="btn btn-default btn-block" type="button" th:text="#{abort}"
+                      th:onclick="'javascript:document.location.href=getViewUrl(document.location.href);return false;'">
+                abort
+              </button>
+            </span>
+            <span class="col-sm-6">
+              <button class="btn btn-primary btn-block" type="submit" th:text="#{save}">
+                save
+              </button>
+            </span>
           </div>
         </div>
 
