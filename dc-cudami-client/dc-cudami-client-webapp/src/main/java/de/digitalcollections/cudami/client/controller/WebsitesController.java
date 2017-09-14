@@ -111,12 +111,14 @@ public class WebsitesController extends AbstractController implements MessageSou
   public String edit(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
 //      model.addAttribute("contentNodeTypes", websiteViewService.getContentNodeTypes());
 //      model.addAttribute("navigationNodeTypes", websiteViewService.getNavigationNodeTypes());
-    model.addAttribute("website", websiteService.get(uuid));
+    Website website = (Website) websiteService.get(uuid);
+    model.addAttribute("website", website);
 //      LOGGER.error("Cannot retrieve website with id=" + id + ": ", e);
 //      String message = messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale());
 //      redirectAttributes.addFlashAttribute("error_message", message);
 //      return "redirect:/websites";
     model.addAttribute("isNew", false);
+    model.addAttribute("availableLanguages", website.getLabel().getLanguages());
     model.addAttribute("locales", localeService.findAll());
     model.addAttribute("defaultLocale", localeService.getDefault());
 
@@ -136,6 +138,7 @@ public class WebsitesController extends AbstractController implements MessageSou
       Website websiteDb = (Website) websiteService.get(pathUuid);
       // just update the fields, that were editable
       websiteDb.setUrl(website.getUrl());
+      websiteDb.setLabel(website.getLabel());
       websiteDb.setDescription(website.getDescription());
 
       website = (Website) websiteService.update(websiteDb, results);
@@ -168,6 +171,7 @@ public class WebsitesController extends AbstractController implements MessageSou
   @RequestMapping(value = "/{uuid}", method = RequestMethod.GET)
   public String view(@PathVariable UUID uuid, Model model) {
     Website website = (Website) websiteService.get(uuid);
+    model.addAttribute("availableLanguages", website.getLabel().getLanguages());
     model.addAttribute("website", website);
     return "websites/view";
   }

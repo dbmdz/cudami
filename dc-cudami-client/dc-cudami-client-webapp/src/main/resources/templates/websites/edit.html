@@ -42,8 +42,75 @@
           </div>
         </div>
 
+        <div class="row mainContent">
+          <div class="form-group col-sm-12">
+            <span class="col-sm-2">
+              <label for="id" class="col-sm-1 control-label" th:text="#{id}">ID</label>
+              <div class="col-sm-9">
+                <input id="id" th:field="*{uuid}" type="text" class="form-control" readonly="readonly" th:placeholder="*{id}"/>
+              </div>
+            </span>
+            <span class="col-sm-5">
+              <label for="url" class="col-sm-1 control-label" th:text="#{url}">URL</label>
+              <div class="col-sm-11" th:classappend="${#fields.hasErrors('url')}? has-error">
+                <input id="url" th:field="*{url}" type="text" class="form-control" th:placeholder="#{url_placeholder}" autofocus="autofocus" required/>
+                <p th:if="${#fields.hasErrors('url')}" th:errors="*{url}">...</p>
+              </div>
+            </span>
+            <!--<span class="col-sm-5">
+              <label for="url" class="col-sm-3 control-label" thxx:text="#{title}">Title</label>
+              <div class="col-sm-9" thxx:classappend="${#fields.hasErrors('title')}? has-error">
+                <input id="url" thxx:field="*{title}" type="text" class="form-control" thxx:placeholder="#{websiteTitle_placeholder}"/>
+                <p thxx:if="${#fields.hasErrors('title')}" thxx:errors="*{title}">...</p>
+              </div>
+            </span>-->
+          </div>
+        </div>
+
         <div class="well">
-          <th:block th:if="*{description != null}">
+          <th:block th:if="${isNew}">
+            <ul class="nav nav-tabs">
+              <li class="active">
+                <a th:href="${'#' + defaultLocale}" data-toggle="tab"
+                   th:text="${defaultLocale.getDisplayLanguage(#locale)}">default locale</a>
+              </li>
+              <li>
+                <a href="#">
+                  <i class="fa fa-plus" aria-hidden="true"></i>
+                </a>
+              </li>
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane active" th:id="${defaultLocale}">
+                <label th:text="#{label}">label</label>
+                <input class="form-control" type="text" th:field="*{label.translations[0].text}" required/>
+                <label th:text="#{description}">description</label>
+                <textarea class="form-control" rows="5" th:field="*{description.translations[0].text}"></textarea>
+              </div>
+            </div>
+          </th:block>
+          <th:block th:unless="${isNew}">
+            <ul class="nav nav-tabs">
+              <li th:each="language,iter : ${availableLanguages}" th:classappend="${iter.index} == 0 ? active">
+                <a th:href="${'#' + language}" data-toggle="tab"
+                   th:text="${language}">locale</a>
+              </li>
+              <li>
+                <a href="#">
+                  <i class="fa fa-plus" aria-hidden="true"></i>
+                </a>
+              </li>
+            </ul>
+            <div class="tab-content">
+              <div th:each="language,iter : ${availableLanguages}" class="tab-pane" th:id="${language}" th:classappend="${iter.index} == 0 ? active">
+                <label th:text="#{label}">label</label>
+                <input class="form-control" type="text" th:field="*{label.translations[__${iter.index}__].text}" required/>
+                <label th:text="#{description}">description</label>
+                <textarea class="form-control" rows="5" th:field="*{description.translations[__${iter.index}__].text}"></textarea>
+              </div>
+            </div>
+          </th:block>
+          <!--<th:block th:if="*{description != null}">
             <div class="row" th:each="translation, stat : *{description.translations}">
               <div class="col-md-12 col-lg-12">
                 <label th:text="#{description}">Abstract</label>
@@ -58,32 +125,7 @@
           </th:block>
           <th:block th:unless="*{description != null}">
 
-          </th:block>
-        </div>
-
-        <div class="row mainContent">
-          <div class="form-group col-sm-12">
-            <span class="col-sm-2">
-              <label for="id" class="col-sm-1 control-label" th:text="#{id}">ID</label>
-              <div class="col-sm-9">
-                <input id="id" th:field="*{uuid}" type="text" class="form-control" readonly="readonly" th:placeholder="*{id}"/>
-              </div>
-            </span>
-            <span class="col-sm-5">
-              <label for="url" class="col-sm-1 control-label" th:text="#{url}">URL</label>
-              <div class="col-sm-11" th:classappend="${#fields.hasErrors('url')}? has-error">
-                <input id="url" th:field="*{url}" type="text" class="form-control" th:placeholder="#{url_placeholder}" autofocus="autofocus"/>
-                <p th:if="${#fields.hasErrors('url')}" th:errors="*{url}">...</p>
-              </div>
-            </span>
-            <!--            <span class="col-sm-5">
-                          <label for="url" class="col-sm-3 control-label" thxx:text="#{title}">Title</label>
-                          <div class="col-sm-9" thxx:classappend="${#fields.hasErrors('title')}? has-error">
-                            <input id="url" thxx:field="*{title}" type="text" class="form-control" thxx:placeholder="#{websiteTitle_placeholder}"/>
-                            <p thxx:if="${#fields.hasErrors('title')}" thxx:errors="*{title}">...</p>
-                          </div>
-                        </span>-->
-          </div>
+          </th:block>-->
         </div>
 
         <div class="row mainContent">

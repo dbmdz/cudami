@@ -3,10 +3,13 @@ package de.digitalcollections.cudami.client.business.impl.service;
 import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.cudami.client.backend.api.repository.WebsiteRepository;
+import de.digitalcollections.cudami.client.business.api.service.LocaleService;
 import de.digitalcollections.cudami.client.business.api.service.WebsiteService;
 import de.digitalcollections.cudami.client.business.api.service.exceptions.EntityServiceException;
+import de.digitalcollections.cudami.model.api.Text;
 import de.digitalcollections.cudami.model.api.entity.ContentNode;
 import de.digitalcollections.cudami.model.api.entity.Website;
+import de.digitalcollections.cudami.model.impl.TextImpl;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -28,6 +31,9 @@ public class WebsiteServiceImpl implements WebsiteService<Website, UUID> {
   @Autowired
   private WebsiteRepository websiteRepository;
 
+  @Autowired
+  LocaleService localeService;
+
   @Override
   public long count() {
     return websiteRepository.count();
@@ -35,7 +41,13 @@ public class WebsiteServiceImpl implements WebsiteService<Website, UUID> {
 
   @Override
   public Website create() {
-    return (Website) websiteRepository.create();
+    Website website = (Website) websiteRepository.create();
+    String defaultLocale = localeService.getDefault().getLanguage();
+    Text description = new TextImpl(defaultLocale, "");
+    website.setDescription(description);
+    Text label = new TextImpl(defaultLocale, "");
+    website.setLabel(label);
+    return website;
   }
 
   @Override
