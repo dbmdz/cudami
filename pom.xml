@@ -11,9 +11,10 @@
   <description>Cudami is a Digital Asset Management System for management and editing of cultural objects.</description>
   
   <modules>
-    <module>dc-cudami-client</module>
     <module>dc-cudami-model-parent</module>
     <module>dc-cudami-server</module>
+    <module>dc-cudami-admin</module>
+    <module>dc-cudami-templates</module>
   </modules>
 
   <properties>
