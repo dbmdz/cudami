@@ -31,7 +31,7 @@ locales:
   default: "en_US"
 
 management:
-  port: 9001
+  port: 8081
   security:
     enabled: true
 
