@@ -1,0 +1,25 @@
+
+a {
+  text-decoration: none;
+  color: #1192FF;
+}
+
+h2 {
+  font-family: "Lucida Sans Unicode", Arial, sans-serif;
+  font-size:30px;
+}
+
+img {
+  border: solid 1px beige;
+  margin: 5px;
+  padding: 5px;
+}
+
+.navbar-nav li a{
+  display: inline-block;
+}
+
+.navbar-brand img{
+  height: 100%;
+  background-color: #fff;
+}

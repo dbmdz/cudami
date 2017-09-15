@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="base">
+  <body>
+    <section layout:fragment="content">
+      <h1>Webapp Blueprint (Spring Boot + Thymeleaf)</h1>
+      <p th:text="|#{time}: ${time}|">...</p>
+    </section>
+  </body>
+</html>

@@ -1,0 +1,46 @@
+endpoints:
+  hypermedia:
+    enabled: true
+
+info:
+  app:
+    encoding: @project.build.sourceEncoding@
+    java:
+      source: @maven.compiler.source@
+      target: @maven.compiler.target@
+    project:
+      name: '@project.name@'
+      groupId: @project.groupId@
+      artifactId: @project.artifactId@
+      version: @project.version@
+
+management:
+  port: 9001
+  security:
+    enabled: true
+#    roles: SUPERUSER
+
+security:
+  user:
+    name: admin
+    password: secret
+
+server:
+  context-path: "/"
+  port: 9000
+  server-header: "cudami Website Blueprint v@project.version@"
+
+spring:
+  profiles:
+    active: PROD
+
+---
+
+management:
+  security:
+    enabled: false
+
+spring:
+  profiles: local
+  thymeleaf:
+    cache: false
