@@ -1,11 +1,11 @@
 package de.digitalcollections.cudami.client.backend.impl.repository;
 
+import de.digitalcollections.core.model.api.http.exceptions.client.ResourceNotFoundException;
 import de.digitalcollections.core.model.api.paging.Order;
 import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.core.model.api.paging.Sorting;
 import de.digitalcollections.cudami.client.backend.api.repository.UserRepository;
-import de.digitalcollections.cudami.client.backend.impl.repository.exceptionhandling.client.ResourceNotFoundException;
 import de.digitalcollections.cudami.model.impl.security.UserImpl;
 import java.util.Iterator;
 import java.util.List;

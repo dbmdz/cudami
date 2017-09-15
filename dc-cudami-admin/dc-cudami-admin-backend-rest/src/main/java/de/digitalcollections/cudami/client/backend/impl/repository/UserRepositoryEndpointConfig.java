@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.client.backend.impl.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.client.backend.impl.repository.exceptionhandling.EndpointErrorDecoder;
+import de.digitalcollections.commons.feign.codec.EndpointErrorDecoder;
 import feign.Feign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
