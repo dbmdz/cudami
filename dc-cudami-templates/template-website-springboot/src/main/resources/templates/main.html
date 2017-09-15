@@ -4,8 +4,11 @@
       layout:decorator="base">
   <body>
     <section layout:fragment="content">
-      <h1>Webapp Blueprint (Spring Boot + Thymeleaf)</h1>
-      <p th:text="|#{time}: ${time}|">...</p>
+      <h1>cudami Website Blueprint</h1>
+
+      <p><label for="time" th:text="#{time}">Current servertime</label>: <span id="time" th:text="${time}">...</span></p>
+      <p><label for="locale" th:text="#{default_content_locale}">Default-Locale for new content</label>: <span id="locale" th:text="${defaultLocale}">...</span></p>
+
     </section>
   </body>
 </html>

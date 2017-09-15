@@ -19,7 +19,7 @@ import static org.assertj.core.api.BDDAssertions.then;
  * Basic integration tests for service application.
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = Application.class,
+@SpringBootTest(classes = {Application.class, TestConfig.class},
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {
   "management.port=0"
