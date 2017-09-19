@@ -4,7 +4,7 @@
   
   <parent>
     <groupId>de.digitalcollections.cudami</groupId>
-    <artifactId>dc-cudami-client</artifactId>
+    <artifactId>dc-cudami-admin</artifactId>
     <version>1.1.0-SNAPSHOT</version>
   </parent>
   
@@ -24,7 +24,7 @@
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
-      <artifactId>dc-cudami-client-backend-api</artifactId>
+      <artifactId>dc-cudami-admin-backend-api</artifactId>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
