@@ -25,11 +25,14 @@
     <version.commons-beanutils>1.9.3</version.commons-beanutils>
     <version.commons-dbcp2>2.1.1</version.commons-dbcp2>
     <version.commons-lang3>3.4</version.commons-lang3>
-    <version.dc-commons-server>1.2.5-SNAPSHOT</version.dc-commons-server>
-    <version.dc-commons-springaop>1.2.5-SNAPSHOT</version.dc-commons-springaop>
-    <version.dc-commons-springdata>1.2.5-SNAPSHOT</version.dc-commons-springdata>
-    <version.dc-commons-springmvc>1.2.5-SNAPSHOT</version.dc-commons-springmvc>
+    <version.dc-commons-feign>1.2.6-SNAPSHOT</version.dc-commons-feign>
+    <version.dc-commons-jdbi>1.2.6-SNAPSHOT</version.dc-commons-jdbi>
+    <version.dc-commons-server>1.2.6-SNAPSHOT</version.dc-commons-server>
+    <version.dc-commons-springaop>1.2.6-SNAPSHOT</version.dc-commons-springaop>
+    <version.dc-commons-springdata>1.2.6-SNAPSHOT</version.dc-commons-springdata>
+    <version.dc-commons-springmvc>1.2.6-SNAPSHOT</version.dc-commons-springmvc>
     <version.dc-core-model>2.0.0</version.dc-core-model>
+    <version.feign>9.5.1</version.feign>
     <version.flyway-core>4.0.3</version.flyway-core>
     <version.gson>2.3.1</version.gson>
     <version.guava>20.0</version.guava>
@@ -55,6 +58,7 @@
     <version.spring-tx>4.3.7.RELEASE</version.spring-tx>
     <version.spring-web>4.3.7.RELEASE</version.spring-web>
     <version.spring-webmvc>4.3.7.RELEASE</version.spring-webmvc>
+    <version.thymeleaf>3.0.7.RELEASE</version.thymeleaf>
     <version.thymeleaf-extras-data-attribute>2.0.1</version.thymeleaf-extras-data-attribute>
     <version.thymeleaf-extras-springsecurity4>3.0.2.RELEASE</version.thymeleaf-extras-springsecurity4>
     <version.thymeleaf-layout-dialect>2.2.2</version.thymeleaf-layout-dialect>
@@ -76,7 +80,7 @@
     <version.exec-maven-plugin>1.5.0</version.exec-maven-plugin>
     <version.jetty-maven-plugin>9.4.0.v20161208</version.jetty-maven-plugin>
     <version.lesscss-maven-plugin>1.7.0.1.1</version.lesscss-maven-plugin>
-    <version.maven-compiler-plugin>3.1</version.maven-compiler-plugin>
+    <version.maven-compiler-plugin>3.6.1</version.maven-compiler-plugin>
     <version.maven-war-plugin>2.3</version.maven-war-plugin>
   </properties>
 
@@ -131,6 +135,16 @@
         <groupId>de.digitalcollections</groupId>
         <artifactId>iiif-presentation-model-api</artifactId>
         <version>${version.iiif-presentation-model-api}</version>
+      </dependency>
+      <dependency>
+        <groupId>de.digitalcollections.commons</groupId>
+        <artifactId>dc-commons-feign</artifactId>
+        <version>${version.dc-commons-feign}</version>
+      </dependency>
+      <dependency>
+        <groupId>de.digitalcollections.commons</groupId>
+        <artifactId>dc-commons-jdbi</artifactId>
+        <version>${version.dc-commons-jdbi}</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.commons</groupId>
@@ -201,6 +215,16 @@
         <groupId>de.digitalcollections.cudami</groupId>
         <artifactId>dc-cudami-server-business</artifactId>
         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.github.openfeign</groupId>
+        <artifactId>feign-core</artifactId>
+        <version>${version.feign}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.github.openfeign</groupId>
+        <artifactId>feign-jackson</artifactId>
+        <version>${version.feign}</version>
       </dependency>
       <dependency>
         <groupId>javax.servlet</groupId>
@@ -339,6 +363,11 @@
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-web</artifactId>
         <version>${version.spring-security}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.thymeleaf</groupId>
+        <artifactId>thymeleaf</artifactId>
+        <version>${version.thymeleaf}</version>
       </dependency>
       <dependency>
         <groupId>org.thymeleaf</groupId>
