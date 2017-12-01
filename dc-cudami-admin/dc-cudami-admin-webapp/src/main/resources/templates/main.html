@@ -69,7 +69,7 @@
       </th:block>
 
       <th:block sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_CONTENT_MANAGER')">
-        <h3>Digital Natives</h3>
+        <h3>Containers (object groups/aggregations)</h3>
         <div class="row">
           <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
             <a th:href="@{/websites}" title="...">
@@ -88,14 +88,6 @@
             </a>
           </div>
           <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a href="#" title="...">
-              <div class="innerContent">
-                <div class="icon"><i class="fa fa-file-text-o"></i></div>
-                Artikel
-              </div>
-            </a>
-          </div>
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
             <a th:href="@{/collections}" title="...">
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-list"></i></div>
@@ -103,15 +95,31 @@
               </div>
             </a>
           </div>
+          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a th:href="@{/projects}" title="...">
+              <div class="innerContent">
+                <div class="icon"><i class="fa fa-industry"></i></div>
+                (Digitalisierungs-) Projekte
+              </div>
+            </a>
+          </div>
         </div>
 
-        <h3>(Retro) digitized objects</h3>
+        <h3>Objects</h3>
         <div class="row">
           <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
             <a th:href="@{/books}" title="...">
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-book"></i></div>
                 Bücher
+              </div>
+            </a>
+          </div>
+          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a href="#" title="...">
+              <div class="innerContent">
+                <div class="icon"><i class="fa fa-file-text-o"></i></div>
+                Artikel
               </div>
             </a>
           </div>
