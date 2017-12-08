@@ -14,6 +14,11 @@ Architecture:
 * Cudami repository server with REST-interface
 * Cudami webapp GUI connected over REST-Interface with cudami repository server as backend.
 
+Model:
+
+* cudami Model is in sub-module dc-cudami-model
+* Modelling is done with easyUML-Netbeans-Plugin (see <http://plugins.netbeans.org/plugin/55435/easyuml>) and stored in "dc-cudami/dc-cudami-model-parent/UMLDiagrams".
+
 Features:
 
 * Automatic admin user wizard.

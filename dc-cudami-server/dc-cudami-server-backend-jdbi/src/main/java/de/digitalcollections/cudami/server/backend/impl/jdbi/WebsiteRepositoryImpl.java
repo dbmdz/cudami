@@ -3,8 +3,9 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi;
 import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.core.model.impl.paging.PageResponseImpl;
-import de.digitalcollections.cudami.model.api.entity.Website;
-import de.digitalcollections.cudami.model.impl.entity.WebsiteImpl;
+import de.digitalcollections.cudami.model.api.identifiable.Node;
+import de.digitalcollections.cudami.model.api.identifiable.Website;
+import de.digitalcollections.cudami.model.impl.identifiable.WebsiteImpl;
 import de.digitalcollections.cudami.server.backend.api.repository.EntityRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.WebsiteRepository;
 import java.util.List;
@@ -14,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class WebsiteRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl implements WebsiteRepository<Website, UUID> {
+public class WebsiteRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl implements WebsiteRepository<Website> {
 
   @Autowired
   private Jdbi dbi;
@@ -63,6 +64,11 @@ public class WebsiteRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
   @Override
   protected String[] getAllowedOrderByFields() {
     return new String[]{"url"};
+  }
+
+  @Override
+  public List<Node> getRootNodes(Website website) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override

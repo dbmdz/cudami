@@ -1,17 +1,15 @@
 package de.digitalcollections.cudami.server.business.api.service;
 
-import de.digitalcollections.cudami.model.api.entity.ContentNode;
-import de.digitalcollections.cudami.model.api.entity.Website;
-import java.io.Serializable;
+import de.digitalcollections.cudami.model.api.identifiable.Node;
+import de.digitalcollections.cudami.model.api.identifiable.Website;
 import java.util.List;
 
 /**
  * Service for Website.
  *
  * @param <W> domain object
- * @param <ID> unique id
  */
-public interface WebsiteService<W extends Website, ID extends Serializable> extends EntityService<W, ID> {
+public interface WebsiteService<W extends Website> extends IdentifiableService<W> {
 
-  List<ContentNode> getRootCategories(W website);
+  List<Node> getRootNodes(W website);
 }

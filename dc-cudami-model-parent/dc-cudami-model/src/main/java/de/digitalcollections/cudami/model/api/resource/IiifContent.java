@@ -1,16 +1,15 @@
-package de.digitalcollections.cudami.model.api;
+package de.digitalcollections.cudami.model.api.resource;
 
+import de.digitalcollections.cudami.model.api.identifiable.Identifiable;
 import de.digitalcollections.iiif.presentation.model.api.enums.Version;
-import java.io.Serializable;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Locale;
 
 /**
  * IiifContent is used for IIIF content specified by an IIIF manifest.
- * @param <ID> unique serializable identifier
  */
-public interface IiifContent<ID extends Serializable> {
+public interface IiifContent extends Identifiable {
 
   URL getManifestUrl();
 

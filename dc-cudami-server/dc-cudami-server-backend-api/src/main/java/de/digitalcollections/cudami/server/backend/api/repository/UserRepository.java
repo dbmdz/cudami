@@ -3,16 +3,15 @@ package de.digitalcollections.cudami.server.backend.api.repository;
 import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.cudami.model.api.security.User;
-import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Repository for User persistence handling.
  *
  * @param <U> entity instance
- * @param <ID> unique id
  */
-public interface UserRepository<U extends User, ID extends Serializable> {
+public interface UserRepository<U extends User> {
 
   long count();
 
@@ -22,7 +21,7 @@ public interface UserRepository<U extends User, ID extends Serializable> {
 
   U findByEmail(String email);
 
-  U findOne(ID id);
+  U findOne(UUID uuid);
 
   List<U> findActiveAdminUsers();
 

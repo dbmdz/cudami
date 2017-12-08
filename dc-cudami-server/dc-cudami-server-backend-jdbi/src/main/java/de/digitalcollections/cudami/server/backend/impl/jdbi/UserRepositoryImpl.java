@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class UserRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl implements UserRepository<UserImpl, UUID> {
+public class UserRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl implements UserRepository<UserImpl> {
 
   @Autowired
   private Jdbi dbi;

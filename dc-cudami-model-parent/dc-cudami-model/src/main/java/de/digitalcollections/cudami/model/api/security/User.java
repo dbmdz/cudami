@@ -1,15 +1,14 @@
 package de.digitalcollections.cudami.model.api.security;
 
-import de.digitalcollections.cudami.model.api.Identifiable;
+import de.digitalcollections.cudami.model.api.identifiable.Identifiable;
 import de.digitalcollections.cudami.model.api.security.enums.Role;
-import java.io.Serializable;
 import java.util.List;
+import org.springframework.security.core.GrantedAuthority;
 
 /**
  * An user of the system.
- * @param <T> unique serializable identifier
  */
-public interface User<T extends Serializable> extends Identifiable<T> {
+public interface User extends Identifiable {
 
   String getEmail();
 
@@ -27,7 +26,7 @@ public interface User<T extends Serializable> extends Identifiable<T> {
 
   void setPasswordHash(String passwordHash);
 
-  List<Role> getRoles();
+  List<? extends GrantedAuthority> getRoles();
 
   void setRoles(List<Role> roles);
 

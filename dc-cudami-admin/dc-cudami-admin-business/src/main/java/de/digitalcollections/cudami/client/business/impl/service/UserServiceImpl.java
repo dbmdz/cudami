@@ -28,7 +28,7 @@ import org.springframework.validation.Validator;
  */
 @Service
 @Transactional(readOnly = true)
-public class UserServiceImpl implements UserService<User, UUID> {
+public class UserServiceImpl implements UserService<User> {
 
   @Autowired
   @Qualifier("passwordsValidator")
@@ -46,13 +46,13 @@ public class UserServiceImpl implements UserService<User, UUID> {
   public User activate(UUID uuid) {
     User user = (User) userRepository.findOne(uuid);
     user.setEnabled(true);
-    user = userRepository.update(user);
+    user = (User) userRepository.update(user);
     return user;
   }
 
   @Override
   public User create() {
-    return userRepository.create();
+    return (User) userRepository.create();
   }
 
   @Override
@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService<User, UUID> {
   public User deactivate(UUID uuid) {
     User user = (User) userRepository.findOne(uuid);
     user.setEnabled(false);
-    user = userRepository.update(user);
+    user = (User) userRepository.update(user);
     return user;
   }
 
@@ -121,14 +121,14 @@ public class UserServiceImpl implements UserService<User, UUID> {
     if (user == null || !user.isEnabled()) {
       throw new UsernameNotFoundException(String.format("User \"%s\" was not found.", username));
     }
-    List<GrantedAuthority> authorities = user.getRoles();
+    List<? extends GrantedAuthority> authorities = user.getRoles();
 
     return buildUserForAuthentication(user, authorities);
   }
 
-  private org.springframework.security.core.userdetails.User buildUserForAuthentication(User user, List<GrantedAuthority> authorities) {
+  private org.springframework.security.core.userdetails.User buildUserForAuthentication(User user, List<? extends GrantedAuthority> authorities) {
     return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPasswordHash(),
-            user.isEnabled(), true, true, true, authorities);
+                                                                  user.isEnabled(), true, true, true, authorities);
   }
 
   @Override
@@ -139,7 +139,7 @@ public class UserServiceImpl implements UserService<User, UUID> {
 
   private User save(String password1, String password2, User user, Errors results, boolean isUpdate) {
     final PasswordsValidatorParams passwordsValidatorParams = new PasswordsValidatorParams(password1, password2, user
-            .getPasswordHash());
+                                                                                           .getPasswordHash());
     passwordsValidator.validate(passwordsValidatorParams, results);
     if (!results.hasErrors()) {
       String password = passwordsValidatorParams.getPassword1();

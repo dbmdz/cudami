@@ -1,8 +1,8 @@
-package de.digitalcollections.cudami.model.impl.entity;
+package de.digitalcollections.cudami.model.impl.identifiable;
 
-import de.digitalcollections.cudami.model.api.entity.ContentNode;
-import de.digitalcollections.cudami.model.api.entity.Website;
-import de.digitalcollections.cudami.model.api.enums.EntityType;
+import de.digitalcollections.cudami.model.api.Text;
+import de.digitalcollections.cudami.model.api.identifiable.Node;
+import de.digitalcollections.cudami.model.api.identifiable.Website;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
@@ -10,25 +10,34 @@ import java.util.List;
 /**
  * see {@link Website}
  */
-public class WebsiteImpl extends EntityImpl implements Website<Long> {
+public class WebsiteImpl extends IdentifiableImpl implements Website {
 
+  private Text label;
   private LocalDate registrationDate;
-  private List<ContentNode> rootNodes;
+  private List<Node> rootNodes;
   private URL url;
 
   public WebsiteImpl() {
-    entityType = EntityType.WEBSITE;
   }
 
   public WebsiteImpl(URL url) {
     this(null, url, null);
   }
 
-  public WebsiteImpl(List<ContentNode> rootNodes, URL url, LocalDate registrationDate) {
-    this();
+  public WebsiteImpl(List<Node> rootNodes, URL url, LocalDate registrationDate) {
     this.registrationDate = registrationDate;
     this.rootNodes = rootNodes;
     this.url = url;
+  }
+
+  @Override
+  public Text getLabel() {
+    return label;
+  }
+
+  @Override
+  public void setLabel(Text label) {
+    this.label = label;
   }
 
   @Override
@@ -52,12 +61,12 @@ public class WebsiteImpl extends EntityImpl implements Website<Long> {
   }
 
   @Override
-  public List<ContentNode> getRootNodes() {
+  public List<Node> getRootNodes() {
     return rootNodes;
   }
 
   @Override
-  public void setRootNodes(List<ContentNode> rootNodes) {
+  public void setRootNodes(List<Node> rootNodes) {
     this.rootNodes = rootNodes;
   }
 

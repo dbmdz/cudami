@@ -8,9 +8,9 @@ import de.digitalcollections.core.model.api.paging.enums.NullHandling;
 import de.digitalcollections.core.model.impl.paging.OrderImpl;
 import de.digitalcollections.core.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.core.model.impl.paging.SortingImpl;
-import de.digitalcollections.cudami.model.api.entity.Website;
+import de.digitalcollections.cudami.model.api.identifiable.Website;
 import de.digitalcollections.cudami.server.business.api.service.WebsiteService;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.EntityServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import java.util.Objects;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
@@ -61,14 +61,14 @@ public class WebsiteController {
   @ApiMethod(description = "save a newly created website")
   @RequestMapping(value = "/v1/websites", produces = "application/json", method = RequestMethod.POST)
   @ApiResponseObject
-  public Website save(@RequestBody Website website, BindingResult errors) throws EntityServiceException {
+  public Website save(@RequestBody Website website, BindingResult errors) throws IdentifiableServiceException {
     return (Website) service.save(website);
   }
 
   @ApiMethod(description = "update a website")
   @RequestMapping(value = "/v1/websites/{uuid}", produces = "application/json", method = RequestMethod.PUT)
   @ApiResponseObject
-  public Website update(@PathVariable UUID uuid, @RequestBody Website website, BindingResult errors) throws EntityServiceException {
+  public Website update(@PathVariable UUID uuid, @RequestBody Website website, BindingResult errors) throws IdentifiableServiceException {
     assert Objects.equals(uuid, website.getUuid());
     return (Website) service.update(website);
   }

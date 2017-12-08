@@ -8,9 +8,9 @@ import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.cudami.client.business.api.service.LocaleService;
 import de.digitalcollections.cudami.client.business.api.service.WebsiteService;
-import de.digitalcollections.cudami.client.business.api.service.exceptions.EntityServiceException;
+import de.digitalcollections.cudami.client.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.client.propertyeditor.RoleEditor;
-import de.digitalcollections.cudami.model.api.entity.Website;
+import de.digitalcollections.cudami.model.api.identifiable.Website;
 import java.util.UUID;
 import javax.validation.Valid;
 import org.slf4j.Logger;
@@ -139,10 +139,10 @@ public class WebsitesController extends AbstractController implements MessageSou
       // just update the fields, that were editable
       websiteDb.setUrl(website.getUrl());
       websiteDb.setLabel(website.getLabel());
-      websiteDb.setDescription(website.getDescription());
+//      websiteDb.setDescription(website.getDescription());
 
       website = (Website) websiteService.update(websiteDb, results);
-    } catch (EntityServiceException e) {
+    } catch (IdentifiableServiceException e) {
       String message = "Cannot save website with uuid=" + pathUuid + ": " + e;
       LOGGER.error(message, e);
       redirectAttributes.addFlashAttribute("error_message", message);

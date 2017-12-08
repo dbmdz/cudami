@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class EntityRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl implements EntityRepository<Entity, UUID> {
+public class EntityRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl implements EntityRepository<Entity> {
 
   @Autowired
   private Jdbi dbi;

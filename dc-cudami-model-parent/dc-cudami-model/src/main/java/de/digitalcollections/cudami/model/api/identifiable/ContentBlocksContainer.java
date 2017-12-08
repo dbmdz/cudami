@@ -1,21 +1,15 @@
-package de.digitalcollections.cudami.model.api.entity;
+package de.digitalcollections.cudami.model.api.identifiable;
 
 import de.digitalcollections.cudami.model.api.ContentBlock;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 /**
- * TextContent is used for text content.
- * @param <ID> unique serializable identifier
+ * ContentBlocksContainer is used for text content.
  */
-public interface TextContent<ID extends Serializable> extends Entity<ID> {
-
-  List<ContentNode> getContentNodes();
-
-  void setContentNodes(List<ContentNode> contentNodes);
+public interface ContentBlocksContainer extends Identifiable {
 
   /**
    * @return (multilingual) text content

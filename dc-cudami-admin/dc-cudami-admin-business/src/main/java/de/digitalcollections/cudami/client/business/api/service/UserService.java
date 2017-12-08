@@ -3,8 +3,8 @@ package de.digitalcollections.cudami.client.business.api.service;
 import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.cudami.model.api.security.User;
-import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.validation.Errors;
 
@@ -12,11 +12,10 @@ import org.springframework.validation.Errors;
  * Service for User.
  *
  * @param <T> domain object
- * @param <ID> unique id
  */
-public interface UserService<T extends User, ID extends Serializable> extends UserDetailsService {
+public interface UserService<T extends User> extends UserDetailsService {
 
-  T activate(ID id);
+  T activate(UUID uuid);
 
   T create();
 
@@ -24,11 +23,11 @@ public interface UserService<T extends User, ID extends Serializable> extends Us
 
   T createAdminUser();
 
-  T deactivate(ID id);
+  T deactivate(UUID uuid);
 
   PageResponse<T> find(PageRequest page);
 
-  T get(ID id);
+  T get(UUID uuid);
 
   List<T> getAll();
 

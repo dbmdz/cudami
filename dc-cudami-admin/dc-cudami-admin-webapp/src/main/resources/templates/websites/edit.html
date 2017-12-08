@@ -47,7 +47,7 @@
             <span class="col-sm-2">
               <label for="id" class="col-sm-1 control-label" th:text="#{id}">ID</label>
               <div class="col-sm-9">
-                <input id="id" th:field="*{uuid}" type="text" class="form-control" readonly="readonly" th:placeholder="*{id}"/>
+                <input id="id" th:field="*{uuid}" type="text" class="form-control" readonly="readonly" th:placeholder="*{uuid}"/>
               </div>
             </span>
             <span class="col-sm-5">
@@ -84,8 +84,8 @@
               <div class="tab-pane active" th:id="${defaultLocale}">
                 <label th:text="#{label}">label</label>
                 <input class="form-control" type="text" th:field="*{label.translations[0].text}" required/>
-                <label th:text="#{description}">description</label>
-                <textarea class="form-control" rows="5" th:field="*{description.translations[0].text}"></textarea>
+<!--                <label xxxth:text="#{description}">description</label>
+                <textarea class="form-control" rows="5" xxxth:field="*{description.translations[0].text}"></textarea>-->
               </div>
             </div>
           </th:block>
@@ -105,8 +105,8 @@
               <div th:each="language,iter : ${availableLanguages}" class="tab-pane" th:id="${language}" th:classappend="${iter.index} == 0 ? active">
                 <label th:text="#{label}">label</label>
                 <input class="form-control" type="text" th:field="*{label.translations[__${iter.index}__].text}" required/>
-                <label th:text="#{description}">description</label>
-                <textarea class="form-control" rows="5" th:field="*{description.translations[__${iter.index}__].text}"></textarea>
+<!--                <label xxxth:text="#{description}">description</label>
+                <textarea class="form-control" rows="5" xxxth:field="*{description.translations[__${iter.index}__].text}"></textarea>-->
               </div>
             </div>
           </th:block>

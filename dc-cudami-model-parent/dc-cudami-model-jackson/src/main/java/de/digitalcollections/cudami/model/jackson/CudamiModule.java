@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.Module;
 import de.digitalcollections.cudami.model.api.Text;
 import de.digitalcollections.cudami.model.api.Thumbnail;
 import de.digitalcollections.cudami.model.api.Translation;
-import de.digitalcollections.cudami.model.api.entity.Website;
+import de.digitalcollections.cudami.model.api.identifiable.Website;
 import de.digitalcollections.cudami.model.api.security.User;
 import de.digitalcollections.cudami.model.jackson.mixin.TextMixIn;
 import de.digitalcollections.cudami.model.jackson.mixin.ThumbnailMixIn;

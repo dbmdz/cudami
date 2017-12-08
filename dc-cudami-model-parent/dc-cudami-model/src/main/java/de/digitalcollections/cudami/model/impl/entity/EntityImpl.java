@@ -4,19 +4,17 @@ import de.digitalcollections.cudami.model.api.Text;
 import de.digitalcollections.cudami.model.api.Thumbnail;
 import de.digitalcollections.cudami.model.api.entity.Entity;
 import de.digitalcollections.cudami.model.api.enums.EntityType;
+import de.digitalcollections.cudami.model.impl.identifiable.IdentifiableImpl;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
-public class EntityImpl implements Entity<Long> {
+public class EntityImpl extends IdentifiableImpl implements Entity {
 
   private LocalDateTime created;
   private Text description;
   protected EntityType entityType;
-  private Long id;
   private Text label;
   private LocalDateTime lastModified;
   private Thumbnail thumbnail;
-  private UUID uuid = UUID.randomUUID();
 
   @Override
   public LocalDateTime getCreated() {
@@ -49,16 +47,6 @@ public class EntityImpl implements Entity<Long> {
   }
 
   @Override
-  public Long getId() {
-    return id;
-  }
-
-  @Override
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  @Override
   public Text getLabel() {
     return label;
   }
@@ -86,15 +74,5 @@ public class EntityImpl implements Entity<Long> {
   @Override
   public void setThumbnail(Thumbnail thumbnail) {
     this.thumbnail = thumbnail;
-  }
-
-  @Override
-  public UUID getUuid() {
-    return uuid;
-  }
-
-  @Override
-  public void setUuid(UUID uuid) {
-    this.uuid = uuid;
   }
 }

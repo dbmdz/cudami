@@ -4,6 +4,7 @@ import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.cudami.model.api.security.User;
 import de.digitalcollections.cudami.model.api.security.enums.Role;
+import de.digitalcollections.cudami.model.impl.security.UserImpl;
 import de.digitalcollections.cudami.server.backend.api.repository.UserRepository;
 import de.digitalcollections.cudami.server.business.api.service.UserService;
 import java.util.List;
@@ -20,7 +21,7 @@ import org.springframework.validation.Validator;
  */
 @Service
 //@Transactional(readOnly = true)
-public class UserServiceImpl implements UserService<User, UUID> {
+public class UserServiceImpl implements UserService<User> {
 
   @Autowired
   @Qualifier("uniqueUsernameValidator")
@@ -55,7 +56,7 @@ public class UserServiceImpl implements UserService<User, UUID> {
 
   @Override
   public User createAdminUser() {
-    User user = userRepository.create();
+    UserImpl user = (UserImpl) userRepository.create();
     user.getRoles().add(Role.ADMIN);
     return user;
   }

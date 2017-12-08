@@ -1,14 +1,14 @@
-package de.digitalcollections.cudami.model.impl;
+package de.digitalcollections.cudami.model.impl.resource;
 
-import de.digitalcollections.cudami.model.api.IiifContent;
 import de.digitalcollections.cudami.model.api.Thumbnail;
+import de.digitalcollections.cudami.model.api.resource.IiifContent;
+import de.digitalcollections.cudami.model.impl.identifiable.IdentifiableImpl;
 import de.digitalcollections.iiif.presentation.model.api.enums.Version;
-import java.io.Serializable;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Locale;
 
-public class IiifContentImpl<ID extends Serializable> implements IiifContent<ID> {
+public class IiifContentImpl extends IdentifiableImpl implements IiifContent {
 
   private HashMap<Locale, String> attributions;
   private HashMap<Locale, String> descriptions;

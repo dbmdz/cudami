@@ -14,10 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class UserRepositoryImpl implements UserRepository<UserImpl, UUID> {
+public class UserRepositoryImpl implements UserRepository<UserImpl> {
 
   @Autowired
   private UserRepositoryEndpoint endpoint;
+
+  @Override
+  public long count() {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
 
   @Override
   public UserImpl create() {

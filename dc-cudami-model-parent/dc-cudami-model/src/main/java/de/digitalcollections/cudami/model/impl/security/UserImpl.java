@@ -9,7 +9,7 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.util.StringUtils;
 
-public class UserImpl implements User<Long> {
+public class UserImpl implements User {
 
   @NotBlank
   @Email
@@ -52,16 +52,6 @@ public class UserImpl implements User<Long> {
   @Override
   public void setFirstname(String firstname) {
     this.firstname = firstname;
-  }
-
-  @Override
-  public Long getId() {
-    return id;
-  }
-
-  @Override
-  public void setId(Long id) {
-    this.id = id;
   }
 
   @Override

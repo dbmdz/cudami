@@ -1,13 +1,15 @@
 package de.digitalcollections.cudami.client.backend.api.repository;
 
-import de.digitalcollections.cudami.model.api.entity.Website;
-import java.io.Serializable;
+import de.digitalcollections.cudami.model.api.identifiable.Node;
+import de.digitalcollections.cudami.model.api.identifiable.Website;
+import java.util.List;
 
 /**
  * Repository for Website persistence handling.
  *
  * @param <W> entity instance
- * @param <ID> unique id
  */
-public interface WebsiteRepository<W extends Website, ID extends Serializable> extends EntityRepository<W, ID> {
+public interface WebsiteRepository<W extends Website> extends IdentifiableRepository<W> {
+
+  List<Node> getRootNodes(W website);
 }

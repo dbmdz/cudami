@@ -1,28 +1,15 @@
-package de.digitalcollections.cudami.model.impl;
+package de.digitalcollections.cudami.model.impl.resource;
 
 import de.digitalcollections.core.model.api.MimeType;
-import de.digitalcollections.cudami.model.api.BinaryContent;
-import de.digitalcollections.cudami.model.api.entity.ContentNode;
-import java.io.Serializable;
+import de.digitalcollections.cudami.model.api.resource.BinaryContent;
+import de.digitalcollections.cudami.model.impl.identifiable.IdentifiableImpl;
 import java.net.URL;
-import java.util.List;
 
-public class BinaryContentImpl<ID extends Serializable> implements BinaryContent<ID> {
+public class BinaryContentImpl extends IdentifiableImpl implements BinaryContent {
 
-  private List<ContentNode> contentNodes;
   private MimeType mimeType;
   private URL previewUrl;
   private long sizeInBytes;
-
-  @Override
-  public List<ContentNode> getContentNodes() {
-    return contentNodes;
-  }
-
-  @Override
-  public void setContentNodes(List<ContentNode> contentNodes) {
-    this.contentNodes = contentNodes;
-  }
 
   @Override
   public long getSizeInBytes() {
