@@ -33,7 +33,7 @@
             <hr/>
           </div>
         </div>
-        
+
         <div class="row mainContent">
           <div class="form-group col-sm-12">
             <span class="col-sm-2">
@@ -49,23 +49,17 @@
                 <p th:if="${#fields.hasErrors('url')}" th:errors="*{url}">...</p>
               </div>
             </span>
-<!--            <span class="col-sm-5">
-              <label for="url" class="col-sm-3 control-label" thxx:text="#{title}">Title</label>
-              <div class="col-sm-9" thxx:classappend="${#fields.hasErrors('title')}? has-error">
-                <input id="url" thxx:field="*{title}" type="text" class="form-control" thxx:placeholder="#{websiteTitle_placeholder}"/>
-                <p thxx:if="${#fields.hasErrors('title')}" thxx:errors="*{title}">...</p>
-              </div>
-            </span>-->
+            <!--            <span class="col-sm-5">
+                          <label for="url" class="col-sm-3 control-label" thxx:text="#{title}">Title</label>
+                          <div class="col-sm-9" thxx:classappend="${#fields.hasErrors('title')}? has-error">
+                            <input id="url" thxx:field="*{title}" type="text" class="form-control" thxx:placeholder="#{websiteTitle_placeholder}"/>
+                            <p thxx:if="${#fields.hasErrors('title')}" thxx:errors="*{title}">...</p>
+                          </div>
+                        </span>-->
           </div>
         </div>
-        
-        
-
-        <div class="row mainContent">
-          <div id="tree1" class="col-sm-12" data-url="sitemap/do?operation=get_nodes"></div>
-        </div>
       </form>
-      
+
       <div class="modal fade" id="addContentNodeModal" tabindex="-1" role="dialog" aria-labelledby="addContentNodeModal" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -88,7 +82,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="modal fade" id="addStructureNodeModal" tabindex="-1" role="dialog" aria-labelledby="addStructureNodeModal" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -119,82 +113,82 @@
       var website_id = /*[[*{id}]]*/ 0;
       // <![CDATA[
       $('#tree1')
-        .tree({
-          dragAndDrop: true,
-          autoOpen: true,
-          autoEscape: false,
-          onCanMoveTo: function(moved_node, target_node, position) {
-            // TODO: Ensure, that we can only use a menu (main navigation, footer navigation) as target_node
-            if ( moved_node.type != target_node.type ) {
-              return false;
-            }
-            return ( position=='before' || position=='after' );
-          },
-          onCreateLi: function(node, $li) {
-            if ( node.viewable ) {
-              $li.find('.jqtree-title').after('<span class="glyphicon glyphicon-eye-open viewnode" data-node-id="'+node.id+'" data-node-type="'+node.type+'"></span>');
-            }
-            if ( node.parentid && node.editable ) {
-              $li.find('.jqtree-title').after('<span class="glyphicon glyphicon-edit editnode" data-node-id="'+node.id+'" data-node-parentid="'+node.parentid+'" data-node-type="'+node.type+'"></span>');
-            }
-            if ( node.deleteable === true && node.parentid ) {
-              $li.find('.jqtree-title').after('<span class="glyphicon glyphicon-trash deletenode" data-node-id="'+node.id+'" data-node-parentid="'+node.parentid+'" data-node-type="'+node.type+'"></span>');
-            }
-            if ( node.appendable === true ) {
-              $li.find('.jqtree-title').after('<span class="glyphicon glyphicon-plus addnode" data-node-id="'+node.id+'" data-node-type="'+node.type+'"></span>');
-            }
-          }
-        })
-        .on(
-          'click','.viewnode',
-          function(e) {
-            var node_id = $(e.target).data('node-id');  
-            document.location.href='/records/' + node_id + '/view';
-          }
-        ).on(
-          'click','.addnode',
-            function(e) {
-              var node_id = $(e.target).data('node-id');  
-              var node_type = $(e.target).data('node-type');
-              var dialog_options = {
-                "backdrop" : "static"
+              .tree({
+                dragAndDrop: true,
+                autoOpen: true,
+                autoEscape: false,
+                onCanMoveTo: function (moved_node, target_node, position) {
+                  // TODO: Ensure, that we can only use a menu (main navigation, footer navigation) as target_node
+                  if (moved_node.type != target_node.type) {
+                    return false;
+                  }
+                  return (position == 'before' || position == 'after');
+                },
+                onCreateLi: function (node, $li) {
+                  if (node.viewable) {
+                    $li.find('.jqtree-title').after('<span class="glyphicon glyphicon-eye-open viewnode" data-node-id="' + node.id + '" data-node-type="' + node.type + '"></span>');
+                  }
+                  if (node.parentid && node.editable) {
+                    $li.find('.jqtree-title').after('<span class="glyphicon glyphicon-edit editnode" data-node-id="' + node.id + '" data-node-parentid="' + node.parentid + '" data-node-type="' + node.type + '"></span>');
+                  }
+                  if (node.deleteable === true && node.parentid) {
+                    $li.find('.jqtree-title').after('<span class="glyphicon glyphicon-trash deletenode" data-node-id="' + node.id + '" data-node-parentid="' + node.parentid + '" data-node-type="' + node.type + '"></span>');
+                  }
+                  if (node.appendable === true) {
+                    $li.find('.jqtree-title').after('<span class="glyphicon glyphicon-plus addnode" data-node-id="' + node.id + '" data-node-type="' + node.type + '"></span>');
+                  }
+                }
+              })
+              .on(
+                      'click', '.viewnode',
+                      function (e) {
+                        var node_id = $(e.target).data('node-id');
+                        document.location.href = '/records/' + node_id + '/view';
+                      }
+              ).on(
+              'click', '.addnode',
+              function (e) {
+                var node_id = $(e.target).data('node-id');
+                var node_type = $(e.target).data('node-type');
+                var dialog_options = {
+                  "backdrop": "static"
+                }
+                if (node_type === 'NavigationStructure') {
+                  $('#addStructureNodeModal')
+                          .modal(dialog_options)
+                          .on('submit', function (e) {
+                            e.preventDefault();
+                            var contentType = $('#add-item-form').serialize();
+                            document.location.href = '/nodes/' + node_id + '/new?' + contentType;
+                          });
+                } else {
+                  $('#addContentNodeModal')
+                          .modal(dialog_options)
+                          .on('submit', function (e) {
+                            e.preventDefault();
+                            var contentType = $('#add-content-node-form').serialize();
+                            if (contentType.split("=")[1] === 'WebPageContent') {
+                              document.location.href = '/content/' + node_id + '/new';
+                            } else {
+                              document.location.href = '/nodes/' + node_id + '/new?' + contentType;
+                            }
+                          });
+                }
               }
-              if ( node_type === 'NavigationStructure' ) {
-                $('#addStructureNodeModal')
-                  .modal(dialog_options)
-                  .on('submit', function(e) {
-                    e.preventDefault();
-                    var contentType = $('#add-item-form').serialize();
-                    document.location.href='/nodes/' + node_id + '/new?' + contentType;
-                });
-              } else {
-                $('#addContentNodeModal')
-                  .modal(dialog_options)
-                  .on('submit', function(e) {
-                    e.preventDefault();
-                    var contentType = $('#add-content-node-form').serialize();
-                    if ( contentType.split("=")[1] === 'WebPageContent' ) {
-                      document.location.href='/content/' + node_id + '/new';
-                    } else {
-                      document.location.href='/nodes/' + node_id + '/new?' + contentType;
-                    }
-                });
-              }
-            }
-        ).on(
-          'click','.deletenode',
-            function(e) {
-              var node_id = $(e.target).data('node-id');
-              var parent_node_id = $(e.target).data('node-parentid');
-              var dialog_options = {
-                "backdrop" : "static"
-              }
-              var dialog=$('#confirmYesNoDialog')
-              dialog.find('.modal-body p').text('Do you want to delete this item?');
-              dialog.find('.modal-title').text('Delete item');
-              dialog
-                .modal(dialog_options)
-                .find('.modal-footer #confirm').on('click', function(e){
+      ).on(
+              'click', '.deletenode',
+              function (e) {
+                var node_id = $(e.target).data('node-id');
+                var parent_node_id = $(e.target).data('node-parentid');
+                var dialog_options = {
+                  "backdrop": "static"
+                }
+                var dialog = $('#confirmYesNoDialog')
+                dialog.find('.modal-body p').text('Do you want to delete this item?');
+                dialog.find('.modal-title').text('Delete item');
+                dialog
+                        .modal(dialog_options)
+                        .find('.modal-footer #confirm').on('click', function (e) {
                   e.preventDefault();
                   var delete_data = {
                     'node_uuid': node_id,
@@ -206,47 +200,47 @@
                     dataType: 'json',
                     url: 'sitemap/do?operation=delete_node',
                     data: JSON.stringify(delete_data),
-                    success: function(result){
+                    success: function (result) {
                       $('#confirmYesNoDialog').modal('hide');
                       $('#tree1').tree('reload');
                     }
                   });
-              });             
-              dialog.modal('show');
-            }
-        ).on(
-          'click','.editnode',
-            function(e) {
-              var node_id = $(e.target).data('node-id');
-              var node_type = $(e.target).data('node-type');
-              if ( node_type === 'WebpageContent' ) {
-                document.location.href='/content/' + node_id + '/edit';
-              } else {
-                document.location.href='/nodes/' + node_id + '/edit';
+                });
+                dialog.modal('show');
               }
-            }
-        ).bind(
-          'tree.move', function(event) {
-            event.preventDefault(); 
-            var move_data = {
-              'moved_node':event.move_info.moved_node.id,
-              'target_node':event.move_info.target_node.id,
-              'position':event.move_info.position
-            }
-            event.move_info.do_move();
-            $.ajax({
-              type: "POST",
-              contentType: 'application/json; charset=utf-8',
-              dataType: 'json',
-              url: 'sitemap/do?operation=move_nodes',
-              data: JSON.stringify(move_data),
-              success: function(result){
-                $('#tree1').tree('reload');
+      ).on(
+              'click', '.editnode',
+              function (e) {
+                var node_id = $(e.target).data('node-id');
+                var node_type = $(e.target).data('node-type');
+                if (node_type === 'WebpageContent') {
+                  document.location.href = '/content/' + node_id + '/edit';
+                } else {
+                  document.location.href = '/nodes/' + node_id + '/edit';
+                }
               }
-            });
-          }
-        );
-        // ]]>
+      ).bind(
+              'tree.move', function (event) {
+                event.preventDefault();
+                var move_data = {
+                  'moved_node': event.move_info.moved_node.id,
+                  'target_node': event.move_info.target_node.id,
+                  'position': event.move_info.position
+                }
+                event.move_info.do_move();
+                $.ajax({
+                  type: "POST",
+                  contentType: 'application/json; charset=utf-8',
+                  dataType: 'json',
+                  url: 'sitemap/do?operation=move_nodes',
+                  data: JSON.stringify(move_data),
+                  success: function (result) {
+                    $('#tree1').tree('reload');
+                  }
+                });
+              }
+      );
+      // ]]>
     </script>
   </th:block>
 </body>

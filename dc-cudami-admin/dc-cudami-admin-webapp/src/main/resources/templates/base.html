@@ -48,8 +48,8 @@
           </button>
           <a class="navbar-brand" th:href="@{/}">
             <img th:src="@{/images/logo-cudami.png}" height="39" style="margin-top:-5px;"/>
-<!--            <i class="logo fa fa-code-fork"></i>-->
-<!--<span class="logotext" title="cudami">cudami</span><br/><span style="font-size: 9px;white-space: nowrap;">cultural digital asset management</span>-->
+            <!--            <i class="logo fa fa-code-fork"></i>-->
+            <!--<span class="logotext" title="cudami">cudami</span><br/><span style="font-size: 9px;white-space: nowrap;">cultural digital asset management</span>-->
           </a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
@@ -90,5 +90,8 @@
     <script th:src="@{/webjars/bootstrap/3.3.7/js/bootstrap.min.js}"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script th:src="@{/webjars/ie10-viewport-bug-workaround/1.0.3/dist/ie10-viewport-bug-workaround.min.js}"></script>
-  </body>
+  <th:block layout:fragment="beforeBodyEnds"></th:block>
+  <!--/* Add JS in child templates */-->
+  <th:block layout:fragment="morejs"> </th:block>
+</body>
 </html>
