@@ -8,7 +8,7 @@ import de.digitalcollections.core.model.api.paging.enums.NullHandling;
 import de.digitalcollections.core.model.impl.paging.OrderImpl;
 import de.digitalcollections.core.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.core.model.impl.paging.SortingImpl;
-import de.digitalcollections.cudami.model.api.identifiable.Website;
+import de.digitalcollections.cudami.model.api.entity.Website;
 import de.digitalcollections.cudami.server.business.api.service.WebsiteService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import java.util.Objects;

@@ -6,7 +6,7 @@ import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.core.model.api.paging.Sorting;
 import de.digitalcollections.cudami.client.backend.api.repository.WebsiteRepository;
 import de.digitalcollections.cudami.model.api.identifiable.Node;
-import de.digitalcollections.cudami.model.impl.identifiable.WebsiteImpl;
+import de.digitalcollections.cudami.model.impl.entity.WebsiteImpl;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;

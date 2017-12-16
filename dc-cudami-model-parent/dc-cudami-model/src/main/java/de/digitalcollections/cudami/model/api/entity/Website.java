@@ -1,6 +1,6 @@
-package de.digitalcollections.cudami.model.api.identifiable;
+package de.digitalcollections.cudami.model.api.entity;
 
-import de.digitalcollections.cudami.model.api.Text;
+import de.digitalcollections.cudami.model.api.identifiable.Node;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
@@ -8,11 +8,7 @@ import java.util.List;
 /**
  * A Website.
  */
-public interface Website extends Identifiable {
-
-  Text getLabel();
-
-  void setLabel(Text label);
+public interface Website extends Entity {
 
   List<Node> getRootNodes();
 

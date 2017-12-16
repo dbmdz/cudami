@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.server.business.impl.service;
 import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.cudami.model.api.identifiable.Node;
-import de.digitalcollections.cudami.model.api.identifiable.Website;
+import de.digitalcollections.cudami.model.api.entity.Website;
 import de.digitalcollections.cudami.server.backend.api.repository.WebsiteRepository;
 import de.digitalcollections.cudami.server.business.api.service.WebsiteService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;

@@ -10,7 +10,7 @@ import de.digitalcollections.cudami.client.business.api.service.LocaleService;
 import de.digitalcollections.cudami.client.business.api.service.WebsiteService;
 import de.digitalcollections.cudami.client.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.client.propertyeditor.RoleEditor;
-import de.digitalcollections.cudami.model.api.identifiable.Website;
+import de.digitalcollections.cudami.model.api.entity.Website;
 import java.util.UUID;
 import javax.validation.Valid;
 import org.slf4j.Logger;

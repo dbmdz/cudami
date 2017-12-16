@@ -8,7 +8,7 @@ import de.digitalcollections.cudami.client.business.api.service.WebsiteService;
 import de.digitalcollections.cudami.client.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.model.api.Text;
 import de.digitalcollections.cudami.model.api.identifiable.Node;
-import de.digitalcollections.cudami.model.api.identifiable.Website;
+import de.digitalcollections.cudami.model.api.entity.Website;
 import de.digitalcollections.cudami.model.impl.TextImpl;
 import java.util.List;
 import java.util.UUID;

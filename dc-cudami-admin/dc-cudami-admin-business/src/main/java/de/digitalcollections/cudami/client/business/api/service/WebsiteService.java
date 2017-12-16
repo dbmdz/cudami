@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.client.business.api.service;
 
 import de.digitalcollections.cudami.model.api.identifiable.Node;
-import de.digitalcollections.cudami.model.api.identifiable.Website;
+import de.digitalcollections.cudami.model.api.entity.Website;
 import java.util.List;
 
 /**

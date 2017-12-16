@@ -1,8 +1,8 @@
-package de.digitalcollections.cudami.model.impl.identifiable;
+package de.digitalcollections.cudami.model.impl.entity;
 
-import de.digitalcollections.cudami.model.api.Text;
 import de.digitalcollections.cudami.model.api.identifiable.Node;
-import de.digitalcollections.cudami.model.api.identifiable.Website;
+import de.digitalcollections.cudami.model.api.entity.Website;
+import de.digitalcollections.cudami.model.api.enums.EntityType;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
@@ -10,14 +10,14 @@ import java.util.List;
 /**
  * see {@link Website}
  */
-public class WebsiteImpl extends IdentifiableImpl implements Website {
+public class WebsiteImpl extends EntityImpl implements Website {
 
-  private Text label;
   private LocalDate registrationDate;
   private List<Node> rootNodes;
   private URL url;
 
   public WebsiteImpl() {
+    this.entityType = EntityType.WEBSITE;
   }
 
   public WebsiteImpl(URL url) {
@@ -25,19 +25,10 @@ public class WebsiteImpl extends IdentifiableImpl implements Website {
   }
 
   public WebsiteImpl(List<Node> rootNodes, URL url, LocalDate registrationDate) {
+    this();
     this.registrationDate = registrationDate;
     this.rootNodes = rootNodes;
     this.url = url;
-  }
-
-  @Override
-  public Text getLabel() {
-    return label;
-  }
-
-  @Override
-  public void setLabel(Text label) {
-    this.label = label;
   }
 
   @Override

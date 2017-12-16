@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Article is used to manage cultural articles and their hierarchy.
  */
-public interface Article extends Identifiable {
+public interface Article extends Entity {
 
   Article getParent();
 

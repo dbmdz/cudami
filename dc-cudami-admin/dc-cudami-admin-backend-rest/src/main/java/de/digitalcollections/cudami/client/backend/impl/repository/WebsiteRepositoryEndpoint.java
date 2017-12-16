@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.client.backend.impl.repository;
 
 import de.digitalcollections.core.model.api.paging.PageResponse;
-import de.digitalcollections.cudami.model.impl.identifiable.WebsiteImpl;
+import de.digitalcollections.cudami.model.impl.entity.WebsiteImpl;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
