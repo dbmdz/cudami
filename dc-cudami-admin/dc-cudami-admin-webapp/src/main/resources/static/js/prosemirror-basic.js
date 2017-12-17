@@ -11,9 +11,18 @@ var mySchema = new prosemirrorModel.Schema({
 
 window.view = new prosemirrorView.EditorView(document.querySelector("#editor"), {
   state: prosemirrorState.EditorState.create({
-    doc: prosemirrorModel.DOMParser.fromSchema(mySchema).parse(document.querySelector("#content")),
+// from HTML:
+// doc: prosemirrorModel.DOMParser.fromSchema(mySchema).parse(document.querySelector("#content")),
+
+// from JSON:
+    doc: prosemirrorModel.Node.fromJSON(mySchema, JSON.parse(document.querySelector("#content").value)),
     plugins: prosemirrorExampleSetup.exampleSetup({schema: mySchema})
-  })
+  }),
+  dispatchTransaction(tr) {
+    window.view.updateState(window.view.state.apply(tr));
+    //current state as json in text area
+    document.querySelector("#content").value = JSON.stringify(window.view.state.doc.toJSON(), null, 2);
+  }
 });
 // }
 
