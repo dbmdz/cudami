@@ -73,3 +73,8 @@ table .actionButton:hover {
 .main-content + .main-content {
   margin-top: 20px;
 }
+
+.well {
+  /*background-color: #dff0d8;*/
+  border: solid 1px #ccc;
+}
