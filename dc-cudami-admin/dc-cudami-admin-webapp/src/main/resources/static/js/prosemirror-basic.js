@@ -9,19 +9,28 @@ var mySchema = new prosemirrorModel.Schema({
   marks: prosemirrorSchemaBasic.schema.spec.marks
 });
 
+var initialJson = document.querySelector("#content").value;
+if (initialJson === null || initialJson === "") {
+  initialJson = '{"type":"doc","content":[{"type":"paragraph"}]}';
+}
 window.view = new prosemirrorView.EditorView(document.querySelector("#editor"), {
   state: prosemirrorState.EditorState.create({
 // from HTML:
 // doc: prosemirrorModel.DOMParser.fromSchema(mySchema).parse(document.querySelector("#content")),
 
 // from JSON:
-    doc: prosemirrorModel.Node.fromJSON(mySchema, JSON.parse(document.querySelector("#content").value)),
+    doc: prosemirrorModel.Node.fromJSON(mySchema, JSON.parse(initialJson)),
     plugins: prosemirrorExampleSetup.exampleSetup({schema: mySchema})
   }),
   dispatchTransaction(tr) {
     window.view.updateState(window.view.state.apply(tr));
     //current state as json in text area
-    document.querySelector("#content").value = JSON.stringify(window.view.state.doc.toJSON(), null, 2);
+    var json = JSON.stringify(window.view.state.doc.toJSON());
+    if (json === '{"type":"doc","content":[{"type":"paragraph"}]}') {
+      document.querySelector("#content").value = null;
+    } else {
+      document.querySelector("#content").value = json;
+    }
   }
 });
 // }

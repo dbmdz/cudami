@@ -4,13 +4,14 @@ import de.digitalcollections.cudami.model.api.Text;
 import de.digitalcollections.cudami.model.api.Thumbnail;
 import de.digitalcollections.cudami.model.api.entity.Entity;
 import de.digitalcollections.cudami.model.api.enums.EntityType;
+import de.digitalcollections.cudami.model.impl.TextImpl;
 import de.digitalcollections.cudami.model.impl.identifiable.IdentifiableImpl;
 import java.time.LocalDateTime;
 
 public class EntityImpl extends IdentifiableImpl implements Entity {
 
   private LocalDateTime created;
-  private Text description;
+  private Text description = new TextImpl();
   protected EntityType entityType;
   private Text label;
   private LocalDateTime lastModified;
