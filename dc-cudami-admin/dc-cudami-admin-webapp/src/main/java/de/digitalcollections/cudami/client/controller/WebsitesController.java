@@ -139,7 +139,7 @@ public class WebsitesController extends AbstractController implements MessageSou
       // just update the fields, that were editable
       websiteDb.setUrl(website.getUrl());
       websiteDb.setLabel(website.getLabel());
-//      websiteDb.setDescription(website.getDescription());
+      websiteDb.setDescription(website.getDescription());
 
       website = (Website) websiteService.update(websiteDb, results);
     } catch (IdentifiableServiceException e) {

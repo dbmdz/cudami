@@ -65,48 +65,49 @@
         </div>
 
         <div class="well">
-          <th:block th:if="${isNew}">
-            <ul class="nav nav-tabs">
+          <ul class="nav nav-tabs">
+            <th:block th:if="${isNew}">
               <li class="active">
-                <a th:href="${'#' + defaultLocale}" data-toggle="tab"
-                   th:text="${defaultLocale.getDisplayLanguage(#locale)}">default locale</a>
+                <a th:href="${'#' + defaultLocale}" data-toggle="tab" th:text="${defaultLocale.getDisplayLanguage(#locale)}">default locale</a>
               </li>
-              <li>
-                <a href="#">
-                  <i class="fa fa-plus" aria-hidden="true"></i>
-                </a>
+            </th:block>
+            <th:block th:unless="${isNew}">
+              <li th:each="language,iter : ${availableLanguages}" th:classappend="${iter.index} == 0 ? active">
+                <a th:href="${'#' + language}" data-toggle="tab" th:text="${language}">locale</a>
               </li>
-            </ul>
-            <div class="tab-content">
+            </th:block>
+            <li>
+              <a href="#">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+              </a>
+            </li>
+          </ul>
+
+          <div class="tab-content">
+            <th:block th:if="${isNew}">
               <div class="tab-pane active" th:id="${defaultLocale}">
                 <label th:text="#{label}">label</label>
                 <input class="form-control" type="text" th:field="*{label.translations[0].text}" required/>
                 <!--                <label xxxth:text="#{description}">description</label>
                                 <textarea class="form-control" rows="5" xxxth:field="*{description.translations[0].text}"></textarea>-->
+                <label th:text="#{description}">description</label>
+                <div id="editor" style="margin-bottom: 23px"></div>
+                <textarea id="content" class="form-control" cols="70" rows="10" th:field="*{description.translations[0].text}">{"type":"doc","content":[{"type":"heading","attrs":{"level":3},"content":[{"type":"text","text":"Hello ProseMirror"}]},{"type":"paragraph","content":[{"type":"text","text":"This is editable text. You can focus it and start typing."}]},{"type":"paragraph","content":[{"type":"text","text":"To apply styling, you can select a piece of text and manipulate its styling from the menu. The basic schema supports "},{"type":"text","marks":[{"type":"em"}],"text":"emphasis"},{"type":"text","text":", "},{"type":"text","marks":[{"type":"strong"}],"text":"strong text"},{"type":"text","text":", "},{"type":"text","marks":[{"type":"link","attrs":{"href":"http://marijnhaverbeke.nl/blog","title":null}}],"text":"links"},{"type":"text","text":", "},{"type":"text","marks":[{"type":"code"}],"text":"code font"},{"type":"text","text":", and "},{"type":"image","attrs":{"src":"/img/smiley.png","alt":null,"title":null}},{"type":"text","text":" images."}]},{"type":"paragraph","content":[{"type":"text","text":"Block-level structure can be manipulated with key bindings (try ctrl-shift-2 to create a level 2 heading, or enter in an empty textblock to exit the parent block), or through the menu."}]},{"type":"paragraph","content":[{"type":"text","text":"Try using the “list” item in the menu to wrap this paragraph in a numbered list."}]}]}</textarea>
               </div>
-            </div>
-          </th:block>
-          <th:block th:unless="${isNew}">
-            <ul class="nav nav-tabs">
-              <li th:each="language,iter : ${availableLanguages}" th:classappend="${iter.index} == 0 ? active">
-                <a th:href="${'#' + language}" data-toggle="tab"
-                   th:text="${language}">locale</a>
-              </li>
-              <li>
-                <a href="#">
-                  <i class="fa fa-plus" aria-hidden="true"></i>
-                </a>
-              </li>
-            </ul>
-            <div class="tab-content">
+            </th:block>
+            <th:block th:unless="${isNew}">
               <div th:each="language,iter : ${availableLanguages}" class="tab-pane" th:id="${language}" th:classappend="${iter.index} == 0 ? active">
                 <label th:text="#{label}">label</label>
                 <input class="form-control" type="text" th:field="*{label.translations[__${iter.index}__].text}" required/>
                 <!--                <label xxxth:text="#{description}">description</label>
                                 <textarea class="form-control" rows="5" xxxth:field="*{description.translations[__${iter.index}__].text}"></textarea>-->
+                <label th:text="#{description}">description</label>
+                <div id="editor" style="margin-bottom: 23px"></div>
+                <textarea id="content" class="form-control" cols="70" rows="10" th:field="*{description.translations[__${iter.index}__].text}">{"type":"doc","content":[{"type":"heading","attrs":{"level":3},"content":[{"type":"text","text":"Hello ProseMirror"}]},{"type":"paragraph","content":[{"type":"text","text":"This is editable text. You can focus it and start typing."}]},{"type":"paragraph","content":[{"type":"text","text":"To apply styling, you can select a piece of text and manipulate its styling from the menu. The basic schema supports "},{"type":"text","marks":[{"type":"em"}],"text":"emphasis"},{"type":"text","text":", "},{"type":"text","marks":[{"type":"strong"}],"text":"strong text"},{"type":"text","text":", "},{"type":"text","marks":[{"type":"link","attrs":{"href":"http://marijnhaverbeke.nl/blog","title":null}}],"text":"links"},{"type":"text","text":", "},{"type":"text","marks":[{"type":"code"}],"text":"code font"},{"type":"text","text":", and "},{"type":"image","attrs":{"src":"/img/smiley.png","alt":null,"title":null}},{"type":"text","text":" images."}]},{"type":"paragraph","content":[{"type":"text","text":"Block-level structure can be manipulated with key bindings (try ctrl-shift-2 to create a level 2 heading, or enter in an empty textblock to exit the parent block), or through the menu."}]},{"type":"paragraph","content":[{"type":"text","text":"Try using the “list” item in the menu to wrap this paragraph in a numbered list."}]}]}</textarea>
               </div>
-            </div>
-          </th:block>
+            </th:block>
+          </div>
+
           <!--<th:block th:if="*{description != null}">
             <div class="row" th:each="translation, stat : *{description.translations}">
               <div class="col-md-12 col-lg-12">
@@ -123,19 +124,10 @@
           <th:block th:unless="*{description != null}">
 
           </th:block>-->
-          <div class="row">
-            <div class="col-md-12 col-lg-12">
-              <label th:text="#{description}">Abstract</label>
-              <div id="editor" style="margin-bottom: 23px"></div>
-              
-            </div>
-          </div>
-
-          <textarea id="content" cols="70" rows="10">{"type":"doc","content":[{"type":"heading","attrs":{"level":3},"content":[{"type":"text","text":"Hello ProseMirror"}]},{"type":"paragraph","content":[{"type":"text","text":"This is editable text. You can focus it and start typing."}]},{"type":"paragraph","content":[{"type":"text","text":"To apply styling, you can select a piece of text and manipulate its styling from the menu. The basic schema supports "},{"type":"text","marks":[{"type":"em"}],"text":"emphasis"},{"type":"text","text":", "},{"type":"text","marks":[{"type":"strong"}],"text":"strong text"},{"type":"text","text":", "},{"type":"text","marks":[{"type":"link","attrs":{"href":"http://marijnhaverbeke.nl/blog","title":null}}],"text":"links"},{"type":"text","text":", "},{"type":"text","marks":[{"type":"code"}],"text":"code font"},{"type":"text","text":", and "},{"type":"image","attrs":{"src":"/img/smiley.png","alt":null,"title":null}},{"type":"text","text":" images."}]},{"type":"paragraph","content":[{"type":"text","text":"Block-level structure can be manipulated with key bindings (try ctrl-shift-2 to create a level 2 heading, or enter in an empty textblock to exit the parent block), or through the menu."}]},{"type":"paragraph","content":[{"type":"text","text":"Try using the “list” item in the menu to wrap this paragraph in a numbered list."}]}]}</textarea>
 
           <a href="#" onclick="alert(JSON.stringify(window.view.state.doc.toJSON()))">json</a>
           <!-- see https://discuss.prosemirror.net/t/how-exactly-to-use-fromjson/927 -->
-          
+
           <a href="#" onclick="alert(document.querySelector('#content').value)">content</a>
         </div>
 

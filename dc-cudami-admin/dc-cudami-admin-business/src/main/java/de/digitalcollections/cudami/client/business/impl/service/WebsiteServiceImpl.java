@@ -43,10 +43,10 @@ public class WebsiteServiceImpl implements WebsiteService<Website> {
   public Website create() {
     Website website = (Website) websiteRepository.create();
     String defaultLocale = localeService.getDefault().getLanguage();
-//    Text description = new TextImpl(defaultLocale, "");
-//    website.setDescription(description);
     Text label = new TextImpl(defaultLocale, "");
     website.setLabel(label);
+    Text description = new TextImpl(defaultLocale, "");
+    website.setDescription(description);
     return website;
   }
 
