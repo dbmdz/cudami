@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.model.api.entity;
 
-import de.digitalcollections.cudami.model.api.identifiable.Node;
+import de.digitalcollections.cudami.model.api.identifiable.Webpage;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
@@ -10,9 +10,9 @@ import java.util.List;
  */
 public interface Website extends Entity {
 
-  List<Node> getRootNodes();
+  List<Webpage> getRootPages();
 
-  void setRootNodes(List<Node> rootNodes);
+  void setRootPages(List<Webpage> rootPages);
 
   LocalDate getRegistrationDate();
 
