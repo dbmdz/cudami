@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.client.config;
 
-import de.digitalcollections.cudami.client.business.api.service.UserService;
-import de.digitalcollections.cudami.client.business.api.service.WebsiteService;
+import de.digitalcollections.cudami.client.business.api.service.identifiable.UserService;
+import de.digitalcollections.cudami.client.business.api.service.entity.WebsiteService;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.business.impl.validator;
 
 import de.digitalcollections.cudami.model.api.security.User;
-import de.digitalcollections.cudami.server.business.api.service.UserService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;

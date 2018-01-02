@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.server;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
-import de.digitalcollections.cudami.server.business.api.service.UserService;
-import de.digitalcollections.cudami.server.business.api.service.WebsiteService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.UserService;
+import de.digitalcollections.cudami.server.business.api.service.entity.WebsiteService;
 import java.util.Locale;
 import org.flywaydb.core.Flyway;
 import org.mockito.Mockito;

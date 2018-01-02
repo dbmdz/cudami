@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.client.interceptors;
 
-import de.digitalcollections.cudami.client.business.api.service.UserService;
+import de.digitalcollections.cudami.client.business.api.service.identifiable.UserService;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;

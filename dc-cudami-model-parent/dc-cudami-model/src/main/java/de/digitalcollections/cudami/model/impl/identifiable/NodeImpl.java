@@ -5,30 +5,30 @@ import de.digitalcollections.cudami.model.api.identifiable.Identifiable;
 import de.digitalcollections.cudami.model.api.identifiable.Node;
 import java.util.List;
 
-public class NodeImpl extends IdentifiableImpl implements Node {
+public class NodeImpl<N extends Node> extends IdentifiableImpl implements Node<N> {
 
-  private Node parent;
-  private List<Node> children;
+  private N parent;
+  private List<N> children;
   private Text label;
   private List<Identifiable> content;
 
   @Override
-  public Node getParent() {
+  public N getParent() {
     return parent;
   }
 
   @Override
-  public void setParent(Node parent) {
+  public void setParent(N parent) {
     this.parent = parent;
   }
 
   @Override
-  public List<Node> getChildren() {
+  public List<N> getChildren() {
     return children;
   }
 
   @Override
-  public void setChildren(List<Node> children) {
+  public void setChildren(List<N> children) {
     this.children = children;
   }
 

@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.client.controller;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.client.business.api.service.UserService;
+import de.digitalcollections.cudami.client.business.api.service.identifiable.UserService;
 import de.digitalcollections.cudami.model.api.security.User;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  * Controller for system setup tasks.
  */
 @Controller
-@RequestMapping(value = {"/setup"})
 @SessionAttributes(value = {"user"})
 public class SetupController extends AbstractController implements MessageSourceAware {
 
@@ -48,13 +47,13 @@ public class SetupController extends AbstractController implements MessageSource
     return true;
   }
 
-  @RequestMapping(value = "adminUser", method = RequestMethod.GET)
+  @RequestMapping(value = "/setup/adminUser", method = RequestMethod.GET)
   public String adminUser(Model model) {
     model.addAttribute("user", userService.createAdminUser());
     return "users/edit";
   }
 
-  @RequestMapping(value = "adminUser", method = RequestMethod.POST)
+  @RequestMapping(value = "/setup/adminUser", method = RequestMethod.POST)
   public String adminUser(@RequestParam("pwd1") String password1, @RequestParam("pwd2") String password2, @ModelAttribute @Valid User user, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {

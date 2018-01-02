@@ -10,7 +10,7 @@ import de.digitalcollections.core.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.core.model.impl.paging.SortingImpl;
 import de.digitalcollections.cudami.model.api.security.User;
 import de.digitalcollections.cudami.model.api.security.enums.Role;
-import de.digitalcollections.cudami.server.business.api.service.UserService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.UserService;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;

@@ -8,16 +8,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@RequestMapping(value = {"", "/"})
 public class MainController {
 
-  @RequestMapping(method = RequestMethod.GET)
+  @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
   public String printWelcome(Model model) {
     model.addAttribute("time", new Date());
     return "main";
   }
 
-  @RequestMapping("/login")
+  @RequestMapping(value = {"/login"}, method = RequestMethod.GET)
   public String login(@RequestParam(value = "error", defaultValue = "false") boolean error, Model model) {
     model.addAttribute("error", error);
     model.addAttribute("login", true);

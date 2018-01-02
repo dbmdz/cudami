@@ -6,22 +6,23 @@ import java.util.List;
 
 /**
  * Node is used to structure cultural content hierarchically.
+ * @param <N> a node
  */
-public interface Node extends Identifiable {
+public interface Node<N extends Node> extends Identifiable {
 
   Text getLabel();
 
   void setLabel(Text label);
 
-  Node getParent();
+  N getParent();
 
-  void setParent(Node parent);
+  void setParent(N parent);
 
-  List<Node> getChildren();
+  List<N> getChildren();
 
-  void setChildren(List<Node> children);
+  void setChildren(List<N> children);
 
-  default void addChild(Node child) {
+  default void addChild(N child) {
     if (getChildren() == null) {
       setChildren(new ArrayList<>());
     }
