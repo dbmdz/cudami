@@ -4,6 +4,7 @@ import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.core.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.cudami.model.api.entity.ContentTree;
+import de.digitalcollections.cudami.model.api.entity.Entity;
 import de.digitalcollections.cudami.model.api.enums.EntityType;
 import de.digitalcollections.cudami.model.api.identifiable.ContentNode;
 import de.digitalcollections.cudami.model.impl.entity.ContentTreeImpl;
@@ -55,7 +56,7 @@ public class ContentTreeRepositoryImpl extends AbstractPagingAndSortingRepositor
   @Override
   public ContentTree findOne(UUID uuid) {
     List<ContentTreeImpl> list = dbi.withHandle(h -> h.createQuery(
-            "SELECT * FROM entities WHERE" + ENTITY_WHERE_CLAUSE + "' AND uuid = :uuid")
+            "SELECT * FROM entities WHERE" + ENTITY_WHERE_CLAUSE + " AND uuid = :uuid")
             .bind("uuid", uuid)
             .mapToBean(ContentTreeImpl.class)
             .list());
@@ -77,8 +78,9 @@ public class ContentTreeRepositoryImpl extends AbstractPagingAndSortingRepositor
 
   @Override
   public ContentTree save(ContentTree contentTree) {
-    ContentTree result = (ContentTree) entityRepository.save(contentTree);
+    Entity entity = (Entity) entityRepository.save(contentTree);
     saveRootNodes(contentTree);
+    ContentTree result = findOne(entity.getUuid());
     return result;
   }
 

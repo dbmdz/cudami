@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+
+  <head>
+    <title th:text="#{content_trees}">Content Trees</title>
+  </head>
+  <body>
+    <section layout:fragment="content">
+      <h1><span th:text="#{content_trees}">Content Trees</span> <a class="btn btn-default" th:href="@{/contenttrees/new}" th:text="#{btn_new}">New</a></h1>
+
+      <div class="row">
+        <div class="col-sm-12" >
+          <div th:replace="fragments/pagination-navigation :: pagination">
+            ...
+          </div>
+<!--          <div class="objectCounter lighter">
+            <span class="message" th:text="${page.totalItems}">Found 17 books.</span>
+          </div>-->
+        </div>
+      </div>
+      
+      <table class="table table-bordered table-condensed table-striped table-hover table-responsive">
+        <thead>
+          <tr sd:page-object="${page.page}">
+            <th class="center"></th>
+            <th class="center" th:text="#{last_modified}">last modified</th>
+            <th class="center" th:text="#{action}">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="contenttree : ${page.content}">
+            <td><a th:href="@{'/contenttrees/' + ${contenttree.uuid}}" th:text="${contenttree.label.text}">Physics</a></td>          
+            <td th:text="${contenttree.lastModified}">23.01.1999</td>
+            <td class="center">
+              <a th:href="@{'/contenttrees/' + ${contenttree.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fa fa-pencil actionButton"></span></a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="row">
+        <div class="col-sm-12" >
+          <div th:replace="fragments/pagination-navigation :: pagination">
+            ...
+          </div>
+        </div>
+      </div>
+      
+      <div th:replace="fragments/modals-confirmation :: confirmYesNoDialog"></div>
+    </section>
+  </body>
+</html>
+
+

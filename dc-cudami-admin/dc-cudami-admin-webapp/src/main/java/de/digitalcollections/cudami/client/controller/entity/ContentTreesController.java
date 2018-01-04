@@ -154,7 +154,7 @@ public class ContentTreesController extends AbstractController implements Messag
   }
 
   @RequestMapping(value = "/contenttrees", method = RequestMethod.GET)
-  public String list(Model model, @PageableDefault(sort = {"email"}, size = 25) Pageable pageable) {
+  public String list(Model model, @PageableDefault(sort = {"lastModified"}, size = 25) Pageable pageable) {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = contentTreeService.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);

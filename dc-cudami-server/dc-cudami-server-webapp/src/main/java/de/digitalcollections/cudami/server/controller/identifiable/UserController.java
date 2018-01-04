@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.server.controller;
+package de.digitalcollections.cudami.server.controller.identifiable;
 
 import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;

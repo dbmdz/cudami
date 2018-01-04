@@ -1,0 +1,92 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+
+  <head>
+    <title th:text="|#{content_trees}: #{content_tree}|">Content trees: Content tree</title>
+    <script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/js/jqtree/tree.jquery.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/jqtree/jqtree.css}"/>
+    <link rel="stylesheet" th:href="@{/css/dzpadmin.css}"/>
+  </head>
+  <body>
+    <section layout:fragment="content" th:object="${contentTree}">
+
+      <div class="row">
+        <div class="col-sm-9">
+          <b th:text="#{content_tree}">Content tree</b> <!-- <b thxx:text="${website.title}"/> --> TODO
+        </div>
+        <div class="col-sm-3">
+          <a class="btn btn-default btn-block"
+             th:href="@{${contentTree.uuid} + '/edit'}" th:text="#{edit}">edit</a>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12">
+          <hr/>
+        </div>
+      </div>
+
+      <div class="row main-content">
+        <div class="col-sm-12">
+          <div class="container-fluid rows-striped">
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{id}">ID</label></div>
+              <div class="col-md-9"><span th:text="*{uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row main-content">
+        <div class="col-sm-12">
+          <ul class="nav nav-tabs">
+            <li th:each="language,iter : ${availableLanguages}" th:classappend="${iter.index} == 0 ? active">
+              <a th:href="${'#' + language}" data-toggle="tab"
+                 th:text="${language}">locale</a>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div th:each="language,iter : ${availableLanguages}" class="tab-pane active" th:id="${language}" th:classappend="${iter.index} == 0 ? active">
+              <div class="well">
+                <div class="row">
+                  <div class="col-sm-2">
+                    <img alt="64x64" class="media-object" data-src="holder.js/64x64" style="width: 64px; height: 64px;" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PCEtLQpTb3VyY2UgVVJMOiBob2xkZXIuanMvNjR4NjQKQ3JlYXRlZCB3aXRoIEhvbGRlci5qcyAyLjYuMC4KTGVhcm4gbW9yZSBhdCBodHRwOi8vaG9sZGVyanMuY29tCihjKSAyMDEyLTIwMTUgSXZhbiBNYWxvcGluc2t5IC0gaHR0cDovL2ltc2t5LmNvCi0tPjxkZWZzPjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+PCFbQ0RBVEFbI2hvbGRlcl8xNWU3YjMxMzA3YSB0ZXh0IHsgZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQgfSBdXT48L3N0eWxlPjwvZGVmcz48ZyBpZD0iaG9sZGVyXzE1ZTdiMzEzMDdhIj48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIGZpbGw9IiNFRUVFRUUiLz48Zz48dGV4dCB4PSIxNC41IiB5PSIzNi41Ij42NHg2NDwvdGV4dD48L2c+PC9nPjwvc3ZnPg==" data-holder-rendered="true">
+                  </div>
+                  <div class="col-sm-10">
+                    <label th:text="#{label}">label</label>
+                    <p th:text="*{label.translations[__${iter.index}__].text}">label</p>
+<!--                    <label xxxth:text="#{description}">description</label>
+                    <p xxxth:text="*{description.translations[__${iter.index}__].text}">description</p>-->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      &nbsp;<br/>
+
+      <div class="row mainContent">
+        <div id="tree1" class="col-sm-12" th:attr="data-url=${contentTree.uuid + '/sitemap/do?operation=get_nodes'}"></div>
+      </div>
+
+    </section>
+
+  <th:block layout:fragment="beforeBodyEnds">
+    <script type="text/javascript" th:inline="javascript">
+      // <![CDATA[
+      $('#tree1').tree({
+        dragAndDrop: false,
+        autoOpen: true,
+        autoEscape: false
+      });
+      // ]]>
+    </script>
+  </th:block>
+</body>
+</html>

@@ -33,20 +33,22 @@ public class ContentTreeRepositoryImpl implements ContentTreeRepository<ContentT
   public PageResponse<ContentTreeImpl> find(PageRequest pageRequest) {
     int pageNumber = pageRequest.getPageNumber();
     int pageSize = pageRequest.getPageSize();
-
-    Sorting sorting = pageRequest.getSorting();
-    Iterator<Order> iterator = sorting.iterator();
-
     // FIXME add support for multiple sort fields
     String sortField = "";
     String sortDirection = "";
     String nullHandling = "";
+
+    Sorting sorting = pageRequest.getSorting();
+    if (sorting != null) {
+      Iterator<Order> iterator = sorting.iterator();
+
 //    while (iterator.hasNext()) {
-    if (iterator.hasNext()) {
-      Order order = iterator.next();
-      sortField = order.getProperty() == null ? "" : order.getProperty();
-      sortDirection = order.getDirection() == null ? "" : order.getDirection().name();
-      nullHandling = order.getNullHandling() == null ? "" : order.getNullHandling().name();
+      if (iterator.hasNext()) {
+        Order order = iterator.next();
+        sortField = order.getProperty() == null ? "" : order.getProperty();
+        sortDirection = order.getDirection() == null ? "" : order.getDirection().name();
+        nullHandling = order.getNullHandling() == null ? "" : order.getNullHandling().name();
+      }
     }
 
     return endpoint.find(pageNumber, pageSize, sortField, sortDirection, nullHandling);

@@ -77,7 +77,7 @@ public class WebsiteServiceImpl implements WebsiteService<Website> {
 //  public Website find(UUID uuid) {
 //    return (Website) websiteRepository.find(uuid);
 //  }
-  public void setWebsiteRepository(WebsiteRepository websiteRepository) {
+  public void setRepository(WebsiteRepository websiteRepository) {
     this.websiteRepository = websiteRepository;
   }
 }

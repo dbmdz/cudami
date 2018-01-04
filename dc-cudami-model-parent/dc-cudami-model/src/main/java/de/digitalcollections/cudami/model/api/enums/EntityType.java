@@ -10,6 +10,6 @@ public enum EntityType {
 
   @Override
   public String toString() {
-    return name().toLowerCase();
+    return name();
   }
 }
