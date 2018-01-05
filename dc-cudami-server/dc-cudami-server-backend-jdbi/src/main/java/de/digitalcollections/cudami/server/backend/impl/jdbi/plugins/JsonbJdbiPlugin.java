@@ -7,7 +7,7 @@ import org.jdbi.v3.core.spi.JdbiPlugin;
 
 public class JsonbJdbiPlugin implements JdbiPlugin {
 
-  private ObjectMapper objectMapper;
+  private final ObjectMapper objectMapper;
 
   public JsonbJdbiPlugin(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;

@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.model.impl.identifiable;
 
-import de.digitalcollections.cudami.model.api.Text;
 import de.digitalcollections.cudami.model.api.identifiable.Identifiable;
 import de.digitalcollections.cudami.model.api.identifiable.Node;
 import java.util.List;
@@ -9,7 +8,6 @@ public class NodeImpl<N extends Node> extends IdentifiableImpl implements Node<N
 
   private N parent;
   private List<N> children;
-  private Text label;
   private List<Identifiable> content;
 
   @Override
@@ -30,16 +28,6 @@ public class NodeImpl<N extends Node> extends IdentifiableImpl implements Node<N
   @Override
   public void setChildren(List<N> children) {
     this.children = children;
-  }
-
-  @Override
-  public Text getLabel() {
-    return label;
-  }
-
-  @Override
-  public void setLabel(Text label) {
-    this.label = label;
   }
 
   @Override

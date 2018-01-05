@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.client.business.impl.validator;
 
-import de.digitalcollections.cudami.client.business.api.service.identifiable.UserService;
+import de.digitalcollections.cudami.client.business.api.service.security.UserService;
 import de.digitalcollections.cudami.model.api.security.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

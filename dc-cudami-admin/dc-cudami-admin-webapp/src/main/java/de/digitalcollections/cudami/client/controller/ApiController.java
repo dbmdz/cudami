@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.client.controller;
 
-import de.digitalcollections.cudami.client.business.api.service.identifiable.UserService;
+import de.digitalcollections.cudami.client.business.api.service.security.UserService;
 import de.digitalcollections.cudami.model.api.security.User;
 import java.util.List;
 import org.slf4j.Logger;
@@ -25,6 +25,6 @@ public class ApiController {
   @ResponseBody
   @RequestMapping(value = "/api/users", method = RequestMethod.GET, produces = "application/json; charset=UTF-8")
   public List<User> getUsers() {
-    return userService.getAll();
+    return userService.findAll();
   }
 }

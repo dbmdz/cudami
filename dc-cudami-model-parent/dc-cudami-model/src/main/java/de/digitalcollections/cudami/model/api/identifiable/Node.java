@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.model.api.identifiable;
 
-import de.digitalcollections.cudami.model.api.Text;
+import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
+import de.digitalcollections.cudami.model.api.identifiable.Identifiable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,10 +10,6 @@ import java.util.List;
  * @param <N> a node
  */
 public interface Node<N extends Node> extends Identifiable {
-
-  Text getLabel();
-
-  void setLabel(Text label);
 
   N getParent();
 

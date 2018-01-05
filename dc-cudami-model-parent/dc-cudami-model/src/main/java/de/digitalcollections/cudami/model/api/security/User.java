@@ -1,14 +1,14 @@
 package de.digitalcollections.cudami.model.api.security;
 
-import de.digitalcollections.cudami.model.api.identifiable.Identifiable;
 import de.digitalcollections.cudami.model.api.security.enums.Role;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.security.core.GrantedAuthority;
 
 /**
  * An user of the system.
  */
-public interface User extends Identifiable {
+public interface User {
 
   String getEmail();
 
@@ -33,4 +33,8 @@ public interface User extends Identifiable {
   boolean isEnabled();
 
   void setEnabled(boolean enabled);
+
+  UUID getUuid();
+
+  void setUuid(UUID uuid);
 }

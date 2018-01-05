@@ -2,20 +2,20 @@ package de.digitalcollections.cudami.model.jackson;
 
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.Module;
-import de.digitalcollections.cudami.model.api.Text;
-import de.digitalcollections.cudami.model.api.Thumbnail;
-import de.digitalcollections.cudami.model.api.Translation;
-import de.digitalcollections.cudami.model.api.entity.ContentTree;
-import de.digitalcollections.cudami.model.api.entity.Website;
+import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
+import de.digitalcollections.cudami.model.api.identifiable.parts.Translation;
+import de.digitalcollections.cudami.model.api.identifiable.entity.ContentTree;
+import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
 import de.digitalcollections.cudami.model.api.security.User;
-import de.digitalcollections.cudami.model.jackson.mixin.TextMixIn;
-import de.digitalcollections.cudami.model.jackson.mixin.ThumbnailMixIn;
-import de.digitalcollections.cudami.model.jackson.mixin.TranslationMixIn;
+import de.digitalcollections.cudami.model.jackson.mixin.identifiable.parts.TextMixIn;
+import de.digitalcollections.cudami.model.jackson.mixin.identifiable.parts.TranslationMixIn;
 import de.digitalcollections.cudami.model.jackson.mixin.entity.ContentTreeMixIn;
 import de.digitalcollections.cudami.model.jackson.mixin.entity.WebsiteMixIn;
 import de.digitalcollections.cudami.model.jackson.mixin.security.UserMixIn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import de.digitalcollections.cudami.model.api.identifiable.resource.IiifImage;
+import de.digitalcollections.cudami.model.jackson.mixin.resource.IiifImageMixIn;
 
 public class CudamiModule extends Module {
 
@@ -32,7 +32,7 @@ public class CudamiModule extends Module {
 //    context.setMixInAnnotations(Entity.class, EntityMixIn.class); // FIXME not needed/working, switched back to wrapper info...
     context.setMixInAnnotations(ContentTree.class, ContentTreeMixIn.class);
     context.setMixInAnnotations(Text.class, TextMixIn.class);
-    context.setMixInAnnotations(Thumbnail.class, ThumbnailMixIn.class);
+    context.setMixInAnnotations(IiifImage.class, IiifImageMixIn.class);
     context.setMixInAnnotations(Translation.class, TranslationMixIn.class);
     context.setMixInAnnotations(User.class, UserMixIn.class);
     context.setMixInAnnotations(Website.class, WebsiteMixIn.class);

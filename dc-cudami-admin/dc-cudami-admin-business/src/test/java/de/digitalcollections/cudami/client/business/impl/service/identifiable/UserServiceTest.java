@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.client.business.impl.service.identifiable;
 
-import de.digitalcollections.cudami.client.backend.api.repository.identifiable.UserRepository;
-import de.digitalcollections.cudami.client.business.api.service.identifiable.UserService;
+import de.digitalcollections.cudami.client.backend.api.repository.security.UserRepository;
+import de.digitalcollections.cudami.client.business.api.service.security.UserService;
 import de.digitalcollections.cudami.config.SpringConfigBackendForTest;
 import de.digitalcollections.cudami.config.SpringConfigBusiness;
 import de.digitalcollections.cudami.model.api.security.User;
