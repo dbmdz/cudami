@@ -2,5 +2,5 @@ CREATE TABLE IF NOT EXISTS entities (
   id SERIAL PRIMARY KEY NOT NULL,
   uuid UUID NOT NULL UNIQUE,
 
-  entity_type VARCHAR NOT NULL,
+  entity_type VARCHAR NOT NULL
 );
