@@ -1,7 +1,5 @@
 package de.digitalcollections.cudami.model.api.identifiable;
 
-import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
-import de.digitalcollections.cudami.model.api.identifiable.Identifiable;
 import java.util.ArrayList;
 import java.util.List;
 
