@@ -12,14 +12,16 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSo
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.jdbi.v3.core.Jdbi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends AbstractPagingAndSortingRepositoryImpl implements IdentifiableRepository<I> {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableRepositoryImpl.class);
 
   @Autowired
   private Jdbi dbi;
@@ -86,7 +88,7 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Abst
               .mapToBean(IdentifiableImpl.class)
               .findOnly());
     } catch (JsonProcessingException ex) {
-      Logger.getLogger(IdentifiableRepositoryImpl.class.getName()).log(Level.SEVERE, null, ex);
+      LOGGER.error("error saving identifiable", ex);
     }
     return (I) result;
   }
@@ -107,7 +109,7 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Abst
               .mapToBean(IdentifiableImpl.class)
               .findOnly());
     } catch (JsonProcessingException ex) {
-      Logger.getLogger(IdentifiableRepositoryImpl.class.getName()).log(Level.SEVERE, null, ex);
+      LOGGER.error("error updating identifiable", ex);
     }
     return (I) result;
   }
