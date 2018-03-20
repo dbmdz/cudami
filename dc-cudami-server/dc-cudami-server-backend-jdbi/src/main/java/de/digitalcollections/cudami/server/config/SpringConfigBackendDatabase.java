@@ -37,19 +37,19 @@ public class SpringConfigBackendDatabase {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfigBackendDatabase.class);
 
-  @Value("${database.name}")
+  @Value("${custom.database.name}")
   private String databaseName;
 
-  @Value("${database.hostname}")
+  @Value("${custom.database.hostname}")
   private String databaseHostname;
 
-  @Value("${database.password}")
+  @Value("${custom.database.password}")
   private String databasePassword;
 
-  @Value("${database.port}")
+  @Value("${custom.database.port}")
   private String databasePort;
 
-  @Value("${database.username}")
+  @Value("${custom.database.username}")
   private String databaseUsername;
 
   @Autowired

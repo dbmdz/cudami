@@ -1,10 +1,16 @@
+custom:
+  database:
+    hostname: localhost
+    name: cudami
+    password: somepassword
+    port: 5432
+    username: cudami
 
-# Activate /actuator
+# local/default
 endpoints:
   hypermedia:
     enabled: true
 
-# Application info /info
 info:
   app:
     encoding: @project.build.sourceEncoding@
@@ -17,40 +23,46 @@ info:
       artifactId: @project.artifactId@
       version: @project.version@
 
-# mandatory configuration
-jsondoc:
-  basePath: https://www.myrestserver.com:8080
-  version: 1.0
-  packages[0]: de.digitalcollections.cudami.server.webapp.controller
-  #packages[1]: com.example.model
-  # optional configuration
-  playgroundEnabled: true
-  displayMethodAs: URI
-
 locales:
   default: "en_US"
 
 management:
-  port: 8081
+  context-path: '/monitoring'
+  port: 9001
   security:
-    enabled: true
+    enabled: false
+
+security:
+  basic:
+    enabled: false
+  headers:
+    cache: false
+    # disables pragma no-cache header
 
 server:
-  port: 8080
+  port: 9000
+  server-header: "@project.name@ v@project.version@"
 
 spring:
   profiles:
-    active: PROD
+    active: local
+  thymeleaf:
+    cache: false
+    mode: HTML
 
 ---
 
-spring:
-  profiles: local
-
-jsondoc:
-  basePath: http://localhost:8080
-
-# Deactivate security for sensitive actuator endpoints (DO NOT USE ON A PUBLIC ACCESSIBLE SYSTEM!!!)
+# PROD
 management:
   security:
-    enabled: false    
+    enabled: true
+
+security:
+  user:
+    name: admin
+    password: secret
+
+spring:
+  profiles: PROD
+  thymeleaf:
+    cache: true
