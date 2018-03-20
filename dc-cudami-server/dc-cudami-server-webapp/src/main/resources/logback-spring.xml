@@ -5,7 +5,7 @@
   <springProfile name="DEV, STG, PROD">
     <appender name="default" class="ch.qos.logback.core.rolling.RollingFileAppender">
       <!-- create directory /var/log/digitalcollections with proper permissions... -->
-      <file>/var/log/cudami-server.log</file>
+      <file>/var/log/cudami/cudami-server.log</file>
       <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
         <fileNamePattern>cudami-server.%d{yyyy-MM-dd}.log</fileNamePattern>
       </rollingPolicy>
