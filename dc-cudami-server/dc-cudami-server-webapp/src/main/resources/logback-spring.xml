@@ -7,10 +7,10 @@
       <!-- create directory /var/log/digitalcollections with proper permissions... -->
       <file>/var/log/cudami/cudami-server.log</file>
       <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-        <fileNamePattern>cudami-server.%d{yyyy-MM-dd}.log</fileNamePattern>
+        <fileNamePattern>/var/log/cudami/cudami-server.%d{yyyy-MM-dd}.log</fileNamePattern>
       </rollingPolicy>
       <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-        <fileNamePattern>cudami-server.%d{yyyy-MM}.%i.log.gz</fileNamePattern>
+        <fileNamePattern>/var/log/cudami/cudami-server.%d{yyyy-MM}.%i.log.gz</fileNamePattern>
         <maxFileSize>100MB</maxFileSize>
         <maxHistory>90</maxHistory>
         <totalSizeCap>5GB</totalSizeCap>
