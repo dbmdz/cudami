@@ -20,11 +20,17 @@ import static org.assertj.core.api.BDDAssertions.then;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {Application.class, TestConfig.class},
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(properties = {"management.port=0"})
+@TestPropertySource(properties = {
+  "spring.profiles.active=local",
+  "management.port=0"
+})
 public class ApplicationTest {
 
+  @Value("${management.context-path}")
+  private String managementContextPath;
+
   @Value("${local.management.port}")
-  private int mgt;
+  private int managementPort;
 
   @Autowired
   private TestRestTemplate testRestTemplate;
@@ -41,7 +47,7 @@ public class ApplicationTest {
   public void shouldReturn200WhenSendingRequestToManagementEndpoint() throws Exception {
     @SuppressWarnings("rawtypes")
     ResponseEntity<Map> entity = this.testRestTemplate.getForEntity(
-            "http://localhost:" + this.mgt + "/info", Map.class);
+            "http://localhost:" + this.managementPort + this.managementContextPath + "/info", Map.class);
 
     then(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
   }
