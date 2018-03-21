@@ -77,12 +77,6 @@
       <artifactId>logstash-logback-encoder</artifactId>
       <version>${version.logstash-logback-encoder}</version>
       <scope>runtime</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>ch.qos.logback</groupId>
-          <artifactId>logback-core</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.aspectj</groupId>
@@ -222,9 +216,6 @@
             </goals>
           </execution>
         </executions>
-        <configuration>
-          <classifier>exec</classifier>
-        </configuration>
       </plugin>
     </plugins>
   </build>

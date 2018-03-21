@@ -20,7 +20,7 @@
       </encoder>
     </appender>
   </springProfile>
-  
+
   <springProfile name="local">
     <appender name="default" class="ch.qos.logback.core.ConsoleAppender">
       <encoder>
