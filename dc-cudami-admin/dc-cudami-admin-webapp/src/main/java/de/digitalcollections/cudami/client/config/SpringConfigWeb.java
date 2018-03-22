@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -29,14 +32,13 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.thymeleaf.dialect.springdata.SpringDataDialect;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 
@@ -55,6 +57,11 @@ import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 //})
 @Import(SpringConfigCommonsMvc.class)
 public class SpringConfigWeb extends WebMvcConfigurerAdapter {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfigWeb.class);
+
+  @Value("${cudami.defaultLocale-gui}")
+  private String defaultLocaleTag;
 
   static final String ENCODING = "UTF-8";
 
@@ -150,9 +157,13 @@ public class SpringConfigWeb extends WebMvcConfigurerAdapter {
   }
 
   @Bean(name = "localeResolver")
-  public LocaleResolver sessionLocaleResolver() {
-    SessionLocaleResolver localeResolver = new SessionLocaleResolver();
-    localeResolver.setDefaultLocale(Locale.GERMAN);
+  public CookieLocaleResolver localeResolver() {
+    CookieLocaleResolver localeResolver = new CookieLocaleResolver();
+    Locale defaultLocale = Locale.forLanguageTag(defaultLocaleTag);
+    LOGGER.info("##### Setting users' default locale for GUI to '{}' (persisted in cookie)", defaultLocale);
+    localeResolver.setDefaultLocale(defaultLocale);
+//    localeResolver.setCookieName("my-locale-cookie");
+    localeResolver.setCookieMaxAge(14 * 24 * 60 * 60); // 14 days (as content managers will work in office it should be relatively long)
     return localeResolver;
   }
 
