@@ -7,14 +7,12 @@ import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.core.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.cudami.model.api.identifiable.Node;
 import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
-import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.model.impl.identifiable.entity.WebsiteImpl;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSortingRepositoryImpl;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,20 +46,28 @@ public class WebsiteRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
 
   @Override
   public PageResponse<Website> find(PageRequest pageRequest) {
-    StringBuilder query = new StringBuilder("SELECT * FROM websites INNER JOIN entities ON websites.uuid=entities.uuid INNER JOIN identifiables ON websites.uuid=identifiables.uuid");
+    StringBuilder query = new StringBuilder("SELECT ws.id as id, ws.uuid as uuid, ws.url as url, ws.registration_date as registration_date, ws.rootpages as rootpages"
+            + " FROM websites ws INNER JOIN entities e ON ws.uuid=e.uuid INNER JOIN identifiables i ON ws.uuid=i.uuid");
+//    StringBuilder query = new StringBuilder("SELECT ws.id as id, ws.uuid as uuid, ws.url as url, ws.registration_date as registration_date FROM websites ws INNER JOIN entities e ON ws.uuid=e.uuid INNER JOIN identifiables i ON ws.uuid=i.uuid");
 
     addPageRequestParams(pageRequest, query);
+
+//    List<Map<String, Object>> list = dbi.withHandle(h -> h.createQuery(query.toString()).mapToMap().list());
     List<WebsiteImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
             .mapToBean(WebsiteImpl.class)
             .list());
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
+//    PageResponse pageResponse = new PageResponseImpl(null, pageRequest, total);
     return pageResponse;
   }
 
   @Override
   public Website findOne(UUID uuid) {
-    String query = "SELECT * FROM websites INNER JOIN entities ON websites.uuid=entities.uuid INNER JOIN identifiables ON websites.uuid=identifiables.uuid WHERE websites.uuid = :uuid";
+//    String query = "SELECT * FROM websites INNER JOIN entities ON websites.uuid=entities.uuid INNER JOIN identifiables ON websites.uuid=identifiables.uuid WHERE websites.uuid = :uuid";
+    String query = "SELECT ws.id as id, ws.uuid as uuid, ws.url as url, ws.registration_date as registration_date, ws.rootpages as rootpages"
+            + " FROM websites ws INNER JOIN entities e ON ws.uuid=e.uuid INNER JOIN identifiables i ON ws.uuid=i.uuid"
+            + " WHERE ws.uuid = :uuid";
 
     List<WebsiteImpl> list = dbi.withHandle(h -> h.createQuery(query)
             .bind("uuid", uuid)
@@ -90,18 +96,18 @@ public class WebsiteRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
     // TODO use Optional with emptyset, had problem with type...
     //  (Optional.ofNullable(collection).orElse(Collections.emptySet())
     List<UUID> uuidListRootPages = null;
-    List<Webpage> rootPages = website.getRootPages();
-    if (rootPages != null && !rootPages.isEmpty()) {
-      uuidListRootPages = rootPages.stream().map((identifiable) -> identifiable.getUuid()).collect(Collectors.toList());
-    }
-    
+//    List<Webpage> rootPages = website.getRootPages();
+//    if (rootPages != null && !rootPages.isEmpty()) {
+//      uuidListRootPages = rootPages.stream().map((identifiable) -> identifiable.getUuid()).collect(Collectors.toList());
+//    }
+
     WebsiteImpl result = null;
     try {
       String uuidsRootPages = objectMapper.writeValueAsString(uuidListRootPages);
 
       result = dbi.withHandle(h -> h
-              .createQuery("INSERT INTO websites(url, registration_date, uuid, rootPages) VALUES (:url, :registrationDate, :uuid, :rootPages::JSONB) RETURNING *")
-              .bind("rootPages", uuidsRootPages)
+              .createQuery("INSERT INTO websites(url, registration_date, uuid, rootPages) VALUES (:url, :registrationDate, :uuid, :rootPages) RETURNING *")
+              //              .bind("rootPages", uuidsRootPages)
               .bindBean(website)
               .mapToBean(WebsiteImpl.class) // FIXME: mapping back from list<uuid> to list<webpage>
               .findOnly());

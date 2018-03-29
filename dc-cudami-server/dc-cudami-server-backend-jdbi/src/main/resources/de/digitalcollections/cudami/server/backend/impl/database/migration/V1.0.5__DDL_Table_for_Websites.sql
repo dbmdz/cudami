@@ -4,6 +4,6 @@ CREATE TABLE IF NOT EXISTS websites (
 
   url VARCHAR NOT NULL UNIQUE,
   registration_date DATE,
-  rootPages JSONB
+  rootPages UUID[]
 );
 

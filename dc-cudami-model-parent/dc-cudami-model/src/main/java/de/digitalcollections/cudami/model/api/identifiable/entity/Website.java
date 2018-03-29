@@ -1,18 +1,18 @@
 package de.digitalcollections.cudami.model.api.identifiable.entity;
 
-import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * A Website.
  */
 public interface Website extends Entity {
 
-  List<Webpage> getRootPages();
+  List<UUID> getRootPages();
 
-  void setRootPages(List<Webpage> rootPages);
+  void setRootPages(List<UUID> rootPages);
 
   LocalDate getRegistrationDate();
 
