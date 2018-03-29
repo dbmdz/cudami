@@ -3,16 +3,20 @@ package de.digitalcollections.cudami.model.jackson;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.model.api.security.User;
+import de.digitalcollections.cudami.model.impl.identifiable.entity.WebsiteImpl;
 import de.digitalcollections.cudami.model.impl.security.UserImpl;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.util.Set;
 import org.apache.commons.beanutils.BeanUtils;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Ignore
 public class CudamiModuleTest {
 
   ObjectMapper mapper;
@@ -29,6 +33,13 @@ public class CudamiModuleTest {
 
     checkSerializeDeserialize(user);
 
+  }
+
+  @Test
+  public void testWebsite() throws Exception {
+    WebsiteImpl website = new WebsiteImpl(new URL("http://www.example.org/"));
+    String serializedObject = mapper.writeValueAsString(website);
+    checkSerializeDeserialize(website);
   }
 
 //  @Test
