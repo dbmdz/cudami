@@ -3,7 +3,7 @@ custom:
     hostname: localhost
     name: cudami
     password: somepassword
-    port: 5432
+    port: 22222
     username: cudami
 
 # local/default
@@ -53,6 +53,10 @@ spring:
 ---
 
 # PROD
+custom:
+  database:
+    port: 5432
+
 management:
   security:
     enabled: true
