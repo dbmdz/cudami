@@ -6,4 +6,3 @@ CREATE TABLE IF NOT EXISTS websites (
   registration_date DATE,
   rootPages UUID[]
 );
-
