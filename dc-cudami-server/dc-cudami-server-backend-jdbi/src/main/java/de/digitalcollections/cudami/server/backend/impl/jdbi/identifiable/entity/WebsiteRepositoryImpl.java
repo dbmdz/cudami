@@ -46,7 +46,7 @@ public class WebsiteRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
 
   @Override
   public PageResponse<Website> find(PageRequest pageRequest) {
-    StringBuilder query = new StringBuilder("SELECT ws.id as id, ws.uuid as uuid, ws.url as url, ws.registration_date as registration_date, ws.rootpages as rootpages"
+    StringBuilder query = new StringBuilder("SELECT ws.id as id, ws.uuid as uuid, ws.url as url, ws.registration_date as registration_date, ws.rootpages as rootpages, i.label as label"
             + " FROM websites ws INNER JOIN entities e ON ws.uuid=e.uuid INNER JOIN identifiables i ON ws.uuid=i.uuid");
 //    StringBuilder query = new StringBuilder("SELECT ws.id as id, ws.uuid as uuid, ws.url as url, ws.registration_date as registration_date FROM websites ws INNER JOIN entities e ON ws.uuid=e.uuid INNER JOIN identifiables i ON ws.uuid=i.uuid");
 
@@ -65,7 +65,7 @@ public class WebsiteRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
   @Override
   public Website findOne(UUID uuid) {
 //    String query = "SELECT * FROM websites INNER JOIN entities ON websites.uuid=entities.uuid INNER JOIN identifiables ON websites.uuid=identifiables.uuid WHERE websites.uuid = :uuid";
-    String query = "SELECT ws.id as id, ws.uuid as uuid, ws.url as url, ws.registration_date as registration_date, ws.rootpages as rootpages"
+    String query = "SELECT ws.id as id, ws.uuid as uuid, ws.url as url, ws.registration_date as registration_date, ws.rootpages as rootpages, i.label as label"
             + " FROM websites ws INNER JOIN entities e ON ws.uuid=e.uuid INNER JOIN identifiables i ON ws.uuid=i.uuid"
             + " WHERE ws.uuid = :uuid";
 
