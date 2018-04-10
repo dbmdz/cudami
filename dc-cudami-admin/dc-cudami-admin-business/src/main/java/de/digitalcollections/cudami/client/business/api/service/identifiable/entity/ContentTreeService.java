@@ -11,5 +11,5 @@ import java.util.List;
  */
 public interface ContentTreeService<C extends ContentTree> extends EntityService<C> {
 
-  List<ContentNode> getRootNodes(C ContentTree);
+  List<ContentNode> getRootNodes(C contentTree);
 }

@@ -3,11 +3,11 @@ package de.digitalcollections.cudami.client.business.impl.service.identifiable.e
 import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.cudami.client.backend.api.repository.identifiable.entity.ContentTreeRepository;
-import de.digitalcollections.cudami.client.business.api.service.identifiable.entity.ContentTreeService;
 import de.digitalcollections.cudami.client.business.api.service.LocaleService;
 import de.digitalcollections.cudami.client.business.api.service.exceptions.IdentifiableServiceException;
-import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
+import de.digitalcollections.cudami.client.business.api.service.identifiable.entity.ContentTreeService;
 import de.digitalcollections.cudami.model.api.identifiable.entity.ContentTree;
+import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
 import de.digitalcollections.cudami.model.api.identifiable.resource.ContentNode;
 import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
 import java.util.List;

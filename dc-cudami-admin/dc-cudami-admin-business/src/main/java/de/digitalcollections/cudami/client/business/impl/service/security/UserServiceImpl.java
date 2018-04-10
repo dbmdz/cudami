@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.client.business.impl.service.security;
 import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.cudami.client.backend.api.repository.security.UserRepository;
-import de.digitalcollections.cudami.client.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.client.business.api.service.security.UserService;
 import de.digitalcollections.cudami.client.business.impl.validator.PasswordsValidatorParams;
 import de.digitalcollections.cudami.model.api.security.User;
@@ -129,7 +128,7 @@ public class UserServiceImpl implements UserService<User> {
 
   private org.springframework.security.core.userdetails.User buildUserForAuthentication(User user, List<? extends GrantedAuthority> authorities) {
     return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPasswordHash(),
-                                                                  user.isEnabled(), true, true, true, authorities);
+            user.isEnabled(), true, true, true, authorities);
   }
 
   @Override
@@ -140,7 +139,7 @@ public class UserServiceImpl implements UserService<User> {
 
   private User save(String password1, String password2, User user, Errors results, boolean isUpdate) {
     final PasswordsValidatorParams passwordsValidatorParams = new PasswordsValidatorParams(password1, password2, user
-                                                                                           .getPasswordHash());
+            .getPasswordHash());
     passwordsValidator.validate(passwordsValidatorParams, results);
     if (!results.hasErrors()) {
       String password = passwordsValidatorParams.getPassword1();
