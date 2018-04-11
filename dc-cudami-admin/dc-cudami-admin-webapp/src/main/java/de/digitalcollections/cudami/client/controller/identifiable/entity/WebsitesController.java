@@ -167,6 +167,7 @@ public class WebsitesController extends AbstractController implements MessageSou
   public String view(@PathVariable UUID uuid, Model model) {
     Website website = (Website) websiteService.get(uuid);
     model.addAttribute("availableLanguages", website.getLabel().getLanguages());
+    model.addAttribute("defaultLocale", localeService.getDefault());
     model.addAttribute("website", website);
     return "websites/view";
   }

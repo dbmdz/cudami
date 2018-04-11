@@ -36,4 +36,3 @@ window.view = new prosemirrorView.EditorView(document.querySelector("#editor"), 
 // }
 
 }(PM.state,PM.view,PM.model,PM.schema_basic,PM.schema_list,PM.example_setup));
-
