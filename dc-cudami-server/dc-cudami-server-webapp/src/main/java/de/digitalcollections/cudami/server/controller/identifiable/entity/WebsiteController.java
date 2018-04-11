@@ -34,15 +34,14 @@ public class WebsiteController {
 
   @ApiMethod(description = "get all websites")
   @RequestMapping(value = "/v1/websites",
-          params = {"pageNumber", "pageSize", "sortField", "sortDirection", "nullHandling"},
-          produces = "application/json", method = {RequestMethod.GET, RequestMethod.POST})
+          produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public PageResponse<Website> findAll(
-          @RequestParam(name = "pageNumber", required = false) int pageNumber,
-          @RequestParam(name = "pageSize", required = false) int pageSize,
-          @RequestParam(name = "sortField", required = false) String sortField,
-          @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
-          @RequestParam(name = "nullHandling", required = false) NullHandling nullHandling
+          @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+          @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+          @RequestParam(name = "sortField", required = false, defaultValue = "url") String sortField,
+          @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC") Direction sortDirection,
+          @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE") NullHandling nullHandling
   ) {
     // FIXME add support for multiple sorting orders
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
