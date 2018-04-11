@@ -4,11 +4,14 @@ import de.digitalcollections.core.model.api.paging.Order;
 import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.core.model.api.paging.Sorting;
+import de.digitalcollections.cudami.client.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.client.backend.api.repository.identifiable.entity.WebsiteRepository;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.model.impl.identifiable.entity.WebsiteImpl;
+import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -19,6 +22,9 @@ public class WebsiteRepositoryImpl implements WebsiteRepository<WebsiteImpl> {
   @Autowired
   private WebsiteRepositoryEndpoint endpoint;
 
+  @Autowired
+  private LocaleRepository localeRepository;
+
   @Override
   public long count() {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -26,7 +32,12 @@ public class WebsiteRepositoryImpl implements WebsiteRepository<WebsiteImpl> {
 
   @Override
   public WebsiteImpl create() {
-    return new WebsiteImpl();
+    Locale defaultLocale = localeRepository.getDefault();
+    String defaultLanguage = defaultLocale.getLanguage();
+    WebsiteImpl website = new WebsiteImpl();
+    website.setLabel(new TextImpl(defaultLanguage, ""));
+    website.setDescription(new TextImpl(defaultLanguage, ""));
+    return website;
   }
 
   @Override

@@ -74,6 +74,7 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Abst
 
   @Override
   public I save(I identifiable) {
+    identifiable.setUuid(UUID.randomUUID());
     identifiable.setCreated(LocalDateTime.now());
     identifiable.setLastModified(LocalDateTime.now());
 

@@ -85,6 +85,7 @@ public class UserRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl i
 
   @Override
   public UserImpl save(UserImpl user) {
+    user.setUuid(UUID.randomUUID());
 //    UserImpl result = dbi.withHandle(h -> h.createQuery(
 //            "INSERT INTO users(email, enabled, firstname, lastname, passwordHash, roles) VALUES (:email, :enabled, :firstname, :lastname, :passwordHash, :roles) RETURNING *")
 //            .bindBean(user)
