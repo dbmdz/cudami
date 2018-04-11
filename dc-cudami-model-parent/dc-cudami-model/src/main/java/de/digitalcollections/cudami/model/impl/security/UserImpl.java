@@ -29,7 +29,7 @@ public class UserImpl implements User {
 
   private List<Role> roles = new ArrayList<>();
 
-  private UUID uuid = UUID.randomUUID();
+  private UUID uuid;
 
   public UserImpl() {
   }

@@ -13,7 +13,6 @@ public class TextImpl implements Text {
 
   public TextImpl() {
     translations = new HashSet<>();
-    setText("");
   }
 
   public TextImpl(String lang, String text) {

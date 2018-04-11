@@ -1,18 +1,17 @@
 package de.digitalcollections.cudami.model.impl.identifiable;
 
-import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
 import de.digitalcollections.cudami.model.api.identifiable.Identifiable;
 import de.digitalcollections.cudami.model.api.identifiable.IdentifiableType;
-import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
+import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
+import de.digitalcollections.cudami.model.api.identifiable.resource.IiifImage;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import de.digitalcollections.cudami.model.api.identifiable.resource.IiifImage;
 
 public class IdentifiableImpl implements Identifiable {
 
-  private UUID uuid = UUID.randomUUID();
+  private UUID uuid;
   protected LocalDateTime created;
-  protected Text description = new TextImpl();
+  protected Text description;
   protected Text label;
   protected LocalDateTime lastModified;
   protected IiifImage iiifImage;
