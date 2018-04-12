@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.client.repository;
 
 import de.digitalcollections.cudami.client.rest.api.CudamiClient;
+import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
 import java.util.List;
 import java.util.Locale;
 import org.slf4j.Logger;
@@ -17,24 +18,22 @@ public class CudamiRepositoryImpl implements CudamiRepository {
   private CudamiClient cudamiClient;
 
   @Override
-  public Locale getDefaultLocale() {
-    try {
-      return cudamiClient.getDefaultLocale();
-    } catch (Exception e) {
-      LOGGER.error("Cannot get default locale from Cudami: " + e, e);
-    }
-
-    return null;
+  public Locale getDefaultLocale() throws Exception {
+    return cudamiClient.getDefaultLocale();
   }
 
   @Override
-  public List<Locale> getAllLocales() {
-    try {
-      return cudamiClient.getAllLocales();
-    } catch (Exception e) {
-      LOGGER.error("Cannot get all locales from Cudami: " + e, e);
-    }
+  public List<Locale> getAllLocales() throws Exception {
+    return cudamiClient.getAllLocales();
+  }
 
-    return null;
+  @Override
+  public String getWebpage(String uuid) throws Exception {
+    return cudamiClient.getWebpage(uuid);
+  }
+
+  @Override
+  public Website getWebsite(String uuid) throws Exception {
+    return cudamiClient.getWebsite(uuid);
   }
 }

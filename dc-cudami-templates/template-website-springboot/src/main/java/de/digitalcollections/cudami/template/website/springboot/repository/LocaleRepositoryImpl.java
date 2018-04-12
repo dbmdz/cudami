@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.template.website.springboot.repository;
 
+import de.digitalcollections.cudami.client.business.CudamiException;
 import de.digitalcollections.cudami.client.business.CudamiService;
 import java.util.List;
 import java.util.Locale;
@@ -18,11 +19,21 @@ public class LocaleRepositoryImpl implements LocaleRepository {
 
   @Override
   public Locale getDefault() {
-    return cudamiService.getDefaultLocale();
+    try {
+      return cudamiService.getDefaultLocale();
+    } catch ( CudamiException e) {
+      LOGGER.error("Cannot get default locale: " + e, e);
+      return null;
+    }
   }
 
   @Override
   public List<Locale> getAll() {
-    return cudamiService.getAllLocales();
+    try {
+      return cudamiService.getAllLocales();
+    } catch ( CudamiException e) {
+      LOGGER.error("Cannot get all locales: " + e, e);
+      return null;
+    }
   }
 }
