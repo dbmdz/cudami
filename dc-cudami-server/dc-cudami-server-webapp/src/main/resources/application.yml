@@ -6,7 +6,7 @@ custom:
     port: 22222
     username: cudami
   defaults:
-    locale: de_DE
+    locale: en_US
 
 # local/default
 endpoints:
