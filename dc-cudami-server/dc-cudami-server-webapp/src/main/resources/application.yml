@@ -25,6 +25,15 @@ info:
       artifactId: @project.artifactId@
       version: @project.version@
 
+jsondoc:
+  basePath: http://localhost:9000
+  version: @project.version@
+  packages:
+    - de.digitalcollections.cudami.server.controller
+  # optional configuration
+  playgroundEnabled: true
+  displayMethodAs: URI
+
 management:
   context-path: '/monitoring'
   port: 9001
