@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.client.business;
 
 import de.digitalcollections.cudami.client.repository.CudamiRepository;
 import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
+import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import java.util.List;
 import java.util.Locale;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class CudamiServiceImpl implements CudamiService {
   }
 
   @Override
-  public String getWebpage(String uuid) throws CudamiException {
+  public Webpage getWebpage(String uuid) throws CudamiException {
     try {
       return repository.getWebpage(uuid);
     } catch ( Exception e ) {

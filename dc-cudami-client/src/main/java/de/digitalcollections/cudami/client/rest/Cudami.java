@@ -1,12 +1,13 @@
 package de.digitalcollections.cudami.client.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.rest.api.Client;
 import de.digitalcollections.cudami.client.rest.api.CudamiClient;
 import de.digitalcollections.cudami.client.rest.config.BackendUrls;
 import de.digitalcollections.cudami.client.rest.config.BackendUrlsFromConfig;
 import de.digitalcollections.cudami.client.rest.exceptions.CudamiRestErrorDecoder;
 import de.digitalcollections.cudami.client.rest.impl.ClientFactory;
-import de.digitalcollections.cudami.model.jackson.CudamiObjectMapper;
+import de.digitalcollections.cudami.model.jackson.CudamiModule;
 import feign.Feign;
 import feign.Logger;
 import feign.ReflectiveFeign;
@@ -32,11 +33,12 @@ public class Cudami {
   }
 
   public Cudami(BackendUrls backendUrls) {
-    final CudamiObjectMapper objectMapper = new CudamiObjectMapper();
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new CudamiModule());
 
     Feign.Builder feign = ReflectiveFeign.builder()
-        .decoder(new JacksonDecoder(objectMapper))
-        .encoder(new JacksonEncoder(objectMapper))
+        .decoder(new JacksonDecoder(mapper))
+        .encoder(new JacksonEncoder(mapper))
         .errorDecoder(new CudamiRestErrorDecoder())
         .logger(new Slf4jLogger())
         .logLevel(Logger.Level.BASIC)

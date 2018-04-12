@@ -7,8 +7,10 @@ import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
 import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
 import de.digitalcollections.cudami.model.api.identifiable.parts.Translation;
 import de.digitalcollections.cudami.model.api.identifiable.resource.IiifImage;
+import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.model.api.security.User;
 import de.digitalcollections.cudami.model.jackson.mixin.entity.ContentTreeMixIn;
+import de.digitalcollections.cudami.model.jackson.mixin.entity.WebpageMixIn;
 import de.digitalcollections.cudami.model.jackson.mixin.entity.WebsiteMixIn;
 import de.digitalcollections.cudami.model.jackson.mixin.identifiable.parts.TextMixIn;
 import de.digitalcollections.cudami.model.jackson.mixin.identifiable.parts.TranslationMixIn;
@@ -35,6 +37,7 @@ public class CudamiModule extends Module {
     context.setMixInAnnotations(IiifImage.class, IiifImageMixIn.class);
     context.setMixInAnnotations(Translation.class, TranslationMixIn.class);
     context.setMixInAnnotations(User.class, UserMixIn.class);
+    context.setMixInAnnotations(Webpage.class, WebpageMixIn.class);
     context.setMixInAnnotations(Website.class, WebsiteMixIn.class);
   }
 

@@ -24,7 +24,7 @@ public class WebpageController {
   @RequestMapping(value = "/v1/webpages/{uuid}", produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public Webpage getWebpage(
-          @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable UUID uuid
+          @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid
   ) throws IdentifiableServiceException {
     Text text = new TextImpl();
     text.setText(

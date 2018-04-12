@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.client.rest.api;
 
 import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
+import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import java.util.List;
 import java.util.Locale;
 
@@ -10,7 +11,7 @@ public interface CudamiClient extends Client {
 
   Locale getDefaultLocale() throws Exception;
 
-  String getWebpage(String uuid);
+  Webpage getWebpage(String uuid);
 
   Website getWebsite(String uuid);
 

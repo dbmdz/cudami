@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.client.repository;
 
 import de.digitalcollections.cudami.client.rest.api.CudamiClient;
 import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
+import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import java.util.List;
 import java.util.Locale;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ public class CudamiRepositoryImpl implements CudamiRepository {
   }
 
   @Override
-  public String getWebpage(String uuid) throws Exception {
+  public Webpage getWebpage(String uuid) throws Exception {
     return cudamiClient.getWebpage(uuid);
   }
 

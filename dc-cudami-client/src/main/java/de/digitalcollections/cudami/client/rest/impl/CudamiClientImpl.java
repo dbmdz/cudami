@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.client.rest.impl;
 import de.digitalcollections.cudami.client.rest.api.CudamiClient;
 import de.digitalcollections.cudami.client.rest.backend.CudamiBackend;
 import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
+import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import java.util.List;
 import java.util.Locale;
 
@@ -25,7 +26,7 @@ public class CudamiClientImpl implements CudamiClient {
   }
 
   @Override
-  public String getWebpage(String uuid) {
+  public Webpage getWebpage(String uuid) {
     return backend.getWebpage(uuid);
   }
 
