@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.template.website.springboot.repository;
 
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -8,4 +9,6 @@ import java.util.Locale;
 public interface LocaleRepository {
 
   public Locale getDefault();
+
+  public List<Locale> getAll();
 }

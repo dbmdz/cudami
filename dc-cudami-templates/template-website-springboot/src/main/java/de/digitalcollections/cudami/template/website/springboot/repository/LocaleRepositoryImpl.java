@@ -1,7 +1,8 @@
 package de.digitalcollections.cudami.template.website.springboot.repository;
 
+import de.digitalcollections.cudami.client.business.CudamiService;
+import java.util.List;
 import java.util.Locale;
-import org.apache.commons.lang3.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +14,15 @@ public class LocaleRepositoryImpl implements LocaleRepository {
   private static final Logger LOGGER = LoggerFactory.getLogger(LocaleRepositoryImpl.class);
 
   @Autowired
-  private LocaleRepositoryEndpoint endpoint;
+  private CudamiService cudamiService;
 
   @Override
   public Locale getDefault() {
-    String defaultLocaleCode = endpoint.getDefault();
-    return LocaleUtils.toLocale(defaultLocaleCode);
+    return cudamiService.getDefaultLocale();
+  }
+
+  @Override
+  public List<Locale> getAll() {
+    return cudamiService.getAllLocales();
   }
 }

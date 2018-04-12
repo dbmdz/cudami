@@ -37,20 +37,8 @@
   
   <dependencies>
     <dependency>
-      <groupId>de.digitalcollections.commons</groupId>
-      <artifactId>dc-commons-feign</artifactId>
-    </dependency>
-    <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
-      <artifactId>dc-cudami-model-jackson</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.github.openfeign</groupId>
-      <artifactId>feign-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.github.openfeign</groupId>
-      <artifactId>feign-jackson</artifactId>
+      <artifactId>dc-cudami-client</artifactId>
     </dependency>
     <dependency>
       <groupId>nz.net.ultraq.thymeleaf</groupId>

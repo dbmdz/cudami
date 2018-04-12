@@ -1,0 +1,4 @@
+local:
+  default: http://localhost:9000/
+test:
+  default: http://localhost:9000/
