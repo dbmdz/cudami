@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS webpages (
+  id SERIAL PRIMARY KEY NOT NULL,
+  uuid UUID NOT NULL UNIQUE,
+
+  contentblocks JSONB
+);
