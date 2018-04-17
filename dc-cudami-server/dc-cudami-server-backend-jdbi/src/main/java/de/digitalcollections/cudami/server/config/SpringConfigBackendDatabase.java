@@ -20,10 +20,12 @@ import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
@@ -56,25 +58,31 @@ public class SpringConfigBackendDatabase {
   ObjectMapper objectMapper;
 
   @Bean(initMethod = "migrate")
-  public Flyway flyway() {
+  @Autowired
+  @Qualifier(value = "pds")
+  public Flyway flyway(DataSource pds) {
     Flyway flyway = new Flyway();
-    flyway.setDataSource(pooledDataSource()); // could be another datasource with different user/pwd...
+    flyway.setDataSource(pds); // could be another datasource with different user/pwd...
     flyway.setLocations("classpath:/de/digitalcollections/cudami/server/backend/impl/database/migration");
     flyway.setBaselineOnMigrate(true);
     return flyway;
   }
 
   @Bean
-  public PersistentTokenRepository persistentTokenRepository() {
+  @Autowired
+  @Qualifier(value = "pds")
+  public PersistentTokenRepository persistentTokenRepository(DataSource pds) {
     JdbcTokenRepositoryImpl db = new JdbcTokenRepositoryImpl();
-    db.setDataSource(pooledDataSource());
+    db.setDataSource(pds);
     return db;
   }
 
   @Bean
   @DependsOn(value = "flyway")
-  public JdbiFactoryBean jdbi() throws Exception {
-    JdbiFactoryBean jdbiFactoryBean = new JdbiFactoryBean(pooledDataSource());
+  @Autowired
+  @Qualifier(value = "ds")
+  public JdbiFactoryBean jdbi(DataSource ds) throws Exception {
+    JdbiFactoryBean jdbiFactoryBean = new JdbiFactoryBean(ds);
     List plugins = new ArrayList();
     plugins.add(new SqlObjectPlugin());
     plugins.add(new PostgresPlugin());
@@ -84,10 +92,17 @@ public class SpringConfigBackendDatabase {
     return jdbiFactoryBean;
   }
 
+//  @Bean
+//  public DataSourceTransactionManager transactionManager() {
+//    return new DataSourceTransactionManager(dataSource());
+//  }
+
   /*
    * Unpooled datasource.
    */
-  private DataSource dataSource() {
+  @Bean(name = "ds")
+  @Primary
+  public DataSource dataSource() {
     DriverManagerDataSource ds = new DriverManagerDataSource();
     ds.setDriverClassName("org.postgresql.Driver");
     ds.setUrl("jdbc:postgresql://" + databaseHostname + ":" + databasePort + "/" + databaseName);
@@ -133,19 +148,21 @@ public class SpringConfigBackendDatabase {
      * Pooled datasource.
      * We create the PoolingDataSource, passing in the object pool created.
    */
-  @Bean
-  public DataSource pooledDataSource() {
-    ObjectPool<PoolableConnection> pool = getObjectPool();
-    PoolingDataSource ds = new PoolingDataSource<>(pool);
-    return ds;
+  @Bean(name = "pds")
+  @Autowired
+  @Qualifier(value = "ds")
+  public DataSource pooledDataSource(DataSource ds) {
+    ObjectPool<PoolableConnection> pool = getObjectPool(ds);
+    PoolingDataSource pds = new PoolingDataSource<>(pool);
+    return pds;
   }
 
   /*
      * We need a ObjectPool that serves as the actual pool of connections.
      * We'll use a GenericObjectPool instance, although any ObjectPool implementation will suffice.
    */
-  private ObjectPool<PoolableConnection> getObjectPool() {
-    PoolableConnectionFactory poolableConnectionFactory = getPoolableConnectionFactory();
+  private ObjectPool<PoolableConnection> getObjectPool(DataSource ds) {
+    PoolableConnectionFactory poolableConnectionFactory = getPoolableConnectionFactory(ds);
     ObjectPool<PoolableConnection> connectionPool = new GenericObjectPool<>(poolableConnectionFactory);
     // Set the factory's pool property to the owning pool
     poolableConnectionFactory.setPool(connectionPool);
@@ -156,8 +173,8 @@ public class SpringConfigBackendDatabase {
      * We create the PoolableConnectionFactory, which wraps the "real" Connections
      * created by the ConnectionFactory with the classes that implement the pooling functionality.
    */
-  private PoolableConnectionFactory getPoolableConnectionFactory() {
-    DataSourceConnectionFactory dataSourceConnectionFactory = getDataSourceConnectionFactory();
+  private PoolableConnectionFactory getPoolableConnectionFactory(DataSource ds) {
+    DataSourceConnectionFactory dataSourceConnectionFactory = getDataSourceConnectionFactory(ds);
     PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(dataSourceConnectionFactory, null);
     poolableConnectionFactory.setValidationQuery("SELECT 1");
     long maxConnLifetimeMillis = 600000; // ten minutes
@@ -169,8 +186,8 @@ public class SpringConfigBackendDatabase {
      * We create a ConnectionFactory that the pool will use to create Connections.
      * It is using the unppoled datasource we had before.
    */
-  private DataSourceConnectionFactory getDataSourceConnectionFactory() {
-    DataSourceConnectionFactory dscf = new DataSourceConnectionFactory(dataSource());
+  private DataSourceConnectionFactory getDataSourceConnectionFactory(DataSource ds) {
+    DataSourceConnectionFactory dscf = new DataSourceConnectionFactory(ds);
     return dscf;
   }
 
