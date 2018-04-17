@@ -42,6 +42,15 @@ public class CudamiServiceImpl implements CudamiService {
   }
 
   @Override
+  public Webpage getWebpage(Locale locale, String uuid) throws CudamiException {
+    try {
+      return repository.getWebpage(locale, uuid);
+    } catch ( Exception e ) {
+      throw new CudamiException("Cannot get webpage with locale=" + locale + " and uuid=" + uuid + ": " + e.getMessage(), e);
+    }
+  }
+
+  @Override
   public Website getWebsite(String uuid) throws CudamiException {
     try {
       return repository.getWebsite(uuid);

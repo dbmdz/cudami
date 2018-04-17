@@ -34,6 +34,11 @@ public class CudamiRepositoryImpl implements CudamiRepository {
   }
 
   @Override
+  public Webpage getWebpage(Locale locale, String uuid) throws Exception {
+    return cudamiClient.getWebpage(locale, uuid);
+  }
+
+  @Override
   public Website getWebsite(String uuid) throws Exception {
     return cudamiClient.getWebsite(uuid);
   }

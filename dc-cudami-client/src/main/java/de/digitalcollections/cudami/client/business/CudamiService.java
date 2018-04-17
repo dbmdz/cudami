@@ -13,6 +13,8 @@ public interface CudamiService {
 
   public Webpage getWebpage(String uuid) throws CudamiException;
 
+  public Webpage getWebpage(Locale locale, String uuid) throws CudamiException;
+
   public Website getWebsite(String uuid) throws CudamiException;
 
 }

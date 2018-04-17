@@ -11,6 +11,7 @@ import de.digitalcollections.core.model.impl.paging.SortingImpl;
 import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.model.impl.identifiable.resource.WebpageImpl;
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.WebpageService;
 import de.digitalcollections.prosemirror.model.api.Content;
@@ -38,6 +39,7 @@ import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiPathParam;
+import org.jsondoc.core.annotation.ApiQueryParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -51,6 +53,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Api(description = "The webpage controller", name = "Webpage controller")
 public class WebpageController {
+
+  @Autowired
+  private LocaleService localeService;
 
   @Autowired
   private WebpageService service;
@@ -76,10 +81,12 @@ public class WebpageController {
 
   // Test-URL: http://localhost:9000/v1/webpages/599a120c-2dd5-11e8-b467-0ed5f89f718b
   @ApiMethod(description = "get a webpage as JSON")
-  @RequestMapping(value = "/v1/webpages/{uuid}", produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(value = {"/v1/webpages/{uuid}", "/v1/webpages/{uuid}?format=json"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public Webpage getWebpage(
-      @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid
+      @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
+      @ApiQueryParam(name = "locale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+        @RequestParam(name = "locale", required = false) Locale locale
   ) throws IdentifiableServiceException {
     List<Content> contents = new ArrayList<>();
 
@@ -142,7 +149,7 @@ public class WebpageController {
 
 
     Document document = new DocumentImpl();
-    document.addContentBlocks(Locale.GERMAN, contents);
+    document.addContentBlocks(locale != null ? locale : localeService.getDefault(), contents);
 
     Webpage webpage = new WebpageImpl();
     webpage.setContentBlocksContainer(document);

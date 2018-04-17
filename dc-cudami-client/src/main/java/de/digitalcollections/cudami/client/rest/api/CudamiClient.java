@@ -13,6 +13,8 @@ public interface CudamiClient extends Client {
 
   Webpage getWebpage(String uuid);
 
+  Webpage getWebpage(Locale locale, String uuid);
+
   Website getWebsite(String uuid);
 
 }

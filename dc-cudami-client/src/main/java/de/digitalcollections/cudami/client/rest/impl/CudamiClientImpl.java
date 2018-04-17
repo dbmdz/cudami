@@ -31,6 +31,11 @@ public class CudamiClientImpl implements CudamiClient {
   }
 
   @Override
+  public Webpage getWebpage(Locale locale, String uuid) {
+    return backend.getWebpage(locale, uuid);
+  }
+
+  @Override
   public Website getWebsite(String uuid) {
     return backend.getWebsite(uuid);
   }

@@ -13,5 +13,7 @@ public interface CudamiRepository {
 
   public Webpage getWebpage(String uuid) throws Exception;
 
+  public Webpage getWebpage(Locale locale, String uuid) throws Exception;
+
   public Website getWebsite(String uuid) throws Exception;
 }
