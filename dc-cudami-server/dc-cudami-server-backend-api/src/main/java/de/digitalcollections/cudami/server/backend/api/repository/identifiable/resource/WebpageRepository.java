@@ -1,0 +1,15 @@
+package de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource;
+
+import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
+import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
+
+/**
+ * Repository for Webpage persistence handling.
+ *
+ * @param <W> entity instance
+ */
+public interface WebpageRepository<W extends Webpage> extends IdentifiableRepository<W> {
+
+  Text getContentBlocks(W webpage);
+}
