@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.model.api.identifiable.entity.ContentTree;
 import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
 import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
 import de.digitalcollections.cudami.model.api.identifiable.parts.Translation;
+import de.digitalcollections.cudami.model.api.identifiable.resource.ContentBlocksContainer;
 import de.digitalcollections.cudami.model.api.identifiable.resource.IiifImage;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.model.api.security.User;
@@ -14,6 +15,7 @@ import de.digitalcollections.cudami.model.jackson.mixin.entity.WebpageMixIn;
 import de.digitalcollections.cudami.model.jackson.mixin.entity.WebsiteMixIn;
 import de.digitalcollections.cudami.model.jackson.mixin.identifiable.parts.TextMixIn;
 import de.digitalcollections.cudami.model.jackson.mixin.identifiable.parts.TranslationMixIn;
+import de.digitalcollections.cudami.model.jackson.mixin.identifiable.resource.ContentBlocksContainerMixIn;
 import de.digitalcollections.cudami.model.jackson.mixin.resource.IiifImageMixIn;
 import de.digitalcollections.cudami.model.jackson.mixin.security.UserMixIn;
 import org.slf4j.Logger;
@@ -32,6 +34,7 @@ public class CudamiModule extends Module {
   public void setupModule(SetupContext context) {
     LOGGER.info("Using CudamiModule");
 //    context.setMixInAnnotations(Entity.class, EntityMixIn.class); // FIXME not needed/working, switched back to wrapper info...
+    context.setMixInAnnotations(ContentBlocksContainer.class, ContentBlocksContainerMixIn.class);
     context.setMixInAnnotations(ContentTree.class, ContentTreeMixIn.class);
     context.setMixInAnnotations(Text.class, TextMixIn.class);
     context.setMixInAnnotations(IiifImage.class, IiifImageMixIn.class);

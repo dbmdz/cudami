@@ -1,18 +1,8 @@
-package de.digitalcollections.cudami.server.controller.identifiable.resource;
+package de.digitalcollections.cudami.model.jackson;
 
-import de.digitalcollections.core.model.api.paging.PageRequest;
-import de.digitalcollections.core.model.api.paging.PageResponse;
-import de.digitalcollections.core.model.api.paging.Sorting;
-import de.digitalcollections.core.model.api.paging.enums.Direction;
-import de.digitalcollections.core.model.api.paging.enums.NullHandling;
-import de.digitalcollections.core.model.impl.paging.OrderImpl;
-import de.digitalcollections.core.model.impl.paging.PageRequestImpl;
-import de.digitalcollections.core.model.impl.paging.SortingImpl;
-import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.model.impl.identifiable.resource.WebpageImpl;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.WebpageService;
 import de.digitalcollections.prosemirror.model.api.Content;
 import de.digitalcollections.prosemirror.model.api.Document;
 import de.digitalcollections.prosemirror.model.api.content.BulletList;
@@ -33,51 +23,38 @@ import de.digitalcollections.prosemirror.model.impl.content.TextImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
-import org.jsondoc.core.annotation.Api;
-import org.jsondoc.core.annotation.ApiMethod;
-import org.jsondoc.core.annotation.ApiPathParam;
-import org.jsondoc.core.annotation.ApiResponseObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-@RestController
-@Api(description = "The webpage controller", name = "Webpage controller")
-public class WebpageController {
+@Disabled("Between two models...")
+public class WebpageTest extends BaseSerializationTest {
 
-  @Autowired
-  private WebpageService service;
+  ObjectMapper mapper;
 
-  @ApiMethod(description = "get all webpages")
-  @RequestMapping(value = "/v1/webpages",
-          //params = {"pageNumber", "pageSize", "sortField", "sortDirection", "nullHandling"},
-          produces = "application/json", method = RequestMethod.GET)
-  @ApiResponseObject
-  public PageResponse<Website> findAll(
-          @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-          @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-          @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
-          @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC") Direction sortDirection,
-          @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE") NullHandling nullHandling
-  ) {
-    // FIXME add support for multiple sorting orders
-    OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
-    Sorting sorting = new SortingImpl(order);
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
-    return service.find(pageRequest);
+  @BeforeEach
+  public void beforeEach() {
+    mapper = new ObjectMapper();
+    mapper.registerModule(new CudamiModule());
   }
 
-  // Test-URL: http://localhost:9000/v1/webpages/599a120c-2dd5-11e8-b467-0ed5f89f718b
-  @ApiMethod(description = "get a webpage as JSON")
-  @RequestMapping(value = "/v1/webpages/{uuid}", produces = "application/json", method = RequestMethod.GET)
-  @ApiResponseObject
-  public Webpage getWebpage(
-      @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid
-  ) throws IdentifiableServiceException {
+  @Override
+  protected ObjectMapper getMapper() {
+    return mapper;
+  }
+
+  @Test
+  public void testSerialisationInBothWays() throws Exception {
+    Webpage webpage = constructWebpage();
+    checkSerializeDeserialize(webpage);
+  }
+
+  // -------------------------------------------------------------------
+  private Webpage constructWebpage() {
+    Webpage webpage = new WebpageImpl();
+
+    Document document = new DocumentImpl();
+
     List<Content> contents = new ArrayList<>();
 
     contents.add(new HeadingImpl(3, "Impressum"));
@@ -138,10 +115,8 @@ public class WebpageController {
     contents.add(new EmbeddedCodeBlockImpl("<iframe style=\"border: 1px solid lightgrey\" frameborder=\"no\" width=\"98%\" height=\"auto\" src=\"https://statistiken.digitale-sammlungen.de/index.php?module=CoreAdminHome&amp;action=optOut&amp;language=de\"></iframe>"));
 
 
-    Document document = new DocumentImpl();
-    document.addContentBlocks(Locale.GERMAN, contents);
 
-    Webpage webpage = new WebpageImpl();
+    document.addContentBlocks(Locale.GERMAN, contents);
     webpage.setContentBlocksContainer(document);
 
     return webpage;

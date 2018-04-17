@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.digitalcollections.core.model.jackson.DcCoreModelModule;
+import de.digitalcollections.prosemirror.model.jackson.ProseMirrorModule;
 
 public class CudamiObjectMapper extends ObjectMapper {
 
@@ -18,6 +19,7 @@ public class CudamiObjectMapper extends ObjectMapper {
     objectMapper.registerModule(new JavaTimeModule());
     objectMapper.registerModule(new DcCoreModelModule());
     objectMapper.registerModule(new CudamiModule());
+    objectMapper.registerModule(new ProseMirrorModule());
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
     objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);

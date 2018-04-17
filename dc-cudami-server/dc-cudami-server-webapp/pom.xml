@@ -46,6 +46,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>de.digitalcollections.commons</groupId>
+      <artifactId>dc-commons-prosemirror-model</artifactId>
+    </dependency>
+    <dependency>
       <groupId>de.digitalcollections.core</groupId>
       <artifactId>dc-core-model</artifactId>
     </dependency>

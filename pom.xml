@@ -50,6 +50,8 @@
     <version.jackson>2.8.8</version.jackson>
     <version.javax.servlet-api>3.1.0</version.javax.servlet-api>
     <version.junit>4.12</version.junit>
+    <version.junit5>5.1.0</version.junit5>
+    <version.junit5-surefire>1.1.0</version.junit5-surefire>
     <version.mockito-core>1.10.19</version.mockito-core>
     <version.querydsl>4.1.4</version.querydsl>
     <version.slf4j-api>1.7.24</version.slf4j-api>
@@ -167,6 +169,11 @@
         <groupId>de.digitalcollections.commons</groupId>
         <artifactId>dc-commons-jdbi</artifactId>
         <version>${version.dc-commons-jdbi}</version>
+      </dependency>
+      <dependency>
+        <groupId>de.digitalcollections.commons</groupId>
+        <artifactId>dc-commons-prosemirror-model</artifactId>
+        <version>${version.dc-commons-prosemirror-model}</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.commons</groupId>
@@ -324,6 +331,18 @@
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-validator</artifactId>
         <version>${version.hibernate-validator}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-engine</artifactId>
+        <version>${version.junit5}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-api</artifactId>
+        <version>${version.junit5}</version>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>

@@ -3,18 +3,18 @@ package de.digitalcollections.cudami.model.impl.identifiable.resource;
 import de.digitalcollections.cudami.model.api.identifiable.Identifiable;
 import de.digitalcollections.cudami.model.api.identifiable.Node;
 import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
-import de.digitalcollections.cudami.model.api.identifiable.resource.ContentBlocksContainer;
 import de.digitalcollections.cudami.model.api.identifiable.resource.ResourceType;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.model.impl.identifiable.NodeImpl;
 import java.util.List;
+import de.digitalcollections.prosemirror.model.api.Document;
 
 public class WebpageImpl extends ResourceImpl implements Webpage, Node<Webpage> {
 
   private Text contentBlocks;
 
-  private ContentBlocksContainer contentBlocksContainer;
   private final NodeImpl<Webpage> node;
+  private Document contentBlocksContainer;
 
   public WebpageImpl() {
     super();
@@ -63,12 +63,12 @@ public class WebpageImpl extends ResourceImpl implements Webpage, Node<Webpage> 
   }
 
   @Override
-  public ContentBlocksContainer getContentBlocksContainer() {
+  public Document getContentBlocksContainer() {
     return contentBlocksContainer;
   }
 
   @Override
-  public void setContentBlocksContainer(ContentBlocksContainer contentBlocksContainer) {
+  public void setContentBlocksContainer(Document contentBlocksContainer) {
     this.contentBlocksContainer = contentBlocksContainer;
   }
 
