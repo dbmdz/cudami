@@ -3,6 +3,5 @@ CREATE TABLE IF NOT EXISTS websites (
   uuid UUID NOT NULL UNIQUE,
 
   url VARCHAR NOT NULL UNIQUE,
-  registration_date DATE,
-  rootPages UUID[]
+  registration_date DATE
 );

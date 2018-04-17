@@ -11,5 +11,5 @@ import java.util.List;
  */
 public interface WebsiteService<W extends Website> extends EntityService<W> {
 
-  List<Webpage> getRootNodes(W website);
+  List<Webpage> getRootPages(W website);
 }

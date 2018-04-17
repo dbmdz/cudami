@@ -2,11 +2,10 @@ package de.digitalcollections.cudami.model.impl.identifiable.entity;
 
 import de.digitalcollections.cudami.model.api.identifiable.entity.EntityType;
 import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
+import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * see {@link Website}
@@ -14,7 +13,7 @@ import java.util.UUID;
 public class WebsiteImpl extends EntityImpl implements Website {
 
   private LocalDate registrationDate;
-  private List<UUID> rootPages = new ArrayList<>();
+  private List<Webpage> rootPages;
   private URL url;
 
   public WebsiteImpl() {
@@ -26,7 +25,7 @@ public class WebsiteImpl extends EntityImpl implements Website {
     this(null, url, null);
   }
 
-  public WebsiteImpl(List<UUID> rootPages, URL url, LocalDate registrationDate) {
+  public WebsiteImpl(List<Webpage> rootPages, URL url, LocalDate registrationDate) {
     this();
     this.registrationDate = registrationDate;
     this.rootPages = rootPages;
@@ -54,12 +53,12 @@ public class WebsiteImpl extends EntityImpl implements Website {
   }
 
   @Override
-  public List<UUID> getRootPages() {
+  public List<Webpage> getRootPages() {
     return rootPages;
   }
 
   @Override
-  public void setRootPages(List<UUID> rootPages) {
+  public void setRootPages(List<Webpage> rootPages) {
     this.rootPages = rootPages;
   }
 

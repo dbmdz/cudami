@@ -5,8 +5,8 @@ import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -47,8 +47,8 @@ public class WebsiteServiceImpl implements WebsiteService<Website> {
   }
 
   @Override
-  public List<Webpage> getRootNodes(Website website) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  public List<Webpage> getRootPages(Website website) {
+    return websiteRepository.getRootPages(website);
   }
 
   @Override
