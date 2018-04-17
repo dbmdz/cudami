@@ -1,23 +1,60 @@
 package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
+import de.digitalcollections.core.model.api.paging.PageRequest;
+import de.digitalcollections.core.model.api.paging.PageResponse;
+import de.digitalcollections.core.model.api.paging.Sorting;
+import de.digitalcollections.core.model.api.paging.enums.Direction;
+import de.digitalcollections.core.model.api.paging.enums.NullHandling;
+import de.digitalcollections.core.model.impl.paging.OrderImpl;
+import de.digitalcollections.core.model.impl.paging.PageRequestImpl;
+import de.digitalcollections.core.model.impl.paging.SortingImpl;
+import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
 import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
 import de.digitalcollections.cudami.model.impl.identifiable.resource.WebpageImpl;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.WebpageService;
+import java.util.Objects;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiPathParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Api(description = "The webpage controller", name = "Webpage controller")
 public class WebpageController {
+
+  @Autowired
+  private WebpageService service;
+
+  @ApiMethod(description = "get all webpages")
+  @RequestMapping(value = "/v1/webpages",
+          //params = {"pageNumber", "pageSize", "sortField", "sortDirection", "nullHandling"},
+          produces = "application/json", method = RequestMethod.GET)
+  @ApiResponseObject
+  public PageResponse<Website> findAll(
+          @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+          @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+          @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
+          @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC") Direction sortDirection,
+          @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE") NullHandling nullHandling
+  ) {
+    // FIXME add support for multiple sorting orders
+    OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
+    Sorting sorting = new SortingImpl(order);
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
+    return service.find(pageRequest);
+  }
 
   // Test-URL: http://localhost:9000/v1/webpages/599a120c-2dd5-11e8-b467-0ed5f89f718b
   @ApiMethod(description = "get a webpage")
@@ -41,5 +78,20 @@ public class WebpageController {
     Webpage webpage = new WebpageImpl();
     webpage.setContentBlocks(text);
     return webpage;
+  }
+
+  @ApiMethod(description = "save a newly created webpage")
+  @RequestMapping(value = "/v1/webpages", produces = "application/json", method = RequestMethod.POST)
+  @ApiResponseObject
+  public Webpage save(@RequestBody Webpage webpage, BindingResult errors) throws IdentifiableServiceException {
+    return (Webpage) service.save(webpage);
+  }
+
+  @ApiMethod(description = "update a webpage")
+  @RequestMapping(value = "/v1/webpages/{uuid}", produces = "application/json", method = RequestMethod.PUT)
+  @ApiResponseObject
+  public Webpage update(@PathVariable UUID uuid, @RequestBody Webpage webpage, BindingResult errors) throws IdentifiableServiceException {
+    assert Objects.equals(uuid, webpage.getUuid());
+    return (Webpage) service.update(webpage);
   }
 }
