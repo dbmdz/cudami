@@ -33,13 +33,16 @@ import de.digitalcollections.prosemirror.model.impl.content.TextImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiPathParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -145,6 +148,21 @@ public class WebpageController {
     webpage.setContentBlocksContainer(document);
 
     return webpage;
+  }
+
+  @ApiMethod(description = "save a newly created webpage")
+  @RequestMapping(value = "/v1/webpages", produces = "application/json", method = RequestMethod.POST)
+  @ApiResponseObject
+  public Webpage save(@RequestBody Webpage webpage, BindingResult errors) throws IdentifiableServiceException {
+    return (Webpage) service.save(webpage);
+  }
+
+  @ApiMethod(description = "update a webpage")
+  @RequestMapping(value = "/v1/webpages/{uuid}", produces = "application/json", method = RequestMethod.PUT)
+  @ApiResponseObject
+  public Webpage update(@PathVariable UUID uuid, @RequestBody Webpage webpage, BindingResult errors) throws IdentifiableServiceException {
+    assert Objects.equals(uuid, webpage.getUuid());
+    return (Webpage) service.update(webpage);
   }
 
 }
