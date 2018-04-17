@@ -28,7 +28,7 @@
       </encoder>
     </appender>
   </springProfile>
-  
+
   <!-- if no environment of above is set add console log as fallback -->
   <!-- documented feature, but working with OR, so can not be used this way! -->
   <!-- see: https://github.com/spring-projects/spring-boot/issues/5851 -->
@@ -41,7 +41,7 @@
     </appender>
   </springProfile>
   -->
-    
+
   <logger name="de.digitalcollections.cudami" level="debug" />
   <logger name="org.jdbi" level="debug" />
 
