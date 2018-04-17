@@ -12,7 +12,7 @@
   </appender>
 
   <!-- Application Loggers -->
-  <logger name="de.digitalcollections.cudami.client">
+  <logger name="de.digitalcollections.cudami.admin">
     <level value="info"/>
   </logger>
 

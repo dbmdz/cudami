@@ -11,8 +11,8 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
  */
 @Configuration
 @ComponentScan(basePackages = {
-  "de.digitalcollections.cudami.client.business.impl.service",
-  "de.digitalcollections.cudami.client.business.impl.validator"})
+  "de.digitalcollections.cudami.admin.business.impl.service",
+  "de.digitalcollections.cudami.admin.business.impl.validator"})
 @PropertySource(value = {
   "classpath:de/digitalcollections/cudami/config/SpringConfigBusiness-${spring.profiles.active:local}.properties"})
 public class SpringConfigBusiness {
