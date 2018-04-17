@@ -17,6 +17,7 @@ import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.slf4j.Slf4jLogger;
 import java.lang.invoke.MethodHandles;
+import java.net.URI;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,19 @@ public class Cudami {
 
   public Cudami(Environment environment) {
     this(new BackendUrlsFromConfig(environment));
+  }
+
+  public Cudami(URI uri) {
+    this(uri.toString());
+  }
+
+  public Cudami(String url) {
+    this(new BackendUrls() {
+      @Override
+      public String forBackend(String backend) {
+        return url;
+      }
+    });
   }
 
   public Cudami(BackendUrls backendUrls) {
