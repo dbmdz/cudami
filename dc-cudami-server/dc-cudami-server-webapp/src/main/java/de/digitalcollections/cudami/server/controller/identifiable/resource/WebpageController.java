@@ -84,14 +84,14 @@ public class WebpageController {
   @RequestMapping(value = {"/v1/webpages/{uuid}", "/v1/webpages/{uuid}?format=json"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public Webpage getWebpage(
-      @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
-      @ApiQueryParam(name = "locale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
-        @RequestParam(name = "locale", required = false) Locale locale
+          @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
+          @ApiQueryParam(name = "locale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+          @RequestParam(name = "locale", required = false) Locale locale
   ) throws IdentifiableServiceException {
     List<Content> contents = new ArrayList<>();
 
     contents.add(new HeadingImpl(3, "Impressum"));
-    contents.add(new HeadingImpl(4,"Bayerische Staatsbibliothek"));
+    contents.add(new HeadingImpl(4, "Bayerische Staatsbibliothek"));
     contents.add(new ParagraphImpl("Ludwigstraße 16"));
     contents.add(new HardBreakImpl());
     contents.add(new HeadingImpl(4, "Gesetzlicher Vertreter:"));
@@ -101,7 +101,7 @@ public class WebpageController {
     paragraph1.addContent(new TextImpl("Telefon:", "strong"));
     paragraph1.addContent(new TextImpl(" +49 89 28638-0"));
     paragraph1.addContent(new HardBreakImpl());
-    paragraph1.addContent(new TextImpl("Fax:", "strong","em"));
+    paragraph1.addContent(new TextImpl("Fax:", "strong", "em"));
     paragraph1.addContent(new TextImpl(" +49 89 28638-2200"));
     paragraph1.addContent(new HardBreakImpl());
     paragraph1.addContent(new TextImpl("E-Mail:", "strong"));
@@ -112,7 +112,7 @@ public class WebpageController {
 
     Text internet = new TextImpl("https://www.bsb-muenchen.de");
     Mark link = new MarkImpl("link");
-    link.addAttribute("href","https://www.bsb-muenchen.de");
+    link.addAttribute("href", "https://www.bsb-muenchen.de");
     link.addAttribute("title", null);
     internet.addMark(link);
     paragraph1.addContent(internet);
@@ -121,14 +121,15 @@ public class WebpageController {
     paragraph1.addContent(new TextImpl(" DE 811335517"));
     contents.add(paragraph1);
 
-    contents.add(new ParagraphImpl("Die Bayerische Staatsbibliothek ist eine dem Bayerischen Staatsministerium für Bildung und Kultus, Wissenschaft und Kunst nachgeordnete Behörde der Mittelstufe mit dem Sitz in München"));
+    contents
+            .add(new ParagraphImpl("Die Bayerische Staatsbibliothek ist eine dem Bayerischen Staatsministerium für Bildung und Kultus, Wissenschaft und Kunst nachgeordnete Behörde der Mittelstufe mit dem Sitz in München"));
     contents.add(new HardBreakImpl());
 
     Text text2 = new TextImpl("Bayerischen Staatsministerium für Bildung und Kultus, Wissenschaft und Kunst");
     Mark link2 = new MarkImpl("link");
-    link2.addAttribute("href","https://www.km.bayern.de");
+    link2.addAttribute("href", "https://www.km.bayern.de");
     link2.addAttribute("title", null);
-    text2.addMark(link);
+    text2.addMark(link2);
     contents.add(text2);
 
     BulletList bulletList = new BulletListImpl();
@@ -145,8 +146,8 @@ public class WebpageController {
     orderedList.addContent(new ListItemImpl("test 3"));
     contents.add(orderedList);
 
-    contents.add(new EmbeddedCodeBlockImpl("<iframe style=\"border: 1px solid lightgrey\" frameborder=\"no\" width=\"98%\" height=\"auto\" src=\"https://statistiken.digitale-sammlungen.de/index.php?module=CoreAdminHome&amp;action=optOut&amp;language=de\"></iframe>"));
-
+    contents
+            .add(new EmbeddedCodeBlockImpl("<iframe style=\"border: 1px solid lightgrey\" frameborder=\"no\" width=\"98%\" height=\"auto\" src=\"https://statistiken.digitale-sammlungen.de/index.php?module=CoreAdminHome&amp;action=optOut&amp;language=de\"></iframe>"));
 
     Document document = new DocumentImpl();
     document.addContentBlocks(locale != null ? locale : localeService.getDefault(), contents);
