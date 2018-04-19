@@ -86,7 +86,7 @@ public class WebpageController {
   @ApiMethod(description = "get a webpage as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @RequestMapping(value = {"/v1/webpages/{uuid}"}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, method = RequestMethod.GET)
   @ApiResponseObject
-  public Webpage getWebpage(
+  public ResponseEntity<Webpage> getWebpage(
           @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
           @ApiQueryParam(name = "locale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "locale", required = false) Locale locale
