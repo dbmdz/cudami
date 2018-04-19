@@ -42,6 +42,9 @@ import org.jsondoc.core.annotation.ApiPathParam;
 import org.jsondoc.core.annotation.ApiQueryParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -80,8 +83,8 @@ public class WebpageController {
   }
 
   // Test-URL: http://localhost:9000/v1/webpages/599a120c-2dd5-11e8-b467-0ed5f89f718b
-  @ApiMethod(description = "get a webpage as JSON")
-  @RequestMapping(value = {"/v1/webpages/{uuid}", "/v1/webpages/{uuid}?format=json"}, produces = "application/json", method = RequestMethod.GET)
+  @ApiMethod(description = "get a webpage as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @RequestMapping(value = {"/v1/webpages/{uuid}"}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, method = RequestMethod.GET)
   @ApiResponseObject
   public Webpage getWebpage(
           @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
@@ -155,7 +158,7 @@ public class WebpageController {
     Webpage webpage = new WebpageImpl();
     webpage.setContentBlocksContainer(document);
 
-    return webpage;
+    return new ResponseEntity<>(webpage, HttpStatus.OK);
   }
 
   @ApiMethod(description = "save a newly created webpage")

@@ -21,6 +21,7 @@ public class CudamiObjectMapper extends ObjectMapper {
     objectMapper.registerModule(new CudamiModule());
     objectMapper.registerModule(new ProseMirrorModule());
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
+    objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
     objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     return objectMapper;

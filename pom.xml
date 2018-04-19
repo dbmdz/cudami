@@ -62,6 +62,7 @@
     <version.spring-data-commons>1.13.1.RELEASE</version.spring-data-commons>
     <version.spring-data-jpa>1.11.0.RELEASE</version.spring-data-jpa>
     <version.spring-orm>4.3.7.RELEASE</version.spring-orm>
+    <!-- <version.spring-oxm>4.3.7.RELEASE</version.spring-oxm> -->
     <version.spring-security>4.2.1.RELEASE</version.spring-security>
     <version.spring-test>4.3.7.RELEASE</version.spring-test>
     <version.spring-tx>4.3.7.RELEASE</version.spring-tx>
@@ -74,6 +75,7 @@
     <version.thymeleaf-spring4>3.0.7.RELEASE</version.thymeleaf-spring4>
     <version.unbescape>1.1.4.RELEASE</version.unbescape>
     <version.validation-api>1.0.0.GA</version.validation-api> <!-- TODO Upgrade -->
+    <version.xstream>1.4.10</version.xstream>
     
     <!-- webjars -->
     <version.webjar-bootstrap>3.3.7</version.webjar-bootstrap>
@@ -144,6 +146,11 @@
         <groupId>com.querydsl</groupId>
         <artifactId>querydsl-jpa</artifactId>
         <version>${version.querydsl}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.thoughtworks.xstream</groupId>
+        <artifactId>xstream</artifactId>
+        <version>${version.xstream}</version>
       </dependency>
       <dependency>
         <groupId>commons-beanutils</groupId>
