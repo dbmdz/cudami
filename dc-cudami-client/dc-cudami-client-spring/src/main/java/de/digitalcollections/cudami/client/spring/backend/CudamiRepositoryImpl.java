@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.client.spring.backend;
 
-import de.digitalcollections.cudami.client.rest.api.CudamiClient;
+import de.digitalcollections.cudami.client.feign.api.CudamiClient;
 import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import java.util.List;

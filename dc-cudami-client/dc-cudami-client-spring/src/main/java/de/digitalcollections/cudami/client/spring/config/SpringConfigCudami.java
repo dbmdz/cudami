@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.client.spring.config;
 
-import de.digitalcollections.cudami.client.rest.Cudami;
-import de.digitalcollections.cudami.client.rest.Environment;
-import de.digitalcollections.cudami.client.rest.api.CudamiClient;
+import de.digitalcollections.cudami.client.feign.Cudami;
+import de.digitalcollections.cudami.client.feign.Environment;
+import de.digitalcollections.cudami.client.feign.api.CudamiClient;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
