@@ -1,5 +1,7 @@
 cudami:
   environment: local
+  server:
+    address: http://localhost:9000/
 
 endpoints:
   hypermedia:

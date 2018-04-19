@@ -41,6 +41,10 @@
       <artifactId>dc-cudami-client-openfeign</artifactId>
     </dependency>
     <dependency>
+      <groupId>de.digitalcollections.cudami</groupId>
+      <artifactId>dc-cudami-client-spring</artifactId>
+    </dependency>
+    <dependency>
       <groupId>nz.net.ultraq.thymeleaf</groupId>
       <artifactId>thymeleaf-layout-dialect</artifactId>
     </dependency>

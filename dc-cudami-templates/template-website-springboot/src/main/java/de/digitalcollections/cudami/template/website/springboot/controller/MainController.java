@@ -27,6 +27,9 @@ public class MainController {
 
     model.addAttribute("time", new Date());
     Locale defaultLocale = localeService.getDefaultLocale();
+    if (defaultLocale == null) {
+      defaultLocale = Locale.ENGLISH;
+    }
     Locale currentUserLocale = LocaleContextHolder.getLocale();
     model.addAttribute("defaultLocale", defaultLocale.getDisplayName(currentUserLocale));
 
