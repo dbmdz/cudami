@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.client.business;
+package de.digitalcollections.cudami.client.spring.business;
 
 public class CudamiException extends Exception {
 

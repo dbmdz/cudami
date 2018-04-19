@@ -1,10 +1,11 @@
-package de.digitalcollections.cudami.client.business;
+package de.digitalcollections.cudami.client.spring.business;
 
-import de.digitalcollections.cudami.client.repository.CudamiRepository;
+import de.digitalcollections.cudami.client.spring.backend.CudamiRepository;
 import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,20 +16,38 @@ public class CudamiServiceImpl implements CudamiService {
   private CudamiRepository repository;
 
   @Override
+  public List<Locale> getAllLocales() throws CudamiException {
+    try {
+      return repository.getAllLocales();
+    } catch (Exception e) {
+      throw new CudamiException("Cannot get all locales: " + e.getMessage(), e);
+    }
+  }
+
+  @Override
   public Locale getDefaultLocale() throws CudamiException {
     try {
       return repository.getDefaultLocale();
-    } catch ( Exception e ) {
+    } catch (Exception e) {
       throw new CudamiException("Cannot get default locale: " + e.getMessage(), e);
     }
   }
 
   @Override
-  public List<Locale> getAllLocales() throws CudamiException {
+  public Webpage getWebpage(UUID uuid) throws CudamiException {
     try {
-      return repository.getAllLocales();
-    } catch ( Exception e ) {
-      throw new CudamiException("Cannot get all locales: " + e.getMessage(), e);
+      return repository.getWebpage(uuid);
+    } catch (Exception e) {
+      throw new CudamiException("Cannot get webpage with uuid=" + uuid + ": " + e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public Webpage getWebpage(Locale locale, UUID uuid) throws CudamiException {
+    try {
+      return repository.getWebpage(locale, uuid);
+    } catch (Exception e) {
+      throw new CudamiException("Cannot get webpage with locale=" + locale + " and uuid=" + uuid + ": " + e.getMessage(), e);
     }
   }
 
@@ -36,7 +55,7 @@ public class CudamiServiceImpl implements CudamiService {
   public Webpage getWebpage(String uuid) throws CudamiException {
     try {
       return repository.getWebpage(uuid);
-    } catch ( Exception e ) {
+    } catch (Exception e) {
       throw new CudamiException("Cannot get webpage with uuid=" + uuid + ": " + e.getMessage(), e);
     }
   }
@@ -45,7 +64,7 @@ public class CudamiServiceImpl implements CudamiService {
   public Webpage getWebpage(Locale locale, String uuid) throws CudamiException {
     try {
       return repository.getWebpage(locale, uuid);
-    } catch ( Exception e ) {
+    } catch (Exception e) {
       throw new CudamiException("Cannot get webpage with locale=" + locale + " and uuid=" + uuid + ": " + e.getMessage(), e);
     }
   }
@@ -54,7 +73,7 @@ public class CudamiServiceImpl implements CudamiService {
   public Website getWebsite(String uuid) throws CudamiException {
     try {
       return repository.getWebsite(uuid);
-    } catch ( Exception e ) {
+    } catch (Exception e) {
       throw new CudamiException("Cannot get website with uuid=" + uuid + ": " + e.getMessage(), e);
     }
   }
