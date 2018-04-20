@@ -9,7 +9,7 @@
   <packaging>pom</packaging>
 
   <description>Cudami is a Digital Asset Management System for management and editing of cultural objects.</description>
-  
+
   <modules>
     <module>dc-cudami-model-parent</module>
     <module>dc-cudami-server</module>
@@ -76,10 +76,10 @@
     <version.unbescape>1.1.4.RELEASE</version.unbescape>
     <version.validation-api>1.0.0.GA</version.validation-api> <!-- TODO Upgrade -->
     <version.xstream>1.4.10</version.xstream>
-    
+
     <!-- webjars -->
     <version.webjar-bootstrap>3.3.7</version.webjar-bootstrap>
-    <version.webjar-bootswatch>3.3.5+4</version.webjar-bootswatch>
+    <version.webjar-bootswatch>3.3.7</version.webjar-bootswatch>
     <version.webjar-fontawesome>4.7.0</version.webjar-fontawesome>
     <version.webjar-ie10-viewport-bug-workaround>1.0.3</version.webjar-ie10-viewport-bug-workaround>
     <version.webjar-html5shiv>3.7.3</version.webjar-html5shiv>

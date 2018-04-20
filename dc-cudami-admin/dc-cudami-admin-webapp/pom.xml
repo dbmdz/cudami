@@ -155,7 +155,7 @@
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
-      <artifactId>bootswatch-yeti</artifactId>
+      <artifactId>bootswatch</artifactId>
       <version>${version.webjar-bootswatch}</version>
     </dependency>
     <dependency>
