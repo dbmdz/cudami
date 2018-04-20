@@ -159,6 +159,7 @@ public class WebsitesController extends AbstractController implements MessageSou
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = websiteService.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
+    model.addAttribute("defaultLocale", localeService.getDefault());
     model.addAttribute("page", new PageWrapper(page, "/websites"));
     return "websites/list";
   }
