@@ -16,11 +16,11 @@
 
       <div class="row">
         <div class="col-sm-9">
-          <b th:text="#{website}">Website</b> <!-- <b thxx:text="${website.title}"/> --> TODO  (<a th:href="${website.url}"><span th:text="${website.url}"/></a>)
+          <b th:text="#{website}">Website</b> <a th:href="*{url}" th:text="*{url}" target="_blank"></a>
         </div>
         <div class="col-sm-3">
           <a class="btn btn-default btn-block"
-             th:href="@{${website.uuid} + '/edit'}" th:text="#{edit}">edit</a>
+             th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
         </div>
       </div>
 
@@ -39,7 +39,7 @@
             </div>
             <div class="row">
               <div class="col-md-3"><label th:text="#{url}">URL</label></div>
-              <div class="col-md-9"><span th:text="*{url}">http://www.example.de/</span></div>
+              <div class="col-md-9"><a th:href="*{url}" th:text="*{url}" target="_blank">http://www.example.de/</a></div>
             </div>
           </div>
         </div>
