@@ -2,6 +2,8 @@ package de.digitalcollections.cudami.server.business.api.service.identifiable.re
 
 import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import java.util.UUID;
 
 /**
  * Service for Webpage.
@@ -11,4 +13,6 @@ import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 public interface WebpageService<W extends Webpage> extends ResourceService<W> {
 
   Text getContentBlocks(W webpage);
+
+  W save(W webpage, UUID websiteUuid) throws IdentifiableServiceException;
 }

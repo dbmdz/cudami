@@ -100,6 +100,11 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
 
   @Override
   public Webpage save(Webpage webpage) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
+  public Webpage save(Webpage webpage, UUID websiteUuid) {
     resourceRepository.save(webpage);
 
     WebpageImpl result = dbi.withHandle(h -> h
@@ -107,6 +112,14 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
             .bindBean(webpage)
             .mapToBean(WebpageImpl.class)
             .findOnly());
+
+    dbi.withHandle(h -> {
+      return h.createUpdate("INSERT INTO website_webpage(website_uuid, webpage_uuid) VALUES (:website_uuid, :uuid)")
+              .bind("website_uuid", websiteUuid)
+              .bindBean(webpage)
+              .execute();
+    });
+
     return result;
   }
 
@@ -114,11 +127,11 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
   public Webpage update(Webpage webpage) {
     resourceRepository.update(webpage);
 
-    WebpageImpl result = dbi.withHandle(h -> h
-            .createQuery("UPDATE webpages SET XXX WHERE uuid=:uuid RETURNING *") // TODO update columns
-            .bindBean(webpage)
-            .mapToBean(WebpageImpl.class)
-            .findOnly());
-    return result;
+//    WebpageImpl result = dbi.withHandle(h -> h
+//            .createQuery("UPDATE webpages SET XXX WHERE uuid=:uuid RETURNING *") // TODO update columns
+//            .bindBean(webpage)
+//            .mapToBean(WebpageImpl.class)
+//            .findOnly());
+    return webpage;
   }
 }

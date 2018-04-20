@@ -162,10 +162,10 @@ public class WebpageController {
   }
 
   @ApiMethod(description = "save a newly created webpage")
-  @RequestMapping(value = "/v1/webpages", produces = "application/json", method = RequestMethod.POST)
+  @RequestMapping(value = "/v1/websites/{websiteUuid}/webpage", produces = "application/json", method = RequestMethod.POST)
   @ApiResponseObject
-  public Webpage save(@RequestBody Webpage webpage, BindingResult errors) throws IdentifiableServiceException {
-    return (Webpage) service.save(webpage);
+  public Webpage save(@PathVariable UUID websiteUuid, @RequestBody Webpage webpage, BindingResult errors) throws IdentifiableServiceException {
+    return (Webpage) service.save(webpage, websiteUuid);
   }
 
   @ApiMethod(description = "update a webpage")

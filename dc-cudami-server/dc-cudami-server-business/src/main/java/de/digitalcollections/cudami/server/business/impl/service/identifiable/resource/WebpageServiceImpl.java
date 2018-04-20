@@ -51,10 +51,15 @@ public class WebpageServiceImpl implements WebpageService<Webpage> {
   }
 
   @Override
-  //  @Transactional(readOnly = false)
   public Webpage save(Webpage webpage) throws IdentifiableServiceException {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
+  //  @Transactional(readOnly = false)
+  public Webpage save(Webpage webpage, UUID websiteUuid) throws IdentifiableServiceException {
     try {
-      return (Webpage) webpageRepository.save(webpage);
+      return (Webpage) webpageRepository.save(webpage, websiteUuid);
     } catch (Exception e) {
       LOGGER.error("Cannot save webpage " + webpage + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
