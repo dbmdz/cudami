@@ -2,6 +2,12 @@
   max-height: 400px;
   overflow-y: auto;
 }*/
+a[href^="http"]:not(.noExt):after {
+  content: "\f08e";
+  font-family: FontAwesome;
+  padding-left: 3px;
+}
+
 .ProseMirror-menubar {
   border-top-left-radius: inherit;
   border-top-right-radius: inherit;
