@@ -72,10 +72,36 @@
         </div>
       </div>
 
-      &nbsp;<br/>
+      <div class="row main-content">
+        <div class="col-sm-12">
+          <h3>
+            <span th:text="#{webpages}">root pages</span>
+            <a class="btn btn-default pull-right" th:href="@{/webpages/new(websiteUuid=*{uuid})}" th:text="#{btn_new}">New</a>
+          </h3>
+          <table class="table table-bordered table-condensed table-striped table-hover table-responsive">
+            <thead>
+              <tr>
+                <th class="center" th:text="#{label}">Label</th>
+                <th class="center" th:text="#{actions}">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="rootpage: *{rootPages}">
+                <td>
+                  <a th:href="@{'/webpages/' + ${rootpage.uuid}}" th:text="${rootpage.label.translations[0].text}">Label</a>
+                </td>
+                <td class="center">
+                  <a th:href="@{'/webpages/' + ${rootpage.uuid}}" th:title="#{tooltip_view}"><span class="fa fa-eye actionButton"></span></a>
+                  <a th:href="@{'/webpages/' + ${rootpage.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fa fa-pencil actionButton"></span></a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       <div class="row mainContent">
-        <div id="tree1" class="col-sm-12" th:attr="data-url=${website.uuid + '/sitemap/do?operation=get_nodes'}"></div>
+        <div id="tree1" class="col-sm-12" th:attr="data-url=*{uuid + '/sitemap/do?operation=get_nodes'}"></div>
       </div>
 
     </section>
