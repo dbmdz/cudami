@@ -74,7 +74,7 @@ public class TextImpl implements Text {
     if (translation != null) {
       return translation.getText();
     }
-    return null;
+    return getText();
   }
 
   @Override
