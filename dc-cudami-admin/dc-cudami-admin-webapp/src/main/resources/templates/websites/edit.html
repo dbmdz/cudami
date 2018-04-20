@@ -16,14 +16,13 @@
           <div th:replace="fragments/feedback-messages :: form"></div>
 
           <div class="col-sm-8">
-            <b th:text="#{website}">Website</b> <!-- <b thxx:text="${website.title}"></b> --> TODO (<a th:href="${website.url}"><span th:text="${website.url}"/></a>)
+            <b th:if="${isNew}" th:text="#{create_website}">...</b>
+            <b th:unless="${isNew}" th:text="#{edit_website(${website.url})}">...</b>
           </div>
           <div class="col-sm-4">
             <span class="col-sm-6">
-              <button class="btn btn-default btn-block" type="button" th:text="#{abort}"
-                      th:onclick="'javascript:document.location.href=getViewUrl(document.location.href);return false;'">
-                abort
-              </button>
+              <a th:if="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{/websites}" th:text="#{abort}">abort</a>
+              <a th:unless="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{'/websites/' + *{uuid}}" th:text="#{abort}">abort</a>
             </span>
             <span class="col-sm-6">
               <button class="btn btn-primary btn-block" type="submit" th:text="#{save}">
