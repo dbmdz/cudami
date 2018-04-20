@@ -2,19 +2,16 @@ package de.digitalcollections.cudami.model.impl.identifiable.resource;
 
 import de.digitalcollections.cudami.model.api.identifiable.Identifiable;
 import de.digitalcollections.cudami.model.api.identifiable.Node;
-import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
+import de.digitalcollections.cudami.model.api.identifiable.resource.MultilanguageDocument;
 import de.digitalcollections.cudami.model.api.identifiable.resource.ResourceType;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.model.impl.identifiable.NodeImpl;
 import java.util.List;
-import de.digitalcollections.prosemirror.model.api.Document;
 
 public class WebpageImpl extends ResourceImpl implements Webpage, Node<Webpage> {
 
-  private Text contentBlocks;
-
   private final NodeImpl<Webpage> node;
-  private Document contentBlocksContainer;
+  private MultilanguageDocument multilanguageDocument;
 
   public WebpageImpl() {
     super();
@@ -53,23 +50,13 @@ public class WebpageImpl extends ResourceImpl implements Webpage, Node<Webpage> 
   }
 
   @Override
-  public Text getContentBlocks() {
-    return contentBlocks;
+  public MultilanguageDocument getMultilanguageDocument() {
+    return multilanguageDocument;
   }
 
   @Override
-  public void setContentBlocks(Text contentBlocks) {
-    this.contentBlocks = contentBlocks;
-  }
-
-  @Override
-  public Document getContentBlocksContainer() {
-    return contentBlocksContainer;
-  }
-
-  @Override
-  public void setContentBlocksContainer(Document contentBlocksContainer) {
-    this.contentBlocksContainer = contentBlocksContainer;
+  public void setMultilanguageDocument(MultilanguageDocument multilanguageDocument) {
+    this.multilanguageDocument = multilanguageDocument;
   }
 
   @Override

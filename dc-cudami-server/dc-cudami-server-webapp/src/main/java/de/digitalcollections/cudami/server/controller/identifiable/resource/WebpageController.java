@@ -9,28 +9,29 @@ import de.digitalcollections.core.model.impl.paging.OrderImpl;
 import de.digitalcollections.core.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.core.model.impl.paging.SortingImpl;
 import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
+import de.digitalcollections.cudami.model.api.identifiable.resource.MultilanguageDocument;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
-import de.digitalcollections.cudami.model.impl.identifiable.resource.WebpageImpl;
+import de.digitalcollections.cudami.model.impl.identifiable.resource.MultilanguageDocumentImpl;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.WebpageService;
-import de.digitalcollections.prosemirror.model.api.Content;
+import de.digitalcollections.prosemirror.model.api.ContentBlock;
 import de.digitalcollections.prosemirror.model.api.Document;
-import de.digitalcollections.prosemirror.model.api.content.BulletList;
-import de.digitalcollections.prosemirror.model.api.content.Mark;
-import de.digitalcollections.prosemirror.model.api.content.OrderedList;
-import de.digitalcollections.prosemirror.model.api.content.Paragraph;
-import de.digitalcollections.prosemirror.model.api.content.Text;
+import de.digitalcollections.prosemirror.model.api.Mark;
+import de.digitalcollections.prosemirror.model.api.contentblocks.BulletList;
+import de.digitalcollections.prosemirror.model.api.contentblocks.OrderedList;
+import de.digitalcollections.prosemirror.model.api.contentblocks.Paragraph;
+import de.digitalcollections.prosemirror.model.api.contentblocks.Text;
 import de.digitalcollections.prosemirror.model.impl.DocumentImpl;
-import de.digitalcollections.prosemirror.model.impl.content.BulletListImpl;
-import de.digitalcollections.prosemirror.model.impl.content.EmbeddedCodeBlockImpl;
-import de.digitalcollections.prosemirror.model.impl.content.HardBreakImpl;
-import de.digitalcollections.prosemirror.model.impl.content.HeadingImpl;
-import de.digitalcollections.prosemirror.model.impl.content.ListItemImpl;
-import de.digitalcollections.prosemirror.model.impl.content.MarkImpl;
-import de.digitalcollections.prosemirror.model.impl.content.OrderedListImpl;
-import de.digitalcollections.prosemirror.model.impl.content.ParagraphImpl;
-import de.digitalcollections.prosemirror.model.impl.content.TextImpl;
+import de.digitalcollections.prosemirror.model.impl.MarkImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.BulletListImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.EmbeddedCodeImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.HardBreakImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.HeadingImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.ListItemImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.OrderedListImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.ParagraphImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.TextImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -91,7 +92,10 @@ public class WebpageController {
           @ApiQueryParam(name = "locale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "locale", required = false) Locale locale
   ) throws IdentifiableServiceException {
-    List<Content> contents = new ArrayList<>();
+
+    Webpage webpage = (Webpage) service.create();
+    webpage.getLabel().setText("Dummy Impressum");
+    List<ContentBlock> contents = new ArrayList<>();
 
     contents.add(new HeadingImpl(3, "Impressum"));
     contents.add(new HeadingImpl(4, "Bayerische Staatsbibliothek"));
@@ -101,27 +105,27 @@ public class WebpageController {
     contents.add(new ParagraphImpl("Generaldirektor Dr. Klaus Ceynowa"));
 
     Paragraph paragraph1 = new ParagraphImpl();
-    paragraph1.addContent(new TextImpl("Telefon:", "strong"));
-    paragraph1.addContent(new TextImpl(" +49 89 28638-0"));
-    paragraph1.addContent(new HardBreakImpl());
-    paragraph1.addContent(new TextImpl("Fax:", "strong", "em"));
-    paragraph1.addContent(new TextImpl(" +49 89 28638-2200"));
-    paragraph1.addContent(new HardBreakImpl());
-    paragraph1.addContent(new TextImpl("E-Mail:", "strong"));
-    paragraph1.addContent(new TextImpl(" direktion [AT] bsb-muenchen.de"));
-    paragraph1.addContent(new HardBreakImpl());
-    paragraph1.addContent(new TextImpl("Internet:", "strong"));
-    paragraph1.addContent(new TextImpl(" "));
+    paragraph1.addContentBlock(new TextImpl("Telefon:", "strong"));
+    paragraph1.addContentBlock(new TextImpl(" +49 89 28638-0"));
+    paragraph1.addContentBlock(new HardBreakImpl());
+    paragraph1.addContentBlock(new TextImpl("Fax:", "strong", "em"));
+    paragraph1.addContentBlock(new TextImpl(" +49 89 28638-2200"));
+    paragraph1.addContentBlock(new HardBreakImpl());
+    paragraph1.addContentBlock(new TextImpl("E-Mail:", "strong"));
+    paragraph1.addContentBlock(new TextImpl(" direktion [AT] bsb-muenchen.de"));
+    paragraph1.addContentBlock(new HardBreakImpl());
+    paragraph1.addContentBlock(new TextImpl("Internet:", "strong"));
+    paragraph1.addContentBlock(new TextImpl(" "));
 
     Text internet = new TextImpl("https://www.bsb-muenchen.de");
     Mark link = new MarkImpl("link");
     link.addAttribute("href", "https://www.bsb-muenchen.de");
     link.addAttribute("title", null);
     internet.addMark(link);
-    paragraph1.addContent(internet);
-    paragraph1.addContent(new HardBreakImpl());
-    paragraph1.addContent(new TextImpl("Umsatzsteueridentifikationsnummer:", "strong"));
-    paragraph1.addContent(new TextImpl(" DE 811335517"));
+    paragraph1.addContentBlock(internet);
+    paragraph1.addContentBlock(new HardBreakImpl());
+    paragraph1.addContentBlock(new TextImpl("Umsatzsteueridentifikationsnummer:", "strong"));
+    paragraph1.addContentBlock(new TextImpl(" DE 811335517"));
     contents.add(paragraph1);
 
     contents
@@ -136,27 +140,29 @@ public class WebpageController {
     contents.add(text2);
 
     BulletList bulletList = new BulletListImpl();
-    bulletList.addContent(new ListItemImpl("test 1"));
-    bulletList.addContent(new ListItemImpl("test 2"));
-    bulletList.addContent(new ListItemImpl("test 3"));
+    bulletList.addContentBlock(new ListItemImpl("test 1"));
+    bulletList.addContentBlock(new ListItemImpl("test 2"));
+    bulletList.addContentBlock(new ListItemImpl("test 3"));
     contents.add(bulletList);
 
     contents.add(new ParagraphImpl("Mehr Text."));
 
     OrderedList orderedList = new OrderedListImpl(1);
-    orderedList.addContent(new ListItemImpl("test 1"));
-    orderedList.addContent(new ListItemImpl("test 2"));
-    orderedList.addContent(new ListItemImpl("test 3"));
+    orderedList.addContentBlock(new ListItemImpl("test 1"));
+    orderedList.addContentBlock(new ListItemImpl("test 2"));
+    orderedList.addContentBlock(new ListItemImpl("test 3"));
     contents.add(orderedList);
 
     contents
-            .add(new EmbeddedCodeBlockImpl("<iframe style=\"border: 1px solid lightgrey\" frameborder=\"no\" width=\"98%\" height=\"auto\" src=\"https://statistiken.digitale-sammlungen.de/index.php?module=CoreAdminHome&amp;action=optOut&amp;language=de\"></iframe>"));
+            .add(new EmbeddedCodeImpl("<iframe style=\"border: 1px solid lightgrey\" frameborder=\"no\" width=\"98%\" height=\"auto\" src=\"https://statistiken.digitale-sammlungen.de/index.php?module=CoreAdminHome&amp;action=optOut&amp;language=de\"></iframe>"));
 
     Document document = new DocumentImpl();
-    document.addContentBlocks(locale != null ? locale : localeService.getDefault(), contents);
+    document.setContentBlocks(contents);
 
-    Webpage webpage = new WebpageImpl();
-    webpage.setContentBlocksContainer(document);
+    MultilanguageDocument multilanguageDocument = new MultilanguageDocumentImpl();
+    multilanguageDocument.addDocument(locale != null ? locale : localeService.getDefault(), document);
+
+    webpage.setMultilanguageDocument(multilanguageDocument);
 
     return new ResponseEntity<>(webpage, HttpStatus.OK);
   }

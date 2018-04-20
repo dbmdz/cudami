@@ -7,9 +7,7 @@ import de.digitalcollections.cudami.admin.business.api.service.LocaleService;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
-import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
-import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -42,11 +40,6 @@ public class WebsiteServiceImpl implements WebsiteService<Website> {
   @Override
   public Website create() {
     Website website = (Website) websiteRepository.create();
-    String defaultLocale = localeService.getDefault().getLanguage();
-    Text label = new TextImpl(defaultLocale, "");
-    website.setLabel(label);
-    Text description = new TextImpl(defaultLocale, "");
-    website.setDescription(description);
     return website;
   }
 

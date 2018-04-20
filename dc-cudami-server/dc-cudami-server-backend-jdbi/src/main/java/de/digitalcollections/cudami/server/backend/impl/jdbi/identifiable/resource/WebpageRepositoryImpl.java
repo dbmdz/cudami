@@ -5,13 +5,17 @@ import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.core.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
+import de.digitalcollections.cudami.model.api.identifiable.resource.MultilanguageDocument;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
+import de.digitalcollections.cudami.model.impl.identifiable.resource.MultilanguageDocumentImpl;
 import de.digitalcollections.cudami.model.impl.identifiable.resource.WebpageImpl;
 import de.digitalcollections.cudami.server.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ResourceRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.WebpageRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSortingRepositoryImpl;
+import de.digitalcollections.prosemirror.model.api.Document;
+import de.digitalcollections.prosemirror.model.impl.DocumentImpl;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -48,11 +52,21 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
   public Webpage create() {
     Locale defaultLocale = localeRepository.getDefault();
     String defaultLanguage = defaultLocale.getLanguage();
+
     WebpageImpl webpage = new WebpageImpl();
     webpage.setLabel(new TextImpl(defaultLanguage, ""));
-    webpage.setDescription(new TextImpl(defaultLanguage, ""));
-    webpage.setContentBlocks(new TextImpl(defaultLanguage, ""));
+
+    webpage.setDescription(createEmptyMLD(defaultLocale));
+    webpage.setMultilanguageDocument(createEmptyMLD(defaultLocale));
     return webpage;
+  }
+
+  private MultilanguageDocument createEmptyMLD(Locale defaultLocale) {
+    MultilanguageDocument emptyMLD = new MultilanguageDocumentImpl();
+    Document document = new DocumentImpl();
+    document.addContentBlock(new de.digitalcollections.prosemirror.model.impl.contentblocks.TextImpl(""));
+    emptyMLD.addDocument(defaultLocale, document);
+    return emptyMLD;
   }
 
   @Override

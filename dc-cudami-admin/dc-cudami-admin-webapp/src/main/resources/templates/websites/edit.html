@@ -91,7 +91,7 @@
                                 <textarea class="form-control" rows="5" xxxth:field="*{description.translations[0].text}"></textarea>-->
                 <label th:text="#{description}">description</label>
                 <div id="editor" class="editor" style="margin-bottom: 23px"></div>
-                <textarea id="content" class="form-control" cols="70" rows="10" th:field="*{description.translations[0].text}">{"type":"doc",...}</textarea>
+                <textarea id="content" class="form-control" cols="70" rows="10" th:field="*{description.contentBlocks[__${defaultLocale}__]}">{"type":"doc",...}</textarea>
               </div>
             </th:block>
             <th:block th:unless="${isNew}">
@@ -102,7 +102,7 @@
                                 <textarea class="form-control" rows="5" xxxth:field="*{description.translations[__${iter.index}__].text}"></textarea>-->
                 <label th:text="#{description}">description</label>
                 <div id="editor" class="editor" style="margin-bottom: 23px"></div>
-                <textarea id="content" class="form-control" cols="70" rows="10" th:field="*{description.translations[__${iter.index}__].text}">{"type":"doc",...}</textarea>
+                <textarea id="content" class="form-control" cols="70" rows="10" th:field="*{description.contentBlocks[__${language}__]}">{"type":"doc",...}</textarea>
               </div>
             </th:block>
           </div>

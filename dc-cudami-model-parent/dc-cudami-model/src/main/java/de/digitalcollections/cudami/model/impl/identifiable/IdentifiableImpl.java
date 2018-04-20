@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.model.api.identifiable.Identifiable;
 import de.digitalcollections.cudami.model.api.identifiable.IdentifiableType;
 import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
 import de.digitalcollections.cudami.model.api.identifiable.resource.IiifImage;
+import de.digitalcollections.cudami.model.api.identifiable.resource.MultilanguageDocument;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -11,7 +12,7 @@ public class IdentifiableImpl implements Identifiable {
 
   private UUID uuid;
   protected LocalDateTime created;
-  protected Text description;
+  protected MultilanguageDocument description;
   protected Text label;
   protected LocalDateTime lastModified;
   protected IiifImage iiifImage;
@@ -33,7 +34,7 @@ public class IdentifiableImpl implements Identifiable {
   }
 
   @Override
-  public Text getDescription() {
+  public MultilanguageDocument getDescription() {
     return description;
   }
 
@@ -58,7 +59,7 @@ public class IdentifiableImpl implements Identifiable {
   }
 
   @Override
-  public void setDescription(Text description) {
+  public void setDescription(MultilanguageDocument description) {
     this.description = description;
   }
 

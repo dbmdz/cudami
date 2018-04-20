@@ -6,9 +6,7 @@ import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.re
 import de.digitalcollections.cudami.admin.business.api.service.LocaleService;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.WebpageService;
-import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
-import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,11 +37,6 @@ public class WebpageServiceImpl implements WebpageService<Webpage> {
   @Override
   public Webpage create() {
     Webpage webpage = (Webpage) webpageRepository.create();
-    String defaultLocale = localeService.getDefault().getLanguage();
-    Text label = new TextImpl(defaultLocale, "");
-    webpage.setLabel(label);
-    Text description = new TextImpl(defaultLocale, "");
-    webpage.setDescription(description);
     return webpage;
   }
 

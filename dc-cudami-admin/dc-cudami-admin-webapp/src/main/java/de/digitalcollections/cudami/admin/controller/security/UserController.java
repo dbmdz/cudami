@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.UUID;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -70,7 +69,6 @@ public class UserController extends AbstractController implements MessageSourceA
   @InitBinder("user")
   protected void initBinder(WebDataBinder binder) {
     binder.registerCustomEditor(Role.class, roleEditor);
-    binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
 //        binder.setDisallowedFields("password");
 //        binder.addValidators(mySpecialUserValidator);
   }

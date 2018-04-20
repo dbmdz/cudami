@@ -7,9 +7,7 @@ import de.digitalcollections.cudami.admin.business.api.service.LocaleService;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.ContentTreeService;
 import de.digitalcollections.cudami.model.api.identifiable.entity.ContentTree;
-import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
 import de.digitalcollections.cudami.model.api.identifiable.resource.ContentNode;
-import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -42,11 +40,6 @@ public class ContentTreeServiceImpl implements ContentTreeService<ContentTree> {
   @Override
   public ContentTree create() {
     ContentTree contentTree = (ContentTree) contentTreeRepository.create();
-    String defaultLocale = localeService.getDefault().getLanguage();
-    Text label = new TextImpl(defaultLocale, "");
-    contentTree.setLabel(label);
-    Text description = new TextImpl(defaultLocale, "");
-    contentTree.setDescription(description);
     return contentTree;
   }
 

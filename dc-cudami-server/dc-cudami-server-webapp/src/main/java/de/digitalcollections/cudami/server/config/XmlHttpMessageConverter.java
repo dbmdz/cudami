@@ -10,18 +10,17 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 import com.thoughtworks.xstream.mapper.Mapper;
-import de.digitalcollections.cudami.model.api.identifiable.resource.ContentBlocksContainer;
 import de.digitalcollections.cudami.model.impl.identifiable.resource.WebpageImpl;
 import de.digitalcollections.prosemirror.model.impl.DocumentImpl;
-import de.digitalcollections.prosemirror.model.impl.content.BulletListImpl;
-import de.digitalcollections.prosemirror.model.impl.content.EmbeddedCodeBlockImpl;
-import de.digitalcollections.prosemirror.model.impl.content.HardBreakImpl;
-import de.digitalcollections.prosemirror.model.impl.content.HeadingImpl;
-import de.digitalcollections.prosemirror.model.impl.content.ListItemImpl;
-import de.digitalcollections.prosemirror.model.impl.content.MarkImpl;
-import de.digitalcollections.prosemirror.model.impl.content.OrderedListImpl;
-import de.digitalcollections.prosemirror.model.impl.content.ParagraphImpl;
-import de.digitalcollections.prosemirror.model.impl.content.TextImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.BulletListImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.EmbeddedCodeImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.HardBreakImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.HeadingImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.ListItemImpl;
+import de.digitalcollections.prosemirror.model.impl.MarkImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.OrderedListImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.ParagraphImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.TextImpl;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +29,7 @@ import java.util.Set;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
 import org.springframework.oxm.xstream.XStreamMarshaller;
+import de.digitalcollections.cudami.model.api.identifiable.resource.MultilanguageDocument;
 
 public class XmlHttpMessageConverter {
 
@@ -41,9 +41,9 @@ public class XmlHttpMessageConverter {
 
     Map<String, Class> aliases = new HashMap<>();
     aliases.put("bulletList", BulletListImpl.class);
-    aliases.put("contentBlocksContainer", ContentBlocksContainer.class);
+    aliases.put("contentBlocksContainer", MultilanguageDocument.class);
     aliases.put("document", DocumentImpl.class);
-    aliases.put("embeddedCodeBlock", EmbeddedCodeBlockImpl.class);
+    aliases.put("embeddedCodeBlock", EmbeddedCodeImpl.class);
     aliases.put("hardBreak", HardBreakImpl.class);
     aliases.put("heading", HeadingImpl.class);
     aliases.put("listItem", ListItemImpl.class);
