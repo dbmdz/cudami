@@ -136,12 +136,12 @@ public class WebsitesController extends AbstractController implements MessageSou
       websiteDb.setLabel(website.getLabel());
       websiteDb.setDescription(website.getDescription());
 
-      website = (Website) websiteService.update(websiteDb, results);
+      websiteService.update(websiteDb, results);
     } catch (IdentifiableServiceException e) {
       String message = "Cannot save website with uuid=" + pathUuid + ": " + e;
       LOGGER.error(message, e);
       redirectAttributes.addFlashAttribute("error_message", message);
-      return "redirect:/websites/" + pathUuid;
+      return "redirect:/websites/" + pathUuid + "/edit";
     }
 
     if (results.hasErrors()) {
@@ -151,7 +151,7 @@ public class WebsitesController extends AbstractController implements MessageSou
     status.setComplete();
     String message = messageSource.getMessage("msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
-    return "redirect:/websites/" + pathUuid + "/edit";
+    return "redirect:/websites/" + pathUuid;
   }
 
   @RequestMapping(value = "/websites", method = RequestMethod.GET)
