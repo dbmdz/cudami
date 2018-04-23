@@ -1,27 +1,27 @@
 package de.digitalcollections.cudami.model.impl.identifiable.parts;
 
-import com.google.common.base.Strings;
 import de.digitalcollections.cudami.model.api.identifiable.parts.Translation;
+import java.util.Locale;
 import java.util.Objects;
 
 public class TranslationImpl implements Translation {
 
-  private String lang;
+  private Locale locale;
   private String text;
 
   private TranslationImpl() {
   }
 
-  public TranslationImpl(String lang, String text) {
-    if (Strings.isNullOrEmpty(lang)) {
-      throw new IllegalArgumentException("Language must not be null or empty!");
+  public TranslationImpl(Locale locale, String text) {
+    if (locale == null) {
+      throw new IllegalArgumentException("Locale must not be null!");
     }
     this.text = text;
-    this.lang = lang;
+    this.locale = locale;
   }
 
   public TranslationImpl(Translation translation) {
-    this(translation.getLang(), translation.getText());
+    this(translation.getLocale(), translation.getText());
   }
 
   @Override
@@ -32,22 +32,22 @@ public class TranslationImpl implements Translation {
     if (obj instanceof TranslationImpl) {
       TranslationImpl other = (TranslationImpl) obj;
       return Objects.equals(text, other.getText())
-          && Objects.equals(lang, other.getLang());
+              && Objects.equals(locale, other.getLocale());
     }
     return false;
   }
 
   @Override
-  public String getLang() {
-    return lang;
+  public Locale getLocale() {
+    return locale;
   }
 
   @Override
-  public void setLang(String lang) {
-    if (Strings.isNullOrEmpty(lang)) {
-      throw new IllegalArgumentException("Language must not be null or empty!");
+  public void setLocale(Locale locale) {
+    if (locale == null) {
+      throw new IllegalArgumentException("Locale must not be null!");
     }
-    this.lang = lang;
+    this.locale = locale;
   }
 
   @Override
@@ -61,18 +61,18 @@ public class TranslationImpl implements Translation {
   }
 
   @Override
-  public boolean has(String lang) {
-    return Objects.equals(this.lang, lang);
+  public boolean has(Locale locale) {
+    return Objects.equals(this.locale, locale);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(text, lang);
+    return Objects.hash(text, locale);
   }
 
   @Override
   public String toString() {
-    return "Translation{" + "lang: '" + lang + "', text: '" + text + '}';
+    return "Translation {" + "locale: '" + locale + "', text: '" + text + '}';
   }
 
 }

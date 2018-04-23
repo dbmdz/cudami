@@ -102,7 +102,7 @@ public class WebpagesController extends AbstractController implements MessageSou
     Webpage webpage = (Webpage) webpageService.get(uuid);
     model.addAttribute("webpage", webpage);
     model.addAttribute("isNew", false);
-    model.addAttribute("availableLanguages", webpage.getLabel().getLanguages());
+    model.addAttribute("availableLanguages", webpage.getLabel().getLocales());
     model.addAttribute("locales", localeService.findAll());
     model.addAttribute("defaultLocale", localeService.getDefault());
 
@@ -154,7 +154,7 @@ public class WebpagesController extends AbstractController implements MessageSou
   @RequestMapping(value = "/webpages/{uuid}", method = RequestMethod.GET)
   public String view(@PathVariable UUID uuid, Model model) {
     Webpage webpage = (Webpage) webpageService.get(uuid);
-    model.addAttribute("availableLanguages", webpage.getLabel().getLanguages());
+    model.addAttribute("availableLanguages", webpage.getLabel().getLocales());
     model.addAttribute("defaultLocale", localeService.getDefault());
     model.addAttribute("webpage", webpage);
     return "webpages/view";

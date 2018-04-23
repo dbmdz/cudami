@@ -89,15 +89,18 @@ public class WebpageController {
   @ApiResponseObject
   public ResponseEntity<Webpage> getWebpage(
           @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
-          @ApiQueryParam(name = "locale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
-          @RequestParam(name = "locale", required = false) Locale locale
+          @ApiQueryParam(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+          @RequestParam(name = "pLocale", required = false) Locale pLocale
   ) throws IdentifiableServiceException {
 
+    if (pLocale == null) {
+      pLocale = localeService.getDefault();
+    }
+
     Webpage webpage = (Webpage) service.create();
-    webpage.getLabel().setText("Dummy Impressum");
+    webpage.getLabel().setText(Locale.GERMANY, "Dummy Impressum");
     List<ContentBlock> contents = new ArrayList<>();
 
-    contents.add(new HeadingImpl(3, "Impressum"));
     contents.add(new HeadingImpl(4, "Bayerische Staatsbibliothek"));
     contents.add(new ParagraphImpl("Ludwigstraße 16"));
     contents.add(new HardBreakImpl());
@@ -160,7 +163,7 @@ public class WebpageController {
     document.setContentBlocks(contents);
 
     MultilanguageDocument multilanguageDocument = new MultilanguageDocumentImpl();
-    multilanguageDocument.addDocument(locale != null ? locale : localeService.getDefault(), document);
+    multilanguageDocument.addDocument(pLocale, document);
 
     webpage.setText(multilanguageDocument);
 

@@ -5,8 +5,8 @@ import de.digitalcollections.cudami.model.api.identifiable.parts.MultilanguageDo
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.model.api.security.User;
 import de.digitalcollections.cudami.model.impl.identifiable.entity.WebsiteImpl;
-import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
 import de.digitalcollections.cudami.model.impl.identifiable.parts.MultilanguageDocumentImpl;
+import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
 import de.digitalcollections.cudami.model.impl.identifiable.resource.WebpageImpl;
 import de.digitalcollections.cudami.model.impl.security.UserImpl;
 import de.digitalcollections.prosemirror.model.api.ContentBlock;
@@ -130,7 +130,7 @@ public class CudamiModuleTest extends BaseSerializationTest {
     document.setContentBlocks(contents);
 
     Webpage webpage = new WebpageImpl();
-    webpage.setLabel(new TextImpl(Locale.GERMAN.getLanguage(), ""));
+    webpage.setLabel(new TextImpl(Locale.GERMANY, ""));
 
     MultilanguageDocument mld = new MultilanguageDocumentImpl();
     mld.addDocument(Locale.GERMAN, document);

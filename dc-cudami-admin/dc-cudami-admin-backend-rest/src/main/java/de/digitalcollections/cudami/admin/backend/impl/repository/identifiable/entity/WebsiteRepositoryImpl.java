@@ -9,8 +9,8 @@ import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.en
 import de.digitalcollections.cudami.model.api.identifiable.parts.MultilanguageDocument;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.model.impl.identifiable.entity.WebsiteImpl;
-import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
 import de.digitalcollections.cudami.model.impl.identifiable.parts.MultilanguageDocumentImpl;
+import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
 import de.digitalcollections.prosemirror.model.api.Document;
 import de.digitalcollections.prosemirror.model.impl.DocumentImpl;
 import java.util.Iterator;
@@ -37,9 +37,8 @@ public class WebsiteRepositoryImpl implements WebsiteRepository<WebsiteImpl> {
   @Override
   public WebsiteImpl create() {
     Locale defaultLocale = localeRepository.getDefault();
-    String defaultLanguage = defaultLocale.getLanguage();
     WebsiteImpl website = new WebsiteImpl();
-    website.setLabel(new TextImpl(defaultLanguage, ""));
+    website.setLabel(new TextImpl(defaultLocale, ""));
     website.setDescription(createEmptyMLD(defaultLocale));
     return website;
   }

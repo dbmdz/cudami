@@ -18,7 +18,7 @@ public interface CudamiBackend extends CommonCudamiBackend {
   @RequestLine("GET /v1/webpages/{uuid}")
   Webpage getWebpage(@Param("uuid") String uuid);
 
-  @RequestLine("GET /v1/webpages/{uuid}?locale={locale}")
+  @RequestLine("GET /v1/webpages/{uuid}?pLocale={locale}")
   Webpage getWebpage(@Param("locale") Locale locale, @Param("uuid") String uuid);
 
   @RequestLine("GET /v1/websites/{uuid}")

@@ -105,7 +105,7 @@ public class ContentTreesController extends AbstractController implements Messag
 //      redirectAttributes.addFlashAttribute("error_message", message);
 //      return "redirect:/websites";
     model.addAttribute("isNew", false);
-    model.addAttribute("availableLanguages", contentTree.getLabel().getLanguages());
+    model.addAttribute("availableLanguages", contentTree.getLabel().getLocales());
     model.addAttribute("locales", localeService.findAll());
     model.addAttribute("defaultLocale", localeService.getDefault());
 
@@ -157,7 +157,7 @@ public class ContentTreesController extends AbstractController implements Messag
   @RequestMapping(value = "/contenttrees/{uuid}", method = RequestMethod.GET)
   public String view(@PathVariable UUID uuid, Model model) {
     ContentTree contentTree = (ContentTree) contentTreeService.get(uuid);
-    model.addAttribute("availableLanguages", contentTree.getLabel().getLanguages());
+    model.addAttribute("availableLanguages", contentTree.getLabel().getLocales());
     model.addAttribute("contentTree", contentTree);
     return "contenttrees/view";
   }

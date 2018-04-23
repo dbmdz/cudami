@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.core.model.impl.paging.PageResponseImpl;
-import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
 import de.digitalcollections.cudami.model.api.identifiable.parts.MultilanguageDocument;
+import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
-import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
 import de.digitalcollections.cudami.model.impl.identifiable.parts.MultilanguageDocumentImpl;
+import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
 import de.digitalcollections.cudami.model.impl.identifiable.resource.WebpageImpl;
 import de.digitalcollections.cudami.server.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ResourceRepository;
@@ -51,10 +51,9 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
   @Override
   public Webpage create() {
     Locale defaultLocale = localeRepository.getDefault();
-    String defaultLanguage = defaultLocale.getLanguage();
 
     WebpageImpl webpage = new WebpageImpl();
-    webpage.setLabel(new TextImpl(defaultLanguage, ""));
+    webpage.setLabel(new TextImpl(defaultLocale, ""));
 
     webpage.setDescription(createEmptyMLD(defaultLocale));
     webpage.setText(createEmptyMLD(defaultLocale));
@@ -71,7 +70,7 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
 
   @Override
   public PageResponse<Webpage> find(PageRequest pageRequest) {
-    StringBuilder query = new StringBuilder("SELECT wp.id as id, wp.uuid as uuid, wp.contentblocks as contentblocks"
+    StringBuilder query = new StringBuilder("SELECT wp.id as id, wp.uuid as uuid, wp.text as text"
             + " FROM webpages wp INNER JOIN resources r ON wp.uuid=r.uuid INNER JOIN identifiables i ON wp.uuid=i.uuid");
 
     addPageRequestParams(pageRequest, query);
@@ -88,7 +87,7 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
 
   @Override
   public Webpage findOne(UUID uuid) {
-    String query = "SELECT wp.id as id, wp.uuid as uuid, wp.contentblocks as contentblocks, i.label as label, i.description as description"
+    String query = "SELECT wp.id as id, wp.uuid as uuid, wp.text as text, i.label as label, i.description as description"
             + " FROM webpages wp INNER JOIN resources r ON wp.uuid=r.uuid INNER JOIN identifiables i ON wp.uuid=i.uuid"
             + " WHERE wp.uuid = :uuid";
 

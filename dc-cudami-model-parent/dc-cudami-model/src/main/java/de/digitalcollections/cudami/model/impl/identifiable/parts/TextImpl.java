@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.model.api.identifiable.parts.Translation;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 public class TextImpl implements Text {
@@ -15,28 +16,28 @@ public class TextImpl implements Text {
     translations = new HashSet<>();
   }
 
-  public TextImpl(String lang, String text) {
+  public TextImpl(Locale locale, String text) {
     this();
-    translations.add(new TranslationImpl(lang, text));
+    translations.add(new TranslationImpl(locale, text));
   }
 
-  public TextImpl(List<String> languages, String text) {
+  public TextImpl(List<Locale> locales, String text) {
     this();
-    for (String lang : languages) {
-      translations.add(new TranslationImpl(lang, text));
+    for (Locale locale : locales) {
+      translations.add(new TranslationImpl(locale, text));
     }
   }
 
   public TextImpl(Text text) {
     this();
     for (Translation translation : text.getTranslations()) {
-      translations.add(new TranslationImpl(translation.getLang(), translation.getText()));
+      translations.add(new TranslationImpl(translation.getLocale(), translation.getText()));
     }
   }
 
-  private Translation findTranslation(String lang) {
+  private Translation findTranslation(Locale locale) {
     for (Translation translation : translations) {
-      if (translation.has(lang)) {
+      if (translation.has(locale)) {
         return translation;
       }
     }
@@ -44,33 +45,26 @@ public class TextImpl implements Text {
   }
 
   @Override
-  public Collection<String> getLanguages() {
-    Set<String> languages = new HashSet<>();
+  public Collection<Locale> getLocales() {
+    Set<Locale> locales = new HashSet<>();
     for (Translation translation : translations) {
-      languages.add(translation.getLang());
+      locales.add(translation.getLocale());
     }
-    return languages;
+    return locales;
   }
 
   @Override
   public String getText() {
-    Collection<String> langs = getLanguages();
-    if (langs.isEmpty()) {
+    Collection<Locale> locales = getLocales();
+    if (locales.isEmpty()) {
       return null;
     }
-    if (langs.size() == 1) {
-      return getText(langs.iterator().next());
-    }
-    if (langs.contains(DEFAULT_LANG)) {
-      return getText(DEFAULT_LANG);
-    } else {
-      return getText(langs.iterator().next());
-    }
+    return getText(locales.iterator().next());
   }
 
   @Override
-  public String getText(String lang) {
-    Translation translation = findTranslation(lang);
+  public String getText(Locale locale) {
+    Translation translation = findTranslation(locale);
     if (translation != null) {
       return translation.getText();
     }
@@ -78,22 +72,12 @@ public class TextImpl implements Text {
   }
 
   @Override
-  public void setText(String text) {
-    Translation translation = findTranslation(DEFAULT_LANG);
+  public void setText(Locale locale, String text) {
+    Translation translation = findTranslation(locale);
     if (translation != null) {
       translation.setText(text);
     } else {
-      translations.add(new TranslationImpl(DEFAULT_LANG, text));
-    }
-  }
-
-  @Override
-  public void setText(String lang, String text) {
-    Translation translation = findTranslation(lang);
-    if (translation != null) {
-      translation.setText(text);
-    } else {
-      translations.add(new TranslationImpl(lang, text));
+      translations.add(new TranslationImpl(locale, text));
     }
   }
 

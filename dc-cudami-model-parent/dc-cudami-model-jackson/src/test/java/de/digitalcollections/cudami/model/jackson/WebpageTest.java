@@ -116,7 +116,7 @@ public class WebpageTest extends BaseSerializationTest {
     document.setContentBlocks(contents);
 
     Webpage webpage = new WebpageImpl();
-    webpage.setLabel(new de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl(Locale.GERMAN.getLanguage(), ""));
+    webpage.setLabel(new de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl(Locale.GERMANY, ""));
 
     MultilanguageDocument mld = new MultilanguageDocumentImpl();
     mld.addDocument(Locale.GERMAN, document);
