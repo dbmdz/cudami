@@ -7,7 +7,6 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
-import de.digitalcollections.cudami.admin.propertyeditor.RoleEditor;
 import de.digitalcollections.cudami.model.api.security.User;
 import de.digitalcollections.cudami.model.api.security.enums.Role;
 import java.util.Arrays;
@@ -48,9 +47,6 @@ public class UserController extends AbstractController implements MessageSourceA
   @Autowired
   UserService userService;
 
-  @Autowired
-  RoleEditor roleEditor;
-
   @Override
   public void setMessageSource(MessageSource messageSource) {
     this.messageSource = messageSource;
@@ -68,7 +64,6 @@ public class UserController extends AbstractController implements MessageSourceA
 
   @InitBinder("user")
   protected void initBinder(WebDataBinder binder) {
-    binder.registerCustomEditor(Role.class, roleEditor);
 //        binder.setDisallowedFields("password");
 //        binder.addValidators(mySpecialUserValidator);
   }

@@ -6,6 +6,6 @@ import de.digitalcollections.cudami.model.impl.identifiable.resource.Multilangua
 
 @JsonDeserialize(as = MultilanguageDocumentImpl.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public interface ContentBlocksContainerMixIn {
+public interface MultilanguageDocumentMixIn {
 
 }
