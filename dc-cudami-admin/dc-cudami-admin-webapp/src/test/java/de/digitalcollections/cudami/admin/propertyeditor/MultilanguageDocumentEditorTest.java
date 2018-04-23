@@ -3,8 +3,8 @@ package de.digitalcollections.cudami.admin.propertyeditor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.admin.config.SpringConfigBusinessForTest;
 import de.digitalcollections.cudami.admin.config.SpringConfigWeb;
-import de.digitalcollections.cudami.model.api.identifiable.resource.MultilanguageDocument;
-import de.digitalcollections.cudami.model.impl.identifiable.resource.MultilanguageDocumentImpl;
+import de.digitalcollections.cudami.model.api.identifiable.parts.MultilanguageDocument;
+import de.digitalcollections.cudami.model.impl.identifiable.parts.MultilanguageDocumentImpl;
 import de.digitalcollections.cudami.model.jackson.CudamiObjectMapper;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -80,7 +80,6 @@ public class MultilanguageDocumentEditorTest implements InitializingBean {
     documentEditor.setAsText(json);
 
     MultilanguageDocumentImpl result = (MultilanguageDocumentImpl) documentEditor.getValue();
-    assertEquals(expResult.getType(), result.getType());
     assertEquals(expResult.getDocuments().size(), result.getDocuments().size());
   }
 

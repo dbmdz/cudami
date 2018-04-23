@@ -1,12 +1,12 @@
 package de.digitalcollections.cudami.model.jackson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.model.api.identifiable.resource.MultilanguageDocument;
+import de.digitalcollections.cudami.model.api.identifiable.parts.MultilanguageDocument;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.model.api.security.User;
 import de.digitalcollections.cudami.model.impl.identifiable.entity.WebsiteImpl;
 import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
-import de.digitalcollections.cudami.model.impl.identifiable.resource.MultilanguageDocumentImpl;
+import de.digitalcollections.cudami.model.impl.identifiable.parts.MultilanguageDocumentImpl;
 import de.digitalcollections.cudami.model.impl.identifiable.resource.WebpageImpl;
 import de.digitalcollections.cudami.model.impl.security.UserImpl;
 import de.digitalcollections.prosemirror.model.api.ContentBlock;
@@ -134,7 +134,7 @@ public class CudamiModuleTest extends BaseSerializationTest {
 
     MultilanguageDocument mld = new MultilanguageDocumentImpl();
     mld.addDocument(Locale.GERMAN, document);
-    webpage.setMultilanguageDocument(mld);
+    webpage.setText(mld);
 
     checkSerializeDeserialize(webpage);
 

@@ -9,9 +9,9 @@ import de.digitalcollections.core.model.impl.paging.OrderImpl;
 import de.digitalcollections.core.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.core.model.impl.paging.SortingImpl;
 import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
-import de.digitalcollections.cudami.model.api.identifiable.resource.MultilanguageDocument;
+import de.digitalcollections.cudami.model.api.identifiable.parts.MultilanguageDocument;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
-import de.digitalcollections.cudami.model.impl.identifiable.resource.MultilanguageDocumentImpl;
+import de.digitalcollections.cudami.model.impl.identifiable.parts.MultilanguageDocumentImpl;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.WebpageService;
@@ -162,7 +162,7 @@ public class WebpageController {
     MultilanguageDocument multilanguageDocument = new MultilanguageDocumentImpl();
     multilanguageDocument.addDocument(locale != null ? locale : localeService.getDefault(), document);
 
-    webpage.setMultilanguageDocument(multilanguageDocument);
+    webpage.setText(multilanguageDocument);
 
     return new ResponseEntity<>(webpage, HttpStatus.OK);
   }

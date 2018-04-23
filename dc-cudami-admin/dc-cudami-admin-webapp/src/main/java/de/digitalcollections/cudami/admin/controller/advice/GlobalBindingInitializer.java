@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.admin.controller.advice;
 
 import de.digitalcollections.cudami.admin.propertyeditor.MultilanguageDocumentEditor;
 import de.digitalcollections.cudami.admin.propertyeditor.RoleEditor;
-import de.digitalcollections.cudami.model.api.identifiable.resource.MultilanguageDocument;
+import de.digitalcollections.cudami.model.api.identifiable.parts.MultilanguageDocument;
 import de.digitalcollections.cudami.model.api.security.enums.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;

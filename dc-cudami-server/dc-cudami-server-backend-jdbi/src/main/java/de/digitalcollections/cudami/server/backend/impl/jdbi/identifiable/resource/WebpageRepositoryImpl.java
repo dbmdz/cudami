@@ -5,10 +5,10 @@ import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.core.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
-import de.digitalcollections.cudami.model.api.identifiable.resource.MultilanguageDocument;
+import de.digitalcollections.cudami.model.api.identifiable.parts.MultilanguageDocument;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
-import de.digitalcollections.cudami.model.impl.identifiable.resource.MultilanguageDocumentImpl;
+import de.digitalcollections.cudami.model.impl.identifiable.parts.MultilanguageDocumentImpl;
 import de.digitalcollections.cudami.model.impl.identifiable.resource.WebpageImpl;
 import de.digitalcollections.cudami.server.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ResourceRepository;
@@ -57,7 +57,7 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
     webpage.setLabel(new TextImpl(defaultLanguage, ""));
 
     webpage.setDescription(createEmptyMLD(defaultLocale));
-    webpage.setMultilanguageDocument(createEmptyMLD(defaultLocale));
+    webpage.setText(createEmptyMLD(defaultLocale));
     return webpage;
   }
 

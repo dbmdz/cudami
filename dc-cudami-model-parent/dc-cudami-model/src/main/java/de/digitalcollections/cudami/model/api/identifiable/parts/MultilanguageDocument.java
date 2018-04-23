@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.model.api.identifiable.resource;
+package de.digitalcollections.cudami.model.api.identifiable.parts;
 
 import de.digitalcollections.prosemirror.model.api.Document;
 import java.util.HashMap;
@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * MultilanguageDocument is used for text content.
  */
-public interface MultilanguageDocument extends Resource {
+public interface MultilanguageDocument {
 
   /**
    * @return (multilingual) text content

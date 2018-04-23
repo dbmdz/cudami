@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.model.api.identifiable;
 
 import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
 import de.digitalcollections.cudami.model.api.identifiable.resource.IiifImage;
-import de.digitalcollections.cudami.model.api.identifiable.resource.MultilanguageDocument;
+import de.digitalcollections.cudami.model.api.identifiable.parts.MultilanguageDocument;
 import java.time.LocalDateTime;
 import java.util.UUID;
 

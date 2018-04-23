@@ -7,7 +7,7 @@ import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
 import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
 import de.digitalcollections.cudami.model.api.identifiable.parts.Translation;
 import de.digitalcollections.cudami.model.api.identifiable.resource.IiifImage;
-import de.digitalcollections.cudami.model.api.identifiable.resource.MultilanguageDocument;
+import de.digitalcollections.cudami.model.api.identifiable.parts.MultilanguageDocument;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.model.api.security.User;
 import de.digitalcollections.cudami.model.jackson.mixin.entity.ContentTreeMixIn;

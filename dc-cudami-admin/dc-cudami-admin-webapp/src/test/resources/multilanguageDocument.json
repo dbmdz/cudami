@@ -1,6 +1,4 @@
 {
-  "type": "RESOURCE",
-  "resourceType": "MULTILANGUAGE_DOCUMENT",
   "documents": {
     "en_US": {
       "type": "doc",

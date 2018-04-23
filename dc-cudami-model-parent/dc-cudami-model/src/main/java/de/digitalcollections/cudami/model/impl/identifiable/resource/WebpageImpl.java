@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.model.impl.identifiable.resource;
 
 import de.digitalcollections.cudami.model.api.identifiable.Identifiable;
 import de.digitalcollections.cudami.model.api.identifiable.Node;
-import de.digitalcollections.cudami.model.api.identifiable.resource.MultilanguageDocument;
+import de.digitalcollections.cudami.model.api.identifiable.parts.MultilanguageDocument;
 import de.digitalcollections.cudami.model.api.identifiable.resource.ResourceType;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.model.impl.identifiable.NodeImpl;
@@ -11,7 +11,7 @@ import java.util.List;
 public class WebpageImpl extends ResourceImpl implements Webpage, Node<Webpage> {
 
   private final NodeImpl<Webpage> node;
-  private MultilanguageDocument multilanguageDocument;
+  private MultilanguageDocument text;
 
   public WebpageImpl() {
     super();
@@ -50,13 +50,13 @@ public class WebpageImpl extends ResourceImpl implements Webpage, Node<Webpage> 
   }
 
   @Override
-  public MultilanguageDocument getMultilanguageDocument() {
-    return multilanguageDocument;
+  public MultilanguageDocument getText() {
+    return text;
   }
 
   @Override
-  public void setMultilanguageDocument(MultilanguageDocument multilanguageDocument) {
-    this.multilanguageDocument = multilanguageDocument;
+  public void setText(MultilanguageDocument text) {
+    this.text = text;
   }
 
   @Override

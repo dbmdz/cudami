@@ -94,7 +94,7 @@
           <th:block th:unless="${isNew}">
             <!--<div xxxth:each="language,iter : ${availableLanguages}" class="tab-pane" xxxth:id="${language}" xxxth:classappend="${iter.index} == 0 ? active">-->
             <label th:text="#{document}">long text</label>
-            <textarea class="form-control" rows="5" th:field="*{multilanguageDocument}"></textarea>
+            <textarea class="form-control" rows="5" th:field="*{text}"></textarea>
         <!--</div>-->
           </th:block>
 
