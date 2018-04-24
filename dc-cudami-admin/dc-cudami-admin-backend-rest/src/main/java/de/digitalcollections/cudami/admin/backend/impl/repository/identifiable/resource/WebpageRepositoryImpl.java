@@ -40,7 +40,6 @@ public class WebpageRepositoryImpl implements WebpageRepository<WebpageImpl> {
     webpage.setLabel(new TextImpl(defaultLocale, ""));
     webpage.setDescription(createEmptyMLD(defaultLocale));
     webpage.setText(createEmptyMLD(defaultLocale));
-
     return webpage;
   }
 

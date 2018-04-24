@@ -14,7 +14,7 @@
       <form th:object="${webpage}" th:action="@{#}" method="post" role="form">
         <input type="hidden" name="websiteUuid" th:value="${websiteUuid}" />
         <input type="hidden" id="description" class="content" th:field="*{description}" />
-        <!--<input type="hidden" id="text" class="content" th:field="*{text}" />-->
+        <input type="hidden" id="text" class="content" th:field="*{text}" />
         <div class="row mainContent">
           <div th:replace="fragments/feedback-messages :: form"></div>
 
@@ -60,9 +60,9 @@
         </ul>
 
         <div class="tab-content">
-          <div class="well">
+          <div th:each="translation,iter : *{label.translations}" class="tab-pane" th:id="${translation.locale}" th:classappend="${iter.index} == 0 ? active">
             <!-- identifiable fields -->
-            <div th:each="document,iter : *{description.documents}" class="tab-pane" th:id="${document.key}" th:classappend="${iter.index} == 0 ? active">
+            <div class="well">
               <div class="form-group">
                 <label th:text="#{label}">label</label>
                 <input class="form-control" type="text" th:field="*{label.translations[__${iter.index}__].text}" required/>
@@ -70,17 +70,15 @@
 
               <div class="form-group">
                 <label th:text="#{description}">description</label>
-                <div class="editor" th:attr="data-content-id='description', data-content-language=${document.key}"></div>
+                <div class="editor" th:attr="data-content-id='description', data-content-language=${translation.locale}"></div>
               </div>
             </div>
-          </div>
 
-          <th:block th:unless="${isNew}">
-            <!--<div xxxth:each="language,iter : ${availableLanguages}" class="tab-pane" xxxth:id="${language}" xxxth:classappend="${iter.index} == 0 ? active">-->
-            <label th:text="#{document}">long text</label>
-            <textarea class="form-control" rows="5" th:field="*{text}"></textarea>
-        <!--</div>-->
-          </th:block>
+            <div class="form-group">
+              <label th:text="#{document}">long text</label>
+              <div class="editor" th:attr="data-content-id='text', data-content-language=${translation.locale}"></div>
+            </div>
+          </div>
 
         <!--<th:block th:if="*{description != null}">
           <div class="row" th:each="translation, stat : *{description.translations}">
