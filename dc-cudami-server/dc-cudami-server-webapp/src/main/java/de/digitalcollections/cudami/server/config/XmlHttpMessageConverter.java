@@ -10,14 +10,17 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 import com.thoughtworks.xstream.mapper.Mapper;
+import de.digitalcollections.cudami.model.api.identifiable.parts.MultilanguageDocument;
+import de.digitalcollections.cudami.model.api.identifiable.resource.parts.ContentBlock;
+import de.digitalcollections.cudami.model.impl.identifiable.parts.TranslationImpl;
 import de.digitalcollections.cudami.model.impl.identifiable.resource.WebpageImpl;
 import de.digitalcollections.prosemirror.model.impl.DocumentImpl;
+import de.digitalcollections.prosemirror.model.impl.MarkImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.BulletListImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.EmbeddedCodeImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.HardBreakImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.HeadingImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.ListItemImpl;
-import de.digitalcollections.prosemirror.model.impl.MarkImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.OrderedListImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.ParagraphImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.TextImpl;
@@ -29,7 +32,6 @@ import java.util.Set;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
 import org.springframework.oxm.xstream.XStreamMarshaller;
-import de.digitalcollections.cudami.model.api.identifiable.parts.MultilanguageDocument;
 
 public class XmlHttpMessageConverter {
 
@@ -41,9 +43,10 @@ public class XmlHttpMessageConverter {
 
     Map<String, Class> aliases = new HashMap<>();
     aliases.put("bulletList", BulletListImpl.class);
+    aliases.put("content", ContentBlock.class);
     aliases.put("contentBlocksContainer", MultilanguageDocument.class);
     aliases.put("document", DocumentImpl.class);
-    aliases.put("embeddedCodeBlock", EmbeddedCodeImpl.class);
+    aliases.put("embeddedCode", EmbeddedCodeImpl.class);
     aliases.put("hardBreak", HardBreakImpl.class);
     aliases.put("heading", HeadingImpl.class);
     aliases.put("listItem", ListItemImpl.class);
@@ -51,6 +54,7 @@ public class XmlHttpMessageConverter {
     aliases.put("orderedList", OrderedListImpl.class);
     aliases.put("paragraph", ParagraphImpl.class);
     aliases.put("text", TextImpl.class);
+    aliases.put("translation", TranslationImpl.class);
     aliases.put("webpage", WebpageImpl.class);
     xstreamMarshaller.setAliases(aliases);
 
@@ -63,6 +67,14 @@ public class XmlHttpMessageConverter {
 
     xStream.registerConverter(new MapToFlatConverter(xStream.getMapper()));
     xStream.aliasField("body", TextImpl.class, "text");
+    xStream.aliasField("content", BulletListImpl.class, "contentBlocks");
+    xStream.aliasField("content", DocumentImpl.class, "contentBlocks");
+    xStream.aliasField("content", HeadingImpl.class, "contentBlocks");
+    xStream.aliasField("content", ListItemImpl.class, "contentBlocks");
+    xStream.aliasField("content", OrderedListImpl.class, "contentBlocks");
+    xStream.aliasField("content", ParagraphImpl.class, "contentBlocks");
+
+    xStream.setMode(XStream.NO_REFERENCES);
 
     xmlConverter.setMarshaller(xstreamMarshaller);
     xmlConverter.setUnmarshaller(xstreamMarshaller);
