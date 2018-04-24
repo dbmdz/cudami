@@ -4,9 +4,17 @@ import de.digitalcollections.core.model.api.paging.Order;
 import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.core.model.api.paging.Sorting;
+import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.WebpageRepository;
+import de.digitalcollections.cudami.model.api.identifiable.parts.MultilanguageDocument;
+import de.digitalcollections.cudami.model.impl.identifiable.parts.MultilanguageDocumentImpl;
+import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
 import de.digitalcollections.cudami.model.impl.identifiable.resource.WebpageImpl;
+import de.digitalcollections.prosemirror.model.api.Document;
+import de.digitalcollections.prosemirror.model.impl.DocumentImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.ParagraphImpl;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -17,6 +25,9 @@ public class WebpageRepositoryImpl implements WebpageRepository<WebpageImpl> {
   @Autowired
   private WebpageRepositoryEndpoint endpoint;
 
+  @Autowired
+  LocaleRepository localeRepository;
+
   @Override
   public long count() {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -24,7 +35,21 @@ public class WebpageRepositoryImpl implements WebpageRepository<WebpageImpl> {
 
   @Override
   public WebpageImpl create() {
-    return new WebpageImpl();
+    Locale defaultLocale = localeRepository.getDefault();
+    WebpageImpl webpage = new WebpageImpl();
+    webpage.setLabel(new TextImpl(defaultLocale, ""));
+    webpage.setDescription(createEmptyMLD(defaultLocale));
+    webpage.setText(createEmptyMLD(defaultLocale));
+
+    return webpage;
+  }
+
+  private MultilanguageDocument createEmptyMLD(Locale defaultLocale) {
+    MultilanguageDocument emptyMLD = new MultilanguageDocumentImpl();
+    Document document = new DocumentImpl();
+    document.addContentBlock(new ParagraphImpl());
+    emptyMLD.addDocument(defaultLocale, document);
+    return emptyMLD;
   }
 
   @Override
