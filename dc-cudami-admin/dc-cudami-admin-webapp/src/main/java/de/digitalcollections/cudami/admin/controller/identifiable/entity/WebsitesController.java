@@ -105,7 +105,7 @@ public class WebsitesController extends AbstractController implements MessageSou
 //      redirectAttributes.addFlashAttribute("error_message", message);
 //      return "redirect:/websites";
     model.addAttribute("isNew", false);
-    model.addAttribute("availableLanguages", website.getLabel().getLocales());
+    model.addAttribute("availableLocales", website.getLabel().getLocales());
     model.addAttribute("locales", localeService.findAll());
     model.addAttribute("defaultLocale", localeService.getDefault());
 
@@ -159,7 +159,7 @@ public class WebsitesController extends AbstractController implements MessageSou
   @RequestMapping(value = "/websites/{uuid}", method = RequestMethod.GET)
   public String view(@PathVariable UUID uuid, Model model) {
     Website website = (Website) websiteService.get(uuid);
-    model.addAttribute("availableLanguages", website.getLabel().getLocales());
+    model.addAttribute("availableLocales", website.getLabel().getLocales());
     model.addAttribute("defaultLocale", localeService.getDefault());
     model.addAttribute("website", website);
     return "websites/view";
