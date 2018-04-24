@@ -1,4 +1,4 @@
-(function (prosemirrorState,prosemirrorView,prosemirrorModel,prosemirrorSchemaBasic,prosemirrorSchemaList,prosemirrorExampleSetup){
+(function(prosemirrorState, prosemirrorView, prosemirrorModel, prosemirrorSchemaBasic, prosemirrorSchemaList, prosemirrorExampleSetup){
   'use strict';
 
   // Mix the nodes from prosemirror-schema-list into the basic schema to
@@ -10,28 +10,39 @@
     marks: prosemirrorSchemaBasic.schema.spec.marks
   });
 
-  var initialJson = document.querySelector("#content").value;
-  if(initialJson === null || initialJson === ""){
-    initialJson = '{"type":"doc","content":[{"type":"paragraph"}]}';
-  }
-  window.view = new prosemirrorView.EditorView(document.querySelector("#editor"), {
-    state: prosemirrorState.EditorState.create({
-      // from HTML:
-      // doc: prosemirrorModel.DOMParser.fromSchema(mySchema).parse(document.querySelector("#content")),
+  var contents = $(".content");
+  var editorViews = {};
+  contents.each(function(index, contentElement){
+    var contentJson = JSON.parse($(this).val());
+    $.each(contentJson.documents, function(language, content){
+      var currentEditor = document.querySelector(
+        '.editor[data-content-id=' + contentElement.id + ']' +
+        '[data-content-language=' + language + ']'
+      );
+      var editorView = new prosemirrorView.EditorView(currentEditor, {
+        state: prosemirrorState.EditorState.create({
+          // from HTML:
+          // doc: prosemirrorModel.DOMParser.fromSchema(mySchema).parse(document.querySelector("#content")),
 
-      // from JSON:
-      doc: prosemirrorModel.Node.fromJSON(mySchema, JSON.parse(initialJson)),
-      plugins: prosemirrorExampleSetup.exampleSetup({schema: mySchema})
-    }),
-    dispatchTransaction(tr){
-      window.view.updateState(window.view.state.apply(tr));
-      //current state as json in text area
-      var json = JSON.stringify(window.view.state.doc.toJSON());
-      if(json === '{"type":"doc","content":[{"type":"paragraph"}]}'){
-        document.querySelector("#content").value = null;
-      }else{
-        document.querySelector("#content").value = json;
-      }
-    }
+          // from JSON:
+          doc: prosemirrorModel.Node.fromJSON(mySchema, content),
+          plugins: prosemirrorExampleSetup.exampleSetup({schema: mySchema})
+        }),
+        dispatchTransaction: function(tr){
+          var currentEditorView = editorViews[this.contentElement.id + '+' + language];
+          currentEditorView.updateState(currentEditorView.state.apply(tr));
+          // current state as json in text area
+          this.contentJson.documents[this.language] = currentEditorView.state.doc.toJSON();
+          $(this.contentElement).val(JSON.stringify(this.contentJson));
+        }.bind({
+          'contentElement': contentElement, 'contentJson': contentJson, 'language': language
+        })
+      });
+      editorViews[contentElement.id + '+' + language] = editorView;
+    });
+
+//    if(initialJson === null || initialJson === ""){
+//      initialJson = '{"type":"doc","content":[{"type":"paragraph"}]}';
+//    }
   });
-}(PM.state,PM.view,PM.model,PM.schema_basic,PM.schema_list,PM.example_setup));
+}(PM.state, PM.view, PM.model, PM.schema_basic, PM.schema_list, PM.example_setup));
