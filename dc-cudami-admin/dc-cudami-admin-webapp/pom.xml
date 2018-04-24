@@ -76,6 +76,10 @@
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
+      <artifactId>dc-cudami-client-spring</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-model</artifactId>
     </dependency>
     <dependency>
