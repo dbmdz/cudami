@@ -13,11 +13,11 @@
       <h1><span th:text="#{websites}">Websites</span> <a class="btn btn-default pull-right" th:href="@{/websites/new}" th:text="#{btn_new}">New</a></h1>
 
       <div class="row">
-        <div class="col-sm-12" >
+        <div class="col-sm-12">
           <div th:replace="fragments/pagination-navigation :: pagination">
             ...
           </div>
-<!--          <div class="objectCounter lighter">
+<!--          <div class="objectCounter lighter pull-right">
             <span class="message" th:text="${page.totalItems}">Found 17 books.</span>
           </div>-->
         </div>
@@ -26,7 +26,7 @@
       <table class="table table-bordered table-condensed table-striped table-hover table-responsive">
         <thead>
           <tr sd:page-object="${page.page}">
-            <th class="center"><a th:text="#{label}">Label</a></th>
+            <th class="center" th:text="#{label}">Label</th>
             <th class="center"><a class="sorted" sd:pagination-sort="url" th:text="#{url}">Url</a></th>
             <!--<th class="center" th:text="#{registration_date}">Registration Date</th>-->
             <th class="center" th:text="#{actions}">Actions</th>
