@@ -25,7 +25,6 @@ import de.digitalcollections.prosemirror.model.api.contentblocks.Text;
 import de.digitalcollections.prosemirror.model.impl.DocumentImpl;
 import de.digitalcollections.prosemirror.model.impl.MarkImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.BulletListImpl;
-import de.digitalcollections.prosemirror.model.impl.contentblocks.EmbeddedCodeImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.HardBreakImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.HeadingImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.ListItemImpl;
@@ -93,20 +92,24 @@ public class WebpageController {
           @RequestParam(name = "pLocale", required = false) Locale pLocale
   ) throws IdentifiableServiceException {
 
-    if (pLocale == null) {
-      pLocale = localeService.getDefault();
-    }
+//    if (pLocale == null) {
+//      pLocale = localeService.getDefault();
+//    }
+//    Webpage webpage = createDummyWebpage(pLocale);
+    // TODO implement locale specific webpage get
+    Webpage webpage = (Webpage) service.get(uuid);
+    return new ResponseEntity<>(webpage, HttpStatus.OK);
+  }
 
+  private Webpage createDummyWebpage(Locale pLocale) {
     Webpage webpage = (Webpage) service.create();
     webpage.getLabel().setText(Locale.GERMANY, "Dummy Impressum");
     List<ContentBlock> contents = new ArrayList<>();
-
     contents.add(new HeadingImpl(4, "Bayerische Staatsbibliothek"));
     contents.add(new ParagraphImpl("Ludwigstraße 16"));
     contents.add(new HardBreakImpl());
     contents.add(new HeadingImpl(4, "Gesetzlicher Vertreter:"));
     contents.add(new ParagraphImpl("Generaldirektor Dr. Klaus Ceynowa"));
-
     Paragraph paragraph1 = new ParagraphImpl();
     paragraph1.addContentBlock(new TextImpl("Telefon:", "strong"));
     paragraph1.addContentBlock(new TextImpl(" +49 89 28638-0"));
@@ -119,7 +122,6 @@ public class WebpageController {
     paragraph1.addContentBlock(new HardBreakImpl());
     paragraph1.addContentBlock(new TextImpl("Internet:", "strong"));
     paragraph1.addContentBlock(new TextImpl(" "));
-
     Text internet = new TextImpl("https://www.bsb-muenchen.de");
     Mark link = new MarkImpl("link");
     link.addAttribute("href", "https://www.bsb-muenchen.de");
@@ -130,44 +132,34 @@ public class WebpageController {
     paragraph1.addContentBlock(new TextImpl("Umsatzsteueridentifikationsnummer:", "strong"));
     paragraph1.addContentBlock(new TextImpl(" DE 811335517"));
     contents.add(paragraph1);
-
     contents
             .add(new ParagraphImpl("Die Bayerische Staatsbibliothek ist eine dem Bayerischen Staatsministerium für Bildung und Kultus, Wissenschaft und Kunst nachgeordnete Behörde der Mittelstufe mit dem Sitz in München"));
     contents.add(new HardBreakImpl());
-
     Text text2 = new TextImpl("Bayerischen Staatsministerium für Bildung und Kultus, Wissenschaft und Kunst");
     Mark link2 = new MarkImpl("link");
     link2.addAttribute("href", "https://www.km.bayern.de");
     link2.addAttribute("title", null);
     text2.addMark(link2);
     contents.add(text2);
-
     BulletList bulletList = new BulletListImpl();
     bulletList.addContentBlock(new ListItemImpl("test 1"));
     bulletList.addContentBlock(new ListItemImpl("test 2"));
     bulletList.addContentBlock(new ListItemImpl("test 3"));
     contents.add(bulletList);
-
     contents.add(new ParagraphImpl("Mehr Text."));
-
     OrderedList orderedList = new OrderedListImpl(1);
     orderedList.addContentBlock(new ListItemImpl("test 1"));
     orderedList.addContentBlock(new ListItemImpl("test 2"));
     orderedList.addContentBlock(new ListItemImpl("test 3"));
     contents.add(orderedList);
-
-    contents
-            .add(new EmbeddedCodeImpl("<iframe style=\"border: 1px solid lightgrey\" frameborder=\"no\" width=\"98%\" height=\"auto\" src=\"https://statistiken.digitale-sammlungen.de/index.php?module=CoreAdminHome&amp;action=optOut&amp;language=de\"></iframe>"));
-
+    //    contents
+//            .add(new EmbeddedCodeImpl("<iframe style=\"border: 1px solid lightgrey\" frameborder=\"no\" width=\"98%\" height=\"auto\" src=\"https://statistiken.digitale-sammlungen.de/index.php?module=CoreAdminHome&amp;action=optOut&amp;language=de\"></iframe>"));
     Document document = new DocumentImpl();
     document.setContentBlocks(contents);
-
     MultilanguageDocument multilanguageDocument = new MultilanguageDocumentImpl();
     multilanguageDocument.addDocument(pLocale, document);
-
     webpage.setText(multilanguageDocument);
-
-    return new ResponseEntity<>(webpage, HttpStatus.OK);
+    return webpage;
   }
 
   @ApiMethod(description = "save a newly created webpage")
