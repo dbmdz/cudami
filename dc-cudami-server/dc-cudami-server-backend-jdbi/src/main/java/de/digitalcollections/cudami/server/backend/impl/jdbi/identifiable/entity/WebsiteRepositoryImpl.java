@@ -88,7 +88,7 @@ public class WebsiteRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
   @Override
   public List<Webpage> getRootPages(Website website) {
     // minimal data required for creating text links in a list
-    String query = "SELECT ws.uuid as uuid, i.label as label"
+    String query = "SELECT ww.webpage_uuid as uuid, i.label as label"
             + " FROM websites ws INNER JOIN website_webpage ww ON ws.uuid=ww.website_uuid INNER JOIN identifiables i ON ww.webpage_uuid=i.uuid"
             + " WHERE ws.uuid = :uuid";
 
