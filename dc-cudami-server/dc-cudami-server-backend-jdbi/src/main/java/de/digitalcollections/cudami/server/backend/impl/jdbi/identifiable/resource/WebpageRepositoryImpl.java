@@ -16,6 +16,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.r
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSortingRepositoryImpl;
 import de.digitalcollections.prosemirror.model.api.Document;
 import de.digitalcollections.prosemirror.model.impl.DocumentImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.ParagraphImpl;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -51,10 +52,8 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
   @Override
   public Webpage create() {
     Locale defaultLocale = localeRepository.getDefault();
-
     WebpageImpl webpage = new WebpageImpl();
     webpage.setLabel(new TextImpl(defaultLocale, ""));
-
     webpage.setDescription(createEmptyMLD(defaultLocale));
     webpage.setText(createEmptyMLD(defaultLocale));
     return webpage;
@@ -63,7 +62,7 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
   private MultilanguageDocument createEmptyMLD(Locale defaultLocale) {
     MultilanguageDocument emptyMLD = new MultilanguageDocumentImpl();
     Document document = new DocumentImpl();
-    document.addContentBlock(new de.digitalcollections.prosemirror.model.impl.contentblocks.TextImpl(""));
+    document.addContentBlock(new ParagraphImpl());
     emptyMLD.addDocument(defaultLocale, document);
     return emptyMLD;
   }
