@@ -43,12 +43,12 @@
       <div class="row main-content">
         <div class="col-sm-12">
           <ul class="nav nav-tabs">
-            <li th:each="language,iter : ${availableLanguages}" th:classappend="${iter.index} == 0 ? active">
-              <a th:href="${'#' + language}" data-toggle="tab" th:text="${defaultLocale.getDisplayLanguage(#locale)}">locale</a>
+            <li th:each="locale,iter : ${availableLocales}" th:classappend="${iter.index} == 0 ? active">
+              <a th:href="${'#' + locale}" data-toggle="tab" th:text="${locale.getDisplayLanguage(#locale)}">locale</a>
             </li>
           </ul>
           <div class="tab-content">
-            <div th:each="language,iter : ${availableLanguages}" class="tab-pane" th:id="${language}" th:classappend="${iter.index} == 0 ? active">
+            <div th:each="locale,iter : ${availableLocales}" class="tab-pane" th:id="${locale}" th:classappend="${iter.index} == 0 ? active">
               <div class="well">
                 <div class="row">
                   <div class="col-sm-2">
