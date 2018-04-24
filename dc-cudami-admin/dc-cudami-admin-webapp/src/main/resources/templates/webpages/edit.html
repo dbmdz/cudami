@@ -23,7 +23,7 @@
             <b th:if="${isNew}" th:text="#{create_webpage}">...</b>
             <b th:unless="${isNew}" th:text="#{edit_webpage}">...</b>
           </div>
-          <div class="col-sm-4 col-sm-offset-8">
+          <div class="col-sm-4">
             <span class="col-sm-6">
               <a th:if="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{'/websites/' + ${websiteUuid}}" th:text="#{abort}">abort</a>
               <a th:unless="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{'/webpages/' + *{uuid}}" th:text="#{abort}">abort</a>
@@ -43,9 +43,13 @@
         </div>
 
         <div class="row mainContent">
-          <div class="form-group col-sm-2">
-            <label for="id" class="control-label" th:text="#{id}">ID</label>
-            <input id="id" th:field="*{uuid}" type="text" class="form-control" readonly="readonly" th:placeholder="*{uuid}"/>
+          <div class="form-group col-sm-12">
+            <span class="col-sm-4">
+              <label for="id" class="col-sm-1 control-label" th:text="#{id}">ID</label>
+              <div class="col-sm-9">
+                <input id="id" th:field="*{uuid}" type="text" class="form-control" readonly="readonly" th:placeholder="*{uuid}"/>
+              </div>
+            </span>
           </div>
         </div>
 

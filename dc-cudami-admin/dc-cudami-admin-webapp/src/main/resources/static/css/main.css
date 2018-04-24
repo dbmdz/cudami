@@ -87,6 +87,14 @@ table .actionButton:hover {
   border-right: solid 1px #ccc;
 }
 .well {
-  /*background-color: #dff0d8;*/
+  background-color: #fefefe;
   border: solid 1px #ccc;
+}
+
+div.editor {
+  margin: 0;
+}
+
+.new-button {
+  margin-bottom: 3px;
 }
