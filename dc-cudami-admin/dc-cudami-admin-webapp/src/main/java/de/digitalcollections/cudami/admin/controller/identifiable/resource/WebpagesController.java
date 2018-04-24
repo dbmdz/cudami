@@ -100,11 +100,13 @@ public class WebpagesController extends AbstractController implements MessageSou
   @RequestMapping(value = "/webpages/{uuid}/edit", method = RequestMethod.GET)
   public String edit(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
     Webpage webpage = (Webpage) webpageService.get(uuid);
-    model.addAttribute("webpage", webpage);
-    model.addAttribute("isNew", false);
+
     model.addAttribute("availableLanguages", webpage.getLabel().getLocales());
-    model.addAttribute("locales", localeService.findAll());
     model.addAttribute("defaultLocale", localeService.getDefault());
+    model.addAttribute("webpage", webpage);
+
+    model.addAttribute("isNew", false);
+    model.addAttribute("locales", localeService.findAll());
 
     return "webpages/edit";
   }
