@@ -13,6 +13,7 @@ import de.digitalcollections.cudami.model.impl.identifiable.parts.MultilanguageD
 import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
 import de.digitalcollections.prosemirror.model.api.Document;
 import de.digitalcollections.prosemirror.model.impl.DocumentImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.ParagraphImpl;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -46,7 +47,7 @@ public class WebsiteRepositoryImpl implements WebsiteRepository<WebsiteImpl> {
   private MultilanguageDocument createEmptyMLD(Locale defaultLocale) {
     MultilanguageDocument emptyMLD = new MultilanguageDocumentImpl();
     Document document = new DocumentImpl();
-    document.addContentBlock(new de.digitalcollections.prosemirror.model.impl.contentblocks.TextImpl(""));
+    document.addContentBlock(new ParagraphImpl());
     emptyMLD.addDocument(defaultLocale, document);
     return emptyMLD;
   }

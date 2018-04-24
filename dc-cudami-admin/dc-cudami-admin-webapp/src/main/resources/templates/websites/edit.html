@@ -12,6 +12,8 @@
   <body>
     <section layout:fragment="content">
       <form th:object="${website}" th:action="@{#}" method="post" role="form" class="form-horizontal">
+        <input type="hidden" id="description" class="content" th:field="*{description}" />
+
         <div class="row mainContent">
           <div th:replace="fragments/feedback-messages :: form"></div>
 
@@ -40,95 +42,53 @@
 
         <div class="row mainContent">
           <div class="form-group col-sm-12">
-            <span class="col-sm-2">
+            <span class="col-sm-4">
               <label for="id" class="col-sm-1 control-label" th:text="#{id}">ID</label>
               <div class="col-sm-9">
                 <input id="id" th:field="*{uuid}" type="text" class="form-control" readonly="readonly" th:placeholder="*{uuid}"/>
               </div>
             </span>
-            <span class="col-sm-5">
+            <span class="col-sm-8">
               <label for="url" class="col-sm-1 control-label" th:text="#{url}">URL</label>
               <div class="col-sm-11" th:classappend="${#fields.hasErrors('url')}? has-error">
                 <input id="url" th:field="*{url}" type="url" class="form-control" th:placeholder="#{url_placeholder}" autofocus="autofocus" required/>
                 <p th:if="${#fields.hasErrors('url')}" th:errors="*{url}">...</p>
               </div>
             </span>
-            <!--<span class="col-sm-5">
-              <label for="url" class="col-sm-3 control-label" thxx:text="#{title}">Title</label>
-              <div class="col-sm-9" thxx:classappend="${#fields.hasErrors('title')}? has-error">
-                <input id="url" thxx:field="*{title}" type="text" class="form-control" thxx:placeholder="#{websiteTitle_placeholder}"/>
-                <p thxx:if="${#fields.hasErrors('title')}" thxx:errors="*{title}">...</p>
-              </div>
-            </span>-->
           </div>
         </div>
 
-        <div class="well">
-          <ul class="nav nav-tabs">
-            <th:block th:if="${isNew}">
-              <li class="active">
-                <a th:href="${'#' + defaultLocale}" data-toggle="tab" th:text="${defaultLocale.getDisplayLanguage(#locale)}">default locale</a>
+        <div class="row mainContent">
+          <div class="col-sm-12">
+            <ul class="nav nav-tabs">
+              <li th:each="translation,iter : *{label.translations}" th:classappend="${iter.index} == 0 ? active">
+                <a th:href="${'#' + translation.locale}" data-toggle="tab" th:text="${translation.locale.getDisplayLanguage(#locale)}">locale</a>
               </li>
-            </th:block>
-            <th:block th:unless="${isNew}">
-              <li th:each="language,iter : ${availableLanguages}" th:classappend="${iter.index} == 0 ? active">
-                <a th:href="${'#' + language}" data-toggle="tab" th:text="${defaultLocale.getDisplayLanguage(#locale)}">locale</a>
-              </li>
-            </th:block>
-<!--            <li>
-              <a href="#">
-                <i class="fa fa-plus" aria-hidden="true"></i>
-              </a>
-            </li>-->
-          </ul>
+              <!--            <li>
+                            <a href="#">
+                              <i class="fa fa-plus" aria-hidden="true"></i>
+                            </a>
+                          </li>-->
+            </ul>
 
-          <div class="tab-content">
-            <th:block th:if="${isNew}">
-              <div class="tab-pane active" th:id="${defaultLocale}">
-                <label th:text="#{label}">label</label>
-                <input class="form-control" type="text" th:field="*{label.translations[0].text}" required/>
-                <!--                <label xxxth:text="#{description}">description</label>
-                                <textarea class="form-control" rows="5" xxxth:field="*{description.translations[0].text}"></textarea>-->
-                <label th:text="#{description}">description</label>
-                <div id="editor" class="editor" style="margin-bottom: 23px"></div>
-                <textarea id="content" class="form-control" cols="70" rows="10" th:field="*{description.contentBlocks[__${defaultLocale}__]}">{"type":"doc",...}</textarea>
-              </div>
-            </th:block>
-            <th:block th:unless="${isNew}">
-              <div th:each="language,iter : ${availableLanguages}" class="tab-pane" th:id="${language}" th:classappend="${iter.index} == 0 ? active">
-                <label th:text="#{label}">label</label>
-                <input class="form-control" type="text" th:field="*{label.translations[__${iter.index}__].text}" required/>
-                <!--                <label xxxth:text="#{description}">description</label>
-                                <textarea class="form-control" rows="5" xxxth:field="*{description.translations[__${iter.index}__].text}"></textarea>-->
-                <label th:text="#{description}">description</label>
-                <div id="editor" class="editor" style="margin-bottom: 23px"></div>
-                <textarea id="content" class="form-control" cols="70" rows="10" th:field="*{description.contentBlocks[__${language}__]}">{"type":"doc",...}</textarea>
-              </div>
-            </th:block>
-          </div>
+            <div class="tab-content">
+              <div th:each="translation,iter : *{label.translations}" class="tab-pane" th:id="${translation.locale}" th:classappend="${iter.index} == 0 ? active">
+                <!-- identifiable fields -->
+                <div class="well">
+                  <div class="form-group">
+                    <label th:text="#{label}">label</label>
+                    <input class="form-control" type="text" th:field="*{label.translations[__${iter.index}__].text}" required/>
+                  </div>
 
-          <!--<th:block th:if="*{description != null}">
-            <div class="row" th:each="translation, stat : *{description.translations}">
-              <div class="col-md-12 col-lg-12">
-                <label th:text="#{description}">Abstract</label>
-                <div class="form-group form-horizontal"
-                     th:classappend="${#fields.hasErrors('*{description}')} ? has-error">
-                  <span th:text="${translation.lang}">de</span>
-                  <input id="description" type="text" class="form-control" autofocus="autofocus"
-                         th:field="*{description.translations[__${stat.index}__].text}"/>
+                  <div class="form-group">
+                    <label th:text="#{description}">description</label>
+                    <div class="editor" th:attr="data-content-id='description', data-content-language=${translation.locale}"></div>
+                  </div>
                 </div>
               </div>
             </div>
-          </th:block>
-          <th:block th:unless="*{description != null}">
-
-          </th:block>-->
-
-<!--      <a href="#" onclick="alert(JSON.stringify(window.view.state.doc.toJSON()))">json</a>
-          see https://discuss.prosemirror.net/t/how-exactly-to-use-fromjson/927
-          <a href="#" onclick="alert(document.querySelector('#content').value)">content</a>-->
+          </div>
         </div>
-
       </form>
 
       <div th:replace="fragments/modals-confirmation :: confirmYesNoDialog"></div>
