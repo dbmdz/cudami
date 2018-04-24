@@ -6,9 +6,6 @@
 
   <head>
     <title th:text="|#{websites}: #{website} ${website.url}|">Websites: Website http://www.example.de/</title>
-    <script th:src="@{/js/jquery.min.js}"></script>
-    <script th:src="@{/js/jqtree/tree.jquery.js}"></script>
-    <link rel="stylesheet" th:href="@{/css/jqtree/jqtree.css}"/>
   </head>
   <body>
     <section layout:fragment="content" th:object="${website}">
@@ -97,23 +94,6 @@
           </table>
         </div>
       </div>
-
-      <div class="row mainContent">
-        <div id="tree1" class="col-sm-12" th:attr="data-url=*{uuid + '/sitemap/do?operation=get_nodes'}"></div>
-      </div>
-
     </section>
-
-  <th:block layout:fragment="beforeBodyEnds">
-    <script type="text/javascript" th:inline="javascript">
-      // <![CDATA[
-      $('#tree1').tree({
-        dragAndDrop: false,
-        autoOpen: true,
-        autoEscape: false
-      });
-      // ]]>
-    </script>
-  </th:block>
-</body>
+  </body>
 </html>
