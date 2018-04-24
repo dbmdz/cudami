@@ -125,6 +125,7 @@ public class WebpagesController extends AbstractController implements MessageSou
       // just update the fields, that were editable
       webpageDb.setLabel(webpage.getLabel());
       webpageDb.setDescription(webpage.getDescription());
+      webpageDb.setText(webpage.getText());
 
       webpage = (Webpage) webpageService.update(webpageDb, results);
     } catch (IdentifiableServiceException e) {
