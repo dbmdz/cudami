@@ -19,7 +19,7 @@
 
           <div class="col-sm-8">
             <b th:if="${isNew}" th:text="#{create_website}">...</b>
-            <b th:unless="${isNew}" th:text="#{edit_website(${website.url})}">...</b>
+            <b th:unless="${isNew}" th:utext="#{edit_website(${website.url})}">...</b>
           </div>
           <div class="col-sm-4">
             <span class="col-sm-6">
