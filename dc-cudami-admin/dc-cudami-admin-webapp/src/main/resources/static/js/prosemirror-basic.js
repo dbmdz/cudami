@@ -40,9 +40,5 @@
       });
       editorViews[contentElement.id + '+' + language] = editorView;
     });
-
-//    if(initialJson === null || initialJson === ""){
-//      initialJson = '{"type":"doc","content":[{"type":"paragraph"}]}';
-//    }
   });
 }(PM.state, PM.view, PM.model, PM.schema_basic, PM.schema_list, PM.example_setup));
