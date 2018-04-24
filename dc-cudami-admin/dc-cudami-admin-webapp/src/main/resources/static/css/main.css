@@ -80,6 +80,12 @@ table .actionButton:hover {
   margin-top: 20px;
 }
 
+.tab-content {
+  border-left: solid 1px #ccc;
+  border-bottom: solid 1px #ccc;
+  padding: 10px;
+  border-right: solid 1px #ccc;
+}
 .well {
   /*background-color: #dff0d8;*/
   border: solid 1px #ccc;
