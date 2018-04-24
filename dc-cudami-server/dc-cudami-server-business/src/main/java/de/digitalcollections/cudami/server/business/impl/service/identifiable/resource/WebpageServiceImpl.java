@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.r
 
 import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
-import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.WebpageRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
@@ -43,11 +42,6 @@ public class WebpageServiceImpl implements WebpageService<Webpage> {
   @Override
   public Webpage get(UUID uuid) {
     return (Webpage) webpageRepository.findOne(uuid);
-  }
-
-  @Override
-  public Text getContentBlocks(Webpage webpage) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override

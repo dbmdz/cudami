@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -23,7 +24,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class WebsiteRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl implements WebsiteRepository<Website> {
 
-  private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(WebsiteRepositoryImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(WebsiteRepositoryImpl.class);
 
   @Autowired
   private Jdbi dbi;
@@ -48,26 +49,22 @@ public class WebsiteRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
 
   @Override
   public PageResponse<Website> find(PageRequest pageRequest) {
-    StringBuilder query = new StringBuilder("SELECT ws.id as id, ws.uuid as uuid, ws.url as url, ws.registration_date as registration_date, i.label as label"
-            + " FROM websites ws INNER JOIN entities e ON ws.uuid=e.uuid INNER JOIN identifiables i ON ws.uuid=i.uuid");
-//    StringBuilder query = new StringBuilder("SELECT ws.id as id, ws.uuid as uuid, ws.url as url, ws.registration_date as registration_date FROM websites ws INNER JOIN entities e ON ws.uuid=e.uuid INNER JOIN identifiables i ON ws.uuid=i.uuid");
+    StringBuilder query = new StringBuilder("SELECT ws.id as id, ws.uuid as uuid, ws.url as url, ws.registration_date as registration_date, i.label as label, i.description as description")
+            .append(" FROM websites ws INNER JOIN entities e ON ws.uuid=e.uuid INNER JOIN identifiables i ON ws.uuid=i.uuid");
 
     addPageRequestParams(pageRequest, query);
 
-//    List<Map<String, Object>> list = dbi.withHandle(h -> h.createQuery(query.toString()).mapToMap().list());
     List<WebsiteImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
             .mapToBean(WebsiteImpl.class)
             .list());
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
-//    PageResponse pageResponse = new PageResponseImpl(null, pageRequest, total);
     return pageResponse;
   }
 
   @Override
   public Website findOne(UUID uuid) {
-//    String query = "SELECT * FROM websites INNER JOIN entities ON websites.uuid=entities.uuid INNER JOIN identifiables ON websites.uuid=identifiables.uuid WHERE websites.uuid = :uuid";
-    String query = "SELECT ws.id as id, ws.uuid as uuid, ws.url as url, ws.registration_date as registration_date, i.label as label, i.description as description"
+    String query = "SELECT ws.uuid as uuid, ws.url as url, ws.registration_date as registration_date, i.label as label, i.description as description"
             + " FROM websites ws INNER JOIN entities e ON ws.uuid=e.uuid INNER JOIN identifiables i ON ws.uuid=i.uuid"
             + " WHERE ws.uuid = :uuid";
 
@@ -90,7 +87,8 @@ public class WebsiteRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
 
   @Override
   public List<Webpage> getRootPages(Website website) {
-    String query = "SELECT i.uuid as uuid, i.label as label"
+    // minimal data required for creating text links in a list
+    String query = "SELECT ws.uuid as uuid, i.label as label"
             + " FROM websites ws INNER JOIN website_webpage ww ON ws.uuid=ww.website_uuid INNER JOIN identifiables i ON ww.webpage_uuid=i.uuid"
             + " WHERE ws.uuid = :uuid";
 
@@ -108,42 +106,19 @@ public class WebsiteRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
   @Override
   public Website save(Website website) {
     entityRepository.save(website);
-
-    // TODO use Optional with emptyset, had problem with type...
-    //  (Optional.ofNullable(collection).orElse(Collections.emptySet())
-//    List<UUID> uuidListRootPages = null;
-//    List<Webpage> rootPages = website.getRootPages();
-//    if (rootPages != null && !rootPages.isEmpty()) {
-//      uuidListRootPages = rootPages.stream().map((identifiable) -> identifiable.getUuid()).collect(Collectors.toList());
-//    }
-    WebsiteImpl result = dbi.withHandle(h -> h
-            .createQuery("INSERT INTO websites(url, registration_date, uuid) VALUES (:url, :registrationDate, :uuid) RETURNING *")
-            //              .bind("rootPages", uuidsRootPages)
+    dbi.withHandle(h -> h.createUpdate("INSERT INTO websites(url, registration_date, uuid) VALUES (:url, :registrationDate, :uuid)")
             .bindBean(website)
-            .mapToBean(WebsiteImpl.class) // FIXME: mapping back from list<uuid> to list<webpage>
-            .findOnly());
-//    } catch (JsonProcessingException ex) {
-//      LOGGER.error("error saving website", ex);
-//    }
-    return result;
+            .execute());
+    return findOne(website.getUuid());
   }
 
   @Override
   public Website update(Website website) {
     entityRepository.update(website);
-
-    List<Webpage> rootPages = website.getRootPages();
-    if (rootPages != null) {
-      for (Webpage rootPage : rootPages) {
-
-      }
-    }
-
-    WebsiteImpl result = dbi.withHandle(h -> h
-            .createQuery("UPDATE websites SET url=:url, registration_date=:registrationDate WHERE uuid=:uuid RETURNING *")
+    // do not update/left out from statement: created, uuid
+    dbi.withHandle(h -> h.createUpdate("UPDATE websites SET url=:url, registration_date=:registrationDate WHERE uuid=:uuid")
             .bindBean(website)
-            .mapToBean(WebsiteImpl.class)
-            .findOnly());
-    return result;
+            .execute());
+    return findOne(website.getUuid());
   }
 }

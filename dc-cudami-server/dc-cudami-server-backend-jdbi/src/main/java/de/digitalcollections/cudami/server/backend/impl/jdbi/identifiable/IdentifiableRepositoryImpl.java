@@ -78,30 +78,12 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Abst
     identifiable.setLastModified(LocalDateTime.now());
 
     IdentifiableImpl result = null;
-//    try {
-//      IiifImage iiifImage = identifiable.getIiifImage();
-//      final String iiifImageValue;
-//      if (iiifImage != null) {
-//        iiifImageValue = objectMapper.writeValueAsString(identifiable.getIiifImage());
-//      } else {
-//        iiifImageValue = null;
-//      }
 
     result = dbi.withHandle(h -> h
             .createQuery("INSERT INTO identifiables(created, description, identifiable_type, label, last_modified, iiif_image, uuid) VALUES (:created, :description::JSONB, :type, :label::JSONB, :lastModified, :iiifImage::JSONB, :uuid) RETURNING *")
-//              .bind("description", objectMapper.writeValueAsString(identifiable.getDescription()))
-//              .bind("label", objectMapper.writeValueAsString(identifiable.getLabel()))
-//              .bind("iiifImage", iiifImageValue)
             .bindBean(identifiable)
             .mapToBean(IdentifiableImpl.class)
             .findOnly());
-//  }
-//  catch (JsonProcessingException ex
-//
-//
-//    ) {
-//      LOGGER.error("error saving identifiable", ex);
-//  }
     return (I) result;
   }
 
@@ -111,20 +93,13 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Abst
 
     IdentifiableImpl result = null;
 
-//    try {
     // do not update/left out from statement: created, uuid
     result = dbi.withHandle(h -> h
             .createQuery("UPDATE identifiables SET description=:description::JSONB, identifiable_type=:type, label=:label::JSONB, last_modified=:lastModified, iiif_image=:iiifImage::JSONB WHERE uuid=:uuid RETURNING *")
-//              .bind("description", objectMapper.writeValueAsString(identifiable.getDescription()))
-//              .bind("label", objectMapper.writeValueAsString(identifiable.getLabel()))
-//              .bind("iiifImage", objectMapper.writeValueAsString(identifiable.getIiifImage()))
             .bindBean(identifiable)
             .mapToBean(IdentifiableImpl.class
             )
             .findOnly());
-//    } catch (JsonProcessingException ex) {
-//      LOGGER.error("error updating identifiable", ex);
-//    }
     return (I) result;
   }
 }

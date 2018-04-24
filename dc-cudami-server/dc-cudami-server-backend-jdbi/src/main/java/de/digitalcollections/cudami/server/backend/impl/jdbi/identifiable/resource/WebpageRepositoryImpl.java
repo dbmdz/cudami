@@ -5,7 +5,6 @@ import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.core.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.cudami.model.api.identifiable.parts.MultilanguageDocument;
-import de.digitalcollections.cudami.model.api.identifiable.parts.Text;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.model.impl.identifiable.parts.MultilanguageDocumentImpl;
 import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
@@ -21,6 +20,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl implements WebpageRepository<Webpage> {
 
-  private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(WebpageRepositoryImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(WebpageRepositoryImpl.class);
 
   @Autowired
   private Jdbi dbi;
@@ -69,8 +69,8 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
 
   @Override
   public PageResponse<Webpage> find(PageRequest pageRequest) {
-    StringBuilder query = new StringBuilder("SELECT wp.id as id, wp.uuid as uuid, wp.text as text"
-            + " FROM webpages wp INNER JOIN resources r ON wp.uuid=r.uuid INNER JOIN identifiables i ON wp.uuid=i.uuid");
+    StringBuilder query = new StringBuilder("SELECT wp.uuid as uuid, wp.text as text, i.label as label, i.description as description")
+            .append(" FROM webpages wp INNER JOIN resources r ON wp.uuid=r.uuid INNER JOIN identifiables i ON wp.uuid=i.uuid");
 
     addPageRequestParams(pageRequest, query);
 
@@ -86,7 +86,7 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
 
   @Override
   public Webpage findOne(UUID uuid) {
-    String query = "SELECT wp.id as id, wp.uuid as uuid, wp.text as text, i.label as label, i.description as description"
+    String query = "SELECT wp.uuid as uuid, wp.text as text, i.label as label, i.description as description"
             + " FROM webpages wp INNER JOIN resources r ON wp.uuid=r.uuid INNER JOIN identifiables i ON wp.uuid=i.uuid"
             + " WHERE wp.uuid = :uuid";
 
@@ -106,24 +106,17 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
   }
 
   @Override
-  public Text getContentBlocks(Webpage webpage) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  }
-
-  @Override
   public Webpage save(Webpage webpage) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    throw new UnsupportedOperationException("Not supported yet.");
   }
 
   @Override
   public Webpage save(Webpage webpage, UUID websiteUuid) {
     resourceRepository.save(webpage);
 
-    WebpageImpl result = dbi.withHandle(h -> h
-            .createQuery("INSERT INTO webpages(uuid) VALUES (:uuid) RETURNING *")
+    dbi.withHandle(h -> h.createUpdate("INSERT INTO webpages(uuid, text) VALUES (:uuid, :text::JSONB)")
             .bindBean(webpage)
-            .mapToBean(WebpageImpl.class)
-            .findOnly());
+            .execute());
 
     dbi.withHandle(h -> {
       return h.createUpdate("INSERT INTO website_webpage(website_uuid, webpage_uuid) VALUES (:website_uuid, :uuid)")
@@ -132,18 +125,15 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
               .execute();
     });
 
-    return result;
+    return findOne(webpage.getUuid());
   }
 
   @Override
   public Webpage update(Webpage webpage) {
     resourceRepository.update(webpage);
-
-//    WebpageImpl result = dbi.withHandle(h -> h
-//            .createQuery("UPDATE webpages SET XXX WHERE uuid=:uuid RETURNING *") // TODO update columns
-//            .bindBean(webpage)
-//            .mapToBean(WebpageImpl.class)
-//            .findOnly());
-    return webpage;
+    dbi.withHandle(h -> h.createUpdate("UPDATE webpages SET text=:text::JSONB WHERE uuid=:uuid")
+            .bindBean(webpage)
+            .execute());
+    return findOne(webpage.getUuid());
   }
 }
