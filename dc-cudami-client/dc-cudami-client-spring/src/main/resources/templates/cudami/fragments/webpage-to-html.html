@@ -35,10 +35,22 @@
 
   <th:block th:fragment="renderContentBlock(block)">
 
+    <th:block th:if="${block.class.simpleName == 'BlockquoteImpl'}">
+      <blockquote>
+        <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
+      </blockquote>
+    </th:block>
+
     <th:block th:if="${block.class.simpleName == 'BulletListImpl'}">
       <ul>
         <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
       </ul>
+    </th:block>
+    
+    <th:block th:if="${block.class.simpleName == 'CodeBlockImpl'}">
+      <pre>
+        <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
+      </pre>
     </th:block>
 
     <th:block th:if="${block.class.simpleName == 'EmbeddedCodeImpl'}">
