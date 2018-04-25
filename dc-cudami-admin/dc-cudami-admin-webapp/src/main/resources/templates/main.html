@@ -10,7 +10,7 @@
         <h3>cudami Administration</h3>
         <div class="row">
           <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a th:href="@{/users}" th:title="#{users}">
+            <a class="btn" th:href="@{/users}" th:title="#{users}">
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-users"></i></div>
                 <span th:text="#{users}">Users</span>
@@ -21,10 +21,10 @@
       </th:block>
 
       <th:block sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_CONTENT_MANAGER')">
-        <h3>Containers (object groups/aggregations)</h3>
+        <h3 th:text="#{containers}">Containers (object groups/aggregations)</h3>
         <div class="row">
           <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a th:href="@{/websites}" th:title="#{websites}">
+            <a class="btn" th:href="@{/websites}" th:title="#{websites}">
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-globe"></i></div>
                 <span th:text="#{websites}">Websites</span>
@@ -32,7 +32,7 @@
             </a>
           </div>
           <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a th:href="@{/contenttrees}" title="...">
+            <a class="btn disabled" th:href="@{/contenttrees}" th:title="#{content_trees}">
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-share-alt"></i></div>
                 <span th:utext="#{content_trees}">Content trees</span>
@@ -40,106 +40,106 @@
             </a>
           </div>
           <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a th:href="@{/collections}" title="...">
+            <a class="btn disabled" th:href="@{/collections}" title="...">
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-list"></i></div>
-                Sammlungen
+                <span>Sammlungen</span>
               </div>
             </a>
           </div>
           <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a th:href="@{/projects}" title="...">
+            <a class="btn disabled" th:href="@{/projects}" title="...">
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-industry"></i></div>
-                (Digitalisierungs-) Projekte
+                <span>(Digitalisierungs-) Projekte</span>
               </div>
             </a>
           </div>
         </div>
 
-        <h3>Objects</h3>
+        <h3 th:text="#{objects}">Objects</h3>
         <div class="row">
           <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a th:href="@{/books}" title="...">
+            <a class="btn disabled" th:href="@{/books}" title="...">
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-book"></i></div>
-                Bücher
+                <span>Bücher</span>
               </div>
             </a>
           </div>
           <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a href="#" title="...">
+            <a class="btn disabled" href="#" title="...">
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-file-text-o"></i></div>
-                Artikel
+                <span>Artikel</span>
               </div>
             </a>
           </div>
           <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a href="#" title="...">
+            <a class="btn disabled" href="#" title="...">
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-file-image-o"></i></div>
-                Bilder
+                <span>Bilder</span>
               </div>
             </a>
           </div>
           <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a href="#" title="...">
+            <a class="btn disabled" href="#" title="...">
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-cube"></i></div>
-                3D Objekte
+                <span>3D Objekte</span>
               </div>
             </a>
           </div>
           <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a href="#" title="...">
+            <a class="btn disabled" href="#" title="...">
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-file-audio-o"></i></div>
-                Audios
+                <span>Audios</span>
               </div>
             </a>
           </div>
           <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a href="#" title="...">
+            <a class="btn disabled" href="#" title="...">
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-file-video-o"></i></div>
-                Videos
+                <span>Videos</span>
               </div>
             </a>
           </div>
         </div>
 
-        <h3>Entitäten</h3>
+        <h3 th:text="#{entities}">Entitäten</h3>
         <div class="row">
           <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a href="#" title="...">
+            <a class="btn disabled" href="#" title="...">
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-users"></i></div>
-                Personen
+                <span>Personen</span>
               </div>
             </a>
           </div>
           <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a href="#" title="...">
+            <a class="btn disabled" href="#" title="...">
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-institution"></i></div>
-                Körperschaften
+                <span>Körperschaften</span>
               </div>
             </a>
           </div>
           <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a href="#" title="...">
+            <a class="btn disabled" href="#" title="...">
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-map-marker"></i></div>
-                Orte
+                <span>Orte</span>
               </div>
             </a>
           </div>
           <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a href="#" title="...">
+            <a class="btn disabled" href="#" title="...">
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-calendar"></i></div>
-                Ereignisse
+                <span>Ereignisse</span>
               </div>
             </a>
           </div>

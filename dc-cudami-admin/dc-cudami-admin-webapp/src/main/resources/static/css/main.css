@@ -30,6 +30,11 @@ a[href^="http"]:not(.noExt):after {
   font-size: 14px;
   padding: 5px 15px;
 }
+
+.btn .innerContent span {
+  white-space: normal;
+}
+
 h1 a.btn {
   float: right;
 }
@@ -136,7 +141,7 @@ div.editor {
 }
 @media(min-width:992px){
   .outerContent{
-    padding-bottom: 16.66%;
+    padding-bottom: 14.66%;
   }
 }
 .innerContent:hover{
