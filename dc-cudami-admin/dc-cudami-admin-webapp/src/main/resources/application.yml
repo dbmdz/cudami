@@ -1,5 +1,5 @@
-cudami:
-  defaultLocale-gui: de
+custom:
+  defaultLocale-gui: en
   server:
     address: http://localhost:9000
   
