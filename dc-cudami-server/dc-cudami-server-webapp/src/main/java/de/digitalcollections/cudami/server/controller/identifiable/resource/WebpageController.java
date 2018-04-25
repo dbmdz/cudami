@@ -18,13 +18,18 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.res
 import de.digitalcollections.prosemirror.model.api.ContentBlock;
 import de.digitalcollections.prosemirror.model.api.Document;
 import de.digitalcollections.prosemirror.model.api.Mark;
+import de.digitalcollections.prosemirror.model.api.contentblocks.Blockquote;
 import de.digitalcollections.prosemirror.model.api.contentblocks.BulletList;
+import de.digitalcollections.prosemirror.model.api.contentblocks.CodeBlock;
 import de.digitalcollections.prosemirror.model.api.contentblocks.OrderedList;
 import de.digitalcollections.prosemirror.model.api.contentblocks.Paragraph;
 import de.digitalcollections.prosemirror.model.api.contentblocks.Text;
 import de.digitalcollections.prosemirror.model.impl.DocumentImpl;
 import de.digitalcollections.prosemirror.model.impl.MarkImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.BlockquoteImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.BulletListImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.CodeBlockImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.EmbeddedCodeImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.HardBreakImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.HeadingImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.ListItemImpl;
@@ -152,8 +157,16 @@ public class WebpageController {
     orderedList.addContentBlock(new ListItemImpl("test 2"));
     orderedList.addContentBlock(new ListItemImpl("test 3"));
     contents.add(orderedList);
-    //    contents
-//            .add(new EmbeddedCodeImpl("<iframe style=\"border: 1px solid lightgrey\" frameborder=\"no\" width=\"98%\" height=\"auto\" src=\"https://statistiken.digitale-sammlungen.de/index.php?module=CoreAdminHome&amp;action=optOut&amp;language=de\"></iframe>"));
+    contents.add(new EmbeddedCodeImpl("<iframe style=\"border: 1px solid lightgrey\" frameborder=\"no\" width=\"98%\" height=\"auto\" src=\"https://statistiken.digitale-sammlungen.de/index.php?module=CoreAdminHome&amp;action=optOut&amp;language=de\"></iframe>"));
+
+    Blockquote blockQuote = new BlockquoteImpl();
+    blockQuote.addContentBlock(new TextImpl("Das ist ein Zitat"));
+    contents.add(blockQuote);
+
+    CodeBlock codeBlock = new CodeBlockImpl();
+    codeBlock.addContentBlock(new TextImpl("10 print \"Hallo Welt\""));
+    contents.add(codeBlock);
+
     Document document = new DocumentImpl();
     document.setContentBlocks(contents);
     MultilanguageDocument multilanguageDocument = new MultilanguageDocumentImpl();

@@ -16,7 +16,9 @@ import de.digitalcollections.cudami.model.impl.identifiable.parts.TranslationImp
 import de.digitalcollections.cudami.model.impl.identifiable.resource.WebpageImpl;
 import de.digitalcollections.prosemirror.model.impl.DocumentImpl;
 import de.digitalcollections.prosemirror.model.impl.MarkImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.BlockquoteImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.BulletListImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.CodeBlockImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.EmbeddedCodeImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.HardBreakImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.HeadingImpl;
@@ -42,7 +44,9 @@ public class XmlHttpMessageConverter {
     xstreamMarshaller.setStreamDriver(new CdataXppDriver());
 
     Map<String, Class> aliases = new HashMap<>();
+    aliases.put("blockquote", BlockquoteImpl.class);
     aliases.put("bulletList", BulletListImpl.class);
+    aliases.put("codeBlock", CodeBlockImpl.class);
     aliases.put("content", ContentBlock.class);
     aliases.put("contentBlocksContainer", MultilanguageDocument.class);
     aliases.put("document", DocumentImpl.class);
@@ -67,7 +71,9 @@ public class XmlHttpMessageConverter {
 
     xStream.registerConverter(new MapToFlatConverter(xStream.getMapper()));
     xStream.aliasField("body", TextImpl.class, "text");
+    xStream.aliasField("content", BlockquoteImpl.class, "contentBlocks");
     xStream.aliasField("content", BulletListImpl.class, "contentBlocks");
+    xStream.aliasField("content", CodeBlockImpl.class, "contentBlocks");
     xStream.aliasField("content", DocumentImpl.class, "contentBlocks");
     xStream.aliasField("content", HeadingImpl.class, "contentBlocks");
     xStream.aliasField("content", ListItemImpl.class, "contentBlocks");
