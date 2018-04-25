@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class LocaleRepositoryEndpointConfig {
 
-  @Value(value = "${cudami.server.address}")
+  @Value(value = "${custom.server.address}")
   private String cudamiServerAddress;
 
   @Autowired

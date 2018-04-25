@@ -16,7 +16,7 @@ public class SpringConfigCudami {
   @Value(value = "${cudami.environment:#{null}}")
   private Optional<String> cudamiEnvironment;
 
-  @Value(value = "${cudami.server.address}")
+  @Value(value = "${custom.server.address}")
   private String cudamiServerAddress;
 
   @Bean
