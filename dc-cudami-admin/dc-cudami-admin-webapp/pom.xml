@@ -247,9 +247,9 @@
             </goals>
           </execution>
         </executions>
-        <configuration>
+        <!--<configuration>
           <classifier>exec</classifier>
-        </configuration>
+        </configuration>-->
       </plugin>
     </plugins>
   </build>
