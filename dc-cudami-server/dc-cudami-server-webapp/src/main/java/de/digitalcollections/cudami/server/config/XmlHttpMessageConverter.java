@@ -38,7 +38,6 @@ import org.springframework.oxm.xstream.XStreamMarshaller;
 public class XmlHttpMessageConverter {
 
   public HttpMessageConverter<Object> createConverter() {
-    MarshallingHttpMessageConverter xmlConverter = new MarshallingHttpMessageConverter();
     XStreamMarshaller xstreamMarshaller = new XStreamMarshaller();
 
     xstreamMarshaller.setStreamDriver(new CdataXppDriver());
@@ -82,6 +81,7 @@ public class XmlHttpMessageConverter {
 
     xStream.setMode(XStream.NO_REFERENCES);
 
+    MarshallingHttpMessageConverter xmlConverter = new MarshallingHttpMessageConverter();
     xmlConverter.setMarshaller(xstreamMarshaller);
     xmlConverter.setUnmarshaller(xstreamMarshaller);
     return xmlConverter;
@@ -93,21 +93,19 @@ public class XmlHttpMessageConverter {
       super(mapper);
     }
 
-
     @Override
     public boolean canConvert(Class type) {
       return Map.class.isAssignableFrom(type);
     }
-
 
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
       Map<Object, Object> map = (Map<Object, Object>) source;
 
       Set<Object> keySet = map.keySet();
-      if ( keySet != null && !keySet.isEmpty() && keySet.iterator().next() instanceof String) {
-        for (Entry<Object, Object> entry :  map.entrySet()) {
-          if ( entry.getValue() != null ) {
+      if (keySet != null && !keySet.isEmpty() && keySet.iterator().next() instanceof String) {
+        for (Entry<Object, Object> entry : map.entrySet()) {
+          if (entry.getValue() != null) {
             writer.startNode(entry.getKey().toString());
             writer.setValue(entry.getValue().toString());
             writer.endNode();
@@ -123,7 +121,6 @@ public class XmlHttpMessageConverter {
       return null;
     }
   }
-
 
   class CdataXppDriver extends XppDriver {
 
@@ -141,7 +138,7 @@ public class XmlHttpMessageConverter {
 
         @Override
         protected void writeText(QuickWriter writer, String text) {
-          if ( cdata ) {
+          if (cdata) {
             writer.write("<![CDATA[");
             writer.write(text);
             writer.write("]]>");
