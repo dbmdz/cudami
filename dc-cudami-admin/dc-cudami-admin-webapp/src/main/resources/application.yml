@@ -21,7 +21,7 @@ info:
 
 management:
   context-path: '/monitoring'
-  port: 9001
+  port: 19898
   security:
     enabled: false
 #    roles: SUPERUSER
