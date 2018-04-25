@@ -7,21 +7,36 @@ endpoints:
   hypermedia:
     enabled: true
 
+info:
+  app:
+    encoding: @project.build.sourceEncoding@
+    java:
+      source: @maven.compiler.source@
+      target: @maven.compiler.target@
+    project:
+      name: '@project.name@'
+      groupId: @project.groupId@
+      artifactId: @project.artifactId@
+      version: @project.version@
+
 management:
-  context-path: /manage
-  port: 19898
+  context-path: '/monitoring'
+  port: 9001
   security:
-    enabled: true
+    enabled: false
 #    roles: SUPERUSER
 # default role is "ACTUATOR"
 
 security:
-  user:
-    name: admin
-    password: secret
+  basic:
+    enabled: false
+  headers:
+    cache: false
+    # disables pragma no-cache header
 
 server:
   port: 9898
+  server-header: "@project.name@ v@project.version@"
 
 # upload config: see org.springframework.boot.autoconfigure.web.MultipartProperties
 spring:
@@ -34,14 +49,25 @@ spring:
       max-request-size: 25MB
       # resolve-lazily: false
   profiles:
-    active: PROD
+    active: local
   thymeleaf:
+    cache: false
+    mode: HTML
     # Order of the template resolver in the chain. (order 1 is the common classpath resolver)
     template-resolver-order: 2
 
 ---
 
+management:
+  security:
+    enabled: true
+
+security:
+  user:
+    name: admin
+    password: secret
+
 spring:
-  profiles: local
+  profiles: PROD
   thymeleaf:
-    cache: false
+    cache: true
