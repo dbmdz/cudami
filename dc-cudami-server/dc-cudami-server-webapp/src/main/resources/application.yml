@@ -1,4 +1,4 @@
-custom:
+cudami:
   database:
     hostname: localhost
     name: cudami

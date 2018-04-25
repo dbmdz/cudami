@@ -60,7 +60,7 @@ public class SpringConfigWeb extends WebMvcConfigurerAdapter {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfigWeb.class);
 
-  @Value("${custom.defaultLocale-gui}")
+  @Value("${cudami.defaultLocale-gui}")
   private String defaultLocaleTag;
 
   static final String ENCODING = "UTF-8";

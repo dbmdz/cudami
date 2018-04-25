@@ -39,19 +39,19 @@ public class SpringConfigBackendDatabase {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfigBackendDatabase.class);
 
-  @Value("${custom.database.name}")
+  @Value("${cudami.database.name}")
   private String databaseName;
 
-  @Value("${custom.database.hostname}")
+  @Value("${cudami.database.hostname}")
   private String databaseHostname;
 
-  @Value("${custom.database.password}")
+  @Value("${cudami.database.password}")
   private String databasePassword;
 
-  @Value("${custom.database.port}")
+  @Value("${cudami.database.port}")
   private String databasePort;
 
-  @Value("${custom.database.username}")
+  @Value("${cudami.database.username}")
   private String databaseUsername;
 
   @Autowired

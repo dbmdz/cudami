@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ContentTreeRepositoryEndpointConfig {
 
-  @Value(value = "${custom.server.address}")
+  @Value(value = "${cudami.server.address}")
   private String cudamiServerAddress;
 
   @Autowired

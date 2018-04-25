@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class LocaleRepositoryImpl implements LocaleRepository {
 
-  @Value("${custom.defaults.locale}")
+  @Value("${cudami.defaults.locale}")
   private Locale defaultLocale;
 
   @Override
