@@ -52,9 +52,6 @@ import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 )
 @EnableAspectJAutoProxy
 @EnableSpringDataWebSupport // for getting support for sorting and paging params
-//@PropertySource(value = {
-//  "classpath:de/digitalcollections/cudami/config/SpringConfigWeb-${spring.profiles.active:local}.properties"
-//})
 @Import(SpringConfigCommonsMvc.class)
 public class SpringConfigWeb extends WebMvcConfigurerAdapter {
 
@@ -65,11 +62,6 @@ public class SpringConfigWeb extends WebMvcConfigurerAdapter {
 
   static final String ENCODING = "UTF-8";
 
-//  private ApplicationContext applicationContext;
-//  @Bean
-//  public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-//    return new PropertySourcesPlaceholderConfigurer();
-//  }
 //  @Value("${cacheTemplates}")
 //  private boolean cacheTemplates;
 //  @Autowired
