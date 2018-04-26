@@ -132,7 +132,7 @@ public class XmlHttpMessageConverter {
 
         @SuppressWarnings("rawtypes")
         public void startNode(String name, Class clazz) {
-          cdata = "code".equalsIgnoreCase(name) || "body".equalsIgnoreCase(name);
+          cdata = "body".equalsIgnoreCase(name);
           super.startNode(name, clazz);
         }
 
