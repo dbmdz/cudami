@@ -22,6 +22,7 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+    <version.logstash-logback-encoder>4.7</version.logstash-logback-encoder>
     <version.maven-resources-plugin>2.7</version.maven-resources-plugin>
     <version.spring-boot>1.5.10.RELEASE</version.spring-boot>
     <version.thymeleaf-spring-data-dialect>3.3.0</version.thymeleaf-spring-data-dialect>
@@ -92,6 +93,12 @@
       <groupId>io.github.jpenren</groupId>
       <artifactId>thymeleaf-spring-data-dialect</artifactId>
       <version>${version.thymeleaf-spring-data-dialect}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.logstash.logback</groupId>
+      <artifactId>logstash-logback-encoder</artifactId>
+      <version>${version.logstash-logback-encoder}</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>nz.net.ultraq.thymeleaf</groupId>
