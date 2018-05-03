@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @Configuration
@@ -23,7 +24,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 //@PropertySource(value = {
 //  "classpath:de/digitalcollections/cudami/server/config/SpringConfigWeb-${spring.profiles.active:PROD}.properties"
 //})
-public class SpringConfigWeb extends WebMvcConfigurerAdapter implements InitializingBean {
+public class SpringConfigWeb extends WebMvcConfigurerAdapter implements WebMvcConfigurer, InitializingBean {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfigWeb.class);
 
@@ -80,8 +81,8 @@ public class SpringConfigWeb extends WebMvcConfigurerAdapter implements Initiali
   @Override
   public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
     configurer
-        .favorParameter(true)
-        .defaultContentType(MediaType.APPLICATION_JSON); // we are are REST-Server (no HTML/Webapp!) !
+            .favorParameter(true)
+            .defaultContentType(MediaType.APPLICATION_JSON); // we are are REST-Server (no HTML/Webapp!) !
     configurer.mediaType("html", MediaType.TEXT_HTML);
     configurer.mediaType("json", MediaType.APPLICATION_JSON);
     configurer.mediaType("xml", MediaType.APPLICATION_XML);
@@ -96,7 +97,5 @@ public class SpringConfigWeb extends WebMvcConfigurerAdapter implements Initiali
   private HttpMessageConverter<Object> createXmlHttpMessageConverter() {
     return new XmlHttpMessageConverter().createConverter();
   }
-
-
 
 }

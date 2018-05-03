@@ -1,3 +1,5 @@
+# local/default
+
 cudami:
   database:
     hostname: localhost
@@ -8,26 +10,21 @@ cudami:
   defaults:
     locale: en_US
 
-# local/default
-endpoints:
-  hypermedia:
-    enabled: true
-
 info:
   app:
-    encoding: @project.build.sourceEncoding@
+    encoding: "@project.build.sourceEncoding@"
     java:
-      source: @maven.compiler.source@
-      target: @maven.compiler.target@
+      source: "@maven.compiler.source@"
+      target: "@maven.compiler.target@"
     project:
-      name: '@project.name@'
-      groupId: @project.groupId@
-      artifactId: @project.artifactId@
-      version: @project.version@
+      name: "@project.name@"
+      groupId: "@project.groupId@"
+      artifactId: "@project.artifactId@"
+      version: "@project.version@"
 
 jsondoc:
-  basePath: http://localhost:9000
-  version: @project.version@
+  basePath: "http://localhost:9000"
+  version: "@project.version@"
   packages:
     - de.digitalcollections.cudami.server.controller
   # optional configuration
@@ -35,17 +32,13 @@ jsondoc:
   displayMethodAs: URI
 
 management:
-  context-path: '/monitoring'
-  port: 9001
-  security:
-    enabled: false
-
-security:
-  basic:
-    enabled: false
-  headers:
-    cache: false
-    # disables pragma no-cache header
+  endpoints:
+    web:
+      base-path: "/monitoring"
+      exposure:
+        include: "*"
+  server:
+    port: 9001
 
 server:
   port: 9000
@@ -54,6 +47,10 @@ server:
 spring:
   profiles:
     active: local
+  security:
+    user:
+      name: admin
+      password: secret
   thymeleaf:
     cache: false
     mode: HTML
@@ -64,15 +61,6 @@ spring:
 custom:
   database:
     port: 5432
-
-management:
-  security:
-    enabled: true
-
-security:
-  user:
-    name: admin
-    password: secret
 
 spring:
   profiles: PROD

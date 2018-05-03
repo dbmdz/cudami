@@ -134,8 +134,7 @@
                 {
                   "type": "link",
                   "attrs": {
-                    "href": "https://www.bsb-muenchen.de",
-                    "title": null
+                    "href": "https://www.bsb-muenchen.de"
                   }
                 }
               ]
@@ -177,8 +176,7 @@
             {
               "type": "link",
               "attrs": {
-                "href": "https://www.km.bayern.de",
-                "title": null
+                "href": "https://www.km.bayern.de"
               }
             }
           ]

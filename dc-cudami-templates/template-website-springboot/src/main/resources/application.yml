@@ -3,10 +3,6 @@ cudami:
   server:
     address: http://localhost:9000/
 
-endpoints:
-  hypermedia:
-    enabled: true
-
 info:
   app:
     encoding: @project.build.sourceEncoding@
@@ -20,30 +16,24 @@ info:
       version: @project.version@
 
 management:
-  port: 9101
-  security:
-    enabled: true
-#    roles: SUPERUSER
-
-security:
-  user:
-    name: admin
-    password: secret
+  server:
+    port: 9101
 
 server:
-  context-path: "/"
+  servlet:
+    context-path: "/"
   port: 9100
   server-header: "cudami Website Blueprint v@project.version@"
 
 spring:
   profiles:
     active: PROD
+  security:
+    user:
+      name: admin
+      password: secret
 
 ---
-
-management:
-  security:
-    enabled: false
 
 spring:
   profiles: local

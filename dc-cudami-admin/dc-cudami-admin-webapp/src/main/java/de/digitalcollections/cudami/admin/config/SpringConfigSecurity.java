@@ -2,44 +2,76 @@ package de.digitalcollections.cudami.admin.config;
 
 import de.digitalcollections.cudami.model.api.security.enums.Role;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
 @Configuration
-@Order(1)
-public class SpringConfigSecurityWebapp extends WebSecurityConfigurerAdapter {
+/*
+ FIXME: It is not possible to use two separated user bases.
+ what we achieved is:
+ - actuator user ("admin") from application.yml (password unencrypted)
+ - webapp users from database (password bcrypted)
+ BUT: both authentication providers are asked if a user tries to login, so
+ - actuator user "admin" is able to login into webapp (!!!) (but sees not secured parts as of missing role...)
+ - webapp user is able to authenticate at actuator endpoints (but gets an 403 Unauthorized because of missing ACTUATOR role...)
+
+ see https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-security.html
+ */
+public class SpringConfigSecurity extends WebSecurityConfigurerAdapter {
+
+  @Value("${spring.security.user.name}")
+  private String actuatorUsername;
+
+  @Value("${spring.security.user.password}")
+  private String actuatorPassword;
 
   @Autowired(required = true)
   PersistentTokenRepository persistentTokenRepository;
   @Autowired(required = true)
   private UserDetailsService userDetailsService; // provided by component scan
 
-  @Override
-  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    auth.inMemoryAuthentication().withUser("monitoring").password("secret").roles("ACTUATOR");
-    auth.authenticationProvider(authProvider());
+  @Autowired
+  public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+    auth
+            .inMemoryAuthentication().passwordEncoder(passwordEncoderDummy()).withUser(User.withUsername(actuatorUsername).password(actuatorPassword).roles("ACTUATOR")).and()
+            .authenticationProvider(authProvider());
   }
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    http.authorizeRequests().antMatchers("/api/**", "/setup/**").permitAll();
-    http.authorizeRequests().antMatchers("/users/**").hasAnyAuthority(Role.ADMIN.getAuthority());
-    http.authorizeRequests().anyRequest().authenticated().and().formLogin() // enable form based log in
-            .loginPage("/login").permitAll().and()
+    // Monitoring:
+    // see https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#production-ready-endpoints
+    http.authorizeRequests()
+            .requestMatchers(EndpointRequest.to("info", "health")).permitAll()
+            .requestMatchers(EndpointRequest.toAnyEndpoint()).hasRole("ACTUATOR").and().httpBasic();
+
+    // Webapp:
+    http.authorizeRequests()
+            .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+            .antMatchers("/api/**", "/setup/**").permitAll();
+
+    http.authorizeRequests()
+            .antMatchers("/users/**").hasAnyAuthority(Role.ADMIN.getAuthority())
+            .anyRequest().authenticated().and()
+            // enable form based log in
+            .formLogin().loginPage("/login").permitAll().and()
             .logout().logoutUrl("/logout").permitAll().and()
-            .rememberMe().tokenRepository(persistentTokenRepository).tokenValiditySeconds(14 * 24 * 3600)
-            .userDetailsService(userDetailsService).and()
-            .httpBasic();
+            .rememberMe().tokenRepository(persistentTokenRepository).tokenValiditySeconds(14 * 24 * 3600);
+//            .userDetailsService(userDetailsService);
     // FIXME: add CSRF protection and test all static resources and unit tests (if /css is only web.ignoring()...)
     //    // http.csrf().disable();
     //    http.csrf().requireCsrfProtectionMatcher(new RequestMatcher() {
@@ -69,17 +101,26 @@ public class SpringConfigSecurityWebapp extends WebSecurityConfigurerAdapter {
     //    });
   }
 
-  //@Bean
+  @Bean
   public AuthenticationProvider authProvider() {
     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-    authProvider.setPasswordEncoder(passwordEncoder());
+    authProvider.setPasswordEncoder(new BCryptPasswordEncoder());
     authProvider.setUserDetailsService(userDetailsService);
     return authProvider;
   }
 
-  @Bean
-  public Object passwordEncoder() {
-    return new BCryptPasswordEncoder();
+  private PasswordEncoder passwordEncoderDummy() {
+    return new PasswordEncoder() {
+      @Override
+      public String encode(CharSequence rawPassword) {
+        return rawPassword.toString();
+      }
+
+      @Override
+      public boolean matches(CharSequence rawPassword, String encodedPassword) {
+        return rawPassword.toString().equals(encodedPassword);
+      }
+    };
   }
 
   // FIXME: replace with serverside token repository?

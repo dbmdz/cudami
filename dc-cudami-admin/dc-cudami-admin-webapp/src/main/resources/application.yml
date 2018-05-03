@@ -3,10 +3,6 @@ cudami:
   server:
     address: http://localhost:9000
   
-endpoints:
-  hypermedia:
-    enabled: true
-
 info:
   app:
     encoding: @project.build.sourceEncoding@
@@ -20,19 +16,13 @@ info:
       version: @project.version@
 
 management:
-  context-path: '/monitoring'
-  port: 19898
-  security:
-    enabled: false
-#    roles: SUPERUSER
-# default role is "ACTUATOR"
-
-security:
-  basic:
-    enabled: false
-  headers:
-    cache: false
-    # disables pragma no-cache header
+  endpoints:
+    web:
+      base-path: '/monitoring'
+      exposure:
+        include: '*'
+  server:
+    port: 19898
 
 server:
   port: 9898
@@ -40,7 +30,7 @@ server:
 
 # upload config: see org.springframework.boot.autoconfigure.web.MultipartProperties
 spring:
-  http:
+  servlet:
     multipart:
       # Values can use the suffixes "MB" or "KB" to indicate megabytes or kilobytes respectively.
       file-size-threshold: 1MB
@@ -50,6 +40,10 @@ spring:
       # resolve-lazily: false
   profiles:
     active: local
+  security:
+    user:
+      name: admin
+      password: secret
   thymeleaf:
     cache: false
     mode: HTML
@@ -58,16 +52,11 @@ spring:
 
 ---
 
-management:
-  security:
-    enabled: true
-
-security:
-  user:
-    name: admin
-    password: secret
-
 spring:
   profiles: PROD
+  security:
+    user:
+      name: admin
+      password: secret
   thymeleaf:
     cache: true
