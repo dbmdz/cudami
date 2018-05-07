@@ -13,11 +13,6 @@
   <artifactId>dc-cudami-server-business</artifactId>
   <packaging>jar</packaging>
   
-  <properties>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-  </properties>
-  
   <dependencies>
     <dependency>
       <groupId>de.digitalcollections.core</groupId>

@@ -79,7 +79,6 @@
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <scope>runtime</scope>
-      <version>42.1.4</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

@@ -52,23 +52,23 @@
     <version.junit5>5.1.0</version.junit5>
     <version.junit5-surefire>1.1.0</version.junit5-surefire>
     <version.mockito-core>2.15.0</version.mockito-core>
+    <version.postgresql>42.1.4</version.postgresql>
     <version.querydsl>4.1.4</version.querydsl>
     <version.slf4j-api>1.7.24</version.slf4j-api>
     <version.slf4j-log4j12>1.7.24</version.slf4j-log4j12>
     <version.snakeyaml>1.19</version.snakeyaml><!-- do not upgrade! see https://github.com/spring-projects/spring-boot/issues/12793 -->
     <version.spring-aop>5.0.5.RELEASE</version.spring-aop>
+    <version.spring-boot-starter-validation>2.0.1.RELEASE</version.spring-boot-starter-validation>
     <version.spring-context>5.0.5.RELEASE</version.spring-context>
     <version.spring-data-commons>1.13.1.RELEASE</version.spring-data-commons>
     <version.spring-data-jpa>1.11.0.RELEASE</version.spring-data-jpa>
     <version.spring-orm>5.0.5.RELEASE</version.spring-orm>
-    <!-- <version.spring-oxm>4.3.7.RELEASE</version.spring-oxm> -->
     <version.spring-security>5.0.4.RELEASE</version.spring-security>
     <version.spring-test>5.0.5.RELEASE</version.spring-test>
     <version.spring-tx>5.0.5.RELEASE</version.spring-tx>
     <version.spring-web>5.0.5.RELEASE</version.spring-web>
     <version.spring-webmvc>5.0.5.RELEASE</version.spring-webmvc>
     <version.unbescape>1.1.4.RELEASE</version.unbescape>
-    <!--<version.validation-api>1.0.0.GA</version.validation-api>  TODO Upgrade -->
     <version.xstream>1.4.10</version.xstream>
 
     <!-- webjars -->
@@ -86,6 +86,8 @@
     <version.jetty-maven-plugin>9.4.0.v20161208</version.jetty-maven-plugin>
     <version.lesscss-maven-plugin>1.7.0.1.1</version.lesscss-maven-plugin>
     <version.maven-compiler-plugin>3.6.1</version.maven-compiler-plugin>
+    <version.maven-resources-plugin>2.7</version.maven-resources-plugin>
+    <version.maven-surefire-plugin>2.19.1</version.maven-surefire-plugin>
     <version.maven-war-plugin>2.3</version.maven-war-plugin>
   </properties>
 
@@ -276,7 +278,7 @@
         <artifactId>javax.servlet-api</artifactId>
         <version>${version.javax.servlet-api}</version>
       </dependency>
-<!--      <dependency>
+      <!--      <dependency>
         <groupId>javax.validation</groupId>
         <artifactId>validation-api</artifactId>
         <version>${version.validation-api}</version>
@@ -342,6 +344,12 @@
         <scope>test</scope>
       </dependency>
       <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>${version.postgresql}</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
         <version>${version.slf4j-api}</version>
@@ -385,6 +393,11 @@
         <groupId>org.springframework</groupId>
         <artifactId>spring-webmvc</artifactId>
         <version>${version.spring-webmvc}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-validation</artifactId>
+        <version>${version.spring-boot-starter-validation}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.data</groupId>
@@ -439,14 +452,36 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-war-plugin</artifactId>
-          <version>${version.maven-war-plugin}</version>
-        </plugin>
-        <plugin>
           <groupId>com.mysema.maven</groupId>
           <artifactId>apt-maven-plugin</artifactId>
           <version>${version.apt-maven-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>${version.maven-resources-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${version.maven-surefire-plugin}</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.junit.platform</groupId>
+              <artifactId>junit-platform-surefire-provider</artifactId>
+              <version>${version.junit5-surefire}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.junit.jupiter</groupId>
+              <artifactId>junit-jupiter-engine</artifactId>
+              <version>${version.junit5}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>${version.maven-war-plugin}</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -463,6 +498,7 @@
           <artifactId>lesscss-maven-plugin</artifactId>
           <version>${version.lesscss-maven-plugin}</version>
         </plugin>
+        
       </plugins>
     </pluginManagement>
   </build>

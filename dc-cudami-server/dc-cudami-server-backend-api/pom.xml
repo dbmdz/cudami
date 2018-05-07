@@ -14,11 +14,6 @@
   <artifactId>dc-cudami-server-backend-api</artifactId>
   <packaging>jar</packaging>
   
-  <properties>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-  </properties>
-  
   <dependencies>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>

@@ -15,15 +15,8 @@
   <packaging>jar</packaging>
 
   <properties>
-    <!-- The spring-boot-starter-parent chooses fairly conservative Java compatibility. If you want to follow our recommendation and use a later Java version you can add a java.version property -->
-    <java.version>1.8</java.version>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    
     <version.jsondoc-ui-webjar>1.2.17</version.jsondoc-ui-webjar>
     <version.logstash-logback-encoder>5.1</version.logstash-logback-encoder>
-    <version.maven-resources-plugin>2.7</version.maven-resources-plugin>
     <version.spring-boot>2.0.1.RELEASE</version.spring-boot>
     <version.spring-boot-starter-jsondoc>1.2.19</version.spring-boot-starter-jsondoc>
   </properties>
@@ -101,7 +94,6 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.1.4</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -134,61 +126,6 @@
       <artifactId>hal-browser</artifactId>
     </dependency>
   </dependencies>
-  
-<!--  <dependencies>
-    <dependency>
-      <groupId>net.logstash.logback</groupId>
-      <artifactId>logstash-logback-encoder</artifactId>
-      <version>${version.logstash-logback-encoder}</version>
-      <scope>runtime</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>ch.qos.logback</groupId>
-          <artifactId>logback-core</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-dependencies</artifactId>
-      <version>${version.spring-boot}</version>
-      <type>pom</type>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-autoconfigure</artifactId>
-      <version>${version.spring-boot}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-      <version>${version.spring-boot}</version>
-      <scope>runtime</scope>
-    </dependency>
-  </dependencies>
-  
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>${version.exec-maven-plugin}</version>
-        <configuration>
-          <mainClass>de.digitalcollections.template.rest.server.frontend.impl.springboot.Application</mainClass>
-          <systemProperties>
-            <systemProperty>
-              <key>spring.profiles.active</key>
-              <value>local</value>
-            </systemProperty>
-          </systemProperties>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>-->
 
   <build>
     <resources>
@@ -208,21 +145,11 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>${version.maven-resources-plugin}</version>
         <configuration>
           <delimiters>
             <delimiter>@</delimiter>
           </delimiters>
           <useDefaultDelimiters>false</useDefaultDelimiters>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>${version.maven-compiler-plugin}</version>
-        <configuration>
-          <source>${maven.compiler.source}</source>
-          <target>${maven.compiler.target}</target>
         </configuration>
       </plugin>
       <plugin>
