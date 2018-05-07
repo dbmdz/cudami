@@ -128,7 +128,7 @@ public class UserServiceImpl implements UserService<User> {
 
   private org.springframework.security.core.userdetails.User buildUserForAuthentication(User user, List<? extends GrantedAuthority> authorities) {
     return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPasswordHash(),
-            user.isEnabled(), true, true, true, authorities);
+                                                                  user.isEnabled(), true, true, true, authorities);
   }
 
   @Override
@@ -138,11 +138,12 @@ public class UserServiceImpl implements UserService<User> {
   }
 
   private User save(String password1, String password2, User user, Errors results, boolean isUpdate) {
-    final PasswordsValidatorParams passwordsValidatorParams = new PasswordsValidatorParams(password1, password2, user
-            .getPasswordHash());
-    passwordsValidator.validate(passwordsValidatorParams, results);
+    final PasswordsValidatorParams passwordsValidatorParams = new PasswordsValidatorParams(password1, password2, user.getPasswordHash());
+    String password = passwordsValidatorParams.getPassword1();
+    if (!StringUtils.isEmpty(password)) {
+      passwordsValidator.validate(passwordsValidatorParams, results);
+    }
     if (!results.hasErrors()) {
-      String password = passwordsValidatorParams.getPassword1();
       if (!StringUtils.isEmpty(password)) {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String passwordHash = passwordEncoder.encode(password);
