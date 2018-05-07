@@ -33,7 +33,7 @@
     <div class="alert alert-warning" th:if="${#fields.hasAnyErrors()}">
       <span class="glyphicon glyphicon-warning-sign"></span> <span th:text="#{msg.correct_input_errors}">Correct invalid input, please.</span>
       <ul th:if="${#fields.hasErrors('global')}">
-        <li th:each="err : ${#fields.errors('global')}" th:text="${err}">Input is incorrect</li>
+        <li th:each="err : ${#fields.errors('global')}" th:utext="${err}">Input is incorrect</li>
       </ul>
     </div>
   </div>

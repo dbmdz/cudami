@@ -1,5 +1,14 @@
 package de.digitalcollections.cudami.admin.business.impl.validator;
 
+import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.passay.CharacterRule;
+import org.passay.EnglishCharacterData;
+import org.passay.LengthRule;
+import org.passay.PasswordData;
+import org.passay.PasswordValidator;
+import org.passay.RuleResult;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -11,6 +20,13 @@ import org.springframework.validation.Validator;
  */
 @Component
 public class PasswordsValidator implements Validator {
+
+  private static final Pattern PATTERN_SPECIAL_CHAR = Pattern.compile(".*[^a-zA-Z0-9]+.*");
+
+  protected boolean containsSpecialChar(String password) {
+    Matcher m = PATTERN_SPECIAL_CHAR.matcher(password);
+    return m.matches();
+  }
 
   @Override
   public boolean supports(Class<?> clazz) {
@@ -37,6 +53,37 @@ public class PasswordsValidator implements Validator {
 
     if (!StringUtils.isEmpty(password1) && password1.length() < 12) {
       errors.reject("error.password_min_length", new Object[]{12}, "Password's minimum length is 12.");
+      return;
+    }
+
+    final PasswordValidator validator = new PasswordValidator(Arrays.asList(
+            // minimum length 12, maximum length 30:
+            new LengthRule(12, 30),
+            // at least one upper case letter:
+            new CharacterRule(EnglishCharacterData.UpperCase, 1),
+            // at least one lower case letter:
+            new CharacterRule(EnglishCharacterData.LowerCase, 1),
+            // at least one digit character:
+            new CharacterRule(EnglishCharacterData.Digit, 1)));
+    // at least one symbol (special character):
+    //            new CharacterRule(EnglishCharacterData.Special, 1);
+    // rejects passwords that contain a sequence of 3 digits (e.g. 123):
+    //            new IllegalSequenceRule(EnglishSequenceData.Numerical, 3, false),
+    // rejects passwords that contain a sequence of 5 characters (e.g. "start"):
+    //            new IllegalSequenceRule(EnglishSequenceData.Alphabetical, 5, false),
+    // rejects passwords that contain a sequence of 5 line-up characters on keyboard (e.g. "qwert"):
+    //            new IllegalSequenceRule(EnglishSequenceData.USQwerty, 5, false),
+    // no whitespace characters:
+    //            new WhitespaceRule()));
+    final RuleResult result = validator.validate(new PasswordData(password1));
+    if (!result.isValid()) {
+      errors.reject("error.password_too_weak");
+      return;
+    }
+
+    // at least one special character
+    if (!containsSpecialChar(password1)) {
+      errors.reject("error.password_too_weak");
       return;
     }
   }

@@ -35,8 +35,8 @@ public class PasswordsValidator implements Validator {
       return;
     }
 
-    if (!StringUtils.isEmpty(password1) && password1.length() < 6) {
-      errors.reject("error.password_min_length", new Object[]{6}, "Password's minimum length is 6.");
+    if (!StringUtils.isEmpty(password1) && password1.length() < 12) {
+      errors.reject("error.password_min_length", new Object[]{12}, "Password's minimum length is 12.");
       return;
     }
   }
