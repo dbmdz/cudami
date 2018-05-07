@@ -5,8 +5,8 @@ import de.digitalcollections.cudami.model.api.security.enums.Role;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotBlank;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import org.springframework.util.StringUtils;
 
 public class UserImpl implements User {
