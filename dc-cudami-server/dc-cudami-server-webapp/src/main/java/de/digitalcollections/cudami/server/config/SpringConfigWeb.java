@@ -17,14 +17,13 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @Configuration
 @EnableAspectJAutoProxy
 //@PropertySource(value = {
 //  "classpath:de/digitalcollections/cudami/server/config/SpringConfigWeb-${spring.profiles.active:PROD}.properties"
 //})
-public class SpringConfigWeb extends WebMvcConfigurerAdapter implements WebMvcConfigurer, InitializingBean {
+public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfigWeb.class);
 
@@ -91,7 +90,6 @@ public class SpringConfigWeb extends WebMvcConfigurerAdapter implements WebMvcCo
   @Override
   public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
     converters.add(createXmlHttpMessageConverter());
-    super.configureMessageConverters(converters);
   }
 
   private HttpMessageConverter<Object> createXmlHttpMessageConverter() {

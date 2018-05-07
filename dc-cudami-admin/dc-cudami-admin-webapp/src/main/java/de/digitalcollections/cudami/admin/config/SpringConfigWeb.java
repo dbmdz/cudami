@@ -36,7 +36,7 @@ import org.springframework.web.servlet.config.annotation.DefaultServletHandlerCo
 import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.thymeleaf.dialect.springdata.SpringDataDialect;
@@ -53,7 +53,7 @@ import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 @EnableAspectJAutoProxy
 @EnableSpringDataWebSupport // for getting support for sorting and paging params
 @Import(SpringConfigCommonsMvc.class)
-public class SpringConfigWeb extends WebMvcConfigurerAdapter {
+public class SpringConfigWeb implements WebMvcConfigurer {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfigWeb.class);
 
