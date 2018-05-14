@@ -81,6 +81,10 @@ public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
   public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
     configurer
             .favorParameter(true)
+            .favorPathExtension(true)
+            //            .ignoreAcceptHeader(false)
+            .ignoreUnknownPathExtensions(true)
+            .useRegisteredExtensionsOnly(false)
             .defaultContentType(MediaType.APPLICATION_JSON); // we are are REST-Server (no HTML/Webapp!) !
     configurer.mediaType("html", MediaType.TEXT_HTML);
     configurer.mediaType("json", MediaType.APPLICATION_JSON);
