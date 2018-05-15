@@ -49,7 +49,7 @@ public class XmlHttpMessageConverter {
     aliases.put("content", ContentBlock.class);
     aliases.put("contentBlocksContainer", MultilanguageDocument.class);
     aliases.put("document", DocumentImpl.class);
-    aliases.put("embeddedCode", IFrameImpl.class);
+    aliases.put("iframe", IFrameImpl.class);
     aliases.put("hardBreak", HardBreakImpl.class);
     aliases.put("heading", HeadingImpl.class);
     aliases.put("listItem", ListItemImpl.class);
