@@ -288,8 +288,12 @@
           }
         },
         {
-          "type": "embedded_code",
-          "code": "<iframe style=\"border: 1px solid lightgrey\" frameborder=\"no\" width=\"98%\" height=\"auto\" src=\"https://statistiken.digitale-sammlungen.de/index.php?module=CoreAdminHome&amp;action=optOut&amp;language=de\"></iframe>"
+          "type": "iframe",
+          "attrs": {
+            "src": "https://statistiken.digitale-sammlungen.de/index.php?module=CoreAdminHome&amp;action=optOut&amp;language=de",
+            "height": "auto",
+            "width": "98%"
+          }
         }
       ]
     }

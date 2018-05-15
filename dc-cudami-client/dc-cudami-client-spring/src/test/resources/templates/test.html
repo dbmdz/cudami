@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>test page</title>
+  </head>
+
+  <body>
+    <div th:if="${block}" th:insert="cudami/fragments/webpage-to-html :: renderContentBlock(${block})">...</div>
+  </body>
+</html>

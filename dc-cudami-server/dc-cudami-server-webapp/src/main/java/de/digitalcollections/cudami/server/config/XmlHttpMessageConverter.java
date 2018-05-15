@@ -19,7 +19,7 @@ import de.digitalcollections.prosemirror.model.impl.MarkImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.BlockquoteImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.BulletListImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.CodeBlockImpl;
-import de.digitalcollections.prosemirror.model.impl.contentblocks.EmbeddedCodeImpl;
+import de.digitalcollections.prosemirror.model.impl.contentblocks.IFrameImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.HardBreakImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.HeadingImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.ListItemImpl;
@@ -49,7 +49,7 @@ public class XmlHttpMessageConverter {
     aliases.put("content", ContentBlock.class);
     aliases.put("contentBlocksContainer", MultilanguageDocument.class);
     aliases.put("document", DocumentImpl.class);
-    aliases.put("embeddedCode", EmbeddedCodeImpl.class);
+    aliases.put("embeddedCode", IFrameImpl.class);
     aliases.put("hardBreak", HardBreakImpl.class);
     aliases.put("heading", HeadingImpl.class);
     aliases.put("listItem", ListItemImpl.class);
