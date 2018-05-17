@@ -34,7 +34,6 @@
   </th:block>
 
   <th:block th:fragment="renderContentBlock(block)">
-
     <th:block th:if="${block.class.simpleName == 'BlockquoteImpl'}">
       <blockquote>
         <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
@@ -83,6 +82,24 @@
         th:attr="src=${attr.get('src') != null}?${attr.get('src')}, width=${attr.get('width') != null}?${attr.get('width')}, height=${attr.get('height') != null}?${attr.get('height')}"></iframe>
     </th:block>
 
+    <th:block th:if="${block.class.simpleName == 'ListItemImpl'}">
+      <li>
+      <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
+      </li>
+    </th:block>
+
+    <th:block th:if="${block.class.simpleName == 'OrderedListImpl'}">
+      <ol>
+        <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
+      </ol>
+    </th:block>
+
+    <th:block th:if="${block.class.simpleName == 'ParagraphImpl'}">
+      <p>
+      <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
+      </p>
+    </th:block>
+
     <th:block th:if="${block.class.simpleName == 'TextImpl'}">
       <th:block th:if="${block.marks}">
         <th:block th:each="mark, iter : ${block.marks}">
@@ -110,52 +127,6 @@
       </th:block>
     </th:block>
   </th:block>
-
-  <th:block th:if="${block.class.simpleName == 'ListItemImpl'}">
-    <li>
-    <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
-  </li>
-</th:block>
-
-<th:block th:if="${block.class.simpleName == 'OrderedListImpl'}">
-  <ol>
-    <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
-  </ol>
-</th:block>
-
-<th:block th:if="${block.class.simpleName == 'ParagraphImpl'}">
-  <p>
-  <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
-</p>
-</th:block>
-
-<th:block th:if="${block.class.simpleName == 'TextImpl'}">
-  <th:block th:if="${block.marks}">
-    <th:block th:each="mark, iter : ${block.marks}">
-      <th:block th:if="${mark.type} == 'link'">
-        <th:block th:utext="'<a '"></th:block>
-        <th:block th:each="attribute, iter : ${mark.attributes.entrySet()}">
-          <th:block th:text="${attribute.key} + '='"></th:block>
-          "<th:block th:text="${attribute.value}"></th:block>"
-        </th:block>
-        <th:block th:utext="'>'"></th:block>
-      </th:block>
-      <th:block th:unless="${mark.type} == 'link'" th:utext="'<' + ${mark.type} + '>'"></th:block>
-    </th:block>
-  </th:block>
-  <th:block th:utext="${block.text}">...</th:block>
-  <th:block th:if="${block.marks}">
-    <th:block th:each="mark, iter : ${T(com.google.common.collect.ImmutableList).copyOf(block.marks).reverse()}">
-      <th:block th:if="${mark.type} == 'link'">
-        <th:block th:utext="'</a>'"></th:block>
-      </th:block>
-      <th:block th:unless="${mark.type} == 'link'">
-        <th:block th:utext="'</' + ${mark.type} + '>'"></th:block>
-      </th:block>
-    </th:block>
-  </th:block>
-</th:block>
-</th:block>
 
 </body>
 </html>
