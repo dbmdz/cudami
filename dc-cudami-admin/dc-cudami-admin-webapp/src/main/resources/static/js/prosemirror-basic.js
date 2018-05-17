@@ -8,24 +8,24 @@
       width: {}
     },
     draggable: true,
+    group: 'block',
     inline: false,
     parseDOM: [{
-      tag: 'div.iframe-placeholder',
+      tag: 'iframe[src]',
       getAttrs: function(element){
         return {
-          'height': element.getAttribute('data-height'),
-          'src': element.getAttribute('data-src'),
-          'width': element.getAttribute('data-width')
+          'height': element.getAttribute('height'),
+          'src': element.getAttribute('src'),
+          'width': element.getAttribute('width')
         };
       }
     }],
     toDOM: function(node){
-      return ['div', {
-        'class': 'iframe-placeholder',
-        'data-height': node.attrs.height,
-        'data-src': node.attrs.src,
-        'data-width': node.attrs.width,
-        'title': node.attrs.src
+      return ['iframe', {
+        'height': node.attrs.height,
+        'sandbox': '',
+        'src': node.attrs.src,
+        'width': node.attrs.width,
       }];
     }
   };
@@ -77,12 +77,17 @@
     return false;
   }
 
-  var openIframeDialog = function(view){
+  var openIframeDialog = function(state, view, nodeType){
     $(document.body).append(iframeDialogTemplate);
+    if(state.selection instanceof prosemirrorState.NodeSelection && state.selection.node.type === nodeType){
+      var attrs = state.selection.node.attrs;
+      $('#iframe-dialog #iframe-height').val(attrs.height);
+      $('#iframe-dialog #iframe-src').val(attrs.src);
+      $('#iframe-dialog #iframe-width').val(attrs.width);
+    }
     $('#iframe-dialog form').submit(function(evt){
       evt.preventDefault();
-      console.log(view.state.tr);
-      view.dispatch(view.state.tr.replaceSelectionWith(schema.nodes.iframe.createAndFill({
+      view.dispatch(view.state.tr.replaceSelectionWith(nodeType.createAndFill({
         'height': $(this).find('#iframe-height').val(),
         'src': $(this).find('#iframe-src').val(),
         'width': $(this).find('#iframe-width').val()
@@ -101,7 +106,7 @@
     title: 'Insert iframe',
     label: 'Iframe',
     enable: function(state){ return canInsertIframe(state, schema.nodes.iframe); },
-    run: function(state, _, view){ openIframeDialog(view); }
+    run: function(state, _, view){ openIframeDialog(state, view, schema.nodes.iframe); }
   }));
 
   var contents = $('.content');
