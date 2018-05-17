@@ -148,3 +148,6 @@ div.editor {
   border-color: #4863a0;
   transition: 0.4s;
 }
+iframe.editable {
+  border: 5px dashed;
+}

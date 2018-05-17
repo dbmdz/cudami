@@ -22,6 +22,7 @@
     }],
     toDOM: function(node){
       return ['iframe', {
+        'class': 'editable',
         'height': node.attrs.height,
         'sandbox': '',
         'src': node.attrs.src,
