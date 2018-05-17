@@ -5,6 +5,7 @@ import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.core.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.cudami.model.api.identifiable.parts.MultilanguageDocument;
+import de.digitalcollections.cudami.model.api.identifiable.parts.Translation;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.model.impl.identifiable.parts.MultilanguageDocumentImpl;
 import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
@@ -18,6 +19,7 @@ import de.digitalcollections.prosemirror.model.impl.DocumentImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.ParagraphImpl;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
@@ -98,6 +100,16 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
       return null;
     }
     return list.get(0);
+  }
+
+  @Override
+  public Webpage findOne(UUID uuid, Locale locale) {
+    Webpage webpage = findOne(uuid);
+    // TODO maybe a better solution to just get locale specific fields directly from database instead of removing it here?
+    webpage.getLabel().getTranslations().removeIf((Translation translation) -> !translation.getLocale().equals(locale));
+    webpage.getDescription().getDocuments().entrySet().removeIf((Map.Entry entry) -> !entry.getKey().equals(locale));
+    webpage.getText().getDocuments().entrySet().removeIf((Map.Entry entry) -> !entry.getKey().equals(locale));
+    return webpage;
   }
 
   @Override

@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.WebpageRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.WebpageService;
+import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,11 @@ public class WebpageServiceImpl implements WebpageService<Webpage> {
   @Override
   public Webpage get(UUID uuid) {
     return (Webpage) webpageRepository.findOne(uuid);
+  }
+
+  @Override
+  public Webpage get(UUID uuid, Locale locale) throws IdentifiableServiceException {
+    return (Webpage) webpageRepository.findOne(uuid, locale);
   }
 
   @Override
