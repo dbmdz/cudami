@@ -84,6 +84,7 @@
     <!-- plugins -->
     <version.apt-maven-plugin>1.1.3</version.apt-maven-plugin>
     <version.exec-maven-plugin>1.5.0</version.exec-maven-plugin>
+    <version.jacoco-maven-plugin>0.8.1</version.jacoco-maven-plugin>
     <version.jetty-maven-plugin>9.4.0.v20161208</version.jetty-maven-plugin>
     <version.lesscss-maven-plugin>1.7.0.1.1</version.lesscss-maven-plugin>
     <version.maven-compiler-plugin>3.6.1</version.maven-compiler-plugin>
@@ -484,6 +485,31 @@
           <target>${maven.compiler.target}</target>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${version.jacoco-maven-plugin}</version>
+        <executions>
+          <execution>
+            <id>pre-unit-test</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <excludes>
+            <exclude>**/Application.*</exclude>
+            <exclude>**/SpringConfig*</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
     </plugins>
     <pluginManagement>
       <plugins>
@@ -554,4 +580,14 @@
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </repository>
   </repositories>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${version.jacoco-maven-plugin}</version>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>
