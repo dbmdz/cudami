@@ -2,13 +2,57 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <name>DigitalCollections: cudami</name>
   <groupId>de.digitalcollections.cudami</groupId>
   <artifactId>dc-cudami</artifactId>
   <version>2.2.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
+  <name>DigitalCollections: cudami</name>
   <description>Cudami is a Digital Asset Management System for management and editing of cultural objects.</description>
+  <url>https://github.com/dbmdz/cudami</url>
+
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>https://github.com/dbmdz/cudami/blob/master/LICENSE</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>Ralf Eichinger</name>
+      <email>ralf.eichinger@bsb-muenchen.de</email>
+      <id>datazuul</id>
+    </developer>
+    <developer>
+      <name>Matthias Lindinger</name>
+      <email>matthias.lindinger@bsb-muenchen.de</email>
+      <id>morpheus-87</id>
+    </developer>
+    <developer>
+      <name>Christoph Lorenz</name>
+      <email>christoph.lorenz@bsb-muenchen.de</email>
+      <id>clorenz</id>
+    </developer>
+    <developer>
+      <name>Thomas Zirngibl</name>
+      <email>thomas.zirngibl@bsb-muenchen.de</email>
+      <id>tomzirn</id>
+    </developer>
+  </developers>
+  <ciManagement>
+    <system>Travis CI</system>
+    <url>https://travis-ci.org/dbmdz/cudami</url>
+  </ciManagement>
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/dbmdz/cudami/issues</url>
+  </issueManagement>
+  <scm>
+    <connection>https://github.com/dbmdz/cudami.git</connection>
+    <developerConnection>git@github.com:dbmdz/cudami.git</developerConnection>
+    <url>https://github.com/dbmdz/cudami</url>
+  </scm>
 
   <modules>
     <module>dc-cudami-model-parent</module>
@@ -88,9 +132,13 @@
     <version.jetty-maven-plugin>9.4.0.v20161208</version.jetty-maven-plugin>
     <version.lesscss-maven-plugin>1.7.0.1.1</version.lesscss-maven-plugin>
     <version.maven-compiler-plugin>3.6.1</version.maven-compiler-plugin>
+    <version.maven-gpg-plugin>1.6</version.maven-gpg-plugin>
+    <version.maven-javadoc-plugin>3.0.0</version.maven-javadoc-plugin>
     <version.maven-resources-plugin>2.7</version.maven-resources-plugin>
+    <version.maven-source-plugin>3.0.1</version.maven-source-plugin>
     <version.maven-surefire-plugin>2.19.1</version.maven-surefire-plugin>
     <version.maven-war-plugin>2.3</version.maven-war-plugin>
+    <version.nexus-staging-maven-plugin>1.6.8</version.nexus-staging-maven-plugin>
   </properties>
 
   <dependencyManagement>
@@ -486,6 +534,32 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>${version.maven-javadoc-plugin}</version>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>${version.maven-source-plugin}</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
         <version>${version.jacoco-maven-plugin}</version>
@@ -508,6 +582,17 @@
             <exclude>**/Application.*</exclude>
             <exclude>**/SpringConfig*</exclude>
           </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>${version.nexus-staging-maven-plugin}</version>
+        <extensions>true</extensions>
+        <configuration>
+          <serverId>ossrh</serverId>
+          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>true</autoReleaseAfterClose>
         </configuration>
       </plugin>
     </plugins>
@@ -578,6 +663,12 @@
       <id>ossrh-snapshots</id>
       <name>Sonatype Nexus Snapshots</name>
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
     </repository>
   </repositories>
 
@@ -590,4 +681,28 @@
       </plugin>
     </plugins>
   </reporting>
+
+  <profiles>
+    <profile>
+      <id>deploy</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>${version.maven-gpg-plugin}</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
