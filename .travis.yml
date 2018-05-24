@@ -1,0 +1,23 @@
+language: java
+jdk:
+- oraclejdk8
+
+before_script:
+- if [ ! -z "$TRAVIS_TAG" ]; then mvn versions:set -DnewVersion=$TRAVIS_TAG; fi
+
+script:
+- mvn clean install
+
+after_success:
+- bash <(curl -s https://codecov.io/bash)
+
+deploy:
+  provider: releases
+  api_key:
+    secure: oTXozaI9Srkeqfgf397bIxjFM46fHfWKWgkiNL9iS1320I6wruc2wRmeAyjtiythLpoAOTEBS/Lo88KbL3r2dBN/Sp98/SHuW7zvSNQL6JYQkErhQGXh1mSeX7z6eaNvHa8BVlMdNhki7mmpxBndz705CBhr9pSe/EE+p12RkM8nyDXBcqhf+46+NRUjmAD3oL6dS8JjwMgX2GhNukUQ1UhLdiyILBHmsM/hIsTW0ES+h7tgUgPQUpopf4UwCwhTqvmEbJeqlOaEKzfnMwkE1cmCJ2wZEsmTQqllnQXh53iDcoeYaBcv+Qv6E0dRcrtZHVVaFXE7neHMpUqZCtrKRnIMkAAzVD7Jvg81YOp36AiiF9ONrOgHnPTTBa6Y6jZ5dbqBXQGPKRAgcIw1/YzAoKY+ZPP/n77t3uZYFZOWhzM7G42iwJVZDdYCixp4ma9oxNX6SdBhHkVILIuo7ZOpFItHZj1zgJupvf7hv9C7jq56dgXaS4ejo9TVAvLajH24EWUKqB4Lz2ippKW8ifJkggSy33/5ytgKqe340gVAzEyHIsfr+lAYDVi8uMKD4r/PNBz5O3KvH0XJPTc3pZBSx0K9Pi1e2RvvLEawJShDb8E58xzenR4L+jnl4Kks5NaEGqn4w28nCJuzfTxpw5WDGqml0MXtMKA3vuj03SdeNQY=
+  file_glob: true
+  file:
+    - "**/target/*.jar"
+  skip_cleanup: true
+  on:
+    tags: true
