@@ -1,9 +1,12 @@
 # cudami (cultural digital asset management)
 
+[![Javadocs](http://javadoc.io/badge/de.digitalcollections.cudami/dc-cudami.svg)](http://javadoc.io/doc/de.digitalcollections.cudami/dc-cudami)
 [![Build Status](https://travis-ci.org/dbmdz/cudami.svg?branch=master)](https://travis-ci.org/dbmdz/cudami)
 [![Codebeat](https://codebeat.co/badges/f592b49d-3ba1-407b-a6b4-6e7c9850a7b0)](https://codebeat.co/projects/github-com-dbmdz-cudami-master)
 [![Codecov](https://codecov.io/gh/dbmdz/cudami/branch/master/graph/badge.svg)](https://codecov.io/gh/dbmdz/cudami)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![GitHub release](https://img.shields.io/github/release/dbmdz/cudami.svg?maxAge=2592000)](https://github.com/dbmdz/cudami/releases)
+[![Maven Central](https://img.shields.io/maven-central/v/de.digitalcollections.cudami/dc-cudami.svg?maxAge=2592000)](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22cudami%22)
 
 cudami is an editorial backoffice for managing cultural digital assets like websites, articles, digitized objects, digital native objects and entities.
 
