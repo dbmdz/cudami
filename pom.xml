@@ -103,16 +103,16 @@
     <version.slf4j-log4j12>1.7.24</version.slf4j-log4j12>
     <version.snakeyaml>1.19</version.snakeyaml><!-- do not upgrade! see https://github.com/spring-projects/spring-boot/issues/12793 -->
     <version.spring-aop>5.0.5.RELEASE</version.spring-aop>
-    <version.spring-boot>2.0.1.RELEASE</version.spring-boot>
-    <version.spring-context>5.0.5.RELEASE</version.spring-context>
+    <version.spring-boot>2.0.2.RELEASE</version.spring-boot>
+    <version.spring-context>5.0.6.RELEASE</version.spring-context>
     <version.spring-data-commons>1.13.1.RELEASE</version.spring-data-commons>
     <version.spring-data-jpa>1.11.0.RELEASE</version.spring-data-jpa>
-    <version.spring-orm>5.0.5.RELEASE</version.spring-orm>
-    <version.spring-security>5.0.4.RELEASE</version.spring-security>
-    <version.spring-test>5.0.5.RELEASE</version.spring-test>
-    <version.spring-tx>5.0.5.RELEASE</version.spring-tx>
-    <version.spring-web>5.0.5.RELEASE</version.spring-web>
-    <version.spring-webmvc>5.0.5.RELEASE</version.spring-webmvc>
+    <version.spring-orm>5.0.6.RELEASE</version.spring-orm>
+    <version.spring-security>5.0.5.RELEASE</version.spring-security>
+    <version.spring-test>5.0.6.RELEASE</version.spring-test>
+    <version.spring-tx>5.0.6.RELEASE</version.spring-tx>
+    <version.spring-web>5.0.6.RELEASE</version.spring-web>
+    <version.spring-webmvc>5.0.6.RELEASE</version.spring-webmvc>
     <version.unbescape>1.1.4.RELEASE</version.unbescape>
     <version.xstream>1.4.10</version.xstream>
 
