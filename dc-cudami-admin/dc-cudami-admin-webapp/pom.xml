@@ -24,7 +24,6 @@
 
     <version.logstash-logback-encoder>5.1</version.logstash-logback-encoder>
     <version.maven-resources-plugin>2.7</version.maven-resources-plugin>
-    <version.spring-boot>2.0.1.RELEASE</version.spring-boot>
     <version.thymeleaf-spring-data-dialect>3.3.0</version.thymeleaf-spring-data-dialect>
   </properties>
 

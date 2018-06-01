@@ -17,7 +17,6 @@
   <properties>
     <version.jsondoc-ui-webjar>1.2.17</version.jsondoc-ui-webjar>
     <version.logstash-logback-encoder>5.1</version.logstash-logback-encoder>
-    <version.spring-boot>2.0.1.RELEASE</version.spring-boot>
     <version.spring-boot-starter-jsondoc>1.2.19</version.spring-boot-starter-jsondoc>
   </properties>
 
