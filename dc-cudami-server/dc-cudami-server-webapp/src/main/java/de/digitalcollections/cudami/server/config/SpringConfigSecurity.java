@@ -10,6 +10,9 @@ public class SpringConfigSecurity extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
+    // make it possible to render HTML response from API in an iframe
+    http.headers().frameOptions().disable();
+
     // CSRF handling is 'on' by default with Spring Security
     // see https://stackoverflow.com/questions/38108357/how-to-enable-post-put-and-delete-methods-in-spring-security
     // https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-security.html#boot-features-security-csrf
