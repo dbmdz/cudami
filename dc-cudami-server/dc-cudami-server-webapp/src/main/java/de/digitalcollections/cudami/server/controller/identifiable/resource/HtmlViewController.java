@@ -40,11 +40,11 @@ public class HtmlViewController {
           Model model
   ) throws IdentifiableServiceException {
 
-    if (pLocale == null) {
-      pLocale = localeService.getDefault();
-    }
+//    if (pLocale == null) {
+//      pLocale = localeService.getDefault();
+//    }
     // TODO implement locale specific webpage get
-    Webpage webpage = (Webpage) webpageServcie.get(uuid, pLocale);
+    Webpage webpage = (Webpage) webpageServcie.get(uuid);
     Locale returnedLocale = getLocale(webpage);
     model.addAttribute("locale", returnedLocale);
     model.addAttribute("webpage", webpage);
