@@ -4,8 +4,10 @@ import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.WebpageService;
+
 import java.util.Locale;
 import java.util.UUID;
+
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiPathParam;
 import org.jsondoc.core.annotation.ApiQueryParam;
@@ -29,7 +31,7 @@ public class HtmlViewController {
   private LocaleService localeService;
 
   @Autowired
-  private WebpageService webpageServcie;
+  private WebpageService webpageService;
 
   @ApiMethod(description = "get a webpage as HTML")
   @RequestMapping(value = {"/v1/webpages/{uuid}.html"}, produces = {MediaType.TEXT_HTML_VALUE}, method = RequestMethod.GET)
@@ -40,13 +42,14 @@ public class HtmlViewController {
           Model model
   ) throws IdentifiableServiceException {
 
-//    if (pLocale == null) {
-//      pLocale = localeService.getDefault();
-//    }
-    // TODO implement locale specific webpage get
-    Webpage webpage = (Webpage) webpageServcie.get(uuid);
-    Locale returnedLocale = getLocale(webpage);
-    model.addAttribute("locale", returnedLocale);
+    Webpage webpage;
+    if (pLocale == null) {
+      webpage = (Webpage) webpageService.get(uuid);
+    } else {
+      webpage = (Webpage) webpageService.get(uuid, pLocale);
+      Locale returnedLocale = getLocale(webpage);
+      model.addAttribute("locale", returnedLocale);
+    }
     model.addAttribute("webpage", webpage);
     return "webpage";
   }
@@ -55,7 +58,7 @@ public class HtmlViewController {
     if (webpage == null) {
       return null;
     }
-    Locale returnedLocale = webpage.getText().getDocuments().keySet().iterator().next();
+    Locale returnedLocale = webpage.getLabel().getTranslations().stream().findFirst().get().getLocale();
     return returnedLocale;
   }
 

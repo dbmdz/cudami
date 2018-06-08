@@ -17,10 +17,9 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSo
 import de.digitalcollections.prosemirror.model.api.Document;
 import de.digitalcollections.prosemirror.model.impl.DocumentImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.ParagraphImpl;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
+
+import java.util.*;
+
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,10 +104,30 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
   @Override
   public Webpage findOne(UUID uuid, Locale locale) {
     Webpage webpage = findOne(uuid);
+    Set<Translation> translations = webpage.getLabel().getTranslations();
+
+    if (locale == null) {
+      // just return first existing locale
+      Optional<Translation> translation = translations.stream().findFirst();
+      locale = translation.map(Translation::getLocale).orElse(null);
+    }
+    final Locale fLocale = locale;
+    if (fLocale == null) {
+      // a webpage/identifiable without label does not make sense...
+      return null;
+    }
+
+    // if requested locale does not exist, return null
+    boolean requestedTranslationExists = translations.stream().anyMatch(translation -> translation.getLocale().equals(fLocale));
+    if (!requestedTranslationExists) {
+      return null;
+    }
+
     // TODO maybe a better solution to just get locale specific fields directly from database instead of removing it here?
-    webpage.getLabel().getTranslations().removeIf((Translation translation) -> !translation.getLocale().equals(locale));
-    webpage.getDescription().getDocuments().entrySet().removeIf((Map.Entry entry) -> !entry.getKey().equals(locale));
-    webpage.getText().getDocuments().entrySet().removeIf((Map.Entry entry) -> !entry.getKey().equals(locale));
+    // iterate over all localized fields and remove all texts that are not matching the requested locale:
+    webpage.getLabel().getTranslations().removeIf(translation -> !translation.getLocale().equals(fLocale));
+    webpage.getDescription().getDocuments().entrySet().removeIf(entry -> !entry.getKey().equals(fLocale));
+    webpage.getText().getDocuments().entrySet().removeIf((Map.Entry entry) -> !entry.getKey().equals(fLocale));
     return webpage;
   }
 

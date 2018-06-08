@@ -41,14 +41,14 @@ public class WebpageController {
   private LocaleService localeService;
 
   @Autowired
-  private WebpageService service;
+  private WebpageService<Webpage> webpageService;
 
   @ApiMethod(description = "get all webpages")
   @RequestMapping(value = "/v1/webpages",
           //params = {"pageNumber", "pageSize", "sortField", "sortDirection", "nullHandling"},
           produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
-  public PageResponse<Website> findAll(
+  public PageResponse<Webpage> findAll(
           @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
           @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
           @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
@@ -59,7 +59,7 @@ public class WebpageController {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
-    return service.find(pageRequest);
+    return webpageService.find(pageRequest);
   }
 
   // Test-URL: http://localhost:9000/v1/webpages/599a120c-2dd5-11e8-b467-0ed5f89f718b
@@ -72,11 +72,12 @@ public class WebpageController {
           @RequestParam(name = "pLocale", required = false) Locale pLocale
   ) throws IdentifiableServiceException {
 
-//    if (pLocale == null) {
-//      pLocale = localeService.getDefault();
-//    }
-    // TODO implement locale specific webpage get
-    Webpage webpage = (Webpage) service.get(uuid);
+    Webpage webpage;
+    if (pLocale == null) {
+      webpage = webpageService.get(uuid);
+    } else {
+      webpage = webpageService.get(uuid, pLocale);
+    }
     return new ResponseEntity<>(webpage, HttpStatus.OK);
   }
 
@@ -84,7 +85,7 @@ public class WebpageController {
   @RequestMapping(value = "/v1/websites/{websiteUuid}/webpage", produces = "application/json", method = RequestMethod.POST)
   @ApiResponseObject
   public Webpage save(@PathVariable UUID websiteUuid, @RequestBody Webpage webpage, BindingResult errors) throws IdentifiableServiceException {
-    return (Webpage) service.save(webpage, websiteUuid);
+    return webpageService.save(webpage, websiteUuid);
   }
 
   @ApiMethod(description = "update a webpage")
@@ -92,7 +93,7 @@ public class WebpageController {
   @ApiResponseObject
   public Webpage update(@PathVariable UUID uuid, @RequestBody Webpage webpage, BindingResult errors) throws IdentifiableServiceException {
     assert Objects.equals(uuid, webpage.getUuid());
-    return (Webpage) service.update(webpage);
+    return webpageService.update(webpage);
   }
 
 }

@@ -4,6 +4,7 @@ import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.WebpageRepository;
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.WebpageService;
 import java.util.Locale;
@@ -23,7 +24,10 @@ public class WebpageServiceImpl implements WebpageService<Webpage> {
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpageServiceImpl.class);
 
   @Autowired
-  private WebpageRepository webpageRepository;
+  private WebpageRepository<Webpage> webpageRepository;
+
+  @Autowired
+  private LocaleService localeService;
 
   @Override
   public long count() {
@@ -47,7 +51,19 @@ public class WebpageServiceImpl implements WebpageService<Webpage> {
 
   @Override
   public Webpage get(UUID uuid, Locale locale) throws IdentifiableServiceException {
-    return (Webpage) webpageRepository.findOne(uuid, locale);
+    Webpage webpage = webpageRepository.findOne(uuid, locale);
+
+    // webpage does not exist in requested language, so try with default locale
+    if (webpage == null) {
+      webpage = webpageRepository.findOne(uuid, localeService.getDefault());
+    }
+
+    // webpage does not exist in default locale, so just return first existing language
+    if (webpage == null) {
+      webpage = webpageRepository.findOne(uuid, null);
+    }
+
+    return webpage;
   }
 
   @Override
