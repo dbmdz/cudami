@@ -149,12 +149,10 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
             .bindBean(webpage)
             .execute());
 
-    dbi.withHandle(h -> {
-      return h.createUpdate("INSERT INTO website_webpage(website_uuid, webpage_uuid) VALUES (:website_uuid, :uuid)")
-              .bind("website_uuid", websiteUuid)
-              .bindBean(webpage)
-              .execute();
-    });
+    dbi.withHandle(h -> h.createUpdate("INSERT INTO website_webpage(website_uuid, webpage_uuid) VALUES (:website_uuid, :uuid)")
+            .bind("website_uuid", websiteUuid)
+            .bindBean(webpage)
+            .execute());
 
     return findOne(webpage.getUuid());
   }

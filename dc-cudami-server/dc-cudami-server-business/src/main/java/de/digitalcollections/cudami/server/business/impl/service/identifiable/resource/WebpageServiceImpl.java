@@ -36,7 +36,7 @@ public class WebpageServiceImpl implements WebpageService<Webpage> {
 
   @Override
   public Webpage create() {
-    return (Webpage) webpageRepository.create();
+    return webpageRepository.create();
   }
 
   @Override
@@ -46,7 +46,7 @@ public class WebpageServiceImpl implements WebpageService<Webpage> {
 
   @Override
   public Webpage get(UUID uuid) {
-    return (Webpage) webpageRepository.findOne(uuid);
+    return webpageRepository.findOne(uuid);
   }
 
   @Override
@@ -75,7 +75,7 @@ public class WebpageServiceImpl implements WebpageService<Webpage> {
   //  @Transactional(readOnly = false)
   public Webpage save(Webpage webpage, UUID websiteUuid) throws IdentifiableServiceException {
     try {
-      return (Webpage) webpageRepository.save(webpage, websiteUuid);
+      return webpageRepository.save(webpage, websiteUuid);
     } catch (Exception e) {
       LOGGER.error("Cannot save webpage " + webpage + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
@@ -86,7 +86,7 @@ public class WebpageServiceImpl implements WebpageService<Webpage> {
   //  @Transactional(readOnly = false)
   public Webpage update(Webpage webpage) throws IdentifiableServiceException {
     try {
-      return (Webpage) webpageRepository.update(webpage);
+      return webpageRepository.update(webpage);
     } catch (Exception e) {
       LOGGER.error("Cannot update webpage " + webpage + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
