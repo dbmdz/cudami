@@ -158,7 +158,7 @@ $ docker-compose down
 
 ## Build
 
-Build CMS:
+Build cudami:
 
     $ cd <cudami source directory>
     $ mvn clean install
@@ -170,8 +170,8 @@ Build CMS:
 Start repository and then cudami GUI webapp:
 
 ```sh
-$ java -jar dc-cudami-server-webapp-1.1.0-SNAPSHOT-exec.jar --spring.profiles.active=local &
-$ java -jar dc-cudami-client-webapp-1.1.0-SNAPSHOT-exec.jar --spring.profiles.active=local &
+$ java -jar dc-cudami-server-webapp-<VERSION>-exec.jar --spring.profiles.active=local &
+$ java -jar dc-cudami-admin-webapp-<VERSION>-exec.jar --spring.profiles.active=local &
 ```
 
 ### Run cudami (with "PROD" profile = configuration for production)
@@ -179,8 +179,8 @@ $ java -jar dc-cudami-client-webapp-1.1.0-SNAPSHOT-exec.jar --spring.profiles.ac
 Start repository and then cudami GUI webapp:
 
 ```sh
-$ java -jar dc-cudami-server-webapp-1.1.0-SNAPSHOT-exec.jar --spring.profiles.active=PROD &
-$ java -jar dc-cudami-client-webapp-1.1.0-SNAPSHOT-exec.jar --spring.profiles.active=PROD &
+$ java -jar dc-cudami-server-webapp-<VERSION>-exec.jar --spring.profiles.active=PROD &
+$ java -jar dc-cudami-client-webapp-<VERSION>-exec.jar --spring.profiles.active=PROD &
 ```
 
 ### GUI
