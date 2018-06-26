@@ -37,6 +37,62 @@ Features:
 * Layer modularization (Frontend, Business, Backend; each API and IMPL)
 * Completely REST-based repository
 
+## Development Quickstart using Docker Compose
+
+Install Docker according to the official [Docker documentation](https://www.docker.com/products/overview).
+
+Add your user to docker group to run docker without sudo:
+
+```shell
+$ sudo groupadd docker
+$ sudo gpasswd -a yourusername docker
+$ sudo service docker restart
+```
+
+Install Docker Compose according to the official [documentation](https://docs.docker.com/compose/install/).
+
+To get cudami quickly up running, you can start all backend services using Docker Compose:
+
+```shell
+$ cd dc-cudami-server
+$ docker-compose build
+$ docker-compose up -d
+```
+
+Then PostgreSql is running in a container and everything is ready for running a local instance of cudami (see below).
+
+To start cudami server webapp, you have to run:
+
+```shell
+$ cd dc-cudami-server/dc-cudami-server-webapp
+$ java -jar dc-cudami-server-webapp-<VERSION>.jar
+```
+
+The cudami server webapp is now running under <http://localhost:9000/>.
+
+To start cudami admin webapp, you have to run:
+
+```shell
+$ cd dc-cudami-admin/dc-cudami-admin-webapp
+$ java -jar dc-cudami-admin-webapp-<VERSION>.jar
+```
+
+The cudami admin webapp is now running under <http://localhost:9898/>.
+
+To stop the container run
+
+```shell
+$ cd dc-cudami-server
+$ docker-compose stop
+```
+
+To delete the container and all data:
+
+```shell
+$ cd dc-cudami-server
+$ docker-compose down
+```
+
 ## Installation
 
 1.  Install PostgreSql:
@@ -54,13 +110,13 @@ Features:
 2.  Create a database on your PostgreSql instance:
 
         $ sudo su - postgres
-    
+
         ($ dropdb 'cudami')
-    
+
         $ psql -c "CREATE USER cudami PASSWORD 'somepassword';"
-    
+
         CREATE ROLE
-    
+
         $ createdb cudami -O cudami
 
     Check:
@@ -71,12 +127,12 @@ Features:
                                           List of databases
            Name    |  Owner   | Encoding |   Collate   |    Ctype    |   Access privileges   
         -----------+----------+----------+-------------+-------------+-----------------------
-         postgres  | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | 
+         postgres  | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 |
          template0 | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =c/postgres          +
                    |          |          |             |             | postgres=CTc/postgres
          template1 | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =c/postgres          +
                    |          |          |             |             | postgres=CTc/postgres
-         cudami    | cudami   | UTF8     | en_US.UTF-8 | en_US.UTF-8 | 
+         cudami    | cudami   | UTF8     | en_US.UTF-8 | en_US.UTF-8 |
          (4 rows)
 
     List tables of database cudami:
