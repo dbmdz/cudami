@@ -7,6 +7,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.r
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.WebpageService;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -67,15 +68,31 @@ public class WebpageServiceImpl implements WebpageService<Webpage> {
   }
 
   @Override
+  public List<Webpage> getSubPages(Webpage webpage) {
+    return webpageRepository.getSubPages(webpage);
+  }
+
+  @Override
   public Webpage save(Webpage webpage) throws IdentifiableServiceException {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
   //  @Transactional(readOnly = false)
-  public Webpage save(Webpage webpage, UUID websiteUuid) throws IdentifiableServiceException {
+  public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid) throws IdentifiableServiceException {
     try {
-      return webpageRepository.save(webpage, websiteUuid);
+      return webpageRepository.saveWithParentWebsite(webpage, parentWebsiteUuid);
+    } catch (Exception e) {
+      LOGGER.error("Cannot save top-level webpage " + webpage + ": ", e);
+      throw new IdentifiableServiceException(e.getMessage());
+    }
+  }
+
+  @Override
+  //  @Transactional(readOnly = false)
+  public Webpage saveWithParentWebpage(Webpage webpage, UUID parentWebpageUuid) throws IdentifiableServiceException {
+    try {
+      return webpageRepository.saveWithParentWebpage(webpage, parentWebpageUuid);
     } catch (Exception e) {
       LOGGER.error("Cannot save webpage " + webpage + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());

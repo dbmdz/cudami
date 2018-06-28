@@ -56,10 +56,23 @@ public class WebpageServiceImpl implements WebpageService<Webpage> {
   }
 
   @Override
-  public Webpage save(Webpage webpage, UUID websiteUUID, Errors results) throws IdentifiableServiceException {
+  public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUUID, Errors results) throws IdentifiableServiceException {
     if (!results.hasErrors()) {
       try {
-        webpage = (Webpage) webpageRepository.save(webpage, websiteUUID);
+        webpage = (Webpage) webpageRepository.saveWithParentWebsite(webpage, parentWebsiteUUID);
+      } catch (Exception e) {
+        LOGGER.error("Cannot save top-level webpage " + webpage + ": ", e);
+        throw new IdentifiableServiceException(e.getMessage());
+      }
+    }
+    return webpage;
+  }
+
+  @Override
+  public Webpage saveWithParentWebpage(Webpage webpage, UUID parentWebpageUUID, Errors results) throws IdentifiableServiceException {
+    if (!results.hasErrors()) {
+      try {
+        webpage = (Webpage) webpageRepository.saveWithParentWebpage(webpage, parentWebpageUUID);
       } catch (Exception e) {
         LOGGER.error("Cannot save webpage " + webpage + ": ", e);
         throw new IdentifiableServiceException(e.getMessage());

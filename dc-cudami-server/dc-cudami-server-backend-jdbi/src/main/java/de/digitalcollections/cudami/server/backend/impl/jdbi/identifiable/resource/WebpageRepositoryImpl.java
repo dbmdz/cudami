@@ -17,9 +17,8 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSo
 import de.digitalcollections.prosemirror.model.api.Document;
 import de.digitalcollections.prosemirror.model.impl.DocumentImpl;
 import de.digitalcollections.prosemirror.model.impl.contentblocks.ParagraphImpl;
-
 import java.util.*;
-
+import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,7 +97,9 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
     if (list.isEmpty()) {
       return null;
     }
-    return list.get(0);
+    WebpageImpl webpage = list.get(0);
+    webpage.setSubPages(getSubPages(webpage));
+    return webpage;
   }
 
   @Override
@@ -137,20 +138,54 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
   }
 
   @Override
+  public List<Webpage> getSubPages(Webpage webpage) {
+    // minimal data required for creating text links in a list
+    String query = "SELECT ww.child_webpage_uuid as uuid, i.label as label"
+            + " FROM webpages wp INNER JOIN webpage_webpage ww ON wp.uuid=ww.parent_webpage_uuid INNER JOIN identifiables i ON ww.child_webpage_uuid=i.uuid"
+            + " WHERE wp.uuid = :uuid";
+
+    List<WebpageImpl> list = dbi.withHandle(h -> h.createQuery(query)
+            .bind("uuid", webpage.getUuid())
+            .mapToBean(WebpageImpl.class)
+            .list());
+
+    if (list.isEmpty()) {
+      return new ArrayList<>();
+    }
+    return list.stream().map(Webpage.class::cast).collect(Collectors.toList());
+  }
+
+  @Override
   public Webpage save(Webpage webpage) {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
   @Override
-  public Webpage save(Webpage webpage, UUID websiteUuid) {
+  public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid) {
     resourceRepository.save(webpage);
 
     dbi.withHandle(h -> h.createUpdate("INSERT INTO webpages(uuid, text) VALUES (:uuid, :text::JSONB)")
             .bindBean(webpage)
             .execute());
 
-    dbi.withHandle(h -> h.createUpdate("INSERT INTO website_webpage(website_uuid, webpage_uuid) VALUES (:website_uuid, :uuid)")
-            .bind("website_uuid", websiteUuid)
+    dbi.withHandle(h -> h.createUpdate("INSERT INTO website_webpage(website_uuid, webpage_uuid) VALUES (:parent_website_uuid, :uuid)")
+            .bind("parent_website_uuid", parentWebsiteUuid)
+            .bindBean(webpage)
+            .execute());
+
+    return findOne(webpage.getUuid());
+  }
+
+  @Override
+  public Webpage saveWithParentWebpage(Webpage webpage, UUID parentWebpageUuid) {
+    resourceRepository.save(webpage);
+
+    dbi.withHandle(h -> h.createUpdate("INSERT INTO webpages(uuid, text) VALUES (:uuid, :text::JSONB)")
+            .bindBean(webpage)
+            .execute());
+
+    dbi.withHandle(h -> h.createUpdate("INSERT INTO webpage_webpage(parent_webpage_uuid, child_webpage_uuid) VALUES (:parent_webpage_uuid, :uuid)")
+            .bind("parent_webpage_uuid", parentWebpageUuid)
             .bindBean(webpage)
             .execute());
 

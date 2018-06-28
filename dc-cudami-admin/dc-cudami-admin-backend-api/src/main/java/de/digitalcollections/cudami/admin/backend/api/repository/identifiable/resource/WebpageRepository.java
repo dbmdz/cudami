@@ -10,6 +10,8 @@ import java.util.UUID;
  */
 public interface WebpageRepository<W extends Webpage> extends ResourceRepository<W> {
 
-  W save(W webpage, UUID websiteUUID);
+  W saveWithParentWebsite(W webpage, UUID parentWebsiteUUID);
+
+  W saveWithParentWebpage(W webpage, UUID parentWebpageUUID);
 
 }

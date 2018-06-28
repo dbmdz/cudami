@@ -12,7 +12,7 @@
   <body>
     <section layout:fragment="content">
       <form th:object="${webpage}" th:action="@{#}" method="post" role="form">
-        <input type="hidden" name="websiteUuid" th:value="${websiteUuid}" />
+        <input type="hidden" name="parentUuid" th:value="${parentUuid}" />
         <input type="hidden" id="description" class="content" th:field="*{description}" />
         <input type="hidden" id="text" class="content" th:field="*{text}" />
 
@@ -25,7 +25,7 @@
           </div>
           <div class="col-sm-4">
             <span class="col-sm-6">
-              <a th:if="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{'/websites/' + ${websiteUuid}}" th:text="#{abort}">abort</a>
+              <a th:if="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{'/websites/' + ${parentUuid}}" th:text="#{abort}">abort</a>
               <a th:unless="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{'/webpages/' + *{uuid}}" th:text="#{abort}">abort</a>
             </span>
             <span class="col-sm-6">

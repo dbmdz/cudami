@@ -8,7 +8,6 @@ import de.digitalcollections.core.model.api.paging.enums.NullHandling;
 import de.digitalcollections.core.model.impl.paging.OrderImpl;
 import de.digitalcollections.core.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.core.model.impl.paging.SortingImpl;
-import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
@@ -81,11 +80,18 @@ public class WebpageController {
     return new ResponseEntity<>(webpage, HttpStatus.OK);
   }
 
-  @ApiMethod(description = "save a newly created webpage")
-  @RequestMapping(value = "/v1/websites/{websiteUuid}/webpage", produces = "application/json", method = RequestMethod.POST)
+  @ApiMethod(description = "save a newly created top-level webpage")
+  @RequestMapping(value = "/v1/websites/{parentWebsiteUuid}/webpage", produces = "application/json", method = RequestMethod.POST)
   @ApiResponseObject
-  public Webpage save(@PathVariable UUID websiteUuid, @RequestBody Webpage webpage, BindingResult errors) throws IdentifiableServiceException {
-    return webpageService.save(webpage, websiteUuid);
+  public Webpage saveWithParentWebsite(@PathVariable UUID parentWebsiteUuid, @RequestBody Webpage webpage, BindingResult errors) throws IdentifiableServiceException {
+    return webpageService.saveWithParentWebsite(webpage, parentWebsiteUuid);
+  }
+
+  @ApiMethod(description = "save a newly created webpage")
+  @RequestMapping(value = "/v1/webpages/{parentWebpageUuid}/webpage", produces = "application/json", method = RequestMethod.POST)
+  @ApiResponseObject
+  public Webpage saveWithParentWebpage(@PathVariable UUID parentWebpageUuid, @RequestBody Webpage webpage, BindingResult errors) throws IdentifiableServiceException {
+    return webpageService.saveWithParentWebpage(webpage, parentWebpageUuid);
   }
 
   @ApiMethod(description = "update a webpage")

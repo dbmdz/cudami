@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.business.api.service.identifiable.re
 
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -14,5 +15,9 @@ public interface WebpageService<W extends Webpage> extends ResourceService<W> {
 
   W get(UUID uuid, Locale locale) throws IdentifiableServiceException;
 
-  W save(W webpage, UUID uuid) throws IdentifiableServiceException;
+  List<Webpage> getSubPages(W webpage);
+
+  W saveWithParentWebsite(W webpage, UUID parentWebsiteUuid) throws IdentifiableServiceException;
+
+  W saveWithParentWebpage(W webpage, UUID parentWebpageUuid) throws IdentifiableServiceException;
 }

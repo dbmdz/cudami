@@ -22,9 +22,13 @@ public interface WebpageRepositoryEndpoint {
   @Headers("Content-Type: application/json")
   WebpageImpl save(WebpageImpl webpage);
 
-  @RequestLine("POST /v1/websites/{websiteUuid}/webpage")
+  @RequestLine("POST /v1/websites/{parentWebsiteUuid}/webpage")
   @Headers("Content-Type: application/json")
-  WebpageImpl save(WebpageImpl webpage, @Param("websiteUuid") UUID websiteUuid);
+  WebpageImpl saveWithParentWebsite(WebpageImpl webpage, @Param("parentWebsiteUuid") UUID parentWebsiteUuid);
+
+  @RequestLine("POST /v1/webpages/{parentWebpageUuid}/webpage")
+  @Headers("Content-Type: application/json")
+  WebpageImpl saveWithParentWebpage(WebpageImpl webpage, @Param("parentWebpageUuid") UUID parentWebpageUuid);
 
   @RequestLine("PUT /v1/webpages/{uuid}")
   @Headers("Content-Type: application/json")

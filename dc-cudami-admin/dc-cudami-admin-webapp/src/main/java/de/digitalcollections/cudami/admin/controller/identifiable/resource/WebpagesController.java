@@ -10,6 +10,7 @@ import de.digitalcollections.cudami.admin.business.api.service.LocaleService;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.WebpageService;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
+import java.util.Objects;
 import java.util.UUID;
 import javax.validation.Valid;
 import org.slf4j.Logger;
@@ -61,17 +62,18 @@ public class WebpagesController extends AbstractController implements MessageSou
   }
 
   @RequestMapping(value = "/webpages/new", method = RequestMethod.GET)
-  public String create(Model model, @RequestParam("websiteUuid") String websiteUuid) {
+  public String create(Model model, @RequestParam("parentUuid") String parentUuid) {
     model.addAttribute("webpage", webpageService.create());
     model.addAttribute("isNew", true);
     model.addAttribute("locales", localeService.findAll());
     model.addAttribute("defaultLocale", localeService.getDefault());
-    model.addAttribute("websiteUuid", websiteUuid);
+    model.addAttribute("parentUuid", parentUuid);
     return "webpages/edit";
   }
 
   @RequestMapping(value = "/webpages/new", method = RequestMethod.POST)
-  public String create(@ModelAttribute @Valid Webpage webpage, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes, @RequestParam("websiteUuid") UUID websiteUuid) {
+  public String create(@ModelAttribute @Valid Webpage webpage, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes, @RequestParam("parentType") String parentType, @RequestParam(
+          "parentUuid") UUID parentUuid) {
     verifyBinding(results);
     if (results.hasErrors()) {
       model.addAttribute("isNew", true);
@@ -79,10 +81,19 @@ public class WebpagesController extends AbstractController implements MessageSou
     }
     Webpage webpageDb = null;
     try {
-      webpageDb = webpageService.save(webpage, websiteUuid, results);
-      LOGGER.info("Successfully saved webpage");
+      if (Objects.equals(parentType, "website")) {
+        webpageDb = webpageService.saveWithParentWebsite(webpage, parentUuid, results);
+        LOGGER.info("Successfully saved top-level webpage");
+      } else if (Objects.equals(parentType, "webpage")) {
+        webpageDb = webpageService.saveWithParentWebpage(webpage, parentUuid, results);
+        LOGGER.info("Successfully saved webpage");
+      }
     } catch (Exception e) {
-      LOGGER.error("Cannot save webpage: ", e);
+      if (Objects.equals(parentType, "website")) {
+        LOGGER.info("Cannot save top-level webpage: ", e);
+      } else if (Objects.equals(parentType, "webpage")) {
+        LOGGER.error("Cannot save webpage: ", e);
+      }
       String message = messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale());
       redirectAttributes.addFlashAttribute("error_message", message);
       return "redirect:/websites";

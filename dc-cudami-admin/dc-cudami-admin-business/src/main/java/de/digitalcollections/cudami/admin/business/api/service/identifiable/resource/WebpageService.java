@@ -12,6 +12,8 @@ import org.springframework.validation.Errors;
  */
 public interface WebpageService<W extends Webpage> extends ResourceService<W> {
 
-  Webpage save(W webpage, UUID websiteUUID, Errors results) throws IdentifiableServiceException;
+  Webpage saveWithParentWebsite(W webpage, UUID parentWebsiteUUID, Errors results) throws IdentifiableServiceException;
+
+  Webpage saveWithParentWebpage(W webpage, UUID parentWebpageUUID, Errors results) throws IdentifiableServiceException;
 
 }

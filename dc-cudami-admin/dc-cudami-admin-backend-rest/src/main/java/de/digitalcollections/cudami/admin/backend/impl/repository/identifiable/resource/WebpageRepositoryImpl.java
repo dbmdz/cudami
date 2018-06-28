@@ -85,8 +85,13 @@ public class WebpageRepositoryImpl implements WebpageRepository<WebpageImpl> {
   }
 
   @Override
-  public WebpageImpl save(WebpageImpl webpage, UUID websiteUUID) {
-    return (WebpageImpl) endpoint.save(webpage, websiteUUID);
+  public WebpageImpl saveWithParentWebsite(WebpageImpl webpage, UUID parentWebsiteUUID) {
+    return (WebpageImpl) endpoint.saveWithParentWebsite(webpage, parentWebsiteUUID);
+  }
+
+  @Override
+  public WebpageImpl saveWithParentWebpage(WebpageImpl webpage, UUID parentWebpageUUID) {
+    return (WebpageImpl) endpoint.saveWithParentWebpage(webpage, parentWebpageUUID);
   }
 
   @Override

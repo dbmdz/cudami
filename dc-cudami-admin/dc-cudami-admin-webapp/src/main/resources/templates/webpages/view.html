@@ -62,6 +62,34 @@
           </div>
         </div>
       </div>
+
+      <div class="row main-content">
+        <div class="col-sm-12">
+          <h3>
+            <span th:text="#{webpages}">sub pages</span>
+            <a class="btn btn-default pull-right new-button" th:href="@{/webpages/new(parentType=webpage, parentUuid=*{uuid})}" th:text="#{btn_new}">New</a>
+          </h3>
+          <table class="table table-bordered table-condensed table-striped table-hover table-responsive">
+            <thead>
+              <tr>
+                <th class="center" th:text="#{label}">Label</th>
+                <th class="center" th:text="#{actions}">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="subpage: *{subPages}">
+                <td>
+                  <a th:href="@{'/webpages/' + ${subpage.uuid}}" th:text="${subpage.label.translations[0].text}">Label</a>
+                </td>
+                <td class="center">
+                  <a th:href="@{'/webpages/' + ${subpage.uuid}}" th:title="#{tooltip_view}"><span class="fa fa-eye actionButton"></span></a>
+                  <a th:href="@{'/webpages/' + ${subpage.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fa fa-pencil actionButton"></span></a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </section>
   </body>
 </html>

@@ -12,11 +12,19 @@ public class WebpageImpl extends ResourceImpl implements Webpage, Node<Webpage> 
 
   private final NodeImpl<Webpage> node;
   private MultilanguageDocument text;
+  private List<Webpage> subPages;
 
   public WebpageImpl() {
     super();
     this.node = new NodeImpl<>();
     this.resourceType = ResourceType.WEBPAGE;
+  }
+
+  public WebpageImpl(List<Webpage> subPages) {
+    super();
+    this.node = new NodeImpl<>();
+    this.resourceType = ResourceType.WEBPAGE;
+    this.subPages = subPages;
   }
 
   @Override
@@ -77,5 +85,15 @@ public class WebpageImpl extends ResourceImpl implements Webpage, Node<Webpage> 
   @Override
   public void setResourceType(ResourceType resourceType) {
     this.resourceType = resourceType;
+  }
+
+  @Override
+  public List<Webpage> getSubPages() {
+    return subPages;
+  }
+
+  @Override
+  public void setSubPages(List<Webpage> subPages) {
+    this.subPages = subPages;
   }
 }
