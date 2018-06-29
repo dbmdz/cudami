@@ -22,6 +22,8 @@ import org.springframework.validation.Validator;
 public class PasswordsValidator implements Validator {
 
   private static final Pattern PATTERN_SPECIAL_CHAR = Pattern.compile(".*[^a-zA-Z0-9]+.*");
+  private static final int PASSWORD_MIN_LENGTH = 12;
+  private static final int PASSWORD_MAX_LENGTH = 30;
 
   protected boolean containsSpecialChar(String password) {
     Matcher m = PATTERN_SPECIAL_CHAR.matcher(password);
@@ -51,14 +53,20 @@ public class PasswordsValidator implements Validator {
       return;
     }
 
-    if (!StringUtils.isEmpty(password1) && password1.length() < 12) {
-      errors.reject("error.password_min_length", new Object[]{12}, "Password's minimum length is 12.");
+    if (!StringUtils.isEmpty(password1) && password1.length() < PASSWORD_MIN_LENGTH) {
+      errors.reject("error.password_min_length", new Object[]{PASSWORD_MIN_LENGTH}, String.format("Password's minimum length is %d.", PASSWORD_MIN_LENGTH));
       return;
     }
 
+    if (!StringUtils.isEmpty(password1) && password1.length() > PASSWORD_MAX_LENGTH) {
+      errors.reject("error.password_max_length", new Object[]{PASSWORD_MAX_LENGTH}, String.format("Password's maximum length is %d.", PASSWORD_MAX_LENGTH));
+      return;
+    }
+
+
     final PasswordValidator validator = new PasswordValidator(Arrays.asList(
-            // minimum length 12, maximum length 30:
-            new LengthRule(12, 30),
+            // Password minimum and maximum length range:
+            new LengthRule(PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH),
             // at least one upper case letter:
             new CharacterRule(EnglishCharacterData.UpperCase, 1),
             // at least one lower case letter:
