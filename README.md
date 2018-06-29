@@ -64,7 +64,7 @@ Then PostgreSql is running in a container and everything is ready for running a 
 To start cudami server webapp, you have to run:
 
 ```shell
-$ cd dc-cudami-server/dc-cudami-server-webapp
+$ cd dc-cudami-server/dc-cudami-server-webapp/target
 $ java -jar dc-cudami-server-webapp-<VERSION>.jar
 ```
 
@@ -73,7 +73,7 @@ The cudami server webapp is now running under <http://localhost:9000/>.
 To start cudami admin webapp, you have to run:
 
 ```shell
-$ cd dc-cudami-admin/dc-cudami-admin-webapp
+$ cd dc-cudami-admin/dc-cudami-admin-webapp/target
 $ java -jar dc-cudami-admin-webapp-<VERSION>.jar
 ```
 
