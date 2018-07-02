@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -46,11 +47,9 @@ public class UserControllerTest {
     assertEquals(MediaType.APPLICATION_JSON_UTF8, contentType);
   }
 
-  // FIXME: Spring Boot Security test...
-  // see? http://docs.spring.io/spring-security/site/docs/4.2.3.RELEASE/reference/htmlsingle/#test-method-withmockuser
+  // see https://docs.spring.io/spring-security/site/docs/5.0.5.RELEASE/reference/htmlsingle/#test-method-withmockuser
   @Test
-  @Disabled
-  @WithUserDetails
+  @WithMockUser(username="admin",roles={"USER","ADMIN"})
   public void testUsersNewRequest() {
     ResponseEntity<Object> responseEntity = this.testRestTemplate.withBasicAuth("admin", "secret").getForEntity("/users/new", Object.class);
     Object object = responseEntity.getBody();
