@@ -39,7 +39,7 @@ public class WebsiteController {
   public PageResponse<Website> findAll(
           @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
           @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-          @RequestParam(name = "sortField", required = false, defaultValue = "url") String sortField,
+          @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
           @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC") Direction sortDirection,
           @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE") NullHandling nullHandling
   ) {

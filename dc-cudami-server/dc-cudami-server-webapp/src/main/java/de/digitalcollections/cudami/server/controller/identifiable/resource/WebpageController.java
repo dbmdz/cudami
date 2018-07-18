@@ -44,7 +44,6 @@ public class WebpageController {
 
   @ApiMethod(description = "get all webpages")
   @RequestMapping(value = "/v1/webpages",
-          //params = {"pageNumber", "pageSize", "sortField", "sortDirection", "nullHandling"},
           produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public PageResponse<Webpage> findAll(
