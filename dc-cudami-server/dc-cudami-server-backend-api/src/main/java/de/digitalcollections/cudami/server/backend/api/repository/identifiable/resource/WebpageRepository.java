@@ -8,7 +8,7 @@ import java.util.UUID;
 /**
  * Repository for Webpage persistence handling.
  *
- * @param <W> entity instance
+ * @param <W> resource instance
  */
 public interface WebpageRepository<W extends Webpage> extends IdentifiableRepository<W> {
 

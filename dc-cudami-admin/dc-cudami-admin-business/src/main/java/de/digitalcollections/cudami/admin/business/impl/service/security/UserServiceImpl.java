@@ -51,6 +51,11 @@ public class UserServiceImpl implements UserService<User> {
   }
 
   @Override
+  public long count() {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
   public User create() {
     return (User) userRepository.create();
   }
@@ -128,7 +133,7 @@ public class UserServiceImpl implements UserService<User> {
 
   private org.springframework.security.core.userdetails.User buildUserForAuthentication(User user, List<? extends GrantedAuthority> authorities) {
     return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPasswordHash(),
-                                                                  user.isEnabled(), true, true, true, authorities);
+            user.isEnabled(), true, true, true, authorities);
   }
 
   @Override
@@ -157,10 +162,4 @@ public class UserServiceImpl implements UserService<User> {
     }
     return user;
   }
-
-  @Override
-  public long count() {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  }
-
 }

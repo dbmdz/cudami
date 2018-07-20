@@ -7,9 +7,9 @@ import java.util.List;
 /**
  * Repository for ContentTree persistence handling.
  *
- * @param <E> entity instance
+ * @param <C> entity instance
  */
-public interface ContentTreeRepository<E extends ContentTree> extends EntityRepository<E> {
+public interface ContentTreeRepository<C extends ContentTree> extends EntityRepository<C> {
 
-  List<ContentNode> getRootNodes(E contentTree);
+  List<ContentNode> getRootNodes(C contentTree);
 }

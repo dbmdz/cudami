@@ -7,9 +7,9 @@ import java.util.List;
 /**
  * Service for ContentTree.
  *
- * @param <E> domain object
+ * @param <C> domain object
  */
-public interface ContentTreeService<E extends ContentTree> extends EntityService<E> {
+public interface ContentTreeService<C extends ContentTree> extends EntityService<C> {
 
-  List<ContentNode> getRootNodes(E contentTree);
+  List<ContentNode> getRootNodes(C contentTree);
 }
