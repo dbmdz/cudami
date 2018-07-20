@@ -138,7 +138,7 @@ public class WebpagesController extends AbstractController implements MessageSou
       webpageDb.setDescription(webpage.getDescription());
       webpageDb.setText(webpage.getText());
 
-      webpage = (Webpage) webpageService.update(webpageDb, results);
+      webpageService.update(webpageDb, results);
     } catch (IdentifiableServiceException e) {
       String message = "Cannot save webpage with uuid=" + pathUuid + ": " + e;
       LOGGER.error(message, e);
