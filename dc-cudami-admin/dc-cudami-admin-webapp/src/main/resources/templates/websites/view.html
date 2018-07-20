@@ -81,13 +81,13 @@
               </tr>
             </thead>
             <tbody>
-              <tr th:each="rootpage: *{rootPages}">
+              <tr th:each="rootPage: *{rootPages}">
                 <td>
-                  <a th:href="@{'/webpages/' + ${rootpage.uuid}}" th:text="${rootpage.label.translations[0].text}">Label</a>
+                  <a th:href="@{'/webpages/' + ${rootPage.uuid}}" th:text="${rootPage.label.translations[0].text}">Label</a>
                 </td>
                 <td class="center">
-                  <a th:href="@{'/webpages/' + ${rootpage.uuid}}" th:title="#{tooltip_view}"><span class="fa fa-eye actionButton"></span></a>
-                  <a th:href="@{'/webpages/' + ${rootpage.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fa fa-pencil actionButton"></span></a>
+                  <a th:href="@{'/webpages/' + ${rootPage.uuid}}" th:title="#{tooltip_view}"><span class="fa fa-eye actionButton"></span></a>
+                  <a th:href="@{'/webpages/' + ${rootPage.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fa fa-pencil actionButton"></span></a>
                 </td>
               </tr>
             </tbody>
