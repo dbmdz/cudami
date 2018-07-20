@@ -9,7 +9,6 @@ import de.digitalcollections.core.model.impl.paging.OrderImpl;
 import de.digitalcollections.core.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.core.model.impl.paging.SortingImpl;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
-import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.WebpageService;
 import java.util.Locale;
@@ -35,9 +34,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Api(description = "The webpage controller", name = "Webpage controller")
 public class WebpageController {
-
-  @Autowired
-  private LocaleService localeService;
 
   @Autowired
   private WebpageService<Webpage> webpageService;
