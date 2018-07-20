@@ -77,9 +77,9 @@ public class ContentTreesController extends AbstractController implements Messag
     }
     try {
       contentTreeService.save(contentTree, results);
-      LOGGER.info("Successfully saved contentTree");
+      LOGGER.info("Successfully saved content tree");
     } catch (Exception e) {
-      LOGGER.error("Cannot save contentTree: ", e);
+      LOGGER.error("Cannot save content tree: ", e);
       String message = messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale());
       redirectAttributes.addFlashAttribute("error_message", message);
       return "redirect:/contenttrees";
@@ -122,17 +122,17 @@ public class ContentTreesController extends AbstractController implements Messag
 
     try {
       // get content tree from db
-      ContentTree contentTreeDB = (ContentTree) contentTreeService.get(pathUuid);
+      ContentTree contentTreeDb = (ContentTree) contentTreeService.get(pathUuid);
       // just update the fields, that were editable
-      contentTreeDB.setLabel(contentTreeDB.getLabel());
-      contentTreeDB.setDescription(contentTreeDB.getDescription());
+      contentTreeDb.setLabel(contentTree.getLabel());
+      contentTreeDb.setDescription(contentTree.getDescription());
 
-      contentTreeDB = (ContentTree) contentTreeService.update(contentTreeDB, results);
+      contentTreeService.update(contentTreeDb, results);
     } catch (IdentifiableServiceException e) {
-      String message = "Cannot save contentTree with uuid=" + pathUuid + ": " + e;
+      String message = "Cannot save content tree with uuid=" + pathUuid + ": " + e;
       LOGGER.error(message, e);
       redirectAttributes.addFlashAttribute("error_message", message);
-      return "redirect:/contenttrees/" + pathUuid;
+      return "redirect:/contenttrees/" + pathUuid + "/edit";
     }
 
     if (results.hasErrors()) {
@@ -142,7 +142,7 @@ public class ContentTreesController extends AbstractController implements Messag
     status.setComplete();
     String message = messageSource.getMessage("msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
-    return "redirect:/contenttrees/" + pathUuid + "/edit";
+    return "redirect:/contenttrees/" + pathUuid;
   }
 
   @RequestMapping(value = "/contenttrees", method = RequestMethod.GET)
