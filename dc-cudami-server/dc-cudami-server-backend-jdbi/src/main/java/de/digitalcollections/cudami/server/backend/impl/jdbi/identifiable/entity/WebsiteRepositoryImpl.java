@@ -7,12 +7,16 @@ import de.digitalcollections.core.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
 import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.model.impl.identifiable.entity.WebsiteImpl;
+import de.digitalcollections.cudami.model.impl.identifiable.parts.MultilanguageDocumentImpl;
+import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
 import de.digitalcollections.cudami.model.impl.identifiable.resource.WebpageImpl;
+import de.digitalcollections.cudami.server.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSortingRepositoryImpl;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
@@ -35,6 +39,9 @@ public class WebsiteRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
   @Autowired
   private EntityRepository entityRepository;
 
+  @Autowired
+  LocaleRepository localeRepository;
+
   @Override
   public long count() {
     String sql = "SELECT count(*) FROM websites";
@@ -44,7 +51,11 @@ public class WebsiteRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
 
   @Override
   public Website create() {
-    return new WebsiteImpl();
+    Locale defaultLocale = localeRepository.getDefault();
+    WebsiteImpl website = new WebsiteImpl();
+    website.setLabel(new TextImpl(defaultLocale, ""));
+    website.setDescription(new MultilanguageDocumentImpl(defaultLocale));
+    return website;
   }
 
   @Override

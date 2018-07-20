@@ -8,10 +8,14 @@ import de.digitalcollections.cudami.model.api.identifiable.entity.Entity;
 import de.digitalcollections.cudami.model.api.identifiable.entity.EntityType;
 import de.digitalcollections.cudami.model.api.identifiable.resource.ContentNode;
 import de.digitalcollections.cudami.model.impl.identifiable.entity.ContentTreeImpl;
+import de.digitalcollections.cudami.model.impl.identifiable.parts.MultilanguageDocumentImpl;
+import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
+import de.digitalcollections.cudami.server.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ContentTreeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSortingRepositoryImpl;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +30,9 @@ public class ContentTreeRepositoryImpl extends AbstractPagingAndSortingRepositor
   @Autowired
   private EntityRepository entityRepository;
 
+  @Autowired
+  LocaleRepository localeRepository;
+
   private final static String ENTITY_WHERE_CLAUSE = " entities.entity_type='" + EntityType.CONTENT_TREE + "'";
 
   @Override
@@ -37,7 +44,11 @@ public class ContentTreeRepositoryImpl extends AbstractPagingAndSortingRepositor
 
   @Override
   public ContentTree create() {
-    return new ContentTreeImpl();
+    Locale defaultLocale = localeRepository.getDefault();
+    ContentTreeImpl contentTree = new ContentTreeImpl();
+    contentTree.setLabel(new TextImpl(defaultLocale, ""));
+    contentTree.setDescription(new MultilanguageDocumentImpl(defaultLocale));
+    return contentTree;
   }
 
   @Override

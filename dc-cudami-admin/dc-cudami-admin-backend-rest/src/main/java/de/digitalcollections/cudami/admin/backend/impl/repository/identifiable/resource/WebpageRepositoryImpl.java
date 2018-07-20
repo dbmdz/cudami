@@ -6,13 +6,9 @@ import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.core.model.api.paging.Sorting;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.WebpageRepository;
-import de.digitalcollections.cudami.model.api.identifiable.parts.MultilanguageDocument;
 import de.digitalcollections.cudami.model.impl.identifiable.parts.MultilanguageDocumentImpl;
 import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
 import de.digitalcollections.cudami.model.impl.identifiable.resource.WebpageImpl;
-import de.digitalcollections.prosemirror.model.api.Document;
-import de.digitalcollections.prosemirror.model.impl.DocumentImpl;
-import de.digitalcollections.prosemirror.model.impl.contentblocks.ParagraphImpl;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.UUID;
@@ -38,17 +34,9 @@ public class WebpageRepositoryImpl implements WebpageRepository<WebpageImpl> {
     Locale defaultLocale = localeRepository.getDefault();
     WebpageImpl webpage = new WebpageImpl();
     webpage.setLabel(new TextImpl(defaultLocale, ""));
-    webpage.setDescription(createEmptyMLD(defaultLocale));
-    webpage.setText(createEmptyMLD(defaultLocale));
+    webpage.setDescription(new MultilanguageDocumentImpl(defaultLocale));
+    webpage.setText(new MultilanguageDocumentImpl(defaultLocale));
     return webpage;
-  }
-
-  private MultilanguageDocument createEmptyMLD(Locale defaultLocale) {
-    MultilanguageDocument emptyMLD = new MultilanguageDocumentImpl();
-    Document document = new DocumentImpl();
-    document.addContentBlock(new ParagraphImpl());
-    emptyMLD.addDocument(defaultLocale, document);
-    return emptyMLD;
   }
 
   @Override
