@@ -43,7 +43,7 @@ public class UserController {
 
   @ApiMethod(description = "get all users")
   @RequestMapping(value = "/v1/users",
-          produces = "application/json", method = {RequestMethod.GET, RequestMethod.POST})
+          produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public PageResponse<User> findAll(
           @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
