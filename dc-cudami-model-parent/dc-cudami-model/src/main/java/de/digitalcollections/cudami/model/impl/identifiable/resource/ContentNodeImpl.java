@@ -10,7 +10,7 @@ public class ContentNodeImpl extends NodeImpl<ContentNode> implements ContentNod
 
   public ContentNodeImpl() {
     super();
-    this.resourceType = ResourceType.CONTENTNODE;
+    this.resourceType = ResourceType.CONTENT_NODE;
   }
 
   @Override
