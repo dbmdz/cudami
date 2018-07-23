@@ -10,7 +10,7 @@
   </head>
   <body>
     <section layout:fragment="content">
-      <h1><span th:text="#{content_trees}">Content Trees</span> <a class="btn btn-default" th:href="@{/contenttrees/new}" th:text="#{btn_new}">New</a></h1>
+      <h1><span th:text="#{content_trees}">Content Trees</span> <a class="btn btn-default pull-right" th:href="@{/contenttrees/new}" th:text="#{btn_new}">New</a></h1>
 
       <div class="row">
         <div class="col-sm-12" >
@@ -26,16 +26,15 @@
       <table class="table table-bordered table-condensed table-striped table-hover table-responsive">
         <thead>
           <tr sd:page-object="${page.page}">
-            <th class="center"></th>
-            <th class="center" th:text="#{last_modified}">last modified</th>
-            <th class="center" th:text="#{action}">Action</th>
+            <th class="center" th:text="#{label}">Label</th>
+            <th class="center" th:text="#{actions}">Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr th:each="contenttree : ${page.content}">
-            <td><a th:href="@{'/contenttrees/' + ${contenttree.uuid}}" th:text="${contenttree.label.text}">Physics</a></td>          
-            <td th:text="${contenttree.lastModified}">23.01.1999</td>
+          <tr th:each="contenttree: ${page.content}">
+            <td><th:block th:if="${contenttree.label}" th:text="${contenttree.label.getText(defaultLocale)}">bavarikon</th:block></td>
             <td class="center">
+              <a th:href="@{'/contenttrees/' + ${contenttree.uuid}}" th:title="#{tooltip_view}"><span class="fa fa-eye actionButton"></span></a>
               <a th:href="@{'/contenttrees/' + ${contenttree.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fa fa-pencil actionButton"></span></a>
             </td>
           </tr>

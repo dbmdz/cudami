@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.config;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.ContentTreeRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.WebsiteRepository;
+import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.ContentNodeRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.WebpageRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.security.UserRepository;
 import org.mockito.Mockito;
@@ -14,6 +15,11 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class SpringConfigBackendForTest {
+
+  @Bean
+  public ContentNodeRepository contentNodeRepository() {
+    return Mockito.mock(ContentNodeRepository.class);
+  }
 
   @Bean
   public ContentTreeRepository contentTreeRepository() {

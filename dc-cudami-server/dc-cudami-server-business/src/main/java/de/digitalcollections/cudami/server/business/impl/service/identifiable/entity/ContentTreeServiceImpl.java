@@ -5,8 +5,8 @@ import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.cudami.model.api.identifiable.entity.ContentTree;
 import de.digitalcollections.cudami.model.api.identifiable.resource.ContentNode;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ContentTreeRepository;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ContentTreeService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ContentTreeService;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -48,7 +48,7 @@ public class ContentTreeServiceImpl implements ContentTreeService<ContentTree> {
 
   @Override
   public List<ContentNode> getRootNodes(ContentTree contentTree) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return contentTreeRepository.getRootNodes(contentTree);
   }
 
   @Override
@@ -73,10 +73,6 @@ public class ContentTreeServiceImpl implements ContentTreeService<ContentTree> {
     }
   }
 
-//  @Override
-//  public Website find(UUID uuid) {
-//    return (Website) websiteRepository.find(uuid);
-//  }
   public void setRepository(ContentTreeRepository contentTreeRepository) {
     this.contentTreeRepository = contentTreeRepository;
   }

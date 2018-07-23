@@ -5,14 +5,14 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:text="|#{content_trees}: #{content_tree}|">Content trees: Content tree</title>
+    <title th:text="|#{content_nodes}: #{content_node}|">Content nodes: Content node</title>
   </head>
   <body>
-    <section layout:fragment="content" th:object="${contentTree}">
+    <section layout:fragment="content" th:object="${contentNode}">
 
       <div class="row">
         <div class="col-sm-9">
-          <b th:text="#{content_tree}">Content tree</b>
+          <b th:text="#{content_node}">Content node</b>
         </div>
         <div class="col-sm-3">
           <a class="btn btn-default btn-block"
@@ -54,7 +54,7 @@
                   <div class="col-sm-10">
                     <label th:text="*{label.translations[__${iter.index}__].text}">label</label>
 
-                    <div th:if="*{description}" th:insert="cudami/fragments/webpage-to-html :: renderDocument(${contentTree.description.documents}, ${locale})"></div>
+                    <div th:if="*{description}" th:insert="cudami/fragments/webpage-to-html :: renderDocument(${contentNode.description.documents}, ${locale})"></div>
                   </div>
                 </div>
               </div>
@@ -66,8 +66,8 @@
       <div class="row main-content">
         <div class="col-sm-12">
           <h3>
-            <span th:text="#{content_nodes}">root nodes</span>
-            <a class="btn btn-default pull-right new-button" th:href="@{/contentnodes/new(parentType=contentTree, parentUuid=*{uuid})}" th:text="#{btn_new}">New</a>
+            <span th:text="#{content_nodes}">sub nodes</span>
+            <a class="btn btn-default pull-right new-button" th:href="@{/contentnodes/new(parentType=contentNode, parentUuid=*{uuid})}" th:text="#{btn_new}">New</a>
           </h3>
           <table class="table table-bordered table-condensed table-striped table-hover table-responsive">
             <thead>
@@ -77,13 +77,13 @@
               </tr>
             </thead>
             <tbody>
-              <tr th:each="rootNode: *{rootNodes}">
+              <tr th:each="subNode: *{subNodes}">
                 <td>
-                  <a th:href="@{'/contentnodes/' + ${rootNode.uuid}}" th:text="${rootNode.label.translations[0].text}">Label</a>
+                  <a th:href="@{'/contentnodes/' + ${subNode.uuid}}" th:text="${subNode.label.translations[0].text}">Label</a>
                 </td>
                 <td class="center">
-                  <a th:href="@{'/contentnodes/' + ${rootNode.uuid}}" th:title="#{tooltip_view}"><span class="fa fa-eye actionButton"></span></a>
-                  <a th:href="@{'/contentnodes/' + ${rootNode.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fa fa-pencil actionButton"></span></a>
+                  <a th:href="@{'/contentnodes/' + ${subNode.uuid}}" th:title="#{tooltip_view}"><span class="fa fa-eye actionButton"></span></a>
+                  <a th:href="@{'/contentnodes/' + ${subNode.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fa fa-pencil actionButton"></span></a>
                 </td>
               </tr>
             </tbody>

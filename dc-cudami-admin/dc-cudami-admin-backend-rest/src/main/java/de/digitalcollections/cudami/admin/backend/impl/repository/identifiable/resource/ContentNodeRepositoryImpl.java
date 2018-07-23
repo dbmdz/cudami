@@ -1,30 +1,28 @@
-package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.entity;
+package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.resource;
 
 import de.digitalcollections.core.model.api.paging.Order;
 import de.digitalcollections.core.model.api.paging.PageRequest;
 import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.core.model.api.paging.Sorting;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
-import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.ContentTreeRepository;
-import de.digitalcollections.cudami.model.api.identifiable.resource.ContentNode;
-import de.digitalcollections.cudami.model.impl.identifiable.entity.ContentTreeImpl;
+import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.ContentNodeRepository;
 import de.digitalcollections.cudami.model.impl.identifiable.parts.MultilanguageDocumentImpl;
 import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
+import de.digitalcollections.cudami.model.impl.identifiable.resource.ContentNodeImpl;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ContentTreeRepositoryImpl implements ContentTreeRepository<ContentTreeImpl> {
+public class ContentNodeRepositoryImpl implements ContentNodeRepository<ContentNodeImpl> {
 
   @Autowired
-  private ContentTreeRepositoryEndpoint endpoint;
+  private ContentNodeRepositoryEndpoint endpoint;
 
   @Autowired
-  private LocaleRepository localeRepository;
+  LocaleRepository localeRepository;
 
   @Override
   public long count() {
@@ -32,16 +30,16 @@ public class ContentTreeRepositoryImpl implements ContentTreeRepository<ContentT
   }
 
   @Override
-  public ContentTreeImpl create() {
+  public ContentNodeImpl create() {
     Locale defaultLocale = localeRepository.getDefault();
-    ContentTreeImpl contentTree = new ContentTreeImpl();
-    contentTree.setLabel(new TextImpl(defaultLocale, ""));
-    contentTree.setDescription(new MultilanguageDocumentImpl(defaultLocale));
-    return contentTree;
+    ContentNodeImpl contentNode = new ContentNodeImpl();
+    contentNode.setLabel(new TextImpl(defaultLocale, ""));
+    contentNode.setDescription(new MultilanguageDocumentImpl(defaultLocale));
+    return contentNode;
   }
 
   @Override
-  public PageResponse<ContentTreeImpl> find(PageRequest pageRequest) {
+  public PageResponse<ContentNodeImpl> find(PageRequest pageRequest) {
     int pageNumber = pageRequest.getPageNumber();
     int pageSize = pageRequest.getPageSize();
 
@@ -52,7 +50,7 @@ public class ContentTreeRepositoryImpl implements ContentTreeRepository<ContentT
     String sortField = "";
     String sortDirection = "";
     String nullHandling = "";
-
+//    while (iterator.hasNext()) {
     if (iterator.hasNext()) {
       Order order = iterator.next();
       sortField = order.getProperty() == null ? "" : order.getProperty();
@@ -64,22 +62,27 @@ public class ContentTreeRepositoryImpl implements ContentTreeRepository<ContentT
   }
 
   @Override
-  public ContentTreeImpl findOne(UUID uuid) {
+  public ContentNodeImpl findOne(UUID uuid) {
     return endpoint.findOne(uuid);
   }
 
   @Override
-  public List<ContentNode> getRootNodes(ContentTreeImpl contentTreeImpl) {
+  public ContentNodeImpl save(ContentNodeImpl webpage) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public ContentTreeImpl save(ContentTreeImpl contentTree) {
-    return (ContentTreeImpl) endpoint.save(contentTree);
+  public ContentNodeImpl saveWithParentContentTree(ContentNodeImpl webpage, UUID parentWebsiteUUID) {
+    return (ContentNodeImpl) endpoint.saveWithParentContentTree(webpage, parentWebsiteUUID);
   }
 
   @Override
-  public ContentTreeImpl update(ContentTreeImpl contentTree) {
-    return (ContentTreeImpl) endpoint.update(contentTree.getUuid(), contentTree);
+  public ContentNodeImpl saveWithParentContentNode(ContentNodeImpl webpage, UUID parentWebpageUUID) {
+    return (ContentNodeImpl) endpoint.saveWithParentContentNode(webpage, parentWebpageUUID);
+  }
+
+  @Override
+  public ContentNodeImpl update(ContentNodeImpl webpage) {
+    return (ContentNodeImpl) endpoint.update(webpage.getUuid(), webpage);
   }
 }

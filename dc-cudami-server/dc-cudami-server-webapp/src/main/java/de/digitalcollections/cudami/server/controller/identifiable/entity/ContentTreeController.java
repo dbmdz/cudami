@@ -9,8 +9,8 @@ import de.digitalcollections.core.model.impl.paging.OrderImpl;
 import de.digitalcollections.core.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.core.model.impl.paging.SortingImpl;
 import de.digitalcollections.cudami.model.api.identifiable.entity.ContentTree;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ContentTreeService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ContentTreeService;
 import java.util.Objects;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
@@ -34,15 +34,14 @@ public class ContentTreeController {
 
   @ApiMethod(description = "get all content trees")
   @RequestMapping(value = "/v1/contenttrees",
-          params = {"pageNumber", "pageSize", "sortField", "sortDirection", "nullHandling"},
-          produces = "application/json", method = {RequestMethod.GET, RequestMethod.POST})
+          produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public PageResponse<ContentTree> findAll(
-          @RequestParam(name = "pageNumber", required = false) int pageNumber,
-          @RequestParam(name = "pageSize", required = false) int pageSize,
-          @RequestParam(name = "sortField", required = false) String sortField,
-          @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
-          @RequestParam(name = "nullHandling", required = false) NullHandling nullHandling
+          @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+          @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+          @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
+          @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC") Direction sortDirection,
+          @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE") NullHandling nullHandling
   ) {
     // FIXME add support for multiple sorting orders
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);

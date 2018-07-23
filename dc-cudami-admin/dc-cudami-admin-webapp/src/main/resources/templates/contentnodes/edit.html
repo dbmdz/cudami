@@ -5,26 +5,26 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:if="${isNew}" th:text="|#{content_trees}: #{create_content_tree}|">Content trees: Create a new content tree</title>
-    <title th:unless="${isNew}" th:text="|#{content_trees}: #{edit_content_tree}|">Content trees: Edit content tree</title>
+    <title th:if="${isNew}" th:text="|#{content_nodes}: #{create_content_node}|">Content nodes: Create a new content node</title>
+    <title th:unless="${isNew}" th:text="|#{content_nodes}: #{edit_content_node}|">Content nodes: Edit content node</title>
     <link rel=stylesheet th:href="@{/css/thirdparty/prosemirror.css}" />
   </head>
   <body>
     <section layout:fragment="content">
-      <form th:object="${contentTree}" th:action="@{#}" method="post" role="form" class="form-horizontal">
+      <form th:object="${contentNode}" th:action="@{#}" method="post" role="form" class="form-horizontal">
         <input type="hidden" id="description" class="content" th:field="*{description}" />
 
         <div class="row mainContent">
           <div th:replace="fragments/feedback-messages :: form"></div>
 
           <div class="col-sm-8">
-            <b th:if="${isNew}" th:text="#{create_content_tree}">...</b>
-            <b th:unless="${isNew}" th:utext="#{edit_content_tree}">...</b>
+            <b th:if="${isNew}" th:text="#{create_content_node}">...</b>
+            <b th:unless="${isNew}" th:utext="#{edit_content_node}">...</b>
           </div>
           <div class="col-sm-4">
             <span class="col-sm-6">
-              <a th:if="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{/contenttrees}" th:text="#{abort}">abort</a>
-              <a th:unless="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{'/contenttrees/' + *{uuid}}" th:text="#{abort}">abort</a>
+              <a th:if="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{/contentnodes}" th:text="#{abort}">abort</a>
+              <a th:unless="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{'/contentnodes/' + *{uuid}}" th:text="#{abort}">abort</a>
             </span>
             <span class="col-sm-6">
               <button class="btn btn-primary btn-block" type="submit" th:text="#{save}">
