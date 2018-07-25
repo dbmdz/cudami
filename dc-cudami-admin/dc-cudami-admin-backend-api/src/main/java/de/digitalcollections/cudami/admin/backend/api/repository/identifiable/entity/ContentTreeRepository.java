@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity;
 
-import de.digitalcollections.cudami.model.api.identifiable.entity.ContentTree;
-import de.digitalcollections.cudami.model.api.identifiable.resource.ContentNode;
+import de.digitalcollections.model.api.identifiable.entity.ContentTree;
+import de.digitalcollections.model.api.identifiable.resource.ContentNode;
 import java.util.List;
 
 /**

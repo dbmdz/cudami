@@ -1,12 +1,12 @@
 package de.digitalcollections.cudami.admin.backend.impl.repository.security;
 
-import de.digitalcollections.core.model.api.http.exceptions.client.ResourceNotFoundException;
-import de.digitalcollections.core.model.api.paging.Order;
-import de.digitalcollections.core.model.api.paging.PageRequest;
-import de.digitalcollections.core.model.api.paging.PageResponse;
-import de.digitalcollections.core.model.api.paging.Sorting;
 import de.digitalcollections.cudami.admin.backend.api.repository.security.UserRepository;
-import de.digitalcollections.cudami.model.impl.security.UserImpl;
+import de.digitalcollections.model.api.http.exceptions.client.ResourceNotFoundException;
+import de.digitalcollections.model.api.paging.Order;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.Sorting;
+import de.digitalcollections.model.impl.security.UserImpl;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;

@@ -1,13 +1,13 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.core.model.api.paging.PageRequest;
-import de.digitalcollections.core.model.api.paging.PageResponse;
-import de.digitalcollections.core.model.impl.paging.PageResponseImpl;
-import de.digitalcollections.cudami.model.api.identifiable.Identifiable;
-import de.digitalcollections.cudami.model.impl.identifiable.IdentifiableImpl;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSortingRepositoryImpl;
+import de.digitalcollections.model.api.identifiable.Identifiable;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.impl.PageResponseImpl;
+import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;

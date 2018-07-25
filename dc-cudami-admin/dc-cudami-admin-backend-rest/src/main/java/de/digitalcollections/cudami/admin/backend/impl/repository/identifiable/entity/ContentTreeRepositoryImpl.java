@@ -1,15 +1,15 @@
 package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.entity;
 
-import de.digitalcollections.core.model.api.paging.Order;
-import de.digitalcollections.core.model.api.paging.PageRequest;
-import de.digitalcollections.core.model.api.paging.PageResponse;
-import de.digitalcollections.core.model.api.paging.Sorting;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.ContentTreeRepository;
-import de.digitalcollections.cudami.model.api.identifiable.resource.ContentNode;
-import de.digitalcollections.cudami.model.impl.identifiable.entity.ContentTreeImpl;
-import de.digitalcollections.cudami.model.impl.identifiable.parts.MultilanguageDocumentImpl;
-import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
+import de.digitalcollections.model.api.identifiable.resource.ContentNode;
+import de.digitalcollections.model.api.paging.Order;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.Sorting;
+import de.digitalcollections.model.impl.identifiable.entity.ContentTreeImpl;
+import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
+import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -35,8 +35,8 @@ public class ContentTreeRepositoryImpl implements ContentTreeRepository<ContentT
   public ContentTreeImpl create() {
     Locale defaultLocale = localeRepository.getDefault();
     ContentTreeImpl contentTree = new ContentTreeImpl();
-    contentTree.setLabel(new TextImpl(defaultLocale, ""));
-    contentTree.setDescription(new MultilanguageDocumentImpl(defaultLocale));
+    contentTree.setLabel(new LocalizedTextImpl(defaultLocale, ""));
+    contentTree.setDescription(new LocalizedStructuredContentImpl(defaultLocale));
     return contentTree;
   }
 

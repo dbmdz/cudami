@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.resource;
 
-import de.digitalcollections.cudami.model.api.identifiable.resource.ContentNode;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.model.api.identifiable.resource.ContentNode;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;

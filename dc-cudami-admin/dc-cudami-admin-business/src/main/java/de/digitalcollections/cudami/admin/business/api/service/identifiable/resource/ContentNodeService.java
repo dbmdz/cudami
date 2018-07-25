@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.business.api.service.identifiable.resource;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
-import de.digitalcollections.cudami.model.api.identifiable.resource.ContentNode;
+import de.digitalcollections.model.api.identifiable.resource.ContentNode;
 import java.util.UUID;
 import org.springframework.validation.Errors;
 

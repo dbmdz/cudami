@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.client.feign.api;
 
-import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
-import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
+import de.digitalcollections.model.api.identifiable.entity.Website;
+import de.digitalcollections.model.api.identifiable.resource.Webpage;
 import java.util.List;
 import java.util.Locale;
 

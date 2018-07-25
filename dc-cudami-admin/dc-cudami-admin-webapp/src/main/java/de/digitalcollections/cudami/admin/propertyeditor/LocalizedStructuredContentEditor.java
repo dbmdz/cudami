@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.admin.propertyeditor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.model.api.identifiable.parts.MultilanguageDocument;
+import de.digitalcollections.model.api.identifiable.parts.structuredcontent.LocalizedStructuredContent;
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import org.slf4j.Logger;
@@ -11,9 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MultilanguageDocumentEditor extends PropertyEditorSupport {
+public class LocalizedStructuredContentEditor extends PropertyEditorSupport {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(MultilanguageDocumentEditor.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(LocalizedStructuredContentEditor.class);
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -24,11 +24,11 @@ public class MultilanguageDocumentEditor extends PropertyEditorSupport {
 
   @Override
   public String getAsText() {
-    MultilanguageDocument mld = (MultilanguageDocument) getValue();
+    LocalizedStructuredContent lsc = (LocalizedStructuredContent) getValue();
     try {
-      return objectMapper.writeValueAsString(mld);
+      return objectMapper.writeValueAsString(lsc);
     } catch (JsonProcessingException ex) {
-      LOGGER.warn("Problem converting MultilanguageDocument to JSON-String", ex);
+      LOGGER.warn("Problem converting LocalizedStructuredContent to JSON-String", ex);
       return null;
     }
   }
@@ -36,10 +36,10 @@ public class MultilanguageDocumentEditor extends PropertyEditorSupport {
   @Override
   public void setAsText(String json) {
     try {
-      MultilanguageDocument mld = objectMapper.readValue(json, MultilanguageDocument.class);
-      setValue(mld);
+      LocalizedStructuredContent lsc = objectMapper.readValue(json, LocalizedStructuredContent.class);
+      setValue(lsc);
     } catch (IOException ex) {
-      LOGGER.warn("Problem converting JSON-String to MultilanguageDocument", ex);
+      LOGGER.warn("Problem converting JSON-String to LocalizedStructuredContent", ex);
     }
   }
 }

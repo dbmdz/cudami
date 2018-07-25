@@ -1,9 +1,9 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi;
 
-import de.digitalcollections.core.model.api.paging.Order;
-import de.digitalcollections.core.model.api.paging.PageRequest;
-import de.digitalcollections.core.model.api.paging.Sorting;
-import de.digitalcollections.core.model.api.paging.enums.Direction;
+import de.digitalcollections.model.api.paging.Order;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.Sorting;
+import de.digitalcollections.model.api.paging.enums.Direction;
 import java.util.Arrays;
 import java.util.Iterator;
 

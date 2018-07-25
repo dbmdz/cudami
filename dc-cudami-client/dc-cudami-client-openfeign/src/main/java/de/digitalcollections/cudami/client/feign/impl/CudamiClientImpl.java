@@ -2,8 +2,8 @@ package de.digitalcollections.cudami.client.feign.impl;
 
 import de.digitalcollections.cudami.client.feign.api.CudamiClient;
 import de.digitalcollections.cudami.client.feign.backend.CudamiBackend;
-import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
-import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
+import de.digitalcollections.model.api.identifiable.entity.Website;
+import de.digitalcollections.model.api.identifiable.resource.Webpage;
 import java.util.List;
 import java.util.Locale;
 

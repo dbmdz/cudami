@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.model.jackson.CudamiObjectMapper;
+import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -28,6 +28,6 @@ public class SpringConfigBackend implements InitializingBean {
   @Override
   public void afterPropertiesSet() throws Exception {
     // customize default spring boot jackson objectmapper
-    CudamiObjectMapper.customize(objectMapper);
+    DigitalCollectionsObjectMapper.customize(objectMapper);
   }
 }

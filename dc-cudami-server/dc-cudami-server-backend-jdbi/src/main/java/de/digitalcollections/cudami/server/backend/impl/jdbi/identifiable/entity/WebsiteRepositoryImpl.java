@@ -1,19 +1,19 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.core.model.api.paging.PageRequest;
-import de.digitalcollections.core.model.api.paging.PageResponse;
-import de.digitalcollections.core.model.impl.paging.PageResponseImpl;
-import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
-import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
-import de.digitalcollections.cudami.model.impl.identifiable.entity.WebsiteImpl;
-import de.digitalcollections.cudami.model.impl.identifiable.parts.MultilanguageDocumentImpl;
-import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
-import de.digitalcollections.cudami.model.impl.identifiable.resource.WebpageImpl;
 import de.digitalcollections.cudami.server.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSortingRepositoryImpl;
+import de.digitalcollections.model.api.identifiable.entity.Website;
+import de.digitalcollections.model.api.identifiable.resource.Webpage;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.impl.PageResponseImpl;
+import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
+import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
+import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
+import de.digitalcollections.model.impl.identifiable.resource.WebpageImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -53,8 +53,8 @@ public class WebsiteRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
   public Website create() {
     Locale defaultLocale = localeRepository.getDefault();
     WebsiteImpl website = new WebsiteImpl();
-    website.setLabel(new TextImpl(defaultLocale, ""));
-    website.setDescription(new MultilanguageDocumentImpl(defaultLocale));
+    website.setLabel(new LocalizedTextImpl(defaultLocale, ""));
+    website.setDescription(new LocalizedStructuredContentImpl(defaultLocale));
     return website;
   }
 

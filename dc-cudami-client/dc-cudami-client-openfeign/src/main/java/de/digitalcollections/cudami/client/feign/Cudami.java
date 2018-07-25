@@ -7,8 +7,7 @@ import de.digitalcollections.cudami.client.feign.config.BackendUrls;
 import de.digitalcollections.cudami.client.feign.config.BackendUrlsFromConfig;
 import de.digitalcollections.cudami.client.feign.exceptions.CudamiRestErrorDecoder;
 import de.digitalcollections.cudami.client.feign.impl.ClientFactory;
-import de.digitalcollections.cudami.model.jackson.CudamiModule;
-import de.digitalcollections.prosemirror.model.jackson.ProseMirrorModule;
+import de.digitalcollections.model.jackson.DigitalCollectionsModelModule;
 import feign.Feign;
 import feign.Logger;
 import feign.ReflectiveFeign;
@@ -49,16 +48,15 @@ public class Cudami {
 
   public Cudami(BackendUrls backendUrls) {
     ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new CudamiModule());
-    mapper.registerModule(new ProseMirrorModule());
+    mapper.registerModule(new DigitalCollectionsModelModule());
 
     Feign.Builder feign = ReflectiveFeign.builder()
-        .decoder(new JacksonDecoder(mapper))
-        .encoder(new JacksonEncoder(mapper))
-        .errorDecoder(new CudamiRestErrorDecoder())
-        .logger(new Slf4jLogger())
-        .logLevel(Logger.Level.BASIC)
-        .retryer(new Retryer.Default());
+            .decoder(new JacksonDecoder(mapper))
+            .encoder(new JacksonEncoder(mapper))
+            .errorDecoder(new CudamiRestErrorDecoder())
+            .logger(new Slf4jLogger())
+            .logLevel(Logger.Level.BASIC)
+            .retryer(new Retryer.Default());
     this.clientFactory = new ClientFactory(feign, backendUrls);
     this.clients = new ConcurrentHashMap();
   }

@@ -4,8 +4,8 @@ import de.digitalcollections.cudami.admin.backend.api.repository.security.UserRe
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import de.digitalcollections.cudami.config.SpringConfigBackendForTest;
 import de.digitalcollections.cudami.config.SpringConfigBusiness;
-import de.digitalcollections.cudami.model.api.security.User;
-import de.digitalcollections.cudami.model.impl.security.UserImpl;
+import de.digitalcollections.model.api.security.User;
+import de.digitalcollections.model.impl.security.UserImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

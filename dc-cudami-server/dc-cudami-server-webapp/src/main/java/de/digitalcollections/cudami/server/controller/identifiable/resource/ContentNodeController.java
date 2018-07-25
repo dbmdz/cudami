@@ -1,16 +1,16 @@
 package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
-import de.digitalcollections.core.model.api.paging.PageRequest;
-import de.digitalcollections.core.model.api.paging.PageResponse;
-import de.digitalcollections.core.model.api.paging.Sorting;
-import de.digitalcollections.core.model.api.paging.enums.Direction;
-import de.digitalcollections.core.model.api.paging.enums.NullHandling;
-import de.digitalcollections.core.model.impl.paging.OrderImpl;
-import de.digitalcollections.core.model.impl.paging.PageRequestImpl;
-import de.digitalcollections.core.model.impl.paging.SortingImpl;
-import de.digitalcollections.cudami.model.api.identifiable.resource.ContentNode;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ContentNodeService;
+import de.digitalcollections.model.api.identifiable.resource.ContentNode;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.Sorting;
+import de.digitalcollections.model.api.paging.enums.Direction;
+import de.digitalcollections.model.api.paging.enums.NullHandling;
+import de.digitalcollections.model.api.paging.impl.OrderImpl;
+import de.digitalcollections.model.api.paging.impl.PageRequestImpl;
+import de.digitalcollections.model.api.paging.impl.SortingImpl;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;

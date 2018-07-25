@@ -114,7 +114,7 @@
   var editorViews = {};
   contents.each(function(i, contentElement){
     var contentJson = JSON.parse($(this).val());
-    $.each(contentJson.documents, function(language, content){
+    $.each(contentJson.localizedStructuredContent, function(language, content){
       var currentEditor = document.querySelector(
         '.editor[data-content-id=' + contentElement.id + ']' +
         '[data-content-language=' + language + ']'
@@ -132,7 +132,7 @@
           var currentEditorView = editorViews[this.contentElement.id + '+' + language];
           currentEditorView.updateState(currentEditorView.state.apply(tr));
           // current state as json in text area
-          this.contentJson.documents[this.language] = currentEditorView.state.doc.toJSON();
+          this.contentJson.localizedStructuredContent[this.language] = currentEditorView.state.doc.toJSON();
           $(this.contentElement).val(JSON.stringify(this.contentJson));
         }.bind({
           'contentElement': contentElement, 'contentJson': contentJson, 'language': language

@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.server.business.api.service.security;
 
-import de.digitalcollections.core.model.api.paging.PageRequest;
-import de.digitalcollections.core.model.api.paging.PageResponse;
-import de.digitalcollections.cudami.model.api.security.User;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.security.User;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

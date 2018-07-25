@@ -1,13 +1,13 @@
 package de.digitalcollections.cudami.admin.business.impl.service.identifiable.entity;
 
-import de.digitalcollections.core.model.api.paging.PageRequest;
-import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.ContentTreeRepository;
 import de.digitalcollections.cudami.admin.business.api.service.LocaleService;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.ContentTreeService;
-import de.digitalcollections.cudami.model.api.identifiable.entity.ContentTree;
-import de.digitalcollections.cudami.model.api.identifiable.resource.ContentNode;
+import de.digitalcollections.model.api.identifiable.entity.ContentTree;
+import de.digitalcollections.model.api.identifiable.resource.ContentNode;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;

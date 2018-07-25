@@ -1,12 +1,12 @@
 package de.digitalcollections.cudami.admin.business.impl.service.security;
 
-import de.digitalcollections.core.model.api.paging.PageRequest;
-import de.digitalcollections.core.model.api.paging.PageResponse;
 import de.digitalcollections.cudami.admin.backend.api.repository.security.UserRepository;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import de.digitalcollections.cudami.admin.business.impl.validator.PasswordsValidatorParams;
-import de.digitalcollections.cudami.model.api.security.User;
-import de.digitalcollections.cudami.model.api.security.enums.Role;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.security.User;
+import de.digitalcollections.model.api.security.enums.Role;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

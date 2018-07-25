@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.admin.config;
 
-import de.digitalcollections.cudami.model.api.security.enums.Role;
+import de.digitalcollections.model.api.security.enums.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;

@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource;
 
-import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
+import de.digitalcollections.model.api.identifiable.resource.Webpage;
 import java.util.UUID;
 
 /**

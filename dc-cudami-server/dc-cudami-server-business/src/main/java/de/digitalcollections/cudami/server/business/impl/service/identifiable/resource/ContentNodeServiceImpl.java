@@ -1,12 +1,12 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.resource;
 
-import de.digitalcollections.core.model.api.paging.PageRequest;
-import de.digitalcollections.core.model.api.paging.PageResponse;
-import de.digitalcollections.cudami.model.api.identifiable.resource.ContentNode;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ContentNodeRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ContentNodeService;
+import de.digitalcollections.model.api.identifiable.resource.ContentNode;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;

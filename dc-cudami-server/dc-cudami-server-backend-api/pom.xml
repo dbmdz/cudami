@@ -16,8 +16,8 @@
   
   <dependencies>
     <dependency>
-      <groupId>de.digitalcollections.cudami</groupId>
-      <artifactId>dc-cudami-model</artifactId>
+      <groupId>de.digitalcollections.model</groupId>
+      <artifactId>dc-model</artifactId>
     </dependency>
   </dependencies>
 </project>

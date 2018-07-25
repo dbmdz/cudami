@@ -1,15 +1,15 @@
 package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.entity;
 
-import de.digitalcollections.core.model.api.paging.Order;
-import de.digitalcollections.core.model.api.paging.PageRequest;
-import de.digitalcollections.core.model.api.paging.PageResponse;
-import de.digitalcollections.core.model.api.paging.Sorting;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.WebsiteRepository;
-import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
-import de.digitalcollections.cudami.model.impl.identifiable.entity.WebsiteImpl;
-import de.digitalcollections.cudami.model.impl.identifiable.parts.MultilanguageDocumentImpl;
-import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
+import de.digitalcollections.model.api.identifiable.resource.Webpage;
+import de.digitalcollections.model.api.paging.Order;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.Sorting;
+import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
+import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
+import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -35,8 +35,8 @@ public class WebsiteRepositoryImpl implements WebsiteRepository<WebsiteImpl> {
   public WebsiteImpl create() {
     Locale defaultLocale = localeRepository.getDefault();
     WebsiteImpl website = new WebsiteImpl();
-    website.setLabel(new TextImpl(defaultLocale, ""));
-    website.setDescription(new MultilanguageDocumentImpl(defaultLocale));
+    website.setLabel(new LocalizedTextImpl(defaultLocale, ""));
+    website.setDescription(new LocalizedStructuredContentImpl(defaultLocale));
     return website;
   }
 

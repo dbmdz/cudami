@@ -1,9 +1,9 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable;
 
-import de.digitalcollections.core.model.api.paging.PageRequest;
-import de.digitalcollections.core.model.api.paging.PageResponse;
-import de.digitalcollections.cudami.model.api.identifiable.Identifiable;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.model.api.identifiable.Identifiable;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.UUID;
 
 public interface IdentifiableService<I extends Identifiable> {

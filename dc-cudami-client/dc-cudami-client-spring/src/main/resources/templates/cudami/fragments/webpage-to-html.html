@@ -7,15 +7,15 @@
   <div class="webpage">
     <!-- label of webpage: -->
     <div class="webpage-label">
-      <th:block th:insert="~{::renderText(${webpage.label}, ${locale})}"></th:block>
+      <th:block th:insert="~{::renderLocalizedText(${webpage.label}, ${locale})}"></th:block>
     </div>
 
     <!-- text of webpage: -->
-    <th:block th:insert="~{::renderDocument(${webpage.text.documents}, ${locale})}"></th:block>
+    <th:block th:insert="~{::renderLocalizedStructuredContent(${webpage.text.localizedStructuredContent}, ${locale})}"></th:block>
   </div>
 </th:block>
 
-<th:block th:fragment="renderText(text, locale)">
+<th:block th:fragment="renderLocalizedText(text, locale)">
   <th:block th:if="${text}">
     <th:block th:if="${locale}">
       <th:block th:utext="${text.getText(locale)}">...</th:block>
@@ -26,13 +26,13 @@
   </th:block>
 </th:block>
 
-<th:block th:fragment="renderDocument(documents, locale)">
-  <th:block th:if="${documents}">
+<th:block th:fragment="renderLocalizedStructuredContent(structuredContent, locale)">
+  <th:block th:if="${structuredContent}">
     <th:block th:if="${locale}">
-      <th:block th:insert="~{::renderContentBlocks(${documents.get(locale).contentBlocks})}"></th:block>
+      <th:block th:insert="~{::renderContentBlocks(${structuredContent.get(locale).contentBlocks})}"></th:block>
     </th:block>
     <th:block th:unless="${locale}">
-      <th:block th:insert="~{::renderContentBlocks(${documents.values().stream().findFirst().get().contentBlocks})}"></th:block>
+      <th:block th:insert="~{::renderContentBlocks(${structuredContent.values().stream().findFirst().get().contentBlocks})}"></th:block>
     </th:block>
   </th:block>
 </th:block>

@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.admin.controller;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
-import de.digitalcollections.cudami.model.api.security.User;
+import de.digitalcollections.model.api.security.User;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;

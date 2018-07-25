@@ -3,9 +3,9 @@ package de.digitalcollections.cudami.admin.propertyeditor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.admin.config.SpringConfigBusinessForTest;
 import de.digitalcollections.cudami.admin.config.SpringConfigWeb;
-import de.digitalcollections.cudami.model.api.identifiable.parts.MultilanguageDocument;
-import de.digitalcollections.cudami.model.impl.identifiable.parts.MultilanguageDocumentImpl;
-import de.digitalcollections.cudami.model.jackson.CudamiObjectMapper;
+import de.digitalcollections.model.api.identifiable.parts.structuredcontent.LocalizedStructuredContent;
+import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
+import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
@@ -20,25 +20,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {SpringConfigWeb.class, SpringConfigBusinessForTest.class})
-public class MultilanguageDocumentEditorTest implements InitializingBean {
+public class LocalizedStructuredContentEditorTest implements InitializingBean {
 
   @Autowired
   private ObjectMapper objectMapper;
 
-  private MultilanguageDocumentEditor documentEditor;
+  private LocalizedStructuredContentEditor documentEditor;
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    CudamiObjectMapper.customize(objectMapper);
-    this.documentEditor = new MultilanguageDocumentEditor();
+    DigitalCollectionsObjectMapper.customize(objectMapper);
+    this.documentEditor = new LocalizedStructuredContentEditor();
     this.documentEditor.setObjectMapper(objectMapper);
   }
 
-  private MultilanguageDocument createMultilanguageDocument(String filename) {
+  private LocalizedStructuredContent createLocalizedStructuredContent(String filename) {
     try {
       String json = createJson(filename);
-      MultilanguageDocument multilanguageDocument = objectMapper.readValue(json, MultilanguageDocument.class);
-      return multilanguageDocument;
+      LocalizedStructuredContent lsc = objectMapper.readValue(json, LocalizedStructuredContent.class);
+      return lsc;
     } catch (IOException ex) {
       return null;
     }
@@ -54,33 +54,29 @@ public class MultilanguageDocumentEditorTest implements InitializingBean {
   }
 
   /**
-   * Test of getAsText method, of class MultilanguageDocumentEditor.
+   * Test of getAsText method, of class LocalizedStructuredContentEditor.
    */
   @Test
   public void testGetAsText() {
-    System.out.println("getAsText");
-
-    String expResult = createJson("multilanguageDocument.json").replaceAll("\\s", "");
-    MultilanguageDocument multilanguageDocument = createMultilanguageDocument("multilanguageDocument.json");
-    documentEditor.setValue(multilanguageDocument);
+    String expResult = createJson("localizedStructuredContent.json").replaceAll("\\s", "");
+    LocalizedStructuredContent lsc = createLocalizedStructuredContent("localizedStructuredContent.json");
+    documentEditor.setValue(lsc);
 
     String result = documentEditor.getAsText().replaceAll("\\s", "");
     assertEquals(expResult, result);
   }
 
   /**
-   * Test of setAsText method, of class MultilanguageDocumentEditor.
+   * Test of setAsText method, of class LocalizedStructuredContentEditor.
    */
   @Test
   public void testSetAsText() {
-    System.out.println("setAsText");
-
-    MultilanguageDocument expResult = createMultilanguageDocument("multilanguageDocument.json");
-    String json = createJson("multilanguageDocument.json");
+    LocalizedStructuredContent expResult = createLocalizedStructuredContent("localizedStructuredContent.json");
+    String json = createJson("localizedStructuredContent.json");
     documentEditor.setAsText(json);
 
-    MultilanguageDocumentImpl result = (MultilanguageDocumentImpl) documentEditor.getValue();
-    assertEquals(expResult.getDocuments().size(), result.getDocuments().size());
+    LocalizedStructuredContentImpl result = (LocalizedStructuredContentImpl) documentEditor.getValue();
+    assertEquals(expResult.getLocalizedStructuredContent().size(), result.getLocalizedStructuredContent().size());
   }
 
 }

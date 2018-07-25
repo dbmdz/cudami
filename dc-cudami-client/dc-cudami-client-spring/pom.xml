@@ -19,8 +19,8 @@
       <artifactId>dc-cudami-client-openfeign</artifactId>
     </dependency>
     <dependency>
-      <groupId>de.digitalcollections.cudami</groupId>
-      <artifactId>dc-cudami-model</artifactId>
+      <groupId>de.digitalcollections.model</groupId>
+      <artifactId>dc-model</artifactId>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>

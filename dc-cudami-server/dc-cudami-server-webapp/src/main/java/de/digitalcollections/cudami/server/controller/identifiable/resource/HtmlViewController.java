@@ -1,13 +1,11 @@
 package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
-import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.WebpageService;
-
+import de.digitalcollections.model.api.identifiable.resource.Webpage;
 import java.util.Locale;
 import java.util.UUID;
-
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiPathParam;
 import org.jsondoc.core.annotation.ApiQueryParam;

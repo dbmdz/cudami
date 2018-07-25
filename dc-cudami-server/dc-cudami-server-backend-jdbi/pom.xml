@@ -1,14 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  
+
   <modelVersion>4.0.0</modelVersion>
-  
+
   <parent>
     <groupId>de.digitalcollections.cudami</groupId>
     <artifactId>dc-cudami-server</artifactId>
     <version>3.0.0-SNAPSHOT</version>
   </parent>
-  
+
   <name>DigitalCollections: cudami Server (Backend IMPL JDBI PostgreSql)</name>
   <artifactId>dc-cudami-server-backend-jdbi</artifactId>
   <packaging>jar</packaging>
@@ -31,20 +31,16 @@
       <artifactId>dc-commons-jdbi</artifactId>
     </dependency>
     <dependency>
-      <groupId>de.digitalcollections.core</groupId>
-      <artifactId>dc-core-model</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>de.digitalcollections.cudami</groupId>
-      <artifactId>dc-cudami-model</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>de.digitalcollections.cudami</groupId>
-      <artifactId>dc-cudami-model-jackson</artifactId>
-    </dependency>
-    <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-server-backend-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.model</groupId>
+      <artifactId>dc-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.model</groupId>
+      <artifactId>dc-model-jackson</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -66,7 +62,7 @@
     <dependency>
       <groupId>org.jdbi</groupId>
       <artifactId>jdbi3-postgres</artifactId>
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>org.jdbi</groupId>
       <artifactId>jdbi3-spring4</artifactId>

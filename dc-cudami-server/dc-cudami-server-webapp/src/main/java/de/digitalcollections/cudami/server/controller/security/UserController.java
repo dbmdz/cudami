@@ -1,16 +1,16 @@
 package de.digitalcollections.cudami.server.controller.security;
 
-import de.digitalcollections.core.model.api.paging.PageRequest;
-import de.digitalcollections.core.model.api.paging.PageResponse;
-import de.digitalcollections.core.model.api.paging.Sorting;
-import de.digitalcollections.core.model.api.paging.enums.Direction;
-import de.digitalcollections.core.model.api.paging.enums.NullHandling;
-import de.digitalcollections.core.model.impl.paging.OrderImpl;
-import de.digitalcollections.core.model.impl.paging.PageRequestImpl;
-import de.digitalcollections.core.model.impl.paging.SortingImpl;
-import de.digitalcollections.cudami.model.api.security.User;
-import de.digitalcollections.cudami.model.api.security.enums.Role;
 import de.digitalcollections.cudami.server.business.api.service.security.UserService;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.Sorting;
+import de.digitalcollections.model.api.paging.enums.Direction;
+import de.digitalcollections.model.api.paging.enums.NullHandling;
+import de.digitalcollections.model.api.paging.impl.OrderImpl;
+import de.digitalcollections.model.api.paging.impl.PageRequestImpl;
+import de.digitalcollections.model.api.paging.impl.SortingImpl;
+import de.digitalcollections.model.api.security.User;
+import de.digitalcollections.model.api.security.enums.Role;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;

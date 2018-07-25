@@ -1,14 +1,14 @@
 package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.resource;
 
-import de.digitalcollections.core.model.api.paging.Order;
-import de.digitalcollections.core.model.api.paging.PageRequest;
-import de.digitalcollections.core.model.api.paging.PageResponse;
-import de.digitalcollections.core.model.api.paging.Sorting;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.WebpageRepository;
-import de.digitalcollections.cudami.model.impl.identifiable.parts.MultilanguageDocumentImpl;
-import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
-import de.digitalcollections.cudami.model.impl.identifiable.resource.WebpageImpl;
+import de.digitalcollections.model.api.paging.Order;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.Sorting;
+import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
+import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
+import de.digitalcollections.model.impl.identifiable.resource.WebpageImpl;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.UUID;
@@ -33,9 +33,9 @@ public class WebpageRepositoryImpl implements WebpageRepository<WebpageImpl> {
   public WebpageImpl create() {
     Locale defaultLocale = localeRepository.getDefault();
     WebpageImpl webpage = new WebpageImpl();
-    webpage.setLabel(new TextImpl(defaultLocale, ""));
-    webpage.setDescription(new MultilanguageDocumentImpl(defaultLocale));
-    webpage.setText(new MultilanguageDocumentImpl(defaultLocale));
+    webpage.setLabel(new LocalizedTextImpl(defaultLocale, ""));
+    webpage.setDescription(new LocalizedStructuredContentImpl(defaultLocale));
+    webpage.setText(new LocalizedStructuredContentImpl(defaultLocale));
     return webpage;
   }
 

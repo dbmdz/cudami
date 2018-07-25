@@ -47,10 +47,6 @@
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
-      <artifactId>dc-commons-prosemirror-model</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-server</artifactId>
     </dependency>
     <dependency>
@@ -84,8 +80,12 @@
       <artifactId>dc-cudami-client-spring</artifactId>
     </dependency>
     <dependency>
-      <groupId>de.digitalcollections.cudami</groupId>
-      <artifactId>dc-cudami-model</artifactId>
+      <groupId>de.digitalcollections.model</groupId>
+      <artifactId>dc-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.model</groupId>
+      <artifactId>dc-model-jackson</artifactId>
     </dependency>
     <dependency>
       <!--see https://github.com/jpenren/thymeleaf-spring-data-dialect--> 

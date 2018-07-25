@@ -1,18 +1,18 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.core.model.api.paging.PageRequest;
-import de.digitalcollections.core.model.api.paging.PageResponse;
-import de.digitalcollections.core.model.impl.paging.PageResponseImpl;
-import de.digitalcollections.cudami.model.api.identifiable.parts.Translation;
-import de.digitalcollections.cudami.model.api.identifiable.resource.ContentNode;
-import de.digitalcollections.cudami.model.impl.identifiable.parts.MultilanguageDocumentImpl;
-import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
-import de.digitalcollections.cudami.model.impl.identifiable.resource.ContentNodeImpl;
 import de.digitalcollections.cudami.server.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ContentNodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ResourceRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSortingRepositoryImpl;
+import de.digitalcollections.model.api.identifiable.parts.Translation;
+import de.digitalcollections.model.api.identifiable.resource.ContentNode;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.impl.PageResponseImpl;
+import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
+import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
+import de.digitalcollections.model.impl.identifiable.resource.ContentNodeImpl;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
@@ -49,8 +49,8 @@ public class ContentNodeRepositoryImpl extends AbstractPagingAndSortingRepositor
   public ContentNode create() {
     Locale defaultLocale = localeRepository.getDefault();
     ContentNodeImpl contentNode = new ContentNodeImpl();
-    contentNode.setLabel(new TextImpl(defaultLocale, ""));
-    contentNode.setDescription(new MultilanguageDocumentImpl(defaultLocale));
+    contentNode.setLabel(new LocalizedTextImpl(defaultLocale, ""));
+    contentNode.setDescription(new LocalizedStructuredContentImpl(defaultLocale));
     return contentNode;
   }
 
@@ -114,7 +114,7 @@ public class ContentNodeRepositoryImpl extends AbstractPagingAndSortingRepositor
     // TODO maybe a better solution to just get locale specific fields directly from database instead of removing it here?
     // iterate over all localized fields and remove all texts that are not matching the requested locale:
     contentNode.getLabel().getTranslations().removeIf(translation -> !translation.getLocale().equals(fLocale));
-    contentNode.getDescription().getDocuments().entrySet().removeIf(entry -> !entry.getKey().equals(fLocale));
+    contentNode.getDescription().getLocalizedStructuredContent().entrySet().removeIf(entry -> !entry.getKey().equals(fLocale));
     return contentNode;
   }
 

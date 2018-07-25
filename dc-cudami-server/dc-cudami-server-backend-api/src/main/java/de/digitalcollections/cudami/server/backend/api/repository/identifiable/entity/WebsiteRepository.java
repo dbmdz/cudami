@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity;
 
-import de.digitalcollections.cudami.model.api.identifiable.entity.Website;
-import de.digitalcollections.cudami.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
+import de.digitalcollections.model.api.identifiable.entity.Website;
+import de.digitalcollections.model.api.identifiable.resource.Webpage;
 import java.util.List;
 
 /**

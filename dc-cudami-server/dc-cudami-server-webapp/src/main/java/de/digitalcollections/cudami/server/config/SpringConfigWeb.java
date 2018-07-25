@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.model.jackson.CudamiObjectMapper;
+import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -39,7 +39,7 @@ public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
   @Override
   public void afterPropertiesSet() throws Exception {
     // customize default spring boot jackson objectmapper
-    CudamiObjectMapper.customize(objectMapper);
+    DigitalCollectionsObjectMapper.customize(objectMapper);
     //objectMapper.registerModule(new JacksonXmlModule());
 
     setupJsondoc();

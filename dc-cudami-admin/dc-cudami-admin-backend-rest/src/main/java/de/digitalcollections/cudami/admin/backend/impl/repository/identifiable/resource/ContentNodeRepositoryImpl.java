@@ -1,14 +1,14 @@
 package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.resource;
 
-import de.digitalcollections.core.model.api.paging.Order;
-import de.digitalcollections.core.model.api.paging.PageRequest;
-import de.digitalcollections.core.model.api.paging.PageResponse;
-import de.digitalcollections.core.model.api.paging.Sorting;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.ContentNodeRepository;
-import de.digitalcollections.cudami.model.impl.identifiable.parts.MultilanguageDocumentImpl;
-import de.digitalcollections.cudami.model.impl.identifiable.parts.TextImpl;
-import de.digitalcollections.cudami.model.impl.identifiable.resource.ContentNodeImpl;
+import de.digitalcollections.model.api.paging.Order;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.Sorting;
+import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
+import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
+import de.digitalcollections.model.impl.identifiable.resource.ContentNodeImpl;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.UUID;
@@ -33,8 +33,8 @@ public class ContentNodeRepositoryImpl implements ContentNodeRepository<ContentN
   public ContentNodeImpl create() {
     Locale defaultLocale = localeRepository.getDefault();
     ContentNodeImpl contentNode = new ContentNodeImpl();
-    contentNode.setLabel(new TextImpl(defaultLocale, ""));
-    contentNode.setDescription(new MultilanguageDocumentImpl(defaultLocale));
+    contentNode.setLabel(new LocalizedTextImpl(defaultLocale, ""));
+    contentNode.setDescription(new LocalizedStructuredContentImpl(defaultLocale));
     return contentNode;
   }
 

@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.business.api.service.security;
 
-import de.digitalcollections.core.model.api.paging.PageRequest;
-import de.digitalcollections.core.model.api.paging.PageResponse;
-import de.digitalcollections.cudami.model.api.security.User;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.security.User;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -32,17 +32,13 @@ public interface UserService<U extends User> extends UserDetailsService {
   PageResponse<U> find(PageRequest pageRequest);
 
 //  List<U> findActiveAdminUsers();
-
   List<U> findAll();
 
 //  U findByEmail(String email);
-
   U findOne(UUID uuid);
 
 //  U save(U user);
-
 //  U update(U user);
-
   U update(U user, String password1, String password2, Errors results);
 
 }

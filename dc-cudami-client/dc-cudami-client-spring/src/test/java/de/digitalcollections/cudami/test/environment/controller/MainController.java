@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.test.environment.controller;
 
-import de.digitalcollections.prosemirror.model.api.contentblocks.IFrame;
-import de.digitalcollections.prosemirror.model.impl.contentblocks.IFrameImpl;
+import de.digitalcollections.model.api.identifiable.parts.structuredcontent.contentblocks.IFrame;
+import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.contentblocks.IFrameImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -9,7 +9,7 @@ import de.digitalcollections.commons.springmvc.controller.ErrorController;
 import de.digitalcollections.cudami.admin.converter.GrantedAuthorityJsonFilter;
 import de.digitalcollections.cudami.admin.converter.UserJsonFilter;
 import de.digitalcollections.cudami.admin.interceptors.CreateAdminUserInterceptor;
-import de.digitalcollections.cudami.model.api.security.User;
+import de.digitalcollections.model.api.security.User;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;

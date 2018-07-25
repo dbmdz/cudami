@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.backend.impl.repository.security;
 
-import de.digitalcollections.core.model.api.paging.PageResponse;
-import de.digitalcollections.cudami.model.impl.security.UserImpl;
+import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.security.UserImpl;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;

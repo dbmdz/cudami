@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.controller;
 
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
-import de.digitalcollections.cudami.model.api.security.User;
+import de.digitalcollections.model.api.security.User;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

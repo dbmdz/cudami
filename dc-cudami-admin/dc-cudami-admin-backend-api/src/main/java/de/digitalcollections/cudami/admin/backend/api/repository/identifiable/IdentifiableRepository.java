@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.backend.api.repository.identifiable;
 
-import de.digitalcollections.core.model.api.paging.PageRequest;
-import de.digitalcollections.core.model.api.paging.PageResponse;
-import de.digitalcollections.cudami.model.api.identifiable.Identifiable;
+import de.digitalcollections.model.api.identifiable.Identifiable;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.UUID;
 
 public interface IdentifiableRepository<I extends Identifiable> {
