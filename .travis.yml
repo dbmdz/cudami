@@ -1,23 +1,24 @@
 language: java
 jdk:
 - oraclejdk8
-
 before_script:
 - if [ ! -z "$TRAVIS_TAG" ]; then mvn versions:set -DnewVersion=$TRAVIS_TAG; fi
-
 script:
 - mvn clean install
-
 after_success:
 - bash <(curl -s https://codecov.io/bash)
-
+- if [ -z "$TRAVIS_TAG" ]; then mvn deploy -B -DskipTests=true --settings settings.xml; fi
 deploy:
   provider: releases
   api_key:
     secure: oTXozaI9Srkeqfgf397bIxjFM46fHfWKWgkiNL9iS1320I6wruc2wRmeAyjtiythLpoAOTEBS/Lo88KbL3r2dBN/Sp98/SHuW7zvSNQL6JYQkErhQGXh1mSeX7z6eaNvHa8BVlMdNhki7mmpxBndz705CBhr9pSe/EE+p12RkM8nyDXBcqhf+46+NRUjmAD3oL6dS8JjwMgX2GhNukUQ1UhLdiyILBHmsM/hIsTW0ES+h7tgUgPQUpopf4UwCwhTqvmEbJeqlOaEKzfnMwkE1cmCJ2wZEsmTQqllnQXh53iDcoeYaBcv+Qv6E0dRcrtZHVVaFXE7neHMpUqZCtrKRnIMkAAzVD7Jvg81YOp36AiiF9ONrOgHnPTTBa6Y6jZ5dbqBXQGPKRAgcIw1/YzAoKY+ZPP/n77t3uZYFZOWhzM7G42iwJVZDdYCixp4ma9oxNX6SdBhHkVILIuo7ZOpFItHZj1zgJupvf7hv9C7jq56dgXaS4ejo9TVAvLajH24EWUKqB4Lz2ippKW8ifJkggSy33/5ytgKqe340gVAzEyHIsfr+lAYDVi8uMKD4r/PNBz5O3KvH0XJPTc3pZBSx0K9Pi1e2RvvLEawJShDb8E58xzenR4L+jnl4Kks5NaEGqn4w28nCJuzfTxpw5WDGqml0MXtMKA3vuj03SdeNQY=
   file_glob: true
   file:
-    - "**/target/*.jar"
+  - "**/target/*.jar"
   skip_cleanup: true
   on:
     tags: true
+env:
+  global:
+  - secure: KXhmVTCMi4Fg1hhlMzqeRlUUAmLKw9HYSz2xpI4eLForg7GVs/i36tHt929KnkT9UATM4glcdWaoqORzNbMKf6S8T9eRo6suor1Pf1B3JVrNpZMOeL714SeWT5GkoCZrNvw4KjHgh/dEzolgHN8EwInpk6boDbNI47EWFgXhRjPu8jC3EVzSy6y/8rMZ42jKB/TMuyeA8Mb9wI8fzx9o40ZWV0r9CT+RLULVietM1lYSVEQpluESFNnBmeeFThizZhhE/H5rJv/k0fVUjj6RayLw8wwiCYPJaB1ojhU5Pv0bbdXBcnFtgpar1Dfx+Sy6EeJ5OyoiiU8E78R+pcFTtJFa2TLglWcfAE79Ap5xKRUEuc69BcA1m+IqIEayLkobeNc4vkHgNU7rGBKyWgIWNZPcR2PNsGLUgzkMEpnU88kvmLr7KakNStk3WljLVf5Y7BreGea3mpXOg6Vwvm3yFGtST0TpseG57Nfn40nRUwecVnr2bMjXk9HcV58BrfUBpPaI3I05JDj2d3jHUFLDfiIdbHxMKDI9uOtiG7KfH8Lt5LrZv1Q/7lM56I6J0Tgb+MHdYSXQJJWGmzgglIP7iV4m1S8aj9eKGvQD9CnwDHp5j9G28UTSQtHo6E9M3D8yBQ46CTQBBwEjrTfMFF0+GN08KSRlz3nCdu9vylVA9Hg=
+  - secure: f0VE/JKEKPxhtFnsF4qJERw6Ob4jH49i01aYEGhSkPLPghNisq6JKSLaFeUSX0A09iQdoWwMhs3S46sj7z+BBmswdpo1X3Jt6apHRuBkZCgqkJVX/BCvj6eSknGvXGhDasMUu2Quu+1otLXwjpXkuDQ4lyGHcyRog/uWCsB8BqpUJ/yqvNz/oDHEYr9BS/FdyNFdxm8uujdRx+glZufICqC5b7+Eeoxq5B0ti/BKWitV5WsUOIPNSY619ScJp5adeGr38aMRvSU31Cr2wMa+M3MitaZd/DKrIvRfVjmyTSOWsc9i9ThCYXymN0+3Ky77gLuItYQOJM1pz4hOnqcnKx9uIH9qv7/+gFB/IizcY0Ia3UfsGBz8Q+qFNUEivMCWyvRF1BzVI9USWwY5GU3xBc+41o/qduWZGZ2zlibds/V81y5yd8MQqIpFoEuPatZRtr1p/RKmu363qq2kGgKuAGtFBJ5FkrqO0fDXtQZD35+OH25HZlpU5xv9QCBfFqTswnQ6o/h339l9A8SiuBe8pobK8Eqi7BTelx8TvnpVIkjsQteoTslyeCScy8oxCyb5w5EuL0PGFFZhyZZTx4XQn6nwDxw3eUhyrJKzKiGwR3TVqoGagiFEI+NJaiNaGNf622u5tO8sP889aRi7B/FAN1awk1kYbdZ7M4U+8dx9Vzk=
