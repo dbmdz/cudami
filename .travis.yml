@@ -1,13 +1,18 @@
 language: java
 jdk:
 - oraclejdk8
+addons:
+  apt:
+    packages:
+    - libxml2-utils
 before_script:
+- PROJECT_VERSION=$(xmllint --xpath '/*[local-name()="project"]/*[local-name()="version"]/text()' pom.xml)
 - if [ ! -z "$TRAVIS_TAG" ]; then mvn versions:set -DnewVersion=$TRAVIS_TAG; fi
 script:
 - mvn clean install
 after_success:
 - bash <(curl -s https://codecov.io/bash)
-- if [ -z "$TRAVIS_TAG" ]; then mvn deploy -B -DskipTests=true --settings settings.xml; fi
+- if [[ "$PROJECT_VERSION" == *SNAPSHOT ]]; then mvn deploy -B -DskipTests=true --settings settings.xml; fi
 deploy:
   provider: releases
   api_key:
