@@ -14,7 +14,7 @@ script:
 after_success:
 - bash <(curl -s https://codecov.io/bash)
 - if [[ "$PROJECT_VERSION" == *SNAPSHOT ]]; then mvn deploy -B -DskipTests=true --settings settings.xml; fi
-- if [[ "$PROJECT_VERSION" == *SNAPSHOT ]]; then curl -X POST -F token=$TRIGGER_TOKEN -F ref=master -F "variables[PROJECT_VERSION]=$PROJECT_VERSION" $TRIGGER_URL
+- if [[ "$PROJECT_VERSION" == *SNAPSHOT ]]; then curl -X POST -F token=$TRIGGER_TOKEN -F ref=master -F "variables[PROJECT_VERSION]=$PROJECT_VERSION" $TRIGGER_URL; fi
 deploy:
   provider: releases
   api_key:
