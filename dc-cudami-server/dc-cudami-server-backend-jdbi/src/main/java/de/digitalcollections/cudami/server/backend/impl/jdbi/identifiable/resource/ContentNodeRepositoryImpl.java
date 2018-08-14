@@ -128,7 +128,8 @@ public class ContentNodeRepositoryImpl extends AbstractPagingAndSortingRepositor
     // minimal data required for creating text links in a list
     String query = "SELECT cc.child_contentnode_uuid as uuid, i.label as label"
             + " FROM contentnodes cn INNER JOIN contentnode_contentnode cc ON cn.uuid=cc.parent_contentnode_uuid INNER JOIN identifiables i ON cc.child_contentnode_uuid=i.uuid"
-            + " WHERE cn.uuid = :uuid";
+            + " WHERE cn.uuid = :uuid"
+            + " ORDER BY cc.sortIndex ASC";
 
     List<ContentNodeImpl> list = dbi.withHandle(h -> h.createQuery(query)
             .bind("uuid", contentNode.getUuid())
@@ -154,7 +155,11 @@ public class ContentNodeRepositoryImpl extends AbstractPagingAndSortingRepositor
             .bindBean(contentNode)
             .execute());
 
-    dbi.withHandle(h -> h.createUpdate("INSERT INTO contenttree_contentnode(contenttree_uuid, contentnode_uuid) VALUES (:parent_contenttree_uuid, :uuid)")
+    // select max sortIndex from parent contenttree and insert with max+1:
+    
+    dbi.withHandle(h -> h.createUpdate(
+            "INSERT INTO contenttree_contentnode(contenttree_uuid, contentnode_uuid, sortIndex)"
+            + " VALUES (:parent_contenttree_uuid, :uuid, (SELECT MAX(sortIndex) + 1 FROM contenttree_contentnode WHERE contenttree_uuid = :parent_contenttree_uuid))")
             .bind("parent_contenttree_uuid", parentContentTreeUuid)
             .bindBean(contentNode)
             .execute());
@@ -169,8 +174,10 @@ public class ContentNodeRepositoryImpl extends AbstractPagingAndSortingRepositor
     dbi.withHandle(h -> h.createUpdate("INSERT INTO contentnodes(uuid) VALUES (:uuid)")
             .bindBean(contentNode)
             .execute());
-
-    dbi.withHandle(h -> h.createUpdate("INSERT INTO contentnode_contentnode(parent_contentnode_uuid, child_contentnode_uuid) VALUES (:parent_contentnode_uuid, :uuid)")
+    
+    dbi.withHandle(h -> h.createUpdate(
+            "INSERT INTO contentnode_contentnode(parent_contentnode_uuid, child_contentnode_uuid, sortIndex)"
+            + " VALUES (:parent_contentnode_uuid, :uuid, (SELECT MAX(sortIndex) + 1 FROM contentnode_contentnode WHERE parent_contentnode_uuid = :parent_contentnode_uuid))")
             .bind("parent_contentnode_uuid", parentContentNodeUuid)
             .bindBean(contentNode)
             .execute());

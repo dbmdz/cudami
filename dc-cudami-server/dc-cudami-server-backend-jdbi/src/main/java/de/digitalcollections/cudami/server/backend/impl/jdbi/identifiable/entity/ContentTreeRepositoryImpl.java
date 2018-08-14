@@ -101,7 +101,8 @@ public class ContentTreeRepositoryImpl extends AbstractPagingAndSortingRepositor
     // minimal data required for creating text links in a list
     String query = "SELECT cc.contentnode_uuid as uuid, i.label as label"
             + " FROM contenttrees ct INNER JOIN contenttree_contentnode cc ON ct.uuid=cc.contenttree_uuid INNER JOIN identifiables i ON cc.contentnode_uuid=i.uuid"
-            + " WHERE ct.uuid = :uuid";
+            + " WHERE ct.uuid = :uuid"
+            + " ORDER BY cc.sortIndex ASC";
 
     List<ContentNodeImpl> list = dbi.withHandle(h -> h.createQuery(query)
             .bind("uuid", contentTree.getUuid())
