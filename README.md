@@ -140,7 +140,7 @@ Enjoy!
 
 ### Installation
 
-Install Docker according to the official [Docker documentation](https://www.docker.com/products/overview).
+Install Docker according to the official [Docker documentation](https://docs.docker.com/install/).
 Install Docker Compose according to the official [documentation](https://docs.docker.com/compose/install/).
 
 #### Debian 9
