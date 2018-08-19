@@ -69,11 +69,11 @@
               </div>
             </a>
           </div>
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a class="btn disabled" href="#" title="...">
+            <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a class="btn" th:href="@{/articles}" th:title="#{articles}">
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-file-text-o"></i></div>
-                <span>Artikel</span>
+                <span th:utext="#{articles}">Articles</span>
               </div>
             </a>
           </div>

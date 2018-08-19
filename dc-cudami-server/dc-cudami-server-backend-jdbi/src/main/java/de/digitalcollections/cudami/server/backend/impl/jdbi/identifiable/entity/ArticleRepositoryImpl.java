@@ -66,7 +66,7 @@ public class ArticleRepositoryImpl<A extends Article> extends EntityRepositoryIm
   @Override
   public PageResponse<A> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder("SELECT a.uuid as uuid, a.text as text, i.label as label, i.description as description")
-            .append(" FROM articles a INNER JOIN resources r ON a.uuid=r.uuid INNER JOIN identifiables i ON a.uuid=i.uuid");
+            .append(" FROM articles a INNER JOIN entities e ON a.uuid=e.uuid INNER JOIN identifiables i ON a.uuid=i.uuid");
 
     addPageRequestParams(pageRequest, query);
 
@@ -83,7 +83,7 @@ public class ArticleRepositoryImpl<A extends Article> extends EntityRepositoryIm
   @Override
   public A findOne(UUID uuid) {
     String query = "SELECT a.uuid as uuid, a.text as text, i.label as label, i.description as description"
-            + " FROM articles a INNER JOIN resources r ON a.uuid=r.uuid INNER JOIN identifiables i ON a.uuid=i.uuid"
+            + " FROM articles a INNER JOIN entities e ON a.uuid=e.uuid INNER JOIN identifiables i ON a.uuid=i.uuid"
             + " WHERE a.uuid = :uuid";
 
     List<ArticleImpl> list = dbi.withHandle(h -> h.createQuery(query)
@@ -143,7 +143,8 @@ public class ArticleRepositoryImpl<A extends Article> extends EntityRepositoryIm
     // minimal data required for creating text links in a list
     String query = "SELECT aa.child_article_uuid as uuid, i.label as label"
             + " FROM articles a INNER JOIN article_article aa ON a.uuid=aa.parent_article_uuid INNER JOIN identifiables i ON aa.child_article_uuid=i.uuid"
-            + " WHERE a.uuid = :uuid";
+            + " WHERE a.uuid = :uuid"
+            + " ORDER BY aa.sortIndex ASC";
 
     List<ArticleImpl> list = dbi.withHandle(h -> h.createQuery(query)
             .bind("uuid", uuid)
@@ -169,9 +170,16 @@ public class ArticleRepositoryImpl<A extends Article> extends EntityRepositoryIm
 
   @Override
   public A saveWithParent(A article, UUID parentUuid) {
-    save(article);
+    entityRepository.save(article);
 
-    dbi.withHandle(h -> h.createUpdate("INSERT INTO article_article(parent_article_uuid, child_article_uuid) VALUES (:parent_uuid, :uuid)")
+    dbi.withHandle(h -> h.createUpdate("INSERT INTO articles(uuid, text) VALUES (:uuid, :text::JSONB)")
+            .bindBean(article)
+            .execute());
+
+    // FIXME: sortIndex is always null! (first max gets no results....)
+    dbi.withHandle(h -> h.createUpdate(
+            "INSERT INTO article_article(parent_article_uuid, child_article_uuid, sortIndex)"
+            + " VALUES (:parent_uuid, :uuid, (SELECT MAX(sortIndex) + 1 FROM article_article WHERE parent_article_uuid = :parent_uuid))")
             .bind("parent_uuid", parentUuid)
             .bindBean(article)
             .execute());

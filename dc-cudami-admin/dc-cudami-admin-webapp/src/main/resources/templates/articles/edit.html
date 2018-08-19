@@ -1,0 +1,96 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+
+  <head>
+    <title th:if="${isNew}" th:text="|#{articles}: #{create_article}|">Articles: Create a new article</title>
+    <title th:unless="${isNew}" th:text="|#{articles}: #{edit_article}|">Articles:: Edit article</title>
+    <link rel=stylesheet th:href="@{/css/thirdparty/prosemirror.css}" />
+  </head>
+  <body>
+    <section layout:fragment="content">
+      <form th:object="${article}" th:action="@{#}" method="post" role="form" class="form-horizontal">
+        <input type="hidden" id="description" class="content" th:field="*{description}" />
+
+        <div class="row mainContent">
+          <div th:replace="fragments/feedback-messages :: form"></div>
+
+          <div class="col-sm-8">
+            <b th:if="${isNew}" th:text="#{create_article}">...</b>
+            <b th:unless="${isNew}" th:utext="#{edit_article}">...</b>
+          </div>
+          <div class="col-sm-4">
+            <span class="col-sm-6">
+              <a th:if="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{/articles}" th:text="#{abort}">abort</a>
+              <a th:unless="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{'/articles/' + *{uuid}}" th:text="#{abort}">abort</a>
+            </span>
+            <span class="col-sm-6">
+              <button class="btn btn-primary btn-block" type="submit" th:text="#{save}">
+                save
+              </button>
+            </span>
+          </div>
+        </div>
+
+        <div class="row mainContent">
+          <div class="col-sm-12">
+            <hr/>
+          </div>
+        </div>
+
+        <div class="row mainContent">
+          <div class="form-group col-sm-12">
+            <span class="col-sm-4">
+              <label for="id" class="col-sm-1 control-label" th:text="#{id}">ID</label>
+              <div class="col-sm-9">
+                <input id="id" th:field="*{uuid}" type="text" class="form-control" readonly="readonly" th:placeholder="*{uuid}"/>
+              </div>
+            </span>
+          </div>
+        </div>
+
+        <div class="row mainContent">
+          <div class="col-sm-12">
+            <ul class="nav nav-tabs">
+              <li th:each="translation,iter : *{label.translations}" th:classappend="${iter.index} == 0 ? active">
+                <a th:href="${'#' + translation.locale}" data-toggle="tab" th:text="${translation.locale.getDisplayLanguage(#locale)}">locale</a>
+              </li>
+              <!--            <li>
+                            <a href="#">
+                              <i class="fa fa-plus" aria-hidden="true"></i>
+                            </a>
+                          </li>-->
+            </ul>
+
+            <div class="tab-content">
+              <div th:each="translation,iter : *{label.translations}" class="tab-pane" th:id="${translation.locale}" th:classappend="${iter.index} == 0 ? active">
+                <!-- identifiable fields -->
+                <div class="well">
+                  <div class="form-group">
+                    <label th:text="#{label}">label</label>
+                    <input class="form-control" type="text" th:field="*{label.translations[__${iter.index}__].text}" required/>
+                  </div>
+
+                  <div class="form-group">
+                    <label th:text="#{description}">description</label>
+                    <div class="editor" th:attr="data-content-id='description', data-content-language=${translation.locale}"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <div th:replace="fragments/modals-confirmation :: confirmYesNoDialog"></div>
+    </section>
+
+  <th:block layout:fragment="beforeBodyEnds">
+    <script th:src="@{/js/thirdparty/prosemirror.js}"></script>
+    <script th:src="@{/js/prosemirror-basic.js}"></script>
+  </th:block>
+</body>
+
+</html>

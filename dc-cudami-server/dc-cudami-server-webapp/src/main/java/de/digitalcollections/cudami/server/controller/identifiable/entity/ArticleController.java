@@ -76,14 +76,14 @@ public class ArticleController {
   }
 
   @ApiMethod(description = "save a newly created top-level article")
-  @RequestMapping(value = "/v1/articles/article", produces = "application/json", method = RequestMethod.POST)
+  @RequestMapping(value = "/v1/articles", produces = "application/json", method = RequestMethod.POST)
   @ApiResponseObject
   public Article save(@RequestBody Article article, BindingResult errors) throws IdentifiableServiceException {
     return articleService.save(article);
   }
 
   @ApiMethod(description = "save a newly created article with a parent article")
-  @RequestMapping(value = "/v1/articles/{parentArticleUuid}/webpage", produces = "application/json", method = RequestMethod.POST)
+  @RequestMapping(value = "/v1/articles/{parentArticleUuid}/article", produces = "application/json", method = RequestMethod.POST)
   @ApiResponseObject
   public Article saveWithParentArticle(@PathVariable UUID parentArticleUuid, @RequestBody Article article, BindingResult errors) throws IdentifiableServiceException {
     return articleService.saveWithParent(article, parentArticleUuid);
