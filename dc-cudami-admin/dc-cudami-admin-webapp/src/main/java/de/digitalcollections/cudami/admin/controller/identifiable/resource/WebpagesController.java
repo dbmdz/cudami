@@ -72,8 +72,9 @@ public class WebpagesController extends AbstractController implements MessageSou
   }
 
   @RequestMapping(value = "/webpages/new", method = RequestMethod.POST)
-  public String create(@ModelAttribute @Valid Webpage webpage, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes, @RequestParam("parentType") String parentType, @RequestParam(
-          "parentUuid") UUID parentUuid) {
+  public String create(@ModelAttribute @Valid Webpage webpage, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes,
+          @RequestParam("parentType") String parentType,
+          @RequestParam("parentUuid") UUID parentUuid) {
     verifyBinding(results);
     if (results.hasErrors()) {
       model.addAttribute("isNew", true);
