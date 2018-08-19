@@ -12,8 +12,10 @@
   <body>
     <section layout:fragment="content">
       <form th:object="${article}" th:action="@{#}" method="post" role="form" class="form-horizontal">
+        <input type="hidden" name="parentUuid" th:value="${parentUuid}" />
         <input type="hidden" id="description" class="content" th:field="*{description}" />
-
+        <input type="hidden" id="text" class="content" th:field="*{text}" />
+        
         <div class="row mainContent">
           <div th:replace="fragments/feedback-messages :: form"></div>
 
@@ -77,6 +79,11 @@
                     <label th:text="#{description}">description</label>
                     <div class="editor" th:attr="data-content-id='description', data-content-language=${translation.locale}"></div>
                   </div>
+                </div>
+                
+                <div class="form-group">
+                  <label th:text="#{document}">long text</label>
+                  <div class="editor" th:attr="data-content-id='text', data-content-language=${translation.locale}"></div>
                 </div>
               </div>
             </div>

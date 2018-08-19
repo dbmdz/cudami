@@ -59,6 +59,9 @@
                   </div>
                 </div>
               </div>
+              <th:block th:if="${article.text}">
+                <div th:insert="cudami/fragments/webpage-to-html :: renderLocalizedStructuredContent(${article.text.localizedStructuredContent}, ${locale})"></div>
+              </th:block>
             </div>
           </div>
         </div>
@@ -80,11 +83,11 @@
             <tbody>
               <tr th:each="child: *{children}">
                 <td>
-                  <a th:href="@{'/contentnodes/' + ${child.uuid}}" th:text="${child.label.translations[0].text}">Label</a>
+                  <a th:href="@{'/articles/' + ${child.uuid}}" th:text="${child.label.translations[0].text}">Label</a>
                 </td>
                 <td class="center">
-                  <a th:href="@{'/contentnodes/' + ${child.uuid}}" th:title="#{tooltip_view}"><span class="fa fa-eye actionButton"></span></a>
-                  <a th:href="@{'/contentnodes/' + ${child.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fa fa-pencil actionButton"></span></a>
+                  <a th:href="@{'/articles/' + ${child.uuid}}" th:title="#{tooltip_view}"><span class="fa fa-eye actionButton"></span></a>
+                  <a th:href="@{'/articles/' + ${child.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fa fa-pencil actionButton"></span></a>
                 </td>
               </tr>
             </tbody>

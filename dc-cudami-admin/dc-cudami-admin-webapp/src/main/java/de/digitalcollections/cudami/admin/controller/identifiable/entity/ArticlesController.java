@@ -48,7 +48,7 @@ public class ArticlesController extends AbstractController implements MessageSou
   LocaleService localeService;
 
   @Autowired
-  ArticleService service;
+  ArticleService<Article> service;
 
   @Override
   public void setMessageSource(MessageSource messageSource) {
@@ -61,11 +61,12 @@ public class ArticlesController extends AbstractController implements MessageSou
   }
 
   @RequestMapping(value = "/articles/new", method = RequestMethod.GET)
-  public String create(Model model) {
+  public String create(Model model, @RequestParam("parentUuid") String parentUuid) {
     model.addAttribute("article", service.create());
     model.addAttribute("isNew", true);
     model.addAttribute("locales", localeService.findAll());
     model.addAttribute("defaultLocale", localeService.getDefault());
+    model.addAttribute("parentUuid", parentUuid);
     return "articles/edit";
   }
 
@@ -78,13 +79,15 @@ public class ArticlesController extends AbstractController implements MessageSou
       model.addAttribute("isNew", true);
       return "articles/edit";
     }
+    Article articleDb = null;
     try {
       if ("article".equals(parentType) && parentUuid != null) {
-        service.saveWithParent(article, parentUuid);
+        articleDb = service.saveWithParent(article, parentUuid);
+        LOGGER.info("Successfully saved subarticle");
       } else {
-        service.save(article, results);
+        articleDb = service.save(article, results);
+        LOGGER.info("Successfully saved article");
       }
-      LOGGER.info("Successfully saved article");
     } catch (Exception e) {
       LOGGER.error("Cannot save article: ", e);
       String message = messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale());
@@ -98,23 +101,19 @@ public class ArticlesController extends AbstractController implements MessageSou
     status.setComplete();
     String message = messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
-    return "redirect:/articles";
+    return "redirect:/articles/" + articleDb.getUuid().toString();
   }
 
   @RequestMapping(value = "/articles/{uuid}/edit", method = RequestMethod.GET)
   public String edit(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
-//      model.addAttribute("contentNodeTypes", websiteViewService.getContentNodeTypes());
-//      model.addAttribute("navigationNodeTypes", websiteViewService.getNavigationNodeTypes());
-    Article article = (Article) service.get(uuid);
-    model.addAttribute("article", article);
-//      LOGGER.error("Cannot retrieve website with id=" + id + ": ", e);
-//      String message = messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale());
-//      redirectAttributes.addFlashAttribute("error_message", message);
-//      return "redirect:/websites";
-    model.addAttribute("isNew", false);
+    Article article = service.get(uuid);
+
     model.addAttribute("availableLocales", article.getLabel().getLocales());
-    model.addAttribute("locales", localeService.findAll());
     model.addAttribute("defaultLocale", localeService.getDefault());
+    model.addAttribute("article", article);
+
+    model.addAttribute("isNew", false);
+    model.addAttribute("locales", localeService.findAll());
 
     return "articles/edit";
   }
@@ -129,10 +128,11 @@ public class ArticlesController extends AbstractController implements MessageSou
 
     try {
       // get content tree from db
-      Article articleDb = (Article) service.get(pathUuid);
+      Article articleDb = service.get(pathUuid);
       // just update the fields, that were editable
       articleDb.setLabel(article.getLabel());
       articleDb.setDescription(article.getDescription());
+      articleDb.setText(article.getText());
 
       service.update(articleDb, results);
     } catch (IdentifiableServiceException e) {
@@ -165,11 +165,11 @@ public class ArticlesController extends AbstractController implements MessageSou
   public String view(@PathVariable UUID uuid, Model model) {
     Article article = (Article) service.get(uuid);
     model.addAttribute("availableLocales", article.getLabel().getLocales());
+    model.addAttribute("defaultLocale", localeService.getDefault());
     model.addAttribute("article", article);
     return "articles/view";
   }
 
-  // ----------------------------------------------------------------------------
   public void setService(ArticleService service) {
     this.service = service;
   }
