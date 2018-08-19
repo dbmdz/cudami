@@ -2,15 +2,13 @@ package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.
 
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.WebsiteRepository;
+import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.resource.Webpage;
-import de.digitalcollections.model.api.paging.Order;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -18,68 +16,53 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class WebsiteRepositoryImpl implements WebsiteRepository<WebsiteImpl> {
-
-  @Autowired
-  private WebsiteRepositoryEndpoint endpoint;
+// FIXME: duplicate methods (replace by functional call with specific endpoint instance?)
+public class WebsiteRepositoryImpl<W extends WebsiteImpl> extends EntityRepositoryImpl<W> implements WebsiteRepository<W> {
 
   @Autowired
   private LocaleRepository localeRepository;
 
-  @Override
-  public long count() {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  }
+  @Autowired
+  private WebsiteRepositoryEndpoint endpoint;
 
   @Override
-  public WebsiteImpl create() {
+  public long count() {
+    return endpoint.count();
+  }
+  
+  @Override
+  public W create() {
     Locale defaultLocale = localeRepository.getDefault();
-    WebsiteImpl website = new WebsiteImpl();
+    W website = (W) new WebsiteImpl();
     website.setLabel(new LocalizedTextImpl(defaultLocale, ""));
     website.setDescription(new LocalizedStructuredContentImpl(defaultLocale));
     return website;
   }
 
   @Override
-  public PageResponse<WebsiteImpl> find(PageRequest pageRequest) {
-    int pageNumber = pageRequest.getPageNumber();
-    int pageSize = pageRequest.getPageSize();
-
-    Sorting sorting = pageRequest.getSorting();
-    Iterator<Order> iterator = sorting.iterator();
-
-    // FIXME add support for multiple sort fields
-    String sortField = "";
-    String sortDirection = "";
-    String nullHandling = "";
-//    while (iterator.hasNext()) {
-    if (iterator.hasNext()) {
-      Order order = iterator.next();
-      sortField = order.getProperty() == null ? "" : order.getProperty();
-      sortDirection = order.getDirection() == null ? "" : order.getDirection().name();
-      nullHandling = order.getNullHandling() == null ? "" : order.getNullHandling().name();
-    }
-
-    return endpoint.find(pageNumber, pageSize, sortField, sortDirection, nullHandling);
+  public PageResponse<W> find(PageRequest pageRequest) {
+    FindParams f = getFindParams(pageRequest);
+    PageResponse<Website> pageResponse = endpoint.find(f.getPageNumber(), f.getPageSize(), f.getSortField(), f.getSortDirection(), f.getNullHandling());
+    return getGenericPageResponse(pageResponse);
+  }
+  
+  @Override
+  public W findOne(UUID uuid) {
+    return (W) endpoint.findOne(uuid);
   }
 
   @Override
-  public WebsiteImpl findOne(UUID uuid) {
-    return endpoint.findOne(uuid);
+  public W save(W identifiable) {
+    return (W) endpoint.save(identifiable);
   }
 
   @Override
-  public List<Webpage> getRootNodes(WebsiteImpl website) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  public W update(W identifiable) {
+    return (W) endpoint.update(identifiable.getUuid(), identifiable);
   }
-
+  
   @Override
-  public WebsiteImpl save(WebsiteImpl website) {
-    return (WebsiteImpl) endpoint.save(website);
-  }
-
-  @Override
-  public WebsiteImpl update(WebsiteImpl website) {
-    return (WebsiteImpl) endpoint.update(website.getUuid(), website);
+  public List<Webpage> getRootPages(W website) {
+    return (List<Webpage>) endpoint.getRootPages(website.getUuid());
   }
 }

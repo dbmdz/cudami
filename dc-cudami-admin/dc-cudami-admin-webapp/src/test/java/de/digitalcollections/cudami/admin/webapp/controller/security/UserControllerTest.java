@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.admin.webapp.controller.security;
 
-import de.digitalcollections.cudami.admin.Application;
+import de.digitalcollections.cudami.admin.test.TestApplication;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 // Don’t forget to also add @RunWith(SpringRunner.class) to your test, otherwise the annotations will be ignored:
 @ExtendWith(SpringExtension.class)
 // annotation which can be used as an alternative to the standard spring-test @ContextConfiguration annotation when you need Spring Boot features:
-@SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+        classes = {TestApplication.class},
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+)
 // RANDOM_PORT — Loads an EmbeddedWebApplicationContext and provides a real servlet environment. Embedded servlet containers are started and listening on a random port
 // SpringBootTest registers a TestRestTemplate bean for use in web tests that are using a fully running container.
 //@ContextConfiguration

@@ -2,87 +2,81 @@ package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.
 
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.ContentNodeRepository;
-import de.digitalcollections.model.api.paging.Order;
+import de.digitalcollections.model.api.identifiable.resource.ContentNode;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ContentNodeImpl;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ContentNodeRepositoryImpl implements ContentNodeRepository<ContentNodeImpl> {
-
-  @Autowired
-  private ContentNodeRepositoryEndpoint endpoint;
+public class ContentNodeRepositoryImpl<C extends ContentNode> extends ResourceRepositoryImpl<C> implements ContentNodeRepository<C> {
 
   @Autowired
   LocaleRepository localeRepository;
 
+  @Autowired
+  private ContentNodeRepositoryEndpoint endpoint;
+
   @Override
   public long count() {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return endpoint.count();
   }
 
   @Override
-  public ContentNodeImpl create() {
+  public C create() {
     Locale defaultLocale = localeRepository.getDefault();
-    ContentNodeImpl contentNode = new ContentNodeImpl();
+    C contentNode = (C) new ContentNodeImpl();
     contentNode.setLabel(new LocalizedTextImpl(defaultLocale, ""));
     contentNode.setDescription(new LocalizedStructuredContentImpl(defaultLocale));
     return contentNode;
   }
 
   @Override
-  public PageResponse<ContentNodeImpl> find(PageRequest pageRequest) {
-    int pageNumber = pageRequest.getPageNumber();
-    int pageSize = pageRequest.getPageSize();
-
-    Sorting sorting = pageRequest.getSorting();
-    Iterator<Order> iterator = sorting.iterator();
-
-    // FIXME add support for multiple sort fields
-    String sortField = "";
-    String sortDirection = "";
-    String nullHandling = "";
-//    while (iterator.hasNext()) {
-    if (iterator.hasNext()) {
-      Order order = iterator.next();
-      sortField = order.getProperty() == null ? "" : order.getProperty();
-      sortDirection = order.getDirection() == null ? "" : order.getDirection().name();
-      nullHandling = order.getNullHandling() == null ? "" : order.getNullHandling().name();
-    }
-
-    return endpoint.find(pageNumber, pageSize, sortField, sortDirection, nullHandling);
+  public PageResponse<C> find(PageRequest pageRequest) {
+    FindParams f = getFindParams(pageRequest);
+    PageResponse<ContentNode> pageResponse = endpoint.find(f.getPageNumber(), f.getPageSize(), f.getSortField(), f.getSortDirection(), f.getNullHandling());
+    return getGenericPageResponse(pageResponse);
   }
 
   @Override
-  public ContentNodeImpl findOne(UUID uuid) {
-    return endpoint.findOne(uuid);
+  public C findOne(UUID uuid) {
+    return (C) endpoint.findOne(uuid);
   }
 
   @Override
-  public ContentNodeImpl save(ContentNodeImpl webpage) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  public C save(C identifiable) {
+    return (C) endpoint.save(identifiable);
   }
 
   @Override
-  public ContentNodeImpl saveWithParentContentTree(ContentNodeImpl webpage, UUID parentWebsiteUUID) {
-    return (ContentNodeImpl) endpoint.saveWithParentContentTree(webpage, parentWebsiteUUID);
+  public C update(C identifiable) {
+    return (C) endpoint.update(identifiable.getUuid(), identifiable);
   }
 
   @Override
-  public ContentNodeImpl saveWithParentContentNode(ContentNodeImpl webpage, UUID parentWebpageUUID) {
-    return (ContentNodeImpl) endpoint.saveWithParentContentNode(webpage, parentWebpageUUID);
+  public List<C> getChildren(UUID uuid) {
+    return (List<C>) endpoint.getChildren(uuid);
   }
 
   @Override
-  public ContentNodeImpl update(ContentNodeImpl webpage) {
-    return (ContentNodeImpl) endpoint.update(webpage.getUuid(), webpage);
+  public List<C> getChildren(C contentNode) {
+    return getChildren(contentNode.getUuid());
   }
+
+  @Override
+  public C saveWithParentContentTree(C contentNode, UUID parentContentTreeUUID) {
+    return (C) endpoint.saveWithParentContentTree(contentNode, parentContentTreeUUID);
+  }
+
+  @Override
+  public C saveWithParentContentNode(C contentNode, UUID parentContentNodeUUID) {
+    return (C) endpoint.saveWithParentContentNode(contentNode, parentContentNodeUUID);
+  }
+
 }

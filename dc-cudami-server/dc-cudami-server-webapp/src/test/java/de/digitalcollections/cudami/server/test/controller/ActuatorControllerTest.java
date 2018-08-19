@@ -1,5 +1,6 @@
-package de.digitalcollections.cudami.server;
+package de.digitalcollections.cudami.server.test.controller;
 
+import de.digitalcollections.cudami.server.test.TestApplication;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,13 +20,13 @@ import static org.assertj.core.api.BDDAssertions.then;
  * Basic integration tests for service application.
  */
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {Application.class, TestConfig.class},
+@SpringBootTest(classes = {TestApplication.class},
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {
   "spring.profiles.active=local",
   "management.server.port=0"
 })
-public class ApplicationTest {
+public class ActuatorControllerTest {
 
   @Value("${management.endpoints.web.base-path}")
   private String managementContextPath;

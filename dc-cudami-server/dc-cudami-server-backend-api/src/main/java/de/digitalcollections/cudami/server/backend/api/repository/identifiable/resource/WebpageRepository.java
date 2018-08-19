@@ -1,20 +1,17 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.model.api.identifiable.resource.Webpage;
-import java.util.List;
 import java.util.UUID;
 
 /**
  * Repository for Webpage persistence handling.
  *
- * @param <W> resource instance
+ * @param <W> webpage instance
  */
-public interface WebpageRepository<W extends Webpage> extends IdentifiableRepository<W> {
+public interface WebpageRepository<W extends Webpage> extends ResourceRepository<W>, NodeRepository<W> {
 
-  List<Webpage> getSubPages(W webpage);
+  W saveWithParentWebsite(W webpage, UUID parentWebsiteUuid);
 
-  Webpage saveWithParentWebsite(W webpage, UUID parentWebsiteUuid);
-
-  Webpage saveWithParentWebpage(W webpage, UUID parentWebpageUuid);
+  W saveWithParentWebpage(W webpage, UUID parentWebpageUuid);
 }

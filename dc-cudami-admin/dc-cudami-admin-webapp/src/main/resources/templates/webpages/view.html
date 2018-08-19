@@ -77,7 +77,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr th:each="subpage: *{subPages}">
+              <tr th:each="subpage :*{children}">
                 <td>
                   <a th:href="@{'/webpages/' + ${subpage.uuid}}" th:text="${subpage.label.translations[0].text}">Label</a>
                 </td>

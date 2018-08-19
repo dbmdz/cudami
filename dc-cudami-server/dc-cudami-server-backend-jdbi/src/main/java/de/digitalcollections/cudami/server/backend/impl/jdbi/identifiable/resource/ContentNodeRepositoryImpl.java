@@ -2,9 +2,10 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resou
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.backend.api.repository.LocaleRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ContentNodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ResourceRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSortingRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.parts.Translation;
 import de.digitalcollections.model.api.identifiable.resource.ContentNode;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -13,31 +14,39 @@ import de.digitalcollections.model.api.paging.impl.PageResponseImpl;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ContentNodeImpl;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ContentNodeRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl implements ContentNodeRepository<ContentNode> {
+public class ContentNodeRepositoryImpl<C extends ContentNode> extends ResourceRepositoryImpl<C> implements ContentNodeRepository<C> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentNodeRepositoryImpl.class);
 
-  @Autowired
-  private Jdbi dbi;
+  private final ResourceRepository resourceRepository;
+  private final LocaleRepository localeRepository;
 
   @Autowired
-  ObjectMapper objectMapper;
-
-  @Autowired
-  private ResourceRepository resourceRepository;
-
-  @Autowired
-  LocaleRepository localeRepository;
-
+  public ContentNodeRepositoryImpl(
+          @Qualifier("identifiableRepositoryImpl") IdentifiableRepository identifiableRepository,
+          @Qualifier("resourceRepositoryImpl") ResourceRepository resourceRepository,
+          LocaleRepository localeRepository,
+          Jdbi dbi) {
+    super(dbi, identifiableRepository);
+    this.resourceRepository = resourceRepository;
+    this.localeRepository = localeRepository;
+  }
+  
   @Override
   public long count() {
     String sql = "SELECT count(*) FROM contentnodes";
@@ -46,16 +55,16 @@ public class ContentNodeRepositoryImpl extends AbstractPagingAndSortingRepositor
   }
 
   @Override
-  public ContentNode create() {
+  public C create() {
     Locale defaultLocale = localeRepository.getDefault();
-    ContentNodeImpl contentNode = new ContentNodeImpl();
+    C contentNode = (C) new ContentNodeImpl();
     contentNode.setLabel(new LocalizedTextImpl(defaultLocale, ""));
     contentNode.setDescription(new LocalizedStructuredContentImpl(defaultLocale));
     return contentNode;
   }
 
   @Override
-  public PageResponse<ContentNode> find(PageRequest pageRequest) {
+  public PageResponse<C> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder("SELECT cn.uuid as uuid, i.label as label, i.description as description")
             .append(" FROM contentnodes cn INNER JOIN resources r ON cn.uuid=r.uuid INNER JOIN identifiables i ON cn.uuid=i.uuid");
 
@@ -72,7 +81,7 @@ public class ContentNodeRepositoryImpl extends AbstractPagingAndSortingRepositor
   }
 
   @Override
-  public ContentNode findOne(UUID uuid) {
+  public C findOne(UUID uuid) {
     String query = "SELECT cn.uuid as uuid, i.label as label, i.description as description"
             + " FROM contentnodes cn INNER JOIN resources r ON cn.uuid=r.uuid INNER JOIN identifiables i ON cn.uuid=i.uuid"
             + " WHERE cn.uuid = :uuid";
@@ -84,14 +93,14 @@ public class ContentNodeRepositoryImpl extends AbstractPagingAndSortingRepositor
     if (list.isEmpty()) {
       return null;
     }
-    ContentNodeImpl contentNode = list.get(0);
-    contentNode.setSubNodes(getSubNodes(contentNode));
+    C contentNode = (C) list.get(0);
+    contentNode.setChildren(getChildren(contentNode));
     return contentNode;
   }
 
   @Override
-  public ContentNode findOne(UUID uuid, Locale locale) {
-    ContentNode contentNode = findOne(uuid);
+  public C findOne(UUID uuid, Locale locale) {
+    C contentNode = findOne(uuid);
     Set<Translation> translations = contentNode.getLabel().getTranslations();
 
     if (locale == null) {
@@ -124,7 +133,12 @@ public class ContentNodeRepositoryImpl extends AbstractPagingAndSortingRepositor
   }
 
   @Override
-  public List<ContentNode> getSubNodes(ContentNode contentNode) {
+  public List<C> getChildren(C contentNode) {
+    return getChildren(contentNode.getUuid());
+  }
+  
+  @Override
+  public List<C> getChildren(UUID uuid) {
     // minimal data required for creating text links in a list
     String query = "SELECT cc.child_contentnode_uuid as uuid, i.label as label"
             + " FROM contentnodes cn INNER JOIN contentnode_contentnode cc ON cn.uuid=cc.parent_contentnode_uuid INNER JOIN identifiables i ON cc.child_contentnode_uuid=i.uuid"
@@ -132,23 +146,29 @@ public class ContentNodeRepositoryImpl extends AbstractPagingAndSortingRepositor
             + " ORDER BY cc.sortIndex ASC";
 
     List<ContentNodeImpl> list = dbi.withHandle(h -> h.createQuery(query)
-            .bind("uuid", contentNode.getUuid())
+            .bind("uuid", uuid)
             .mapToBean(ContentNodeImpl.class)
             .list());
 
     if (list.isEmpty()) {
       return new ArrayList<>();
     }
-    return list.stream().map(ContentNode.class::cast).collect(Collectors.toList());
+    return list.stream().map(s -> (C) s).collect(Collectors.toList());
   }
 
   @Override
-  public ContentNode save(ContentNode contentNode) {
-    throw new UnsupportedOperationException("Not supported yet.");
+  public C save(C contentNode) {
+    resourceRepository.save(contentNode);
+
+    dbi.withHandle(h -> h.createUpdate("INSERT INTO contentnodes(uuid) VALUES (:uuid)")
+            .bindBean(contentNode)
+            .execute());
+
+    return findOne(contentNode.getUuid());
   }
 
   @Override
-  public ContentNode saveWithParentContentTree(ContentNode contentNode, UUID parentContentTreeUuid) {
+  public C saveWithParentContentTree(C contentNode, UUID parentContentTreeUuid) {
     resourceRepository.save(contentNode);
 
     dbi.withHandle(h -> h.createUpdate("INSERT INTO contentnodes(uuid) VALUES (:uuid)")
@@ -156,7 +176,6 @@ public class ContentNodeRepositoryImpl extends AbstractPagingAndSortingRepositor
             .execute());
 
     // select max sortIndex from parent contenttree and insert with max+1:
-    
     dbi.withHandle(h -> h.createUpdate(
             "INSERT INTO contenttree_contentnode(contenttree_uuid, contentnode_uuid, sortIndex)"
             + " VALUES (:parent_contenttree_uuid, :uuid, (SELECT MAX(sortIndex) + 1 FROM contenttree_contentnode WHERE contenttree_uuid = :parent_contenttree_uuid))")
@@ -168,13 +187,13 @@ public class ContentNodeRepositoryImpl extends AbstractPagingAndSortingRepositor
   }
 
   @Override
-  public ContentNode saveWithParentContentNode(ContentNode contentNode, UUID parentContentNodeUuid) {
+  public C saveWithParentContentNode(C contentNode, UUID parentContentNodeUuid) {
     resourceRepository.save(contentNode);
 
     dbi.withHandle(h -> h.createUpdate("INSERT INTO contentnodes(uuid) VALUES (:uuid)")
             .bindBean(contentNode)
             .execute());
-    
+
     dbi.withHandle(h -> h.createUpdate(
             "INSERT INTO contentnode_contentnode(parent_contentnode_uuid, child_contentnode_uuid, sortIndex)"
             + " VALUES (:parent_contentnode_uuid, :uuid, (SELECT MAX(sortIndex) + 1 FROM contentnode_contentnode WHERE parent_contentnode_uuid = :parent_contentnode_uuid))")
@@ -186,7 +205,7 @@ public class ContentNodeRepositoryImpl extends AbstractPagingAndSortingRepositor
   }
 
   @Override
-  public ContentNode update(ContentNode contentNode) {
+  public C update(C contentNode) {
     resourceRepository.update(contentNode);
     return findOne(contentNode.getUuid());
   }

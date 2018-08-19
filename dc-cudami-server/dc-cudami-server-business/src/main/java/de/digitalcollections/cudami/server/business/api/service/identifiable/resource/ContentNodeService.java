@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.resource;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.NodeService;
 import de.digitalcollections.model.api.identifiable.resource.ContentNode;
-import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -11,11 +11,9 @@ import java.util.UUID;
  *
  * @param <C> domain object
  */
-public interface ContentNodeService<C extends ContentNode> extends ResourceService<C> {
+public interface ContentNodeService<C extends ContentNode> extends ResourceService<C>, NodeService<C> {
 
   C get(UUID uuid, Locale locale) throws IdentifiableServiceException;
-
-  List<ContentNode> getSubNodes(C contentNode);
 
   C saveWithParentContentTree(C contentNode, UUID parentContentTreeUuid) throws IdentifiableServiceException;
 

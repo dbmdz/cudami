@@ -7,9 +7,9 @@ import java.util.List;
 /**
  * Repository for Website persistence handling.
  *
- * @param <W> entity instance
+ * @param <W> website instance
  */
 public interface WebsiteRepository<W extends Website> extends EntityRepository<W> {
 
-  List<Webpage> getRootNodes(W website);
+  List<Webpage> getRootPages(W website);
 }

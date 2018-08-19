@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ContentTreeService;
 import de.digitalcollections.model.api.identifiable.entity.ContentTree;
+import de.digitalcollections.model.api.identifiable.resource.ContentNode;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
@@ -11,6 +12,7 @@ import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.api.paging.impl.OrderImpl;
 import de.digitalcollections.model.api.paging.impl.PageRequestImpl;
 import de.digitalcollections.model.api.paging.impl.SortingImpl;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
@@ -70,5 +72,19 @@ public class ContentTreeController {
   public ContentTree update(@PathVariable UUID uuid, @RequestBody ContentTree contentTree, BindingResult errors) throws IdentifiableServiceException {
     assert Objects.equals(uuid, contentTree.getUuid());
     return (ContentTree) service.update(contentTree);
+  }
+
+  @ApiMethod(description = "get count of content trees")
+  @RequestMapping(value = "/v1/contenttrees/count", produces = "application/json", method = RequestMethod.GET)
+  @ApiResponseObject
+  public long count() {
+    return service.count();
+  }
+
+  @ApiMethod(description = "get root nodes of content tree")
+  @RequestMapping(value = "/v1/contenttrees/{uuid}/rootNodes", produces = "application/json", method = RequestMethod.GET)
+  @ApiResponseObject
+  List<ContentNode> getRootNodes(@PathVariable UUID uuid) {
+    return service.getRootNodes(uuid);
   }
 }

@@ -3,6 +3,9 @@ package de.digitalcollections.cudami.admin.backend.api.repository.identifiable.r
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.model.api.identifiable.resource.Resource;
 
+/**
+ * @param <R> resource instance
+ */
 public interface ResourceRepository<R extends Resource> extends IdentifiableRepository<R> {
 
 }

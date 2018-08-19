@@ -1,20 +1,17 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.model.api.identifiable.resource.ContentNode;
-import java.util.List;
 import java.util.UUID;
 
 /**
  * Repository for ContentNode persistence handling.
  *
- * @param <C> resource instance
+ * @param <C> content node instance
  */
-public interface ContentNodeRepository<C extends ContentNode> extends IdentifiableRepository<C> {
+public interface ContentNodeRepository<C extends ContentNode> extends ResourceRepository<C>, NodeRepository<C> {
 
-  List<ContentNode> getSubNodes(C contentNode);
+  C saveWithParentContentTree(C contentNode, UUID parentContentTreeUuid);
 
-  ContentNode saveWithParentContentTree(C contentNode, UUID parentContentTreeUuid);
-
-  ContentNode saveWithParentContentNode(C contentNode, UUID parentContentNodeUuid);
+  C saveWithParentContentNode(C contentNode, UUID parentContentNodeUuid);
 }

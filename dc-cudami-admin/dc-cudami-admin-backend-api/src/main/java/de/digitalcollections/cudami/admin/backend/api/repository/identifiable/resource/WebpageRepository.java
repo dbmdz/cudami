@@ -1,14 +1,15 @@
 package de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource;
 
+import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.model.api.identifiable.resource.Webpage;
 import java.util.UUID;
 
 /**
  * Repository for Webpage persistence handling.
  *
- * @param <W> resource instance
+ * @param <W> webpage instance
  */
-public interface WebpageRepository<W extends Webpage> extends ResourceRepository<W> {
+public interface WebpageRepository<W extends Webpage> extends ResourceRepository<W>, NodeRepository<W> {
 
   W saveWithParentWebsite(W webpage, UUID parentWebsiteUUID);
 

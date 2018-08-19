@@ -1,10 +1,9 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.backend.api.repository.LocaleRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ContentTreeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSortingRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.entity.ContentTree;
 import de.digitalcollections.model.api.identifiable.resource.ContentNode;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -23,24 +22,27 @@ import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ContentTreeRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl implements ContentTreeRepository<ContentTree> {
+public class ContentTreeRepositoryImpl<C extends ContentTree> extends EntityRepositoryImpl<C> implements ContentTreeRepository<C> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentTreeRepositoryImpl.class);
 
-  @Autowired
-  private Jdbi dbi;
+  private final EntityRepository entityRepository;
+  private final LocaleRepository localeRepository;
 
   @Autowired
-  ObjectMapper objectMapper;
-
-  @Autowired
-  private EntityRepository entityRepository;
-
-  @Autowired
-  LocaleRepository localeRepository;
+  public ContentTreeRepositoryImpl(
+          @Qualifier("identifiableRepositoryImpl") IdentifiableRepository identifiableRepository,
+          @Qualifier("entityRepositoryImpl") EntityRepository entityRepository,
+          LocaleRepository localeRepository,
+          Jdbi dbi) {
+    super(dbi, identifiableRepository);
+    this.entityRepository = entityRepository;
+    this.localeRepository = localeRepository;
+  }
 
   @Override
   public long count() {
@@ -50,16 +52,16 @@ public class ContentTreeRepositoryImpl extends AbstractPagingAndSortingRepositor
   }
 
   @Override
-  public ContentTree create() {
+  public C create() {
     Locale defaultLocale = localeRepository.getDefault();
-    ContentTreeImpl contentTree = new ContentTreeImpl();
+    C contentTree = (C) new ContentTreeImpl();
     contentTree.setLabel(new LocalizedTextImpl(defaultLocale, ""));
     contentTree.setDescription(new LocalizedStructuredContentImpl(defaultLocale));
     return contentTree;
   }
 
   @Override
-  public PageResponse<ContentTree> find(PageRequest pageRequest) {
+  public PageResponse<C> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder("SELECT ct.id as id, ct.uuid as uuid, i.label as label, i.description as description")
             .append(" FROM contenttrees ct INNER JOIN entities e ON ct.uuid=e.uuid INNER JOIN identifiables i ON ct.uuid=i.uuid");
 
@@ -74,7 +76,7 @@ public class ContentTreeRepositoryImpl extends AbstractPagingAndSortingRepositor
   }
 
   @Override
-  public ContentTree findOne(UUID uuid) {
+  public C findOne(UUID uuid) {
     String query = "SELECT ct.uuid as uuid, i.label as label, i.description as description"
             + " FROM contenttrees ct INNER JOIN entities e ON ct.uuid=e.uuid INNER JOIN identifiables i ON ct.uuid=i.uuid"
             + " WHERE ct.uuid = :uuid";
@@ -86,7 +88,7 @@ public class ContentTreeRepositoryImpl extends AbstractPagingAndSortingRepositor
     if (list.isEmpty()) {
       return null;
     }
-    ContentTreeImpl contentTree = list.get(0);
+    C contentTree = (C) list.get(0);
     contentTree.setRootNodes(getRootNodes(contentTree));
     return contentTree;
   }
@@ -97,26 +99,7 @@ public class ContentTreeRepositoryImpl extends AbstractPagingAndSortingRepositor
   }
 
   @Override
-  public List<ContentNode> getRootNodes(ContentTree contentTree) {
-    // minimal data required for creating text links in a list
-    String query = "SELECT cc.contentnode_uuid as uuid, i.label as label"
-            + " FROM contenttrees ct INNER JOIN contenttree_contentnode cc ON ct.uuid=cc.contenttree_uuid INNER JOIN identifiables i ON cc.contentnode_uuid=i.uuid"
-            + " WHERE ct.uuid = :uuid"
-            + " ORDER BY cc.sortIndex ASC";
-
-    List<ContentNodeImpl> list = dbi.withHandle(h -> h.createQuery(query)
-            .bind("uuid", contentTree.getUuid())
-            .mapToBean(ContentNodeImpl.class)
-            .list());
-
-    if (list.isEmpty()) {
-      return new ArrayList<>();
-    }
-    return list.stream().map(ContentNode.class::cast).collect(Collectors.toList());
-  }
-
-  @Override
-  public ContentTree save(ContentTree contentTree) {
+  public C save(C contentTree) {
     entityRepository.save(contentTree);
     dbi.withHandle(h -> h.createUpdate("INSERT INTO contenttrees(uuid) VALUES (:uuid)")
             .bindBean(contentTree)
@@ -125,8 +108,33 @@ public class ContentTreeRepositoryImpl extends AbstractPagingAndSortingRepositor
   }
 
   @Override
-  public ContentTree update(ContentTree contentTree) {
+  public C update(C contentTree) {
     entityRepository.update(contentTree);
     return findOne(contentTree.getUuid());
+  }
+
+  @Override
+  public List<ContentNode> getRootNodes(C contentTree) {
+    UUID uuid = contentTree.getUuid();
+    return getRootNodes(uuid);
+  }
+
+  @Override
+  public List<ContentNode> getRootNodes(UUID uuid) {
+    // minimal data required for creating text links in a list
+    String query = "SELECT cc.contentnode_uuid as uuid, i.label as label"
+            + " FROM contenttrees ct INNER JOIN contenttree_contentnode cc ON ct.uuid=cc.contenttree_uuid INNER JOIN identifiables i ON cc.contentnode_uuid=i.uuid"
+            + " WHERE ct.uuid = :uuid"
+            + " ORDER BY cc.sortIndex ASC";
+
+    List<ContentNodeImpl> list = dbi.withHandle(h -> h.createQuery(query)
+            .bind("uuid", uuid)
+            .mapToBean(ContentNodeImpl.class)
+            .list());
+
+    if (list.isEmpty()) {
+      return new ArrayList<>();
+    }
+    return list.stream().map(ContentNode.class::cast).collect(Collectors.toList());
   }
 }

@@ -1,10 +1,9 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.backend.api.repository.LocaleRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ResourceRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.WebpageRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSortingRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.parts.Translation;
 import de.digitalcollections.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -13,30 +12,39 @@ import de.digitalcollections.model.api.paging.impl.PageResponseImpl;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
 import de.digitalcollections.model.impl.identifiable.resource.WebpageImpl;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl implements WebpageRepository<Webpage> {
+public class WebpageRepositoryImpl<W extends Webpage> extends ResourceRepositoryImpl<W> implements WebpageRepository<W> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpageRepositoryImpl.class);
 
-  @Autowired
-  private Jdbi dbi;
+  private final ResourceRepository resourceRepository;
+  private final LocaleRepository localeRepository;
 
   @Autowired
-  ObjectMapper objectMapper;
-
-  @Autowired
-  private ResourceRepository resourceRepository;
-
-  @Autowired
-  LocaleRepository localeRepository;
+  public WebpageRepositoryImpl(
+          @Qualifier("identifiableRepositoryImpl") IdentifiableRepository identifiableRepository,
+          @Qualifier("resourceRepositoryImpl") ResourceRepository resourceRepository,
+          LocaleRepository localeRepository,
+          Jdbi dbi) {
+    super(dbi, identifiableRepository);
+    this.resourceRepository = resourceRepository;
+    this.localeRepository = localeRepository;
+  }
 
   @Override
   public long count() {
@@ -46,9 +54,9 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
   }
 
   @Override
-  public Webpage create() {
+  public W create() {
     Locale defaultLocale = localeRepository.getDefault();
-    WebpageImpl webpage = new WebpageImpl();
+    W webpage = (W) new WebpageImpl();
     webpage.setLabel(new LocalizedTextImpl(defaultLocale, ""));
     webpage.setDescription(new LocalizedStructuredContentImpl(defaultLocale));
     webpage.setText(new LocalizedStructuredContentImpl(defaultLocale));
@@ -56,7 +64,7 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
   }
 
   @Override
-  public PageResponse<Webpage> find(PageRequest pageRequest) {
+  public PageResponse<W> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder("SELECT wp.uuid as uuid, wp.text as text, i.label as label, i.description as description")
             .append(" FROM webpages wp INNER JOIN resources r ON wp.uuid=r.uuid INNER JOIN identifiables i ON wp.uuid=i.uuid");
 
@@ -73,7 +81,7 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
   }
 
   @Override
-  public Webpage findOne(UUID uuid) {
+  public W findOne(UUID uuid) {
     String query = "SELECT wp.uuid as uuid, wp.text as text, i.label as label, i.description as description"
             + " FROM webpages wp INNER JOIN resources r ON wp.uuid=r.uuid INNER JOIN identifiables i ON wp.uuid=i.uuid"
             + " WHERE wp.uuid = :uuid";
@@ -85,14 +93,14 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
     if (list.isEmpty()) {
       return null;
     }
-    WebpageImpl webpage = list.get(0);
-    webpage.setSubPages(getSubPages(webpage));
+    W webpage = (W) list.get(0);
+    webpage.setChildren(getChildren(webpage));
     return webpage;
   }
 
   @Override
-  public Webpage findOne(UUID uuid, Locale locale) {
-    Webpage webpage = findOne(uuid);
+  public W findOne(UUID uuid, Locale locale) {
+    W webpage = findOne(uuid);
     Set<Translation> translations = webpage.getLabel().getTranslations();
 
     if (locale == null) {
@@ -126,30 +134,41 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
   }
 
   @Override
-  public List<Webpage> getSubPages(Webpage webpage) {
+  public List<W> getChildren(W webpage) {
+    return getChildren(webpage.getUuid());
+  }
+
+  @Override
+  public List<W> getChildren(UUID uuid) {
     // minimal data required for creating text links in a list
     String query = "SELECT ww.child_webpage_uuid as uuid, i.label as label"
             + " FROM webpages wp INNER JOIN webpage_webpage ww ON wp.uuid=ww.parent_webpage_uuid INNER JOIN identifiables i ON ww.child_webpage_uuid=i.uuid"
             + " WHERE wp.uuid = :uuid";
 
     List<WebpageImpl> list = dbi.withHandle(h -> h.createQuery(query)
-            .bind("uuid", webpage.getUuid())
+            .bind("uuid", uuid)
             .mapToBean(WebpageImpl.class)
             .list());
 
     if (list.isEmpty()) {
       return new ArrayList<>();
     }
-    return list.stream().map(Webpage.class::cast).collect(Collectors.toList());
+    return list.stream().map(s -> (W) s).collect(Collectors.toList());
   }
 
   @Override
-  public Webpage save(Webpage webpage) {
-    throw new UnsupportedOperationException("Not supported yet.");
+  public W save(W webpage) {
+    resourceRepository.save(webpage);
+
+    dbi.withHandle(h -> h.createUpdate("INSERT INTO webpages(uuid, text) VALUES (:uuid, :text::JSONB)")
+            .bindBean(webpage)
+            .execute());
+
+    return findOne(webpage.getUuid());
   }
 
   @Override
-  public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid) {
+  public W saveWithParentWebsite(W webpage, UUID parentWebsiteUuid) {
     resourceRepository.save(webpage);
 
     dbi.withHandle(h -> h.createUpdate("INSERT INTO webpages(uuid, text) VALUES (:uuid, :text::JSONB)")
@@ -165,7 +184,7 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
   }
 
   @Override
-  public Webpage saveWithParentWebpage(Webpage webpage, UUID parentWebpageUuid) {
+  public W saveWithParentWebpage(W webpage, UUID parentWebpageUuid) {
     resourceRepository.save(webpage);
 
     dbi.withHandle(h -> h.createUpdate("INSERT INTO webpages(uuid, text) VALUES (:uuid, :text::JSONB)")
@@ -181,7 +200,7 @@ public class WebpageRepositoryImpl extends AbstractPagingAndSortingRepositoryImp
   }
 
   @Override
-  public Webpage update(Webpage webpage) {
+  public W update(W webpage) {
     resourceRepository.update(webpage);
     dbi.withHandle(h -> h.createUpdate("UPDATE webpages SET text=:text::JSONB WHERE uuid=:uuid")
             .bindBean(webpage)

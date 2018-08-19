@@ -79,7 +79,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr th:each="subNode: *{subNodes}">
+              <tr th:each="subNode: *{children}">
                 <td>
                   <a th:href="@{'/contentnodes/' + ${subNode.uuid}}" th:text="${subNode.label.translations[0].text}">Label</a>
                 </td>

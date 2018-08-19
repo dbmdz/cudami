@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSortingRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifiable;
@@ -18,15 +17,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends AbstractPagingAndSortingRepositoryImpl implements IdentifiableRepository<I> {
+public class IdentifiableRepositoryImpl<I extends Identifiable> extends AbstractPagingAndSortingRepositoryImpl implements IdentifiableRepository<I> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableRepositoryImpl.class);
 
   @Autowired
-  private Jdbi dbi;
-
-  @Autowired
-  ObjectMapper objectMapper;
+  protected Jdbi dbi;
 
   @Override
   public long count() {

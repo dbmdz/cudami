@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ResourceRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSortingRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.resource.Resource;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -14,18 +14,22 @@ import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ResourceRepositoryImpl<R extends ResourceImpl> extends AbstractPagingAndSortingRepositoryImpl implements ResourceRepository<R> {
+public class ResourceRepositoryImpl<R extends Resource> extends IdentifiableRepositoryImpl<R> implements ResourceRepository<R> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ResourceRepositoryImpl.class);
 
-  @Autowired
-  private Jdbi dbi;
+  protected final Jdbi dbi;
+  private final IdentifiableRepository identifiableRepository;
 
   @Autowired
-  private IdentifiableRepositoryImpl identifiableRepository;
+  public ResourceRepositoryImpl(Jdbi dbi, @Qualifier("identifiableRepositoryImpl") IdentifiableRepository identifiableRepository) {
+    this.dbi = dbi;
+    this.identifiableRepository = identifiableRepository;
+  }
 
   @Override
   public long count() {

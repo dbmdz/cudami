@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Repository for ContentTree persistence handling.
  *
- * @param <C> entity instance
+ * @param <C> content tree instance
  */
 public interface ContentTreeRepository<C extends ContentTree> extends EntityRepository<C> {
 

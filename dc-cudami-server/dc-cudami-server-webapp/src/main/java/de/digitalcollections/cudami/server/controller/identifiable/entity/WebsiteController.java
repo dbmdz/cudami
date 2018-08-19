@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.model.api.identifiable.entity.Website;
+import de.digitalcollections.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
@@ -11,6 +12,7 @@ import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.api.paging.impl.OrderImpl;
 import de.digitalcollections.model.api.paging.impl.PageRequestImpl;
 import de.digitalcollections.model.api.paging.impl.SortingImpl;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
@@ -70,5 +72,19 @@ public class WebsiteController {
   public Website update(@PathVariable UUID uuid, @RequestBody Website website, BindingResult errors) throws IdentifiableServiceException {
     assert Objects.equals(uuid, website.getUuid());
     return (Website) service.update(website);
+  }
+
+  @ApiMethod(description = "get count of content trees")
+  @RequestMapping(value = "/v1/websites/count", produces = "application/json", method = RequestMethod.GET)
+  @ApiResponseObject
+  public long count() {
+    return service.count();
+  }
+
+  @ApiMethod(description = "get root pages of website")
+  @RequestMapping(value = "/v1/websites/{uuid}/rootPages", produces = "application/json", method = RequestMethod.GET)
+  @ApiResponseObject
+  List<Webpage> getRootPages(@PathVariable UUID uuid) {
+    return service.getRootPages(uuid);
   }
 }

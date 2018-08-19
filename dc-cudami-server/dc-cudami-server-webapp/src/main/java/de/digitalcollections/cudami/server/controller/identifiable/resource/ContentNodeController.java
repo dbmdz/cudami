@@ -11,6 +11,7 @@ import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.api.paging.impl.OrderImpl;
 import de.digitalcollections.model.api.paging.impl.PageRequestImpl;
 import de.digitalcollections.model.api.paging.impl.SortingImpl;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
@@ -36,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ContentNodeController {
 
   @Autowired
-  private ContentNodeService<ContentNode> contentNodeService;
+  private ContentNodeService<ContentNode> service;
 
   @ApiMethod(description = "get all content nodes")
   @RequestMapping(value = "/v1/contentnodes",
@@ -53,7 +54,7 @@ public class ContentNodeController {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
-    return contentNodeService.find(pageRequest);
+    return service.find(pageRequest);
   }
 
   // Test-URL: http://localhost:9000/v1/contentnodes/599a120c-2dd5-11e8-b467-0ed5f89f718b
@@ -68,9 +69,9 @@ public class ContentNodeController {
 
     ContentNode contentNode;
     if (pLocale == null) {
-      contentNode = contentNodeService.get(uuid);
+      contentNode = service.get(uuid);
     } else {
-      contentNode = contentNodeService.get(uuid, pLocale);
+      contentNode = service.get(uuid, pLocale);
     }
     return new ResponseEntity<>(contentNode, HttpStatus.OK);
   }
@@ -79,14 +80,14 @@ public class ContentNodeController {
   @RequestMapping(value = "/v1/contenttrees/{parentContentTreeUuid}/contentnode", produces = "application/json", method = RequestMethod.POST)
   @ApiResponseObject
   public ContentNode saveWithParentContentTree(@PathVariable UUID parentContentTreeUuid, @RequestBody ContentNode contentNode, BindingResult errors) throws IdentifiableServiceException {
-    return contentNodeService.saveWithParentContentTree(contentNode, parentContentTreeUuid);
+    return service.saveWithParentContentTree(contentNode, parentContentTreeUuid);
   }
 
   @ApiMethod(description = "save a newly created content node")
   @RequestMapping(value = "/v1/contentnodes/{parentContentNodeUuid}/contentnode", produces = "application/json", method = RequestMethod.POST)
   @ApiResponseObject
   public ContentNode saveWithParentContentNode(@PathVariable UUID parentContentNodeUuid, @RequestBody ContentNode contentNode, BindingResult errors) throws IdentifiableServiceException {
-    return contentNodeService.saveWithParentContentNode(contentNode, parentContentNodeUuid);
+    return service.saveWithParentContentNode(contentNode, parentContentNodeUuid);
   }
 
   @ApiMethod(description = "update a content node")
@@ -94,7 +95,20 @@ public class ContentNodeController {
   @ApiResponseObject
   public ContentNode update(@PathVariable UUID uuid, @RequestBody ContentNode contentNode, BindingResult errors) throws IdentifiableServiceException {
     assert Objects.equals(uuid, contentNode.getUuid());
-    return contentNodeService.update(contentNode);
+    return service.update(contentNode);
   }
 
+  @ApiMethod(description = "get count of content nodes")
+  @RequestMapping(value = "/v1/contentnodes/count", produces = "application/json", method = RequestMethod.GET)
+  @ApiResponseObject
+  public long count() {
+    return service.count();
+  }
+
+  @ApiMethod(description = "get child content nodes of content node")
+  @RequestMapping(value = "/v1/contentnodes/{uuid}/children", produces = "application/json", method = RequestMethod.GET)
+  @ApiResponseObject
+  List<ContentNode> getRootPages(@PathVariable UUID uuid) {
+    return service.getChildren(uuid);
+  }
 }

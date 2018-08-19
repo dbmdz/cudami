@@ -1,12 +1,17 @@
 package de.digitalcollections.cudami.config;
 
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
+import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.IdentifiableRepository;
+import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.ArticleRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.ContentTreeRepository;
+import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.WebsiteRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.ContentNodeRepository;
+import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.ResourceRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.WebpageRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.security.UserRepository;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,6 +20,29 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class SpringConfigBackendForTest {
+
+  @Bean
+  public ArticleRepository articleRepository() {
+    return Mockito.mock(ArticleRepository.class);
+  }
+  
+  @Bean
+  @Qualifier("identifiableRepositoryImpl")
+  public IdentifiableRepository identifiableRepositoryImpl() {
+    return Mockito.mock(IdentifiableRepository.class);
+  }
+
+  @Bean
+  @Qualifier("resourceRepositoryImpl")
+  public ResourceRepository resourceRepositoryImpl() {
+    return Mockito.mock(ResourceRepository.class);
+  }
+
+  @Bean
+  @Qualifier("entityRepositoryImpl")
+  public EntityRepository entityRepositoryImpl() {
+    return Mockito.mock(EntityRepository.class);
+  }
 
   @Bean
   public ContentNodeRepository contentNodeRepository() {
