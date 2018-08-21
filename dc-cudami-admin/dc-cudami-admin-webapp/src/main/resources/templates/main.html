@@ -65,15 +65,7 @@
             <a class="btn disabled" th:href="@{/books}" title="...">
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-book"></i></div>
-                <span>Bücher</span>
-              </div>
-            </a>
-          </div>
-            <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a class="btn" th:href="@{/articles}" th:title="#{articles}">
-              <div class="innerContent">
-                <div class="icon"><i class="fa fa-file-text-o"></i></div>
-                <span th:utext="#{articles}">Articles</span>
+                <span th:utext="#{books}">Bücher</span>
               </div>
             </a>
           </div>
@@ -81,7 +73,7 @@
             <a class="btn disabled" href="#" title="...">
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-file-image-o"></i></div>
-                <span>Bilder</span>
+                <span th:utext="#{photos_prints_drawings_paintings}">Photos / Prints / Drawings / Paintings</span>
               </div>
             </a>
           </div>
@@ -89,7 +81,7 @@
             <a class="btn disabled" href="#" title="...">
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-cube"></i></div>
-                <span>3D Objekte</span>
+                <span th:utext="#{3d_objects}">3D Objekte</span>
               </div>
             </a>
           </div>
@@ -97,7 +89,7 @@
             <a class="btn disabled" href="#" title="...">
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-file-audio-o"></i></div>
-                <span>Audios</span>
+                <span th:utext="#{audio_recordings}">Audio Recordings</span>
               </div>
             </a>
           </div>
@@ -105,13 +97,20 @@
             <a class="btn disabled" href="#" title="...">
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-file-video-o"></i></div>
-                <span>Videos</span>
+                <span th:utext="#{films_videos}">Films / Videos</span>
+              </div>
+            </a>
+          </div>
+          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a class="btn disabled" th:href="@{/archived_websites}" th:title="#{archived_websites}">
+              <div class="innerContent">
+                <div class="icon"><i class="fa fa-globe"></i></div>
+                <span th:utext="#{archived_websites}">Archived Websites</span>
               </div>
             </a>
           </div>
         </div>
 
-        <h3 th:text="#{entities}">Entitäten</h3>
         <div class="row">
           <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
             <a class="btn disabled" href="#" title="...">
@@ -142,6 +141,58 @@
               <div class="innerContent">
                 <div class="icon"><i class="fa fa-calendar"></i></div>
                 <span>Ereignisse</span>
+              </div>
+            </a>
+          </div>
+          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a class="btn" th:href="@{/articles}" th:title="#{articles}">
+              <div class="innerContent">
+                <div class="icon"><i class="fa fa-file-text-o"></i></div>
+                <span th:utext="#{articles}">Articles</span>
+              </div>
+            </a>
+          </div>
+        </div>
+        
+        <h3 th:text="#{resources_files}">Resources / Files</h3>
+        <div class="row">
+          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a class="btn disabled" th:href="@{/resources/images}" th:title="#{images}">
+              <div class="innerContent">
+                <div class="icon"><i class="fa fa-file-image-o"></i></div>
+                <span th:utext="#{images}">Images</span>
+              </div>
+            </a>
+          </div>
+          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a class="btn disabled" th:href="@{/resources/videos}" th:title="#{videos}">
+              <div class="innerContent">
+                <div class="icon"><i class="fa fa-file-video-o"></i></div>
+                <span th:utext="#{videos}">Videos</span>
+              </div>
+            </a>
+          </div>
+          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a class="btn disabled" th:href="@{/resources/audios}" th:title="#{audios}">
+              <div class="innerContent">
+                <div class="icon"><i class="fa fa-file-audio-o"></i></div>
+                <span th:utext="#{audios}">Audios</span>
+              </div>
+            </a>
+          </div>
+          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a class="btn disabled" th:href="@{/resources/3d}" th:title="#{3d_data}">
+              <div class="innerContent">
+                <div class="icon"><i class="fa fa-cube"></i></div>
+                <span th:utext="#{3d_data}">3D Data</span>
+              </div>
+            </a>
+          </div>
+          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+            <a class="btn disabled" th:href="@{/resources/textdocs}" th:title="#{text_documents}">
+              <div class="innerContent">
+                <div class="icon"><i class="fa fa-file-text-o"></i></div>
+                <span th:utext="#{text_documents}">Text Documents (PDF, DOC, ...)</span>
               </div>
             </a>
           </div>
