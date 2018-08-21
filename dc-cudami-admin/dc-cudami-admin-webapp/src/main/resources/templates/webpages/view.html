@@ -81,7 +81,7 @@
             <tbody>
               <tr th:each="subpage :*{children}">
                 <td>
-                  <a th:href="@{'/webpages/' + ${subpage.uuid}}" th:text="${subpage.label.translations[0].text}">Label</a>
+                  <a th:href="@{'/webpages/' + ${subpage.uuid}}" th:text="${subpage.label.getText(defaultLocale)}">Label</a>
                 </td>
                 <td class="center">
                   <a th:href="@{'/webpages/' + ${subpage.uuid}}" th:title="#{tooltip_view}"><span class="fa fa-eye actionButton"></span></a>
