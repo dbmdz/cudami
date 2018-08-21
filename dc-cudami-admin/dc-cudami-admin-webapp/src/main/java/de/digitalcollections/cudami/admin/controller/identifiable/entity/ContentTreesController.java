@@ -75,8 +75,9 @@ public class ContentTreesController extends AbstractController implements Messag
       model.addAttribute("isNew", true);
       return "contenttrees/edit";
     }
+    ContentTree contentTreeDb = null;
     try {
-      contentTreeService.save(contentTree, results);
+      contentTreeDb = (ContentTree) contentTreeService.save(contentTree, results);
       LOGGER.info("Successfully saved content tree");
     } catch (Exception e) {
       LOGGER.error("Cannot save content tree: ", e);
@@ -91,7 +92,7 @@ public class ContentTreesController extends AbstractController implements Messag
     status.setComplete();
     String message = messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
-    return "redirect:/contenttrees";
+    return "redirect:/contenttrees/" + contentTreeDb.getUuid().toString();
   }
 
   @RequestMapping(value = "/contenttrees/{uuid}/edit", method = RequestMethod.GET)

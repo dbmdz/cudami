@@ -75,8 +75,9 @@ public class WebsitesController extends AbstractController implements MessageSou
       model.addAttribute("isNew", true);
       return "websites/edit";
     }
+    Website websiteDb = null;
     try {
-      websiteService.save(website, results);
+      websiteDb = (Website) websiteService.save(website, results);
       LOGGER.info("Successfully saved website");
     } catch (Exception e) {
       LOGGER.error("Cannot save website: ", e);
@@ -91,7 +92,7 @@ public class WebsitesController extends AbstractController implements MessageSou
     status.setComplete();
     String message = messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
-    return "redirect:/websites";
+    return "redirect:/websites/" + websiteDb.getUuid().toString();
   }
 
   @RequestMapping(value = "/websites/{uuid}/edit", method = RequestMethod.GET)
