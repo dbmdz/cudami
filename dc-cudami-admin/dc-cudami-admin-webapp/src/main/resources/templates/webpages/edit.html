@@ -56,35 +56,35 @@
 
         <div class="row mainContent">
           <div class="col-sm-12">
-            <ul class="nav nav-tabs">
-              <li th:each="translation,iter : *{label.translations}" th:classappend="${iter.index} == 0 ? active">
-                <a th:href="${'#' + translation.locale}" data-toggle="tab" th:text="${translation.locale.getDisplayLanguage(#locale)}">locale</a>
+            <ul class="nav nav-tabs" id="locale-tabs">
+              <li class="locale-switcher" th:each="translation,iter : *{label.translations}" th:classappend="${iter.index} == 0 ? active">
+                <a href="#" th:attr="data-locale=${translation.locale}" th:text="${translation.locale.getDisplayName(#locale)}">locale</a>
               </li>
-              <!--            <li>
-                            <a href="#">
-                              <i class="fa fa-plus" aria-hidden="true"></i>
-                            </a>
-                          </li>-->
+              <li id="locale-adder">
+                <a href="#">
+                  <i class="fa fa-plus" aria-hidden="true"></i>
+                </a>
+              </li>
             </ul>
 
             <div class="tab-content">
-              <div th:each="translation,iter : *{label.translations}" class="tab-pane" th:id="${translation.locale}" th:classappend="${iter.index} == 0 ? active">
+              <div class="active tab-pane">
                 <!-- identifiable fields -->
                 <div class="well">
                   <div class="form-group">
                     <label th:text="#{label}">label</label>
-                    <input class="form-control" type="text" th:field="*{label.translations[__${iter.index}__].text}" required/>
+                    <input class="form-control label-editor" type="text" required/>
                   </div>
 
                   <div class="form-group">
                     <label th:text="#{description}">description</label>
-                    <div class="editor" th:attr="data-content-id='description', data-content-language=${translation.locale}"></div>
+                    <div class="editor" th:attr="data-content-id='description'"></div>
                   </div>
                 </div>
 
                 <div class="form-group">
                   <label th:text="#{document}">long text</label>
-                  <div class="editor" th:attr="data-content-id='text', data-content-language=${translation.locale}"></div>
+                  <div class="editor" th:attr="data-content-id='text'"></div>
                 </div>
               </div>
             </div>
@@ -92,6 +92,7 @@
         </div>
       </form>
 
+      <div th:replace="fragments/modals :: addLanguageDialog"></div>
       <div th:replace="fragments/modals :: confirmYesNoDialog"></div>
     </section>
 

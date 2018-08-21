@@ -10,7 +10,13 @@ import de.digitalcollections.cudami.admin.business.api.service.identifiable.enti
 import de.digitalcollections.model.api.identifiable.entity.Article;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,11 +67,16 @@ public class ArticlesController extends AbstractController implements MessageSou
   }
 
   @RequestMapping(value = "/articles/new", method = RequestMethod.GET)
-  public String create(Model model, @RequestParam("parentUuid") String parentUuid) {
+  public String create(Model model, @RequestParam(required = false, name = "parentUuid") String parentUuid) {
+    Locale defaultLocale = localeService.getDefault();
+    List<Locale> locales = localeService.findAll().stream()
+            .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
+            .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+            .collect(Collectors.toList());
+
     model.addAttribute("article", service.create());
     model.addAttribute("isNew", true);
-    model.addAttribute("locales", localeService.findAll());
-    model.addAttribute("defaultLocale", localeService.getDefault());
+    model.addAttribute("locales", locales);
     model.addAttribute("parentUuid", parentUuid);
     return "articles/edit";
   }
@@ -107,13 +118,18 @@ public class ArticlesController extends AbstractController implements MessageSou
   @RequestMapping(value = "/articles/{uuid}/edit", method = RequestMethod.GET)
   public String edit(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
     Article article = service.get(uuid);
-
-    model.addAttribute("availableLocales", article.getLabel().getLocales());
-    model.addAttribute("defaultLocale", localeService.getDefault());
     model.addAttribute("article", article);
 
+    HashSet<Locale> availableLocales = (HashSet<Locale>) article.getLabel().getLocales();
+    Set<String> availableLocaleTags = availableLocales.stream().map(Locale::toLanguageTag).collect(Collectors.toSet());
+    List<Locale> locales = localeService.findAll().stream()
+            .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
+            .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+            .collect(Collectors.toList());
+
     model.addAttribute("isNew", false);
-    model.addAttribute("locales", localeService.findAll());
+    model.addAttribute("availableLocales", article.getLabel().getLocales());
+    model.addAttribute("locales", locales);
 
     return "articles/edit";
   }

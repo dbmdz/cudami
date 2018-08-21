@@ -52,5 +52,26 @@
         //-->
       </script>
     </div>
+
+    <div th:fragment="addLanguageDialog">
+      <div id="add-language-dialog" class="modal fade" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" th:text="#{select_language}">Select language</h4>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <select class="form-control" id="locale-selector">
+                <option th:each="locale: ${locales}" th:value="${locale}" th:text="${locale.getDisplayName(#locale)}">locale</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" id="confirm-language-selection" type="submit" th:text="#{add_locale}">Add</button>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
   </body>
 </html>

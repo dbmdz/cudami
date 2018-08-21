@@ -10,7 +10,13 @@ import de.digitalcollections.cudami.admin.business.api.service.identifiable.enti
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,10 +67,15 @@ public class WebsitesController extends AbstractController implements MessageSou
 
   @RequestMapping(value = "/websites/new", method = RequestMethod.GET)
   public String create(Model model) {
+    Locale defaultLocale = localeService.getDefault();
+    List<Locale> locales = localeService.findAll().stream()
+            .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
+            .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+            .collect(Collectors.toList());
+
     model.addAttribute("website", websiteService.create());
     model.addAttribute("isNew", true);
-    model.addAttribute("locales", localeService.findAll());
-    model.addAttribute("defaultLocale", localeService.getDefault());
+    model.addAttribute("locales", locales);
     return "websites/edit";
   }
 
@@ -101,14 +112,20 @@ public class WebsitesController extends AbstractController implements MessageSou
 //      model.addAttribute("navigationNodeTypes", websiteViewService.getNavigationNodeTypes());
     Website website = (Website) websiteService.get(uuid);
     model.addAttribute("website", website);
+
+    HashSet<Locale> availableLocales = (HashSet<Locale>) website.getLabel().getLocales();
+    Set<String> availableLocaleTags = availableLocales.stream().map(Locale::toLanguageTag).collect(Collectors.toSet());
+    List<Locale> locales = localeService.findAll().stream()
+            .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
+            .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+            .collect(Collectors.toList());
 //      LOGGER.error("Cannot retrieve website with id=" + id + ": ", e);
 //      String message = messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale());
 //      redirectAttributes.addFlashAttribute("error_message", message);
 //      return "redirect:/websites";
     model.addAttribute("isNew", false);
-    model.addAttribute("availableLocales", website.getLabel().getLocales());
-    model.addAttribute("locales", localeService.findAll());
-    model.addAttribute("defaultLocale", localeService.getDefault());
+    model.addAttribute("availableLocales", availableLocales);
+    model.addAttribute("locales", locales);
 
     return "websites/edit";
   }

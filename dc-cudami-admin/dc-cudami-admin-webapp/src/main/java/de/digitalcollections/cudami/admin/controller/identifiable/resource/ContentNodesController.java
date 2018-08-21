@@ -10,8 +10,14 @@ import de.digitalcollections.cudami.admin.business.api.service.identifiable.reso
 import de.digitalcollections.model.api.identifiable.resource.ContentNode;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,10 +69,15 @@ public class ContentNodesController extends AbstractController implements Messag
 
   @RequestMapping(value = "/contentnodes/new", method = RequestMethod.GET)
   public String create(Model model, @RequestParam("parentUuid") String parentUuid) {
+    Locale defaultLocale = localeService.getDefault();
+    List<Locale> locales = localeService.findAll().stream()
+            .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
+            .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+            .collect(Collectors.toList());
+
     model.addAttribute("contentNode", contentNodeService.create());
     model.addAttribute("isNew", true);
-    model.addAttribute("locales", localeService.findAll());
-    model.addAttribute("defaultLocale", localeService.getDefault());
+    model.addAttribute("locales", locales);
     model.addAttribute("parentUuid", parentUuid);
     return "contentnodes/edit";
   }
@@ -113,12 +124,17 @@ public class ContentNodesController extends AbstractController implements Messag
   public String edit(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
     ContentNode contentNode = (ContentNode) contentNodeService.get(uuid);
 
-    model.addAttribute("availableLocales", contentNode.getLabel().getLocales());
-    model.addAttribute("defaultLocale", localeService.getDefault());
-    model.addAttribute("contentNode", contentNode);
+    HashSet<Locale> availableLocales = (HashSet<Locale>) contentNode.getLabel().getLocales();
+    Set<String> availableLocaleTags = availableLocales.stream().map(Locale::toLanguageTag).collect(Collectors.toSet());
+    List<Locale> locales = localeService.findAll().stream()
+            .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
+            .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+            .collect(Collectors.toList());
 
+    model.addAttribute("contentNode", contentNode);
     model.addAttribute("isNew", false);
-    model.addAttribute("locales", localeService.findAll());
+    model.addAttribute("availableLocales", availableLocales);
+    model.addAttribute("locales", locales);
 
     return "contentnodes/edit";
   }
