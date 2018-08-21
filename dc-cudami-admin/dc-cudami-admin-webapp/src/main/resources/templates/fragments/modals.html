@@ -39,7 +39,7 @@
           // var form = $(e.relatedTarget).closest('form');
           // $(this).find('.modal-footer #confirm').data('form', form);
           var href = $(e.relatedTarget).data('href');
-          if (href == undefined) {
+          if (href === undefined) {
             return;
           }
           $(this).find('.modal-footer #confirm').attr('href', href);
