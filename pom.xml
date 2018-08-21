@@ -112,7 +112,7 @@
     <!-- webjars -->
     <version.webjar-bootstrap>3.3.7</version.webjar-bootstrap>
     <version.webjar-bootswatch>3.3.7</version.webjar-bootswatch>
-    <version.webjar-fontawesome>4.7.0</version.webjar-fontawesome>
+    <version.webjar-fontawesome>5.2.0</version.webjar-fontawesome>
     <version.webjar-ie10-viewport-bug-workaround>1.0.3</version.webjar-ie10-viewport-bug-workaround>
     <version.webjar-html5shiv>3.7.3</version.webjar-html5shiv>
     <version.webjar-jquery>3.1.1</version.webjar-jquery>
