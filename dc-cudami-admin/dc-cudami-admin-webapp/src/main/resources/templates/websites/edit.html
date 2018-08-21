@@ -12,6 +12,7 @@
   <body>
     <section layout:fragment="content">
       <form th:object="${website}" th:action="@{#}" method="post" role="form">
+        <input type="hidden" id="label" th:field="*{label}" />
         <input type="hidden" id="description" class="content" th:field="*{description}" />
 
         <div class="row mainContent">

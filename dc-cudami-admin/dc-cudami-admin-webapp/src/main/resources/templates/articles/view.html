@@ -53,6 +53,7 @@
                   </div>
                   <div class="col-sm-10">
                     <label th:text="*{label.translations[__${iter.index}__].text}">label</label>
+
                     <th:block th:if="${article.description}">
                       <div th:insert="cudami/fragments/webpage-to-html :: renderLocalizedStructuredContent(${article.description.localizedStructuredContent}, ${locale})"></div>
                     </th:block>
@@ -70,7 +71,7 @@
       <div class="row main-content">
         <div class="col-sm-12">
           <h3>
-            <span th:text="#{child_articles}">Child articles</span>
+            <span th:text="#{child_articles}">child articles</span>
             <a class="btn btn-default pull-right new-button" th:href="@{/articles/new(parentType=article, parentUuid=*{uuid})}" th:text="#{btn_new}">New</a>
           </h3>
           <table class="table table-bordered table-condensed table-striped table-hover table-responsive">

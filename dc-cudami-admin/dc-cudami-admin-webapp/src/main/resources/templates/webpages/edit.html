@@ -13,6 +13,7 @@
     <section layout:fragment="content">
       <form th:object="${webpage}" th:action="@{#}" method="post" role="form">
         <input type="hidden" name="parentUuid" th:value="${parentUuid}" />
+        <input type="hidden" id="label" th:field="*{label}" />
         <input type="hidden" id="description" class="content" th:field="*{description}" />
         <input type="hidden" id="text" class="content" th:field="*{text}" />
 
