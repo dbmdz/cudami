@@ -34,6 +34,7 @@ public class ArticleRepositoryImpl<A extends Article> extends EntityRepositoryIm
     A article = (A) new ArticleImpl();
     article.setLabel(new LocalizedTextImpl(defaultLocale, ""));
     article.setDescription(new LocalizedStructuredContentImpl(defaultLocale));
+    article.setText(new LocalizedStructuredContentImpl(defaultLocale));
     return article;
   }
 
