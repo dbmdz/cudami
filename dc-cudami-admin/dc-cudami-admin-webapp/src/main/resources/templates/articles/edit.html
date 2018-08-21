@@ -57,7 +57,7 @@
           <div class="col-sm-12">
             <ul class="nav nav-tabs">
               <li th:each="translation,iter : *{label.translations}" th:classappend="${iter.index} == 0 ? active">
-                <a th:href="${'#' + translation.locale}" data-toggle="tab" th:text="${translation.locale.getDisplayLanguage(#locale)}">locale</a>
+                <a th:href="${'#' + translation.locale}" data-toggle="tab" th:text="${translation.locale.getDisplayName(#locale)}">locale</a>
               </li>
               <!--            <li>
                             <a href="#">
