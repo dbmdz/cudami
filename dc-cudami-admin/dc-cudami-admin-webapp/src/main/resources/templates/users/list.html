@@ -35,41 +35,44 @@
           </tr>
         </thead>
         <tbody>
-          <tr th:remove="all">
-            <td>Meier</td>
-            <td>Hans</td>
-            <td>hans@meier.de</td>
-            <td>Administrator</td>
-            <td><span class="text-success fa fa-circle" title="active"></span></td>
+          <tr th:each="user: ${page.content}">
             <td>
-              <a href="#" title="edit"><span class="fa fa-pencil"></span></a>
-              <a class="option text-danger" href="#" title="deactivate user"><span class="fa fa-circle"></span></a>
-              <a class="option text-success" href="#" title="activate user"><span class="fa fa-circle"></span></a>
+              <span th:text="${user.lastname}">Meier</span>
+            </td>
+            <td>
+              <span th:text="${user.firstname}">Hans</span>
+            </td>
+            <td>
+              <a th:href="@{'/users/' + ${user.uuid}}" th:text="${user.email}">hans@meier.de</a>
+            </td>
+            <td>
+              <th:block th:each="role,rowStat : ${user.roles}">
+                <span th:text="${role.name()}">ROLE_CONTENT_MANAGER</span>
+                <span th:unless="${rowStat.last}">, </span>
+              </th:block>
+            </td>
+            <td class="center">
+              <span th:title="#{${'tooltip_enabled.' + user.enabled}}" th:classappend="${user.enabled}? 'text-success' : 'text-danger'" class="fas fa-power-off"></span>
+            </td>
+            <td class="center">
+              <a th:href="@{'/users/' + ${user.uuid} + '/edit'}" th:title="#{tooltip_edit}">
+                <span class="fas fa-pencil-alt actionButton"></span>
+              </a>
+              <a th:if="${user.enabled}" href="#"
+                 th:title="#{tooltip_deactivate_user}"
+                 data:href="@{'/users/' + ${user.uuid} + '/deactivate'}"
+                 data:message="#{msg_confirmUserDeactivation(${user.email})}"
+                 data:title="#{title_warning}"
+                 data-target="#confirmYesNoDialog"
+                 data-toggle="modal">
+                <span class="fas fa-toggle-off actionButton"></span>
+              </a>
+              <a th:unless="${user.enabled}" th:href="@{'/users/' + ${user.uuid} + '/activate'}"
+                 th:title="#{tooltip_activate_user}">
+                <span class="fas fa-toggle-on actionButton"></span>
+              </a>
             </td>
           </tr>
-          <tr th:each="user: ${page.content}">
-            <td><span th:text="${user.lastname}">Meier</span></td>
-            <td><span th:text="${user.firstname}">Hans</span></td>
-            <td><a th:href="@{'/users/' + ${user.uuid}}" th:text="${user.email}">hans@meier.de</a></td>
-            <td><th:block th:each="role,rowStat : ${user.roles}"><span th:text="${role.name()}">ROLE_CONTENT_MANAGER</span><span th:unless="${rowStat.last}">, </span></th:block></td>
-        <td class="center"><span th:title="#{${'tooltip_enabled.' + user.enabled}}" th:classappend="${user.enabled}? 'text-success' : 'text-danger'" class="fa fa-power-off"></span></td>
-        <td class="center">
-          <a th:href="@{'/users/' + ${user.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fa fa-pencil actionButton"></span></a>
-          <a th:if="${user.enabled}" href="#"
-             th:title="#{tooltip_deactivate_user}"
-             data:href="@{'/users/' + ${user.uuid} + '/deactivate'}"
-             data:message="#{msg_confirmUserDeactivation(${user.email})}"
-             data:title="#{title_warning}"
-             data-target="#confirmYesNoDialog"
-             data-toggle="modal">
-            <span class="fa fa-toggle-off actionButton"></span>
-          </a>
-          <a th:unless="${user.enabled}" th:href="@{'/users/' + ${user.uuid} + '/activate'}"
-             th:title="#{tooltip_activate_user}">
-            <span class="fa fa-toggle-on actionButton"></span>
-          </a>
-        </td>
-        </tr>
         </tbody>
       </table>
 

@@ -34,8 +34,8 @@
           <tr th:each="article: ${page.content}">
             <td><th:block th:if="${article.label}" th:text="${article.label.getText(defaultLocale)}">label</th:block></td>
             <td class="center">
-              <a th:href="@{'/articles/' + ${article.uuid}}" th:title="#{tooltip_view}"><span class="fa fa-eye actionButton"></span></a>
-              <a th:href="@{'/articles/' + ${article.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fa fa-pencil actionButton"></span></a>
+              <a th:href="@{'/articles/' + ${article.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
+              <a th:href="@{'/articles/' + ${article.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
             </td>
           </tr>
         </tbody>

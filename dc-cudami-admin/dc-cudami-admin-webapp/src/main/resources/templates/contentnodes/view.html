@@ -84,8 +84,8 @@
                   <a th:href="@{'/contentnodes/' + ${subNode.uuid}}" th:text="${subNode.label.getText(defaultLocale)}">Label</a>
                 </td>
                 <td class="center">
-                  <a th:href="@{'/contentnodes/' + ${subNode.uuid}}" th:title="#{tooltip_view}"><span class="fa fa-eye actionButton"></span></a>
-                  <a th:href="@{'/contentnodes/' + ${subNode.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fa fa-pencil actionButton"></span></a>
+                  <a th:href="@{'/contentnodes/' + ${subNode.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
+                  <a th:href="@{'/contentnodes/' + ${subNode.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
                 </td>
               </tr>
             </tbody>
