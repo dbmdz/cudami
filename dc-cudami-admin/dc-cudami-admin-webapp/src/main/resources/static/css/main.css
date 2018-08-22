@@ -2,9 +2,11 @@
   max-height: 400px;
   overflow-y: auto;
 }*/
-a[href^="http"]:not(.noExt):after {
-  content: "\f08e";
-  font-family: FontAwesome;
+a[href^="http"]:not(.no-external):after {
+  content: "\f35d";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 700;
+  opacity: 0.5;
   padding-left: 3px;
 }
 
