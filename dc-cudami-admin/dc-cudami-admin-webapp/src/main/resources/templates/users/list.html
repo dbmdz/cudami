@@ -31,7 +31,7 @@
             <th class="center"><a class="sorted" sd:pagination-sort="email" th:text="#{username}">Username / Email</a></th>
             <th class="center" th:text="#{roles}">Role(s)</th>
             <th class="center" th:text="#{status}">Status</th>
-            <th class="center" th:text="#{action}">Action</th>
+            <th class="center" th:text="#{actions}">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -55,9 +55,8 @@
               <span th:title="#{${'tooltip_enabled.' + user.enabled}}" th:classappend="${user.enabled}? 'text-success' : 'text-danger'" class="fas fa-power-off"></span>
             </td>
             <td class="center">
-              <a th:href="@{'/users/' + ${user.uuid} + '/edit'}" th:title="#{tooltip_edit}">
-                <span class="fas fa-pencil-alt actionButton"></span>
-              </a>
+              <a th:href="@{'/users/' + ${user.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
+              <a th:href="@{'/users/' + ${user.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
               <a th:if="${user.enabled}" href="#"
                  th:title="#{tooltip_deactivate_user}"
                  data:href="@{'/users/' + ${user.uuid} + '/deactivate'}"

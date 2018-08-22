@@ -32,7 +32,9 @@
         </thead>
         <tbody>
           <tr th:each="contenttree: ${page.content}">
-            <td><th:block th:if="${contenttree.label}" th:text="${contenttree.label.getText(defaultLocale)}">bavarikon</th:block></td>
+            <td>
+              <a th:href="@{'/contenttrees/' + ${contenttree.uuid}}" th:if="${contenttree.label}" th:text="${contenttree.label.getText(defaultLocale)}">bavarikon</a>
+            </td>
             <td class="center">
               <a th:href="@{'/contenttrees/' + ${contenttree.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
               <a th:href="@{'/contenttrees/' + ${contenttree.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
