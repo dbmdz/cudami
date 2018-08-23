@@ -1,9 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ContentNodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ResourceRepository;
 import de.digitalcollections.model.api.identifiable.parts.Translation;
@@ -46,7 +44,7 @@ public class ContentNodeRepositoryImpl<C extends ContentNode> extends ResourceRe
     this.resourceRepository = resourceRepository;
     this.localeRepository = localeRepository;
   }
-  
+
   @Override
   public long count() {
     String sql = "SELECT count(*) FROM contentnodes";
@@ -136,7 +134,7 @@ public class ContentNodeRepositoryImpl<C extends ContentNode> extends ResourceRe
   public List<C> getChildren(C contentNode) {
     return getChildren(contentNode.getUuid());
   }
-  
+
   @Override
   public List<C> getChildren(UUID uuid) {
     // minimal data required for creating text links in a list
@@ -175,11 +173,12 @@ public class ContentNodeRepositoryImpl<C extends ContentNode> extends ResourceRe
             .bindBean(contentNode)
             .execute());
 
-    // select max sortIndex from parent contenttree and insert with max+1:
+    Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "contenttree_contentnode", "contenttree_uuid", parentContentTreeUuid);
     dbi.withHandle(h -> h.createUpdate(
             "INSERT INTO contenttree_contentnode(contenttree_uuid, contentnode_uuid, sortIndex)"
-            + " VALUES (:parent_contenttree_uuid, :uuid, (SELECT MAX(sortIndex) + 1 FROM contenttree_contentnode WHERE contenttree_uuid = :parent_contenttree_uuid))")
+            + " VALUES (:parent_contenttree_uuid, :uuid, :sortIndex)")
             .bind("parent_contenttree_uuid", parentContentTreeUuid)
+            .bind("sortIndex", sortIndex)
             .bindBean(contentNode)
             .execute());
 
@@ -194,10 +193,12 @@ public class ContentNodeRepositoryImpl<C extends ContentNode> extends ResourceRe
             .bindBean(contentNode)
             .execute());
 
+    Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "contentnode_contentnode", "parent_contentnode_uuid", parentContentNodeUuid);
     dbi.withHandle(h -> h.createUpdate(
             "INSERT INTO contentnode_contentnode(parent_contentnode_uuid, child_contentnode_uuid, sortIndex)"
-            + " VALUES (:parent_contentnode_uuid, :uuid, (SELECT MAX(sortIndex) + 1 FROM contentnode_contentnode WHERE parent_contentnode_uuid = :parent_contentnode_uuid))")
+            + " VALUES (:parent_contentnode_uuid, :uuid, :sortIndex)")
             .bind("parent_contentnode_uuid", parentContentNodeUuid)
+            .bind("sortIndex", sortIndex)
             .bindBean(contentNode)
             .execute());
 

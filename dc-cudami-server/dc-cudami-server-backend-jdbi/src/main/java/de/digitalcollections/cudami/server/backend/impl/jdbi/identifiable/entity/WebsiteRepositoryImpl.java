@@ -108,7 +108,8 @@ public class WebsiteRepositoryImpl<W extends WebsiteImpl> extends EntityReposito
     // minimal data required for creating text links in a list
     String query = "SELECT ww.webpage_uuid as uuid, i.label as label"
             + " FROM websites ws INNER JOIN website_webpage ww ON ws.uuid=ww.website_uuid INNER JOIN identifiables i ON ww.webpage_uuid=i.uuid"
-            + " WHERE ws.uuid = :uuid";
+            + " WHERE ws.uuid = :uuid"
+            + " ORDER BY ww.sortIndex ASC";
 
     List<WebpageImpl> list = dbi.withHandle(h -> h.createQuery(query)
             .bind("uuid", uuid)

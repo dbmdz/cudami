@@ -176,11 +176,12 @@ public class ArticleRepositoryImpl<A extends Article> extends EntityRepositoryIm
             .bindBean(article)
             .execute());
 
-    // FIXME: sortIndex is always null! (first max gets no results....)
+    Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "article_article", "parent_article_uuid", parentUuid);
     dbi.withHandle(h -> h.createUpdate(
             "INSERT INTO article_article(parent_article_uuid, child_article_uuid, sortIndex)"
-            + " VALUES (:parent_uuid, :uuid, (SELECT MAX(sortIndex) + 1 FROM article_article WHERE parent_article_uuid = :parent_uuid))")
+            + " VALUES (:parent_uuid, :uuid, :sortIndex)")
             .bind("parent_uuid", parentUuid)
+            .bind("sortIndex", sortIndex)
             .bindBean(article)
             .execute());
 

@@ -10,6 +10,7 @@ import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,5 +98,15 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
             )
             .findOnly());
     return (I) result;
+  }
+
+  protected Integer selectNextSortIndexForParentChildren(Jdbi dbi, String tableName, String columNameParentUuid, UUID parentUuid) {
+    // first child: max gets no results (= null)):
+    Integer sortIndex = dbi.withHandle((Handle h) -> h.createQuery("SELECT MAX(sortIndex) + 1 FROM " + tableName + " WHERE " + columNameParentUuid + " = :parent_uuid").bind("parent_uuid", parentUuid).mapTo(Integer.class).findOnly());
+    if (sortIndex == null) {
+      sortIndex = 0;
+    }
+    final Integer sortIndexDb = sortIndex;
+    return sortIndexDb;
   }
 }

@@ -143,7 +143,8 @@ public class WebpageRepositoryImpl<W extends Webpage> extends ResourceRepository
     // minimal data required for creating text links in a list
     String query = "SELECT ww.child_webpage_uuid as uuid, i.label as label"
             + " FROM webpages wp INNER JOIN webpage_webpage ww ON wp.uuid=ww.parent_webpage_uuid INNER JOIN identifiables i ON ww.child_webpage_uuid=i.uuid"
-            + " WHERE wp.uuid = :uuid";
+            + " WHERE wp.uuid = :uuid"
+            + " ORDER BY ww.sortIndex ASC";
 
     List<WebpageImpl> list = dbi.withHandle(h -> h.createQuery(query)
             .bind("uuid", uuid)
@@ -175,8 +176,12 @@ public class WebpageRepositoryImpl<W extends Webpage> extends ResourceRepository
             .bindBean(webpage)
             .execute());
 
-    dbi.withHandle(h -> h.createUpdate("INSERT INTO website_webpage(website_uuid, webpage_uuid) VALUES (:parent_website_uuid, :uuid)")
+    Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "website_webpage", "parent_website_uuid", parentWebsiteUuid);
+    dbi.withHandle(h -> h.createUpdate(
+            "INSERT INTO website_webpage(website_uuid, webpage_uuid, sortIndex)"
+            + " VALUES (:parent_website_uuid, :uuid, :sortIndex)")
             .bind("parent_website_uuid", parentWebsiteUuid)
+            .bind("sortIndex", sortIndex)
             .bindBean(webpage)
             .execute());
 
@@ -191,8 +196,12 @@ public class WebpageRepositoryImpl<W extends Webpage> extends ResourceRepository
             .bindBean(webpage)
             .execute());
 
-    dbi.withHandle(h -> h.createUpdate("INSERT INTO webpage_webpage(parent_webpage_uuid, child_webpage_uuid) VALUES (:parent_webpage_uuid, :uuid)")
+    Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "webpage_webpage", "parent_webpage_uuid", parentWebpageUuid);
+    dbi.withHandle(h -> h.createUpdate(
+            "INSERT INTO webpage_webpage(parent_webpage_uuid, child_webpage_uuid, sortIndex)"
+            + " VALUES (:parent_webpage_uuid, :uuid, :sortIndex)")
             .bind("parent_webpage_uuid", parentWebpageUuid)
+            .bind("sortIndex", sortIndex)
             .bindBean(webpage)
             .execute());
 
