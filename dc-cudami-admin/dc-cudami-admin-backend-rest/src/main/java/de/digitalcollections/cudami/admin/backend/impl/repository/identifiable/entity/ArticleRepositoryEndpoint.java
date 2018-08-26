@@ -37,4 +37,8 @@ public interface ArticleRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine("POST /v1/articles/{parentArticleUuid}/article")
   @Headers("Content-Type: application/json")
   Article saveWithParent(Article article, @Param("parentArticleUuid") UUID parentArticleUuid);
+  
+  @RequestLine("POST /v1/articles/{parentArticleUuid}/article")
+  @Headers("Content-Type: application/json")
+  void addContent(Article article, UUID uuid)(Article article, @Param("parentArticleUuid") UUID parentArticleUuid);
 }
