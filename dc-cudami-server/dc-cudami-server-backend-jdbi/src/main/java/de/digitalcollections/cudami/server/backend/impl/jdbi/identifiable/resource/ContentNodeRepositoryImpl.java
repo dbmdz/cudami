@@ -4,16 +4,17 @@ import de.digitalcollections.cudami.server.backend.api.repository.LocaleReposito
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ContentNodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ResourceRepository;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifiable;
+import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
 import de.digitalcollections.model.api.identifiable.parts.Translation;
-import de.digitalcollections.model.api.identifiable.resource.ContentNode;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.impl.PageResponseImpl;
 import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
+import de.digitalcollections.model.impl.identifiable.entity.parts.ContentNodeImpl;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
-import de.digitalcollections.model.impl.identifiable.resource.ContentNodeImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -29,7 +30,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ContentNodeRepositoryImpl<C extends ContentNode> extends ResourceRepositoryImpl<C> implements ContentNodeRepository<C> {
+public class ContentNodeRepositoryImpl<C extends ContentNode> extends IdentifiableRepositoryImpl<C> implements ContentNodeRepository<C> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentNodeRepositoryImpl.class);
 

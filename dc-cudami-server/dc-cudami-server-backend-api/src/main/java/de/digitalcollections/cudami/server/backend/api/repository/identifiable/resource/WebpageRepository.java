@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.backend.api.repository.identifiable.
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiablesContainerRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
-import de.digitalcollections.model.api.identifiable.resource.Webpage;
+import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import java.util.UUID;
 
 /**
@@ -10,7 +10,7 @@ import java.util.UUID;
  *
  * @param <W> webpage instance
  */
-public interface WebpageRepository<W extends Webpage> extends ResourceRepository<W>, NodeRepository<W>, IdentifiablesContainerRepository<W> {
+public interface WebpageRepository<W extends Webpage> extends NodeRepository<W>, IdentifiablesContainerRepository<W> {
 
   W saveWithParentWebsite(W webpage, UUID parentWebsiteUuid);
 

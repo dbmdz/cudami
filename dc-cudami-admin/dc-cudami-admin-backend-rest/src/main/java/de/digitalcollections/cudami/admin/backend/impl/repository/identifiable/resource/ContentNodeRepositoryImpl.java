@@ -2,13 +2,14 @@ package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.
 
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.ContentNodeRepository;
+import de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifiable;
-import de.digitalcollections.model.api.identifiable.resource.ContentNode;
+import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.identifiable.entity.parts.ContentNodeImpl;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
-import de.digitalcollections.model.impl.identifiable.resource.ContentNodeImpl;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -16,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ContentNodeRepositoryImpl<C extends ContentNode> extends ResourceRepositoryImpl<C> implements ContentNodeRepository<C> {
+public class ContentNodeRepositoryImpl<C extends ContentNode> extends IdentifiableRepositoryImpl<C> implements ContentNodeRepository<C> {
 
   @Autowired
   LocaleRepository localeRepository;
@@ -87,5 +88,10 @@ public class ContentNodeRepositoryImpl<C extends ContentNode> extends ResourceRe
 
   private List<Identifiable> getIdentifiables(UUID uuid) {
     return endpoint.getIdentifiables(uuid);
+  }
+
+  @Override
+  public void addContent(C node, Identifiable identifiable) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 }

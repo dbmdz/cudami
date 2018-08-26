@@ -4,8 +4,9 @@ import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.No
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.WebpageRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.WebpageService;
+import de.digitalcollections.cudami.admin.business.impl.service.identifiable.IdentifiableServiceImpl;
 import de.digitalcollections.model.api.identifiable.Identifiable;
-import de.digitalcollections.model.api.identifiable.resource.Webpage;
+import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -19,7 +20,7 @@ import org.springframework.validation.Errors;
  */
 @Service
 //@Transactional(readOnly = true)
-public class WebpageServiceImpl extends ResourceServiceImpl<Webpage> implements WebpageService<Webpage> {
+public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> implements WebpageService<Webpage> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpageServiceImpl.class);
 
@@ -69,5 +70,10 @@ public class WebpageServiceImpl extends ResourceServiceImpl<Webpage> implements 
   @Override
   public List<Identifiable> getIdentifiables(Webpage webpage) {
     return ((WebpageRepository) repository).getIdentifiables(webpage);
+  }
+
+  @Override
+  public void addContent(Webpage node, Identifiable identifiable) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 }

@@ -5,14 +5,14 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ContentTreeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.model.api.identifiable.entity.ContentTree;
-import de.digitalcollections.model.api.identifiable.resource.ContentNode;
+import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.impl.PageResponseImpl;
 import de.digitalcollections.model.impl.identifiable.entity.ContentTreeImpl;
+import de.digitalcollections.model.impl.identifiable.entity.parts.ContentNodeImpl;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
-import de.digitalcollections.model.impl.identifiable.resource.ContentNodeImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;

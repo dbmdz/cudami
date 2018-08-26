@@ -5,8 +5,9 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.r
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ContentNodeService;
+import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
 import de.digitalcollections.model.api.identifiable.Identifiable;
-import de.digitalcollections.model.api.identifiable.resource.ContentNode;
+import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 //@Transactional(readOnly = true)
-public class ContentNodeServiceImpl extends ResourceServiceImpl<ContentNode> implements ContentNodeService<ContentNode> {
+public class ContentNodeServiceImpl extends IdentifiableServiceImpl<ContentNode> implements ContentNodeService<ContentNode> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentNodeServiceImpl.class);
 

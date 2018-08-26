@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.
 
 import de.digitalcollections.cudami.admin.backend.impl.repository.RepositoryEndpoint;
 import de.digitalcollections.model.api.identifiable.Identifiable;
-import de.digitalcollections.model.api.identifiable.resource.ContentNode;
+import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
 import de.digitalcollections.model.api.paging.PageResponse;
 import feign.Headers;
 import feign.Param;

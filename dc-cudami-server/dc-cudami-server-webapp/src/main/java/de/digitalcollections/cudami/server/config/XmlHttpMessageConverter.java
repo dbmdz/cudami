@@ -11,6 +11,7 @@ import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 import com.thoughtworks.xstream.mapper.Mapper;
 import de.digitalcollections.model.api.identifiable.parts.structuredcontent.ContentBlock;
+import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import de.digitalcollections.model.impl.identifiable.parts.TranslationImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.StructuredContentImpl;
@@ -25,7 +26,6 @@ import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.con
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.contentblocks.OrderedListImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.contentblocks.ParagraphImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.contentblocks.TextImpl;
-import de.digitalcollections.model.impl.identifiable.resource.WebpageImpl;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;

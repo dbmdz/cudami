@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.entity;
 
 import de.digitalcollections.model.api.identifiable.entity.ContentTree;
-import de.digitalcollections.model.api.identifiable.resource.ContentNode;
+import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
 import java.util.List;
 import java.util.UUID;
 

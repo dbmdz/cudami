@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.server.business.api.service.identifiable.re
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiablesContainerService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.NodeService;
-import de.digitalcollections.model.api.identifiable.resource.Webpage;
+import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -12,7 +12,7 @@ import java.util.UUID;
  *
  * @param <W> domain object
  */
-public interface WebpageService<W extends Webpage> extends ResourceService<W>, NodeService<W>, IdentifiablesContainerService<W> {
+public interface WebpageService<W extends Webpage> extends NodeService<W>, IdentifiablesContainerService<W> {
 
   W get(UUID uuid, Locale locale) throws IdentifiableServiceException;
 

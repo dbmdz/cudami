@@ -4,8 +4,9 @@ import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.No
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.ContentNodeRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.ContentNodeService;
+import de.digitalcollections.cudami.admin.business.impl.service.identifiable.IdentifiableServiceImpl;
 import de.digitalcollections.model.api.identifiable.Identifiable;
-import de.digitalcollections.model.api.identifiable.resource.ContentNode;
+import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -19,7 +20,7 @@ import org.springframework.validation.Errors;
  */
 @Service
 //@Transactional(readOnly = true)
-public class ContentNodeServiceImpl extends ResourceServiceImpl<ContentNode> implements ContentNodeService<ContentNode> {
+public class ContentNodeServiceImpl extends IdentifiableServiceImpl<ContentNode> implements ContentNodeService<ContentNode> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentNodeServiceImpl.class);
 
@@ -69,5 +70,10 @@ public class ContentNodeServiceImpl extends ResourceServiceImpl<ContentNode> imp
   @Override
   public List<Identifiable> getIdentifiables(ContentNode contentNode) {
     return ((ContentNodeRepository) repository).getIdentifiables(contentNode);
+  }
+
+  @Override
+  public void addContent(ContentNode node, Identifiable identifiable) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 }

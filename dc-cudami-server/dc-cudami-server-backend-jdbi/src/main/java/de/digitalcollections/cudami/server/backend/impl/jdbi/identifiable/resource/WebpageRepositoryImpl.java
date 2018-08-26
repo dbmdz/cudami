@@ -4,16 +4,17 @@ import de.digitalcollections.cudami.server.backend.api.repository.LocaleReposito
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ResourceRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.WebpageRepository;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifiable;
+import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.identifiable.parts.Translation;
-import de.digitalcollections.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.impl.PageResponseImpl;
 import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
+import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
-import de.digitalcollections.model.impl.identifiable.resource.WebpageImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -30,7 +31,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class WebpageRepositoryImpl<W extends Webpage> extends ResourceRepositoryImpl<W> implements WebpageRepository<W> {
+public class WebpageRepositoryImpl<W extends Webpage> extends IdentifiableRepositoryImpl<W> implements WebpageRepository<W> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpageRepositoryImpl.class);
 

@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.client.spring.business;
 
 import de.digitalcollections.model.api.identifiable.entity.Website;
-import de.digitalcollections.model.api.identifiable.resource.Webpage;
+import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;

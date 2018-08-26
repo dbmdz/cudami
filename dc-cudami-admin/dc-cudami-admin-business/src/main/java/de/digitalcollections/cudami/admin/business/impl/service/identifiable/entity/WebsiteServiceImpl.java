@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.admin.business.impl.service.identifiable.en
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.WebsiteRepository;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.model.api.identifiable.entity.Website;
-import de.digitalcollections.model.api.identifiable.resource.Webpage;
+import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

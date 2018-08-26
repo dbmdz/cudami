@@ -2,13 +2,15 @@ package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.
 
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.WebpageRepository;
+import de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.IdentifiableRepositoryImpl;
+import de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.IdentifiableRepositoryImpl.FindParams;
 import de.digitalcollections.model.api.identifiable.Identifiable;
-import de.digitalcollections.model.api.identifiable.resource.Webpage;
+import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
-import de.digitalcollections.model.impl.identifiable.resource.WebpageImpl;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -16,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class WebpageRepositoryImpl<W extends Webpage> extends ResourceRepositoryImpl<W> implements WebpageRepository<W> {
+public class WebpageRepositoryImpl<W extends Webpage> extends IdentifiableRepositoryImpl<W> implements WebpageRepository<W> {
 
   @Autowired
   LocaleRepository localeRepository;
@@ -88,5 +90,10 @@ public class WebpageRepositoryImpl<W extends Webpage> extends ResourceRepository
 
   private List<Identifiable> getIdentifiables(UUID uuid) {
     return endpoint.getIdentifiables(uuid);
+  }
+
+  @Override
+  public void addContent(W node, Identifiable identifiable) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 }

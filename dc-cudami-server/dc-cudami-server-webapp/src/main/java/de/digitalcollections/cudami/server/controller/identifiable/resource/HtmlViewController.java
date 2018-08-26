@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.resource;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.WebpageService;
-import de.digitalcollections.model.api.identifiable.resource.Webpage;
+import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import java.util.Locale;
 import java.util.UUID;
 import org.jsondoc.core.annotation.ApiMethod;
