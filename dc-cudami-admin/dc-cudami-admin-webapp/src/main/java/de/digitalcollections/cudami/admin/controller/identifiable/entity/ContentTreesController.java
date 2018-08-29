@@ -74,6 +74,7 @@ public class ContentTreesController extends AbstractController implements Messag
             .collect(Collectors.toList());
 
     model.addAttribute("contentTree", contentTreeService.create());
+    model.addAttribute("defaultLocale", defaultLocale);
     model.addAttribute("isNew", true);
     model.addAttribute("locales", locales);
     return "contenttrees/edit";

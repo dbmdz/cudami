@@ -53,15 +53,14 @@
                   </div>
                   <div class="col-sm-10">
                     <label th:text="*{label.translations[__${iter.index}__].text}">label</label>
-
-                    <th:block th:if="${article.description}">
-                      <div th:insert="cudami/fragments/webpage-to-html :: renderLocalizedStructuredContent(${article.description.localizedStructuredContent}, ${locale})"></div>
+                    <th:block th:if="*{description} and ${article.description.localizedStructuredContent.containsKey(locale)}">
+                      <div th:insert="cudami/fragments/webpage-to-html :: renderLocalizedStructuredContent(*{description.localizedStructuredContent}, ${locale})"></div>
                     </th:block>
                   </div>
                 </div>
               </div>
-              <th:block th:if="${article.text}">
-                <div th:insert="cudami/fragments/webpage-to-html :: renderLocalizedStructuredContent(${article.text.localizedStructuredContent}, ${locale})"></div>
+              <th:block th:if="*{text} and ${article.text.localizedStructuredContent.containsKey(locale)}">
+                <div th:insert="cudami/fragments/webpage-to-html :: renderLocalizedStructuredContent(*{text.localizedStructuredContent}, ${locale})"></div>
               </th:block>
             </div>
           </div>

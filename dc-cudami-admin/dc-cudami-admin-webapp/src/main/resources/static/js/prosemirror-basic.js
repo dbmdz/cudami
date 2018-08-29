@@ -79,7 +79,13 @@
 
   var activeLocale;
 
+  var defaultLocale = $('form#editor-form').data('default-locale');
+
+  var invalidLocales = [];
+
   var editorViews = {};
+
+  var initialEditorJsonString = '{"type":"doc","content":[{"type":"paragraph"}]}';
 
   /* Functions */
 
@@ -94,9 +100,26 @@
     return false;
   }
 
+  function cleanupJson(){
+    $('.content').each(function(_, contentElement){
+      var contentJson = JSON.parse($(this).val());
+      Object.keys(contentJson.localizedStructuredContent).forEach(function(currentLocale){
+        var contentJsonString = JSON.stringify(contentJson.localizedStructuredContent[currentLocale]);
+        if(contentJsonString === initialEditorJsonString){
+          delete contentJson.localizedStructuredContent[currentLocale];
+        }
+      });
+      if($.isEmptyObject(contentJson.localizedStructuredContent)){
+        $(contentElement).val('');
+      }else{
+        $(contentElement).val(JSON.stringify(contentJson));
+      }
+    });
+  }
+
   function constructLocaleSwitcher(localeTag, localeName){
     return [
-      '<li class="locale-switcher active">',
+      '<li class="locale-switcher active unsaved">',
       '<a href="#" data-locale="' + localeTag + '">' + localeName + '</a>',
       '</li>'
     ].join('\n');
@@ -133,6 +156,18 @@
 
       updateForm(selectedLocaleTag);
     });
+
+    $('#editor-form').submit(function(evt){
+      evt.preventDefault();
+      if(validateForm()){
+        cleanupJson();
+        $(this)[0].submit();
+      }
+    });
+
+    $('#continue-editing').on('click', function(){
+      $(this).closest('#form-validation-dialog').modal('hide');
+    });
   }
 
   function initializeForm(){
@@ -141,8 +176,10 @@
   }
 
   function initializeEditorsInForm(){
-    var contents = $('.content');
-    contents.each(function(_, contentElement){
+    $('.content').each(function(_, contentElement){
+      if($(this).val() === ''){
+        $(this).val('{"localizedStructuredContent":{"' + defaultLocale + '":' + initialEditorJsonString + '}}');
+      }
       var contentJson = JSON.parse($(this).val());
       var currentEditor = document.querySelector(
         '.editor[data-content-id=' + contentElement.id + ']'
@@ -155,11 +192,12 @@
           // from JSON:
           doc: prosemirrorModel.Node.fromJSON(
             schema,
-            contentJson.localizedStructuredContent[activeLocale] || JSON.parse('{"type":"doc","content":[{"type":"paragraph"}]}')
+            contentJson.localizedStructuredContent[activeLocale] || JSON.parse(initialEditorJsonString)
           ),
           plugins: prosemirrorExampleSetup.exampleSetup({schema: schema, menuContent: menu.fullMenu})
         }),
         dispatchTransaction: function(tr){
+          $('#locale-tabs a[data-locale=' + getActiveLocale() + ']').parent().removeClass('unsaved');
           var currentEditorView = editorViews[this.contentElement.id];
           currentEditorView.updateState(currentEditorView.state.apply(tr));
           // current state as json in text area
@@ -175,6 +213,9 @@
 
   function initializeLabelInForm(locale){
     var labelContent = $('#label');
+    if($(labelContent).val() === ''){
+      $(labelContent).val('{"translations":[{"locale":"' + defaultLocale + '","text":""}]}');
+    }
     var labelJson = JSON.parse($(labelContent).val());
     var activeTranslation = labelJson.translations[0];
     if(locale){
@@ -191,7 +232,8 @@
     }
     activeLocale = activeTranslation.locale;
 
-    $('.label-editor').val(activeTranslation.text).on('input', function(){
+    $('.label-editor').val(activeTranslation.text).off('input').on('input', function(){
+      $('#locale-tabs a[data-locale=' + activeTranslation.locale + ']').parent().removeClass('unsaved');
       $.map(labelJson.translations, function(translation){
         if(translation.locale === activeTranslation.locale){
           translation.text = $('.label-editor').val();
@@ -200,6 +242,17 @@
       $('#label').val(JSON.stringify(labelJson));
     });
   };
+
+  function isLabelEmpty(locale){
+    var labelJson = JSON.parse($('#label').val());
+    var labelInLocale = $.grep(labelJson.translations, function(translation){
+        return translation.locale === locale;
+    });
+    if(labelInLocale.length === 0 || labelInLocale[0].text.trim() === ''){
+      return true;
+    }
+    return false;
+  }
 
   function openIframeDialog(state, view, nodeType){
     $(document.body).append(iframeDialogTemplate);
@@ -238,12 +291,33 @@
       newState = prosemirrorState.EditorState.create({
         doc: prosemirrorModel.Node.fromJSON(
           schema,
-          contentJson.localizedStructuredContent[activeLocale] || JSON.parse('{"type":"doc","content":[{"type":"paragraph"}]}')
+          contentJson.localizedStructuredContent[activeLocale] || JSON.parse(initialEditorJsonString)
         ),
         plugins: prosemirrorExampleSetup.exampleSetup({schema: schema, menuContent: menu.fullMenu})
       });
       editorViews[contentElement.id].updateState(newState);
     });
+  }
+
+  function validateForm(){
+    invalidLocales = [];
+    $('#form-validation-dialog #invalid-locales').empty();
+    $('ul#locale-tabs > li.locale-switcher:not(.unsaved)').removeClass('invalid').find('a').each(function(){
+      if(isLabelEmpty($(this).data('locale'))){
+        $(this).parent().addClass('invalid');
+        invalidLocales.push($(this).text());
+      }
+    });
+    if(invalidLocales.length > 0){
+      invalidLocales.forEach(function(invalidLocale){
+        $('#form-validation-dialog #invalid-locales').append(
+          '<li>' + invalidLocale + '</li>'
+        );
+      });
+      $('#form-validation-dialog').modal('show');
+      return false;
+    }
+    return true;
   }
 
   $(document).ready(function(){

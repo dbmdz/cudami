@@ -76,6 +76,7 @@ public class ContentNodesController extends AbstractController implements Messag
             .collect(Collectors.toList());
 
     model.addAttribute("contentNode", contentNodeService.create());
+    model.addAttribute("defaultLocale", defaultLocale);
     model.addAttribute("isNew", true);
     model.addAttribute("locales", locales);
     model.addAttribute("parentUuid", parentUuid);

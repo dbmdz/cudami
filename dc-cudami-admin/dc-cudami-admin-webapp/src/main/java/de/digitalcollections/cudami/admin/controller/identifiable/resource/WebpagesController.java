@@ -75,10 +75,11 @@ public class WebpagesController extends AbstractController implements MessageSou
             .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
             .collect(Collectors.toList());
 
-    model.addAttribute("webpage", webpageService.create());
+    model.addAttribute("defaultLocale", defaultLocale);
     model.addAttribute("isNew", true);
     model.addAttribute("locales", locales);
     model.addAttribute("parentUuid", parentUuid);
+    model.addAttribute("webpage", webpageService.create());
     return "webpages/edit";
   }
 

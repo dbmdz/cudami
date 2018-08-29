@@ -11,7 +11,7 @@
   </head>
   <body>
     <section layout:fragment="content">
-      <form th:object="${website}" th:action="@{#}" method="post" role="form">
+      <form id="editor-form" th:object="${website}" th:action="@{#}" method="post" role="form" th:attr="data-default-locale=${defaultLocale}">
         <input type="hidden" id="label" th:field="*{label}" />
         <input type="hidden" id="description" class="content" th:field="*{description}" />
 
@@ -62,9 +62,16 @@
         <div class="row mainContent">
           <div class="col-sm-12">
             <ul class="nav nav-tabs" id="locale-tabs">
-              <li class="locale-switcher" th:each="translation,iter : *{label.translations}" th:classappend="${iter.index} == 0 ? active">
-                <a href="#" th:attr="data-locale=${translation.locale}" th:text="${translation.locale.getDisplayName(#locale)}">locale</a>
-              </li>
+              <th:block th:if="${isNew}">
+                <li class="active locale-switcher">
+                  <a href="#" th:attr="data-locale=${defaultLocale}" th:text="${defaultLocale.getDisplayName(#locale)}">default locale</a>
+                </li>
+              </th:block>
+              <th:block th:unless="${isNew}">
+                <li class="locale-switcher" th:each="translation,iter : *{label.translations}" th:classappend="${iter.index} == 0 ? active">
+                  <a href="#" th:attr="data-locale=${translation.locale}" th:text="${translation.locale.getDisplayName(#locale)}">locale</a>
+                </li>
+              </th:block>
               <li id="locale-adder">
                 <a href="#">
                   <i class="fas fa-plus" aria-hidden="true"></i>
@@ -78,7 +85,7 @@
                 <div class="well">
                   <div class="form-group">
                     <label th:text="#{label}">label</label>
-                    <input class="form-control label-editor" type="text" required/>
+                    <input class="form-control label-editor" type="text"/>
                   </div>
 
                   <div class="form-group">
@@ -94,6 +101,7 @@
 
       <div th:replace="fragments/modals :: addLanguageDialog"></div>
       <div th:replace="fragments/modals :: confirmYesNoDialog"></div>
+      <div th:replace="fragments/modals :: formValidationDialog"></div>
     </section>
 
   <th:block layout:fragment="beforeBodyEnds">

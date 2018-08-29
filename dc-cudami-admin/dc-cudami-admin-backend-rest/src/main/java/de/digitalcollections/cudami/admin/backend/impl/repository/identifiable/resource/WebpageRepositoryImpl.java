@@ -5,11 +5,8 @@ import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.re
 import de.digitalcollections.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
-import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
 import de.digitalcollections.model.impl.identifiable.resource.WebpageImpl;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -30,12 +27,7 @@ public class WebpageRepositoryImpl<W extends Webpage> extends ResourceRepository
 
   @Override
   public W create() {
-    Locale defaultLocale = localeRepository.getDefault();
-    W webpage = (W) new WebpageImpl();
-    webpage.setLabel(new LocalizedTextImpl(defaultLocale, ""));
-    webpage.setDescription(new LocalizedStructuredContentImpl(defaultLocale));
-    webpage.setText(new LocalizedStructuredContentImpl(defaultLocale));
-    return webpage;
+    return (W) new WebpageImpl();
   }
 
   @Override

@@ -5,11 +5,8 @@ import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.re
 import de.digitalcollections.model.api.identifiable.resource.ContentNode;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
-import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ContentNodeImpl;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -30,11 +27,7 @@ public class ContentNodeRepositoryImpl<C extends ContentNode> extends ResourceRe
 
   @Override
   public C create() {
-    Locale defaultLocale = localeRepository.getDefault();
-    C contentNode = (C) new ContentNodeImpl();
-    contentNode.setLabel(new LocalizedTextImpl(defaultLocale, ""));
-    contentNode.setDescription(new LocalizedStructuredContentImpl(defaultLocale));
-    return contentNode;
+    return (C) new ContentNodeImpl();
   }
 
   @Override

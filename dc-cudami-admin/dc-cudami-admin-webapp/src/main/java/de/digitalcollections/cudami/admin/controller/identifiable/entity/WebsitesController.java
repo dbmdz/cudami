@@ -73,9 +73,10 @@ public class WebsitesController extends AbstractController implements MessageSou
             .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
             .collect(Collectors.toList());
 
-    model.addAttribute("website", websiteService.create());
+    model.addAttribute("defaultLocale", defaultLocale);
     model.addAttribute("isNew", true);
     model.addAttribute("locales", locales);
+    model.addAttribute("website", websiteService.create());
     return "websites/edit";
   }
 

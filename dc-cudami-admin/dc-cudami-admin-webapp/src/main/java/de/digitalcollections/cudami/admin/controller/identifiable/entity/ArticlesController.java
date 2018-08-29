@@ -75,6 +75,7 @@ public class ArticlesController extends AbstractController implements MessageSou
             .collect(Collectors.toList());
 
     model.addAttribute("article", service.create());
+    model.addAttribute("defaultLocale", defaultLocale);
     model.addAttribute("isNew", true);
     model.addAttribute("locales", locales);
     model.addAttribute("parentUuid", parentUuid);

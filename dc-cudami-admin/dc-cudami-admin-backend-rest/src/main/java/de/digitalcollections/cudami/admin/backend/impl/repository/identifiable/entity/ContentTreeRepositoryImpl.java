@@ -7,10 +7,7 @@ import de.digitalcollections.model.api.identifiable.resource.ContentNode;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.ContentTreeImpl;
-import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
-import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -31,11 +28,7 @@ public class ContentTreeRepositoryImpl<C extends ContentTree> extends EntityRepo
 
   @Override
   public C create() {
-    Locale defaultLocale = localeRepository.getDefault();
-    C contentTree = (C) new ContentTreeImpl();
-    contentTree.setLabel(new LocalizedTextImpl(defaultLocale, ""));
-    contentTree.setDescription(new LocalizedStructuredContentImpl(defaultLocale));
-    return contentTree;
+    return (C) new ContentTreeImpl();
   }
 
   @Override
