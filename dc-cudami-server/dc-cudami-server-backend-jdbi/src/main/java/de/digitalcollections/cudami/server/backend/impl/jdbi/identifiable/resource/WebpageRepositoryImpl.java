@@ -176,7 +176,7 @@ public class WebpageRepositoryImpl<W extends Webpage> extends ResourceRepository
             .bindBean(webpage)
             .execute());
 
-    Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "website_webpage", "parent_website_uuid", parentWebsiteUuid);
+    Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "website_webpage", "website_uuid", parentWebsiteUuid);
     dbi.withHandle(h -> h.createUpdate(
             "INSERT INTO website_webpage(website_uuid, webpage_uuid, sortIndex)"
             + " VALUES (:parent_website_uuid, :uuid, :sortIndex)")
