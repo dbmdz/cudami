@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.resource;
 
 import de.digitalcollections.cudami.admin.backend.impl.repository.RepositoryEndpoint;
+import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.resource.ContentNode;
 import de.digitalcollections.model.api.paging.PageResponse;
 import feign.Headers;
@@ -41,4 +42,7 @@ public interface ContentNodeRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine("POST /v1/contentnodes/{parentContentNodeUuid}/contentnode")
   @Headers("Content-Type: application/json")
   ContentNode saveWithParentContentNode(ContentNode contentNode, @Param("parentContentNodeUuid") UUID parentContentNodeUuid);
+  
+  @RequestLine("GET /v1/contentnodes/{uuid}/identifiables")
+  public List<Identifiable> getIdentifiables(UUID uuid);
 }

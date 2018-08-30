@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.
 
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.ContentNodeRepository;
+import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.resource.ContentNode;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -79,4 +80,12 @@ public class ContentNodeRepositoryImpl<C extends ContentNode> extends ResourceRe
     return (C) endpoint.saveWithParentContentNode(contentNode, parentContentNodeUUID);
   }
 
+  @Override
+  public List<Identifiable> getIdentifiables(C contentNode) {
+    return getIdentifiables(contentNode.getUuid());
+  }
+
+  private List<Identifiable> getIdentifiables(UUID uuid) {
+    return endpoint.getIdentifiables(uuid);
+  }
 }

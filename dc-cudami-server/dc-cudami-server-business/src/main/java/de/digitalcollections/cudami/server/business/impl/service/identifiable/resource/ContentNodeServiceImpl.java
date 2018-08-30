@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.r
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ContentNodeService;
+import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.resource.ContentNode;
 import java.util.List;
 import java.util.Locale;
@@ -80,4 +81,13 @@ public class ContentNodeServiceImpl extends ResourceServiceImpl<ContentNode> imp
     }
   }
 
+  @Override
+  public List<Identifiable> getIdentifiables(ContentNode contentNode) {
+    return getIdentifiables(contentNode.getUuid());
+  }
+
+  @Override
+  public List<Identifiable> getIdentifiables(UUID identifiableUuid) {
+    return ((ContentNodeRepository) repository).getIdentifiables(identifiableUuid);
+  }
 }

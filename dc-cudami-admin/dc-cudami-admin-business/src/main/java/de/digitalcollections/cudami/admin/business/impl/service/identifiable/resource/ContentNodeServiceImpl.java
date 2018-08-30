@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.No
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.ContentNodeRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.ContentNodeService;
+import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.resource.ContentNode;
 import java.util.List;
 import java.util.UUID;
@@ -63,5 +64,10 @@ public class ContentNodeServiceImpl extends ResourceServiceImpl<ContentNode> imp
   @Override
   public List<ContentNode> getChildren(UUID uuid) {
     return ((NodeRepository) repository).getChildren(uuid);
+  }
+
+  @Override
+  public List<Identifiable> getIdentifiables(ContentNode contentNode) {
+    return ((ContentNodeRepository) repository).getIdentifiables(contentNode);
   }
 }

@@ -77,11 +77,11 @@ public class ArticleRepositoryImpl<A extends Article> extends EntityRepositoryIm
   }
 
   @Override
-  public void addContent(A article, Identifiable identifiable) {
-    addContent(article, identifiable.getUuid());
+  public List<Identifiable> getIdentifiables(A article) {
+    return getIdentifiables(article.getUuid());
   }
   
-  private void addContent(A article, UUID uuid) {
-    endpoint.addContent(article, uuid);
+  private List<Identifiable> getIdentifiables(UUID uuid) {
+    return endpoint.getIdentifiables(uuid);
   }
 }

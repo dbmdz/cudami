@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.No
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.WebpageRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.WebpageService;
+import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.resource.Webpage;
 import java.util.List;
 import java.util.UUID;
@@ -63,5 +64,10 @@ public class WebpageServiceImpl extends ResourceServiceImpl<Webpage> implements 
   @Override
   public List<Webpage> getChildren(UUID uuid) {
     return ((NodeRepository) repository).getChildren(uuid);
+  }
+
+  @Override
+  public List<Identifiable> getIdentifiables(Webpage webpage) {
+    return ((WebpageRepository) repository).getIdentifiables(webpage);
   }
 }

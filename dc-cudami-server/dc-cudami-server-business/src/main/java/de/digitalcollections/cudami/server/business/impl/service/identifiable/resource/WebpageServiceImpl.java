@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.r
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.WebpageService;
+import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.resource.Webpage;
 import java.util.List;
 import java.util.Locale;
@@ -78,5 +79,15 @@ public class WebpageServiceImpl extends ResourceServiceImpl<Webpage> implements 
       LOGGER.error("Cannot save webpage " + webpage + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
     }
+  }
+
+  @Override
+  public List<Identifiable> getIdentifiables(Webpage webpage) {
+    return getIdentifiables(webpage.getUuid());
+  }
+
+  @Override
+  public List<Identifiable> getIdentifiables(UUID identifiableUuid) {
+    return ((WebpageRepository) repository).getIdentifiables(identifiableUuid);
   }
 }

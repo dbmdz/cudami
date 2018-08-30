@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.
 
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.WebpageRepository;
+import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -78,5 +79,14 @@ public class WebpageRepositoryImpl<W extends Webpage> extends ResourceRepository
   @Override
   public W saveWithParentWebpage(W webpage, UUID parentWebpageUUID) {
     return (W) endpoint.saveWithParentWebpage(webpage, parentWebpageUUID);
+  }
+  
+  @Override
+  public List<Identifiable> getIdentifiables(W webpage) {
+    return getIdentifiables(webpage.getUuid());
+  }
+
+  private List<Identifiable> getIdentifiables(UUID uuid) {
+    return endpoint.getIdentifiables(uuid);
   }
 }

@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.WebpageService;
+import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -11,6 +12,7 @@ import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.api.paging.impl.OrderImpl;
 import de.digitalcollections.model.api.paging.impl.PageRequestImpl;
 import de.digitalcollections.model.api.paging.impl.SortingImpl;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
@@ -97,4 +99,8 @@ public class WebpageController {
     return webpageService.update(webpage);
   }
 
+  @RequestMapping(value = "/v1/webpages/{uuid}/identifiables", produces = "application/json", method = RequestMethod.GET)
+  public List<Identifiable> getIdentifiables(@PathVariable UUID uuid) {
+    return webpageService.getIdentifiables(uuid);
+  }
 }
