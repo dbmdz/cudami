@@ -71,10 +71,6 @@ public class ArticleServiceImpl extends EntityServiceImpl<Article> implements Ar
   }
 
   @Override
-  public void addContent(Article article, Identifiable identifiable) {
-    ((NodeRepository) repository).addContent(article, identifiable);
-  }
-
   public List<Identifiable> getIdentifiables(Article article) {
     return ((ArticleRepository) repository).getIdentifiables(article);
   }
