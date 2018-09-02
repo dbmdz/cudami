@@ -47,6 +47,10 @@
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
+      <artifactId>dc-commons-file</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-server</artifactId>
     </dependency>
     <dependency>
