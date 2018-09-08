@@ -31,16 +31,8 @@
       </th:block>
 
       <th:block sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_CONTENT_MANAGER')">
-        <h3 th:text="#{containers}">Containers (object groups/aggregations)</h3>
+        <h3 th:text="#{objects}">Objects</h3>
         <div class="row">
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a class="btn" th:href="@{/websites}" th:title="#{websites}">
-              <div class="innerContent">
-                <div class="icon"><i class="fas fa-globe"></i></div>
-                <span th:text="#{websites}">Websites</span>
-              </div>
-            </a>
-          </div>
           <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
             <a class="btn" th:href="@{/contenttrees}" th:title="#{content_trees}">
               <div class="innerContent">
@@ -65,10 +57,6 @@
               </div>
             </a>
           </div>
-        </div>
-
-        <h3 th:text="#{objects}">Objects</h3>
-        <div class="row">
           <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
             <a class="btn disabled" th:href="@{/books}" th:title="#{books}">
               <div class="innerContent">
@@ -117,9 +105,6 @@
               </div>
             </a>
           </div>
-        </div>
-
-        <div class="row">
           <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
             <a class="btn disabled" th:href="@{/persons}" th:title="#{persons}">
               <div class="innerContent">
@@ -153,10 +138,10 @@
             </a>
           </div>
           <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a class="btn disabled" th:href="@{/archived_websites}" th:title="#{archived_websites}">
+            <a class="btn" th:href="@{/websites}" th:title="#{websites}">
               <div class="innerContent">
                 <div class="icon"><i class="fas fa-globe"></i></div>
-                <span th:utext="#{archived_websites}">Archived Websites</span>
+                <span th:text="#{websites}">Websites</span>
               </div>
             </a>
           </div>
