@@ -37,6 +37,7 @@
             <td>
               <a th:href="@{'/resources/' + ${resource.uuid}}" th:if="${resource.label}" th:text="${resource.label.getText(defaultLocale)}">image001.jpg</a>
             </td>
+            <td><span th:text="${resource.resourceType}">FILE</span></td>
             <!--<td><a th:href="${website.url}" th:text="${website.url}" target="_blank">http://www.bavarikon.de/</a></td>-->
             <!--<td><a th:href="@{'/websites/' + ${website.uuid}}" th:text="${website.registrationDate}">23.01.1999</a></td>-->
             <td class="center">
