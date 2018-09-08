@@ -1,0 +1,105 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+
+  <head>
+    <title th:if="${isNew}" th:text="|#{websites}: #{create_website}|">Websites: Create a new website</title>
+    <title th:unless="${isNew}" th:text="|#{websites}: #{edit_website(${website.url})}|">Websites: Edit website http://www.mywebsite.org/</title>
+    <link rel=stylesheet th:href="@{/css/thirdparty/prosemirror.css}" />
+  </head>
+  <body>
+    <section layout:fragment="content">
+      <form th:object="${website}" th:action="@{#}" method="post" role="form">
+        <input type="hidden" id="label" th:field="*{label}" />
+        <input type="hidden" id="description" class="content" th:field="*{description}" />
+
+        <div class="row mainContent">
+          <div th:replace="fragments/feedback-messages :: form"></div>
+
+          <div class="col-sm-8">
+            <b th:if="${isNew}" th:text="#{create_website}">...</b>
+            <b th:unless="${isNew}" th:utext="#{edit_website(${website.url})}">...</b>
+          </div>
+          <div class="col-sm-4">
+            <span class="col-sm-6">
+              <a th:if="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{/websites}" th:text="#{abort}">abort</a>
+              <a th:unless="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{'/websites/' + *{uuid}}" th:text="#{abort}">abort</a>
+            </span>
+            <span class="col-sm-6">
+              <button class="btn btn-primary btn-block" type="submit" th:text="#{save}">
+                save
+              </button>
+            </span>
+          </div>
+        </div>
+
+        <div class="row mainContent">
+          <div class="col-sm-12">
+            <hr/>
+          </div>
+        </div>
+
+        <div class="row mainContent">
+          <div class="form-group col-sm-12">
+            <span class="col-sm-4">
+              <label for="id" class="col-sm-1 control-label" th:text="#{id}">ID</label>
+              <div class="col-sm-9">
+                <input id="id" th:field="*{uuid}" type="text" class="form-control" readonly="readonly" th:placeholder="*{uuid}"/>
+              </div>
+            </span>
+            <span class="col-sm-8">
+              <label for="url" class="col-sm-1 control-label" th:text="#{url}">URL</label>
+              <div class="col-sm-11" th:classappend="${#fields.hasErrors('url')}? has-error">
+                <input id="url" th:field="*{url}" type="url" class="form-control" th:placeholder="#{url_placeholder}" autofocus="autofocus" required/>
+                <p th:if="${#fields.hasErrors('url')}" th:errors="*{url}">...</p>
+              </div>
+            </span>
+          </div>
+        </div>
+
+        <div class="row mainContent">
+          <div class="col-sm-12">
+            <ul class="nav nav-tabs" id="locale-tabs">
+              <li class="locale-switcher" th:each="translation,iter : *{label.translations}" th:classappend="${iter.index} == 0 ? active">
+                <a href="#" th:attr="data-locale=${translation.locale}" th:text="${translation.locale.getDisplayName(#locale)}">locale</a>
+              </li>
+              <li id="locale-adder">
+                <a href="#">
+                  <i class="fas fa-plus" aria-hidden="true"></i>
+                </a>
+              </li>
+            </ul>
+
+            <div class="tab-content">
+              <div class="active tab-pane">
+                <!-- identifiable fields -->
+                <div class="well">
+                  <div class="form-group">
+                    <label th:text="#{label}">label</label>
+                    <input class="form-control label-editor" type="text" required/>
+                  </div>
+
+                  <div class="form-group">
+                    <label th:text="#{description}">description</label>
+                    <div class="editor" th:attr="data-content-id='description'"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <div th:replace="fragments/modals :: addLanguageDialog"></div>
+      <div th:replace="fragments/modals :: confirmYesNoDialog"></div>
+    </section>
+
+  <th:block layout:fragment="beforeBodyEnds">
+    <script th:src="@{/js/thirdparty/prosemirror.js}"></script>
+    <script th:src="@{/js/prosemirror-basic.js}"></script>
+  </th:block>
+</body>
+
+</html>

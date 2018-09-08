@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+
+  <head>
+    <title th:text="#{resources_files}">Resources / Files</title>
+  </head>
+  <body>
+    <section layout:fragment="content">
+      <h1><span th:text="#{resources_files}">Resources / Files</span> <a class="btn btn-default pull-right" th:href="@{/resources/new}" th:text="#{btn_new}">New</a></h1>
+
+      <div class="row">
+        <div class="col-sm-12">
+          <div th:replace="fragments/pagination-navigation :: pagination">
+            ...
+          </div>
+<!--          <div class="objectCounter lighter pull-right">
+            <span class="message" th:text="${page.totalItems}">Found 17 books.</span>
+          </div>-->
+        </div>
+      </div>
+
+      <table class="table table-bordered table-condensed table-striped table-hover table-responsive">
+        <thead>
+          <tr sd:page-object="${page.page}">
+            <th class="center" th:text="#{label}">Label</th>
+            <!--<th class="center"><a class="sorted" sd:pagination-sort="url" th:text="#{url}">Url</a></th>-->
+            <!--<th class="center" th:text="#{registration_date}">Registration Date</th>-->
+            <th class="center" th:text="#{actions}">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="resource : ${page.content}">
+            <td>
+              <a th:href="@{'/resources/' + ${resource.uuid}}" th:if="${resource.label}" th:text="${resource.label.getText(defaultLocale)}">image001.jpg</a>
+            </td>
+            <!--<td><a th:href="${website.url}" th:text="${website.url}" target="_blank">http://www.bavarikon.de/</a></td>-->
+            <!--<td><a th:href="@{'/websites/' + ${website.uuid}}" th:text="${website.registrationDate}">23.01.1999</a></td>-->
+            <td class="center">
+              <a th:href="@{'/resources/' + ${resource.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
+              <a th:href="@{'/resources/' + ${resource.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="row">
+        <div class="col-sm-12" >
+          <div th:replace="fragments/pagination-navigation :: pagination">
+            ...
+          </div>
+        </div>
+      </div>
+
+      <div th:replace="fragments/modals :: confirmYesNoDialog"></div>
+    </section>
+  </body>
+</html>
+
+
