@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.en
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.WebpageService;
 import de.digitalcollections.cudami.admin.business.impl.service.identifiable.IdentifiableServiceImpl;
+import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import java.util.List;
 import java.util.UUID;

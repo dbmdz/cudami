@@ -4,9 +4,7 @@ import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepositor
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.WebpageRepository;
 import de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
-import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.WebpageRepository;
 import de.digitalcollections.model.api.identifiable.Identifiable;
-import de.digitalcollections.model.api.identifiable.resource.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;

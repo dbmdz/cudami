@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.LocaleReposito
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.ContentNodeRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
+import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.parts.Translation;
 import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
 import de.digitalcollections.model.api.paging.PageRequest;

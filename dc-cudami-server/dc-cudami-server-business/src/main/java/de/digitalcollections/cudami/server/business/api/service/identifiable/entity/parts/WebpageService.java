@@ -12,7 +12,7 @@ import java.util.UUID;
  *
  * @param <W> domain object
  */
-public interface WebpageService<W extends Webpage> extends NodeService<W> {
+public interface WebpageService<W extends Webpage> extends NodeService<W>, IdentifiablesContainerService<W> {
 
   W get(UUID uuid, Locale locale) throws IdentifiableServiceException;
 

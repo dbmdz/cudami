@@ -12,7 +12,7 @@ import org.springframework.validation.Errors;
  *
  * @param <W> domain object
  */
-public interface WebpageService<W extends Webpage> extends NodeService<W> {
+public interface WebpageService<W extends Webpage> extends NodeService<W>, IdentifiablesContainerService<W> {
 
   W saveWithParentWebsite(W webpage, UUID parentWebsiteUUID, Errors results) throws IdentifiableServiceException;
 

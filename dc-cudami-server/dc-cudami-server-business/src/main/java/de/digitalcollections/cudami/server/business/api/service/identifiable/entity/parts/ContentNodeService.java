@@ -12,7 +12,7 @@ import java.util.UUID;
  *
  * @param <C> domain object
  */
-public interface ContentNodeService<C extends ContentNode> extends NodeService<C> {
+public interface ContentNodeService<C extends ContentNode> extends NodeService<C>, IdentifiablesContainerService<C> {
 
   C get(UUID uuid, Locale locale) throws IdentifiableServiceException;
 

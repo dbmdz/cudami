@@ -10,7 +10,7 @@ import java.util.UUID;
  *
  * @param <W> webpage instance
  */
-public interface WebpageRepository<W extends Webpage> extends NodeRepository<W> {
+public interface WebpageRepository<W extends Webpage> extends NodeRepository<W>, IdentifiablesContainerRepository<W> {
 
   W saveWithParentWebsite(W webpage, UUID parentWebsiteUuid);
 

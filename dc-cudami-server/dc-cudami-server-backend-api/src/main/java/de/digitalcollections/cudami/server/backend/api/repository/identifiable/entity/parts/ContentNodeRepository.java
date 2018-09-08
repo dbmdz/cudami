@@ -10,7 +10,7 @@ import java.util.UUID;
  *
  * @param <C> content node instance
  */
-public interface ContentNodeRepository<C extends ContentNode> extends NodeRepository<C> {
+public interface ContentNodeRepository<C extends ContentNode> extends NodeRepository<C>, IdentifiablesContainerRepository<C> {
 
   C saveWithParentContentTree(C contentNode, UUID parentContentTreeUuid);
 

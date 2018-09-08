@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ResourceRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.WebpageRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
+import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.parts.Translation;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;

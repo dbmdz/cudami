@@ -12,7 +12,7 @@ import org.springframework.validation.Errors;
  *
  * @param <C> domain object
  */
-public interface ContentNodeService<C extends ContentNode> extends NodeService<C> {
+public interface ContentNodeService<C extends ContentNode> extends NodeService<C>, IdentifiablesContainerService<C> {
 
   ContentNode saveWithParentContentTree(C contentNode, UUID parentContentTreeUUID, Errors results) throws IdentifiableServiceException;
 
