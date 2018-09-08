@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.resource;
+package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.entity.parts;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.commons.feign.codec.EndpointErrorDecoder;

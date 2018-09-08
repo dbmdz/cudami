@@ -6,9 +6,9 @@ import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.en
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.ContentTreeRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.WebsiteRepository;
-import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.ContentNodeRepository;
+import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.ContentNodeRepository;
+import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.WebpageRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.ResourceRepository;
-import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.WebpageRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.security.UserRepository;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Qualifier;

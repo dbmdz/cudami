@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.admin.controller.identifiable.resource;
+package de.digitalcollections.cudami.admin.controller.identifiable.entity.parts;
 
 import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
@@ -6,7 +6,7 @@ import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.business.api.service.LocaleService;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
-import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.ContentNodeService;
+import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.ContentNodeService;
 import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;

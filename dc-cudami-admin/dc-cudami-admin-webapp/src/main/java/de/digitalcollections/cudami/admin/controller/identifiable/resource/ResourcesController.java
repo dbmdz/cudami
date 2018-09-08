@@ -56,7 +56,7 @@ public class ResourcesController extends AbstractController implements MessageSo
     this.messageSource = messageSource;
   }
 
-  @GetMapping("/")
+  @GetMapping("/resources")
   public String list(Model model, @PageableDefault(sort = {"label"}, size = 25) Pageable pageable) {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = resourceService.find(pageRequest);

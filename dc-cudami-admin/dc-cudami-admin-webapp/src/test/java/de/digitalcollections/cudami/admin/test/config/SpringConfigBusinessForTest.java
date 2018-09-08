@@ -5,9 +5,9 @@ import de.digitalcollections.cudami.admin.business.api.service.identifiable.enti
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.WebsiteService;
-import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.ContentNodeService;
+import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.ContentNodeService;
+import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.WebpageService;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.ResourceService;
-import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.WebpageService;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

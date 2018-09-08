@@ -83,17 +83,5 @@ public class ArticleRepositoryImpl<A extends Article> extends EntityRepositoryIm
   
   private List<Identifiable> getIdentifiables(UUID uuid) {
     return endpoint.getIdentifiables(uuid);
-
-  private void addContent(A article, UUID uuid) {
-    endpoint.addContent(article, uuid);
-  }
-
-  @Override
-  public List<Identifiable> getIdentifiables(A article) {
-    return getIdentifiables(article.getUuid());
-  }
-
-  private List<Identifiable> getIdentifiables(UUID uuid) {
-    return endpoint.getIdentifiables(uuid);
   }
 }
