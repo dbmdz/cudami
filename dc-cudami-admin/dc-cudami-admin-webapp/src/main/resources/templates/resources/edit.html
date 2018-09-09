@@ -5,13 +5,13 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:if="${isNew}" th:text="|#{websites}: #{create_website}|">Websites: Create a new website</title>
-    <title th:unless="${isNew}" th:text="|#{websites}: #{edit_website(${website.url})}|">Websites: Edit website http://www.mywebsite.org/</title>
+    <title th:if="${isNew}" th:text="|#{resources_files}: #{create_resource}|">Resources / Files: Create a new resource</title>
+    <title th:unless="${isNew}" th:text="|#{resources_files}: #{edit_resource}|">Resources / Files: Edit resource</title>
     <link rel=stylesheet th:href="@{/css/thirdparty/prosemirror.css}" />
   </head>
   <body>
     <section layout:fragment="content">
-      <form th:object="${website}" th:action="@{#}" method="post" role="form">
+      <form th:object="${resource}" th:action="@{#}" method="post" enctype="multipart/form-data" role="form">
         <input type="hidden" id="label" th:field="*{label}" />
         <input type="hidden" id="description" class="content" th:field="*{description}" />
 
@@ -19,13 +19,13 @@
           <div th:replace="fragments/feedback-messages :: form"></div>
 
           <div class="col-sm-8">
-            <b th:if="${isNew}" th:text="#{create_website}">...</b>
-            <b th:unless="${isNew}" th:utext="#{edit_website(${website.url})}">...</b>
+            <b th:if="${isNew}" th:text="#{create_resource}">...</b>
+            <b th:unless="${isNew}" th:utext="#{edit_resource}">...</b>
           </div>
           <div class="col-sm-4">
             <span class="col-sm-6">
-              <a th:if="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{/websites}" th:text="#{abort}">abort</a>
-              <a th:unless="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{'/websites/' + *{uuid}}" th:text="#{abort}">abort</a>
+              <a th:if="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{/resources}" th:text="#{abort}">abort</a>
+              <a th:unless="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{'/resources/' + *{uuid}}" th:text="#{abort}">abort</a>
             </span>
             <span class="col-sm-6">
               <button class="btn btn-primary btn-block" type="submit" th:text="#{save}">
@@ -43,17 +43,10 @@
 
         <div class="row mainContent">
           <div class="form-group col-sm-12">
-            <span class="col-sm-4">
+            <span class="col-sm-6">
               <label for="id" class="col-sm-1 control-label" th:text="#{id}">ID</label>
               <div class="col-sm-9">
                 <input id="id" th:field="*{uuid}" type="text" class="form-control" readonly="readonly" th:placeholder="*{uuid}"/>
-              </div>
-            </span>
-            <span class="col-sm-8">
-              <label for="url" class="col-sm-1 control-label" th:text="#{url}">URL</label>
-              <div class="col-sm-11" th:classappend="${#fields.hasErrors('url')}? has-error">
-                <input id="url" th:field="*{url}" type="url" class="form-control" th:placeholder="#{url_placeholder}" autofocus="autofocus" required/>
-                <p th:if="${#fields.hasErrors('url')}" th:errors="*{url}">...</p>
               </div>
             </span>
           </div>
@@ -90,6 +83,22 @@
             </div>
           </div>
         </div>
+
+        <div class="row mainContent">
+          <div class="col-sm-12">
+            <br/>
+          </div>
+        </div>
+        
+        <div class="row mainContent">
+          <div class="col-sm-12">
+            <div class="form-group">
+              <label th:text="#{file}">File</label>
+              <input name="file" type="file" id="file_info">
+            </div>
+          </div>
+
+        </div>
       </form>
 
       <div th:replace="fragments/modals :: addLanguageDialog"></div>
@@ -99,6 +108,13 @@
   <th:block layout:fragment="beforeBodyEnds">
     <script th:src="@{/js/thirdparty/prosemirror.js}"></script>
     <script th:src="@{/js/prosemirror-basic.js}"></script>
+    <script th:src="@{/js/thirdparty/bootstrap-filestyle.min.js}" type="text/javascript"></script>
+    <script>
+      $('#file_info').filestyle({
+        buttonName: 'btn-info',
+//        buttonText: ' Select a File'
+      });
+    </script>
   </th:block>
 </body>
 

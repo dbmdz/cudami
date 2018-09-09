@@ -6,6 +6,7 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
+import feign.form.FormData;
 import java.util.UUID;
 
 public interface ResourceRepositoryEndpoint extends RepositoryEndpoint {
@@ -19,9 +20,19 @@ public interface ResourceRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine("GET /v1/resources/{uuid}")
   Resource findOne(@Param("uuid") UUID uuid);
 
+  /**
+   * only saving non binary parts of resource
+   *
+   * @param resource metadata object
+   * @return saved object
+   */
   @RequestLine("POST /v1/resources")
   @Headers("Content-Type: application/json")
   Resource save(Resource resource);
+
+  @RequestLine("POST /v1/resources")
+  @Headers("Content-Type: multipart/form-data")
+  Resource save(@Param("resource") Resource resource, @Param("binaryData") FormData binaryData);
 
   @RequestLine("PUT /v1/resources/{uuid}")
   @Headers("Content-Type: application/json")
