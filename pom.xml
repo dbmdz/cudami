@@ -75,7 +75,7 @@
     <version.dc-commons>2.0.0-SNAPSHOT</version.dc-commons>
     <version.dc-model>2.0.0-SNAPSHOT</version.dc-model>
     <version.feign>9.5.1</version.feign>
-    <version.feign-form>3.3.0</version.feign-form>
+    <version.feign-form-spring>3.3.0</version.feign-form-spring>
     <version.flyway-core>4.0.3</version.flyway-core>
     <version.gson>2.3.1</version.gson>
     <version.guava>20.0</version.guava>
@@ -303,8 +303,8 @@
       </dependency>
       <dependency>
         <groupId>io.github.openfeign.form</groupId>
-        <artifactId>feign-form</artifactId>
-        <version>${version.feign-form}</version>
+        <artifactId>feign-form-spring</artifactId>
+        <version>${version.feign-form-spring}</version>
       </dependency>
       <dependency>
         <groupId>io.github.openfeign</groupId>
