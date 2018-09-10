@@ -13,6 +13,7 @@ import de.digitalcollections.model.api.identifiable.resource.MimeType;
 import de.digitalcollections.model.api.identifiable.resource.Resource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
@@ -92,12 +93,14 @@ public class ResourcesController extends AbstractController implements MessageSo
 
   @PostMapping("/resources/new")
   public String create(@ModelAttribute @Valid Resource resource, BindingResult results, @RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
-    FileResource fileResource;
+    FileResource fileResource = new FileResourceImpl();
+    fileResource.setLabel(resource.getLabel());
+    fileResource.setDescription(resource.getDescription());
     try {
       String contentType = file.getContentType();
       final MimeType mimeType = MimeType.fromTypename(contentType);
 
-      fileResource = fileResourceService.create(mimeType);
+      fileResource.setMimeType(mimeType);
 
       long size = file.getSize();
       fileResource.setSizeInBytes(size);
@@ -106,7 +109,7 @@ public class ResourcesController extends AbstractController implements MessageSo
       fileResource.setFilename(originalFilename);
 
       byte[] bytes = file.getBytes();
-      resourceService.save(resource, fileResource, bytes, results);
+      resourceService.save(fileResource, bytes, results);
     } catch (IOException | IdentifiableServiceException ex) {
       LOGGER.error("Error saving uploaded file data", ex);
     }

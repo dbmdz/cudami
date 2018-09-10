@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.resource;
 
 import de.digitalcollections.cudami.admin.backend.impl.repository.RepositoryEndpoint;
+import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.Resource;
 import de.digitalcollections.model.api.paging.PageResponse;
 import feign.Headers;
@@ -32,7 +33,7 @@ public interface ResourceRepositoryEndpoint extends RepositoryEndpoint {
 
   @RequestLine("POST /v1/resources")
   @Headers("Content-Type: multipart/form-data")
-  Resource save(@Param("resource") Resource resource, @Param("binaryData") FormData binaryData);
+  Resource save(@Param("fileresource") FileResource fileresource, @Param("binaryData") FormData binaryData);
 
   @RequestLine("PUT /v1/resources/{uuid}")
   @Headers("Content-Type: application/json")

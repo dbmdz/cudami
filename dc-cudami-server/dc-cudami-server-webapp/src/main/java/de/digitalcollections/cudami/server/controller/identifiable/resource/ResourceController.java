@@ -1,7 +1,9 @@
 package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ResourceService;
+import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.Resource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -11,14 +13,10 @@ import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.api.paging.impl.OrderImpl;
 import de.digitalcollections.model.api.paging.impl.PageRequestImpl;
 import de.digitalcollections.model.api.paging.impl.SortingImpl;
-import de.digitalcollections.model.impl.identifiable.resource.ResourceImpl;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiPathParam;
@@ -29,12 +27,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -44,6 +42,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class ResourceController {
 
   private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ResourceController.class);
+
+  @Autowired
+  private ObjectMapper objectMapper;
 
   @Autowired
   private ResourceService<Resource> service;
@@ -88,11 +89,18 @@ public class ResourceController {
   @ApiMethod(description = "save a newly created resourcee")
   @PostMapping(value = "/v1/resources", produces = "application/json")
   @ApiResponseObject
-  public String save(@ModelAttribute(name = "resource") @Valid ResourceImpl resource,
-          @RequestParam("binaryData") MultipartFile file,
+  public String save(@RequestParam("fileresource") String resourceJson,
+          @RequestPart("binaryData") MultipartFile file,
           RedirectAttributes redirectAttributes,
           HttpServletRequest request) {
-
+    FileResource resource;
+    try {
+      // FIXME: is it really necessary to handle string and convert to object (no direct support of spring boot/mvc?)
+      resource = objectMapper.readValue(resourceJson, FileResource.class);
+      LOGGER.info("resource: " + resource.getLabel().getText());
+    } catch (IOException ex) {
+      LOGGER.error("Cannot convert resource json to resource: '" + resourceJson + "'", ex);
+    }
 //    storageService.store(file);
     redirectAttributes.addFlashAttribute("message",
             "You successfully uploaded " + file.getOriginalFilename() + "!");
@@ -100,7 +108,7 @@ public class ResourceController {
       byte[] bytes = file.getBytes();
       LOGGER.info("filesize = " + bytes.length);
     } catch (IOException ex) {
-      Logger.getLogger(ResourceController.class.getName()).log(Level.SEVERE, null, ex);
+      LOGGER.error("Cannot read file bytes from: '" + file.getOriginalFilename() + "'", ex);
     }
     return "redirect:/";
   }

@@ -9,6 +9,6 @@ import de.digitalcollections.model.api.identifiable.resource.Resource;
  */
 public interface ResourceRepository<R extends Resource> extends IdentifiableRepository<R> {
 
-  public R save(R resource, FileResource fileResource, byte[] bytes);
+  public R save(FileResource fileResource, byte[] bytes);
 
 }

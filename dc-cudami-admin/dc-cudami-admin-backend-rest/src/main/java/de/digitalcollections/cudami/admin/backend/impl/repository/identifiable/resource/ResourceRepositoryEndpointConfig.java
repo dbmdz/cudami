@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.commons.feign.codec.EndpointErrorDecoder;
 import feign.Feign;
-import feign.form.FormEncoder;
+import feign.form.spring.SpringFormEncoder;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class ResourceRepositoryEndpointConfig {
   public ResourceRepositoryEndpoint resourceRepositoryEndpoint() {
     ResourceRepositoryEndpoint endpoint = Feign.builder()
             .decoder(new JacksonDecoder(objectMapper))
-            .encoder(new FormEncoder(new JacksonEncoder(objectMapper)))
+            .encoder(new SpringFormEncoder(new JacksonEncoder(objectMapper)))
             .errorDecoder(new EndpointErrorDecoder())
             .target(ResourceRepositoryEndpoint.class, cudamiServerAddress);
     return endpoint;

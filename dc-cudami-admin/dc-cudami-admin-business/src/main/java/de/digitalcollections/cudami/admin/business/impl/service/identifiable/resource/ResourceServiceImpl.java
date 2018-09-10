@@ -25,16 +25,17 @@ public class ResourceServiceImpl<R extends Resource> extends IdentifiableService
   }
 
   @Override
-  public R save(R resource, FileResource fileResource, byte[] bytes, Errors results) throws IdentifiableServiceException {
+  public R save(FileResource fileResource, byte[] bytes, Errors results) throws IdentifiableServiceException {
+    Resource resource = null;
     if (!results.hasErrors()) {
       try {
-        resource = (R) ((ResourceRepository) repository).save(resource, fileResource, bytes);
+        resource = (R) ((ResourceRepository) repository).save(fileResource, bytes);
       } catch (Exception e) {
-        LOGGER.error("Cannot save resource " + resource + ": ", e);
+        LOGGER.error("Cannot save fileResource " + fileResource + ": ", e);
         throw new IdentifiableServiceException(e.getMessage());
       }
     }
     // FIXME: what if results has errors? throw exception?
-    return resource;
+    return (R) resource;
   }
 }

@@ -8,6 +8,6 @@ import org.springframework.validation.Errors;
 
 public interface ResourceService<R extends Resource> extends IdentifiableService<R> {
 
-  public R save(R resource, FileResource fileResource, byte[] bytes, Errors results) throws IdentifiableServiceException;
+  public R save(FileResource fileResource, byte[] bytes, Errors results) throws IdentifiableServiceException;
 
 }

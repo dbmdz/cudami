@@ -11,10 +11,14 @@ import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ResourceImpl;
 import feign.form.FormData;
+import java.io.File;
 import java.util.Locale;
 import java.util.UUID;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 @Repository
 public class ResourceRepositoryImpl<R extends Resource> extends IdentifiableRepositoryImpl<R> implements ResourceRepository<R> {
@@ -57,10 +61,10 @@ public class ResourceRepositoryImpl<R extends Resource> extends IdentifiableRepo
   }
 
   @Override
-  public R save(R resource, FileResource fileResource, byte[] bytes) {
+  public R save(FileResource fileResource, byte[] bytes) {
     String contentType = fileResource.getMimeType().getTypeName();
     FormData formData = new FormData(contentType, bytes);
-    return (R) endpoint.save(resource, formData);
+    return (R) endpoint.save(fileResource, formData);
   }
 
   @Override
