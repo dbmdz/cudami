@@ -42,6 +42,9 @@
   </springProfile>
   -->
 
+  <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter">
+    <level value="DEBUG" />
+  </logger>
   <logger name="de.digitalcollections.cudami" level="info" />
   <logger name="org.jdbi" level="info" />
 
