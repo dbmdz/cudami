@@ -1,8 +1,9 @@
 package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.resource;
 
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
-import de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.*;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.ResourceRepository;
+import de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.IdentifiableRepositoryImpl;
+import de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.IdentifiableRepositoryImpl.FindParams;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.Resource;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -11,14 +12,10 @@ import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ResourceImpl;
 import feign.form.FormData;
-import java.io.File;
 import java.util.Locale;
 import java.util.UUID;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 @Repository
 public class ResourceRepositoryImpl<R extends Resource> extends IdentifiableRepositoryImpl<R> implements ResourceRepository<R> {
