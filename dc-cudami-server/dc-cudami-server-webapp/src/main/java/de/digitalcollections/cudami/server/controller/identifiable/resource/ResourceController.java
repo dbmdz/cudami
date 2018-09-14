@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.server.controller.identifiable.resource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ResourceService;
-import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.Resource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -13,10 +12,8 @@ import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.api.paging.impl.OrderImpl;
 import de.digitalcollections.model.api.paging.impl.PageRequestImpl;
 import de.digitalcollections.model.api.paging.impl.SortingImpl;
-import java.io.IOException;
 import java.util.Locale;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiPathParam;
@@ -28,14 +25,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @RestController
 @Api(description = "The resource controller", name = "Resource controller")
@@ -84,33 +77,4 @@ public class ResourceController {
     }
     return new ResponseEntity<>(resource, HttpStatus.OK);
   }
-
-  // FIXME: why we need here ResourceImpl instead Resource (no constructor found)
-  @ApiMethod(description = "save a newly created resourcee")
-  @PostMapping(value = "/v1/resources", produces = "application/json")
-  @ApiResponseObject
-  public String save(@RequestParam("fileresource") String resourceJson,
-          @RequestPart("binaryData") MultipartFile file,
-          RedirectAttributes redirectAttributes,
-          HttpServletRequest request) {
-    FileResource resource;
-    try {
-      // FIXME: is it really necessary to handle string and convert to object (no direct support of spring boot/mvc?)
-      resource = objectMapper.readValue(resourceJson, FileResource.class);
-      LOGGER.info("resource: " + resource.getLabel().getText());
-    } catch (IOException ex) {
-      LOGGER.error("Cannot convert resource json to resource: '" + resourceJson + "'", ex);
-    }
-//    storageService.store(file);
-    redirectAttributes.addFlashAttribute("message",
-            "You successfully uploaded " + file.getOriginalFilename() + "!");
-    try {
-      byte[] bytes = file.getBytes();
-      LOGGER.info("filesize = " + bytes.length);
-    } catch (IOException ex) {
-      LOGGER.error("Cannot read file bytes from: '" + file.getOriginalFilename() + "'", ex);
-    }
-    return "redirect:/";
-  }
-
 }
