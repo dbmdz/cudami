@@ -2,8 +2,9 @@ package de.digitalcollections.cudami.server.business.api.service.identifiable.re
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import java.io.InputStream;
 
-public interface FileResourceService<F extends FileResource> extends ResourceService<F> {
+public interface CudamiFileResourceService<F extends FileResource> extends ResourceService<F> {
 
-  F save(F fileResource, byte[] binaryData) throws IdentifiableServiceException;
+  F save(F fileResource, InputStream binaryData) throws IdentifiableServiceException;
 }

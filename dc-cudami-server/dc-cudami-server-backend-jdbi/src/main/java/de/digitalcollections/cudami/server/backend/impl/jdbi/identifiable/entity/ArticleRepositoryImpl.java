@@ -9,7 +9,7 @@ import de.digitalcollections.model.api.identifiable.entity.Article;
 import de.digitalcollections.model.api.identifiable.parts.Translation;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.impl.PageResponseImpl;
+import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
 import de.digitalcollections.model.impl.identifiable.entity.ArticleImpl;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;

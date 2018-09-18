@@ -6,7 +6,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.Identi
 import de.digitalcollections.model.api.identifiable.resource.Resource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.impl.PageResponseImpl;
+import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ResourceImpl;
 import java.util.List;
 import java.util.UUID;

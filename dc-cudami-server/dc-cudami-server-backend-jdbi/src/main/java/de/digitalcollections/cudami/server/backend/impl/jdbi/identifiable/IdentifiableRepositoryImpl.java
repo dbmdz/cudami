@@ -5,7 +5,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSo
 import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.impl.PageResponseImpl;
+import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
 import java.time.LocalDateTime;
 import java.util.List;

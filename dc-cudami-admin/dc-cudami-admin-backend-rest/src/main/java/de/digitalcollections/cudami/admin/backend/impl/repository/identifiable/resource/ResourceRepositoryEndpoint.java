@@ -31,7 +31,7 @@ public interface ResourceRepositoryEndpoint extends RepositoryEndpoint {
   @Headers("Content-Type: application/json")
   Resource save(Resource resource);
 
-  @RequestLine("POST /v1/resources")
+  @RequestLine("POST /v1/fileresources")
   @Headers("Content-Type: multipart/form-data")
   Resource save(@Param("fileresource") FileResource fileresource, @Param("binaryData") FormData binaryData);
 

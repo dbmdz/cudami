@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS fileresources (
+  id SERIAL PRIMARY KEY NOT NULL,
+  uuid UUID NOT NULL UNIQUE,
+
+  filename VARCHAR NOT NULL,
+  mimetype VARCHAR NOT NULL,
+  size_in_bytes BIGINT NOT NULL
+);

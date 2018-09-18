@@ -11,13 +11,16 @@ import de.digitalcollections.cudami.admin.business.api.service.identifiable.reso
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.MimeType;
 import de.digitalcollections.model.api.identifiable.resource.Resource;
+import de.digitalcollections.model.api.identifiable.resource.ResourceType;
+import de.digitalcollections.model.api.identifiable.resource.enums.FileResourcePersistenceType;
+import de.digitalcollections.model.api.identifiable.resource.exceptions.ResourceIOException;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.slf4j.Logger;
@@ -34,6 +37,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -91,29 +95,64 @@ public class ResourcesController extends AbstractController implements MessageSo
     return "resources/edit";
   }
 
+  // FIXME: add proper error and validation handling (using results and feedbackmessages)
+  // FIXME: make a step by step resource adding assistant: https://commons.wikimedia.org/wiki/Special:UploadWizard
   @PostMapping("/resources/new")
   public String create(@ModelAttribute @Valid Resource resource, BindingResult results, @RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
-    FileResource fileResource = new FileResourceImpl();
-    fileResource.setLabel(resource.getLabel());
-    fileResource.setDescription(resource.getDescription());
-    try {
-      String contentType = file.getContentType();
-      final MimeType mimeType = MimeType.fromTypename(contentType);
+    FileResource fileResource;
+    byte[] bytes;
+    if (!file.isEmpty()) {
+      try {
+        String contentType = file.getContentType();
+        final MimeType mimeType = MimeType.fromTypename(contentType);
 
-      fileResource.setMimeType(mimeType);
+        try {
+          fileResource = fileResourceService.create(null, FileResourcePersistenceType.MANAGED, mimeType);
+          fileResource.setLabel(resource.getLabel());
+          fileResource.setDescription(resource.getDescription());
+        } catch (ResourceIOException ex) {
+          LOGGER.error("Error creating file resource", ex);
+          redirectAttributes.addFlashAttribute("message", "Error creating file resource!");
+          return "redirect:/resources";
+        }
+        fileResource.setMimeType(mimeType);
+        LOGGER.info("mimetype = " + fileResource.getMimeType().getTypeName());
 
-      long size = file.getSize();
-      fileResource.setSizeInBytes(size);
+        long size = file.getSize();
+        fileResource.setSizeInBytes(size);
+        LOGGER.info("filesize = " + fileResource.getSizeInBytes());
 
-      String originalFilename = file.getOriginalFilename();
-      fileResource.setFilename(originalFilename);
+        String originalFilename = file.getOriginalFilename();
+        fileResource.setFilename(originalFilename);
+        LOGGER.info("filename = " + fileResource.getFilename());
 
-      byte[] bytes = file.getBytes();
-      resourceService.save(fileResource, bytes, results);
-    } catch (IOException | IdentifiableServiceException ex) {
-      LOGGER.error("Error saving uploaded file data", ex);
+        bytes = file.getBytes();
+        try {
+          resourceService.save(fileResource, bytes, results);
+          redirectAttributes.addFlashAttribute("message", "You successfully uploaded " + file.getOriginalFilename() + "!");
+          return "redirect:/resources";
+        } catch (IdentifiableServiceException ex) {
+          LOGGER.error("Error saving uploaded file data", ex);
+          redirectAttributes.addFlashAttribute("message", "Error saving resource!");
+          return "redirect:/resources";
+        }
+      } catch (IOException ex) {
+        LOGGER.error("Error saving uploaded file data", ex);
+      }
     }
-    redirectAttributes.addFlashAttribute("message", "You successfully uploaded " + file.getOriginalFilename() + "!");
+    redirectAttributes.addFlashAttribute("message", "Invalid resource!");
     return "redirect:/resources";
+  }
+
+  @RequestMapping(value = "/resources/{uuid}", method = RequestMethod.GET)
+  public String view(@PathVariable UUID uuid, Model model) {
+    Resource resource = (Resource) resourceService.get(uuid);
+    if (ResourceType.FILE.equals(resource.getResourceType())) {
+      // TODO get fileresource... -> split fileresources from resource!
+    }
+    model.addAttribute("availableLocales", resource.getLabel().getLocales());
+    model.addAttribute("defaultLocale", localeService.getDefault());
+    model.addAttribute("resource", resource);
+    return "resources/view";
   }
 }

@@ -2,17 +2,18 @@ package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.CudamiFileResourceService;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.paging.enums.Direction;
 import de.digitalcollections.model.api.paging.enums.NullHandling;
-import de.digitalcollections.model.api.paging.impl.OrderImpl;
-import de.digitalcollections.model.api.paging.impl.PageRequestImpl;
-import de.digitalcollections.model.api.paging.impl.SortingImpl;
+import de.digitalcollections.model.impl.paging.OrderImpl;
+import de.digitalcollections.model.impl.paging.PageRequestImpl;
+import de.digitalcollections.model.impl.paging.SortingImpl;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Locale;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
@@ -45,7 +46,7 @@ public class FileResourceController {
   private ObjectMapper objectMapper;
 
   @Autowired
-  private FileResourceService<FileResource> service;
+  private CudamiFileResourceService<FileResource> service;
 
   @ApiMethod(description = "get all fileresources")
   @GetMapping(value = "/v1/fileresources", produces = "application/json")
@@ -90,7 +91,6 @@ public class FileResourceController {
           RedirectAttributes redirectAttributes,
           HttpServletRequest request) {
     FileResource fileResource;
-    byte[] bytes;
     try {
       // FIXME: is it really necessary to handle string and convert to object (no direct support of spring boot/mvc?)
       fileResource = objectMapper.readValue(resourceJson, FileResource.class);
@@ -100,16 +100,18 @@ public class FileResourceController {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    try {
-      bytes = file.getBytes();
-      LOGGER.info("filesize = " + bytes.length);
-    } catch (IOException ex) {
-      LOGGER.error("Error getting binary data from uploaded file", ex);
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    InputStream inputStream = null;
+    if (!file.isEmpty()) {
+      try {
+        inputStream = file.getInputStream();
+      } catch (IOException ex) {
+        LOGGER.error("Error getting binary data from uploaded file", ex);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      }
     }
     
     try {
-      service.save(fileResource, bytes);
+      service.save(fileResource, inputStream);
     } catch (IdentifiableServiceException ex) {
       LOGGER.error("Error saving fileresource and binary data for uploaded file", ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
