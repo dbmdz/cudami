@@ -15,6 +15,7 @@ import de.digitalcollections.model.impl.paging.SortingImpl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import org.jsondoc.core.annotation.Api;
@@ -27,9 +28,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,6 +52,7 @@ public class FileResourceController {
   @Autowired
   private CudamiFileResourceService<FileResource> service;
 
+  // TODO: see FileResourceRepositoryEndpoint: count()
   @ApiMethod(description = "get all fileresources")
   @GetMapping(value = "/v1/fileresources", produces = "application/json")
   @ApiResponseObject
@@ -109,7 +114,7 @@ public class FileResourceController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
       }
     }
-    
+
     try {
       service.save(fileResource, inputStream);
     } catch (IdentifiableServiceException ex) {
@@ -117,5 +122,13 @@ public class FileResourceController {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return new ResponseEntity<>(fileResource, HttpStatus.OK);
+  }
+
+  @ApiMethod(description = "update a fileresource")
+  @PutMapping(value = "/v1/fileresources/{uuid}", produces = "application/json")
+  @ApiResponseObject
+  public FileResource update(@PathVariable UUID uuid, @RequestBody FileResource fileResource, BindingResult errors) throws IdentifiableServiceException {
+    assert Objects.equals(uuid, fileResource.getUuid());
+    return service.update(fileResource);
   }
 }

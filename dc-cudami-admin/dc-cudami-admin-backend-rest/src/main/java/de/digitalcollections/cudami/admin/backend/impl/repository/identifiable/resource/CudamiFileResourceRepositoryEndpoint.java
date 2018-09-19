@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.
 
 import de.digitalcollections.cudami.admin.backend.impl.repository.RepositoryEndpoint;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.api.identifiable.resource.Resource;
 import de.digitalcollections.model.api.paging.PageResponse;
 import feign.Headers;
 import feign.Param;
@@ -10,35 +9,35 @@ import feign.RequestLine;
 import feign.form.FormData;
 import java.util.UUID;
 
-public interface ResourceRepositoryEndpoint extends RepositoryEndpoint {
+public interface CudamiFileResourceRepositoryEndpoint extends RepositoryEndpoint {
 
-  @RequestLine("GET /v1/resources?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
-  PageResponse<Resource> find(
+  @RequestLine("GET /v1/fileresources?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
+  PageResponse<FileResource> find(
           @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
           @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
   );
 
-  @RequestLine("GET /v1/resources/{uuid}")
-  Resource findOne(@Param("uuid") UUID uuid);
+  @RequestLine("GET /v1/fileresources/{uuid}")
+  FileResource findOne(@Param("uuid") UUID uuid);
 
   /**
    * only saving non binary parts of resource
    *
-   * @param resource metadata object
+   * @param fileresource metadata object
    * @return saved object
    */
-  @RequestLine("POST /v1/resources")
+  @RequestLine("POST /v1/fileresources")
   @Headers("Content-Type: application/json")
-  Resource save(Resource resource);
+  FileResource save(FileResource fileresource);
 
   @RequestLine("POST /v1/fileresources")
   @Headers("Content-Type: multipart/form-data")
-  Resource save(@Param("fileresource") FileResource fileresource, @Param("binaryData") FormData binaryData);
+  FileResource save(@Param("fileresource") FileResource fileresource, @Param("binaryData") FormData binaryData);
 
-  @RequestLine("PUT /v1/resources/{uuid}")
+  @RequestLine("PUT /v1/fileresources/{uuid}")
   @Headers("Content-Type: application/json")
-  Resource update(@Param("uuid") UUID uuid, Resource resource);
+  FileResource update(@Param("uuid") UUID uuid, FileResource fileresource);
 
-  @RequestLine("GET /v1/resources/count")
+  @RequestLine("GET /v1/fileresources/count")
   long count();
 }

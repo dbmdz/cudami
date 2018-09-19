@@ -5,14 +5,14 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:text="|#{websites}: #{website} ${website.url}|">Websites: Website http://www.example.de/</title>
+    <title th:text="|#{fileresources}: #{file} '${fileresource.filename}'|">Files: File 'image001.jpg'</title>
   </head>
   <body>
-    <section layout:fragment="content" th:object="${website}">
+    <section layout:fragment="content" th:object="${fileresource}">
 
       <div class="row">
         <div class="col-sm-9">
-          <b th:text="#{website}">Website</b> <a th:href="*{url}" th:text="*{url}" target="_blank"></a>
+          <b th:text="#{file}">File</b> '<span th:text="*{filename}">image001.jpg</span>'
         </div>
         <div class="col-sm-3">
           <a class="btn btn-default btn-block"
@@ -34,8 +34,8 @@
               <div class="col-md-9"><span th:text="*{uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
             </div>
             <div class="row">
-              <div class="col-md-3"><label th:text="#{url}">URL</label></div>
-              <div class="col-md-9"><a th:href="*{url}" th:text="*{url}" target="_blank">http://www.example.de/</a></div>
+              <div class="col-md-3"><label th:text="#{filename}">Filename</label></div>
+              <div class="col-md-9"><span th:text="*{filename}">image001.jpg</span></div>
             </div>
           </div>
         </div>
@@ -58,40 +58,12 @@
                   <div class="col-sm-10">
                     <label th:text="*{label.translations[__${iter.index}__].text}">label</label>
 
-                    <div th:if="*{description}" th:insert="cudami/fragments/webpage-to-html :: renderLocalizedStructuredContent(${website.description.localizedStructuredContent}, ${locale})"></div>
+                    <div th:if="*{description}" th:insert="cudami/fragments/webpage-to-html :: renderLocalizedStructuredContent(${fileresource.description.localizedStructuredContent}, ${locale})"></div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div class="row main-content">
-        <div class="col-sm-12">
-          <h3>
-            <span th:text="#{webpages}">root pages</span>
-            <a class="btn btn-default pull-right new-button" th:href="@{/webpages/new(parentType=website, parentUuid=*{uuid})}" th:text="#{btn_new}">New</a>
-          </h3>
-          <table class="table table-bordered table-condensed table-striped table-hover table-responsive">
-            <thead>
-              <tr>
-                <th class="center" th:text="#{label}">Label</th>
-                <th class="center" th:text="#{actions}">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr th:each="rootPage: *{rootPages}">
-                <td>
-                  <a th:href="@{'/webpages/' + ${rootPage.uuid}}" th:text="${rootPage.label.getText(defaultLocale)}">Label</a>
-                </td>
-                <td class="center">
-                  <a th:href="@{'/webpages/' + ${rootPage.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
-                  <a th:href="@{'/webpages/' + ${rootPage.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
         </div>
       </div>
     </section>

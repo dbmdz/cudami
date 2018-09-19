@@ -5,13 +5,13 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:if="${isNew}" th:text="|#{resources_files}: #{create_resource}|">Resources / Files: Create a new resource</title>
-    <title th:unless="${isNew}" th:text="|#{resources_files}: #{edit_resource}|">Resources / Files: Edit resource</title>
+    <title th:if="${isNew}" th:text="|#{fileresources}: #{fileresources_create}|">Files: Upload a new file</title>
+    <title th:unless="${isNew}" th:text="|#{fileresources}: #{fileresources_edit}|">Files: Edit file</title>
     <link rel=stylesheet th:href="@{/css/thirdparty/prosemirror.css}" />
   </head>
   <body>
     <section layout:fragment="content">
-      <form th:object="${resource}" th:action="@{#}" method="post" enctype="multipart/form-data" role="form">
+      <form th:object="${fileresource}" th:action="@{#}" method="post" enctype="multipart/form-data" role="form">
         <input type="hidden" id="label" th:field="*{label}" />
         <input type="hidden" id="description" class="content" th:field="*{description}" />
 
@@ -19,13 +19,13 @@
           <div th:replace="fragments/feedback-messages :: form"></div>
 
           <div class="col-sm-8">
-            <b th:if="${isNew}" th:text="#{create_resource}">...</b>
-            <b th:unless="${isNew}" th:utext="#{edit_resource}">...</b>
+            <b th:if="${isNew}" th:text="#{fileresources_create}">...</b>
+            <b th:unless="${isNew}" th:utext="#{fileresources_edit}">...</b>
           </div>
           <div class="col-sm-4">
             <span class="col-sm-6">
-              <a th:if="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{/resources}" th:text="#{abort}">abort</a>
-              <a th:unless="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{'/resources/' + *{uuid}}" th:text="#{abort}">abort</a>
+              <a th:if="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{/fileresources}" th:text="#{abort}">abort</a>
+              <a th:unless="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{'/fileresources/' + *{uuid}}" th:text="#{abort}">abort</a>
             </span>
             <span class="col-sm-6">
               <button class="btn btn-primary btn-block" type="submit" th:text="#{save}">

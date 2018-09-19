@@ -1,16 +1,15 @@
 package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.resource;
 
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
-import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.ResourceRepository;
+import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.CudamiFileResourceRepository;
 import de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.IdentifiableRepositoryImpl.FindParams;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.api.identifiable.resource.Resource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
-import de.digitalcollections.model.impl.identifiable.resource.ResourceImpl;
+import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import feign.form.FormData;
 import java.util.Locale;
 import java.util.UUID;
@@ -18,13 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ResourceRepositoryImpl<R extends Resource> extends IdentifiableRepositoryImpl<R> implements ResourceRepository<R> {
+public class CudamiFileResourceRepositoryImpl<F extends FileResource> extends IdentifiableRepositoryImpl<F> implements CudamiFileResourceRepository<F> {
 
   @Autowired
   private LocaleRepository localeRepository;
 
   @Autowired
-  private ResourceRepositoryEndpoint endpoint;
+  private CudamiFileResourceRepositoryEndpoint endpoint;
 
   @Override
   public long count() {
@@ -32,40 +31,40 @@ public class ResourceRepositoryImpl<R extends Resource> extends IdentifiableRepo
   }
 
   @Override
-  public R create() {
+  public F create() {
     Locale defaultLocale = localeRepository.getDefault();
-    R resource = (R) new ResourceImpl();
+    F resource = (F) new FileResourceImpl();
     resource.setLabel(new LocalizedTextImpl(defaultLocale, ""));
     resource.setDescription(new LocalizedStructuredContentImpl(defaultLocale));
     return resource;
   }
 
   @Override
-  public PageResponse<R> find(PageRequest pageRequest) {
+  public PageResponse<F> find(PageRequest pageRequest) {
     FindParams f = getFindParams(pageRequest);
-    PageResponse<Resource> pageResponse = endpoint.find(f.getPageNumber(), f.getPageSize(), f.getSortField(), f.getSortDirection(), f.getNullHandling());
+    PageResponse<FileResource> pageResponse = endpoint.find(f.getPageNumber(), f.getPageSize(), f.getSortField(), f.getSortDirection(), f.getNullHandling());
     return getGenericPageResponse(pageResponse);
   }
 
   @Override
-  public R findOne(UUID uuid) {
-    return (R) endpoint.findOne(uuid);
+  public F findOne(UUID uuid) {
+    return (F) endpoint.findOne(uuid);
   }
 
   @Override
-  public R save(R identifiable) {
-    return (R) endpoint.save(identifiable);
+  public F save(F identifiable) {
+    return (F) endpoint.save(identifiable);
   }
 
   @Override
-  public R save(FileResource fileResource, byte[] bytes) {
+  public F save(FileResource fileResource, byte[] bytes) {
     String contentType = fileResource.getMimeType().getTypeName();
     FormData formData = new FormData(contentType, bytes);
-    return (R) endpoint.save(fileResource, formData);
+    return (F) endpoint.save(fileResource, formData);
   }
 
   @Override
-  public R update(R identifiable) {
-    return (R) endpoint.update(identifiable.getUuid(), identifiable);
+  public F update(F identifiable) {
+    return (F) endpoint.update(identifiable.getUuid(), identifiable);
   }
 }

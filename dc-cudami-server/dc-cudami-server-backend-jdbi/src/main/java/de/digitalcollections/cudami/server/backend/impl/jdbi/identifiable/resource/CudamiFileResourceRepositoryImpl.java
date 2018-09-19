@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
 import de.digitalcollections.commons.file.backend.api.FileResourceRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.CudamiFileResourceRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ResourceRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.exceptions.ResourceIOException;
@@ -26,15 +26,15 @@ public class CudamiFileResourceRepositoryImpl<F extends FileResource> extends Id
   private static final Logger LOGGER = LoggerFactory.getLogger(CudamiFileResourceRepositoryImpl.class);
 
   protected final Jdbi dbi;
-  private final ResourceRepository<F> resourceRepository;
+  private final IdentifiableRepository identifiableRepository;
 
   @Autowired
   FileResourceRepository<F> fileResourceRepository;
 
   @Autowired
-  public CudamiFileResourceRepositoryImpl(Jdbi dbi, @Qualifier("resourceRepositoryImpl") ResourceRepository resourceRepository) {
+  public CudamiFileResourceRepositoryImpl(Jdbi dbi, @Qualifier("identifiableRepositoryImpl") IdentifiableRepository identifiableRepository) {
     this.dbi = dbi;
-    this.resourceRepository = resourceRepository;
+    this.identifiableRepository = identifiableRepository;
   }
 
   @Override
@@ -65,7 +65,6 @@ public class CudamiFileResourceRepositoryImpl<F extends FileResource> extends Id
 
   @Override
   public F findOne(UUID uuid) {
-    // TODO: until now no data is needed from resources table, so no join and select... may change if there are additional values in resources table
     String query = "SELECT f.filename as filename, f.mimetype as mimeType, f.size_in_bytes as sizeInBytes, i.uuid as uuid, i.label as label, i.description as description"
             + " FROM fileresources f INNER JOIN identifiables i ON f.uuid=i.uuid"
             + " WHERE f.uuid = :uuid";
@@ -88,7 +87,7 @@ public class CudamiFileResourceRepositoryImpl<F extends FileResource> extends Id
       LOGGER.error("Error saving binary data of fileresource " + fileResource.getUuid().toString(), ex);
     }
 
-    resourceRepository.save(fileResource);
+    identifiableRepository.save(fileResource);
     dbi.withHandle(h -> h.createUpdate("INSERT INTO fileresources(filename, mimetype, size_in_bytes, uuid) VALUES (:filename, :mimeType, :sizeInBytes, :uuid)")
             .bindBean(fileResource)
             .execute());
@@ -97,7 +96,7 @@ public class CudamiFileResourceRepositoryImpl<F extends FileResource> extends Id
   
   @Override
   public F update(F fileresource) {
-    resourceRepository.update(fileresource);
+    identifiableRepository.update(fileresource);
     // do not update/left out from statement: created, uuid
     dbi.withHandle(h -> h.createUpdate("UPDATE fileresources SET filename=:filename, mimetype=:mimeType, size_in_bytes=:sizeInBytes WHERE uuid=:uuid")
             .bindBean(fileresource)

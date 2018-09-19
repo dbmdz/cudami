@@ -2,19 +2,18 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ResourceRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.WebpageRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifiable;
-import de.digitalcollections.model.api.identifiable.parts.Translation;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
+import de.digitalcollections.model.api.identifiable.parts.Translation;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
+import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
-import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
+import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -41,7 +40,6 @@ public class WebpageRepositoryImpl<W extends Webpage> extends IdentifiableReposi
   @Autowired
   public WebpageRepositoryImpl(
           @Qualifier("identifiableRepositoryImpl") IdentifiableRepository identifiableRepository,
-          @Qualifier("resourceRepositoryImpl") ResourceRepository resourceRepository,
           LocaleRepository localeRepository,
           Jdbi dbi) {
     this.dbi = dbi;
@@ -69,8 +67,8 @@ public class WebpageRepositoryImpl<W extends Webpage> extends IdentifiableReposi
   @Override
   public PageResponse<W> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder()
-            .append("SELECT wp.uuid as uuid, wp.text as text, i.label as label, i.description as description")
-            .append(" FROM webpages wp INNER JOIN resources r ON wp.uuid=r.uuid INNER JOIN identifiables i ON wp.uuid=i.uuid");
+            .append("SELECT wp.text as text, i.uuid as uuid, i.label as label, i.description as description")
+            .append(" FROM webpages wp INNER JOIN identifiables i ON wp.uuid=i.uuid");
 
     addPageRequestParams(pageRequest, query);
 
@@ -86,8 +84,8 @@ public class WebpageRepositoryImpl<W extends Webpage> extends IdentifiableReposi
 
   @Override
   public W findOne(UUID uuid) {
-    String query = "SELECT wp.uuid as uuid, wp.text as text, i.label as label, i.description as description"
-            + " FROM webpages wp INNER JOIN resources r ON wp.uuid=r.uuid INNER JOIN identifiables i ON wp.uuid=i.uuid"
+    String query = "SELECT wp.text as text, i.uuid as uuid, i.label as label, i.description as description"
+            + " FROM webpages wp INNER JOIN identifiables i ON wp.uuid=i.uuid"
             + " WHERE wp.uuid = :uuid";
 
     List<WebpageImpl> list = dbi.withHandle(h -> h.createQuery(query)

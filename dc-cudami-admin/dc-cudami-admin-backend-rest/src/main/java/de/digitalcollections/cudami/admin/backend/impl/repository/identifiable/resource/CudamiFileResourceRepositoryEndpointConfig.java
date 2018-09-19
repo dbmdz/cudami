@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class ResourceRepositoryEndpointConfig {
+public class CudamiFileResourceRepositoryEndpointConfig {
 
   @Value(value = "${cudami.server.address}")
   private String cudamiServerAddress;
@@ -21,12 +21,12 @@ public class ResourceRepositoryEndpointConfig {
   ObjectMapper objectMapper;
 
   @Bean
-  public ResourceRepositoryEndpoint resourceRepositoryEndpoint() {
-    ResourceRepositoryEndpoint endpoint = Feign.builder()
+  public CudamiFileResourceRepositoryEndpoint fileResourceRepositoryEndpoint() {
+    CudamiFileResourceRepositoryEndpoint endpoint = Feign.builder()
             .decoder(new JacksonDecoder(objectMapper))
             .encoder(new SpringFormEncoder(new JacksonEncoder(objectMapper)))
             .errorDecoder(new EndpointErrorDecoder())
-            .target(ResourceRepositoryEndpoint.class, cudamiServerAddress);
+            .target(CudamiFileResourceRepositoryEndpoint.class, cudamiServerAddress);
     return endpoint;
   }
 }
