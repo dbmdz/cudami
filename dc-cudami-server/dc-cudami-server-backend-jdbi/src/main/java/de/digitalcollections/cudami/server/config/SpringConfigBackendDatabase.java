@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
@@ -35,6 +36,9 @@ import org.springframework.security.web.authentication.rememberme.PersistentToke
  */
 @Configuration
 //@EnableTransactionManagement
+@ComponentScan(basePackages = {
+  "de.digitalcollections.cudami.server.backend.impl.jdbi"
+})
 public class SpringConfigBackendDatabase {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfigBackendDatabase.class);

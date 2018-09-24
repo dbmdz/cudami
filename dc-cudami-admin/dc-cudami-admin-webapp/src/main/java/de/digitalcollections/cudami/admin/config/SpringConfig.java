@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.admin.config;
 
+import de.digitalcollections.commons.file.config.SpringConfigCommonsFile;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +9,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
 
@@ -15,6 +17,7 @@ import org.springframework.core.env.Environment;
 @ComponentScan(basePackages = {
   "de.digitalcollections.cudami.config"
 })
+@Import(SpringConfigCommonsFile.class)
 public class SpringConfig implements EnvironmentAware {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfig.class);

@@ -5,13 +5,13 @@ import de.digitalcollections.cudami.admin.business.api.service.identifiable.enti
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.WebsiteService;
-import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.ContentNodeService;
-import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.ResourceService;
-import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.WebpageService;
+import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.ContentNodeService;
+import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.WebpageService;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.CudamiFileResourceService;
 
 /**
  * Services context.
@@ -55,8 +55,8 @@ public class SpringConfigBusinessForTest {
 
   @Primary
   @Bean
-  public ResourceService resourceService() {
-    return Mockito.mock(ResourceService.class);
+  public CudamiFileResourceService resourceService() {
+    return Mockito.mock(CudamiFileResourceService.class);
   }
 
   @Primary

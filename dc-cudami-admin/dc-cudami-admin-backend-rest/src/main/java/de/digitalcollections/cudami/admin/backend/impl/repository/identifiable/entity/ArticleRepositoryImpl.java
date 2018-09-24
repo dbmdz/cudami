@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.
 
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.ArticleRepository;
+import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.entity.Article;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -73,5 +74,14 @@ public class ArticleRepositoryImpl<A extends Article> extends EntityRepositoryIm
   @Override
   public List<A> getChildren(UUID uuid) {
     return (List<A>) endpoint.getChildren(uuid);
+  }
+
+  @Override
+  public List<Identifiable> getIdentifiables(A article) {
+    return getIdentifiables(article.getUuid());
+  }
+  
+  private List<Identifiable> getIdentifiables(UUID uuid) {
+    return endpoint.getIdentifiables(uuid);
   }
 }

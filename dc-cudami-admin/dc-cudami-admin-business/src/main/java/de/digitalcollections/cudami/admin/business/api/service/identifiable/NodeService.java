@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface NodeService<N extends Node> extends IdentifiableService<N> {
+
   List<N> getChildren(N node);
-  
+
   List<N> getChildren(UUID uuid);
 }

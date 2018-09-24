@@ -4,11 +4,13 @@ import de.digitalcollections.cudami.server.backend.api.repository.LocaleReposito
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ArticleRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
+import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.entity.Article;
 import de.digitalcollections.model.api.identifiable.parts.Translation;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.impl.PageResponseImpl;
+import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
 import de.digitalcollections.model.impl.identifiable.entity.ArticleImpl;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
@@ -195,5 +197,29 @@ public class ArticleRepositoryImpl<A extends Article> extends EntityRepositoryIm
             .bindBean(article)
             .execute());
     return findOne(article.getUuid());
+  }
+
+  @Override
+  public List<Identifiable> getIdentifiables(A article) {
+    return getIdentifiables(article.getUuid());
+  }
+
+  @Override
+  public List<Identifiable> getIdentifiables(UUID identifiableUuid) {
+    // minimal data required for creating text links in a list
+    String query = "SELECT i.uuid as uuid, i.label as label"
+            + " FROM identifiables i INNER JOIN article_identifiables ai ON ai.identifiable_uuid=i.uuid"
+            + " WHERE ai.article_uuid = :uuid"
+            + " ORDER BY ai.sortIndex ASC";
+
+    List<IdentifiableImpl> list = dbi.withHandle(h -> h.createQuery(query)
+            .bind("uuid", identifiableUuid)
+            .mapToBean(IdentifiableImpl.class)
+            .list());
+
+    if (list.isEmpty()) {
+      return new ArrayList<>();
+    }
+    return list.stream().map(Identifiable.class::cast).collect(Collectors.toList());
   }
 }

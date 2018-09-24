@@ -11,6 +11,7 @@ import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 import com.thoughtworks.xstream.mapper.Mapper;
 import de.digitalcollections.model.api.identifiable.parts.structuredcontent.ContentBlock;
+import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import de.digitalcollections.model.impl.identifiable.parts.TranslationImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.StructuredContentImpl;
@@ -25,7 +26,7 @@ import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.con
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.contentblocks.OrderedListImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.contentblocks.ParagraphImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.contentblocks.TextImpl;
-import de.digitalcollections.model.impl.identifiable.resource.WebpageImpl;
+import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +48,7 @@ public class XmlHttpMessageConverter {
     aliases.put("bulletList", BulletListImpl.class);
     aliases.put("codeBlock", CodeBlockImpl.class);
     aliases.put("contentBlocks", ContentBlock.class);
-    aliases.put("structuredContent", StructuredContentImpl.class);
+    aliases.put("fileresource", FileResourceImpl.class);
     aliases.put("iframe", IFrameImpl.class);
     aliases.put("hardBreak", HardBreakImpl.class);
     aliases.put("heading", HeadingImpl.class);
@@ -56,6 +57,7 @@ public class XmlHttpMessageConverter {
     aliases.put("mark", MarkImpl.class);
     aliases.put("orderedList", OrderedListImpl.class);
     aliases.put("paragraph", ParagraphImpl.class);
+    aliases.put("structuredContent", StructuredContentImpl.class);
     aliases.put("text", TextImpl.class);
     aliases.put("translation", TranslationImpl.class);
     aliases.put("webpage", WebpageImpl.class);

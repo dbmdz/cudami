@@ -189,7 +189,7 @@ public class SpringConfigWeb implements WebMvcConfigurer {
   public HttpMessageConverter<?> mappingJackson2HttpMessageConverter() {
     MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
     List<MediaType> supportedMediaTypes = new ArrayList<>();
-    supportedMediaTypes.add(MediaType.APPLICATION_JSON);
+    supportedMediaTypes.add(MediaType.ALL);
     converter.setSupportedMediaTypes(supportedMediaTypes);
     converter.setObjectMapper(objectMapper());
     return converter;
