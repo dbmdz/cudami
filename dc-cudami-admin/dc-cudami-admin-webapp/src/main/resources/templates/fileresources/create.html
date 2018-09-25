@@ -1,0 +1,121 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+
+  <head>
+    <title th:if="${isNew}" th:text="|#{fileresources}: #{fileresources_create}|">Files: Upload a new file</title>
+    <title th:unless="${isNew}" th:text="|#{fileresources}: #{fileresources_edit}|">Files: Edit file</title>
+    <link rel=stylesheet th:href="@{/css/thirdparty/prosemirror.css}" />
+  </head>
+  <body>
+    <section layout:fragment="content">
+      <form th:object="${fileresource}" th:action="@{#}" method="post" enctype="multipart/form-data" role="form">
+        <input type="hidden" id="label" th:field="*{label}" />
+        <input type="hidden" id="description" class="content" th:field="*{description}" />
+
+        <div class="row mainContent">
+          <div th:replace="fragments/feedback-messages :: form"></div>
+
+          <div class="col-sm-8">
+            <b th:if="${isNew}" th:text="#{fileresources_create}">...</b>
+            <b th:unless="${isNew}" th:utext="#{fileresources_edit}">...</b>
+          </div>
+          <div class="col-sm-4">
+            <span class="col-sm-6">
+              <a th:if="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{/fileresources}" th:text="#{abort}">abort</a>
+              <a th:unless="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{'/fileresources/' + *{uuid}}" th:text="#{abort}">abort</a>
+            </span>
+            <span class="col-sm-6">
+              <button class="btn btn-primary btn-block" type="submit" th:text="#{save}">
+                save
+              </button>
+            </span>
+          </div>
+        </div>
+
+        <div class="row mainContent">
+          <div class="col-sm-12">
+            <hr/>
+          </div>
+        </div>
+
+        <div class="row mainContent">
+          <div class="form-group col-sm-12">
+            <span class="col-sm-6">
+              <label for="id" class="col-sm-1 control-label" th:text="#{id}">ID</label>
+              <div class="col-sm-9">
+                <input id="id" th:field="*{uuid}" type="text" class="form-control" readonly="readonly" th:placeholder="*{uuid}"/>
+              </div>
+            </span>
+          </div>
+        </div>
+
+        <div class="row mainContent">
+          <div class="col-sm-12">
+            <ul class="nav nav-tabs" id="locale-tabs">
+              <li class="locale-switcher" th:each="translation,iter : *{label.translations}" th:classappend="${iter.index} == 0 ? active">
+                <a href="#" th:attr="data-locale=${translation.locale}" th:text="${translation.locale.getDisplayName(#locale)}">locale</a>
+              </li>
+              <li id="locale-adder">
+                <a href="#">
+                  <i class="fas fa-plus" aria-hidden="true"></i>
+                </a>
+              </li>
+            </ul>
+
+            <div class="tab-content">
+              <div class="active tab-pane">
+                <!-- identifiable fields -->
+                <div class="well">
+                  <div class="form-group">
+                    <label th:text="#{label}">label</label>
+                    <input class="form-control label-editor" type="text" required/>
+                  </div>
+
+                  <div class="form-group">
+                    <label th:text="#{description}">description</label>
+                    <div class="editor" th:attr="data-content-id='description'"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mainContent">
+          <div class="col-sm-12">
+            <br/>
+          </div>
+        </div>
+        
+        <div class="row mainContent">
+          <div class="col-sm-12">
+            <div class="form-group">
+              <label th:text="#{file}">File</label>
+              <input name="file" type="file" id="file_info">
+            </div>
+          </div>
+
+        </div>
+      </form>
+
+      <div th:replace="fragments/modals :: addLanguageDialog"></div>
+      <div th:replace="fragments/modals :: confirmYesNoDialog"></div>
+    </section>
+
+  <th:block layout:fragment="beforeBodyEnds">
+    <script th:src="@{/js/thirdparty/prosemirror.js}"></script>
+    <script th:src="@{/js/prosemirror-basic.js}"></script>
+    <script th:src="@{/js/thirdparty/bootstrap-filestyle.min.js}" type="text/javascript"></script>
+    <script>
+      $('#file_info').filestyle({
+        buttonName: 'btn-info',
+//        buttonText: ' Select a File'
+      });
+    </script>
+  </th:block>
+</body>
+
+</html>

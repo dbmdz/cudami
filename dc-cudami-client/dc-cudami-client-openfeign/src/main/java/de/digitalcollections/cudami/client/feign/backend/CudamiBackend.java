@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.client.feign.backend;
 
 import de.digitalcollections.model.api.identifiable.entity.Website;
-import de.digitalcollections.model.api.identifiable.resource.Webpage;
+import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import feign.Param;
 import feign.RequestLine;
 import java.util.List;

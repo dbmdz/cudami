@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.en
 import de.digitalcollections.cudami.admin.business.api.service.LocaleService;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.ArticleService;
+import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.entity.Article;
 import java.util.List;
 import java.util.Locale;
@@ -69,4 +70,8 @@ public class ArticleServiceImpl extends EntityServiceImpl<Article> implements Ar
     }
   }
 
+  @Override
+  public List<Identifiable> getIdentifiables(Article article) {
+    return ((ArticleRepository) repository).getIdentifiables(article);
+  }
 }

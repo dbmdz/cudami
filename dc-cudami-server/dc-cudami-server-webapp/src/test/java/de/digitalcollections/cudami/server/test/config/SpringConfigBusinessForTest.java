@@ -5,11 +5,11 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ArticleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ContentTreeService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
-import de.digitalcollections.cudami.server.business.api.service.security.UserService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ContentNodeService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ResourceService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.WebpageService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.ContentNodeService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.WebpageService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.CudamiFileResourceService;
+import de.digitalcollections.cudami.server.business.api.service.security.UserService;
 import java.util.Locale;
 import org.flywaydb.core.Flyway;
 import org.mockito.Mockito;
@@ -25,7 +25,7 @@ public class SpringConfigBusinessForTest {
   public ArticleService articleService() {
     return Mockito.mock(ArticleService.class);
   }
-  
+
   @Primary
   @Bean
   public ContentNodeService contentNodeService() {
@@ -36,6 +36,12 @@ public class SpringConfigBusinessForTest {
   @Bean
   public ContentTreeService contentTreeService() {
     return Mockito.mock(ContentTreeService.class);
+  }
+
+  @Primary
+  @Bean
+  public CudamiFileResourceService cudamiFileResourceService() {
+    return Mockito.mock(CudamiFileResourceService.class);
   }
 
   @Primary
@@ -64,12 +70,6 @@ public class SpringConfigBusinessForTest {
 
     Mockito.when(dummy.getDefault()).thenReturn(defaultLocale);
     return dummy;
-  }
-
-  @Primary
-  @Bean
-  public ResourceService resourceService() {
-    return Mockito.mock(ResourceService.class);
   }
 
   @Bean

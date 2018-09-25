@@ -1,11 +1,13 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +21,9 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableServiceImpl.class);
 
+  @Autowired
+  private LocaleService localeService;
+  
   protected IdentifiableRepository<I> repository;
 
   @Autowired
@@ -45,6 +50,23 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   @Override
   public I get(UUID uuid) {
     return (I) repository.findOne(uuid);
+  }
+  
+  @Override
+  public I get(UUID uuid, Locale locale) throws IdentifiableServiceException {
+    I resource = repository.findOne(uuid, locale);
+
+    // webpage does not exist in requested language, so try with default locale
+    if (resource == null) {
+      resource = repository.findOne(uuid, localeService.getDefault());
+    }
+
+    // webpage does not exist in default locale, so just return first existing language
+    if (resource == null) {
+      resource = repository.findOne(uuid, null);
+    }
+
+    return resource;
   }
 
   @Override

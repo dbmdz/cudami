@@ -51,6 +51,7 @@ spring:
     user:
       name: admin
       password: secret
+      roles: ACTUATOR, SUPERUSER
   thymeleaf:
     cache: false
     mode: HTML
