@@ -5,8 +5,8 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:if="${isNew}" th:text="|#{content_trees}: #{create_content_tree}|">Content trees: Create a new content tree</title>
-    <title th:unless="${isNew}" th:text="|#{content_trees}: #{edit_content_tree}|">Content trees: Edit content tree</title>
+    <title th:if="${isNew}" th:text="|#{content_trees}: #{content_tree_create}|">Content trees: Create a new content tree</title>
+    <title th:unless="${isNew}" th:text="|#{content_trees}: #{content_tree_edit}|">Content trees: Edit content tree</title>
     <link rel=stylesheet th:href="@{/css/thirdparty/prosemirror.css}" />
   </head>
   <body>
@@ -19,8 +19,8 @@
           <div th:replace="fragments/feedback-messages :: form"></div>
 
           <div class="col-sm-8">
-            <b th:if="${isNew}" th:text="#{create_content_tree}">...</b>
-            <b th:unless="${isNew}" th:utext="#{edit_content_tree}">...</b>
+            <b th:if="${isNew}" th:text="#{content_tree_create}">...</b>
+            <b th:unless="${isNew}" th:text="#{content_tree_edit}">...</b>
           </div>
           <div class="col-sm-4">
             <span class="col-sm-6">

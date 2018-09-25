@@ -60,7 +60,7 @@
               <a th:if="${user.enabled}" href="#"
                  th:title="#{tooltip_deactivate_user}"
                  data:href="@{'/users/' + ${user.uuid} + '/deactivate'}"
-                 data:message="#{msg_confirmUserDeactivation(${user.email})}"
+                 data:message="#{msg.confirm_user_deactivation(${user.email})}"
                  data:title="#{title_warning}"
                  data-target="#confirmYesNoDialog"
                  data-toggle="modal">

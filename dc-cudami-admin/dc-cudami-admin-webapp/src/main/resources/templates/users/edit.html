@@ -5,8 +5,8 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:if="${isNew}" th:text="|#{users}: #{create_user}|">Users: Create a new user</title>
-    <title th:unless="${isNew}" th:text="|#{users}: #{edit_user(${user.email})}|">Users: Edit user admin@unknown.org</title>
+    <title th:if="${isNew}" th:text="|#{users}: #{user_create}|">Users: Create a new user</title>
+    <title th:unless="${isNew}" th:text="|#{users}: #{user_edit(${user.email})}|">Users: Edit user admin@unknown.org</title>
   </head>
   <body>
     <section layout:fragment="content">
