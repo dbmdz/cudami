@@ -74,18 +74,16 @@ public class WebsitesController extends AbstractController implements MessageSou
             .collect(Collectors.toList());
 
     model.addAttribute("defaultLocale", defaultLocale);
-    model.addAttribute("isNew", true);
     model.addAttribute("locales", locales);
     model.addAttribute("website", websiteService.create());
-    return "websites/edit";
+    return "websites/create";
   }
 
   @RequestMapping(value = "/websites/new", method = RequestMethod.POST)
   public String create(@ModelAttribute @Valid Website website, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
-      model.addAttribute("isNew", true);
-      return "websites/edit";
+      return "websites/create";
     }
     Website websiteDb = null;
     try {
@@ -98,8 +96,7 @@ public class WebsitesController extends AbstractController implements MessageSou
       return "redirect:/websites";
     }
     if (results.hasErrors()) {
-      model.addAttribute("isNew", true);
-      return "websites/edit";
+      return "websites/create";
     }
     status.setComplete();
     String message = messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
@@ -124,7 +121,6 @@ public class WebsitesController extends AbstractController implements MessageSou
 //      String message = messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale());
 //      redirectAttributes.addFlashAttribute("error_message", message);
 //      return "redirect:/websites";
-    model.addAttribute("isNew", false);
     model.addAttribute("availableLocales", availableLocales);
     model.addAttribute("locales", locales);
 
@@ -135,7 +131,6 @@ public class WebsitesController extends AbstractController implements MessageSou
   public String edit(@PathVariable UUID pathUuid, @ModelAttribute @Valid Website website, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
-      model.addAttribute("isNew", false);
       return "websites/edit";
     }
 
@@ -156,7 +151,6 @@ public class WebsitesController extends AbstractController implements MessageSou
     }
 
     if (results.hasErrors()) {
-      model.addAttribute("isNew", false);
       return "websites/edit";
     }
     status.setComplete();

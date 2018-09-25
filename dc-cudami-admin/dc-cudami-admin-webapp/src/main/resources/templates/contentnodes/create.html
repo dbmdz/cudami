@@ -5,12 +5,12 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:text="|#{content_trees}: #{content_tree_edit}|">Content trees: Edit content tree</title>
+    <title th:text="|#{content_nodes}: #{content_node_create}|">Content nodes: Create a new content node</title>
     <link rel=stylesheet th:href="@{/css/thirdparty/prosemirror.css}" />
   </head>
   <body>
     <section layout:fragment="content">
-      <form id="editor-form" th:object="${contentTree}" th:action="@{#}" method="post" role="form" th:attr="data-default-locale=${defaultLocale}">
+      <form id="editor-form" th:object="${contentNode}" th:action="@{#}" method="post" role="form" th:attr="data-default-locale=${defaultLocale}">
         <input type="hidden" id="label" th:field="*{label}" />
         <input type="hidden" id="description" class="content" th:field="*{description}" />
 
@@ -18,11 +18,11 @@
           <div th:replace="fragments/feedback-messages :: form"></div>
 
           <div class="col-sm-8">
-            <b th:text="#{content_tree_edit}">...</b>
+            <b th:text="#{content_node_create}">...</b>
           </div>
           <div class="col-sm-4">
             <span class="col-sm-6">
-              <a class="btn btn-default btn-block" type="button" th:href="@{'/contenttrees/' + *{uuid}}" th:text="#{abort}">abort</a>
+              <a class="btn btn-default btn-block" type="button" th:href="@{/contentnodes}" th:text="#{abort}">abort</a>
             </span>
             <span class="col-sm-6">
               <button class="btn btn-primary btn-block" type="submit" th:text="#{save}">
@@ -52,8 +52,8 @@
         <div class="row mainContent">
           <div class="col-sm-12">
             <ul class="nav nav-tabs" id="locale-tabs">
-              <li class="locale-switcher" th:each="translation,iter : *{label.translations}" th:classappend="${iter.index} == 0 ? active">
-                <a href="#" th:attr="data-locale=${translation.locale}" th:text="${translation.locale.getDisplayName(#locale)}">locale</a>
+              <li class="active locale-switcher">
+                <a href="#" th:attr="data-locale=${defaultLocale}" th:text="${defaultLocale.getDisplayName(#locale)}">default locale</a>
               </li>
               <li id="locale-adder">
                 <a href="#">

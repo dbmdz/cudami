@@ -5,7 +5,7 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:text="|#{content_trees}: #{content_tree_edit}|">Content trees: Edit content tree</title>
+    <title th:text="|#{content_trees}: #{content_tree_create}|">Content trees: Create a new content tree</title>
     <link rel=stylesheet th:href="@{/css/thirdparty/prosemirror.css}" />
   </head>
   <body>
@@ -18,11 +18,11 @@
           <div th:replace="fragments/feedback-messages :: form"></div>
 
           <div class="col-sm-8">
-            <b th:text="#{content_tree_edit}">...</b>
+            <b th:text="#{content_tree_create}">...</b>
           </div>
           <div class="col-sm-4">
             <span class="col-sm-6">
-              <a class="btn btn-default btn-block" type="button" th:href="@{'/contenttrees/' + *{uuid}}" th:text="#{abort}">abort</a>
+              <a class="btn btn-default btn-block" type="button" th:href="@{/contenttrees}" th:text="#{abort}">abort</a>
             </span>
             <span class="col-sm-6">
               <button class="btn btn-primary btn-block" type="submit" th:text="#{save}">
@@ -52,8 +52,8 @@
         <div class="row mainContent">
           <div class="col-sm-12">
             <ul class="nav nav-tabs" id="locale-tabs">
-              <li class="locale-switcher" th:each="translation,iter : *{label.translations}" th:classappend="${iter.index} == 0 ? active">
-                <a href="#" th:attr="data-locale=${translation.locale}" th:text="${translation.locale.getDisplayName(#locale)}">locale</a>
+              <li class="active locale-switcher">
+                <a href="#" th:attr="data-locale=${defaultLocale}" th:text="${defaultLocale.getDisplayName(#locale)}">default locale</a>
               </li>
               <li id="locale-adder">
                 <a href="#">

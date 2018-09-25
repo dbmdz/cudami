@@ -76,10 +76,9 @@ public class ArticlesController extends AbstractController implements MessageSou
 
     model.addAttribute("article", service.create());
     model.addAttribute("defaultLocale", defaultLocale);
-    model.addAttribute("isNew", true);
     model.addAttribute("locales", locales);
     model.addAttribute("parentUuid", parentUuid);
-    return "articles/edit";
+    return "articles/create";
   }
 
   @RequestMapping(value = "/articles/new", method = RequestMethod.POST)
@@ -88,8 +87,7 @@ public class ArticlesController extends AbstractController implements MessageSou
           @RequestParam(required = false, name = "parentUuid") UUID parentUuid) {
     verifyBinding(results);
     if (results.hasErrors()) {
-      model.addAttribute("isNew", true);
-      return "articles/edit";
+      return "articles/create";
     }
     Article articleDb = null;
     try {
@@ -107,8 +105,7 @@ public class ArticlesController extends AbstractController implements MessageSou
       return "redirect:/articles";
     }
     if (results.hasErrors()) {
-      model.addAttribute("isNew", true);
-      return "articles/edit";
+      return "articles/create";
     }
     status.setComplete();
     String message = messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
@@ -128,7 +125,6 @@ public class ArticlesController extends AbstractController implements MessageSou
             .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
             .collect(Collectors.toList());
 
-    model.addAttribute("isNew", false);
     model.addAttribute("availableLocales", article.getLabel().getLocales());
     model.addAttribute("locales", locales);
 
@@ -139,7 +135,6 @@ public class ArticlesController extends AbstractController implements MessageSou
   public String edit(@PathVariable UUID pathUuid, @ModelAttribute @Valid Article article, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
-      model.addAttribute("isNew", false);
       return "articles/edit";
     }
 
@@ -160,7 +155,6 @@ public class ArticlesController extends AbstractController implements MessageSou
     }
 
     if (results.hasErrors()) {
-      model.addAttribute("isNew", false);
       return "articles/edit";
     }
     status.setComplete();

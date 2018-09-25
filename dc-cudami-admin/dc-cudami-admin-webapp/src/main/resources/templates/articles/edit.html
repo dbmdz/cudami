@@ -5,8 +5,7 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:if="${isNew}" th:text="|#{articles}: #{article_create}|">Articles: Create a new article</title>
-    <title th:unless="${isNew}" th:text="|#{articles}: #{article_edit}|">Articles: Edit article</title>
+    <title th:text="|#{articles}: #{article_edit}|">Articles: Edit article</title>
     <link rel=stylesheet th:href="@{/css/thirdparty/prosemirror.css}" />
   </head>
   <body>
@@ -21,13 +20,11 @@
           <div th:replace="fragments/feedback-messages :: form"></div>
 
           <div class="col-sm-8">
-            <b th:if="${isNew}" th:text="#{article_create}">...</b>
-            <b th:unless="${isNew}" th:text="#{article_edit}">...</b>
+            <b th:text="#{article_edit}">...</b>
           </div>
           <div class="col-sm-4">
             <span class="col-sm-6">
-              <a th:if="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{/articles}" th:text="#{abort}">abort</a>
-              <a th:unless="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{'/articles/' + *{uuid}}" th:text="#{abort}">abort</a>
+              <a class="btn btn-default btn-block" type="button" th:href="@{'/articles/' + *{uuid}}" th:text="#{abort}">abort</a>
             </span>
             <span class="col-sm-6">
               <button class="btn btn-primary btn-block" type="submit" th:text="#{save}">
@@ -57,16 +54,9 @@
         <div class="row mainContent">
           <div class="col-sm-12">
             <ul class="nav nav-tabs" id="locale-tabs">
-              <th:block th:if="${isNew}">
-                <li class="active locale-switcher">
-                  <a href="#" th:attr="data-locale=${defaultLocale}" th:text="${defaultLocale.getDisplayName(#locale)}">default locale</a>
-                </li>
-              </th:block>
-              <th:block th:unless="${isNew}">
-                <li class="locale-switcher" th:each="translation,iter : *{label.translations}" th:classappend="${iter.index} == 0 ? active">
-                  <a href="#" th:attr="data-locale=${translation.locale}" th:text="${translation.locale.getDisplayName(#locale)}">locale</a>
-                </li>
-              </th:block>
+              <li class="locale-switcher" th:each="translation,iter : *{label.translations}" th:classappend="${iter.index} == 0 ? active">
+                <a href="#" th:attr="data-locale=${translation.locale}" th:text="${translation.locale.getDisplayName(#locale)}">locale</a>
+              </li>
               <li id="locale-adder">
                 <a href="#">
                   <i class="fas fa-plus" aria-hidden="true"></i>

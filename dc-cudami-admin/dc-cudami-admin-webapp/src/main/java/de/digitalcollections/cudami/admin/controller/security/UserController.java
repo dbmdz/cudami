@@ -87,21 +87,18 @@ public class UserController extends AbstractController implements MessageSourceA
   @RequestMapping(value = "/users/new", method = RequestMethod.GET)
   public String create(Model model) {
     model.addAttribute("user", userService.create());
-    model.addAttribute("isNew", true);
-    return "users/edit";
+    return "users/create";
   }
 
   @RequestMapping(value = "/users/new", method = RequestMethod.POST)
   public String create(@RequestParam("pwd1") String password1, @RequestParam("pwd2") String password2, @ModelAttribute @Valid User user, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
-      model.addAttribute("isNew", true);
-      return "users/edit";
+      return "users/create";
     }
     user = userService.create(user, password1, password2, (Errors) results);
     if (results.hasErrors()) {
-      model.addAttribute("isNew", true);
-      return "users/edit";
+      return "users/create";
     }
     status.setComplete();
     String message = messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
@@ -112,7 +109,6 @@ public class UserController extends AbstractController implements MessageSourceA
   @RequestMapping(value = "/users/{uuid}/edit", method = RequestMethod.GET)
   public String edit(@PathVariable UUID uuid, Model model) {
     model.addAttribute("user", userService.findOne(uuid));
-    model.addAttribute("isNew", false);
     return "users/edit";
   }
 
@@ -120,12 +116,10 @@ public class UserController extends AbstractController implements MessageSourceA
   public String edit(@PathVariable UUID uuid, @RequestParam("pwd1") String password1, @RequestParam("pwd2") String password2, @ModelAttribute @Valid User user, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
-      model.addAttribute("isNew", false);
       return "users/edit";
     }
     userService.update(user, password1, password2, (Errors) results);
     if (results.hasErrors()) {
-      model.addAttribute("isNew", false);
       return "users/edit";
     }
     status.setComplete();
