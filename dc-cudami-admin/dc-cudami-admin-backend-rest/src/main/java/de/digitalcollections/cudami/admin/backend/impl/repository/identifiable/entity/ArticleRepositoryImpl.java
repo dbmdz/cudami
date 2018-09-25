@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.entity;
 
-import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.ArticleRepository;
 import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.entity.Article;
@@ -14,9 +13,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class ArticleRepositoryImpl<A extends Article> extends EntityRepositoryImpl<A> implements ArticleRepository<A> {
-
-  @Autowired
-  private LocaleRepository localeRepository;
 
   @Autowired
   private ArticleRepositoryEndpoint endpoint;
@@ -72,7 +68,7 @@ public class ArticleRepositoryImpl<A extends Article> extends EntityRepositoryIm
   public List<Identifiable> getIdentifiables(A article) {
     return getIdentifiables(article.getUuid());
   }
-  
+
   private List<Identifiable> getIdentifiables(UUID uuid) {
     return endpoint.getIdentifiables(uuid);
   }

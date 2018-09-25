@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable;
 
-import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.paging.Order;
@@ -8,11 +7,8 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
-import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
-import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -26,9 +22,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> implements Ident
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableRepositoryImpl.class);
 
   @Autowired
-  private LocaleRepository localeRepository;
-
-  @Autowired
   private IdentifiableRepositoryEndpoint endpoint;
 
   @Override
@@ -38,11 +31,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> implements Ident
 
   @Override
   public I create() {
-    Locale defaultLocale = localeRepository.getDefault();
-    I identifiable = (I) new IdentifiableImpl();
-    identifiable.setLabel(new LocalizedTextImpl(defaultLocale, ""));
-    identifiable.setDescription(new LocalizedStructuredContentImpl(defaultLocale));
-    return identifiable;
+    return (I) new IdentifiableImpl();
   }
 
   @Override
