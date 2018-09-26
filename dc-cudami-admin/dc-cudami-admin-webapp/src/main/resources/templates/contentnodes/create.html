@@ -22,7 +22,8 @@
           </div>
           <div class="col-sm-4">
             <span class="col-sm-6">
-              <a class="btn btn-default btn-block" type="button" th:href="@{/contentnodes}" th:text="#{abort}">abort</a>
+              <a class="btn btn-default btn-block" type="button" th:href="@{'/contenttrees/' + ${parentUuid}}" th:if="${parentType} == 'contentTree'" th:text="#{abort}">abort</a>
+              <a class="btn btn-default btn-block" type="button" th:href="@{'/contentnodes/' + ${parentUuid}}" th:if="${parentType} == 'contentNode'" th:text="#{abort}">abort</a>
             </span>
             <span class="col-sm-6">
               <button class="btn btn-primary btn-block" type="submit" th:text="#{save}">

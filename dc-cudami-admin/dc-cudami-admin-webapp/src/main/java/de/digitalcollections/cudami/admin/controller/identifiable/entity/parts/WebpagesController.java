@@ -68,7 +68,7 @@ public class WebpagesController extends AbstractController implements MessageSou
   }
 
   @RequestMapping(value = "/webpages/new", method = RequestMethod.GET)
-  public String create(Model model, @RequestParam("parentUuid") String parentUuid) {
+  public String create(Model model, @RequestParam("parentType") String parentType, @RequestParam("parentUuid") String parentUuid) {
     Locale defaultLocale = localeService.getDefault();
     List<Locale> locales = localeService.findAll().stream()
             .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
@@ -77,6 +77,7 @@ public class WebpagesController extends AbstractController implements MessageSou
 
     model.addAttribute("defaultLocale", defaultLocale);
     model.addAttribute("locales", locales);
+    model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
     model.addAttribute("webpage", webpageService.create());
     return "webpages/create";

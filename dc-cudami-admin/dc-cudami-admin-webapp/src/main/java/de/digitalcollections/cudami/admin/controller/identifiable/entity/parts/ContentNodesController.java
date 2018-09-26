@@ -68,7 +68,7 @@ public class ContentNodesController extends AbstractController implements Messag
   }
 
   @RequestMapping(value = "/contentnodes/new", method = RequestMethod.GET)
-  public String create(Model model, @RequestParam("parentUuid") String parentUuid) {
+  public String create(Model model, @RequestParam("parentType") String parentType, @RequestParam("parentUuid") String parentUuid) {
     Locale defaultLocale = localeService.getDefault();
     List<Locale> locales = localeService.findAll().stream()
             .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
@@ -78,6 +78,7 @@ public class ContentNodesController extends AbstractController implements Messag
     model.addAttribute("contentNode", contentNodeService.create());
     model.addAttribute("defaultLocale", defaultLocale);
     model.addAttribute("locales", locales);
+    model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
     return "contentnodes/create";
   }

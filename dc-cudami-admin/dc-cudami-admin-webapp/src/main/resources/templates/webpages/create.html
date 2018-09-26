@@ -24,7 +24,8 @@
           </div>
           <div class="col-sm-4">
             <span class="col-sm-6">
-              <a class="btn btn-default btn-block" type="button" th:href="@{'/websites/' + ${parentUuid}}" th:text="#{abort}">abort</a>
+              <a class="btn btn-default btn-block" type="button" th:href="@{'/websites/' + ${parentUuid}}" th:if="${parentType} == 'website'" th:text="#{abort}">abort</a>
+              <a class="btn btn-default btn-block" type="button" th:href="@{'/webpages/' + ${parentUuid}}" th:if="${parentType} == 'webpage'" th:text="#{abort}">abort</a>
             </span>
             <span class="col-sm-6">
               <button class="btn btn-primary btn-block" type="submit" th:text="#{save}">
