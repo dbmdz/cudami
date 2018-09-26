@@ -5,7 +5,7 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:text="|#{webpages}: #{edit_webpage}|">Webpages: Edit webpage Webpage</title>
+    <title th:text="|#{webpages}: #{webpage_edit}|">Webpages: Edit webpage Webpage</title>
     <link rel=stylesheet th:href="@{/css/thirdparty/prosemirror.css}" />
   </head>
   <body>
@@ -20,7 +20,7 @@
           <div th:replace="fragments/feedback-messages :: form"></div>
 
           <div class="col-sm-8">
-            <b th:text="#{edit_webpage}">...</b>
+            <b th:text="#{webpage_edit}">...</b>
           </div>
           <div class="col-sm-4">
             <span class="col-sm-6">
