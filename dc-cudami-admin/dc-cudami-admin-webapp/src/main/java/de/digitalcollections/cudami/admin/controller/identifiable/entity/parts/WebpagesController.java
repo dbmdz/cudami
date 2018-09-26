@@ -68,18 +68,19 @@ public class WebpagesController extends AbstractController implements MessageSou
   }
 
   @RequestMapping(value = "/webpages/new", method = RequestMethod.GET)
-  public String create(Model model, @RequestParam("parentUuid") String parentUuid) {
+  public String create(Model model, @RequestParam("parentType") String parentType, @RequestParam("parentUuid") String parentUuid) {
     Locale defaultLocale = localeService.getDefault();
     List<Locale> locales = localeService.findAll().stream()
             .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
             .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
             .collect(Collectors.toList());
 
-    model.addAttribute("webpage", webpageService.create());
-    model.addAttribute("isNew", true);
+    model.addAttribute("defaultLocale", defaultLocale);
     model.addAttribute("locales", locales);
+    model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
-    return "webpages/edit";
+    model.addAttribute("webpage", webpageService.create());
+    return "webpages/create";
   }
 
   @RequestMapping(value = "/webpages/new", method = RequestMethod.POST)
@@ -88,8 +89,7 @@ public class WebpagesController extends AbstractController implements MessageSou
           @RequestParam("parentUuid") UUID parentUuid) {
     verifyBinding(results);
     if (results.hasErrors()) {
-      model.addAttribute("isNew", true);
-      return "webpages/edit";
+      return "webpages/create";
     }
     Webpage webpageDb = null;
     try {
@@ -111,8 +111,7 @@ public class WebpagesController extends AbstractController implements MessageSou
       return "redirect:/websites";
     }
     if (results.hasErrors()) {
-      model.addAttribute("isNew", true);
-      return "webpages/edit";
+      return "webpages/create";
     }
     status.setComplete();
     String message = messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
@@ -132,7 +131,6 @@ public class WebpagesController extends AbstractController implements MessageSou
             .collect(Collectors.toList());
 
     model.addAttribute("webpage", webpage);
-    model.addAttribute("isNew", false);
     model.addAttribute("availableLocales", availableLocales);
     model.addAttribute("locales", locales);
 
@@ -143,7 +141,6 @@ public class WebpagesController extends AbstractController implements MessageSou
   public String edit(@PathVariable UUID pathUuid, @ModelAttribute @Valid Webpage webpage, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
-      model.addAttribute("isNew", false);
       return "webpages/edit";
     }
 
@@ -164,7 +161,6 @@ public class WebpagesController extends AbstractController implements MessageSou
     }
 
     if (results.hasErrors()) {
-      model.addAttribute("isNew", false);
       return "webpages/edit";
     }
     status.setComplete();

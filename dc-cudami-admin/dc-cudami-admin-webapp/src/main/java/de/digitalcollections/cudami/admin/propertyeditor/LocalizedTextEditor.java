@@ -25,12 +25,15 @@ public class LocalizedTextEditor extends PropertyEditorSupport {
   @Override
   public String getAsText() {
     LocalizedText localizedText = (LocalizedText) getValue();
-    try {
-      return objectMapper.writeValueAsString(localizedText);
-    } catch (JsonProcessingException ex) {
-      LOGGER.warn("Problem converting LocalizedText to JSON-String", ex);
-      return null;
+    String text = "";
+    if (localizedText != null) {
+      try {
+        text = objectMapper.writeValueAsString(localizedText);
+      } catch (JsonProcessingException ex) {
+        LOGGER.warn("Problem converting LocalizedText to JSON-String", ex);
+      }
     }
+    return text;
   }
 
   @Override

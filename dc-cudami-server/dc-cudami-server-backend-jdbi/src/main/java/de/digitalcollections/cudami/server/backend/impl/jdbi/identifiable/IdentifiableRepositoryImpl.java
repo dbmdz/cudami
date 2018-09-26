@@ -94,15 +94,18 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
     result = dbi.withHandle(h -> h
             .createQuery("UPDATE identifiables SET description=:description::JSONB, identifiable_type=:type, label=:label::JSONB, last_modified=:lastModified WHERE uuid=:uuid RETURNING *")
             .bindBean(identifiable)
-            .mapToBean(IdentifiableImpl.class
-            )
+            .mapToBean(IdentifiableImpl.class)
             .findOnly());
     return (I) result;
   }
 
   protected Integer selectNextSortIndexForParentChildren(Jdbi dbi, String tableName, String columNameParentUuid, UUID parentUuid) {
     // first child: max gets no results (= null)):
-    Integer sortIndex = dbi.withHandle((Handle h) -> h.createQuery("SELECT MAX(sortIndex) + 1 FROM " + tableName + " WHERE " + columNameParentUuid + " = :parent_uuid").bind("parent_uuid", parentUuid).mapTo(Integer.class).findOnly());
+    Integer sortIndex = dbi.withHandle((Handle h) -> h
+            .createQuery("SELECT MAX(sortIndex) + 1 FROM " + tableName + " WHERE " + columNameParentUuid + " = :parent_uuid")
+            .bind("parent_uuid", parentUuid)
+            .mapTo(Integer.class)
+            .findOnly());
     if (sortIndex == null) {
       sortIndex = 0;
     }

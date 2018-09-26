@@ -51,7 +51,7 @@
             <span class="col-sm-5">
               <label for="url" class="col-sm-3 control-label" th:text="#{title}">Title</label>
               <div class="col-sm-9" th:classappend="${#fields.hasErrors('title')}? has-error">
-                <input id="url" th:field="*{title}" type="text" class="form-control" th:placeholder="#{websiteTitle_placeholder}"/>
+                <input id="url" th:field="*{title}" type="text" class="form-control" th:placeholder="#{website_title_placeholder}"/>
                 <p th:if="${#fields.hasErrors('title')}" th:errors="*{title}">...</p>
               </div>
             </span>

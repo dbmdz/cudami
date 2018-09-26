@@ -57,8 +57,9 @@
                   </div>
                   <div class="col-sm-10">
                     <label th:text="*{label.translations[__${iter.index}__].text}">label</label>
-
-                    <div th:if="*{description}" th:insert="cudami/fragments/webpage-to-html :: renderLocalizedStructuredContent(${fileresource.description.localizedStructuredContent}, ${locale})"></div>
+                    <th:block th:if="*{description} and ${fileresource.description.localizedStructuredContent.containsKey(locale)}">
+                      <div th:insert="cudami/fragments/webpage-to-html :: renderLocalizedStructuredContent(*{description.localizedStructuredContent}, ${locale})"></div>
+                    </th:block>
                   </div>
                 </div>
               </div>

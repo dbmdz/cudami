@@ -68,7 +68,7 @@ public class ContentNodesController extends AbstractController implements Messag
   }
 
   @RequestMapping(value = "/contentnodes/new", method = RequestMethod.GET)
-  public String create(Model model, @RequestParam("parentUuid") String parentUuid) {
+  public String create(Model model, @RequestParam("parentType") String parentType, @RequestParam("parentUuid") String parentUuid) {
     Locale defaultLocale = localeService.getDefault();
     List<Locale> locales = localeService.findAll().stream()
             .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
@@ -76,10 +76,11 @@ public class ContentNodesController extends AbstractController implements Messag
             .collect(Collectors.toList());
 
     model.addAttribute("contentNode", contentNodeService.create());
-    model.addAttribute("isNew", true);
+    model.addAttribute("defaultLocale", defaultLocale);
     model.addAttribute("locales", locales);
+    model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
-    return "contentnodes/edit";
+    return "contentnodes/create";
   }
 
   @RequestMapping(value = "/contentnodes/new", method = RequestMethod.POST)
@@ -88,8 +89,7 @@ public class ContentNodesController extends AbstractController implements Messag
           @RequestParam("parentUuid") UUID parentUuid) {
     verifyBinding(results);
     if (results.hasErrors()) {
-      model.addAttribute("isNew", true);
-      return "contentnodes/edit";
+      return "contentnodes/create";
     }
     ContentNode contentNodeDb = null;
     try {
@@ -111,8 +111,7 @@ public class ContentNodesController extends AbstractController implements Messag
       return "redirect:/contenttrees";
     }
     if (results.hasErrors()) {
-      model.addAttribute("isNew", true);
-      return "contentNodes/edit";
+      return "contentNodes/create";
     }
     status.setComplete();
     String message = messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
@@ -132,7 +131,6 @@ public class ContentNodesController extends AbstractController implements Messag
             .collect(Collectors.toList());
 
     model.addAttribute("contentNode", contentNode);
-    model.addAttribute("isNew", false);
     model.addAttribute("availableLocales", availableLocales);
     model.addAttribute("locales", locales);
 
@@ -143,7 +141,6 @@ public class ContentNodesController extends AbstractController implements Messag
   public String edit(@PathVariable UUID pathUuid, @ModelAttribute @Valid ContentNode contentNode, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
-      model.addAttribute("isNew", false);
       return "contentnodes/edit";
     }
 
@@ -163,7 +160,6 @@ public class ContentNodesController extends AbstractController implements Messag
     }
 
     if (results.hasErrors()) {
-      model.addAttribute("isNew", false);
       return "contentnodes/edit";
     }
     status.setComplete();

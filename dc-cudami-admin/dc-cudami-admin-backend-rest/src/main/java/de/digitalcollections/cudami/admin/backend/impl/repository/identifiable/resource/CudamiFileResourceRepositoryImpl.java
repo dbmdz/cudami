@@ -1,26 +1,19 @@
 package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.resource;
 
-import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.CudamiFileResourceRepository;
 import de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.IdentifiableRepositoryImpl.FindParams;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
-import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import feign.form.FormData;
-import java.util.Locale;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class CudamiFileResourceRepositoryImpl<F extends FileResource> extends IdentifiableRepositoryImpl<F> implements CudamiFileResourceRepository<F> {
-
-  @Autowired
-  private LocaleRepository localeRepository;
 
   @Autowired
   private CudamiFileResourceRepositoryEndpoint endpoint;
@@ -32,11 +25,7 @@ public class CudamiFileResourceRepositoryImpl<F extends FileResource> extends Id
 
   @Override
   public F create() {
-    Locale defaultLocale = localeRepository.getDefault();
-    F resource = (F) new FileResourceImpl();
-    resource.setLabel(new LocalizedTextImpl(defaultLocale, ""));
-    resource.setDescription(new LocalizedStructuredContentImpl(defaultLocale));
-    return resource;
+    return (F) new FileResourceImpl();
   }
 
   @Override

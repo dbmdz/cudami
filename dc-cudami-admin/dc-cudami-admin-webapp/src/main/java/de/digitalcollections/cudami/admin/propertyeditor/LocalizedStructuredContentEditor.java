@@ -25,21 +25,27 @@ public class LocalizedStructuredContentEditor extends PropertyEditorSupport {
   @Override
   public String getAsText() {
     LocalizedStructuredContent localizedStructuredContent = (LocalizedStructuredContent) getValue();
-    try {
-      return objectMapper.writeValueAsString(localizedStructuredContent);
-    } catch (JsonProcessingException ex) {
-      LOGGER.warn("Problem converting LocalizedStructuredContent to JSON-String", ex);
-      return null;
+    String text = "";
+    if (localizedStructuredContent != null) {
+      try {
+        text = objectMapper.writeValueAsString(localizedStructuredContent);
+      } catch (JsonProcessingException ex) {
+        LOGGER.warn("Problem converting LocalizedStructuredContent to JSON-String", ex);
+      }
     }
+    return text;
   }
 
   @Override
   public void setAsText(String json) {
-    try {
-      LocalizedStructuredContent localizedStructuredContent = objectMapper.readValue(json, LocalizedStructuredContent.class);
-      setValue(localizedStructuredContent);
-    } catch (IOException ex) {
-      LOGGER.warn("Problem converting JSON-String to LocalizedStructuredContent", ex);
+    LocalizedStructuredContent localizedStructuredContent = null;
+    if (!json.equals("")) {
+      try {
+        localizedStructuredContent = objectMapper.readValue(json, LocalizedStructuredContent.class);
+      } catch (IOException ex) {
+        LOGGER.warn("Problem converting JSON-String to LocalizedStructuredContent", ex);
+      }
     }
+    setValue(localizedStructuredContent);
   }
 }

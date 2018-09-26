@@ -74,17 +74,16 @@ public class ContentTreesController extends AbstractController implements Messag
             .collect(Collectors.toList());
 
     model.addAttribute("contentTree", contentTreeService.create());
-    model.addAttribute("isNew", true);
+    model.addAttribute("defaultLocale", defaultLocale);
     model.addAttribute("locales", locales);
-    return "contenttrees/edit";
+    return "contenttrees/create";
   }
 
   @RequestMapping(value = "/contenttrees/new", method = RequestMethod.POST)
   public String create(@ModelAttribute @Valid ContentTree contentTree, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
-      model.addAttribute("isNew", true);
-      return "contenttrees/edit";
+      return "contenttrees/create";
     }
     ContentTree contentTreeDb = null;
     try {
@@ -97,8 +96,7 @@ public class ContentTreesController extends AbstractController implements Messag
       return "redirect:/contenttrees";
     }
     if (results.hasErrors()) {
-      model.addAttribute("isNew", true);
-      return "contenttrees/edit";
+      return "contenttrees/create";
     }
     status.setComplete();
     String message = messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
@@ -123,7 +121,6 @@ public class ContentTreesController extends AbstractController implements Messag
 //      String message = messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale());
 //      redirectAttributes.addFlashAttribute("error_message", message);
 //      return "redirect:/websites";
-    model.addAttribute("isNew", false);
     model.addAttribute("availableLocales", availableLocales);
     model.addAttribute("locales", locales);
 
@@ -134,7 +131,6 @@ public class ContentTreesController extends AbstractController implements Messag
   public String edit(@PathVariable UUID pathUuid, @ModelAttribute @Valid ContentTree contentTree, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
-      model.addAttribute("isNew", false);
       return "contenttrees/edit";
     }
 
@@ -154,7 +150,6 @@ public class ContentTreesController extends AbstractController implements Messag
     }
 
     if (results.hasErrors()) {
-      model.addAttribute("isNew", false);
       return "contenttrees/edit";
     }
     status.setComplete();

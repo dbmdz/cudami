@@ -5,13 +5,12 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:if="${isNew}" th:text="|#{fileresources}: #{fileresources_create}|">Files: Upload a new file</title>
-    <title th:unless="${isNew}" th:text="|#{fileresources}: #{fileresources_edit}|">Files: Edit file</title>
+    <title th:text="|#{fileresources}: #{fileresources_edit(${fileresource.filename})}|">Files: Edit file</title>
     <link rel=stylesheet th:href="@{/css/thirdparty/prosemirror.css}" />
   </head>
   <body>
     <section layout:fragment="content">
-      <form th:object="${fileresource}" th:action="@{#}" method="post" role="form">
+      <form id="editor-form" th:object="${fileresource}" th:action="@{#}" method="post" role="form">
         <input type="hidden" id="label" th:field="*{label}" />
         <input type="hidden" id="description" class="content" th:field="*{description}" />
 
@@ -19,13 +18,11 @@
           <div th:replace="fragments/feedback-messages :: form"></div>
 
           <div class="col-sm-8">
-            <b th:if="${isNew}" th:text="#{fileresources_create}">...</b>
-            <b th:unless="${isNew}" th:utext="#{fileresources_edit}">...</b>
+            <b th:text="#{fileresources_edit(${fileresource.filename})}">...</b>
           </div>
           <div class="col-sm-4">
             <span class="col-sm-6">
-              <a th:if="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{/fileresources}" th:text="#{abort}">abort</a>
-              <a th:unless="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{'/fileresources/' + *{uuid}}" th:text="#{abort}">abort</a>
+              <a class="btn btn-default btn-block" type="button" th:href="@{'/fileresources/' + *{uuid}}" th:text="#{abort}">abort</a>
             </span>
             <span class="col-sm-6">
               <button class="btn btn-primary btn-block" type="submit" th:text="#{save}">
@@ -71,7 +68,7 @@
                 <div class="well">
                   <div class="form-group">
                     <label th:text="#{label}">label</label>
-                    <input class="form-control label-editor" type="text" required/>
+                    <input class="form-control label-editor" type="text"/>
                   </div>
 
                   <div class="form-group">
@@ -87,6 +84,7 @@
 
       <div th:replace="fragments/modals :: addLanguageDialog"></div>
       <div th:replace="fragments/modals :: confirmYesNoDialog"></div>
+      <div th:replace="fragments/modals :: formValidationDialog"></div>
     </section>
 
   <th:block layout:fragment="beforeBodyEnds">

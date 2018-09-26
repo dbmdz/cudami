@@ -73,5 +73,24 @@
       </div>
       </div>
     </div>
+
+    <div th:fragment="formValidationDialog">
+      <div id="form-validation-dialog" class="modal fade" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" th:text="#{form_validation_title}">Errors in the form</h4>
+          </div>
+          <div class="modal-body">
+            <p th:text="#{invalid_label_message}">...</p>
+            <ul id="invalid-locales"></ul>
+            <p th:text="#{continue_editing_message}"></p>
+            <button class="btn btn-primary" id="continue-editing" type="submit" th:text="#{continue_editing}">Add</button>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
   </body>
 </html>

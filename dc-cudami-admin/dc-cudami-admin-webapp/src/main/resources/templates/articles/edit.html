@@ -5,13 +5,12 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:if="${isNew}" th:text="|#{articles}: #{create_article}|">Articles: Create a new article</title>
-    <title th:unless="${isNew}" th:text="|#{articles}: #{edit_article}|">Articles:: Edit article</title>
+    <title th:text="|#{articles}: #{article_edit}|">Articles: Edit article</title>
     <link rel=stylesheet th:href="@{/css/thirdparty/prosemirror.css}" />
   </head>
   <body>
     <section layout:fragment="content">
-      <form th:object="${article}" th:action="@{#}" method="post" role="form">
+      <form id="editor-form" th:object="${article}" th:action="@{#}" method="post" role="form" th:attr="data-default-locale=${defaultLocale}">
         <input type="hidden" name="parentUuid" th:value="${parentUuid}" />
         <input type="hidden" id="label" th:field="*{label}" />
         <input type="hidden" id="description" class="content" th:field="*{description}" />
@@ -21,13 +20,11 @@
           <div th:replace="fragments/feedback-messages :: form"></div>
 
           <div class="col-sm-8">
-            <b th:if="${isNew}" th:text="#{create_article}">...</b>
-            <b th:unless="${isNew}" th:utext="#{edit_article}">...</b>
+            <b th:text="#{article_edit}">...</b>
           </div>
           <div class="col-sm-4">
             <span class="col-sm-6">
-              <a th:if="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{/articles}" th:text="#{abort}">abort</a>
-              <a th:unless="${isNew}" class="btn btn-default btn-block" type="button" th:href="@{'/articles/' + *{uuid}}" th:text="#{abort}">abort</a>
+              <a class="btn btn-default btn-block" type="button" th:href="@{'/articles/' + *{uuid}}" th:text="#{abort}">abort</a>
             </span>
             <span class="col-sm-6">
               <button class="btn btn-primary btn-block" type="submit" th:text="#{save}">
@@ -73,7 +70,7 @@
                 <div class="well">
                   <div class="form-group">
                     <label th:text="#{label}">label</label>
-                    <input class="form-control label-editor" type="text" required/>
+                    <input class="form-control label-editor" type="text"/>
                   </div>
 
                   <div class="form-group">
@@ -94,6 +91,7 @@
 
       <div th:replace="fragments/modals :: addLanguageDialog"></div>
       <div th:replace="fragments/modals :: confirmYesNoDialog"></div>
+      <div th:replace="fragments/modals :: formValidationDialog"></div>
     </section>
 
   <th:block layout:fragment="beforeBodyEnds">

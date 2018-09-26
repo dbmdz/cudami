@@ -3,15 +3,12 @@ package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.WebpageRepository;
 import de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.IdentifiableRepositoryImpl;
-import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.identifiable.Identifiable;
+import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
-import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -32,12 +29,7 @@ public class WebpageRepositoryImpl<W extends Webpage> extends IdentifiableReposi
 
   @Override
   public W create() {
-    Locale defaultLocale = localeRepository.getDefault();
-    W webpage = (W) new WebpageImpl();
-    webpage.setLabel(new LocalizedTextImpl(defaultLocale, ""));
-    webpage.setDescription(new LocalizedStructuredContentImpl(defaultLocale));
-    webpage.setText(new LocalizedStructuredContentImpl(defaultLocale));
-    return webpage;
+    return (W) new WebpageImpl();
   }
 
   @Override
@@ -81,7 +73,7 @@ public class WebpageRepositoryImpl<W extends Webpage> extends IdentifiableReposi
   public W saveWithParentWebpage(W webpage, UUID parentWebpageUUID) {
     return (W) endpoint.saveWithParentWebpage(webpage, parentWebpageUUID);
   }
-  
+
   @Override
   public List<Identifiable> getIdentifiables(W webpage) {
     return getIdentifiables(webpage.getUuid());

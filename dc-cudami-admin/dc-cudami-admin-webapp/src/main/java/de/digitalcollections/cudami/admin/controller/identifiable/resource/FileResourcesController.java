@@ -89,8 +89,8 @@ public class FileResourcesController extends AbstractController implements Messa
             .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
             .collect(Collectors.toList());
 
+    model.addAttribute("defaultLocale", defaultLocale);
     model.addAttribute("fileresource", cudamiFileResourceService.create());
-    model.addAttribute("isNew", true);
     model.addAttribute("locales", locales);
     return "fileresources/create";
   }
@@ -165,7 +165,6 @@ public class FileResourcesController extends AbstractController implements Messa
             .collect(Collectors.toList());
 
     model.addAttribute("fileresource", fileresource);
-    model.addAttribute("isNew", false);
     model.addAttribute("availableLocales", availableLocales);
     model.addAttribute("locales", locales);
 
@@ -176,7 +175,6 @@ public class FileResourcesController extends AbstractController implements Messa
   public String edit(@PathVariable UUID pathUuid, @ModelAttribute @Valid FileResourceImpl fileResource, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
-      model.addAttribute("isNew", false);
       return "fileresources/edit";
     }
 
@@ -196,7 +194,6 @@ public class FileResourcesController extends AbstractController implements Messa
     }
 
     if (results.hasErrors()) {
-      model.addAttribute("isNew", false);
       return "fileresources/edit";
     }
     status.setComplete();

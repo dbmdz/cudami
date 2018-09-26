@@ -42,26 +42,21 @@ public class SetupController extends AbstractController implements MessageSource
     return true;
   }
 
-  @ModelAttribute("isNew")
-  public boolean newFlag() {
-    return true;
-  }
-
   @RequestMapping(value = "/setup/adminUser", method = RequestMethod.GET)
   public String adminUser(Model model) {
     model.addAttribute("user", userService.createAdminUser());
-    return "users/edit";
+    return "users/create";
   }
 
   @RequestMapping(value = "/setup/adminUser", method = RequestMethod.POST)
   public String adminUser(@RequestParam("pwd1") String password1, @RequestParam("pwd2") String password2, @ModelAttribute @Valid User user, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
-      return "users/edit";
+      return "users/create";
     }
     userService.create(user, password1, password2, (Errors) results);
     if (results.hasErrors()) {
-      return "users/edit";
+      return "users/create";
     }
     status.setComplete();
     String message = messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
