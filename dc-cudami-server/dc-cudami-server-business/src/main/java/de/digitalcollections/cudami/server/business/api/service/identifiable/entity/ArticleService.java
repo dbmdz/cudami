@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.business.api.service.identifiable.en
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiablesContainerService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.NodeService;
+import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.entity.Article;
 import java.util.Locale;
 import java.util.UUID;
@@ -10,11 +10,10 @@ import java.util.UUID;
 /**
  * Service for Article.
  *
- * @param <A> domain object
+ * @param <A> article instance
+ * @param <I> identifiable instance
  */
-public interface ArticleService<A extends Article> extends EntityService<A>, NodeService<A>, IdentifiablesContainerService<A> {
+public interface ArticleService<A extends Article, I extends Identifiable> extends EntityService<A>, IdentifiablesContainerService<A, I> {
 
   A get(UUID uuid, Locale locale) throws IdentifiableServiceException;
-
-  A saveWithParent(A article, UUID parentUuid) throws IdentifiableServiceException;
 }

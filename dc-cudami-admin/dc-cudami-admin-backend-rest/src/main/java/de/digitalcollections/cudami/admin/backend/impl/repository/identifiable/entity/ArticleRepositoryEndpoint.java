@@ -35,14 +35,13 @@ public interface ArticleRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine("GET /v1/articles/{uuid}/children")
   List<Article> getChildren(@Param("uuid") UUID uuid);
 
-  @RequestLine("POST /v1/articles/{parentArticleUuid}/article")
-  @Headers("Content-Type: application/json")
-  Article saveWithParent(Article article, @Param("parentArticleUuid") UUID parentArticleUuid);
-  
 //  @RequestLine("POST /v1/articles/{parentArticleUuid}/article")
 //  @Headers("Content-Type: application/json")
 //  void addContent(Article article, UUID uuid);
-
   @RequestLine("GET /v1/articles/{uuid}/identifiables")
   public List<Identifiable> getIdentifiables(UUID uuid);
+
+  @RequestLine("POST /v1/articles/{uuid}/identifiables")
+  @Headers("Content-Type: application/json")
+  public void saveIdentifiables(@Param("uuid") UUID uuid, List<Identifiable> identifiables);
 }

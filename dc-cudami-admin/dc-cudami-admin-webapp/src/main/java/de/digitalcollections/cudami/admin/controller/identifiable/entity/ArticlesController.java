@@ -7,6 +7,7 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.business.api.service.LocaleService;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.ArticleService;
+import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.entity.Article;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -34,7 +35,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -54,7 +54,7 @@ public class ArticlesController extends AbstractController implements MessageSou
   LocaleService localeService;
 
   @Autowired
-  ArticleService<Article> service;
+  ArticleService<Article, Identifiable> service;
 
   @Override
   public void setMessageSource(MessageSource messageSource) {
@@ -67,7 +67,7 @@ public class ArticlesController extends AbstractController implements MessageSou
   }
 
   @RequestMapping(value = "/articles/new", method = RequestMethod.GET)
-  public String create(Model model, @RequestParam(required = false, name = "parentUuid") String parentUuid) {
+  public String create(Model model) {
     Locale defaultLocale = localeService.getDefault();
     List<Locale> locales = localeService.findAll().stream()
             .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
@@ -77,27 +77,19 @@ public class ArticlesController extends AbstractController implements MessageSou
     model.addAttribute("article", service.create());
     model.addAttribute("defaultLocale", defaultLocale);
     model.addAttribute("locales", locales);
-    model.addAttribute("parentUuid", parentUuid);
     return "articles/create";
   }
 
   @RequestMapping(value = "/articles/new", method = RequestMethod.POST)
-  public String create(@ModelAttribute @Valid Article article, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes,
-          @RequestParam(required = false, name = "parentType") String parentType,
-          @RequestParam(required = false, name = "parentUuid") UUID parentUuid) {
+  public String create(@ModelAttribute @Valid Article article, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "articles/create";
     }
     Article articleDb = null;
     try {
-      if ("article".equals(parentType) && parentUuid != null) {
-        articleDb = service.saveWithParent(article, parentUuid);
-        LOGGER.info("Successfully saved subarticle");
-      } else {
-        articleDb = service.save(article, results);
-        LOGGER.info("Successfully saved article");
-      }
+      articleDb = service.save(article, results);
+      LOGGER.info("Successfully saved article");
     } catch (Exception e) {
       LOGGER.error("Cannot save article: ", e);
       String message = messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale());
