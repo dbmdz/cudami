@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ContentNodeRepositoryImpl<C extends ContentNode> extends IdentifiableRepositoryImpl<C> implements ContentNodeRepository<C> {
+public class ContentNodeRepositoryImpl<C extends ContentNode, I extends Identifiable> extends IdentifiableRepositoryImpl<C> implements ContentNodeRepository<C, I> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentNodeRepositoryImpl.class);
 
@@ -237,5 +238,21 @@ public class ContentNodeRepositoryImpl<C extends ContentNode> extends Identifiab
       return new ArrayList<>();
     }
     return list.stream().map(Identifiable.class::cast).collect(Collectors.toList());
+  }
+  
+  @Override
+  public void saveIdentifiables(C contentNode, List<Identifiable> identifiables) {
+    UUID uuid = contentNode.getUuid();
+    dbi.withHandle(h -> h.createUpdate("DELETE FROM contentnode_identifiables WHERE contentnode_uuid = :uuid")
+            .bind("uuid", uuid).execute());
+
+    PreparedBatch batch = dbi.withHandle(h -> h.prepareBatch("INSERT INTO contentnode_identifiables(contentnode_uuid, identifiable_uuid, sortIndex) VALUES(:uuid, :identifiableUuid, :sortIndex)"));
+    for (Identifiable identifiable : identifiables) {
+      batch.bind("uuid", uuid)
+              .bind("identifiableUuid", identifiable.getUuid())
+              .bind("sortIndex", identifiables.indexOf(identifiable))
+              .add();
+    }
+    int[] counts = batch.execute();
   }
 }

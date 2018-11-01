@@ -45,4 +45,8 @@ public interface WebpageRepositoryEndpoint extends RepositoryEndpoint {
   
   @RequestLine("GET /v1/webpages/{uuid}/identifiables")
   public List<Identifiable> getIdentifiables(UUID uuid);
+  
+  @RequestLine("POST /v1/webpages/{uuid}/identifiables")
+  @Headers("Content-Type: application/json")
+  public void saveIdentifiables(@Param("uuid") UUID uuid, List<Identifiable> identifiables);
 }

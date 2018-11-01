@@ -18,10 +18,12 @@ import org.springframework.stereotype.Service;
 
 /**
  * Service for Webpage handling.
+ *
+ * @param <I> identifiable instance
  */
 @Service
 //@Transactional(readOnly = true)
-public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> implements WebpageService<Webpage> {
+public class WebpageServiceImpl<I extends Identifiable> extends IdentifiableServiceImpl<Webpage> implements WebpageService<Webpage, I> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpageServiceImpl.class);
 
@@ -29,7 +31,7 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   private LocaleService localeService;
 
   @Autowired
-  public WebpageServiceImpl(WebpageRepository<Webpage> repository) {
+  public WebpageServiceImpl(WebpageRepository<Webpage, I> repository) {
     super(repository);
   }
 
@@ -90,5 +92,10 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   @Override
   public List<Identifiable> getIdentifiables(UUID identifiableUuid) {
     return ((WebpageRepository) repository).getIdentifiables(identifiableUuid);
+  }
+
+  @Override
+  public void saveIdentifiables(Webpage webpage, List<Identifiable> identifiables) {
+    ((WebpageRepository) repository).saveIdentifiables(webpage, identifiables);
   }
 }

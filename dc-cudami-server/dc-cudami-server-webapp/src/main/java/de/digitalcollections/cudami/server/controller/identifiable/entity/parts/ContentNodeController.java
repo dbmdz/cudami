@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ContentNodeController {
 
   @Autowired
-  private ContentNodeService<ContentNode> service;
+  private ContentNodeService<ContentNode, Identifiable> service;
 
   @ApiMethod(description = "get all content nodes")
   @RequestMapping(value = "/v1/contentnodes",

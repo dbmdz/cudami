@@ -18,10 +18,12 @@ import org.springframework.stereotype.Service;
 
 /**
  * Service for ContentNode handling.
+ *
+ * @param <I> identifiable instance
  */
 @Service
 //@Transactional(readOnly = true)
-public class ContentNodeServiceImpl extends IdentifiableServiceImpl<ContentNode> implements ContentNodeService<ContentNode> {
+public class ContentNodeServiceImpl<I extends Identifiable> extends IdentifiableServiceImpl<ContentNode> implements ContentNodeService<ContentNode, I> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentNodeServiceImpl.class);
 
@@ -29,7 +31,7 @@ public class ContentNodeServiceImpl extends IdentifiableServiceImpl<ContentNode>
   private LocaleService localeService;
 
   @Autowired
-  public ContentNodeServiceImpl(ContentNodeRepository<ContentNode> repository) {
+  public ContentNodeServiceImpl(ContentNodeRepository<ContentNode, I> repository) {
     super(repository);
   }
 
@@ -90,5 +92,10 @@ public class ContentNodeServiceImpl extends IdentifiableServiceImpl<ContentNode>
   @Override
   public List<Identifiable> getIdentifiables(UUID identifiableUuid) {
     return ((ContentNodeRepository) repository).getIdentifiables(identifiableUuid);
+  }
+
+  @Override
+  public void saveIdentifiables(ContentNode contentNode, List<Identifiable> identifiables) {
+    ((ContentNodeRepository) repository).saveIdentifiables(contentNode, identifiables);
   }
 }

@@ -17,15 +17,17 @@ import org.springframework.validation.Errors;
 
 /**
  * Service for ContentNode handling.
+ *
+ * @param <I> identifiable instance
  */
 @Service
 //@Transactional(readOnly = true)
-public class ContentNodeServiceImpl extends IdentifiableServiceImpl<ContentNode> implements ContentNodeService<ContentNode> {
+public class ContentNodeServiceImpl<I extends Identifiable> extends IdentifiableServiceImpl<ContentNode> implements ContentNodeService<ContentNode, I> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentNodeServiceImpl.class);
 
   @Autowired
-  public ContentNodeServiceImpl(ContentNodeRepository<ContentNode> repository) {
+  public ContentNodeServiceImpl(ContentNodeRepository<ContentNode, I> repository) {
     super(repository);
   }
 
@@ -70,5 +72,10 @@ public class ContentNodeServiceImpl extends IdentifiableServiceImpl<ContentNode>
   @Override
   public List<Identifiable> getIdentifiables(ContentNode contentNode) {
     return ((ContentNodeRepository) repository).getIdentifiables(contentNode);
+  }
+
+  @Override
+  public void saveIdentifiables(ContentNode contentNode, List<Identifiable> identifiables) {
+    ((ContentNodeRepository) repository).saveIdentifiables(contentNode, identifiables);
   }
 }

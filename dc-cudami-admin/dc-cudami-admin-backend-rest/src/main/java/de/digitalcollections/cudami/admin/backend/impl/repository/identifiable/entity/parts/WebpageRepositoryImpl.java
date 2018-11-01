@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class WebpageRepositoryImpl<W extends Webpage> extends IdentifiableRepositoryImpl<W> implements WebpageRepository<W> {
+public class WebpageRepositoryImpl<W extends Webpage, I extends Identifiable> extends IdentifiableRepositoryImpl<W> implements WebpageRepository<W, I> {
 
   @Autowired
   LocaleRepository localeRepository;
@@ -81,5 +81,10 @@ public class WebpageRepositoryImpl<W extends Webpage> extends IdentifiableReposi
 
   private List<Identifiable> getIdentifiables(UUID uuid) {
     return endpoint.getIdentifiables(uuid);
+  }
+
+  @Override
+  public void saveIdentifiables(W webpage, List<Identifiable> identifiables) {
+    endpoint.saveIdentifiables(webpage.getUuid(), identifiables);
   }
 }

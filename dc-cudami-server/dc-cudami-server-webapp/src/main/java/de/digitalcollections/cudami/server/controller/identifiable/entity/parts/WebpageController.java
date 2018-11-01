@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WebpageController {
 
   @Autowired
-  private WebpageService<Webpage> webpageService;
+  private WebpageService<Webpage, Identifiable> webpageService;
 
   @ApiMethod(description = "get all webpages")
   @RequestMapping(value = "/v1/webpages",

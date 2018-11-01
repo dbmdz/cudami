@@ -1,12 +1,12 @@
 package de.digitalcollections.cudami.admin.backend.api.repository.identifiable;
 
 import de.digitalcollections.model.api.identifiable.Identifiable;
+import de.digitalcollections.model.api.identifiable.IdentifiablesContainer;
 import java.util.List;
 
-public interface IdentifiablesContainerRepository<I extends Identifiable> {
+public interface IdentifiablesContainerRepository<IC extends IdentifiablesContainer, I extends Identifiable> {
 
-  List<Identifiable> getIdentifiables(I identifiable);
+  List<Identifiable> getIdentifiables(IC identifiablesContainer);
 
-//  void setIdentifiables(I identifiable, List<Identifiable> identifiables);
-
+  void saveIdentifiables(IC identifiablesContainer, List<Identifiable> identifiables);
 }

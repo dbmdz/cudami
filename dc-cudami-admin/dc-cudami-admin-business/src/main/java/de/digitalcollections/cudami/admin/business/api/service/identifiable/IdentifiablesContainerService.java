@@ -1,12 +1,12 @@
 package de.digitalcollections.cudami.admin.business.api.service.identifiable;
 
 import de.digitalcollections.model.api.identifiable.Identifiable;
+import de.digitalcollections.model.api.identifiable.IdentifiablesContainer;
 import java.util.List;
 
-public interface IdentifiablesContainerService<I extends Identifiable> {
-  List<Identifiable> getIdentifiables(I identifiable);
+public interface IdentifiablesContainerService<IC extends IdentifiablesContainer, I extends Identifiable> {
 
-//  void setIdentifiables(I identifiable, List<Identifiable> identifiables);
-  
-  // I addIdentifiable(I identifiable, Identifiable);
+  List<Identifiable> getIdentifiables(IC identifiablesContainer);
+
+  void saveIdentifiables(IC identifiablesContainer, List<Identifiable> identifiables);
 }
