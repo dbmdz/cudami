@@ -66,34 +66,6 @@
           </div>
         </div>
       </div>
-
-      <div class="row main-content">
-        <div class="col-sm-12">
-          <h3>
-            <span th:text="#{child_articles}">child articles</span>
-            <a class="btn btn-default pull-right new-button" th:href="@{/articles/new(parentType=article, parentUuid=*{uuid})}" th:text="#{btn_new}">New</a>
-          </h3>
-          <table class="table table-bordered table-condensed table-striped table-hover table-responsive">
-            <thead>
-              <tr>
-                <th class="center" th:text="#{label}">Label</th>
-                <th class="center" th:text="#{actions}">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr th:each="child: *{children}">
-                <td>
-                  <a th:href="@{'/articles/' + ${child.uuid}}" th:text="${child.label.getText(defaultLocale)}">Label</a>
-                </td>
-                <td class="center">
-                  <a th:href="@{'/articles/' + ${child.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
-                  <a th:href="@{'/articles/' + ${child.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
     </section>
   </body>
 </html>
