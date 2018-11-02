@@ -245,18 +245,24 @@ public class WebpageRepositoryImpl<W extends Webpage, I extends Identifiable> ex
   }
 
   @Override
-  public void saveIdentifiables(W webpage, List<Identifiable> identifiables) {
+  public List<Identifiable> saveIdentifiables(W webpage, List<Identifiable> identifiables) {
     UUID uuid = webpage.getUuid();
+    return saveIdentifiables(uuid, identifiables);
+  }
+
+  @Override
+  public List<Identifiable> saveIdentifiables(UUID identifiablesContainerUuid, List<Identifiable> identifiables) {
     dbi.withHandle(h -> h.createUpdate("DELETE FROM webpage_identifiables WHERE webpagee_uuid = :uuid")
-            .bind("uuid", uuid).execute());
+            .bind("uuid", identifiablesContainerUuid).execute());
 
     PreparedBatch batch = dbi.withHandle(h -> h.prepareBatch("INSERT INTO webpage_identifiables(webpage_uuid, identifiable_uuid, sortIndex) VALUES(:uuid, :identifiableUuid, :sortIndex)"));
     for (Identifiable identifiable : identifiables) {
-      batch.bind("uuid", uuid)
+      batch.bind("uuid", identifiablesContainerUuid)
               .bind("identifiableUuid", identifiable.getUuid())
               .bind("sortIndex", identifiables.indexOf(identifiable))
               .add();
     }
     int[] counts = batch.execute();
+    return getIdentifiables(identifiablesContainerUuid);
   }
 }

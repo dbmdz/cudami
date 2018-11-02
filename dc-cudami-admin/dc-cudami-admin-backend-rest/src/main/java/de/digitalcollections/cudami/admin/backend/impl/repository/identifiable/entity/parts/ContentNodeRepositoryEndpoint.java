@@ -48,5 +48,5 @@ public interface ContentNodeRepositoryEndpoint extends RepositoryEndpoint {
 
   @RequestLine("POST /v1/contentnodes/{uuid}/identifiables")
   @Headers("Content-Type: application/json")
-  public void saveIdentifiables(@Param("uuid") UUID uuid, List<Identifiable> identifiables);
+  public List<Identifiable> saveIdentifiables(@Param("uuid") UUID uuid, List<Identifiable> identifiables);
 }

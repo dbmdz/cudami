@@ -75,7 +75,7 @@ public class WebpageServiceImpl<I extends Identifiable> extends IdentifiableServ
   }
 
   @Override
-  public void saveIdentifiables(Webpage webpage, List<Identifiable> identifiables) {
-    ((WebpageRepository) repository).saveIdentifiables(webpage, identifiables);
+  public List<Identifiable> saveIdentifiables(Webpage webpage, List<Identifiable> identifiables) {
+    return ((WebpageRepository) repository).saveIdentifiables(webpage, identifiables);
   }
 }

@@ -95,7 +95,12 @@ public class ContentNodeServiceImpl<I extends Identifiable> extends Identifiable
   }
 
   @Override
-  public void saveIdentifiables(ContentNode contentNode, List<Identifiable> identifiables) {
-    ((ContentNodeRepository) repository).saveIdentifiables(contentNode, identifiables);
+  public List<Identifiable> saveIdentifiables(ContentNode contentNode, List<Identifiable> identifiables) {
+    return saveIdentifiables(contentNode.getUuid(), identifiables);
+  }
+
+  @Override
+  public List<Identifiable> saveIdentifiables(UUID identifiablesContainerUuid, List<Identifiable> identifiables) {
+    return ((ContentNodeRepository) repository).saveIdentifiables(identifiablesContainerUuid, identifiables);
   }
 }

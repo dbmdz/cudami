@@ -180,18 +180,24 @@ public class ArticleRepositoryImpl<A extends Article, I extends Identifiable> ex
   }
 
   @Override
-  public void saveIdentifiables(A article, List<Identifiable> identifiables) {
+  public List<Identifiable> saveIdentifiables(A article, List<Identifiable> identifiables) {
     UUID uuid = article.getUuid();
+    return saveIdentifiables(uuid, identifiables);
+  }
+
+  @Override
+  public List<Identifiable> saveIdentifiables(UUID identifiablesContainerUuid, List<Identifiable> identifiables) {
     dbi.withHandle(h -> h.createUpdate("DELETE FROM article_identifiables WHERE article_uuid = :uuid")
-            .bind("uuid", uuid).execute());
+            .bind("uuid", identifiablesContainerUuid).execute());
 
     PreparedBatch batch = dbi.withHandle(h -> h.prepareBatch("INSERT INTO article_identifiables(article_uuid, identifiable_uuid, sortIndex) VALUES(:uuid, :identifiableUuid, :sortIndex)"));
     for (Identifiable identifiable : identifiables) {
-      batch.bind("uuid", uuid)
+      batch.bind("uuid", identifiablesContainerUuid)
               .bind("identifiableUuid", identifiable.getUuid())
               .bind("sortIndex", identifiables.indexOf(identifiable))
               .add();
     }
     int[] counts = batch.execute();
+    return getIdentifiables(identifiablesContainerUuid);
   }
 }

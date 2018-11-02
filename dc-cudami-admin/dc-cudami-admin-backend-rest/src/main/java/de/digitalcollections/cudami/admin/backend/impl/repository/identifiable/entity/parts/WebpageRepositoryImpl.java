@@ -84,7 +84,7 @@ public class WebpageRepositoryImpl<W extends Webpage, I extends Identifiable> ex
   }
 
   @Override
-  public void saveIdentifiables(W webpage, List<Identifiable> identifiables) {
-    endpoint.saveIdentifiables(webpage.getUuid(), identifiables);
+  public List<Identifiable> saveIdentifiables(W webpage, List<Identifiable> identifiables) {
+    return endpoint.saveIdentifiables(webpage.getUuid(), identifiables);
   }
 }

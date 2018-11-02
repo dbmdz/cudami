@@ -59,7 +59,7 @@ public class ArticleRepositoryImpl<A extends Article, I extends Identifiable> ex
   }
 
   @Override
-  public void saveIdentifiables(A article, List<Identifiable> identifiables) {
-    endpoint.saveIdentifiables(article.getUuid(), identifiables);
+  public List<Identifiable> saveIdentifiables(A article, List<Identifiable> identifiables) {
+    return endpoint.saveIdentifiables(article.getUuid(), identifiables);
   }
 }

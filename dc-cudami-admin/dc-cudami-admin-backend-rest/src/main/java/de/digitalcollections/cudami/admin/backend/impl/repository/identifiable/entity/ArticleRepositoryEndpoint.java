@@ -43,5 +43,5 @@ public interface ArticleRepositoryEndpoint extends RepositoryEndpoint {
 
   @RequestLine("POST /v1/articles/{uuid}/identifiables")
   @Headers("Content-Type: application/json")
-  public void saveIdentifiables(@Param("uuid") UUID uuid, List<Identifiable> identifiables);
+  public List<Identifiable> saveIdentifiables(@Param("uuid") UUID uuid, List<Identifiable> identifiables);
 }

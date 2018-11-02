@@ -8,5 +8,5 @@ public interface IdentifiablesContainerService<IC extends IdentifiablesContainer
 
   List<Identifiable> getIdentifiables(IC identifiablesContainer);
 
-  void saveIdentifiables(IC identifiablesContainer, List<Identifiable> identifiables);
+  List<Identifiable> saveIdentifiables(IC identifiablesContainer, List<Identifiable> identifiables);
 }

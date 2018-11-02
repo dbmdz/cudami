@@ -84,7 +84,7 @@ public class ContentNodeRepositoryImpl<C extends ContentNode, I extends Identifi
   }
 
   @Override
-  public void saveIdentifiables(C contentNode, List<Identifiable> identifiables) {
-    endpoint.saveIdentifiables(contentNode.getUuid(), identifiables);
+  public List<Identifiable> saveIdentifiables(C contentNode, List<Identifiable> identifiables) {
+    return endpoint.saveIdentifiables(contentNode.getUuid(), identifiables);
   }
 }

@@ -61,7 +61,12 @@ public class ArticleServiceImpl<I extends Identifiable> extends EntityServiceImp
   }
 
   @Override
-  public void saveIdentifiables(Article article, List<Identifiable> identifiables) {
-    ((ArticleRepository) repository).saveIdentifiables(article, identifiables);
+  public List<Identifiable> saveIdentifiables(Article article, List<Identifiable> identifiables) {
+    return saveIdentifiables(article.getUuid(), identifiables);
+  }
+
+  @Override
+  public List<Identifiable> saveIdentifiables(UUID identifiablesContainerUuid, List<Identifiable> identifiables) {
+    return ((ArticleRepository) repository).saveIdentifiables(identifiablesContainerUuid, identifiables);
   }
 }
