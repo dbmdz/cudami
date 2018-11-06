@@ -97,7 +97,7 @@
     <version.spring-aop>5.0.5.RELEASE</version.spring-aop>
     <version.spring-boot>2.0.2.RELEASE</version.spring-boot>
     <version.spring-context>5.0.6.RELEASE</version.spring-context>
-    <version.spring-data-commons>1.13.1.RELEASE</version.spring-data-commons>
+    <version.spring-data-commons>1.13.16.RELEASE</version.spring-data-commons>
     <version.spring-data-jpa>1.11.0.RELEASE</version.spring-data-jpa>
     <version.spring-orm>5.0.6.RELEASE</version.spring-orm>
     <version.spring-security>5.0.5.RELEASE</version.spring-security>
@@ -143,7 +143,7 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      
+
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-core</artifactId>
@@ -345,7 +345,7 @@
         <artifactId>hibernate-entitymanager</artifactId>
         <version>${version.hibernate-entitymanager}</version>
       </dependency>
-      
+
       <!-- JUnit 5: -->
       <dependency>
         <groupId>org.junit.jupiter</groupId>
@@ -617,7 +617,7 @@
           <artifactId>lesscss-maven-plugin</artifactId>
           <version>${version.lesscss-maven-plugin}</version>
         </plugin>
-        
+
       </plugins>
     </pluginManagement>
   </build>
@@ -629,7 +629,7 @@
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
   </distributionManagement>
-  
+
   <repositories>
     <repository>
       <id>ossrh-snapshots</id>
