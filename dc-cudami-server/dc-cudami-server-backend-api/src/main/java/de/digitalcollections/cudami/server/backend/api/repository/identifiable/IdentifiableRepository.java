@@ -4,6 +4,7 @@ import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.parts.Translation;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -15,6 +16,8 @@ public interface IdentifiableRepository<I extends Identifiable> {
   I create();
 
   PageResponse<I> find(PageRequest pageRequest);
+
+  List<I> find(String searchTerm, int maxResults);
 
   I findOne(UUID uuid);
 

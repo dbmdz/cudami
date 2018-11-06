@@ -10,6 +10,7 @@ import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
@@ -48,6 +49,29 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
+  }
+
+  @Override
+  public List<I> find(String searchTerm, int maxResults) {
+    StringBuilder query = new StringBuilder("WITH flattened AS (SELECT uuid, label, jsonb_array_elements(label#>'{translations}')->>'text' AS text FROM identifiables)");
+    query.append(" SELECT uuid, label FROM flattened WHERE text ILIKE '%' || :searchTerm || '%'");
+    query.append(" LIMIT :maxResults");
+
+    List<IdentifiableImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
+            .bind("searchTerm", searchTerm)
+            .bind("maxResults", maxResults)
+            .mapToBean(IdentifiableImpl.class)
+            .list());
+    List<I> identifiables = convertToGenericList(result);
+    return identifiables;
+  }
+
+  protected List<I> convertToGenericList(List<IdentifiableImpl> identifiables) {
+    if (identifiables == null) {
+      return null;
+    }
+    List<I> genericContent = identifiables.stream().map(s -> (I) s).collect(Collectors.toList());
+    return genericContent;
   }
 
   @Override

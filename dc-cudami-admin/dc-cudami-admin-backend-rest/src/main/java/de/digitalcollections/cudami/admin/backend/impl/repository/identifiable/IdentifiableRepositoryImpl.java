@@ -41,6 +41,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> implements Ident
     return getGenericPageResponse(pageResponse);
   }
 
+  @Override
+  public List<I> find(String searchTerm, int maxResults) {
+    return convertToGenericList(endpoint.find(searchTerm, maxResults));
+  }
+
   /**
    * Wrapper for find params
    *
@@ -110,13 +115,21 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> implements Ident
     PageResponse<I> genericPageResponse;
     if (pageResponse.hasContent()) {
       List<Identifiable> content = pageResponse.getContent();
-      List<I> genericContent = content.stream().map(s -> (I) s).collect(Collectors.toList());
+      List<I> genericContent = convertToGenericList(content);
       genericPageResponse = (PageResponse<I>) pageResponse;
       genericPageResponse.setContent(genericContent);
     } else {
       genericPageResponse = (PageResponse<I>) pageResponse;
     }
     return genericPageResponse;
+  }
+
+  protected List<I> convertToGenericList(List<Identifiable> identifiables) {
+    if (identifiables == null) {
+      return null;
+    }
+    List<I> genericContent = identifiables.stream().map(s -> (I) s).collect(Collectors.toList());
+    return genericContent;
   }
 
   @Override

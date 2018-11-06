@@ -23,6 +23,11 @@ public class ContentNodeRepositoryImpl<C extends ContentNode, I extends Identifi
   private ContentNodeRepositoryEndpoint endpoint;
 
   @Override
+  public void addIdentifiable(UUID contentNodeUuid, UUID identifiableUuid) {
+    endpoint.addIdentifiable(contentNodeUuid, identifiableUuid);
+  }
+
+  @Override
   public long count() {
     return endpoint.count();
   }

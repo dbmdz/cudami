@@ -32,6 +32,12 @@ public class WebpageServiceImpl<I extends Identifiable> extends IdentifiableServ
   }
 
   @Override
+  public void addIdentifiable(UUID uuidIdentifiablesContainer, UUID identifiableUuid) {
+    // FIXME: implement it
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
   public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUUID, Errors results) throws IdentifiableServiceException {
     if (!results.hasErrors()) {
       try {

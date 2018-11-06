@@ -18,6 +18,12 @@ public class ArticleRepositoryImpl<A extends Article, I extends Identifiable> ex
   private ArticleRepositoryEndpoint endpoint;
 
   @Override
+  public void addIdentifiable(UUID identifiablesContainerUuid, UUID identifiableUuid) {
+    // FIXME: implement it
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
   public long count() {
     return endpoint.count();
   }

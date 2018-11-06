@@ -9,11 +9,11 @@ import de.digitalcollections.model.api.identifiable.entity.Article;
 import de.digitalcollections.model.api.identifiable.parts.Translation;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
 import de.digitalcollections.model.impl.identifiable.entity.ArticleImpl;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
+import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -47,6 +47,12 @@ public class ArticleRepositoryImpl<A extends Article, I extends Identifiable> ex
     super(dbi, identifiableRepository);
     this.entityRepository = entityRepository;
     this.localeRepository = localeRepository;
+  }
+
+  @Override
+  public void addIdentifiable(UUID identifiablesContainerUuid, UUID identifiableUuid) {
+    // FIXME: implement it
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override

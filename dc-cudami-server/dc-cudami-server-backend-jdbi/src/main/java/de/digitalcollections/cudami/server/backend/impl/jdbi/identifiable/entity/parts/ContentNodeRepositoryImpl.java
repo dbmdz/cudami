@@ -5,15 +5,15 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.ContentNodeRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifiable;
-import de.digitalcollections.model.api.identifiable.parts.Translation;
 import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
+import de.digitalcollections.model.api.identifiable.parts.Translation;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
+import de.digitalcollections.model.impl.identifiable.entity.parts.ContentNodeImpl;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
-import de.digitalcollections.model.impl.identifiable.entity.parts.ContentNodeImpl;
+import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -97,6 +97,7 @@ public class ContentNodeRepositoryImpl<C extends ContentNode, I extends Identifi
     }
     C contentNode = (C) list.get(0);
     contentNode.setChildren(getChildren(contentNode));
+    contentNode.setIdentifiables(getIdentifiables(contentNode));
     return contentNode;
   }
 
@@ -238,6 +239,18 @@ public class ContentNodeRepositoryImpl<C extends ContentNode, I extends Identifi
       return new ArrayList<>();
     }
     return list.stream().map(Identifiable.class::cast).collect(Collectors.toList());
+  }
+
+  @Override
+  public void addIdentifiable(UUID identifiablesContainerUuid, UUID identifiableUuid) {
+    Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "contentnode_identifiables", "contentnode_uuid", identifiablesContainerUuid);
+    dbi.withHandle(h -> h.createUpdate(
+            "INSERT INTO contentnode_identifiables(contentnode_uuid, identifiable_uuid, sortIndex)"
+            + " VALUES (:contentnode_uuid, :identifiable_uuid, :sortIndex)")
+            .bind("contentnode_uuid", identifiablesContainerUuid)
+            .bind("identifiable_uuid", identifiableUuid)
+            .bind("sortIndex", sortIndex)
+            .execute());
   }
 
   @Override

@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -126,5 +127,13 @@ public class ContentNodeController {
   @ApiResponseObject
   public List<Identifiable> saveIdentifiables(@PathVariable UUID uuid, @RequestBody List<Identifiable> identifiables) {
     return service.saveIdentifiables(uuid, identifiables);
+  }
+
+  @ApiMethod(description = "add identifiable to content node")
+  @PostMapping(value = "/v1/contentnodes/{uuid}/identifiables/{identifiableUuid}")
+  @ResponseStatus(value = HttpStatus.OK)
+  @ApiResponseObject
+  public void addIdentifiable(@PathVariable UUID uuid, @PathVariable UUID identifiableUuid) {
+    service.addIdentifiable(uuid, identifiableUuid);
   }
 }

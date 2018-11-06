@@ -11,6 +11,8 @@ public interface IdentifiablesContainerRepository<IC extends IdentifiablesContai
 
   List<Identifiable> getIdentifiables(UUID identifiablesContainerUuid);
 
+  void addIdentifiable(UUID identifiablesContainerUuid, UUID identifiableUuid);
+
   List<Identifiable> saveIdentifiables(IC identifiablesContainer, List<Identifiable> identifiables);
 
   List<Identifiable> saveIdentifiables(UUID identifiablesContainerUuid, List<Identifiable> identifiables);

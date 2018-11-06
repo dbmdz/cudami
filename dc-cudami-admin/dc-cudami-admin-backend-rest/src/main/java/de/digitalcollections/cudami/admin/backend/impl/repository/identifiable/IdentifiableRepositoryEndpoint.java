@@ -6,6 +6,7 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
+import java.util.List;
 import java.util.UUID;
 
 public interface IdentifiableRepositoryEndpoint extends RepositoryEndpoint {
@@ -15,6 +16,9 @@ public interface IdentifiableRepositoryEndpoint extends RepositoryEndpoint {
           @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
           @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
   );
+
+  @RequestLine("GET /v1/identifiables?searchTerm={searchTerm}&maxResults={maxResults}")
+  List<Identifiable> find(@Param("searchTerm") String searchTerm, @Param("maxResults") int maxResults);
 
   @RequestLine("GET /v1/identifiables/{uuid}")
   Identifiable findOne(@Param("uuid") UUID uuid);

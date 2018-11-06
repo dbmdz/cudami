@@ -34,6 +34,12 @@ public class ArticleServiceImpl<I extends Identifiable> extends EntityServiceImp
   }
 
   @Override
+  public void addIdentifiable(UUID identifiablesContainerUuid, UUID identifiableUuid) {
+    // FIXME: implement it
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
   public Article get(UUID uuid, Locale locale) throws IdentifiableServiceException {
     Article article = repository.findOne(uuid, locale);
 

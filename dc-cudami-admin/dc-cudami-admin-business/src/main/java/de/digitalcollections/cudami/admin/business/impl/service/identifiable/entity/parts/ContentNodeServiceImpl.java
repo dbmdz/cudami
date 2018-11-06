@@ -32,6 +32,11 @@ public class ContentNodeServiceImpl<I extends Identifiable> extends Identifiable
   }
 
   @Override
+  public void addIdentifiable(UUID contentNodeUuid, UUID identifiableUuid) {
+    ((ContentNodeRepository) repository).addIdentifiable(contentNodeUuid, identifiableUuid);
+  }
+
+  @Override
   public ContentNode saveWithParentContentTree(ContentNode contentNode, UUID parentContentTreeUUID, Errors results) throws IdentifiableServiceException {
     if (!results.hasErrors()) {
       try {

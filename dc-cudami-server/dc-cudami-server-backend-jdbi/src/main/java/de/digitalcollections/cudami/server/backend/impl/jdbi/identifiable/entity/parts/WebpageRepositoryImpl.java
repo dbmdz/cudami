@@ -49,6 +49,12 @@ public class WebpageRepositoryImpl<W extends Webpage, I extends Identifiable> ex
   }
 
   @Override
+  public void addIdentifiable(UUID identifiablesContainerUuid, UUID identifiableUuid) {
+    // FIXME: implement it
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
   public long count() {
     String sql = "SELECT count(*) FROM webpages";
     long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOnly());

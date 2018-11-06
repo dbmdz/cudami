@@ -36,6 +36,11 @@ public class ContentNodeServiceImpl<I extends Identifiable> extends Identifiable
   }
 
   @Override
+  public void addIdentifiable(UUID contentNodeUuid, UUID identifiableUuid) {
+    ((ContentNodeRepository) repository).addIdentifiable(contentNodeUuid, identifiableUuid);
+  }
+
+  @Override
   public ContentNode get(UUID uuid, Locale locale) throws IdentifiableServiceException {
     ContentNode contentNode = repository.findOne(uuid, locale);
 

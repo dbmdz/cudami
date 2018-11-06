@@ -29,20 +29,20 @@
       <script type="text/javascript" th:inline="javascript">
         //<!--
         $('#confirmYesNoDialog').on('show.bs.modal', function (e) {
-          $message = $(e.relatedTarget).attr('data-message');
-          $(this).find('.modal-body p').text($message);
-          
-          $title = $(e.relatedTarget).attr('data-title');
-          $(this).find('.modal-title').text($title);
+        $message = $(e.relatedTarget).attr('data-message');
+        $(this).find('.modal-body p').text($message);
 
-          // Pass form reference to modal for submission on yes/ok
-          // var form = $(e.relatedTarget).closest('form');
-          // $(this).find('.modal-footer #confirm').data('form', form);
-          var href = $(e.relatedTarget).data('href');
-          if (href === undefined) {
-            return;
-          }
-          $(this).find('.modal-footer #confirm').attr('href', href);
+        $title = $(e.relatedTarget).attr('data-title');
+        $(this).find('.modal-title').text($title);
+
+        // Pass form reference to modal for submission on yes/ok
+        // var form = $(e.relatedTarget).closest('form');
+        // $(this).find('.modal-footer #confirm').data('form', form);
+        var href = $(e.relatedTarget).data('href');
+        if (href === undefined) {
+        return;
+        }
+        $(this).find('.modal-footer #confirm').attr('href', href);
         });
 
         //Form confirm (yes/ok) handler, submits form
@@ -55,42 +55,101 @@
 
     <div th:fragment="addLanguageDialog">
       <div id="add-language-dialog" class="modal fade" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" th:text="#{select_language}">Select language</h4>
-          </div>
-          <div class="modal-body">
-            <div class="form-group">
-              <select class="form-control" id="locale-selector">
-                <option th:each="locale: ${locales}" th:value="${locale}" th:text="${locale.getDisplayName(#locale)}">locale</option>
-              </select>
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" th:text="#{select_language}">Select language</h4>
             </div>
-            <button class="btn btn-primary" id="confirm-language-selection" type="submit" th:text="#{add_locale}">Add</button>
+            <div class="modal-body">
+              <div class="form-group">
+                <select class="form-control" id="locale-selector">
+                  <option th:each="locale: ${locales}" th:value="${locale}" th:text="${locale.getDisplayName(#locale)}">locale</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" id="confirm-language-selection" type="button" th:text="#{add_locale}">Add</button>
+            </div>
           </div>
         </div>
-      </div>
       </div>
     </div>
 
     <div th:fragment="formValidationDialog">
       <div id="form-validation-dialog" class="modal fade" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" th:text="#{form_validation_title}">Errors in the form</h4>
-          </div>
-          <div class="modal-body">
-            <p th:text="#{invalid_label_message}">...</p>
-            <ul id="invalid-locales"></ul>
-            <p th:text="#{continue_editing_message}"></p>
-            <button class="btn btn-primary" id="continue-editing" type="submit" th:text="#{continue_editing}">Add</button>
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" th:text="#{form_validation_title}">Errors in the form</h4>
+            </div>
+            <div class="modal-body">
+              <p th:text="#{invalid_label_message}">...</p>
+              <ul id="invalid-locales"></ul>
+              <p th:text="#{continue_editing_message}"></p>
+              <button class="btn btn-primary" id="continue-editing" type="button" th:text="#{continue_editing}">Continue editing</button>
+            </div>
           </div>
         </div>
       </div>
+    </div>
+
+    <div th:fragment="selectItemDialog">
+      <div id="select-item-dialog" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" th:text="#{select_item}">Select an item</h4>
+            </div>
+            <div class="modal-body">
+              <form id="item-form" th:action="@{#}" method="post">
+                <input type="hidden" id="identifiableUuid" name="identifiableUuid" />
+              <div class="row">
+                <div class="col-md-9" th:text="#{selected_item}">Selected item</div>
+                <div class="col-md-3">
+                  <button class="btn btn-primary pull-right" id="add-item" type="submit" th:text="#{ok}">Ok</a>
+                </div>
+              </div>
+              
+              <div class="col-md-12 well" id="selected-item" style="margin-top: 10px;">...</div>
+
+              <div class="row">
+                <div class="col-md-12 ui-widget ui-front">
+                  <input id="item" style="width: 100%;"/>
+                </div>
+              </div>
+              </form>
+            </div>
+          </div>
+        </div>
       </div>
+      <script type="text/javascript" th:inline="javascript">
+        $(function() {
+          $("#item-form").prop('action', window.location.pathname + '/identifiables');
+          var autocompleteElement = $("#item").autocomplete({
+              minLength: 2,
+              source: "/identifiables",
+              focus: function(event, ui) {
+                $("#item").val(ui.item.label.translations[0].text);
+                return false;
+              },
+              select: function(event, ui) {
+                $("#item").val(ui.item.label.translations[0].text);
+                $("#selected-item").text(ui.item.label.translations[0].text);
+                
+                $("#identifiableUuid").attr('value', ui.item.uuid);
+                return false;
+              }
+          }).autocomplete("instance");
+          autocompleteElement._renderItem = function(ul, item) {
+                return $( "<li>" )
+                  .attr( "data-value", item.uuid )
+                  .append( item.label.translations[0].text )
+                  .appendTo( ul );
+              };
+
+        } );
+      </script>
     </div>
   </body>
 </html>
