@@ -120,7 +120,7 @@
     <!-- plugins -->
     <version.apt-maven-plugin>1.1.3</version.apt-maven-plugin>
     <version.exec-maven-plugin>1.5.0</version.exec-maven-plugin>
-    <version.jacoco-maven-plugin>0.8.1</version.jacoco-maven-plugin>
+    <version.jacoco-maven-plugin>0.8.2</version.jacoco-maven-plugin>
     <version.jetty-maven-plugin>9.4.0.v20161208</version.jetty-maven-plugin>
     <version.lesscss-maven-plugin>1.7.0.1.1</version.lesscss-maven-plugin>
     <version.maven-compiler-plugin>3.7.0</version.maven-compiler-plugin>
@@ -128,7 +128,7 @@
     <version.maven-javadoc-plugin>3.0.0</version.maven-javadoc-plugin>
     <version.maven-resources-plugin>2.7</version.maven-resources-plugin>
     <version.maven-source-plugin>3.0.1</version.maven-source-plugin>
-    <version.maven-surefire-plugin>2.19.1</version.maven-surefire-plugin>
+    <version.maven-surefire-plugin>2.22.1</version.maven-surefire-plugin>
     <version.maven-war-plugin>2.3</version.maven-war-plugin>
     <version.nexus-staging-maven-plugin>1.6.8</version.nexus-staging-maven-plugin>
   </properties>
