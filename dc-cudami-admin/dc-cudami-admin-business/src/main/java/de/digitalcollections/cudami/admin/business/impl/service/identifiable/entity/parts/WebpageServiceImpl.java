@@ -32,9 +32,8 @@ public class WebpageServiceImpl<I extends Identifiable> extends IdentifiableServ
   }
 
   @Override
-  public void addIdentifiable(UUID uuidIdentifiablesContainer, UUID identifiableUuid) {
-    // FIXME: implement it
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  public void addIdentifiable(UUID webpageUuid, UUID identifiableUuid) {
+    ((WebpageRepository) repository).addIdentifiable(webpageUuid, identifiableUuid);
   }
 
   @Override

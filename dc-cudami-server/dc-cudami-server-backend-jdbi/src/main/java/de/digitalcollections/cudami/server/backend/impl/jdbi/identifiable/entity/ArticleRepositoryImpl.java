@@ -50,9 +50,15 @@ public class ArticleRepositoryImpl<A extends Article, I extends Identifiable> ex
   }
 
   @Override
-  public void addIdentifiable(UUID identifiablesContainerUuid, UUID identifiableUuid) {
-    // FIXME: implement it
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  public void addIdentifiable(UUID articleUuid, UUID identifiableUuid) {
+    Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "article_identifiables", "article_uuid", articleUuid);
+    dbi.withHandle(h -> h.createUpdate(
+            "INSERT INTO article_identifiables(article_uuid, identifiable_uuid, sortIndex)"
+            + " VALUES (:article_uuid, :identifiable_uuid, :sortIndex)")
+            .bind("article_uuid", articleUuid)
+            .bind("identifiable_uuid", identifiableUuid)
+            .bind("sortIndex", sortIndex)
+            .execute());
   }
 
   @Override
@@ -103,6 +109,7 @@ public class ArticleRepositoryImpl<A extends Article, I extends Identifiable> ex
       return null;
     }
     A article = (A) list.get(0);
+    article.setIdentifiables(getIdentifiables(article));
     return article;
   }
 

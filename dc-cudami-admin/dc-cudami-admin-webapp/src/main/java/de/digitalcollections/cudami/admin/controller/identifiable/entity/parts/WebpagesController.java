@@ -187,6 +187,12 @@ public class WebpagesController extends AbstractController implements MessageSou
     return "webpages/view";
   }
 
+  @RequestMapping(value = "/webpages/{uuid}/identifiables", method = RequestMethod.POST)
+  public String addIdentifiable(@PathVariable UUID uuid, @RequestParam(name = "identifiableUuid") UUID identifiableUuid, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+    webpageService.addIdentifiable(uuid, identifiableUuid);
+    return "redirect:/webpages/" + uuid;
+  }
+
   public void setWebpageService(WebpageService webpageService) {
     this.webpageService = webpageService;
   }

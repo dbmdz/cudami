@@ -53,8 +53,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
 
   @Override
   public List<I> find(String searchTerm, int maxResults) {
-    StringBuilder query = new StringBuilder("WITH flattened AS (SELECT uuid, label, jsonb_array_elements(label#>'{translations}')->>'text' AS text FROM identifiables)");
-    query.append(" SELECT uuid, label FROM flattened WHERE text ILIKE '%' || :searchTerm || '%'");
+    // TODO: think about using GIN
+    // see: https://bitnine.net/blog-postgresql/postgresql-internals-jsonb-type-and-its-indexes/
+    // see: https://www.postgresql.org/docs/10/datatype-json.html
+    StringBuilder query = new StringBuilder("WITH flattened AS (SELECT uuid, label, description, identifiable_type, jsonb_array_elements(label#>'{translations}')->>'text' AS text FROM identifiables)");
+    query.append(" SELECT uuid, label, description, identifiable_type FROM flattened WHERE text ILIKE '%' || :searchTerm || '%'");
     query.append(" LIMIT :maxResults");
 
     List<IdentifiableImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())

@@ -126,6 +126,7 @@
       <script type="text/javascript" th:inline="javascript">
         $(function() {
           $("#item-form").prop('action', window.location.pathname + '/identifiables');
+          
           var autocompleteElement = $("#item").autocomplete({
               minLength: 2,
               source: "/identifiables",
@@ -135,19 +136,19 @@
               },
               select: function(event, ui) {
                 $("#item").val(ui.item.label.translations[0].text);
-                $("#selected-item").text(ui.item.label.translations[0].text);
+                $("#selected-item").text("");
+                $("#selected-item").append("<div class='item-label'>" + ui.item.label.translations[0].text + "</div>");
                 
                 $("#identifiableUuid").attr('value', ui.item.uuid);
                 return false;
               }
           }).autocomplete("instance");
           autocompleteElement._renderItem = function(ul, item) {
-                return $( "<li>" )
-                  .attr( "data-value", item.uuid )
-                  .append( item.label.translations[0].text )
-                  .appendTo( ul );
+                return $("<li>")
+                  .attr("data-value", item.uuid)
+                  .append(item.label.translations[0].text)
+                  .appendTo(ul);
               };
-
         } );
       </script>
     </div>

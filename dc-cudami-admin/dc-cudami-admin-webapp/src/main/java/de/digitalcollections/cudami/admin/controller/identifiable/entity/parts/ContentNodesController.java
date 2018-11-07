@@ -168,13 +168,6 @@ public class ContentNodesController extends AbstractController implements Messag
     return "redirect:/contentnodes/" + uuid;
   }
 
-  @RequestMapping(value = "/contentnodes/{uuid}/identifiables", method = RequestMethod.POST)
-  public String addIdentifiable(@PathVariable UUID uuid, @RequestParam(name = "identifiableUuid") UUID identifiableUuid, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
-    LOGGER.info("add identifiable " + identifiableUuid);
-    contentNodeService.addIdentifiable(uuid, identifiableUuid);
-    return "redirect:/contentnodes/" + uuid;
-  }
-
   @RequestMapping(value = "/contentnodes", method = RequestMethod.GET)
   public String list(Model model, @PageableDefault(sort = {"uuid"}) Pageable pageable) {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
@@ -191,6 +184,12 @@ public class ContentNodesController extends AbstractController implements Messag
     model.addAttribute("defaultLocale", localeService.getDefault());
     model.addAttribute("contentNode", contentNode);
     return "contentnodes/view";
+  }
+
+  @RequestMapping(value = "/contentnodes/{uuid}/identifiables", method = RequestMethod.POST)
+  public String addIdentifiable(@PathVariable UUID uuid, @RequestParam(name = "identifiableUuid") UUID identifiableUuid, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+    contentNodeService.addIdentifiable(uuid, identifiableUuid);
+    return "redirect:/contentnodes/" + uuid;
   }
 
   public void setContentNodeService(ContentNodeService contentNodeService) {

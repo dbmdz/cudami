@@ -70,7 +70,7 @@
       <div class="row main-content">
         <div class="col-sm-12">
           <h3>
-            <span th:text="#{webpages}">sub pages</span>
+            <span th:text="#{sub_webpages}">sub pages</span>
             <a class="btn btn-default pull-right new-button" th:href="@{/webpages/new(parentType=webpage, parentUuid=*{uuid})}" th:text="#{btn_new}">New</a>
           </h3>
           <table class="table table-bordered table-condensed table-striped table-hover table-responsive">
@@ -94,6 +94,37 @@
           </table>
         </div>
       </div>
+      
+      <div class="row main-content">
+        <div class="col-sm-12">
+          <h3>
+            <span th:text="#{linked_data}">Linked Data</span>
+            
+            <button type="button" class="btn btn-default pull-right new-button" data-toggle="modal" data-target="#select-item-dialog" th:text="#{add}">Add</button>
+          </h3>
+          <table class="table table-bordered table-condensed table-striped table-hover table-responsive">
+            <thead>
+              <tr>
+                <th class="center" th:text="#{label}">Label</th>
+                <th class="center" th:text="#{actions}">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="identifiable: *{identifiables}">
+                <td>
+                  <a th:href="@{'/identifiables/' + ${identifiable.uuid}}" th:text="${identifiable.label.getText(defaultLocale)}">Label</a>
+                </td>
+                <td class="center">
+                  <a th:href="@{'/identifiables/' + ${identifiable.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
+                  <a th:href="@{'/identifiables/' + ${identifiable.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <div th:replace="fragments/modals :: selectItemDialog"></div>
     </section>
   </body>
 </html>

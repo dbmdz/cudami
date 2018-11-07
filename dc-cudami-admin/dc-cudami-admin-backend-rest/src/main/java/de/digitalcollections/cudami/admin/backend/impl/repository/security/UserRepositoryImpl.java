@@ -21,7 +21,7 @@ public class UserRepositoryImpl implements UserRepository<UserImpl> {
 
   @Override
   public long count() {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    throw new UnsupportedOperationException("Not supported yet.");
   }
 
   @Override
@@ -76,10 +76,6 @@ public class UserRepositoryImpl implements UserRepository<UserImpl> {
     return endpoint.findActiveAdminUsers();
   }
 
-//  @Override
-//  public Page<UserImpl> find(Pageable pgbl) {
-//    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//  }
   @Override
   public UserImpl save(UserImpl user) {
     return (UserImpl) endpoint.save(user);
@@ -90,45 +86,8 @@ public class UserRepositoryImpl implements UserRepository<UserImpl> {
     return (UserImpl) endpoint.update(user.getUuid(), user);
   }
 
-//  @Override
-//  public <S extends UserImpl> Iterable<S> save(Iterable<S> itrbl) {
-//    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//  }
   @Override
   public UserImpl findOne(UUID uuid) {
     return endpoint.findOne(uuid);
   }
-
-//  @Override
-//  public boolean exists(Long id) {
-//    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//  }
-//  @Override
-//  public Iterable<UserImpl> find() {
-//    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//  }
-//  @Override
-//  public Iterable<UserImpl> find(Iterable<Long> itrbl) {
-//    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//  }
-//  @Override
-//  public long count() {
-//    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//  }
-//  @Override
-//  public void delete(Long id) {
-//    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//  }
-//  @Override
-//  public void delete(UserImpl t) {
-//    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//  }
-//  @Override
-//  public void delete(Iterable<? extends UserImpl> itrbl) {
-//    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//  }
-//  @Override
-//  public void deleteAll() {
-//    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//  }
 }

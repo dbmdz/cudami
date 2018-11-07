@@ -27,10 +27,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -91,10 +93,19 @@ public class ArticleController {
     return articleService.update(article);
   }
 
+  @ApiMethod(description = "get identifiables related to article")
   @RequestMapping(value = "/v1/articles/{uuid}/identifiables", produces = "application/json", method = RequestMethod.GET)
+  @ApiResponseObject
   public List<Identifiable> getIdentifiables(@PathVariable UUID uuid) {
     return articleService.getIdentifiables(uuid);
   }
-  
+
+  @ApiMethod(description = "add identifiable to article")
+  @PostMapping(value = "/v1/articles/{uuid}/identifiables/{identifiableUuid}")
+  @ResponseStatus(value = HttpStatus.OK)
+  @ApiResponseObject
+  public void addIdentifiable(@PathVariable UUID uuid, @PathVariable UUID identifiableUuid) {
+    articleService.addIdentifiable(uuid, identifiableUuid);
+  }
   // TODO: saveIdentifiables
 }

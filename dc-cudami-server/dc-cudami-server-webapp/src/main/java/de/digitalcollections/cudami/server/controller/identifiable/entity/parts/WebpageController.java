@@ -28,10 +28,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -106,7 +108,7 @@ public class WebpageController {
     Locale returnedLocale = webpage.getLabel().getTranslations().stream().findFirst().get().getLocale();
     return returnedLocale;
   }
-  
+
   @ApiMethod(description = "save a newly created top-level webpage")
   @RequestMapping(value = "/v1/websites/{parentWebsiteUuid}/webpage", produces = "application/json", method = RequestMethod.POST)
   @ApiResponseObject
@@ -129,8 +131,18 @@ public class WebpageController {
     return webpageService.update(webpage);
   }
 
+  @ApiMethod(description = "get identifiables related to webpage")
   @RequestMapping(value = "/v1/webpages/{uuid}/identifiables", produces = "application/json", method = RequestMethod.GET)
+  @ApiResponseObject
   public List<Identifiable> getIdentifiables(@PathVariable UUID uuid) {
     return webpageService.getIdentifiables(uuid);
+  }
+
+  @ApiMethod(description = "add identifiable to webpage")
+  @PostMapping(value = "/v1/webpages/{uuid}/identifiables/{identifiableUuid}")
+  @ResponseStatus(value = HttpStatus.OK)
+  @ApiResponseObject
+  public void addIdentifiable(@PathVariable UUID uuid, @PathVariable UUID identifiableUuid) {
+    webpageService.addIdentifiable(uuid, identifiableUuid);
   }
 }
