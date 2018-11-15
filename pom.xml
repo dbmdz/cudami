@@ -72,7 +72,7 @@
     <version.commons-beanutils>1.9.3</version.commons-beanutils>
     <version.commons-dbcp2>2.1.1</version.commons-dbcp2>
     <version.commons-lang3>3.4</version.commons-lang3>
-    <version.dc-commons>2.0.0-SNAPSHOT</version.dc-commons>
+    <version.dc-commons>2.1.0-SNAPSHOT</version.dc-commons>
     <version.dc-model>2.0.0-SNAPSHOT</version.dc-model>
     <version.feign>9.5.1</version.feign>
     <version.feign-form-spring>3.3.0</version.feign-form-spring>
@@ -94,17 +94,9 @@
     <version.slf4j-api>1.7.24</version.slf4j-api>
     <version.slf4j-log4j12>1.7.24</version.slf4j-log4j12>
     <version.snakeyaml>1.19</version.snakeyaml><!-- do not upgrade! see https://github.com/spring-projects/spring-boot/issues/12793 -->
-    <version.spring-aop>5.0.5.RELEASE</version.spring-aop>
-    <version.spring-boot>2.0.2.RELEASE</version.spring-boot>
-    <version.spring-context>5.0.6.RELEASE</version.spring-context>
+    <version.spring-boot>2.0.6.RELEASE</version.spring-boot>
     <version.spring-data-commons>1.13.16.RELEASE</version.spring-data-commons>
     <version.spring-data-jpa>1.11.0.RELEASE</version.spring-data-jpa>
-    <version.spring-orm>5.0.6.RELEASE</version.spring-orm>
-    <version.spring-security>5.0.5.RELEASE</version.spring-security>
-    <version.spring-test>5.0.6.RELEASE</version.spring-test>
-    <version.spring-tx>5.0.6.RELEASE</version.spring-tx>
-    <version.spring-web>5.0.6.RELEASE</version.spring-web>
-    <version.spring-webmvc>5.0.6.RELEASE</version.spring-webmvc>
     <version.unbescape>1.1.4.RELEASE</version.unbescape>
     <version.xstream>1.4.10</version.xstream>
 
@@ -405,41 +397,6 @@
         <version>${version.slf4j-log4j12}</version>
       </dependency>
       <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-aop</artifactId>
-        <version>${version.spring-aop}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-context</artifactId>
-        <version>${version.spring-context}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-orm</artifactId>
-        <version>${version.spring-orm}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-test</artifactId>
-        <version>${version.spring-test}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-tx</artifactId>
-        <version>${version.spring-tx}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-web</artifactId>
-        <version>${version.spring-web}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-webmvc</artifactId>
-        <version>${version.spring-webmvc}</version>
-      </dependency>
-      <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-test</artifactId>
         <version>${version.spring-boot}</version>
@@ -465,21 +422,6 @@
         <groupId>org.springframework.data</groupId>
         <artifactId>spring-data-jpa</artifactId>
         <version>${version.spring-data-jpa}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-config</artifactId>
-        <version>${version.spring-security}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-core</artifactId>
-        <version>${version.spring-security}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-web</artifactId>
-        <version>${version.spring-security}</version>
       </dependency>
       <dependency>
         <groupId>org.unbescape</groupId>
