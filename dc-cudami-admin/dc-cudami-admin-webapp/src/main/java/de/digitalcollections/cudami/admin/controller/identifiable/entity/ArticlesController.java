@@ -11,6 +11,7 @@ import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.entity.Article;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.identifiable.entity.ArticleImpl;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -82,7 +83,7 @@ public class ArticlesController extends AbstractController implements MessageSou
   }
 
   @RequestMapping(value = "/articles/new", method = RequestMethod.POST)
-  public String create(@ModelAttribute @Valid Article article, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  public String create(@ModelAttribute @Valid ArticleImpl article, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "articles/create";
@@ -125,7 +126,7 @@ public class ArticlesController extends AbstractController implements MessageSou
   }
 
   @RequestMapping(value = "/articles/{pathUuid}/edit", method = RequestMethod.POST)
-  public String edit(@PathVariable UUID pathUuid, @ModelAttribute @Valid Article article, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  public String edit(@PathVariable UUID pathUuid, @ModelAttribute @Valid ArticleImpl article, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "articles/edit";

@@ -10,6 +10,7 @@ import de.digitalcollections.cudami.admin.business.api.service.identifiable.enti
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -84,7 +85,7 @@ public class WebpagesController extends AbstractController implements MessageSou
   }
 
   @RequestMapping(value = "/webpages/new", method = RequestMethod.POST)
-  public String create(@ModelAttribute @Valid Webpage webpage, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes,
+  public String create(@ModelAttribute @Valid WebpageImpl webpage, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes,
           @RequestParam("parentType") String parentType,
           @RequestParam("parentUuid") UUID parentUuid) {
     verifyBinding(results);
@@ -138,7 +139,7 @@ public class WebpagesController extends AbstractController implements MessageSou
   }
 
   @RequestMapping(value = "/webpages/{pathUuid}/edit", method = RequestMethod.POST)
-  public String edit(@PathVariable UUID pathUuid, @ModelAttribute @Valid Webpage webpage, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  public String edit(@PathVariable UUID pathUuid, @ModelAttribute @Valid WebpageImpl webpage, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "webpages/edit";
