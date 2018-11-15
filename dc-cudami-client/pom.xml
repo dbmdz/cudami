@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>de.digitalcollections.cudami</groupId>
-        <artifactId>dc-cudami</artifactId>
-        <version>3.1.0-SNAPSHOT</version>
-    </parent>
-    <artifactId>dc-cudami-client</artifactId>
-    <packaging>pom</packaging>
-    <name>DigitalCollections: cudami Client</name>
-    <modules>
-        <module>dc-cudami-client-openfeign</module>
-        <module>dc-cudami-client-spring</module>
-    </modules>
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>de.digitalcollections.cudami</groupId>
+    <artifactId>dc-cudami</artifactId>
+    <version>3.1.0-SNAPSHOT</version>
+  </parent>
+  
+  <name>DigitalCollections: cudami Client</name>
+  <artifactId>dc-cudami-client</artifactId>
+  <packaging>pom</packaging>
+  
+  <modules>
+    <module>dc-cudami-client-openfeign</module>
+    <module>dc-cudami-client-spring</module>
+  </modules>
 </project>
