@@ -10,6 +10,7 @@ import de.digitalcollections.cudami.admin.business.api.service.identifiable.enti
 import de.digitalcollections.model.api.identifiable.entity.ContentTree;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.identifiable.entity.ContentTreeImpl;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -80,7 +81,7 @@ public class ContentTreesController extends AbstractController implements Messag
   }
 
   @RequestMapping(value = "/contenttrees/new", method = RequestMethod.POST)
-  public String create(@ModelAttribute @Valid ContentTree contentTree, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  public String create(@ModelAttribute @Valid ContentTreeImpl contentTree, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "contenttrees/create";
@@ -128,7 +129,7 @@ public class ContentTreesController extends AbstractController implements Messag
   }
 
   @RequestMapping(value = "/contenttrees/{pathUuid}/edit", method = RequestMethod.POST)
-  public String edit(@PathVariable UUID pathUuid, @ModelAttribute @Valid ContentTree contentTree, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  public String edit(@PathVariable UUID pathUuid, @ModelAttribute @Valid ContentTreeImpl contentTree, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "contenttrees/edit";

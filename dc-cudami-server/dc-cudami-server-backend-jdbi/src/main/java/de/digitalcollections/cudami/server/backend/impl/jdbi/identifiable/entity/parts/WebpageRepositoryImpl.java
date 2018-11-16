@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class WebpageRepositoryImpl<W extends Webpage> extends IdentifiableRepositoryImpl<W> implements WebpageRepository<W> {
+public class WebpageRepositoryImpl<W extends Webpage, I extends Identifiable> extends IdentifiableRepositoryImpl<W> implements WebpageRepository<W, I> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpageRepositoryImpl.class);
 
@@ -97,6 +98,7 @@ public class WebpageRepositoryImpl<W extends Webpage> extends IdentifiableReposi
     }
     W webpage = (W) list.get(0);
     webpage.setChildren(getChildren(webpage));
+    webpage.setIdentifiables(getIdentifiables(webpage));
     return webpage;
   }
 
@@ -241,5 +243,39 @@ public class WebpageRepositoryImpl<W extends Webpage> extends IdentifiableReposi
       return new ArrayList<>();
     }
     return list.stream().map(Identifiable.class::cast).collect(Collectors.toList());
+  }
+
+  @Override
+  public void addIdentifiable(UUID webpageUuid, UUID identifiableUuid) {
+    Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "webpage_identifiables", "webpage_uuid", webpageUuid);
+    dbi.withHandle(h -> h.createUpdate(
+            "INSERT INTO webpage_identifiables(webpage_uuid, identifiable_uuid, sortIndex)"
+            + " VALUES (:webpage_uuid, :identifiable_uuid, :sortIndex)")
+            .bind("webpage_uuid", webpageUuid)
+            .bind("identifiable_uuid", identifiableUuid)
+            .bind("sortIndex", sortIndex)
+            .execute());
+  }
+
+  @Override
+  public List<Identifiable> saveIdentifiables(W webpage, List<Identifiable> identifiables) {
+    UUID uuid = webpage.getUuid();
+    return saveIdentifiables(uuid, identifiables);
+  }
+
+  @Override
+  public List<Identifiable> saveIdentifiables(UUID identifiablesContainerUuid, List<Identifiable> identifiables) {
+    dbi.withHandle(h -> h.createUpdate("DELETE FROM webpage_identifiables WHERE webpagee_uuid = :uuid")
+            .bind("uuid", identifiablesContainerUuid).execute());
+
+    PreparedBatch batch = dbi.withHandle(h -> h.prepareBatch("INSERT INTO webpage_identifiables(webpage_uuid, identifiable_uuid, sortIndex) VALUES(:uuid, :identifiableUuid, :sortIndex)"));
+    for (Identifiable identifiable : identifiables) {
+      batch.bind("uuid", identifiablesContainerUuid)
+              .bind("identifiableUuid", identifiable.getUuid())
+              .bind("sortIndex", identifiables.indexOf(identifiable))
+              .add();
+    }
+    int[] counts = batch.execute();
+    return getIdentifiables(identifiablesContainerUuid);
   }
 }

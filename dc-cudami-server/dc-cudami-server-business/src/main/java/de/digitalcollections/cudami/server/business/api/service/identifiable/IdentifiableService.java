@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -14,6 +15,8 @@ public interface IdentifiableService<I extends Identifiable> {
   I create();
 
   PageResponse<I> find(PageRequest pageRequest);
+
+  List<I> find(String searchTerm, int maxResults);
 
   I get(UUID uuid);
 

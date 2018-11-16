@@ -7,9 +7,11 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.business.api.service.LocaleService;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.ArticleService;
+import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.entity.Article;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.identifiable.entity.ArticleImpl;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -54,7 +56,7 @@ public class ArticlesController extends AbstractController implements MessageSou
   LocaleService localeService;
 
   @Autowired
-  ArticleService<Article> service;
+  ArticleService<Article, Identifiable> service;
 
   @Override
   public void setMessageSource(MessageSource messageSource) {
@@ -67,7 +69,7 @@ public class ArticlesController extends AbstractController implements MessageSou
   }
 
   @RequestMapping(value = "/articles/new", method = RequestMethod.GET)
-  public String create(Model model, @RequestParam(required = false, name = "parentUuid") String parentUuid) {
+  public String create(Model model) {
     Locale defaultLocale = localeService.getDefault();
     List<Locale> locales = localeService.findAll().stream()
             .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
@@ -77,27 +79,19 @@ public class ArticlesController extends AbstractController implements MessageSou
     model.addAttribute("article", service.create());
     model.addAttribute("defaultLocale", defaultLocale);
     model.addAttribute("locales", locales);
-    model.addAttribute("parentUuid", parentUuid);
     return "articles/create";
   }
 
   @RequestMapping(value = "/articles/new", method = RequestMethod.POST)
-  public String create(@ModelAttribute @Valid Article article, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes,
-          @RequestParam(required = false, name = "parentType") String parentType,
-          @RequestParam(required = false, name = "parentUuid") UUID parentUuid) {
+  public String create(@ModelAttribute @Valid ArticleImpl article, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "articles/create";
     }
     Article articleDb = null;
     try {
-      if ("article".equals(parentType) && parentUuid != null) {
-        articleDb = service.saveWithParent(article, parentUuid);
-        LOGGER.info("Successfully saved subarticle");
-      } else {
-        articleDb = service.save(article, results);
-        LOGGER.info("Successfully saved article");
-      }
+      articleDb = service.save(article, results);
+      LOGGER.info("Successfully saved article");
     } catch (Exception e) {
       LOGGER.error("Cannot save article: ", e);
       String message = messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale());
@@ -132,7 +126,7 @@ public class ArticlesController extends AbstractController implements MessageSou
   }
 
   @RequestMapping(value = "/articles/{pathUuid}/edit", method = RequestMethod.POST)
-  public String edit(@PathVariable UUID pathUuid, @ModelAttribute @Valid Article article, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  public String edit(@PathVariable UUID pathUuid, @ModelAttribute @Valid ArticleImpl article, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "articles/edit";
@@ -179,6 +173,12 @@ public class ArticlesController extends AbstractController implements MessageSou
     model.addAttribute("defaultLocale", localeService.getDefault());
     model.addAttribute("article", article);
     return "articles/view";
+  }
+
+  @RequestMapping(value = "/articles/{uuid}/identifiables", method = RequestMethod.POST)
+  public String addIdentifiable(@PathVariable UUID uuid, @RequestParam(name = "identifiableUuid") UUID identifiableUuid, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+    service.addIdentifiable(uuid, identifiableUuid);
+    return "redirect:/articles/" + uuid;
   }
 
   public void setService(ArticleService service) {

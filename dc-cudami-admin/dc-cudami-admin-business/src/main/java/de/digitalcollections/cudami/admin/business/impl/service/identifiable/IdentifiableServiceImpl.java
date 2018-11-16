@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.admin.business.api.service.identifiable.Iden
 import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   public IdentifiableServiceImpl(@Qualifier("identifiableRepositoryImpl") IdentifiableRepository<I> repository) {
     this.repository = repository;
   }
-  
+
   @Override
   public long count() {
     return repository.count();
@@ -42,6 +43,11 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   @Override
   public PageResponse<I> find(PageRequest pageRequest) {
     return repository.find(pageRequest);
+  }
+
+  @Override
+  public List<I> find(String searchTerm, int maxResults) {
+    return repository.find(searchTerm, maxResults);
   }
 
   @Override

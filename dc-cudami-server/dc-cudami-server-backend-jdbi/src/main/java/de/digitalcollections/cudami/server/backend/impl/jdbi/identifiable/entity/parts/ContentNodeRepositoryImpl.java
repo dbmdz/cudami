@@ -5,15 +5,15 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.ContentNodeRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifiable;
-import de.digitalcollections.model.api.identifiable.parts.Translation;
 import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
+import de.digitalcollections.model.api.identifiable.parts.Translation;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
+import de.digitalcollections.model.impl.identifiable.entity.parts.ContentNodeImpl;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
-import de.digitalcollections.model.impl.identifiable.entity.parts.ContentNodeImpl;
+import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ContentNodeRepositoryImpl<C extends ContentNode> extends IdentifiableRepositoryImpl<C> implements ContentNodeRepository<C> {
+public class ContentNodeRepositoryImpl<C extends ContentNode, I extends Identifiable> extends IdentifiableRepositoryImpl<C> implements ContentNodeRepository<C, I> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentNodeRepositoryImpl.class);
 
@@ -96,6 +97,7 @@ public class ContentNodeRepositoryImpl<C extends ContentNode> extends Identifiab
     }
     C contentNode = (C) list.get(0);
     contentNode.setChildren(getChildren(contentNode));
+    contentNode.setIdentifiables(getIdentifiables(contentNode));
     return contentNode;
   }
 
@@ -219,7 +221,7 @@ public class ContentNodeRepositoryImpl<C extends ContentNode> extends Identifiab
   public List<Identifiable> getIdentifiables(C contentNode) {
     return getIdentifiables(contentNode.getUuid());
   }
-  
+
   @Override
   public List<Identifiable> getIdentifiables(UUID uuid) {
     // minimal data required for creating text links in a list
@@ -237,5 +239,39 @@ public class ContentNodeRepositoryImpl<C extends ContentNode> extends Identifiab
       return new ArrayList<>();
     }
     return list.stream().map(Identifiable.class::cast).collect(Collectors.toList());
+  }
+
+  @Override
+  public void addIdentifiable(UUID identifiablesContainerUuid, UUID identifiableUuid) {
+    Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "contentnode_identifiables", "contentnode_uuid", identifiablesContainerUuid);
+    dbi.withHandle(h -> h.createUpdate(
+            "INSERT INTO contentnode_identifiables(contentnode_uuid, identifiable_uuid, sortIndex)"
+            + " VALUES (:contentnode_uuid, :identifiable_uuid, :sortIndex)")
+            .bind("contentnode_uuid", identifiablesContainerUuid)
+            .bind("identifiable_uuid", identifiableUuid)
+            .bind("sortIndex", sortIndex)
+            .execute());
+  }
+
+  @Override
+  public List<Identifiable> saveIdentifiables(C contentNode, List<Identifiable> identifiables) {
+    UUID uuid = contentNode.getUuid();
+    return saveIdentifiables(uuid, identifiables);
+  }
+
+  @Override
+  public List<Identifiable> saveIdentifiables(UUID identifiablesContainerUuid, List<Identifiable> identifiables) {
+    dbi.withHandle(h -> h.createUpdate("DELETE FROM contentnode_identifiables WHERE contentnode_uuid = :uuid")
+            .bind("uuid", identifiablesContainerUuid).execute());
+
+    PreparedBatch batch = dbi.withHandle(h -> h.prepareBatch("INSERT INTO contentnode_identifiables(contentnode_uuid, identifiable_uuid, sortIndex) VALUES(:uuid, :identifiableUuid, :sortIndex)"));
+    for (Identifiable identifiable : identifiables) {
+      batch.bind("uuid", identifiablesContainerUuid)
+              .bind("identifiableUuid", identifiable.getUuid())
+              .bind("sortIndex", identifiables.indexOf(identifiable))
+              .add();
+    }
+    int[] counts = batch.execute();
+    return getIdentifiables(identifiablesContainerUuid);
   }
 }

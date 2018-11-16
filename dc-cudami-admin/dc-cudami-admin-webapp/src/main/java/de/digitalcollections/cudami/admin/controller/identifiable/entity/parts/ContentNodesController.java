@@ -10,6 +10,7 @@ import de.digitalcollections.cudami.admin.business.api.service.identifiable.enti
 import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.identifiable.entity.parts.ContentNodeImpl;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -84,7 +85,7 @@ public class ContentNodesController extends AbstractController implements Messag
   }
 
   @RequestMapping(value = "/contentnodes/new", method = RequestMethod.POST)
-  public String create(@ModelAttribute @Valid ContentNode contentNode, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes,
+  public String create(@ModelAttribute @Valid ContentNodeImpl contentNode, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes,
           @RequestParam("parentType") String parentType,
           @RequestParam("parentUuid") UUID parentUuid) {
     verifyBinding(results);
@@ -137,8 +138,8 @@ public class ContentNodesController extends AbstractController implements Messag
     return "contentnodes/edit";
   }
 
-  @RequestMapping(value = "/contentnodes/{pathUuid}/edit", method = RequestMethod.POST)
-  public String edit(@PathVariable UUID pathUuid, @ModelAttribute @Valid ContentNode contentNode, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  @RequestMapping(value = "/contentnodes/{uuid}/edit", method = RequestMethod.POST)
+  public String edit(@PathVariable UUID uuid, @ModelAttribute @Valid ContentNodeImpl contentNode, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "contentnodes/edit";
@@ -146,17 +147,17 @@ public class ContentNodesController extends AbstractController implements Messag
 
     try {
       // get content node from db
-      ContentNode contentNodeDb = (ContentNode) contentNodeService.get(pathUuid);
+      ContentNode contentNodeDb = (ContentNode) contentNodeService.get(uuid);
       // just update the fields, that were editable
       contentNodeDb.setLabel(contentNode.getLabel());
       contentNodeDb.setDescription(contentNode.getDescription());
 
       contentNodeService.update(contentNodeDb, results);
     } catch (IdentifiableServiceException e) {
-      String message = "Cannot save content node with uuid=" + pathUuid + ": " + e;
+      String message = "Cannot save content node with uuid=" + uuid + ": " + e;
       LOGGER.error(message, e);
       redirectAttributes.addFlashAttribute("error_message", message);
-      return "redirect:/contentnodes/" + pathUuid + "/edit";
+      return "redirect:/contentnodes/" + uuid + "/edit";
     }
 
     if (results.hasErrors()) {
@@ -165,7 +166,7 @@ public class ContentNodesController extends AbstractController implements Messag
     status.setComplete();
     String message = messageSource.getMessage("msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
-    return "redirect:/contentnodes/" + pathUuid;
+    return "redirect:/contentnodes/" + uuid;
   }
 
   @RequestMapping(value = "/contentnodes", method = RequestMethod.GET)
@@ -184,6 +185,12 @@ public class ContentNodesController extends AbstractController implements Messag
     model.addAttribute("defaultLocale", localeService.getDefault());
     model.addAttribute("contentNode", contentNode);
     return "contentnodes/view";
+  }
+
+  @RequestMapping(value = "/contentnodes/{uuid}/identifiables", method = RequestMethod.POST)
+  public String addIdentifiable(@PathVariable UUID uuid, @RequestParam(name = "identifiableUuid") UUID identifiableUuid, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+    contentNodeService.addIdentifiable(uuid, identifiableUuid);
+    return "redirect:/contentnodes/" + uuid;
   }
 
   public void setContentNodeService(ContentNodeService contentNodeService) {

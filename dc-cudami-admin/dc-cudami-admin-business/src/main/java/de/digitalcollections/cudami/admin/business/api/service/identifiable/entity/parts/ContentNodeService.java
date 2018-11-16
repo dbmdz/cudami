@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.admin.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.IdentifiablesContainerService;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.NodeService;
+import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
 import java.util.UUID;
 import org.springframework.validation.Errors;
@@ -10,9 +11,10 @@ import org.springframework.validation.Errors;
 /**
  * Service for ContentNode.
  *
- * @param <C> domain object
+ * @param <C> contentnode isntance
+ * @param <I> identifiable instance
  */
-public interface ContentNodeService<C extends ContentNode> extends NodeService<C>, IdentifiablesContainerService<C> {
+public interface ContentNodeService<C extends ContentNode, I extends Identifiable> extends NodeService<C>, IdentifiablesContainerService<C, I> {
 
   ContentNode saveWithParentContentTree(C contentNode, UUID parentContentTreeUUID, Errors results) throws IdentifiableServiceException;
 

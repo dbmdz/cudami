@@ -7,6 +7,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -23,7 +24,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
 
   @Autowired
   private LocaleService localeService;
-  
+
   protected IdentifiableRepository<I> repository;
 
   @Autowired
@@ -48,10 +49,15 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
+  public List<I> find(String searchTerm, int maxResults) {
+    return repository.find(searchTerm, maxResults);
+  }
+
+  @Override
   public I get(UUID uuid) {
     return (I) repository.findOne(uuid);
   }
-  
+
   @Override
   public I get(UUID uuid, Locale locale) throws IdentifiableServiceException {
     I resource = repository.findOne(uuid, locale);
@@ -70,7 +76,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-//  @Transactional(readOnly = false)
+  //  @Transactional(readOnly = false)
   public I save(I identifiable) throws IdentifiableServiceException {
     try {
       return (I) repository.save(identifiable);
@@ -81,7 +87,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-//  @Transactional(readOnly = false)
+  //  @Transactional(readOnly = false)
   public I update(I identifiable) throws IdentifiableServiceException {
     try {
       return (I) repository.update(identifiable);

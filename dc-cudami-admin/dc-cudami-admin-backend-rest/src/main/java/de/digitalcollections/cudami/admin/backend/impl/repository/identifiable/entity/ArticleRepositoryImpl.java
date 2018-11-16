@@ -12,10 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ArticleRepositoryImpl<A extends Article> extends EntityRepositoryImpl<A> implements ArticleRepository<A> {
+public class ArticleRepositoryImpl<A extends Article, I extends Identifiable> extends EntityRepositoryImpl<A> implements ArticleRepository<A, I> {
 
   @Autowired
   private ArticleRepositoryEndpoint endpoint;
+
+  @Override
+  public void addIdentifiable(UUID articleUuid, UUID identifiableUuid) {
+    endpoint.addIdentifiable(articleUuid, identifiableUuid);
+  }
 
   @Override
   public long count() {
@@ -50,26 +55,16 @@ public class ArticleRepositoryImpl<A extends Article> extends EntityRepositoryIm
   }
 
   @Override
-  public Article saveWithParent(A article, UUID parentUuid) {
-    return (A) endpoint.saveWithParent(article, parentUuid);
-  }
-
-  @Override
-  public List<A> getChildren(A article) {
-    return getChildren(article.getUuid());
-  }
-
-  @Override
-  public List<A> getChildren(UUID uuid) {
-    return (List<A>) endpoint.getChildren(uuid);
-  }
-
-  @Override
   public List<Identifiable> getIdentifiables(A article) {
     return getIdentifiables(article.getUuid());
   }
 
   private List<Identifiable> getIdentifiables(UUID uuid) {
     return endpoint.getIdentifiables(uuid);
+  }
+
+  @Override
+  public List<Identifiable> saveIdentifiables(A article, List<Identifiable> identifiables) {
+    return endpoint.saveIdentifiables(article.getUuid(), identifiables);
   }
 }

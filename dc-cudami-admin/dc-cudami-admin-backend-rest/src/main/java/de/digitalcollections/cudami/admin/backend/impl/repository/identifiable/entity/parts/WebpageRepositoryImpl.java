@@ -14,13 +14,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class WebpageRepositoryImpl<W extends Webpage> extends IdentifiableRepositoryImpl<W> implements WebpageRepository<W> {
+public class WebpageRepositoryImpl<W extends Webpage, I extends Identifiable> extends IdentifiableRepositoryImpl<W> implements WebpageRepository<W, I> {
 
   @Autowired
   LocaleRepository localeRepository;
 
   @Autowired
   private WebpageRepositoryEndpoint endpoint;
+
+  @Override
+  public void addIdentifiable(UUID webpageUuid, UUID identifiableUuid) {
+    endpoint.addIdentifiable(webpageUuid, identifiableUuid);
+  }
 
   @Override
   public long count() {
@@ -81,5 +86,10 @@ public class WebpageRepositoryImpl<W extends Webpage> extends IdentifiableReposi
 
   private List<Identifiable> getIdentifiables(UUID uuid) {
     return endpoint.getIdentifiables(uuid);
+  }
+
+  @Override
+  public List<Identifiable> saveIdentifiables(W webpage, List<Identifiable> identifiables) {
+    return endpoint.saveIdentifiables(webpage.getUuid(), identifiables);
   }
 }

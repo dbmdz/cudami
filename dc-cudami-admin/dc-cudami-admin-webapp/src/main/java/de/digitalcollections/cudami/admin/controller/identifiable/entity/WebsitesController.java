@@ -10,6 +10,7 @@ import de.digitalcollections.cudami.admin.business.api.service.identifiable.enti
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -80,7 +81,7 @@ public class WebsitesController extends AbstractController implements MessageSou
   }
 
   @RequestMapping(value = "/websites/new", method = RequestMethod.POST)
-  public String create(@ModelAttribute @Valid Website website, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  public String create(@ModelAttribute @Valid WebsiteImpl website, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "websites/create";
@@ -128,7 +129,7 @@ public class WebsitesController extends AbstractController implements MessageSou
   }
 
   @RequestMapping(value = "/websites/{pathUuid}/edit", method = RequestMethod.POST)
-  public String edit(@PathVariable UUID pathUuid, @ModelAttribute @Valid Website website, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  public String edit(@PathVariable UUID pathUuid, @ModelAttribute @Valid WebsiteImpl website, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "websites/edit";

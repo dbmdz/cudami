@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ArticleRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
@@ -17,10 +16,12 @@ import org.springframework.stereotype.Service;
 
 /**
  * Service for Article handling.
+ *
+ * @param <I> identifiable instance
  */
 @Service
 //@Transactional(readOnly = true)
-public class ArticleServiceImpl extends EntityServiceImpl<Article> implements ArticleService<Article> {
+public class ArticleServiceImpl<I extends Identifiable> extends EntityServiceImpl<Article> implements ArticleService<Article, I> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticleServiceImpl.class);
 
@@ -28,8 +29,13 @@ public class ArticleServiceImpl extends EntityServiceImpl<Article> implements Ar
   private LocaleService localeService;
 
   @Autowired
-  public ArticleServiceImpl(ArticleRepository<Article> repository) {
+  public ArticleServiceImpl(ArticleRepository<Article, I> repository) {
     super(repository);
+  }
+
+  @Override
+  public void addIdentifiable(UUID articleUuid, UUID identifiableUuid) {
+    ((ArticleRepository) repository).addIdentifiable(articleUuid, identifiableUuid);
   }
 
   @Override
@@ -50,27 +56,6 @@ public class ArticleServiceImpl extends EntityServiceImpl<Article> implements Ar
   }
 
   @Override
-  public List<Article> getChildren(Article article) {
-    return ((NodeRepository) repository).getChildren(article);
-  }
-
-  @Override
-  public List<Article> getChildren(UUID uuid) {
-    return ((NodeRepository) repository).getChildren(uuid);
-  }
-
-  @Override
-  //  @Transactional(readOnly = false)
-  public Article saveWithParent(Article article, UUID parentUuid) throws IdentifiableServiceException {
-    try {
-      return ((ArticleRepository) repository).saveWithParent(article, parentUuid);
-    } catch (Exception e) {
-      LOGGER.error("Cannot save article " + article + ": ", e);
-      throw new IdentifiableServiceException(e.getMessage());
-    }
-  }
-
-  @Override
   public List<Identifiable> getIdentifiables(Article article) {
     return getIdentifiables(article.getUuid());
   }
@@ -79,6 +64,14 @@ public class ArticleServiceImpl extends EntityServiceImpl<Article> implements Ar
   public List<Identifiable> getIdentifiables(UUID identifiableUuid) {
     return ((ArticleRepository) repository).getIdentifiables(identifiableUuid);
   }
-  
-  
+
+  @Override
+  public List<Identifiable> saveIdentifiables(Article article, List<Identifiable> identifiables) {
+    return saveIdentifiables(article.getUuid(), identifiables);
+  }
+
+  @Override
+  public List<Identifiable> saveIdentifiables(UUID identifiablesContainerUuid, List<Identifiable> identifiables) {
+    return ((ArticleRepository) repository).saveIdentifiables(identifiablesContainerUuid, identifiables);
+  }
 }

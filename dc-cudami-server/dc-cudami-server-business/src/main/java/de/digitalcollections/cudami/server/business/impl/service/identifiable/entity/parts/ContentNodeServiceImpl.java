@@ -18,10 +18,12 @@ import org.springframework.stereotype.Service;
 
 /**
  * Service for ContentNode handling.
+ *
+ * @param <I> identifiable instance
  */
 @Service
 //@Transactional(readOnly = true)
-public class ContentNodeServiceImpl extends IdentifiableServiceImpl<ContentNode> implements ContentNodeService<ContentNode> {
+public class ContentNodeServiceImpl<I extends Identifiable> extends IdentifiableServiceImpl<ContentNode> implements ContentNodeService<ContentNode, I> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentNodeServiceImpl.class);
 
@@ -29,8 +31,13 @@ public class ContentNodeServiceImpl extends IdentifiableServiceImpl<ContentNode>
   private LocaleService localeService;
 
   @Autowired
-  public ContentNodeServiceImpl(ContentNodeRepository<ContentNode> repository) {
+  public ContentNodeServiceImpl(ContentNodeRepository<ContentNode, I> repository) {
     super(repository);
+  }
+
+  @Override
+  public void addIdentifiable(UUID contentNodeUuid, UUID identifiableUuid) {
+    ((ContentNodeRepository) repository).addIdentifiable(contentNodeUuid, identifiableUuid);
   }
 
   @Override
@@ -90,5 +97,15 @@ public class ContentNodeServiceImpl extends IdentifiableServiceImpl<ContentNode>
   @Override
   public List<Identifiable> getIdentifiables(UUID identifiableUuid) {
     return ((ContentNodeRepository) repository).getIdentifiables(identifiableUuid);
+  }
+
+  @Override
+  public List<Identifiable> saveIdentifiables(ContentNode contentNode, List<Identifiable> identifiables) {
+    return saveIdentifiables(contentNode.getUuid(), identifiables);
+  }
+
+  @Override
+  public List<Identifiable> saveIdentifiables(UUID identifiablesContainerUuid, List<Identifiable> identifiables) {
+    return ((ContentNodeRepository) repository).saveIdentifiables(identifiablesContainerUuid, identifiables);
   }
 }

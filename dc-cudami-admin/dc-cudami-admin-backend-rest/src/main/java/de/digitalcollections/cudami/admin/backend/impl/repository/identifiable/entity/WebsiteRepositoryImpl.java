@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 // FIXME: duplicate methods (replace by functional call with specific endpoint instance?)
-public class WebsiteRepositoryImpl<W extends WebsiteImpl> extends EntityRepositoryImpl<W> implements WebsiteRepository<W> {
+public class WebsiteRepositoryImpl<W extends Website> extends EntityRepositoryImpl<W> implements WebsiteRepository<W> {
 
   @Autowired
   private WebsiteRepositoryEndpoint endpoint;

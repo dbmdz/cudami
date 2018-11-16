@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.entity.parts;
 
 import de.digitalcollections.cudami.admin.backend.impl.repository.RepositoryEndpoint;
-import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.identifiable.Identifiable;
+import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageResponse;
 import feign.Headers;
 import feign.Param;
@@ -42,7 +42,15 @@ public interface WebpageRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine("POST /v1/webpages/{parentWebpageUuid}/webpage")
   @Headers("Content-Type: application/json")
   Webpage saveWithParentWebpage(Webpage webpage, @Param("parentWebpageUuid") UUID parentWebpageUuid);
-  
+
   @RequestLine("GET /v1/webpages/{uuid}/identifiables")
   public List<Identifiable> getIdentifiables(UUID uuid);
+
+  @RequestLine("POST /v1/webpages/{uuid}/identifiables/{identifiableUuid}")
+  @Headers("Content-Type: application/json")
+  void addIdentifiable(@Param("uuid") UUID webpageUuid, @Param("identifiableUuid") UUID identifiableUuid);
+
+  @RequestLine("POST /v1/webpages/{uuid}/identifiables")
+  @Headers("Content-Type: application/json")
+  public List<Identifiable> saveIdentifiables(@Param("uuid") UUID uuid, List<Identifiable> identifiables);
 }

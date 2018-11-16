@@ -27,10 +27,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -38,7 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ArticleController {
 
   @Autowired
-  private ArticleService<Article> articleService;
+  private ArticleService<Article, Identifiable> articleService;
 
   @ApiMethod(description = "get all articles")
   @RequestMapping(value = "/v1/articles", produces = "application/json", method = RequestMethod.GET)
@@ -76,18 +78,11 @@ public class ArticleController {
     return new ResponseEntity<>(article, HttpStatus.OK);
   }
 
-  @ApiMethod(description = "save a newly created top-level article")
+  @ApiMethod(description = "save a newly created article")
   @RequestMapping(value = "/v1/articles", produces = "application/json", method = RequestMethod.POST)
   @ApiResponseObject
   public Article save(@RequestBody Article article, BindingResult errors) throws IdentifiableServiceException {
     return articleService.save(article);
-  }
-
-  @ApiMethod(description = "save a newly created article with a parent article")
-  @RequestMapping(value = "/v1/articles/{parentArticleUuid}/article", produces = "application/json", method = RequestMethod.POST)
-  @ApiResponseObject
-  public Article saveWithParentArticle(@PathVariable UUID parentArticleUuid, @RequestBody Article article, BindingResult errors) throws IdentifiableServiceException {
-    return articleService.saveWithParent(article, parentArticleUuid);
   }
 
   @ApiMethod(description = "update an article")
@@ -98,8 +93,19 @@ public class ArticleController {
     return articleService.update(article);
   }
 
+  @ApiMethod(description = "get identifiables related to article")
   @RequestMapping(value = "/v1/articles/{uuid}/identifiables", produces = "application/json", method = RequestMethod.GET)
+  @ApiResponseObject
   public List<Identifiable> getIdentifiables(@PathVariable UUID uuid) {
     return articleService.getIdentifiables(uuid);
   }
+
+  @ApiMethod(description = "add identifiable to article")
+  @PostMapping(value = "/v1/articles/{uuid}/identifiables/{identifiableUuid}")
+  @ResponseStatus(value = HttpStatus.OK)
+  @ApiResponseObject
+  public void addIdentifiable(@PathVariable UUID uuid, @PathVariable UUID identifiableUuid) {
+    articleService.addIdentifiable(uuid, identifiableUuid);
+  }
+  // TODO: saveIdentifiables
 }

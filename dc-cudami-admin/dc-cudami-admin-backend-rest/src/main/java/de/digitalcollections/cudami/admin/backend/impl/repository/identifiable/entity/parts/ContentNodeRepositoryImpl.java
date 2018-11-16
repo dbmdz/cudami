@@ -14,13 +14,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ContentNodeRepositoryImpl<C extends ContentNode> extends IdentifiableRepositoryImpl<C> implements ContentNodeRepository<C> {
+public class ContentNodeRepositoryImpl<C extends ContentNode, I extends Identifiable> extends IdentifiableRepositoryImpl<C> implements ContentNodeRepository<C, I> {
 
   @Autowired
   LocaleRepository localeRepository;
 
   @Autowired
   private ContentNodeRepositoryEndpoint endpoint;
+
+  @Override
+  public void addIdentifiable(UUID contentNodeUuid, UUID identifiableUuid) {
+    endpoint.addIdentifiable(contentNodeUuid, identifiableUuid);
+  }
 
   @Override
   public long count() {
@@ -81,5 +86,10 @@ public class ContentNodeRepositoryImpl<C extends ContentNode> extends Identifiab
 
   private List<Identifiable> getIdentifiables(UUID uuid) {
     return endpoint.getIdentifiables(uuid);
+  }
+
+  @Override
+  public List<Identifiable> saveIdentifiables(C contentNode, List<Identifiable> identifiables) {
+    return endpoint.saveIdentifiables(contentNode.getUuid(), identifiables);
   }
 }
