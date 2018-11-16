@@ -1,7 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version='1.0' encoding='UTF-8'?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -22,10 +20,10 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <version.webjar-jquery-ui-dist>1.12.1</version.webjar-jquery-ui-dist>
     <version.logstash-logback-encoder>5.1</version.logstash-logback-encoder>
     <version.maven-resources-plugin>2.7</version.maven-resources-plugin>
     <version.thymeleaf-spring-data-dialect>3.3.1</version.thymeleaf-spring-data-dialect>
+    <version.webjar-jquery-ui-dist>1.12.1</version.webjar-jquery-ui-dist>
   </properties>
 
   <dependencies>
@@ -80,7 +78,7 @@
       <artifactId>dc-model-jackson</artifactId>
     </dependency>
     <dependency>
-      <!--see https://github.com/jpenren/thymeleaf-spring-data-dialect--> 
+      <!--see https://github.com/jpenren/thymeleaf-spring-data-dialect-->
       <groupId>io.github.jpenren</groupId>
       <artifactId>thymeleaf-spring-data-dialect</artifactId>
       <version>${version.thymeleaf-spring-data-dialect}</version>

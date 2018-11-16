@@ -106,18 +106,25 @@
             <thead>
               <tr>
                 <th class="center" th:text="#{label}">Label</th>
+                <!-- TODO
                 <th class="center" th:text="#{actions}">Actions</th>
+                -->
               </tr>
             </thead>
             <tbody>
               <tr th:each="identifiable: *{identifiables}">
                 <td>
+                  <!-- TODO
                   <a th:href="@{'/identifiables/' + ${identifiable.uuid}}" th:text="${identifiable.label.getText(defaultLocale)}">Label</a>
+                  -->
+                  <span th:text="${identifiable.label.getText(defaultLocale)}">Label</span>
                 </td>
+                <!-- TODO
                 <td class="center">
                   <a th:href="@{'/identifiables/' + ${identifiable.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
                   <a th:href="@{'/identifiables/' + ${identifiable.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
                 </td>
+                -->
               </tr>
             </tbody>
           </table>
