@@ -45,11 +45,6 @@ public class CudamiFileResourceRepositoryImpl<F extends FileResource> extends Id
   }
 
   @Override
-  public F create() {
-    return (F) new FileResourceImpl();
-  }
-
-  @Override
   public PageResponse<F> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder("SELECT f.filename as filename, f.mimetype as mimeType, f.size_in_bytes as sizeInBytes, i.uuid as uuid, i.label as label, i.description as description")
             .append(" FROM fileresources f INNER JOIN identifiables i ON f.uuid=i.uuid");
@@ -93,7 +88,7 @@ public class CudamiFileResourceRepositoryImpl<F extends FileResource> extends Id
             .execute());
     return findOne(fileResource.getUuid());
   }
-  
+
   @Override
   public F update(F fileresource) {
     identifiableRepository.update(fileresource);

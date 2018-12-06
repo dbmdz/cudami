@@ -11,8 +11,6 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
 import de.digitalcollections.model.impl.identifiable.entity.ArticleImpl;
-import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
-import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,16 +64,6 @@ public class ArticleRepositoryImpl<A extends Article, I extends Identifiable> ex
     String sql = "SELECT count(*) FROM articles";
     long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOnly());
     return count;
-  }
-
-  @Override
-  public A create() {
-    Locale defaultLocale = localeRepository.getDefault();
-    A article = (A) new ArticleImpl();
-    article.setLabel(new LocalizedTextImpl(defaultLocale, ""));
-    article.setDescription(new LocalizedStructuredContentImpl(defaultLocale));
-    article.setText(new LocalizedStructuredContentImpl(defaultLocale));
-    return article;
   }
 
   @Override

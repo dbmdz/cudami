@@ -6,8 +6,8 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.Identi
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
+import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.util.List;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
@@ -32,11 +32,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     String sql = "SELECT count(*) FROM entities";
     long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOnly());
     return count;
-  }
-
-  @Override
-  public E create() {
-    return (E) new EntityImpl();
   }
 
   @Override

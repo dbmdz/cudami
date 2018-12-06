@@ -11,8 +11,6 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
-import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
-import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,16 +51,6 @@ public class WebpageRepositoryImpl<W extends Webpage, I extends Identifiable> ex
     String sql = "SELECT count(*) FROM webpages";
     long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOnly());
     return count;
-  }
-
-  @Override
-  public W create() {
-    Locale defaultLocale = localeRepository.getDefault();
-    W webpage = (W) new WebpageImpl();
-    webpage.setLabel(new LocalizedTextImpl(defaultLocale, ""));
-    webpage.setDescription(new LocalizedStructuredContentImpl(defaultLocale));
-    webpage.setText(new LocalizedStructuredContentImpl(defaultLocale));
-    return webpage;
   }
 
   @Override

@@ -38,12 +38,6 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-  public I create() {
-    I identifiable = (I) repository.create();
-    return identifiable;
-  }
-
-  @Override
   public PageResponse<I> find(PageRequest pageRequest) {
     return repository.find(pageRequest);
   }

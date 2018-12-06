@@ -34,11 +34,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
   }
 
   @Override
-  public I create() {
-    return (I) new IdentifiableImpl();
-  }
-
-  @Override
   public PageResponse<I> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder("SELECT * FROM identifiables");
 

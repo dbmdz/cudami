@@ -7,14 +7,11 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
-import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
-import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
+import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
@@ -48,15 +45,6 @@ public class WebsiteRepositoryImpl<W extends WebsiteImpl> extends EntityReposito
     String sql = "SELECT count(*) FROM websites";
     long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOnly());
     return count;
-  }
-
-  @Override
-  public W create() {
-    Locale defaultLocale = localeRepository.getDefault();
-    W website = (W) new WebsiteImpl();
-    website.setLabel(new LocalizedTextImpl(defaultLocale, ""));
-    website.setDescription(new LocalizedStructuredContentImpl(defaultLocale));
-    return website;
   }
 
   @Override
