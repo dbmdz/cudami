@@ -9,6 +9,7 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.security.User;
 import de.digitalcollections.model.api.security.enums.Role;
+import de.digitalcollections.model.impl.security.UserImpl;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -91,19 +92,19 @@ public class UserController extends AbstractController implements MessageSourceA
   }
 
   @RequestMapping(value = "/users/new", method = RequestMethod.POST)
-  public String create(@RequestParam("pwd1") String password1, @RequestParam("pwd2") String password2, @ModelAttribute @Valid User user, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  public String create(@RequestParam("pwd1") String password1, @RequestParam("pwd2") String password2, @ModelAttribute @Valid UserImpl user, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "users/create";
     }
-    user = userService.create(user, password1, password2, (Errors) results);
+    User userDb = userService.create(user, password1, password2, (Errors) results);
     if (results.hasErrors()) {
       return "users/create";
     }
     status.setComplete();
     String message = messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
-    return "redirect:/users/" + user.getUuid();
+    return "redirect:/users/" + userDb.getUuid().toString();
   }
 
   @RequestMapping(value = "/users/{uuid}/edit", method = RequestMethod.GET)
@@ -113,7 +114,7 @@ public class UserController extends AbstractController implements MessageSourceA
   }
 
   @RequestMapping(value = "/users/{uuid}/edit", method = RequestMethod.POST)
-  public String edit(@PathVariable UUID uuid, @RequestParam("pwd1") String password1, @RequestParam("pwd2") String password2, @ModelAttribute @Valid User user, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  public String edit(@PathVariable UUID uuid, @RequestParam("pwd1") String password1, @RequestParam("pwd2") String password2, @ModelAttribute @Valid UserImpl user, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "users/edit";

@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.admin.controller;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
-import de.digitalcollections.model.api.security.User;
+import de.digitalcollections.model.impl.security.UserImpl;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -49,7 +49,7 @@ public class SetupController extends AbstractController implements MessageSource
   }
 
   @RequestMapping(value = "/setup/adminUser", method = RequestMethod.POST)
-  public String adminUser(@RequestParam("pwd1") String password1, @RequestParam("pwd2") String password2, @ModelAttribute @Valid User user, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  public String adminUser(@RequestParam("pwd1") String password1, @RequestParam("pwd2") String password2, @ModelAttribute(name = "user") @Valid UserImpl user, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "users/create";
