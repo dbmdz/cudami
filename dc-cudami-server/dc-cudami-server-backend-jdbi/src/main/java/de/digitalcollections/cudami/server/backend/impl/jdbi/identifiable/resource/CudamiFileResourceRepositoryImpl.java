@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class CudamiFileResourceRepositoryImpl<F extends FileResource> extends IdentifiableRepositoryImpl<F> implements CudamiFileResourceRepository<F> {
+public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<FileResource> implements CudamiFileResourceRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CudamiFileResourceRepositoryImpl.class);
 
@@ -29,7 +29,7 @@ public class CudamiFileResourceRepositoryImpl<F extends FileResource> extends Id
   private final IdentifiableRepository identifiableRepository;
 
   @Autowired
-  FileResourceRepository<F> fileResourceRepository;
+  FileResourceRepository fileResourceRepository;
 
   @Autowired
   public CudamiFileResourceRepositoryImpl(Jdbi dbi, @Qualifier("identifiableRepositoryImpl") IdentifiableRepository identifiableRepository) {
@@ -45,7 +45,7 @@ public class CudamiFileResourceRepositoryImpl<F extends FileResource> extends Id
   }
 
   @Override
-  public PageResponse<F> find(PageRequest pageRequest) {
+  public PageResponse<FileResource> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder("SELECT f.filename as filename, f.mimetype as mimeType, f.size_in_bytes as sizeInBytes, i.uuid as uuid, i.label as label, i.description as description")
             .append(" FROM fileresources f INNER JOIN identifiables i ON f.uuid=i.uuid");
 
@@ -59,7 +59,7 @@ public class CudamiFileResourceRepositoryImpl<F extends FileResource> extends Id
   }
 
   @Override
-  public F findOne(UUID uuid) {
+  public FileResource findOne(UUID uuid) {
     String query = "SELECT f.filename as filename, f.mimetype as mimeType, f.size_in_bytes as sizeInBytes, i.uuid as uuid, i.label as label, i.description as description"
             + " FROM fileresources f INNER JOIN identifiables i ON f.uuid=i.uuid"
             + " WHERE f.uuid = :uuid";
@@ -71,11 +71,11 @@ public class CudamiFileResourceRepositoryImpl<F extends FileResource> extends Id
     if (list.isEmpty()) {
       return null;
     }
-    return (F) list.get(0);
+    return (FileResource) list.get(0);
   }
 
   @Override
-  public F save(F fileResource, InputStream binaryData) {
+  public FileResource save(FileResource fileResource, InputStream binaryData) {
     try {
       fileResourceRepository.write(fileResource, binaryData);
     } catch (ResourceIOException ex) {
@@ -90,7 +90,7 @@ public class CudamiFileResourceRepositoryImpl<F extends FileResource> extends Id
   }
 
   @Override
-  public F update(F fileresource) {
+  public FileResource update(FileResource fileresource) {
     identifiableRepository.update(fileresource);
     // do not update/left out from statement: created, uuid
     dbi.withHandle(h -> h.createUpdate("UPDATE fileresources SET filename=:filename, mimetype=:mimeType, size_in_bytes=:sizeInBytes WHERE uuid=:uuid")

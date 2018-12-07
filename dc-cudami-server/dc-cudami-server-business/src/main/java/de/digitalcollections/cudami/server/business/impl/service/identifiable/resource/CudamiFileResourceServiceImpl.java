@@ -12,19 +12,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CudamiFileResourceServiceImpl<F extends FileResource> extends IdentifiableServiceImpl<F> implements CudamiFileResourceService<F> {
+public class CudamiFileResourceServiceImpl extends IdentifiableServiceImpl<FileResource> implements CudamiFileResourceService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CudamiFileResourceServiceImpl.class);
 
   @Autowired
-  public CudamiFileResourceServiceImpl(CudamiFileResourceRepository<F> repository) {
+  public CudamiFileResourceServiceImpl(CudamiFileResourceRepository repository) {
     super(repository);
   }
 
   @Override
-  public F save(F fileResource, InputStream binaryData) throws IdentifiableServiceException {
+  public FileResource save(FileResource fileResource, InputStream binaryData) throws IdentifiableServiceException {
     try {
-      return (F) ((CudamiFileResourceRepository) repository).save(fileResource, binaryData);
+      return ((CudamiFileResourceRepository) repository).save(fileResource, binaryData);
     } catch (Exception e) {
       LOGGER.error("Cannot save fileResource " + fileResource.getFilename() + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());

@@ -4,10 +4,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import java.io.InputStream;
 
-/**
- * @param <F> file resource instance
- */
-public interface CudamiFileResourceRepository<F extends FileResource> extends IdentifiableRepository<F> {
+public interface CudamiFileResourceRepository extends IdentifiableRepository<FileResource> {
 
-  F save(F fileResource, InputStream binaryData);
+  FileResource save(FileResource fileResource, InputStream binaryData);
 }

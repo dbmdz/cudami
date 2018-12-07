@@ -50,7 +50,7 @@ public class FileResourceController {
   private ObjectMapper objectMapper;
 
   @Autowired
-  private CudamiFileResourceService<FileResource> service;
+  private CudamiFileResourceService service;
 
   // TODO: see FileResourceRepositoryEndpoint: count()
   @ApiMethod(description = "get all fileresources")

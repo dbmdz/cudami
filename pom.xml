@@ -72,7 +72,7 @@
     <version.commons-beanutils>1.9.3</version.commons-beanutils>
     <version.commons-dbcp2>2.1.1</version.commons-dbcp2>
     <version.commons-lang3>3.4</version.commons-lang3>
-    <version.dc-commons>3.0.0</version.dc-commons>
+    <version.dc-commons>3.0.1-SNAPSHOT</version.dc-commons>
     <version.dc-model>2.1.0</version.dc-model>
     <version.feign>9.5.1</version.feign>
     <version.feign-form-spring>3.3.0</version.feign-form-spring>
