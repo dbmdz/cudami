@@ -92,8 +92,8 @@
     <version.querydsl>4.1.4</version.querydsl>
     <version.slf4j-api>1.7.24</version.slf4j-api>
     <version.slf4j-log4j12>1.7.24</version.slf4j-log4j12>
-    <version.snakeyaml>1.19</version.snakeyaml><!-- do not upgrade! see https://github.com/spring-projects/spring-boot/issues/12793 -->
-    <version.spring-boot>2.0.6.RELEASE</version.spring-boot>
+    <version.snakeyaml>1.23</version.snakeyaml>
+    <version.spring-boot>2.1.1.RELEASE</version.spring-boot>
     <version.spring-data-commons>1.13.16.RELEASE</version.spring-data-commons>
     <version.spring-data-jpa>1.11.0.RELEASE</version.spring-data-jpa>
     <version.unbescape>1.1.4.RELEASE</version.unbescape>
