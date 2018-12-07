@@ -8,9 +8,6 @@ import de.digitalcollections.commons.springmvc.controller.ErrorController;
 import de.digitalcollections.cudami.admin.converter.GrantedAuthorityJsonFilter;
 import de.digitalcollections.cudami.admin.interceptors.CreateAdminUserInterceptor;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 import org.slf4j.Logger;
@@ -26,11 +23,6 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.ByteArrayHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
@@ -124,37 +116,6 @@ public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
   @Bean
   public CreateAdminUserInterceptor createAdminUserInterceptor() {
     return new CreateAdminUserInterceptor();
-  }
-
-  @Override
-  public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-    // support for @ResponseBody of type String
-    final StringHttpMessageConverter stringHMC = new StringHttpMessageConverter(Charset.forName(ENCODING));
-    // supported MediaTypes for stringHMC are by default set to: "text/plain" and MediaType.ALL
-    converters.add(stringHMC);
-
-    // support for @ResponseBody of type Object: convert object to JSON
-    // used in ApiController
-    converters.add(mappingJackson2HttpMessageConverter());
-
-    // support for @ResponseBody of type byte[]
-    ByteArrayHttpMessageConverter bc = new ByteArrayHttpMessageConverter();
-    List<MediaType> supported = new ArrayList<>();
-    supported.add(MediaType.IMAGE_JPEG);
-    supported.add(MediaType.IMAGE_GIF);
-    supported.add(MediaType.IMAGE_PNG);
-    bc.setSupportedMediaTypes(supported);
-    converters.add(bc);
-  }
-
-  @Bean
-  public HttpMessageConverter<?> mappingJackson2HttpMessageConverter() {
-    MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-    List<MediaType> supportedMediaTypes = new ArrayList<>();
-    supportedMediaTypes.add(MediaType.ALL);
-    converter.setSupportedMediaTypes(supportedMediaTypes);
-    converter.setObjectMapper(objectMapper);
-    return converter;
   }
 
   @Override
