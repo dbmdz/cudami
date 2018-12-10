@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.propertyeditor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.admin.test.config.SpringConfigBusinessForTest;
 import de.digitalcollections.cudami.admin.config.SpringConfigWeb;
+import de.digitalcollections.cudami.admin.test.config.SpringConfigBusinessForTest;
 import de.digitalcollections.model.api.identifiable.parts.structuredcontent.LocalizedStructuredContent;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
