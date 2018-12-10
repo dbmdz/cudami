@@ -23,7 +23,14 @@
     <version.logstash-logback-encoder>5.1</version.logstash-logback-encoder>
     <version.maven-resources-plugin>2.7</version.maven-resources-plugin>
     <version.thymeleaf-spring-data-dialect>3.3.1</version.thymeleaf-spring-data-dialect>
-    <version.webjar-jquery-ui-dist>1.12.1</version.webjar-jquery-ui-dist>
+    <version.webjar-bootstrap>3.3.7</version.webjar-bootstrap>
+    <version.webjar-bootswatch>3.3.7</version.webjar-bootswatch>
+    <version.webjar-fontawesome>5.2.0</version.webjar-fontawesome>
+    <version.webjar-html5shiv>3.7.3</version.webjar-html5shiv>
+    <version.webjar-ie10-viewport-bug-workaround>1.0.3</version.webjar-ie10-viewport-bug-workaround>
+    <version.webjar-jquery>3.1.1</version.webjar-jquery>
+    <version.webjar-jquery-ui>1.12.1</version.webjar-jquery-ui>
+    <version.webjar-respond>1.4.2</version.webjar-respond>
   </properties>
 
   <dependencies>
@@ -193,7 +200,7 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>jquery-ui-dist</artifactId>
-      <version>${version.webjar-jquery-ui-dist}</version>
+      <version>${version.webjar-jquery-ui}</version>
     </dependency>
   </dependencies>
 
