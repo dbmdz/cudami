@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.admin.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mxab.thymeleaf.extras.dataattribute.dialect.DataAttributeDialect;
-import de.digitalcollections.commons.servlet.filter.LogSessionIdFilter;
 import de.digitalcollections.commons.springmvc.config.SpringConfigCommonsMvc;
 import de.digitalcollections.commons.springmvc.controller.ErrorController;
 import de.digitalcollections.cudami.admin.converter.GrantedAuthorityJsonFilter;
@@ -15,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -123,12 +121,12 @@ public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
     configurer.enable();
   }
 
-  @Bean
-  public FilterRegistrationBean logSessionIdFilter() {
-    FilterRegistrationBean registration = new FilterRegistrationBean();
-    registration.setFilter(new LogSessionIdFilter());
-    // In case you want the filter to apply to specific URL patterns only (defaults to "/*")
-    //    registration.addUrlPatterns("/*");
-    return registration;
-  }
+//  @Bean
+//  public FilterRegistrationBean logSessionIdFilter() {
+//    FilterRegistrationBean registration = new FilterRegistrationBean();
+//    registration.setFilter(new LogSessionIdFilter());
+//    // In case you want the filter to apply to specific URL patterns only (defaults to "/*")
+//    registration.addUrlPatterns("/*");
+//    return registration;
+//  }
 }
