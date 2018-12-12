@@ -67,39 +67,39 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <version.aspectjweaver>1.8.10</version.aspectjweaver>
+    <version.aspectjweaver>1.9.2</version.aspectjweaver>
     <version.assertj-core>3.11.1</version.assertj-core>
     <version.commons-beanutils>1.9.3</version.commons-beanutils>
-    <version.commons-dbcp2>2.1.1</version.commons-dbcp2>
-    <version.commons-lang3>3.4</version.commons-lang3>
+    <version.commons-dbcp2>2.5.0</version.commons-dbcp2>
+    <version.commons-lang3>3.8.1</version.commons-lang3>
     <version.dc-commons>3.0.1-SNAPSHOT</version.dc-commons>
     <version.dc-model>2.1.0</version.dc-model>
-    <version.feign>9.5.1</version.feign>
+    <version.feign>9.7.0</version.feign>
     <version.feign-form-spring>3.3.0</version.feign-form-spring>
     <version.flyway>4.2.0</version.flyway>
-    <version.gson>2.3.1</version.gson>
+    <version.gson>2.8.5</version.gson>
     <version.guava>20.0</version.guava>
     <version.hamcrest-all>1.3</version.hamcrest-all>
-    <version.hibernate-entitymanager>4.3.10.Final</version.hibernate-entitymanager> <!-- TODO Upgrade -->
+    <version.hibernate-entitymanager>4.3.11.Final</version.hibernate-entitymanager> <!-- TODO Upgrade -->
     <version.javax.servlet-api>3.1.0</version.javax.servlet-api>
     <version.junit>5.3.2</version.junit>
     <version.mockito-core>2.23.4</version.mockito-core>
     <version.passay>1.3.1</version.passay>
-    <version.postgresql>42.1.4</version.postgresql>
-    <version.querydsl>4.1.4</version.querydsl>
+    <version.postgresql>42.2.5</version.postgresql>
+    <version.querydsl>4.2.1</version.querydsl>
     <version.slf4j>1.7.24</version.slf4j>
     <version.snakeyaml>1.23</version.snakeyaml>
     <version.spring-boot>2.1.1.RELEASE</version.spring-boot>
-    <version.unbescape>1.1.4.RELEASE</version.unbescape>
-    <version.xstream>1.4.10</version.xstream>
+    <version.unbescape>1.1.6.RELEASE</version.unbescape>
+    <version.xstream>1.4.11.1</version.xstream>
 
     <!-- plugins -->
     <version.jacoco-maven-plugin>0.8.2</version.jacoco-maven-plugin>
-    <version.maven-compiler-plugin>3.7.0</version.maven-compiler-plugin>
+    <version.maven-compiler-plugin>3.8.0</version.maven-compiler-plugin>
     <version.maven-failsafe-plugin>2.22.1</version.maven-failsafe-plugin>
     <version.maven-gpg-plugin>1.6</version.maven-gpg-plugin>
     <version.maven-javadoc-plugin>3.0.1</version.maven-javadoc-plugin>
-    <version.maven-resources-plugin>2.7</version.maven-resources-plugin>
+    <version.maven-resources-plugin>3.1.0</version.maven-resources-plugin>
     <version.maven-source-plugin>3.0.1</version.maven-source-plugin>
     <version.maven-surefire-plugin>2.22.1</version.maven-surefire-plugin>
     <version.nexus-staging-maven-plugin>1.6.8</version.nexus-staging-maven-plugin>
