@@ -1,6 +1,6 @@
-package de.digitalcollections.cudami.test.controller;
+package de.digitalcollections.cudami.client.spring.test.controller;
 
-import de.digitalcollections.cudami.test.environment.Application;
+import de.digitalcollections.cudami.client.spring.test.environment.Application;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

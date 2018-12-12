@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.test.environment;
+package de.digitalcollections.cudami.client.spring.test.environment;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

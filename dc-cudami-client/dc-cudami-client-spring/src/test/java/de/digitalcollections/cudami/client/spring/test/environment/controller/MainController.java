@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.test.environment.controller;
+package de.digitalcollections.cudami.client.spring.test.environment.controller;
 
 import de.digitalcollections.model.api.identifiable.parts.structuredcontent.contentblocks.IFrame;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.contentblocks.IFrameImpl;
