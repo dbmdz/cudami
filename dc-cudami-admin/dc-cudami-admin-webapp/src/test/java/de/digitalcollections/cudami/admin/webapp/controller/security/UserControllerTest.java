@@ -6,15 +6,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * see https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-testing.html alternatively:
@@ -38,14 +36,7 @@ public class UserControllerTest {
   @Test
   public void resourceRequest() {
     String body = this.testRestTemplate.getForObject("/css/main.css", String.class);
-    assertTrue(body.contains("background"));
-  }
-
-  @Test
-  public void testApiCall() {
-    HttpHeaders headers = this.testRestTemplate.headForHeaders("/api/users");
-    MediaType contentType = headers.getContentType();
-    assertEquals(MediaType.APPLICATION_JSON_UTF8, contentType);
+    assertThat(body.contains("background")).isTrue();
   }
 
   // see https://docs.spring.io/spring-security/site/docs/5.0.5.RELEASE/reference/htmlsingle/#test-method-withmockuser

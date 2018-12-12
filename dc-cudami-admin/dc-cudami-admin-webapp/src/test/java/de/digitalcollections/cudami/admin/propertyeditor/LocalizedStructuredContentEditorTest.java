@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.propertyeditor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.admin.config.SpringConfigWeb;
+import de.digitalcollections.cudami.admin.test.TestApplication;
 import de.digitalcollections.cudami.admin.test.config.SpringConfigBusinessForTest;
 import de.digitalcollections.model.api.identifiable.parts.structuredcontent.LocalizedStructuredContent;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
@@ -13,13 +13,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {SpringConfigWeb.class, SpringConfigBusinessForTest.class})
+@SpringBootTest(classes = {TestApplication.class, SpringConfigBusinessForTest.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
 public class LocalizedStructuredContentEditorTest implements InitializingBean {
 
   @Autowired
@@ -63,7 +64,7 @@ public class LocalizedStructuredContentEditorTest implements InitializingBean {
     documentEditor.setValue(lsc);
 
     String result = documentEditor.getAsText().replaceAll("\\s", "");
-    assertEquals(expResult, result);
+    assertThat(result).isEqualTo(expResult);
   }
 
   /**
@@ -76,7 +77,7 @@ public class LocalizedStructuredContentEditorTest implements InitializingBean {
     documentEditor.setAsText(json);
 
     LocalizedStructuredContentImpl result = (LocalizedStructuredContentImpl) documentEditor.getValue();
-    assertEquals(expResult.getLocalizedStructuredContent().size(), result.getLocalizedStructuredContent().size());
+    assertThat(result.getLocalizedStructuredContent().size()).isEqualTo(expResult.getLocalizedStructuredContent().size());
   }
 
 }

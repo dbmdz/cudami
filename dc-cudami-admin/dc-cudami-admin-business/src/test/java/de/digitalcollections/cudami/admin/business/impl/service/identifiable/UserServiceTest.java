@@ -19,8 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {SpringConfigBusiness.class, SpringConfigBackendForTest.class})
@@ -50,13 +49,13 @@ public class UserServiceTest {
   @Test
   public void testLoadUserByUsername() throws Exception {
     UserDetails retrieved = service.loadUserByUsername("foo@spar.org");
-    assertEquals(user.getEmail(), retrieved.getUsername());
+    assertThat(retrieved.getUsername()).isEqualTo(user.getEmail());
     Mockito.verify(userRepository, VerificationModeFactory.times(1)).findByEmail("foo@spar.org");
   }
 
   @Test
   public void testGetPasswordHash() throws Exception {
     PasswordEncoder pwEncoder = new BCryptPasswordEncoder();
-    assertTrue(pwEncoder.matches("foobar", user.getPasswordHash()));
+    assertThat(pwEncoder.matches("foobar", user.getPasswordHash())).isTrue();
   }
 }
