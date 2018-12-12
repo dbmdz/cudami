@@ -234,11 +234,6 @@
         <version>${version.feign}</version>
       </dependency>
       <dependency>
-        <groupId>io.github.openfeign.form</groupId>
-        <artifactId>feign-form-spring</artifactId>
-        <version>${version.feign-form-spring}</version>
-      </dependency>
-      <dependency>
         <groupId>io.github.openfeign</groupId>
         <artifactId>feign-jackson</artifactId>
         <version>${version.feign}</version>
@@ -247,6 +242,11 @@
         <groupId>io.github.openfeign</groupId>
         <artifactId>feign-slf4j</artifactId>
         <version>${version.feign}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.github.openfeign.form</groupId>
+        <artifactId>feign-form-spring</artifactId>
+        <version>${version.feign-form-spring}</version>
       </dependency>
       <dependency>
         <groupId>javax.servlet</groupId>
