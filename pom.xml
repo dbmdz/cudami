@@ -87,8 +87,7 @@
     <version.passay>1.3.1</version.passay>
     <version.postgresql>42.1.4</version.postgresql>
     <version.querydsl>4.1.4</version.querydsl>
-    <version.slf4j-api>1.7.24</version.slf4j-api>
-    <version.slf4j-log4j12>1.7.24</version.slf4j-log4j12>
+    <version.slf4j>1.7.24</version.slf4j>
     <version.snakeyaml>1.23</version.snakeyaml>
     <version.spring-boot>2.1.1.RELEASE</version.spring-boot>
     <version.unbescape>1.1.4.RELEASE</version.unbescape>
@@ -322,12 +321,12 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>${version.slf4j-api}</version>
+        <version>${version.slf4j}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-log4j12</artifactId>
-        <version>${version.slf4j-log4j12}</version>
+        <artifactId>slf4j-simple</artifactId>
+        <version>${version.slf4j}</version>
       </dependency>
       <dependency>
         <!-- Import dependency management from Spring Boot -->
