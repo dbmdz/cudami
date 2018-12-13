@@ -66,6 +66,10 @@
       <artifactId>dc-model-jackson</artifactId>
     </dependency>
     <dependency>
+      <groupId>de.digitalcollections.model</groupId>
+      <artifactId>dc-model-xml</artifactId>
+    </dependency>
+    <dependency>
       <groupId>net.logstash.logback</groupId>
       <artifactId>logstash-logback-encoder</artifactId>
       <version>${version.logstash-logback-encoder}</version>
