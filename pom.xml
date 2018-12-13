@@ -91,7 +91,6 @@
     <version.snakeyaml>1.23</version.snakeyaml>
     <version.spring-boot>2.1.1.RELEASE</version.spring-boot>
     <version.unbescape>1.1.6.RELEASE</version.unbescape>
-    <version.xstream>1.4.11.1</version.xstream>
 
     <!-- plugins -->
     <version.jacoco-maven-plugin>0.8.2</version.jacoco-maven-plugin>
@@ -116,26 +115,6 @@
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>${version.guava}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.querydsl</groupId>
-        <artifactId>querydsl-apt</artifactId>
-        <version>${version.querydsl}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.querydsl</groupId>
-        <artifactId>querydsl-core</artifactId>
-        <version>${version.querydsl}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.querydsl</groupId>
-        <artifactId>querydsl-jpa</artifactId>
-        <version>${version.querydsl}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.thoughtworks.xstream</groupId>
-        <artifactId>xstream</artifactId>
-        <version>${version.xstream}</version>
       </dependency>
       <dependency>
         <groupId>commons-beanutils</groupId>
@@ -332,6 +311,7 @@
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
         <version>${version.slf4j}</version>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <!-- Import dependency management from Spring Boot -->
