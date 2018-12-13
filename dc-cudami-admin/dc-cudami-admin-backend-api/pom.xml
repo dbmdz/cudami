@@ -9,14 +9,8 @@
   </parent>
 
   <name>DigitalCollections: cudami Admin (Backend API)</name>
-  <groupId>de.digitalcollections.cudami</groupId>
   <artifactId>dc-cudami-admin-backend-api</artifactId>
   <packaging>jar</packaging>
-
-  <properties>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-  </properties>
 
   <dependencies>
     <dependency>

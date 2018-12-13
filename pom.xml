@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -67,50 +67,41 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <version.aspectjweaver>1.8.10</version.aspectjweaver>
+    <version.aspectjweaver>1.9.2</version.aspectjweaver>
     <version.assertj-core>3.11.1</version.assertj-core>
     <version.commons-beanutils>1.9.3</version.commons-beanutils>
-    <version.commons-dbcp2>2.1.1</version.commons-dbcp2>
-    <version.commons-lang3>3.4</version.commons-lang3>
+    <version.commons-dbcp2>2.5.0</version.commons-dbcp2>
+    <version.commons-lang3>3.8.1</version.commons-lang3>
     <version.dc-commons>3.0.1-SNAPSHOT</version.dc-commons>
     <version.dc-model>2.2.0-SNAPSHOT</version.dc-model>
-    <version.feign>9.5.1</version.feign>
-    <version.feign-form-spring>3.3.0</version.feign-form-spring>
-    <version.flyway-core>4.0.3</version.flyway-core>
-    <version.gson>2.3.1</version.gson>
+    <version.feign>9.7.0</version.feign> <!-- Available new major release 10.1.0 -->
+    <version.feign-form-spring>3.3.0</version.feign-form-spring> <!-- Latest version 3.4.1 not working atm -->
+    <version.flyway>4.2.0</version.flyway> <!-- Available new major release 5.2.4 -->
+    <version.gson>2.8.5</version.gson>
     <version.guava>20.0</version.guava>
-    <version.h2>1.4.193</version.h2>
     <version.hamcrest-all>1.3</version.hamcrest-all>
-    <version.hibernate-entitymanager>4.3.10.Final</version.hibernate-entitymanager> <!-- TODO Upgrade -->
-    <version.javax.servlet-api>3.1.0</version.javax.servlet-api>
+    <version.hibernate-entitymanager>4.3.11.Final</version.hibernate-entitymanager> <!-- TODO Upgrade to version 5.3.7.Final -->
+    <version.javax.servlet-api>3.1.0</version.javax.servlet-api> <!-- Available new major release 4.0.1 -->
     <version.junit>5.3.2</version.junit>
     <version.mockito-core>2.23.4</version.mockito-core>
     <version.passay>1.3.1</version.passay>
-    <version.postgresql>42.1.4</version.postgresql>
-    <version.querydsl>4.1.4</version.querydsl>
-    <version.slf4j-api>1.7.24</version.slf4j-api>
-    <version.slf4j-log4j12>1.7.24</version.slf4j-log4j12>
+    <version.postgresql>42.2.5</version.postgresql>
+    <version.querydsl>4.2.1</version.querydsl>
+    <version.slf4j>1.7.25</version.slf4j>
     <version.snakeyaml>1.23</version.snakeyaml>
     <version.spring-boot>2.1.1.RELEASE</version.spring-boot>
-    <version.spring-data-commons>1.13.16.RELEASE</version.spring-data-commons>
-    <version.spring-data-jpa>1.11.0.RELEASE</version.spring-data-jpa>
-    <version.unbescape>1.1.4.RELEASE</version.unbescape>
-    <version.xstream>1.4.10</version.xstream>
+    <version.unbescape>1.1.6.RELEASE</version.unbescape>
+    <version.xstream>1.4.11.1</version.xstream>
 
     <!-- plugins -->
-    <version.apt-maven-plugin>1.1.3</version.apt-maven-plugin>
-    <version.exec-maven-plugin>1.5.0</version.exec-maven-plugin>
     <version.jacoco-maven-plugin>0.8.2</version.jacoco-maven-plugin>
-    <version.jetty-maven-plugin>9.4.0.v20161208</version.jetty-maven-plugin>
-    <version.lesscss-maven-plugin>1.7.0.1.1</version.lesscss-maven-plugin>
-    <version.maven-compiler-plugin>3.7.0</version.maven-compiler-plugin>
+    <version.maven-compiler-plugin>3.8.0</version.maven-compiler-plugin>
     <version.maven-failsafe-plugin>2.22.1</version.maven-failsafe-plugin>
     <version.maven-gpg-plugin>1.6</version.maven-gpg-plugin>
     <version.maven-javadoc-plugin>3.0.1</version.maven-javadoc-plugin>
-    <version.maven-resources-plugin>2.7</version.maven-resources-plugin>
+    <version.maven-resources-plugin>3.1.0</version.maven-resources-plugin>
     <version.maven-source-plugin>3.0.1</version.maven-source-plugin>
     <version.maven-surefire-plugin>2.22.1</version.maven-surefire-plugin>
-    <version.maven-war-plugin>2.3</version.maven-war-plugin>
     <version.nexus-staging-maven-plugin>1.6.8</version.nexus-staging-maven-plugin>
   </properties>
 
@@ -125,11 +116,6 @@
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>${version.guava}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.h2database</groupId>
-        <artifactId>h2</artifactId>
-        <version>${version.h2}</version>
       </dependency>
       <dependency>
         <groupId>com.querydsl</groupId>
@@ -252,11 +238,6 @@
         <version>${version.feign}</version>
       </dependency>
       <dependency>
-        <groupId>io.github.openfeign.form</groupId>
-        <artifactId>feign-form-spring</artifactId>
-        <version>${version.feign-form-spring}</version>
-      </dependency>
-      <dependency>
         <groupId>io.github.openfeign</groupId>
         <artifactId>feign-jackson</artifactId>
         <version>${version.feign}</version>
@@ -265,6 +246,11 @@
         <groupId>io.github.openfeign</groupId>
         <artifactId>feign-slf4j</artifactId>
         <version>${version.feign}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.github.openfeign.form</groupId>
+        <artifactId>feign-form-spring</artifactId>
+        <version>${version.feign-form-spring}</version>
       </dependency>
       <dependency>
         <groupId>javax.servlet</groupId>
@@ -295,7 +281,7 @@
       <dependency>
         <groupId>org.flywaydb</groupId>
         <artifactId>flyway-core</artifactId>
-        <version>${version.flyway-core}</version>
+        <version>${version.flyway}</version>
       </dependency>
       <dependency>
         <groupId>org.hamcrest</groupId>
@@ -308,7 +294,6 @@
         <artifactId>hibernate-entitymanager</artifactId>
         <version>${version.hibernate-entitymanager}</version>
       </dependency>
-      <!-- JUnit 5: -->
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-api</artifactId>
@@ -341,12 +326,12 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>${version.slf4j-api}</version>
+        <version>${version.slf4j}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-log4j12</artifactId>
-        <version>${version.slf4j-log4j12}</version>
+        <artifactId>slf4j-simple</artifactId>
+        <version>${version.slf4j}</version>
       </dependency>
       <dependency>
         <!-- Import dependency management from Spring Boot -->
@@ -374,16 +359,6 @@
         <version>${version.spring-boot}</version>
       </dependency>
       <dependency>
-        <groupId>org.springframework.data</groupId>
-        <artifactId>spring-data-commons</artifactId>
-        <version>${version.spring-data-commons}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.data</groupId>
-        <artifactId>spring-data-jpa</artifactId>
-        <version>${version.spring-data-jpa}</version>
-      </dependency>
-      <dependency>
         <groupId>org.unbescape</groupId>
         <artifactId>unbescape</artifactId>
         <version>${version.unbescape}</version>
@@ -403,9 +378,13 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${version.maven-compiler-plugin}</version>
         <configuration>
-          <source>${maven.compiler.source}</source>
-          <target>${maven.compiler.target}</target>
+          <showDeprecation>true</showDeprecation>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>${version.maven-failsafe-plugin}</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -432,6 +411,11 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${version.maven-surefire-plugin}</version>
       </plugin>
       <plugin>
         <groupId>org.jacoco</groupId>
@@ -473,46 +457,10 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>com.mysema.maven</groupId>
-          <artifactId>apt-maven-plugin</artifactId>
-          <version>${version.apt-maven-plugin}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-failsafe-plugin</artifactId>
-          <version>${version.maven-failsafe-plugin}</version>
-        </plugin>
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
           <version>${version.maven-resources-plugin}</version>
         </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>${version.maven-surefire-plugin}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-war-plugin</artifactId>
-          <version>${version.maven-war-plugin}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>exec-maven-plugin</artifactId>
-          <version>${version.exec-maven-plugin}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.eclipse.jetty</groupId>
-          <artifactId>jetty-maven-plugin</artifactId>
-          <version>${version.jetty-maven-plugin}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.lesscss</groupId>
-          <artifactId>lesscss-maven-plugin</artifactId>
-          <version>${version.lesscss-maven-plugin}</version>
-        </plugin>
-
       </plugins>
     </pluginManagement>
   </build>

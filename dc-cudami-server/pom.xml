@@ -9,7 +9,6 @@
   </parent>
   
   <name>DigitalCollections: cudami Server</name>
-  <groupId>de.digitalcollections.cudami</groupId>
   <artifactId>dc-cudami-server</artifactId>
   <packaging>pom</packaging>
   

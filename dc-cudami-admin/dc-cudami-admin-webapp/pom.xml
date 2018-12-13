@@ -9,17 +9,10 @@
   </parent>
 
   <name>DigitalCollections: cudami Admin (Webapp)</name>
-  <groupId>de.digitalcollections.cudami</groupId>
   <artifactId>dc-cudami-admin-webapp</artifactId>
-  <version>3.1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <properties>
-    <java.version>1.8</java.version>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
     <version.logstash-logback-encoder>5.1</version.logstash-logback-encoder>
     <version.maven-resources-plugin>2.7</version.maven-resources-plugin>
     <version.thymeleaf-spring-data-dialect>3.3.1</version.thymeleaf-spring-data-dialect>
@@ -240,21 +233,11 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>${version.maven-resources-plugin}</version>
         <configuration>
           <delimiters>
             <delimiter>@</delimiter>
           </delimiters>
           <useDefaultDelimiters>false</useDefaultDelimiters>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>${version.maven-compiler-plugin}</version>
-        <configuration>
-          <source>${maven.compiler.source}</source>
-          <target>${maven.compiler.target}</target>
         </configuration>
       </plugin>
       <plugin>
@@ -268,9 +251,6 @@
             </goals>
           </execution>
         </executions>
-        <!--<configuration>
-          <classifier>exec</classifier>
-        </configuration>-->
       </plugin>
     </plugins>
   </build>

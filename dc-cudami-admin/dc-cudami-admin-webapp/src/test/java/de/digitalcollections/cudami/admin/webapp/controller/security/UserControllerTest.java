@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * see https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-testing.html alternatively:
  * https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-testing.html#boot-features-testing-spring-boot-applications-testing-autoconfigured-mvc-tests
  */
-// Don’t forget to also add @RunWith(SpringRunner.class) to your test, otherwise the annotations will be ignored:
 @ExtendWith(SpringExtension.class)
 // annotation which can be used as an alternative to the standard spring-test @ContextConfiguration annotation when you need Spring Boot features:
 @SpringBootTest(
