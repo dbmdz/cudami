@@ -1,5 +1,6 @@
 cudami:
-  environment: local
+  # FIXME nested Optional
+  # environment: local
   server:
     address: http://localhost:9000/
 
