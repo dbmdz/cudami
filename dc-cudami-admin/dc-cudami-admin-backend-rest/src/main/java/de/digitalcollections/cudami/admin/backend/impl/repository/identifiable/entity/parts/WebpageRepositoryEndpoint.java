@@ -12,45 +12,45 @@ import java.util.UUID;
 
 public interface WebpageRepositoryEndpoint extends RepositoryEndpoint {
 
-  @RequestLine("GET /v1/webpages?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
+  @RequestLine("GET /latest/webpages?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<Webpage> find(
           @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
           @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
   );
 
-  @RequestLine("GET /v1/webpages/{uuid}")
+  @RequestLine("GET /latest/webpages/{uuid}")
   Webpage findOne(@Param("uuid") UUID uuid);
 
-  @RequestLine("POST /v1/webpages")
+  @RequestLine("POST /latest/webpages")
   @Headers("Content-Type: application/json")
   Webpage save(Webpage webpage);
 
-  @RequestLine("PUT /v1/webpages/{uuid}")
+  @RequestLine("PUT /latest/webpages/{uuid}")
   @Headers("Content-Type: application/json")
   Webpage update(@Param("uuid") UUID uuid, Webpage webpage);
 
-  @RequestLine("GET /v1/webpages/count")
+  @RequestLine("GET /latest/webpages/count")
   long count();
 
-  @RequestLine("GET /v1/webpages/{uuid}/children")
+  @RequestLine("GET /latest/webpages/{uuid}/children")
   List<Webpage> getChildren(@Param("uuid") UUID uuid);
 
-  @RequestLine("POST /v1/websites/{parentWebsiteUuid}/webpage")
+  @RequestLine("POST /latest/websites/{parentWebsiteUuid}/webpage")
   @Headers("Content-Type: application/json")
   Webpage saveWithParentWebsite(Webpage webpage, @Param("parentWebsiteUuid") UUID parentWebsiteUuid);
 
-  @RequestLine("POST /v1/webpages/{parentWebpageUuid}/webpage")
+  @RequestLine("POST /latest/webpages/{parentWebpageUuid}/webpage")
   @Headers("Content-Type: application/json")
   Webpage saveWithParentWebpage(Webpage webpage, @Param("parentWebpageUuid") UUID parentWebpageUuid);
 
-  @RequestLine("GET /v1/webpages/{uuid}/identifiables")
+  @RequestLine("GET /latest/webpages/{uuid}/identifiables")
   public List<Identifiable> getIdentifiables(UUID uuid);
 
-  @RequestLine("POST /v1/webpages/{uuid}/identifiables/{identifiableUuid}")
+  @RequestLine("POST /latest/webpages/{uuid}/identifiables/{identifiableUuid}")
   @Headers("Content-Type: application/json")
   void addIdentifiable(@Param("uuid") UUID webpageUuid, @Param("identifiableUuid") UUID identifiableUuid);
 
-  @RequestLine("POST /v1/webpages/{uuid}/identifiables")
+  @RequestLine("POST /latest/webpages/{uuid}/identifiables")
   @Headers("Content-Type: application/json")
   public List<Identifiable> saveIdentifiables(@Param("uuid") UUID uuid, List<Identifiable> identifiables);
 }

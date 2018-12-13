@@ -54,7 +54,7 @@ public class FileResourceController {
 
   // TODO: see FileResourceRepositoryEndpoint: count()
   @ApiMethod(description = "get all fileresources")
-  @GetMapping(value = "/v1/fileresources", produces = "application/json")
+  @GetMapping(value = "/latest/fileresources", produces = "application/json")
   @ApiResponseObject
   public PageResponse<FileResource> findAll(
           @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -71,7 +71,7 @@ public class FileResourceController {
   }
 
   @ApiMethod(description = "get a fileresource as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
-  @GetMapping(value = {"/v1/fileresources/{uuid}"}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  @GetMapping(value = {"/latest/fileresources/{uuid}"}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   @ApiResponseObject
   public ResponseEntity<FileResource> get(
           @ApiPathParam(description = "UUID of the fileresource, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
@@ -89,7 +89,7 @@ public class FileResourceController {
   }
 
   @ApiMethod(description = "save a newly created fileresource")
-  @PostMapping(value = "/v1/fileresources", produces = "application/json")
+  @PostMapping(value = "/latest/fileresources", produces = "application/json")
   @ApiResponseObject
   public ResponseEntity<FileResource> save(@RequestParam("fileresource") String resourceJson,
           @RequestPart("binaryData") MultipartFile file,
@@ -125,7 +125,7 @@ public class FileResourceController {
   }
 
   @ApiMethod(description = "update a fileresource")
-  @PutMapping(value = "/v1/fileresources/{uuid}", produces = "application/json")
+  @PutMapping(value = "/latest/fileresources/{uuid}", produces = "application/json")
   @ApiResponseObject
   public FileResource update(@PathVariable UUID uuid, @RequestBody FileResource fileResource, BindingResult errors) throws IdentifiableServiceException {
     assert Objects.equals(uuid, fileResource.getUuid());

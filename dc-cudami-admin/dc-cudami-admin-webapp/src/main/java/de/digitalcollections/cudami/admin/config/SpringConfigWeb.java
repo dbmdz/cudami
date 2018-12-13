@@ -12,7 +12,6 @@ import java.util.Locale;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -22,6 +21,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
@@ -45,7 +45,7 @@ import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect;
 @EnableAspectJAutoProxy
 @EnableSpringDataWebSupport // for getting support for sorting and paging params
 @Import(SpringConfigCommonsMvc.class)
-public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
+public class SpringConfigWeb implements WebMvcConfigurer {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfigWeb.class);
 
@@ -64,12 +64,12 @@ public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
 //    registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
   }
 
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    // customize default spring boot jackson objectmapper
-    DigitalCollectionsObjectMapper.customize(objectMapper);
-    //objectMapper.registerModule(new JacksonXmlModule());
+  @Bean
+  @Primary
+  public ObjectMapper objectMapper() {
+    DigitalCollectionsObjectMapper objectMapper = new DigitalCollectionsObjectMapper();
     objectMapper.addMixIn(GrantedAuthority.class, GrantedAuthorityJsonFilter.class);
+    return objectMapper;
   }
 
   @Bean

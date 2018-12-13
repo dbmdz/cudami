@@ -10,26 +10,26 @@ import java.util.UUID;
 
 public interface UserRepositoryEndpoint {
 
-  @RequestLine("GET /v1/users?role=ADMIN&enabled=true")
+  @RequestLine("GET /latest/users?role=ADMIN&enabled=true")
   List<UserImpl> findActiveAdminUsers();
 
-  @RequestLine("GET /v1/users?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
+  @RequestLine("GET /latest/users?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<UserImpl> find(
           @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
           @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
   );
 
-  @RequestLine("GET /v1/users?email={email}")
+  @RequestLine("GET /latest/users?email={email}")
   UserImpl findByEmail(@Param("email") String email);
 
-  @RequestLine("GET /v1/users/{uuid}")
+  @RequestLine("GET /latest/users/{uuid}")
   UserImpl findOne(@Param("uuid") UUID uuid);
 
-  @RequestLine("POST /v1/users")
+  @RequestLine("POST /latest/users")
   @Headers("Content-Type: application/json")
   UserImpl save(UserImpl user);
 
-  @RequestLine("PUT /v1/users/{uuid}")
+  @RequestLine("PUT /latest/users/{uuid}")
   @Headers("Content-Type: application/json")
   UserImpl update(@Param("uuid") UUID uuid, UserImpl user);
 }

@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.admin.test.TestApplication;
 import de.digitalcollections.cudami.admin.test.config.SpringConfigBusinessForTest;
 import de.digitalcollections.model.api.identifiable.parts.structuredcontent.LocalizedStructuredContent;
 import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
-import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
@@ -30,7 +29,6 @@ public class LocalizedStructuredContentEditorTest implements InitializingBean {
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    DigitalCollectionsObjectMapper.customize(objectMapper);
     this.documentEditor = new LocalizedStructuredContentEditor();
     this.documentEditor.setObjectMapper(objectMapper);
   }

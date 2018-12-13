@@ -21,7 +21,7 @@ public class IdentifiableController {
   private IdentifiableService service;
 
   @ApiMethod(description = "find limited amount of identifiables containing searchTerm in label")
-  @GetMapping(value = "/v1/identifiables", produces = "application/json")
+  @GetMapping(value = "/latest/identifiables", produces = "application/json")
   @ApiResponseObject
   public List<Identifiable> find(
           @RequestParam(name = "searchTerm") String searchTerm,

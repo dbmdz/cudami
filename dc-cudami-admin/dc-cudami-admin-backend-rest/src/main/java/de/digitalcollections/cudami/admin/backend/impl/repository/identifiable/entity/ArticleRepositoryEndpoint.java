@@ -12,37 +12,37 @@ import java.util.UUID;
 
 public interface ArticleRepositoryEndpoint extends RepositoryEndpoint {
 
-  @RequestLine("GET /v1/articles?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
+  @RequestLine("GET /latest/articles?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<Article> find(
           @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
           @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
   );
 
-  @RequestLine("GET /v1/articles/{uuid}")
+  @RequestLine("GET /latest/articles/{uuid}")
   Article findOne(@Param("uuid") UUID uuid);
 
-  @RequestLine("POST /v1/articles")
+  @RequestLine("POST /latest/articles")
   @Headers("Content-Type: application/json")
   Article save(Article article);
 
-  @RequestLine("PUT /v1/articles/{uuid}")
+  @RequestLine("PUT /latest/articles/{uuid}")
   @Headers("Content-Type: application/json")
   Article update(@Param("uuid") UUID uuid, Article article);
 
-  @RequestLine("GET /v1/articles/count")
+  @RequestLine("GET /latest/articles/count")
   long count();
 
-  @RequestLine("GET /v1/articles/{uuid}/children")
+  @RequestLine("GET /latest/articles/{uuid}/children")
   List<Article> getChildren(@Param("uuid") UUID uuid);
 
-  @RequestLine("GET /v1/articles/{uuid}/identifiables")
+  @RequestLine("GET /latest/articles/{uuid}/identifiables")
   public List<Identifiable> getIdentifiables(UUID uuid);
 
-  @RequestLine("POST /v1/articles/{uuid}/identifiables/{identifiableUuid}")
+  @RequestLine("POST /latest/articles/{uuid}/identifiables/{identifiableUuid}")
   @Headers("Content-Type: application/json")
   void addIdentifiable(@Param("uuid") UUID articleUuid, @Param("identifiableUuid") UUID identifiableUuid);
 
-  @RequestLine("POST /v1/articles/{uuid}/identifiables")
+  @RequestLine("POST /latest/articles/{uuid}/identifiables")
   @Headers("Content-Type: application/json")
   public List<Identifiable> saveIdentifiables(@Param("uuid") UUID uuid, List<Identifiable> identifiables);
 }
