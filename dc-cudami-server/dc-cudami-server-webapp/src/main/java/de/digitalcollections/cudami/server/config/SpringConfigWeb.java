@@ -2,9 +2,7 @@ package de.digitalcollections.cudami.server.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
-import de.digitalcollections.model.jackson.v1.V1DigitalCollectionsObjectMapper;
 import de.digitalcollections.model.xml.xstream.DigitalCollectionsXStreamMarshaller;
-import de.digitalcollections.model.xml.xstream.v1.V1DigitalCollectionsXStreamMarshaller;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -51,16 +49,6 @@ public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
   @Primary
   public ObjectMapper objectMapper() {
     return new DigitalCollectionsObjectMapper();
-  }
-
-  @Bean
-  public V1DigitalCollectionsObjectMapper v1ObjectMapper() {
-    return new V1DigitalCollectionsObjectMapper();
-  }
-
-  @Bean
-  public V1DigitalCollectionsXStreamMarshaller v1XStreamMarshaller() {
-    return new V1DigitalCollectionsXStreamMarshaller();
   }
 
   private void setupJsondoc() {

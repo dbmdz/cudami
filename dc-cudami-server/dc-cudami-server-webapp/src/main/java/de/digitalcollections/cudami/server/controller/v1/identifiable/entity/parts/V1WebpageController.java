@@ -21,7 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.oxm.XmlMappingException;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,11 +31,8 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The V1 webpage controller", name = "V1 Webpage controller")
 public class V1WebpageController {
 
-  @Autowired
-  V1DigitalCollectionsObjectMapper v1ObjectMapper;
-
-  @Autowired
-  V1DigitalCollectionsXStreamMarshaller v1XStreamMarshaller;
+  private final V1DigitalCollectionsObjectMapper v1ObjectMapper = new V1DigitalCollectionsObjectMapper();
+  private final V1DigitalCollectionsXStreamMarshaller v1XStreamMarshaller = new V1DigitalCollectionsXStreamMarshaller();
 
   @Autowired
   private WebpageService<Webpage, Identifiable> webpageService;
@@ -79,38 +75,5 @@ public class V1WebpageController {
       webpage = webpageService.get(uuid, pLocale);
     }
     return webpage;
-  }
-
-  @ApiMethod(description = "get a webpage as HTML")
-  @RequestMapping(value = {"/v1/webpages/{uuid}.html"}, produces = {MediaType.TEXT_HTML_VALUE}, method = RequestMethod.GET)
-  public String getWebpageAsHtml(
-          @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
-          @ApiQueryParam(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
-          @RequestParam(name = "pLocale", required = false) Locale pLocale,
-          Model model
-  ) throws IdentifiableServiceException {
-
-    Webpage webpage;
-    if (pLocale == null) {
-      webpage = (Webpage) webpageService.get(uuid);
-    } else {
-      webpage = (Webpage) webpageService.get(uuid, pLocale);
-      Locale returnedLocale = getLocale(webpage);
-      model.addAttribute("locale", returnedLocale);
-    }
-    model.addAttribute("webpage", webpage);
-    return "webpage";
-  }
-
-  private Locale getLocale(Webpage webpage) {
-    if (webpage == null) {
-      return null;
-    }
-    Locale returnedLocale = webpage.getLabel().getTranslations().stream().findFirst().get().getLocale();
-    return returnedLocale;
-  }
-
-  private Webpage convertToV1(Webpage webpage) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 }
