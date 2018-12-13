@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,9 +35,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@Controller
 @Api(description = "The webpage controller", name = "Webpage controller")
 public class WebpageController {
 
@@ -81,7 +81,7 @@ public class WebpageController {
   }
 
   @ApiMethod(description = "get a webpage as HTML")
-  @RequestMapping(value = {"/latest/webpages/{uuid}.html"}, produces = {MediaType.TEXT_HTML_VALUE}, method = RequestMethod.GET)
+  @RequestMapping(value = {"/latest/webpages/{uuid}.html", "/v1/webpages/{uuid}.html"}, produces = {MediaType.TEXT_HTML_VALUE}, method = RequestMethod.GET)
   public String getWebpageAsHtml(
           @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
           @ApiQueryParam(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
