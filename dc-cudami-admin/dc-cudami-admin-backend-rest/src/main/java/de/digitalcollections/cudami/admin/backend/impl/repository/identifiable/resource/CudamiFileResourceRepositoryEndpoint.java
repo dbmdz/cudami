@@ -11,13 +11,13 @@ import java.util.UUID;
 
 public interface CudamiFileResourceRepositoryEndpoint extends RepositoryEndpoint {
 
-  @RequestLine("GET /v1/fileresources?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
+  @RequestLine("GET /latest/fileresources?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<FileResource> find(
           @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
           @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
   );
 
-  @RequestLine("GET /v1/fileresources/{uuid}")
+  @RequestLine("GET /latest/fileresources/{uuid}")
   FileResource findOne(@Param("uuid") UUID uuid);
 
   /**
@@ -26,18 +26,18 @@ public interface CudamiFileResourceRepositoryEndpoint extends RepositoryEndpoint
    * @param fileresource metadata object
    * @return saved object
    */
-  @RequestLine("POST /v1/fileresources")
+  @RequestLine("POST /latest/fileresources")
   @Headers("Content-Type: application/json")
   FileResource save(FileResource fileresource);
 
-  @RequestLine("POST /v1/fileresources")
+  @RequestLine("POST /latest/fileresources")
   @Headers("Content-Type: multipart/form-data")
   FileResource save(@Param("fileresource") FileResource fileresource, @Param("binaryData") FormData binaryData);
 
-  @RequestLine("PUT /v1/fileresources/{uuid}")
+  @RequestLine("PUT /latest/fileresources/{uuid}")
   @Headers("Content-Type: application/json")
   FileResource update(@Param("uuid") UUID uuid, FileResource fileresource);
 
-  @RequestLine("GET /v1/fileresources/count")
+  @RequestLine("GET /latest/fileresources/count")
   long count();
 }

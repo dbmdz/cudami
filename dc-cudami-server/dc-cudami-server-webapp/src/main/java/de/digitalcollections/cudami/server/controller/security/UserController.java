@@ -6,11 +6,11 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.paging.enums.Direction;
 import de.digitalcollections.model.api.paging.enums.NullHandling;
+import de.digitalcollections.model.api.security.User;
+import de.digitalcollections.model.api.security.enums.Role;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
-import de.digitalcollections.model.api.security.User;
-import de.digitalcollections.model.api.security.enums.Role;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-//@RequestMapping("/v1/users") // moved to each method (more readable)
+//@RequestMapping("/latest/users") // moved to each method (more readable)
 @Api(description = "The user controller", name = "User controller")
 public class UserController {
 
@@ -35,14 +35,14 @@ public class UserController {
   private UserService service;
 
   @ApiMethod(description = "get all users with given role and enabled status")
-  @RequestMapping(value = "/v1/users", params = {"role", "enabled"}, produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(value = "/latest/users", params = {"role", "enabled"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public List<User> getByRoleAndStatus(@RequestParam(name = "role") Role role, @RequestParam(name = "enabled") boolean enabled) {
     return service.findActiveAdminUsers();
   }
 
   @ApiMethod(description = "get all users")
-  @RequestMapping(value = "/v1/users",
+  @RequestMapping(value = "/latest/users",
           produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public PageResponse<User> findAll(
@@ -60,28 +60,28 @@ public class UserController {
   }
 
   @ApiMethod(description = "get user by uuid")
-  @RequestMapping(value = "/v1/users/{uuid}", produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(value = "/latest/users/{uuid}", produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public User findById(@PathVariable UUID uuid) {
     return service.get(uuid);
   }
 
   @ApiMethod(description = "get user by email address")
-  @RequestMapping(value = "/v1/users", params = {"email"}, produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(value = "/latest/users", params = {"email"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public User findByName(@RequestParam(name = "email") String email) {
     return service.loadUserByUsername(email);
   }
 
   @ApiMethod(description = "save a newly created user")
-  @RequestMapping(value = "/v1/users", produces = "application/json", method = RequestMethod.POST)
+  @RequestMapping(value = "/latest/users", produces = "application/json", method = RequestMethod.POST)
   @ApiResponseObject
   public User save(@RequestBody User user, BindingResult errors) {
     return service.save(user, errors);
   }
 
   @ApiMethod(description = "update a user")
-  @RequestMapping(value = "/v1/users/{uuid}", produces = "application/json", method = RequestMethod.PUT)
+  @RequestMapping(value = "/latest/users/{uuid}", produces = "application/json", method = RequestMethod.PUT)
   @ApiResponseObject
   public User update(@PathVariable UUID uuid, @RequestBody User user, BindingResult errors) {
     assert Objects.equals(uuid, user.getUuid());

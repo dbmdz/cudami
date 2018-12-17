@@ -3,15 +3,15 @@ package de.digitalcollections.cudami.admin.test.config;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.ContentTreeService;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.EntityService;
-import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.ContentNodeService;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.WebpageService;
+import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.CudamiFileResourceService;
+import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.CudamiFileResourceService;
 
 /**
  * Services context.

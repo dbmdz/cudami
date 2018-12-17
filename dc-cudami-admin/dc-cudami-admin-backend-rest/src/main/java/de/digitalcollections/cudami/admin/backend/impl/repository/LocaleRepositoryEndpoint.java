@@ -5,9 +5,9 @@ import java.util.List;
 
 public interface LocaleRepositoryEndpoint {
 
-  @RequestLine("GET /v1/locales")
+  @RequestLine("GET /latest/locales")
   List<String> find();
 
-  @RequestLine("GET /v1/locales/default")
+  @RequestLine("GET /latest/locales/default")
   String getDefault();
 }

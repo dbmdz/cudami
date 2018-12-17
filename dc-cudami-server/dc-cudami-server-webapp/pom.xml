@@ -9,9 +9,7 @@
   </parent>
 
   <name>DigitalCollections: cudami Server (Webapp)</name>
-  <groupId>de.digitalcollections.cudami</groupId>
   <artifactId>dc-cudami-server-webapp</artifactId>
-  <version>3.1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <properties>
@@ -20,24 +18,7 @@
     <version.spring-boot-starter-jsondoc>1.2.19</version.spring-boot-starter-jsondoc>
   </properties>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <!-- Import dependency management from Spring Boot -->
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-dependencies</artifactId>
-        <version>${version.spring-boot}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
-    <dependency>
-      <groupId>com.thoughtworks.xstream</groupId>
-      <artifactId>xstream</artifactId>
-    </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-client-spring</artifactId>
@@ -64,6 +45,10 @@
     <dependency>
       <groupId>de.digitalcollections.model</groupId>
       <artifactId>dc-model-jackson</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.model</groupId>
+      <artifactId>dc-model-xml</artifactId>
     </dependency>
     <dependency>
       <groupId>net.logstash.logback</groupId>
@@ -96,13 +81,14 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-oxm</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -171,9 +157,6 @@
             </goals>
           </execution>
         </executions>
-        <!--<configuration>
-          <classifier>exec</classifier>
-        </configuration>-->
       </plugin>
     </plugins>
   </build>

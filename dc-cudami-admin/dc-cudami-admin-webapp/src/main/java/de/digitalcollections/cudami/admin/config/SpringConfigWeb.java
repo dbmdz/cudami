@@ -8,15 +8,10 @@ import de.digitalcollections.commons.springmvc.controller.ErrorController;
 import de.digitalcollections.cudami.admin.converter.GrantedAuthorityJsonFilter;
 import de.digitalcollections.cudami.admin.interceptors.CreateAdminUserInterceptor;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -25,12 +20,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.ByteArrayHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
@@ -53,15 +44,12 @@ import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect;
 @EnableAspectJAutoProxy
 @EnableSpringDataWebSupport // for getting support for sorting and paging params
 @Import(SpringConfigCommonsMvc.class)
-public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
+public class SpringConfigWeb implements WebMvcConfigurer {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfigWeb.class);
 
   @Value("${cudami.defaultLocale-gui}")
   private String defaultLocaleTag;
-
-  @Autowired
-  ObjectMapper objectMapper;
 
   static final String ENCODING = "UTF-8";
 
@@ -72,12 +60,12 @@ public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
 //    registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
   }
 
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    // customize default spring boot jackson objectmapper
-    DigitalCollectionsObjectMapper.customize(objectMapper);
-    //objectMapper.registerModule(new JacksonXmlModule());
+  @Bean
+  @Primary
+  public ObjectMapper objectMapper() {
+    DigitalCollectionsObjectMapper objectMapper = new DigitalCollectionsObjectMapper();
     objectMapper.addMixIn(GrantedAuthority.class, GrantedAuthorityJsonFilter.class);
+    return objectMapper;
   }
 
   @Bean
@@ -127,37 +115,6 @@ public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
   }
 
   @Override
-  public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-    // support for @ResponseBody of type String
-    final StringHttpMessageConverter stringHMC = new StringHttpMessageConverter(Charset.forName(ENCODING));
-    // supported MediaTypes for stringHMC are by default set to: "text/plain" and MediaType.ALL
-    converters.add(stringHMC);
-
-    // support for @ResponseBody of type Object: convert object to JSON
-    // used in ApiController
-    converters.add(mappingJackson2HttpMessageConverter());
-
-    // support for @ResponseBody of type byte[]
-    ByteArrayHttpMessageConverter bc = new ByteArrayHttpMessageConverter();
-    List<MediaType> supported = new ArrayList<>();
-    supported.add(MediaType.IMAGE_JPEG);
-    supported.add(MediaType.IMAGE_GIF);
-    supported.add(MediaType.IMAGE_PNG);
-    bc.setSupportedMediaTypes(supported);
-    converters.add(bc);
-  }
-
-  @Bean
-  public HttpMessageConverter<?> mappingJackson2HttpMessageConverter() {
-    MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-    List<MediaType> supportedMediaTypes = new ArrayList<>();
-    supportedMediaTypes.add(MediaType.ALL);
-    converter.setSupportedMediaTypes(supportedMediaTypes);
-    converter.setObjectMapper(objectMapper);
-    return converter;
-  }
-
-  @Override
   public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
     configurer.enable();
   }
@@ -167,7 +124,7 @@ public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
     FilterRegistrationBean registration = new FilterRegistrationBean();
     registration.setFilter(new LogSessionIdFilter());
     // In case you want the filter to apply to specific URL patterns only (defaults to "/*")
-    //    registration.addUrlPatterns("/*");
+    registration.addUrlPatterns("/*");
     return registration;
   }
 }

@@ -1,32 +1,12 @@
 package de.digitalcollections.cudami.admin.business.impl.validator;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class PasswordsValidatorTest {
-
-  @BeforeAll
-  public static void setUpClass() {
-  }
-
-  @AfterAll
-  public static void tearDownClass() {
-  }
-
-  @BeforeEach
-  public void setUp() {
-  }
-
-  @AfterEach
-  public void tearDown() {
-  }
 
   @Test
   public void testContainsSpecialCharFalse() {
@@ -34,7 +14,7 @@ public class PasswordsValidatorTest {
     PasswordsValidator instance = new PasswordsValidator();
     boolean expResult = false;
     boolean result = instance.containsSpecialChar(password);
-    assertEquals(expResult, result);
+    assertThat(result).isEqualTo(expResult);
   }
 
   @Test
@@ -43,7 +23,7 @@ public class PasswordsValidatorTest {
     PasswordsValidator instance = new PasswordsValidator();
     boolean expResult = true;
     boolean result = instance.containsSpecialChar(password);
-    assertEquals(expResult, result);
+    assertThat(result).isEqualTo(expResult);
   }
 
   @Test
@@ -55,11 +35,12 @@ public class PasswordsValidatorTest {
 
     instance.validate(params, errors);
 
+    assertThat(errors.getErrorCount()).isEqualTo(1);
+
     String expectedErrorCode = "error.password_min_length";
     String result = errors.getGlobalErrors().get(0).getCodes()[1];
 
-    assertEquals(errors.getErrorCount(), 1);
-    assertEquals(expectedErrorCode, result);
+    assertThat(result).isEqualTo(expectedErrorCode);
   }
 
   @Test
@@ -71,11 +52,12 @@ public class PasswordsValidatorTest {
 
     instance.validate(params, errors);
 
+    assertThat(errors.getErrorCount()).isEqualTo(1);
+
     String expectedErrorCode = "error.password_max_length";
     String result = errors.getGlobalErrors().get(0).getCodes()[1];
 
-    assertEquals(errors.getErrorCount(), 1);
-    assertEquals(expectedErrorCode, result);
+    assertThat(result).isEqualTo(expectedErrorCode);
   }
 
   @Test
@@ -87,6 +69,6 @@ public class PasswordsValidatorTest {
 
     instance.validate(params, errors);
 
-    assertEquals(errors.getErrorCount(), 0);
+    assertThat(errors.getErrorCount()).isZero();
   }
 }

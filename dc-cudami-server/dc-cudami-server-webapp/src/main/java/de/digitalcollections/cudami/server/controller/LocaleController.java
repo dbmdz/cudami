@@ -19,14 +19,14 @@ public class LocaleController {
   private LocaleService service;
 
   @ApiMethod(description = "get all supported locales")
-  @RequestMapping(value = "/v1/locales", method = {RequestMethod.GET})
+  @RequestMapping(value = {"/latest/locales", "/v1/locales"}, method = {RequestMethod.GET})
   @ApiResponseObject
   public List<Locale> getAll() {
     return service.getAll();
   }
 
   @ApiMethod(description = "get default locale")
-  @RequestMapping(value = "/v1/locales/default", method = {RequestMethod.GET})
+  @RequestMapping(value = {"/latest/locales/default", "/v1/locales/default"}, method = {RequestMethod.GET})
   @ApiResponseObject
   public Locale getDefault() {
     return service.getDefault();

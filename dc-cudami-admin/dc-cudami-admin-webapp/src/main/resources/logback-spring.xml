@@ -24,7 +24,8 @@
   <springProfile name="local">
     <appender name="default" class="ch.qos.logback.core.ConsoleAppender">
       <encoder>
-        <pattern>[%d{ISO8601} %5p] %40.40c:%4L [%-8t] - %m%n</pattern>
+        <!-- contains example for logging sessionID from MDC context -->
+        <pattern>[%d{ISO8601} %5p] %40.40c:%4L [%-8t / %X{sessionID}] - %m%n</pattern>
       </encoder>
     </appender>
   </springProfile>

@@ -9,21 +9,21 @@
   </parent>
 
   <name>DigitalCollections: cudami Admin (Webapp)</name>
-  <groupId>de.digitalcollections.cudami</groupId>
   <artifactId>dc-cudami-admin-webapp</artifactId>
-  <version>3.1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <properties>
-    <java.version>1.8</java.version>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
     <version.logstash-logback-encoder>5.1</version.logstash-logback-encoder>
     <version.maven-resources-plugin>2.7</version.maven-resources-plugin>
     <version.thymeleaf-spring-data-dialect>3.3.1</version.thymeleaf-spring-data-dialect>
-    <version.webjar-jquery-ui-dist>1.12.1</version.webjar-jquery-ui-dist>
+    <version.webjar-bootstrap>3.3.7</version.webjar-bootstrap>
+    <version.webjar-bootswatch>3.3.7</version.webjar-bootswatch>
+    <version.webjar-fontawesome>5.2.0</version.webjar-fontawesome>
+    <version.webjar-html5shiv>3.7.3</version.webjar-html5shiv>
+    <version.webjar-ie10-viewport-bug-workaround>1.0.3</version.webjar-ie10-viewport-bug-workaround>
+    <version.webjar-jquery>3.1.1</version.webjar-jquery>
+    <version.webjar-jquery-ui>1.12.1</version.webjar-jquery-ui>
+    <version.webjar-respond>1.4.2</version.webjar-respond>
   </properties>
 
   <dependencies>
@@ -94,8 +94,18 @@
       <artifactId>thymeleaf-layout-dialect</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -122,6 +132,7 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -130,6 +141,13 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
+      <exclusions>
+        <exclusion>
+          <!-- TODO: excluded because otherwise WsSessionListener throws exception during session creation (sessionCreated is abstract) -->
+          <groupId>org.apache.tomcat.embed</groupId>
+          <artifactId>tomcat-embed-websocket</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
@@ -193,7 +211,7 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>jquery-ui-dist</artifactId>
-      <version>${version.webjar-jquery-ui-dist}</version>
+      <version>${version.webjar-jquery-ui}</version>
     </dependency>
   </dependencies>
 
@@ -215,21 +233,11 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>${version.maven-resources-plugin}</version>
         <configuration>
           <delimiters>
             <delimiter>@</delimiter>
           </delimiters>
           <useDefaultDelimiters>false</useDefaultDelimiters>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>${version.maven-compiler-plugin}</version>
-        <configuration>
-          <source>${maven.compiler.source}</source>
-          <target>${maven.compiler.target}</target>
         </configuration>
       </plugin>
       <plugin>
@@ -243,9 +251,6 @@
             </goals>
           </execution>
         </executions>
-        <!--<configuration>
-          <classifier>exec</classifier>
-        </configuration>-->
       </plugin>
     </plugins>
   </build>

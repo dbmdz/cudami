@@ -35,7 +35,7 @@ public class ContentTreeController {
   private ContentTreeService service;
 
   @ApiMethod(description = "get all content trees")
-  @RequestMapping(value = "/v1/contenttrees",
+  @RequestMapping(value = "/latest/contenttrees",
           produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public PageResponse<ContentTree> findAll(
@@ -53,21 +53,21 @@ public class ContentTreeController {
   }
 
   @ApiMethod(description = "get content tree by uuid")
-  @RequestMapping(value = "/v1/contenttrees/{uuid}", produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(value = "/latest/contenttrees/{uuid}", produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public ContentTree findById(@PathVariable UUID uuid) {
     return (ContentTree) service.get(uuid);
   }
 
   @ApiMethod(description = "save a newly created ContentTree")
-  @RequestMapping(value = "/v1/contenttrees", produces = "application/json", method = RequestMethod.POST)
+  @RequestMapping(value = "/latest/contenttrees", produces = "application/json", method = RequestMethod.POST)
   @ApiResponseObject
   public ContentTree save(@RequestBody ContentTree contentTree, BindingResult errors) throws IdentifiableServiceException {
     return (ContentTree) service.save(contentTree);
   }
 
   @ApiMethod(description = "update a content tree")
-  @RequestMapping(value = "/v1/contenttrees/{uuid}", produces = "application/json", method = RequestMethod.PUT)
+  @RequestMapping(value = "/latest/contenttrees/{uuid}", produces = "application/json", method = RequestMethod.PUT)
   @ApiResponseObject
   public ContentTree update(@PathVariable UUID uuid, @RequestBody ContentTree contentTree, BindingResult errors) throws IdentifiableServiceException {
     assert Objects.equals(uuid, contentTree.getUuid());
@@ -75,14 +75,14 @@ public class ContentTreeController {
   }
 
   @ApiMethod(description = "get count of content trees")
-  @RequestMapping(value = "/v1/contenttrees/count", produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(value = "/latest/contenttrees/count", produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public long count() {
     return service.count();
   }
 
   @ApiMethod(description = "get root nodes of content tree")
-  @RequestMapping(value = "/v1/contenttrees/{uuid}/rootNodes", produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(value = "/latest/contenttrees/{uuid}/rootNodes", produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   List<ContentNode> getRootNodes(@PathVariable UUID uuid) {
     return service.getRootNodes(uuid);

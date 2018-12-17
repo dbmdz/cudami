@@ -12,8 +12,6 @@ public interface IdentifiableService<I extends Identifiable> {
 
   long count();
 
-  I create();
-
   PageResponse<I> find(PageRequest pageRequest);
 
   List<I> find(String searchTerm, int maxResults);

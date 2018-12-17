@@ -1,22 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
+
   <parent>
     <groupId>de.digitalcollections.cudami</groupId>
     <artifactId>dc-cudami-admin</artifactId>
     <version>3.1.0-SNAPSHOT</version>
   </parent>
-  
+
   <name>DigitalCollections: cudami Admin (Business)</name>
   <artifactId>dc-cudami-admin-business</artifactId>
   <packaging>jar</packaging>
-  
-  <properties>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-  </properties>
-  
+
   <dependencies>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
@@ -27,8 +22,18 @@
       <artifactId>dc-model</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -46,7 +51,7 @@
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
+      <artifactId>slf4j-simple</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

@@ -9,7 +9,6 @@
   </parent>
 
   <name>DigitalCollections: cudami Server (Business)</name>
-  <groupId>de.digitalcollections.cudami</groupId>
   <artifactId>dc-cudami-server-business</artifactId>
   <packaging>jar</packaging>
 

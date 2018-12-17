@@ -8,14 +8,11 @@ import de.digitalcollections.model.api.identifiable.entity.ContentTree;
 import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.identifiable.entity.ContentTreeImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.ContentNodeImpl;
-import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
-import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
+import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
@@ -49,15 +46,6 @@ public class ContentTreeRepositoryImpl<C extends ContentTree> extends EntityRepo
     String sql = "SELECT count(*) FROM contenttrees";
     long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOnly());
     return count;
-  }
-
-  @Override
-  public C create() {
-    Locale defaultLocale = localeRepository.getDefault();
-    C contentTree = (C) new ContentTreeImpl();
-    contentTree.setLabel(new LocalizedTextImpl(defaultLocale, ""));
-    contentTree.setDescription(new LocalizedStructuredContentImpl(defaultLocale));
-    return contentTree;
   }
 
   @Override

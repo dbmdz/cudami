@@ -9,19 +9,19 @@ import java.util.Locale;
 
 public interface CudamiBackend extends CommonCudamiBackend {
 
-  @RequestLine("GET /v1/locales")
+  @RequestLine("GET /latest/locales")
   List<Locale> getAllLocales();
 
-  @RequestLine("GET /v1/locales/default")
+  @RequestLine("GET /latest/locales/default")
   Locale getDefaultLocale();
 
-  @RequestLine("GET /v1/webpages/{uuid}")
+  @RequestLine("GET /latest/webpages/{uuid}")
   Webpage getWebpage(@Param("uuid") String uuid);
 
-  @RequestLine("GET /v1/webpages/{uuid}?pLocale={locale}")
+  @RequestLine("GET /latest/webpages/{uuid}?pLocale={locale}")
   Webpage getWebpage(@Param("locale") Locale locale, @Param("uuid") String uuid);
 
-  @RequestLine("GET /v1/websites/{uuid}")
+  @RequestLine("GET /latest/websites/{uuid}")
   Website getWebsite(@Param("uuid") String uuid);
 
 }
