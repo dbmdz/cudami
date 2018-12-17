@@ -12,7 +12,6 @@ import java.util.Locale;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -51,9 +50,6 @@ public class SpringConfigWeb implements WebMvcConfigurer {
 
   @Value("${cudami.defaultLocale-gui}")
   private String defaultLocaleTag;
-
-  @Autowired
-  ObjectMapper objectMapper;
 
   static final String ENCODING = "UTF-8";
 
