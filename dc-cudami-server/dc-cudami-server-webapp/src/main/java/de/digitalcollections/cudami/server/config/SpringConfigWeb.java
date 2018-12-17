@@ -9,7 +9,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,9 +29,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfigWeb.class);
-
-  @Autowired
-  ObjectMapper objectMapper;
 
   @Value("${server.port:80}")
   Integer port;
