@@ -24,7 +24,7 @@ public class TextToHtmlTransformer {
           });
           result.append(">");
         } else {
-          result.append("<").append(markType);
+          result.append("<").append(markType).append(">");
         }
       });
     }
