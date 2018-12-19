@@ -34,7 +34,6 @@ public class WebpageHtmlController {
           @RequestParam(name = "pLocale", required = false) Locale pLocale,
           Model model
   ) throws IdentifiableServiceException {
-
     Webpage webpage;
     if (pLocale == null) {
       webpage = (Webpage) webpageService.get(uuid);
