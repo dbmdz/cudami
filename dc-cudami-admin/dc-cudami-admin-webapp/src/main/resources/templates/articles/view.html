@@ -46,32 +46,20 @@
           </ul>
           <div class="tab-content">
             <div th:each="locale,iter : ${availableLocales}" class="tab-pane" th:id="${locale}" th:classappend="${iter.index} == 0 ? active">
-              <div class="well">
-                <div class="row">
-                  <div class="col-sm-2">
-                    <img alt="no preview" class="media-object" th:src="@{/images/no-image.png}" style="width: 100px;" />
-                  </div>
-                  <div class="col-sm-10">
-                    <label th:text="*{label.translations[__${iter.index}__].text}">label</label>
-                    <th:block th:if="*{description} and ${article.description.localizedStructuredContent.containsKey(locale)}">
-                      <div th:insert="cudami/fragments/webpage-to-html :: renderLocalizedStructuredContent(*{description.localizedStructuredContent}, ${locale})"></div>
-                    </th:block>
-                  </div>
-                </div>
-              </div>
+              <div th:replace="fragments/identifiable::renderTeaser(${article}, ${locale})"></div>
               <th:block th:if="*{text} and ${article.text.localizedStructuredContent.containsKey(locale)}">
-                <div th:insert="cudami/fragments/webpage-to-html :: renderLocalizedStructuredContent(*{text.localizedStructuredContent}, ${locale})"></div>
+                <div th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(*{text.localizedStructuredContent}, ${locale})"></div>
               </th:block>
             </div>
           </div>
         </div>
       </div>
-      
+
       <div class="row main-content">
         <div class="col-sm-12">
           <h3>
             <span th:text="#{linked_data}">Linked Data</span>
-            
+
             <button type="button" class="btn btn-default pull-right new-button" data-toggle="modal" data-target="#select-item-dialog" th:text="#{add}">Add</button>
           </h3>
           <table class="table table-bordered table-condensed table-striped table-hover table-responsive">
@@ -102,7 +90,7 @@
           </table>
         </div>
       </div>
-      
+
       <div th:replace="fragments/modals :: selectItemDialog"></div>
     </section>
   </body>

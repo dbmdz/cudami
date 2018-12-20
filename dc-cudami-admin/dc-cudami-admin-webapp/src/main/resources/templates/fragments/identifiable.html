@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+  <body>
+
+  <th:block th:fragment="renderTeaser(identifiable, locale)">
+    <div class="well">
+      <div class="row">
+        <div class="col-sm-2">
+          <img alt="no preview" class="media-object" th:src="@{/images/no-image.png}" style="width: 100px;" />
+        </div>
+        <div class="col-sm-10">
+          <label>
+            <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${identifiable.label}, ${locale})"></th:block>
+          </label>
+          <th:block th:if="${identifiable.description} and ${identifiable.description.localizedStructuredContent.containsKey(locale)}">
+            <div th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${identifiable.description.localizedStructuredContent}, ${locale})"></div>
+          </th:block>
+        </div>
+      </div>
+    </div>
+  </th:block>
+
+  </body>
+</html>
