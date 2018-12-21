@@ -3,7 +3,7 @@
 [![Javadocs](https://javadoc.io/badge/de.digitalcollections.cudami/dc-cudami.svg)](https://javadoc.io/doc/de.digitalcollections.cudami/dc-cudami)
 [![Build Status](https://img.shields.io/travis/dbmdz/cudami/master.svg)](https://travis-ci.org/dbmdz/cudami)
 [![Codecov](https://img.shields.io/codecov/c/github/dbmdz/cudami/master.svg)](https://codecov.io/gh/dbmdz/cudami)
-[![MIT License](https://img.shields.io/github/license/dbmdz/cudami.svg)](LICENSE)
+[![License](https://img.shields.io/github/license/dbmdz/cudami.svg)](LICENSE)
 [![GitHub release](https://img.shields.io/github/release/dbmdz/cudami.svg)](https://github.com/dbmdz/cudami/releases)
 [![Maven Central](https://img.shields.io/maven-central/v/de.digitalcollections.cudami/dc-cudami.svg)](https://search.maven.org/search?q=a:dc-cudami)
 
