@@ -43,7 +43,7 @@ public class ContentNodeController {
   private ContentNodeService<ContentNode, Identifiable> service;
 
   @ApiMethod(description = "get all content nodes")
-  @RequestMapping(value = "/latest/contentnodes",
+  @RequestMapping(value = {"/latest/contentnodes", "/v2/contentnodes"},
           produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public PageResponse<ContentNode> findAll(
@@ -62,7 +62,7 @@ public class ContentNodeController {
 
   // Test-URL: http://localhost:9000/latest/contentnodes/599a120c-2dd5-11e8-b467-0ed5f89f718b
   @ApiMethod(description = "get a content node as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
-  @RequestMapping(value = {"/latest/contentnodes/{uuid}"}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, method = RequestMethod.GET)
+  @RequestMapping(value = {"/latest/contentnodes/{uuid}", "/v2/contentnodes/{uuid}"}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, method = RequestMethod.GET)
   @ApiResponseObject
   public ResponseEntity<ContentNode> getContentNode(
           @ApiPathParam(description = "UUID of the content node, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
@@ -80,21 +80,23 @@ public class ContentNodeController {
   }
 
   @ApiMethod(description = "save a newly created top-level content node")
-  @RequestMapping(value = "/latest/contenttrees/{parentContentTreeUuid}/contentnode", produces = "application/json", method = RequestMethod.POST)
+  @RequestMapping(value = {"/latest/contenttrees/{parentContentTreeUuid}/contentnode", "/v2/contenttrees/{parentContentTreeUuid}/contentnode"}, produces = "application/json",
+          method = RequestMethod.POST)
   @ApiResponseObject
   public ContentNode saveWithParentContentTree(@PathVariable UUID parentContentTreeUuid, @RequestBody ContentNode contentNode, BindingResult errors) throws IdentifiableServiceException {
     return service.saveWithParentContentTree(contentNode, parentContentTreeUuid);
   }
 
   @ApiMethod(description = "save a newly created content node")
-  @RequestMapping(value = "/latest/contentnodes/{parentContentNodeUuid}/contentnode", produces = "application/json", method = RequestMethod.POST)
+  @RequestMapping(value = {"/latest/contentnodes/{parentContentNodeUuid}/contentnode", "/v2/contentnodes/{parentContentNodeUuid}/contentnode"}, produces = "application/json",
+          method = RequestMethod.POST)
   @ApiResponseObject
   public ContentNode saveWithParentContentNode(@PathVariable UUID parentContentNodeUuid, @RequestBody ContentNode contentNode, BindingResult errors) throws IdentifiableServiceException {
     return service.saveWithParentContentNode(contentNode, parentContentNodeUuid);
   }
 
   @ApiMethod(description = "update a content node")
-  @RequestMapping(value = "/latest/contentnodes/{uuid}", produces = "application/json", method = RequestMethod.PUT)
+  @RequestMapping(value = {"/latest/contentnodes/{uuid}", "/v2/contentnodes/{uuid}"}, produces = "application/json", method = RequestMethod.PUT)
   @ApiResponseObject
   public ContentNode update(@PathVariable UUID uuid, @RequestBody ContentNode contentNode, BindingResult errors) throws IdentifiableServiceException {
     assert Objects.equals(uuid, contentNode.getUuid());
@@ -102,35 +104,35 @@ public class ContentNodeController {
   }
 
   @ApiMethod(description = "get count of content nodes")
-  @RequestMapping(value = "/latest/contentnodes/count", produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(value = {"/latest/contentnodes/count", "/v2/contentnodes/count"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public long count() {
     return service.count();
   }
 
   @ApiMethod(description = "get child content nodes of content node")
-  @RequestMapping(value = "/latest/contentnodes/{uuid}/children", produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(value = {"/latest/contentnodes/{uuid}/children", "/v2/contentnodes/{uuid}/children"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   List<ContentNode> getChildren(@PathVariable UUID uuid) {
     return service.getChildren(uuid);
   }
 
   @ApiMethod(description = "get identifiables of content node")
-  @RequestMapping(value = "/latest/contentnodes/{uuid}/identifiables", produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(value = {"/latest/contentnodes/{uuid}/identifiables", "/v2/contentnodes/{uuid}/identifiables"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public List<Identifiable> getIdentifiables(@PathVariable UUID uuid) {
     return service.getIdentifiables(uuid);
   }
 
   @ApiMethod(description = "save identifiables of content node")
-  @PostMapping(value = "/latest/contentnodes/{uuid}/identifiables", produces = "application/json")
+  @PostMapping(value = {"/latest/contentnodes/{uuid}/identifiables", "/v2/contentnodes/{uuid}/identifiables"}, produces = "application/json")
   @ApiResponseObject
   public List<Identifiable> saveIdentifiables(@PathVariable UUID uuid, @RequestBody List<Identifiable> identifiables) {
     return service.saveIdentifiables(uuid, identifiables);
   }
 
   @ApiMethod(description = "add identifiable to content node")
-  @PostMapping(value = "/latest/contentnodes/{uuid}/identifiables/{identifiableUuid}")
+  @PostMapping(value = {"/latest/contentnodes/{uuid}/identifiables/{identifiableUuid}", "/v2/contentnodes/{uuid}/identifiables/{identifiableUuid}"})
   @ResponseStatus(value = HttpStatus.OK)
   @ApiResponseObject
   public void addIdentifiable(@PathVariable UUID uuid, @PathVariable UUID identifiableUuid) {

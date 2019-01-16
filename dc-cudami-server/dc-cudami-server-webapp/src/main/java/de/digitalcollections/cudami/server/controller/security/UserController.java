@@ -35,14 +35,14 @@ public class UserController {
   private UserService service;
 
   @ApiMethod(description = "get all users with given role and enabled status")
-  @RequestMapping(value = "/latest/users", params = {"role", "enabled"}, produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(value = {"/latest/users", "/v2/users"}, params = {"role", "enabled"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public List<User> getByRoleAndStatus(@RequestParam(name = "role") Role role, @RequestParam(name = "enabled") boolean enabled) {
     return service.findActiveAdminUsers();
   }
 
   @ApiMethod(description = "get all users")
-  @RequestMapping(value = "/latest/users",
+  @RequestMapping(value = {"/latest/users", "/v2/users"},
           produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public PageResponse<User> findAll(
@@ -60,28 +60,28 @@ public class UserController {
   }
 
   @ApiMethod(description = "get user by uuid")
-  @RequestMapping(value = "/latest/users/{uuid}", produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(value = {"/latest/users/{uuid}", "/v2/users/{uuid}"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public User findById(@PathVariable UUID uuid) {
     return service.get(uuid);
   }
 
   @ApiMethod(description = "get user by email address")
-  @RequestMapping(value = "/latest/users", params = {"email"}, produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(value = {"/latest/users", "/v2/users"}, params = {"email"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public User findByName(@RequestParam(name = "email") String email) {
     return service.loadUserByUsername(email);
   }
 
   @ApiMethod(description = "save a newly created user")
-  @RequestMapping(value = "/latest/users", produces = "application/json", method = RequestMethod.POST)
+  @RequestMapping(value = {"/latest/users", "/v2/users"}, produces = "application/json", method = RequestMethod.POST)
   @ApiResponseObject
   public User save(@RequestBody User user, BindingResult errors) {
     return service.save(user, errors);
   }
 
   @ApiMethod(description = "update a user")
-  @RequestMapping(value = "/latest/users/{uuid}", produces = "application/json", method = RequestMethod.PUT)
+  @RequestMapping(value = {"/latest/users/{uuid}", "/v2/users/{uuid}"}, produces = "application/json", method = RequestMethod.PUT)
   @ApiResponseObject
   public User update(@PathVariable UUID uuid, @RequestBody User user, BindingResult errors) {
     assert Objects.equals(uuid, user.getUuid());

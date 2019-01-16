@@ -43,7 +43,7 @@ public class ArticleController {
   private ArticleService<Article, Identifiable> articleService;
 
   @ApiMethod(description = "get all articles")
-  @RequestMapping(value = "/latest/articles", produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(value = {"/latest/articles", "/v2/articles"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public PageResponse<Article> findAll(
           @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -61,7 +61,7 @@ public class ArticleController {
 
   // Test-URL: http://localhost:9000/latest/articles/599a120c-2dd5-11e8-b467-0ed5f89f718b
   @ApiMethod(description = "get an article as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
-  @RequestMapping(value = {"/latest/articles/{uuid}"}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, method = RequestMethod.GET)
+  @RequestMapping(value = {"/latest/articles/{uuid}", "/v2/articles/{uuid}"}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, method = RequestMethod.GET)
   @ApiResponseObject
   public ResponseEntity<Article> getWebpage(
           @ApiPathParam(description = "UUID of the article, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
@@ -79,14 +79,14 @@ public class ArticleController {
   }
 
   @ApiMethod(description = "save a newly created article")
-  @RequestMapping(value = "/latest/articles", produces = "application/json", method = RequestMethod.POST)
+  @RequestMapping(value = {"/latest/articles", "/v2/articles"}, produces = "application/json", method = RequestMethod.POST)
   @ApiResponseObject
   public Article save(@RequestBody Article article, BindingResult errors) throws IdentifiableServiceException {
     return articleService.save(article);
   }
 
   @ApiMethod(description = "update an article")
-  @RequestMapping(value = "/latest/articles/{uuid}", produces = "application/json", method = RequestMethod.PUT)
+  @RequestMapping(value = {"/latest/articles/{uuid}", "/v2/articles/{uuid}"}, produces = "application/json", method = RequestMethod.PUT)
   @ApiResponseObject
   public Article update(@PathVariable UUID uuid, @RequestBody Article article, BindingResult errors) throws IdentifiableServiceException {
     assert Objects.equals(uuid, article.getUuid());
@@ -94,14 +94,14 @@ public class ArticleController {
   }
 
   @ApiMethod(description = "get identifiables related to article")
-  @RequestMapping(value = "/latest/articles/{uuid}/identifiables", produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(value = {"/latest/articles/{uuid}/identifiables", "/v2/articles/{uuid}/identifiables"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public List<Identifiable> getIdentifiables(@PathVariable UUID uuid) {
     return articleService.getIdentifiables(uuid);
   }
 
   @ApiMethod(description = "add identifiable to article")
-  @PostMapping(value = "/latest/articles/{uuid}/identifiables/{identifiableUuid}")
+  @PostMapping(value = {"/latest/articles/{uuid}/identifiables/{identifiableUuid}", "/v2/articles/{uuid}/identifiables/{identifiableUuid}"})
   @ResponseStatus(value = HttpStatus.OK)
   @ApiResponseObject
   public void addIdentifiable(@PathVariable UUID uuid, @PathVariable UUID identifiableUuid) {

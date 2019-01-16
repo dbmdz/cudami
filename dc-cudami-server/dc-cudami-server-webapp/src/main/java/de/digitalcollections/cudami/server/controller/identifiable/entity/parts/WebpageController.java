@@ -43,7 +43,7 @@ public class WebpageController {
   private WebpageService<Webpage, Identifiable> webpageService;
 
   @ApiMethod(description = "get all webpages")
-  @RequestMapping(value = "/latest/webpages",
+  @RequestMapping(value = {"/latest/webpages", "/v2/webpages"},
           produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public PageResponse<Webpage> findAll(
@@ -62,7 +62,7 @@ public class WebpageController {
 
   // Test-URL: http://localhost:9000/latest/webpages/599a120c-2dd5-11e8-b467-0ed5f89f718b
   @ApiMethod(description = "get a webpage as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
-  @RequestMapping(value = {"/latest/webpages/{uuid}"}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, method = RequestMethod.GET)
+  @RequestMapping(value = {"/latest/webpages/{uuid}", "/v2/webpages/{uuid}"}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, method = RequestMethod.GET)
   @ApiResponseObject
   public ResponseEntity<Webpage> getWebpage(
           @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
@@ -79,30 +79,22 @@ public class WebpageController {
     return new ResponseEntity<>(webpage, HttpStatus.OK);
   }
 
-  private Locale getLocale(Webpage webpage) {
-    if (webpage == null) {
-      return null;
-    }
-    Locale returnedLocale = webpage.getLabel().getTranslations().stream().findFirst().get().getLocale();
-    return returnedLocale;
-  }
-
   @ApiMethod(description = "save a newly created top-level webpage")
-  @RequestMapping(value = "/latest/websites/{parentWebsiteUuid}/webpage", produces = "application/json", method = RequestMethod.POST)
+  @RequestMapping(value = {"/latest/websites/{parentWebsiteUuid}/webpage", "/v2/websites/{parentWebsiteUuid}/webpage"}, produces = "application/json", method = RequestMethod.POST)
   @ApiResponseObject
   public Webpage saveWithParentWebsite(@PathVariable UUID parentWebsiteUuid, @RequestBody Webpage webpage, BindingResult errors) throws IdentifiableServiceException {
     return webpageService.saveWithParentWebsite(webpage, parentWebsiteUuid);
   }
 
   @ApiMethod(description = "save a newly created webpage")
-  @RequestMapping(value = "/latest/webpages/{parentWebpageUuid}/webpage", produces = "application/json", method = RequestMethod.POST)
+  @RequestMapping(value = {"/latest/webpages/{parentWebpageUuid}/webpage", "/v2/webpages/{parentWebpageUuid}/webpage"}, produces = "application/json", method = RequestMethod.POST)
   @ApiResponseObject
   public Webpage saveWithParentWebpage(@PathVariable UUID parentWebpageUuid, @RequestBody Webpage webpage, BindingResult errors) throws IdentifiableServiceException {
     return webpageService.saveWithParentWebpage(webpage, parentWebpageUuid);
   }
 
   @ApiMethod(description = "update a webpage")
-  @RequestMapping(value = "/latest/webpages/{uuid}", produces = "application/json", method = RequestMethod.PUT)
+  @RequestMapping(value = {"/latest/webpages/{uuid}", "/v2/webpages/{uuid}"}, produces = "application/json", method = RequestMethod.PUT)
   @ApiResponseObject
   public Webpage update(@PathVariable UUID uuid, @RequestBody Webpage webpage, BindingResult errors) throws IdentifiableServiceException {
     assert Objects.equals(uuid, webpage.getUuid());
@@ -110,14 +102,14 @@ public class WebpageController {
   }
 
   @ApiMethod(description = "get identifiables related to webpage")
-  @RequestMapping(value = "/latest/webpages/{uuid}/identifiables", produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(value = {"/latest/webpages/{uuid}/identifiables", "/v2/webpages/{uuid}/identifiables"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public List<Identifiable> getIdentifiables(@PathVariable UUID uuid) {
     return webpageService.getIdentifiables(uuid);
   }
 
   @ApiMethod(description = "add identifiable to webpage")
-  @PostMapping(value = "/latest/webpages/{uuid}/identifiables/{identifiableUuid}")
+  @PostMapping(value = {"/latest/webpages/{uuid}/identifiables/{identifiableUuid}", "/v2/webpages/{uuid}/identifiables/{identifiableUuid}"})
   @ResponseStatus(value = HttpStatus.OK)
   @ApiResponseObject
   public void addIdentifiable(@PathVariable UUID uuid, @PathVariable UUID identifiableUuid) {
