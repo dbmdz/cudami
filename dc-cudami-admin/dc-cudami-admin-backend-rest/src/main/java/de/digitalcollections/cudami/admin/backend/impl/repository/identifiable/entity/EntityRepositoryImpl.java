@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.entity;
 
-import de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.*;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.EntityRepository;
+import de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.*;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;

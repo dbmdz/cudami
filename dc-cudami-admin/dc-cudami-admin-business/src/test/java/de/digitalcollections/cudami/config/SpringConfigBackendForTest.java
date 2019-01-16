@@ -8,12 +8,12 @@ import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.en
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.WebsiteRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.ContentNodeRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.WebpageRepository;
+import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.CudamiFileResourceRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.security.UserRepository;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.CudamiFileResourceRepository;
 
 /**
  * Mock the backend.
@@ -25,7 +25,7 @@ public class SpringConfigBackendForTest {
   public ArticleRepository articleRepository() {
     return Mockito.mock(ArticleRepository.class);
   }
-  
+
   @Bean
   @Qualifier("identifiableRepositoryImpl")
   public IdentifiableRepository identifiableRepositoryImpl() {

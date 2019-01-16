@@ -4,8 +4,8 @@ import de.digitalcollections.cudami.server.backend.api.repository.security.UserR
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSortingRepositoryImpl;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.api.security.enums.Role;
+import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.security.UserImpl;
 import java.util.List;
 import java.util.UUID;
