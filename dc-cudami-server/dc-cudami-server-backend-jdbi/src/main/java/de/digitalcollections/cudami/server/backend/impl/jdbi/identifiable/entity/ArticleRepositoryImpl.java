@@ -126,8 +126,12 @@ public class ArticleRepositoryImpl<A extends Article, I extends Identifiable> ex
     // TODO maybe a better solution to just get locale specific fields directly from database instead of removing it here?
     // iterate over all localized fields and remove all texts that are not matching the requested locale:
     article.getLabel().getTranslations().removeIf(translation -> !translation.getLocale().equals(fLocale));
-    article.getDescription().getLocalizedStructuredContent().entrySet().removeIf(entry -> !entry.getKey().equals(fLocale));
-    article.getText().getLocalizedStructuredContent().entrySet().removeIf((Map.Entry entry) -> !entry.getKey().equals(fLocale));
+    if (article.getDescription() != null && article.getDescription().getLocalizedStructuredContent() != null) {
+      article.getDescription().getLocalizedStructuredContent().entrySet().removeIf(entry -> !entry.getKey().equals(fLocale));
+    }
+    if (article.getText() != null && article.getText().getLocalizedStructuredContent() != null) {
+      article.getText().getLocalizedStructuredContent().entrySet().removeIf((Map.Entry entry) -> !entry.getKey().equals(fLocale));
+    }
     return article;
   }
 

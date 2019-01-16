@@ -115,7 +115,9 @@ public class ContentNodeRepositoryImpl<C extends ContentNode, I extends Identifi
     // TODO maybe a better solution to just get locale specific fields directly from database instead of removing it here?
     // iterate over all localized fields and remove all texts that are not matching the requested locale:
     contentNode.getLabel().getTranslations().removeIf(translation -> !translation.getLocale().equals(fLocale));
-    contentNode.getDescription().getLocalizedStructuredContent().entrySet().removeIf(entry -> !entry.getKey().equals(fLocale));
+    if (contentNode.getDescription() != null && contentNode.getDescription().getLocalizedStructuredContent() != null) {
+      contentNode.getDescription().getLocalizedStructuredContent().entrySet().removeIf(entry -> !entry.getKey().equals(fLocale));
+    }
     return contentNode;
   }
 

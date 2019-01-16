@@ -115,8 +115,12 @@ public class WebpageRepositoryImpl<W extends Webpage, I extends Identifiable> ex
     // TODO maybe a better solution to just get locale specific fields directly from database instead of removing it here?
     // iterate over all localized fields and remove all texts that are not matching the requested locale:
     webpage.getLabel().getTranslations().removeIf(translation -> !translation.getLocale().equals(fLocale));
-    webpage.getDescription().getLocalizedStructuredContent().entrySet().removeIf(entry -> !entry.getKey().equals(fLocale));
-    webpage.getText().getLocalizedStructuredContent().entrySet().removeIf((Map.Entry entry) -> !entry.getKey().equals(fLocale));
+    if (webpage.getDescription() != null && webpage.getDescription().getLocalizedStructuredContent() != null) {
+      webpage.getDescription().getLocalizedStructuredContent().entrySet().removeIf(entry -> !entry.getKey().equals(fLocale));
+    }
+    if (webpage.getText() != null && webpage.getText().getLocalizedStructuredContent() != null) {
+      webpage.getText().getLocalizedStructuredContent().entrySet().removeIf((Map.Entry entry) -> !entry.getKey().equals(fLocale));
+    }
     return webpage;
   }
 
