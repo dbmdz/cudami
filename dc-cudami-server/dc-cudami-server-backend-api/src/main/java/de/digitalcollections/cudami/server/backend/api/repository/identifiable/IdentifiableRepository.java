@@ -6,7 +6,6 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.UUID;
 
 public interface IdentifiableRepository<I extends Identifiable> {
@@ -23,7 +22,9 @@ public interface IdentifiableRepository<I extends Identifiable> {
     I identifiable = findOne(uuid);
     // TODO maybe a better solution to just get locale specific fields directly from database instead of removing it here?
     identifiable.getLabel().getTranslations().removeIf((Translation translation) -> !translation.getLocale().equals(locale));
-    identifiable.getDescription().getLocalizedStructuredContent().entrySet().removeIf((Map.Entry entry) -> !entry.getKey().equals(locale));
+    if (identifiable.getDescription() != null && identifiable.getDescription().getLocalizedStructuredContent() != null) {
+      identifiable.getDescription().getLocalizedStructuredContent().entrySet().removeIf(entry -> !entry.getKey().equals(locale));
+    }
     return identifiable;
   }
 
