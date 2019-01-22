@@ -44,16 +44,15 @@ public class WebpageController {
 
   @ApiMethod(description = "get all webpages")
   @RequestMapping(value = {"/latest/webpages", "/v2/webpages"},
-          produces = "application/json", method = RequestMethod.GET)
+    produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public PageResponse<Webpage> findAll(
-          @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-          @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-          @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
-          @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC") Direction sortDirection,
-          @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE") NullHandling nullHandling
+    @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+    @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+    @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
+    @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC") Direction sortDirection,
+    @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE") NullHandling nullHandling
   ) {
-    // FIXME add support for multiple sorting orders
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
@@ -65,9 +64,9 @@ public class WebpageController {
   @RequestMapping(value = {"/latest/webpages/{uuid}", "/v2/webpages/{uuid}"}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, method = RequestMethod.GET)
   @ApiResponseObject
   public ResponseEntity<Webpage> getWebpage(
-          @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
-          @ApiQueryParam(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
-          @RequestParam(name = "pLocale", required = false) Locale pLocale
+    @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
+    @ApiQueryParam(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+    @RequestParam(name = "pLocale", required = false) Locale pLocale
   ) throws IdentifiableServiceException {
 
     Webpage webpage;

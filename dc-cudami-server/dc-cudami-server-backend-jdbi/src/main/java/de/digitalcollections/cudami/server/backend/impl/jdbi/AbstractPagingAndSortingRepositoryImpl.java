@@ -31,7 +31,6 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
     if (sorting != null) {
       Iterator<Order> iterator = sorting.iterator();
       if (iterator.hasNext()) {
-        // FIXME just supporting one field sorting until now
         Order order = iterator.next();
         sortField = order.getProperty();
         if (sortField != null) {

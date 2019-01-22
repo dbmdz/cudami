@@ -43,16 +43,15 @@ public class UserController {
 
   @ApiMethod(description = "get all users")
   @RequestMapping(value = {"/latest/users", "/v2/users"},
-          produces = "application/json", method = RequestMethod.GET)
+    produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public PageResponse<User> findAll(
-          @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-          @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-          @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
-          @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC") Direction sortDirection,
-          @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE") NullHandling nullHandling
+    @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+    @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+    @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
+    @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC") Direction sortDirection,
+    @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE") NullHandling nullHandling
   ) {
-    // FIXME add support for multiple sorting orders
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);

@@ -44,16 +44,15 @@ public class ContentNodeController {
 
   @ApiMethod(description = "get all content nodes")
   @RequestMapping(value = {"/latest/contentnodes", "/v2/contentnodes"},
-          produces = "application/json", method = RequestMethod.GET)
+    produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public PageResponse<ContentNode> findAll(
-          @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-          @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-          @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
-          @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC") Direction sortDirection,
-          @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE") NullHandling nullHandling
+    @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+    @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+    @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
+    @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC") Direction sortDirection,
+    @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE") NullHandling nullHandling
   ) {
-    // FIXME add support for multiple sorting orders
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
@@ -65,9 +64,9 @@ public class ContentNodeController {
   @RequestMapping(value = {"/latest/contentnodes/{uuid}", "/v2/contentnodes/{uuid}"}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, method = RequestMethod.GET)
   @ApiResponseObject
   public ResponseEntity<ContentNode> getContentNode(
-          @ApiPathParam(description = "UUID of the content node, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
-          @ApiQueryParam(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
-          @RequestParam(name = "pLocale", required = false) Locale pLocale
+    @ApiPathParam(description = "UUID of the content node, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
+    @ApiQueryParam(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+    @RequestParam(name = "pLocale", required = false) Locale pLocale
   ) throws IdentifiableServiceException {
 
     ContentNode contentNode;
@@ -81,7 +80,7 @@ public class ContentNodeController {
 
   @ApiMethod(description = "save a newly created top-level content node")
   @RequestMapping(value = {"/latest/contenttrees/{parentContentTreeUuid}/contentnode", "/v2/contenttrees/{parentContentTreeUuid}/contentnode"}, produces = "application/json",
-          method = RequestMethod.POST)
+    method = RequestMethod.POST)
   @ApiResponseObject
   public ContentNode saveWithParentContentTree(@PathVariable UUID parentContentTreeUuid, @RequestBody ContentNode contentNode, BindingResult errors) throws IdentifiableServiceException {
     return service.saveWithParentContentTree(contentNode, parentContentTreeUuid);
@@ -89,7 +88,7 @@ public class ContentNodeController {
 
   @ApiMethod(description = "save a newly created content node")
   @RequestMapping(value = {"/latest/contentnodes/{parentContentNodeUuid}/contentnode", "/v2/contentnodes/{parentContentNodeUuid}/contentnode"}, produces = "application/json",
-          method = RequestMethod.POST)
+    method = RequestMethod.POST)
   @ApiResponseObject
   public ContentNode saveWithParentContentNode(@PathVariable UUID parentContentNodeUuid, @RequestBody ContentNode contentNode, BindingResult errors) throws IdentifiableServiceException {
     return service.saveWithParentContentNode(contentNode, parentContentNodeUuid);
