@@ -89,6 +89,7 @@
     <version.querydsl>4.2.1</version.querydsl>
     <version.slf4j>1.7.25</version.slf4j>
     <version.snakeyaml>1.23</version.snakeyaml>
+    <version.spotbugs>3.1.10</version.spotbugs>
     <version.spring-boot>2.1.1.RELEASE</version.spring-boot>
     <version.unbescape>1.1.6.RELEASE</version.unbescape>
 
@@ -103,6 +104,7 @@
     <version.maven-source-plugin>3.0.1</version.maven-source-plugin>
     <version.maven-surefire-plugin>2.22.1</version.maven-surefire-plugin>
     <version.nexus-staging-maven-plugin>1.6.8</version.nexus-staging-maven-plugin>
+    <version.spotbugs-maven-plugin>3.1.10</version.spotbugs-maven-plugin>
   </properties>
 
   <dependencyManagement>
@@ -354,6 +356,19 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-maven-plugin</artifactId>
+        <version>${version.spotbugs}</version>
+        <dependencies>
+          <!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs -->
+          <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs</artifactId>
+            <version>${version.spotbugs-maven-plugin}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
