@@ -48,7 +48,9 @@ public class V1WebpageController {
 
     Webpage webpage = loadWebpage(pLocale, uuid);
     String result = v1ObjectMapper.writeValueAsString(webpage);
-    result = result.replaceAll("ENTITY_PART", "RESOURCE");
+    if (result != null) {
+      result = result.replaceAll("ENTITY_PART", "RESOURCE");
+    }
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
