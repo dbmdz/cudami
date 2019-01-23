@@ -49,7 +49,8 @@ public class SetupController extends AbstractController implements MessageSource
   }
 
   @RequestMapping(value = "/setup/adminUser", method = RequestMethod.POST)
-  public String adminUser(@RequestParam("pwd1") String password1, @RequestParam("pwd2") String password2, @ModelAttribute(name = "user") @Valid UserImpl user, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  public String adminUser(@RequestParam("pwd1") String password1, @RequestParam("pwd2") String password2, @ModelAttribute(name = "user") @Valid UserImpl user, BindingResult results,
+          Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "users/create";

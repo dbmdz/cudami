@@ -59,7 +59,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> implements Ident
     Sorting sorting = pageRequest.getSorting();
     Iterator<Order> iterator = sorting.iterator();
 
-    // FIXME add support for multiple sort fields
     String sortField = "";
     String sortDirection = "";
     String nullHandling = "";

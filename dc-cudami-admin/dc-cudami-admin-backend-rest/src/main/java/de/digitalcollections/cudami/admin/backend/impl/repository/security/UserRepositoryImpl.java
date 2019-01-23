@@ -38,7 +38,6 @@ public class UserRepositoryImpl implements UserRepository<UserImpl> {
     Sorting sorting = pageRequest.getSorting();
     Iterator<Order> iterator = sorting.iterator();
 
-    // FIXME add support for multiple sort fields
     String sortField = "";
     String sortDirection = "";
     String nullHandling = "";

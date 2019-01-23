@@ -85,9 +85,9 @@ public class FileResourcesController extends AbstractController implements Messa
   public String create(Model model) {
     Locale defaultLocale = localeService.getDefault();
     List<Locale> locales = localeService.findAll().stream()
-            .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
-            .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-            .collect(Collectors.toList());
+      .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
+      .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+      .collect(Collectors.toList());
 
     model.addAttribute("defaultLocale", defaultLocale);
     model.addAttribute("fileresource", cudamiFileResourceService.create());
@@ -96,7 +96,6 @@ public class FileResourcesController extends AbstractController implements Messa
   }
 
   // FIXME: add proper error and validation handling (using results and feedbackmessages)
-  // FIXME: make a step by step resource adding assistant: https://commons.wikimedia.org/wiki/Special:UploadWizard
   @PostMapping("/fileresources/new")
   public String create(@ModelAttribute @Valid FileResourceImpl fileResource, BindingResult results, @RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
     FileResource managedFileResource;
@@ -160,9 +159,9 @@ public class FileResourcesController extends AbstractController implements Messa
     HashSet<Locale> availableLocales = (HashSet<Locale>) fileresource.getLabel().getLocales();
     Set<String> availableLocaleTags = availableLocales.stream().map(Locale::toLanguageTag).collect(Collectors.toSet());
     List<Locale> locales = localeService.findAll().stream()
-            .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
-            .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-            .collect(Collectors.toList());
+      .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
+      .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+      .collect(Collectors.toList());
 
     model.addAttribute("fileresource", fileresource);
     model.addAttribute("availableLocales", availableLocales);

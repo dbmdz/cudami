@@ -35,24 +35,23 @@ public class UserController {
   private UserService service;
 
   @ApiMethod(description = "get all users with given role and enabled status")
-  @RequestMapping(value = "/latest/users", params = {"role", "enabled"}, produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(value = {"/latest/users", "/v2/users"}, params = {"role", "enabled"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public List<User> getByRoleAndStatus(@RequestParam(name = "role") Role role, @RequestParam(name = "enabled") boolean enabled) {
     return service.findActiveAdminUsers();
   }
 
   @ApiMethod(description = "get all users")
-  @RequestMapping(value = "/latest/users",
-          produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(value = {"/latest/users", "/v2/users"},
+    produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public PageResponse<User> findAll(
-          @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-          @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-          @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
-          @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC") Direction sortDirection,
-          @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE") NullHandling nullHandling
+    @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+    @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+    @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
+    @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC") Direction sortDirection,
+    @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE") NullHandling nullHandling
   ) {
-    // FIXME add support for multiple sorting orders
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
@@ -60,28 +59,28 @@ public class UserController {
   }
 
   @ApiMethod(description = "get user by uuid")
-  @RequestMapping(value = "/latest/users/{uuid}", produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(value = {"/latest/users/{uuid}", "/v2/users/{uuid}"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public User findById(@PathVariable UUID uuid) {
     return service.get(uuid);
   }
 
   @ApiMethod(description = "get user by email address")
-  @RequestMapping(value = "/latest/users", params = {"email"}, produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(value = {"/latest/users", "/v2/users"}, params = {"email"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public User findByName(@RequestParam(name = "email") String email) {
     return service.loadUserByUsername(email);
   }
 
   @ApiMethod(description = "save a newly created user")
-  @RequestMapping(value = "/latest/users", produces = "application/json", method = RequestMethod.POST)
+  @RequestMapping(value = {"/latest/users", "/v2/users"}, produces = "application/json", method = RequestMethod.POST)
   @ApiResponseObject
   public User save(@RequestBody User user, BindingResult errors) {
     return service.save(user, errors);
   }
 
   @ApiMethod(description = "update a user")
-  @RequestMapping(value = "/latest/users/{uuid}", produces = "application/json", method = RequestMethod.PUT)
+  @RequestMapping(value = {"/latest/users/{uuid}", "/v2/users/{uuid}"}, produces = "application/json", method = RequestMethod.PUT)
   @ApiResponseObject
   public User update(@PathVariable UUID uuid, @RequestBody User user, BindingResult errors) {
     assert Objects.equals(uuid, user.getUuid());

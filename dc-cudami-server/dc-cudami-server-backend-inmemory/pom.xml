@@ -5,7 +5,7 @@
   <parent>
     <groupId>de.digitalcollections.cudami</groupId>
     <artifactId>dc-cudami-server</artifactId>
-    <version>3.1.0-SNAPSHOT</version>
+    <version>3.1.0</version>
   </parent>
 
   <name>DigitalCollections: cudami Server (Backend IMPL InMemory)</name>
