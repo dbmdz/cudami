@@ -38,16 +38,17 @@ public class V1WebpageController {
   private WebpageService<Webpage, Identifiable> webpageService;
 
   @ApiMethod(description = "get a webpage as JSON (Version 1), depending on extension or <tt>format</tt> request parameter or accept header")
-  @RequestMapping(value = {"/v1/webpages/{uuid}.json"}, produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
+  @RequestMapping(value = {"/v1/webpages/{uuid}.json", "/v1/webpages/{uuid}"}, produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
   @ApiResponseObject
   public ResponseEntity<String> getWebpageV1Json(
-          @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
-          @ApiQueryParam(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
-          @RequestParam(name = "pLocale", required = false) Locale pLocale
+    @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
+    @ApiQueryParam(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+    @RequestParam(name = "pLocale", required = false) Locale pLocale
   ) throws IdentifiableServiceException, JsonProcessingException {
 
     Webpage webpage = loadWebpage(pLocale, uuid);
     String result = v1ObjectMapper.writeValueAsString(webpage);
+    result = result.replaceAll("ENTITY_PART", "RESOURCE");
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
@@ -55,9 +56,9 @@ public class V1WebpageController {
   @RequestMapping(value = {"/v1/webpages/{uuid}.xml"}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, method = RequestMethod.GET)
   @ApiResponseObject
   public ResponseEntity<String> getWebpageV1Xml(
-          @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
-          @ApiQueryParam(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
-          @RequestParam(name = "pLocale", required = false) Locale pLocale
+    @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
+    @ApiQueryParam(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+    @RequestParam(name = "pLocale", required = false) Locale pLocale
   ) throws IdentifiableServiceException, JsonProcessingException, XmlMappingException, IOException {
 
     Webpage webpage = loadWebpage(pLocale, uuid);
