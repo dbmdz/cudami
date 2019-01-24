@@ -37,9 +37,9 @@ public class ContentNodeRepositoryImpl<C extends ContentNode, I extends Identifi
 
   @Autowired
   public ContentNodeRepositoryImpl(
-          @Qualifier("identifiableRepositoryImpl") IdentifiableRepository identifiableRepository,
-          LocaleRepository localeRepository,
-          Jdbi dbi) {
+    @Qualifier("identifiableRepositoryImpl") IdentifiableRepository identifiableRepository,
+    LocaleRepository localeRepository,
+    Jdbi dbi) {
     this.dbi = dbi;
     this.identifiableRepository = identifiableRepository;
     this.localeRepository = localeRepository;
@@ -55,15 +55,15 @@ public class ContentNodeRepositoryImpl<C extends ContentNode, I extends Identifi
   @Override
   public PageResponse<C> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder()
-            .append("SELECT i.uuid as uuid, i.label as label, i.description as description")
-            .append(" FROM contentnodes cn INNER JOIN identifiables i ON cn.uuid=i.uuid");
+      .append("SELECT i.uuid as uuid, i.label as label, i.description as description")
+      .append(" FROM contentnodes cn INNER JOIN identifiables i ON cn.uuid=i.uuid");
 
     addPageRequestParams(pageRequest, query);
 
 //    List<Map<String, Object>> list = dbi.withHandle(h -> h.createQuery(query.toString()).mapToMap().list());
     List<ContentNodeImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
-            .mapToBean(ContentNodeImpl.class)
-            .list());
+      .mapToBean(ContentNodeImpl.class)
+      .list());
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
 //    PageResponse pageResponse = new PageResponseImpl(null, pageRequest, total);
@@ -73,14 +73,14 @@ public class ContentNodeRepositoryImpl<C extends ContentNode, I extends Identifi
   @Override
   public C findOne(UUID uuid) {
     StringBuilder query = new StringBuilder()
-            .append("SELECT i.uuid as uuid, i.label as label, i.description as description")
-            .append(" FROM contentnodes cn INNER JOIN identifiables i ON cn.uuid=i.uuid")
-            .append(" WHERE cn.uuid = :uuid");
+      .append("SELECT i.uuid as uuid, i.label as label, i.description as description")
+      .append(" FROM contentnodes cn INNER JOIN identifiables i ON cn.uuid=i.uuid")
+      .append(" WHERE cn.uuid = :uuid");
 
     List<ContentNodeImpl> list = dbi.withHandle(h -> h.createQuery(query.toString())
-            .bind("uuid", uuid)
-            .mapToBean(ContentNodeImpl.class)
-            .list());
+      .bind("uuid", uuid)
+      .mapToBean(ContentNodeImpl.class)
+      .list());
     if (list.isEmpty()) {
       return null;
     }
@@ -135,15 +135,15 @@ public class ContentNodeRepositoryImpl<C extends ContentNode, I extends Identifi
   public List<C> getChildren(UUID uuid) {
     // minimal data required for creating text links in a list
     StringBuilder query = new StringBuilder()
-            .append("SELECT i.uuid as uuid, i.label as label")
-            .append(" FROM contentnodes cn INNER JOIN contentnode_contentnode cc ON cn.uuid=cc.parent_contentnode_uuid INNER JOIN identifiables i ON cc.child_contentnode_uuid=i.uuid")
-            .append(" WHERE cn.uuid = :uuid")
-            .append(" ORDER BY cc.sortIndex ASC");
+      .append("SELECT i.uuid as uuid, i.label as label")
+      .append(" FROM contentnodes cn INNER JOIN contentnode_contentnode cc ON cn.uuid=cc.parent_contentnode_uuid INNER JOIN identifiables i ON cc.child_contentnode_uuid=i.uuid")
+      .append(" WHERE cn.uuid = :uuid")
+      .append(" ORDER BY cc.sortIndex ASC");
 
     List<ContentNodeImpl> list = dbi.withHandle(h -> h.createQuery(query.toString())
-            .bind("uuid", uuid)
-            .mapToBean(ContentNodeImpl.class)
-            .list());
+      .bind("uuid", uuid)
+      .mapToBean(ContentNodeImpl.class)
+      .list());
 
     if (list.isEmpty()) {
       return new ArrayList<>();
@@ -156,8 +156,8 @@ public class ContentNodeRepositoryImpl<C extends ContentNode, I extends Identifi
     identifiableRepository.save(contentNode);
 
     dbi.withHandle(h -> h.createUpdate("INSERT INTO contentnodes(uuid) VALUES (:uuid)")
-            .bindBean(contentNode)
-            .execute());
+      .bindBean(contentNode)
+      .execute());
 
     return findOne(contentNode.getUuid());
   }
@@ -167,17 +167,17 @@ public class ContentNodeRepositoryImpl<C extends ContentNode, I extends Identifi
     identifiableRepository.save(contentNode);
 
     dbi.withHandle(h -> h.createUpdate("INSERT INTO contentnodes(uuid) VALUES (:uuid)")
-            .bindBean(contentNode)
-            .execute());
+      .bindBean(contentNode)
+      .execute());
 
     Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "contenttree_contentnode", "contenttree_uuid", parentContentTreeUuid);
     dbi.withHandle(h -> h.createUpdate(
-            "INSERT INTO contenttree_contentnode(contenttree_uuid, contentnode_uuid, sortIndex)"
-            + " VALUES (:parent_contenttree_uuid, :uuid, :sortIndex)")
-            .bind("parent_contenttree_uuid", parentContentTreeUuid)
-            .bind("sortIndex", sortIndex)
-            .bindBean(contentNode)
-            .execute());
+      "INSERT INTO contenttree_contentnode(contenttree_uuid, contentnode_uuid, sortIndex)"
+      + " VALUES (:parent_contenttree_uuid, :uuid, :sortIndex)")
+      .bind("parent_contenttree_uuid", parentContentTreeUuid)
+      .bind("sortIndex", sortIndex)
+      .bindBean(contentNode)
+      .execute());
 
     return findOne(contentNode.getUuid());
   }
@@ -187,17 +187,17 @@ public class ContentNodeRepositoryImpl<C extends ContentNode, I extends Identifi
     identifiableRepository.save(contentNode);
 
     dbi.withHandle(h -> h.createUpdate("INSERT INTO contentnodes(uuid) VALUES (:uuid)")
-            .bindBean(contentNode)
-            .execute());
+      .bindBean(contentNode)
+      .execute());
 
     Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "contentnode_contentnode", "parent_contentnode_uuid", parentContentNodeUuid);
     dbi.withHandle(h -> h.createUpdate(
-            "INSERT INTO contentnode_contentnode(parent_contentnode_uuid, child_contentnode_uuid, sortIndex)"
-            + " VALUES (:parent_contentnode_uuid, :uuid, :sortIndex)")
-            .bind("parent_contentnode_uuid", parentContentNodeUuid)
-            .bind("sortIndex", sortIndex)
-            .bindBean(contentNode)
-            .execute());
+      "INSERT INTO contentnode_contentnode(parent_contentnode_uuid, child_contentnode_uuid, sortIndex)"
+      + " VALUES (:parent_contentnode_uuid, :uuid, :sortIndex)")
+      .bind("parent_contentnode_uuid", parentContentNodeUuid)
+      .bind("sortIndex", sortIndex)
+      .bindBean(contentNode)
+      .execute());
 
     return findOne(contentNode.getUuid());
   }
@@ -217,14 +217,14 @@ public class ContentNodeRepositoryImpl<C extends ContentNode, I extends Identifi
   public List<Identifiable> getIdentifiables(UUID uuid) {
     // minimal data required for creating text links in a list
     String query = "SELECT i.uuid as uuid, i.label as label"
-            + " FROM identifiables i INNER JOIN contentnode_identifiables ci ON ci.identifiable_uuid=i.uuid"
-            + " WHERE ci.contentnode_uuid = :uuid"
-            + " ORDER BY ci.sortIndex ASC";
+      + " FROM identifiables i INNER JOIN contentnode_identifiables ci ON ci.identifiable_uuid=i.uuid"
+      + " WHERE ci.contentnode_uuid = :uuid"
+      + " ORDER BY ci.sortIndex ASC";
 
     List<IdentifiableImpl> list = dbi.withHandle(h -> h.createQuery(query)
-            .bind("uuid", uuid)
-            .mapToBean(IdentifiableImpl.class)
-            .list());
+      .bind("uuid", uuid)
+      .mapToBean(IdentifiableImpl.class)
+      .list());
 
     if (list.isEmpty()) {
       return new ArrayList<>();
@@ -236,12 +236,12 @@ public class ContentNodeRepositoryImpl<C extends ContentNode, I extends Identifi
   public void addIdentifiable(UUID identifiablesContainerUuid, UUID identifiableUuid) {
     Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "contentnode_identifiables", "contentnode_uuid", identifiablesContainerUuid);
     dbi.withHandle(h -> h.createUpdate(
-            "INSERT INTO contentnode_identifiables(contentnode_uuid, identifiable_uuid, sortIndex)"
-            + " VALUES (:contentnode_uuid, :identifiable_uuid, :sortIndex)")
-            .bind("contentnode_uuid", identifiablesContainerUuid)
-            .bind("identifiable_uuid", identifiableUuid)
-            .bind("sortIndex", sortIndex)
-            .execute());
+      "INSERT INTO contentnode_identifiables(contentnode_uuid, identifiable_uuid, sortIndex)"
+      + " VALUES (:contentnode_uuid, :identifiable_uuid, :sortIndex)")
+      .bind("contentnode_uuid", identifiablesContainerUuid)
+      .bind("identifiable_uuid", identifiableUuid)
+      .bind("sortIndex", sortIndex)
+      .execute());
   }
 
   @Override
@@ -253,16 +253,16 @@ public class ContentNodeRepositoryImpl<C extends ContentNode, I extends Identifi
   @Override
   public List<Identifiable> saveIdentifiables(UUID identifiablesContainerUuid, List<Identifiable> identifiables) {
     dbi.withHandle(h -> h.createUpdate("DELETE FROM contentnode_identifiables WHERE contentnode_uuid = :uuid")
-            .bind("uuid", identifiablesContainerUuid).execute());
+      .bind("uuid", identifiablesContainerUuid).execute());
 
     PreparedBatch batch = dbi.withHandle(h -> h.prepareBatch("INSERT INTO contentnode_identifiables(contentnode_uuid, identifiable_uuid, sortIndex) VALUES(:uuid, :identifiableUuid, :sortIndex)"));
     for (Identifiable identifiable : identifiables) {
       batch.bind("uuid", identifiablesContainerUuid)
-              .bind("identifiableUuid", identifiable.getUuid())
-              .bind("sortIndex", identifiables.indexOf(identifiable))
-              .add();
+        .bind("identifiableUuid", identifiable.getUuid())
+        .bind("sortIndex", identifiables.indexOf(identifiable))
+        .add();
     }
-    int[] counts = batch.execute();
+    batch.execute();
     return getIdentifiables(identifiablesContainerUuid);
   }
 }
