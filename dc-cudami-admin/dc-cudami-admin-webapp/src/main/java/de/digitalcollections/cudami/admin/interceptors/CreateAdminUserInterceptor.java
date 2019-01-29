@@ -45,7 +45,7 @@ public class CreateAdminUserInterceptor extends HandlerInterceptorAdapter implem
 
   @Override
   public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView)
-          throws Exception {
+    throws Exception {
     final Object doCreateAdminUser = request.getAttribute("createAdminUser");
     if (doCreateAdminUser != null) {
       boolean createAdminUser = (boolean) doCreateAdminUser;
@@ -56,6 +56,9 @@ public class CreateAdminUserInterceptor extends HandlerInterceptorAdapter implem
         FlashMap flashMap = new FlashMap();
         flashMap.put("info_message", message);
         FlashMapManager flashMapManager = RequestContextUtils.getFlashMapManager(request);
+        if (flashMapManager == null) {
+          throw new IllegalStateException("FlashMapManager not found despite output FlashMap having been set");
+        }
         flashMapManager.saveOutputFlashMap(flashMap, request, response);
 
 //        modelAndView.addObject("info_message", message);
