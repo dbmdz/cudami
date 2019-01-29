@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.client.feign.exceptions;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import feign.Response;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,9 +13,10 @@ public class HttpException extends Exception {
   int statuscode;
   String errorMessage;
 
+  @SuppressFBWarnings(value = "OS_OPEN_STREAM", justification = "Opened stream will be closed via try-with-resources statement")
   public HttpException(String methodKey, Response response) {
     super(String.format("Got %d for backend call %s.%n⤷ %s",
-      response.status(), methodKey, response.request()));
+        response.status(), methodKey, response.request()));
 
     if (response.body() != null) {
 
