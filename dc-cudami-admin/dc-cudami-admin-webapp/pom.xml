@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -13,8 +14,6 @@
   <packaging>jar</packaging>
 
   <properties>
-    <version.logstash-logback-encoder>5.3</version.logstash-logback-encoder>
-    <version.maven-resources-plugin>2.7</version.maven-resources-plugin>
     <version.thymeleaf-spring-data-dialect>3.3.1</version.thymeleaf-spring-data-dialect>
     <version.webjar-bootstrap>3.4.0</version.webjar-bootstrap>
     <version.webjar-bootswatch>3.3.7</version.webjar-bootswatch>
@@ -86,7 +85,6 @@
     <dependency>
       <groupId>net.logstash.logback</groupId>
       <artifactId>logstash-logback-encoder</artifactId>
-      <version>${version.logstash-logback-encoder}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -133,6 +131,12 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -243,7 +247,6 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>${version.spring-boot}</version>
         <executions>
           <execution>
             <goals>
