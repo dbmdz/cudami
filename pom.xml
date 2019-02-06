@@ -84,7 +84,7 @@
     <version.javax.servlet-api>3.1.0</version.javax.servlet-api> <!-- Available new major release 4.0.1 -->
     <version.junit>5.3.2</version.junit>
     <version.mockito-core>2.23.4</version.mockito-core>
-    <version.passay>1.3.1</version.passay>
+    <version.passay>1.4.0</version.passay>
     <version.postgresql>42.2.5</version.postgresql>
     <version.querydsl>4.2.1</version.querydsl>
     <version.slf4j>1.7.25</version.slf4j>
