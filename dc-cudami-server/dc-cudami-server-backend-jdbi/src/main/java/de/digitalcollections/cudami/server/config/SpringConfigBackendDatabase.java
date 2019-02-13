@@ -65,10 +65,7 @@ public class SpringConfigBackendDatabase {
   @Autowired
   @Qualifier(value = "pds")
   public Flyway flyway(DataSource pds) {
-    Flyway flyway = new Flyway();
-    flyway.setDataSource(pds); // could be another datasource with different user/pwd...
-    flyway.setLocations("classpath:/de/digitalcollections/cudami/server/backend/impl/database/migration");
-    flyway.setBaselineOnMigrate(true);
+    Flyway flyway = Flyway.configure().dataSource(pds).locations("classpath:/de/digitalcollections/cudami/server/backend/impl/database/migration").baselineOnMigrate(true).load();
     return flyway;
   }
 
