@@ -213,3 +213,14 @@ To delete the container and all data:
 $ cd dc-cudami-server
 $ docker-compose down
 ```
+
+### Migrations from 3.1.1 to 3.1.2
+
+- Stop 3.1.1 cudami backend server webapp, manually rename table "schema_version" to "flyway_schema_history":
+
+```sql
+alter table schema_version rename to flyway_schema_history;
+```
+
+- Deploy cudami 3.1.2
+- Start 3.1.2
