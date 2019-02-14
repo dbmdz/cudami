@@ -10,7 +10,7 @@
   </head>
   <body>
     <section layout:fragment="content">
-      <form id="editor-form" th:object="${fileresource}" th:action="@{#}" method="post" enctype="multipart/form-data" role="form" th:attr="data-default-locale=${defaultLocale}">
+      <form id="editor-form" th:object="${fileresource}" th:action="@{/fileresources/new/metadata}" method="post" role="form" th:attr="data-default-locale=${defaultLocale}">
         <input type="hidden" id="label" th:field="*{label}" />
         <input type="hidden" id="description" class="content" th:field="*{description}" />
 
@@ -22,11 +22,12 @@
           </div>
           <div class="col-sm-4">
             <span class="col-sm-6">
-              <a class="btn btn-default btn-block" type="button" th:href="@{/fileresources}" th:text="#{abort}">abort</a>
+              <!-- TODO: on abort delete uploaded binary and database entry for cleanup, check on delete if license is null (so method can not be misused for deleting resources! -->
+              <a class="btn btn-default btn-block" type="button" th:href="@{/fileresources/delete/*{uuid}}" th:text="#{abort}">abort</a>
             </span>
             <span class="col-sm-6">
-              <button class="btn btn-primary btn-block" type="submit" th:text="#{save}">
-                save
+              <button class="btn btn-primary btn-block" type="submit" th:text="#{next}">
+                next
               </button>
             </span>
           </div>
@@ -52,8 +53,8 @@
         <div class="row mainContent">
           <div class="col-sm-12">
             <ul class="nav nav-tabs" id="locale-tabs">
-              <li class="active locale-switcher">
-                <a href="#" th:attr="data-locale=${defaultLocale}" th:text="${defaultLocale.getDisplayName(#locale)}">default locale</a>
+              <li class="locale-switcher" th:each="translation,iter : *{label.translations}" th:classappend="${iter.index} == 0 ? active">
+                <a href="#" th:attr="data-locale=${translation.locale}" th:text="${translation.locale.getDisplayName(#locale)}">locale</a>
               </li>
               <li id="locale-adder">
                 <a href="#">
@@ -79,22 +80,6 @@
               </div>
             </div>
           </div>
-        </div>
-
-        <div class="row mainContent">
-          <div class="col-sm-12">
-            <br/>
-          </div>
-        </div>
-
-        <div class="row mainContent">
-          <div class="col-sm-12">
-            <div class="form-group">
-              <label th:text="#{file}">File</label>
-              <input name="file" type="file" id="file_info">
-            </div>
-          </div>
-
         </div>
       </form>
 
