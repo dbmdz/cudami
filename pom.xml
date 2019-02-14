@@ -82,7 +82,7 @@
     <version.dc-commons>3.0.1</version.dc-commons>
     <version.dc-model>2.2.0</version.dc-model>
     <version.feign>9.7.0</version.feign> <!-- Available new major release 10.1.0 -->
-    <version.feign-form-spring>3.3.0</version.feign-form-spring> <!-- Latest version 3.4.1 not working atm -->
+    <version.feign-form-spring>3.5.0</version.feign-form-spring> <!-- Latest version 3.4.1 not working atm -->
     <version.flyway>5.2.4</version.flyway>
     <version.gson>2.8.5</version.gson>
     <version.guava>20.0</version.guava>
