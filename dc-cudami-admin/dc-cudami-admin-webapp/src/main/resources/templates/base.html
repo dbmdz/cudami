@@ -23,13 +23,7 @@
     
     <!-- Custom styles for this template -->
     <link th:href="@{/css/main.css}" rel="stylesheet" />
-    
 
-    <script th:src="@{/webjars/jquery/3.1.1/jquery.min.js}"></script>
-    <script th:src="@{/webjars/jquery-ui-dist/1.12.1/jquery-ui.min.js}"></script>
-
-    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-    <!--[if lt IE 9]><script src="@{/js/ie8-responsive-file-warning.js}"></script><![endif]-->
     <script th:src="@{/js/thirdparty/ie-emulation-modes-warning.js}"></script>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -91,7 +85,9 @@
 
     </div>
 
-    <script th:src="@{/webjars/bootstrap/3.4.0/js/bootstrap.min.js}"></script>
+    <script th:src="@{/webjars/jquery/3.3.1/dist/jquery.min.js}"></script>
+    <script th:src="@{/webjars/jquery-ui-dist/1.12.1/jquery-ui.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/3.4.0/dist/js/bootstrap.min.js}"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script th:src="@{/webjars/ie10-viewport-bug-workaround/1.0.3/dist/ie10-viewport-bug-workaround.min.js}"></script>
   <th:block layout:fragment="beforeBodyEnds"></th:block>
