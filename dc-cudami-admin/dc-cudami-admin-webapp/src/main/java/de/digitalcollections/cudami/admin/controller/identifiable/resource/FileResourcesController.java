@@ -14,6 +14,7 @@ import de.digitalcollections.model.api.identifiable.resource.enums.FileResourceP
 import de.digitalcollections.model.api.identifiable.resource.exceptions.ResourceIOException;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import java.io.IOException;
 import java.util.Comparator;
@@ -83,21 +84,12 @@ public class FileResourcesController extends AbstractController implements Messa
 
   @GetMapping(value = "/fileresources/new")
   public String create(Model model) {
-    Locale defaultLocale = localeService.getDefault();
-    List<Locale> locales = localeService.findAll().stream()
-      .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
-      .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-      .collect(Collectors.toList());
-
-    model.addAttribute("defaultLocale", defaultLocale);
-    model.addAttribute("fileresource", cudamiFileResourceService.create());
-    model.addAttribute("locales", locales);
-    return "fileresources/create";
+    return "fileresources/create_01-binary";
   }
 
   // FIXME: add proper error and validation handling (using results and feedbackmessages)
-  @PostMapping("/fileresources/new")
-  public String create(@ModelAttribute @Valid FileResourceImpl fileResource, BindingResult results, @RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
+  @PostMapping("/fileresources/new/upload")
+  public String upload(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
     FileResource managedFileResource;
     byte[] bytes;
     if (!file.isEmpty()) {
@@ -107,8 +99,6 @@ public class FileResourcesController extends AbstractController implements Messa
 
         try {
           managedFileResource = fileResourceService.create(null, FileResourcePersistenceType.MANAGED, mimeType);
-          managedFileResource.setLabel(fileResource.getLabel());
-          managedFileResource.setDescription(fileResource.getDescription());
         } catch (ResourceIOException ex) {
           LOGGER.error("Error creating file resource", ex);
           redirectAttributes.addFlashAttribute("message", "Error creating file resource!");
@@ -125,11 +115,15 @@ public class FileResourcesController extends AbstractController implements Messa
         managedFileResource.setFilename(originalFilename);
         LOGGER.info("filename = " + managedFileResource.getFilename());
 
+        // set label to originalfilename for now. can be changed in next step of user input
+        managedFileResource.setLabel(new LocalizedTextImpl(localeService.getDefault(), originalFilename));
+
         bytes = file.getBytes();
         try {
-          cudamiFileResourceService.save(managedFileResource, bytes, results);
-          redirectAttributes.addFlashAttribute("message", "You successfully uploaded " + file.getOriginalFilename() + "!");
-          return "redirect:/fileresources";
+          FileResource fileResource = cudamiFileResourceService.save(managedFileResource, bytes);
+          redirectAttributes.addFlashAttribute("message", "You successfully uploaded " + originalFilename + "!");
+          redirectAttributes.addFlashAttribute("isNew", true);
+          return "redirect:/fileresources/new/metadata/" + fileResource.getUuid().toString();
         } catch (IdentifiableServiceException ex) {
           LOGGER.error("Error saving uploaded file data", ex);
           redirectAttributes.addFlashAttribute("message", "Error saving file resource!");
@@ -141,6 +135,56 @@ public class FileResourcesController extends AbstractController implements Messa
     }
     redirectAttributes.addFlashAttribute("message", "Invalid file resource!");
     return "redirect:/fileresources";
+  }
+
+  @GetMapping(value = "/fileresources/new/metadata/{uuid}")
+  public String metadata(@PathVariable UUID uuid, Model model) {
+    FileResource fileresource = cudamiFileResourceService.get(uuid);
+    Locale defaultLocale = localeService.getDefault();
+    List<Locale> locales = localeService.findAll().stream()
+        .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
+        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+        .collect(Collectors.toList());
+
+    model.addAttribute("defaultLocale", defaultLocale);
+    model.addAttribute("fileresource", fileresource);
+    model.addAttribute("locales", locales);
+    return "fileresources/create_02-metadata";
+  }
+
+  @PostMapping(value = "/fileresources/new/metadata")
+  public String metadata(@ModelAttribute @Valid FileResourceImpl fileResource, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+    verifyBinding(results);
+    if (results.hasErrors()) {
+      return "fileresources/create_02-metadata";
+    }
+
+    UUID fileResourceUuid = fileResource.getUuid();
+
+    try {
+      // get object from db
+      FileResource fileResourceDb = cudamiFileResourceService.get(fileResourceUuid);
+      // just update the fields, that were editable
+      fileResourceDb.setLabel(fileResource.getLabel());
+      fileResourceDb.setDescription(fileResource.getDescription());
+
+      cudamiFileResourceService.update(fileResourceDb, results);
+    } catch (IdentifiableServiceException e) {
+      String message = "Cannot save fileresource with uuid=" + fileResourceUuid + ": " + e;
+      LOGGER.error(message, e);
+      redirectAttributes.addFlashAttribute("error_message", message);
+      redirectAttributes.addFlashAttribute("isNew", true);
+      return "redirect:/fileresources/" + fileResourceUuid + "/edit";
+    }
+
+    if (results.hasErrors()) {
+      return "fileresources/create_02-metadata";
+    }
+    status.setComplete();
+    String message = messageSource.getMessage("msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
+    redirectAttributes.addFlashAttribute("success_message", message);
+//    return "redirect:/fileresources/new/" + fileResourceUuid + "/license";
+    return "redirect:/fileresources/" + fileResourceUuid;
   }
 
   @GetMapping(value = "/fileresources/{uuid}")
@@ -159,15 +203,18 @@ public class FileResourcesController extends AbstractController implements Messa
     HashSet<Locale> availableLocales = (HashSet<Locale>) fileresource.getLabel().getLocales();
     Set<String> availableLocaleTags = availableLocales.stream().map(Locale::toLanguageTag).collect(Collectors.toSet());
     List<Locale> locales = localeService.findAll().stream()
-      .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
-      .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-      .collect(Collectors.toList());
+        .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
+        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+        .collect(Collectors.toList());
 
     model.addAttribute("fileresource", fileresource);
     model.addAttribute("availableLocales", availableLocales);
     model.addAttribute("locales", locales);
-
-    return "fileresources/edit";
+    if (redirectAttributes.containsAttribute("isNew")) {
+      return "fileresources/create_02-metadata";
+    } else {
+      return "fileresources/edit";
+    }
   }
 
   @PostMapping(value = "/fileresources/{pathUuid}/edit")
