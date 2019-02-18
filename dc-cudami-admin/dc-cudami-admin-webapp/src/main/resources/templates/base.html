@@ -20,7 +20,7 @@
     <link th:href="@{/webjars/font-awesome/5.7.2/css/all.css}" rel="stylesheet" />
 
     <link th:href="@{/webjars/jquery-ui-dist/1.12.1/jquery-ui.min.css}" rel="stylesheet" />
-    
+
     <!-- Custom styles for this template -->
     <link th:href="@{/css/main.css}" rel="stylesheet" />
 
@@ -31,6 +31,16 @@
       <script th:src="@{/webjars/html5shiv/3.7.3/html5shiv.min.js}"></script>
       <script th:src="@{/webjars/respond/1.4.2/dest/respond.min.js}"></script>
     <![endif]-->
+    
+    <script>
+      function bytesToSize(bytes, separator = "") {
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
+        if (bytes == 0) return 'n/a'
+        const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10)
+        if (i === 0) return `${bytes}${separator}${sizes[i]}`
+        return `${(bytes / (1024 ** i)).toFixed(1)}${separator}${sizes[i]}`
+      }
+    </script>
   </head>
 
   <body>
@@ -90,6 +100,8 @@
     <script th:src="@{/webjars/bootstrap/4.3.1/dist/js/bootstrap.min.js}"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script th:src="@{/webjars/ie10-viewport-bug-workaround/1.0.3/dist/ie10-viewport-bug-workaround.min.js}"></script>
+    <div th:replace="fragments/modals :: confirmYesNoDialog"></div>
+    
   <th:block layout:fragment="beforeBodyEnds"></th:block>
   <!--/* Add JS in child templates */-->
   <th:block layout:fragment="morejs"> </th:block>

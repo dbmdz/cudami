@@ -18,6 +18,7 @@ import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InvalidObjectException;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
@@ -145,28 +146,25 @@ public class FileResourceController {
     return cudamiFileResourceService.update(fileResource);
   }
 
-  @PostMapping(value = "/latest/fileresources2")
+  @PostMapping(value = {"/latest/fileresources/new/upload", "/v2/fileresources/new/upload"})
   @ApiResponseObject
-  public FileResource apiUpload(HttpServletRequest request) {
+  public FileResource apiUpload(HttpServletRequest request) throws IOException {
     FileResource managedFileResource = null;
 
+    InputStream stream = null;
     try {
       boolean isMultipart = ServletFileUpload.isMultipartContent(request);
       if (!isMultipart) {
-        // Inform user about invalid request
-//        Response<String> responseObject = new Response<>(false, "Not a multipart request.", "");
-//        return responseObject;
+        throw new InvalidObjectException("no multipart content");
       }
 
-      // Create a new file upload handler
       ServletFileUpload upload = new ServletFileUpload();
 
-      // Parse the request
       FileItemIterator iter = upload.getItemIterator(request);
       while (iter.hasNext()) {
         FileItemStream item = iter.next();
         if (!item.isFormField()) {
-          InputStream stream = item.openStream();
+          stream = item.openStream();
           String contentType = item.getContentType();
           final MimeType mimeType = MimeType.fromTypename(contentType);
           managedFileResource = fileResourceService.createManaged(mimeType);
@@ -178,12 +176,16 @@ public class FileResourceController {
           // set label to originalfilename for now. can be changed in next step of user input
           managedFileResource.setLabel(new LocalizedTextImpl(localeService.getDefault(), originalFilename));
 
-          FileResource fileResource = cudamiFileResourceService.save(managedFileResource, stream);
-          LOGGER.info("filesize = " + fileResource.getSizeInBytes());
+          managedFileResource = cudamiFileResourceService.save(managedFileResource, stream);
+          LOGGER.info("filesize = " + managedFileResource.getSizeInBytes());
         }
       }
     } catch (FileUploadException | IOException | IdentifiableServiceException ex) {
       LOGGER.error("Error getting binary data from uploaded file", ex);
+    } finally {
+      if (stream != null) {
+        stream.close();
+      }
     }
 
     return managedFileResource;

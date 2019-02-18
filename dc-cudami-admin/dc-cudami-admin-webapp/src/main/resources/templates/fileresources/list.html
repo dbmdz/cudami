@@ -17,9 +17,9 @@
           <div th:replace="fragments/pagination-navigation :: pagination">
             ...
           </div>
-<!--          <div class="objectCounter lighter pull-right">
-            <span class="message" th:text="${page.totalItems}">Found 17 books.</span>
-          </div>-->
+          <!--          <div class="objectCounter lighter pull-right">
+                      <span class="message" th:text="${page.totalItems}">Found 17 books.</span>
+                    </div>-->
         </div>
       </div>
 
@@ -29,6 +29,7 @@
             <th class="center" th:text="#{label}">Label</th>
             <th class="center" th:text="#{filename}">Filename</th>
             <th class="center" th:text="#{mimetype}">Mimetype</th>
+            <th class="center" th:text="#{filesize}">Filesize</th>
             <!--<th class="center"><a class="sorted" sd:pagination-sort="url" th:text="#{url}">Url</a></th>-->
             <!--<th class="center" th:text="#{registration_date}">Registration Date</th>-->
             <th class="center" th:text="#{actions}">Actions</th>
@@ -41,6 +42,8 @@
             </td>
             <td><span th:text="${fileresource.filename}">image001.jpg</span></td>
             <td><span th:text="${fileresource.mimeType.getTypeName()}">image/jpeg</span></td>
+            <td><span style="white-space: nowrap;float:right;"><script type="text/javascript" th:inline="javascript">document.write(bytesToSize([[${fileresource.sizeInBytes}]], " "));</script></span>
+            </td>
             <!--<td><a th:href="${website.url}" th:text="${website.url}" target="_blank">http://www.bavarikon.de/</a></td>-->
             <!--<td><a th:href="@{'/websites/' + ${website.uuid}}" th:text="${website.registrationDate}">23.01.1999</a></td>-->
             <td class="center">
@@ -58,8 +61,6 @@
           </div>
         </div>
       </div>
-
-      <div th:replace="fragments/modals :: confirmYesNoDialog"></div>
     </section>
   </body>
 </html>
