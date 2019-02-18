@@ -40,6 +40,13 @@ management:
   server:
     port: 9001
 
+multiPatternResolvingFile: 'classpath:/multiPatternResolving-local.yml'
+
+resourceRepository:
+  managedPathFactory:
+    folderpath: '~/resourceRepository'
+    namespace: 'dico'
+
 server:
   port: 9000
   server-header: "@project.name@ v@project.version@"
@@ -52,6 +59,12 @@ spring:
       name: admin
       password: secret
       roles: ACTUATOR, SUPERUSER
+  servlet:
+    multipart:
+      # disable resolving request to MultiPartRequest to get direct access to HttpServletRequest
+      enabled: false
+      max-file-size: -1
+      max-request-size: -1
   thymeleaf:
     cache: false
     mode: HTML
@@ -62,6 +75,13 @@ spring:
 custom:
   database:
     port: 5432
+
+multiPatternResolvingFile: 'classpath:/multiPatternResolving-PROD.yml'
+
+resourceRepository:
+  managedPathFactory:
+    folderpath: '/local/resourceRepository'
+    namespace: 'dico'
 
 spring:
   profiles: PROD

@@ -11,20 +11,32 @@ import de.digitalcollections.cudami.admin.business.api.service.identifiable.reso
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.MimeType;
 import de.digitalcollections.model.api.identifiable.resource.enums.FileResourcePersistenceType;
-import de.digitalcollections.model.api.identifiable.resource.exceptions.ResourceIOException;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import org.apache.tomcat.util.http.fileupload.FileItemIterator;
+import org.apache.tomcat.util.http.fileupload.FileItemStream;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
+import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +49,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -89,52 +102,141 @@ public class FileResourcesController extends AbstractController implements Messa
 
   // FIXME: add proper error and validation handling (using results and feedbackmessages)
   @PostMapping("/fileresources/new/upload")
-  public String upload(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
+  public String upload(HttpServletRequest request, @RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) throws InterruptedException {
+
+    boolean isMultipart = ServletFileUpload.isMultipartContent(request);
+    if (!isMultipart) {
+      // Inform user about invalid request
+      redirectAttributes.addFlashAttribute("message", "Invalid file resource!");
+      return "redirect:/fileresources";
+    }
+
     FileResource managedFileResource;
-    byte[] bytes;
-    if (!file.isEmpty()) {
-      try {
-        String contentType = file.getContentType();
-        final MimeType mimeType = MimeType.fromTypename(contentType);
 
-        try {
+    // Create a new file upload handler
+    ServletFileUpload upload = new ServletFileUpload();
+
+    // Parse the request
+    FileItemIterator iter;
+    InputStream stream = null;
+    try {
+      iter = upload.getItemIterator(request);
+      while (iter.hasNext()) {
+        FileItemStream item = iter.next();
+        if (!item.isFormField()) {
+          String contentType = item.getContentType();
+          final MimeType mimeType = MimeType.fromTypename(contentType);
           managedFileResource = fileResourceService.create(null, FileResourcePersistenceType.MANAGED, mimeType);
-        } catch (ResourceIOException ex) {
-          LOGGER.error("Error creating file resource", ex);
-          redirectAttributes.addFlashAttribute("message", "Error creating file resource!");
-          return "redirect:/fileresources";
-        }
-        managedFileResource.setMimeType(mimeType);
-        LOGGER.info("mimetype = " + managedFileResource.getMimeType().getTypeName());
 
-        long size = file.getSize();
-        managedFileResource.setSizeInBytes(size);
-        LOGGER.info("filesize = " + managedFileResource.getSizeInBytes());
+          stream = item.openStream();
+//          long size = cudamiFileResourceService.write(managedFileResource, stream);
 
-        String originalFilename = file.getOriginalFilename();
-        managedFileResource.setFilename(originalFilename);
-        LOGGER.info("filename = " + managedFileResource.getFilename());
+          HttpClient client = HttpClient.newBuilder().build();
+          HttpRequest uploadRequest = HttpRequest.newBuilder()
+              .uri(URI.create(""))
+              .POST(BodyPublishers.ofInputStream(new Supplier<InputStream>() {
+                @Override
+                public InputStream get() {
+                  try {
+                    return item.openStream();
+                  } catch (IOException ex) {
+                    // TODO
+                    return null;
+                  }
+                }
+              }))
+              .build();
 
-        // set label to originalfilename for now. can be changed in next step of user input
-        managedFileResource.setLabel(new LocalizedTextImpl(localeService.getDefault(), originalFilename));
+          HttpResponse<?> response = client.send(uploadRequest, BodyHandlers.discarding());
+          System.out.println(response.statusCode());
 
-        bytes = file.getBytes();
-        try {
-          FileResource fileResource = cudamiFileResourceService.save(managedFileResource, bytes);
+          // FIXME managedFileResource.setSizeInBytes(size);
+          LOGGER.info("filesize = " + managedFileResource.getSizeInBytes());
+
+          String originalFilename = item.getName();
+          managedFileResource.setFilename(originalFilename);
+          LOGGER.info("filename = " + managedFileResource.getFilename());
+
+          // set label to originalfilename for now. can be changed in next step of user input
+          managedFileResource.setLabel(new LocalizedTextImpl(localeService.getDefault(), originalFilename));
+
+          FileResource fileResource = cudamiFileResourceService.save(managedFileResource, (Errors) null);
           redirectAttributes.addFlashAttribute("message", "You successfully uploaded " + originalFilename + "!");
           redirectAttributes.addFlashAttribute("isNew", true);
           return "redirect:/fileresources/new/metadata/" + fileResource.getUuid().toString();
-        } catch (IdentifiableServiceException ex) {
-          LOGGER.error("Error saving uploaded file data", ex);
-          redirectAttributes.addFlashAttribute("message", "Error saving file resource!");
-          return "redirect:/fileresources";
+
+//          try (OutputStream out = new FileOutputStream(filename)) {
+//            // FIXME replace with production code (otherwise file is copied with given filename into application location)
+//            IOUtils.copy(stream, out);
+//
+////            String key = ""; // key should be uuid of newly created FileResource (during metadata post)
+////            FileResource fileResource = resourceService.create(key, FileResourcePersistenceType.MANAGED, MimeType.fromTypename(item.getContentType()));
+////            resourceService.write(fileResource, stream);
+//            stream.close();
+//          }
         }
-      } catch (IOException ex) {
-        LOGGER.error("Error saving uploaded file data", ex);
+      }
+    } catch (FileUploadException | IOException | IdentifiableServiceException ex) {
+      LOGGER.error("Error creating file resource", ex);
+      redirectAttributes.addFlashAttribute("message", "Error creating file resource!");
+      return "redirect:/fileresources";
+    } finally {
+      if (stream != null) {
+        try {
+          stream.close();
+        } catch (IOException ex) {
+          LOGGER.error("Error closing stream", ex);
+        }
       }
     }
-    redirectAttributes.addFlashAttribute("message", "Invalid file resource!");
+    LOGGER.error("Error creating file resource");
+    redirectAttributes.addFlashAttribute("message", "Error creating file resource!");
     return "redirect:/fileresources";
+
+//    byte[] bytes;
+//    if (!file.isEmpty()) {
+//      try {
+//        String contentType = file.getContentType();
+//        final MimeType mimeType = MimeType.fromTypename(contentType);
+//
+//        try {
+//          managedFileResource = fileResourceService.create(null, FileResourcePersistenceType.MANAGED, mimeType);
+//        } catch (ResourceIOException ex) {
+//          LOGGER.error("Error creating file resource", ex);
+//          redirectAttributes.addFlashAttribute("message", "Error creating file resource!");
+//          return "redirect:/fileresources";
+//        }
+//        managedFileResource.setMimeType(mimeType);
+//        LOGGER.info("mimetype = " + managedFileResource.getMimeType().getTypeName());
+//
+//        long size = file.getSize();
+//        managedFileResource.setSizeInBytes(size);
+//        LOGGER.info("filesize = " + managedFileResource.getSizeInBytes());
+//
+//        String originalFilename = file.getOriginalFilename();
+//        managedFileResource.setFilename(originalFilename);
+//        LOGGER.info("filename = " + managedFileResource.getFilename());
+//
+//        // set label to originalfilename for now. can be changed in next step of user input
+//        managedFileResource.setLabel(new LocalizedTextImpl(localeService.getDefault(), originalFilename));
+//
+//        bytes = file.getBytes();
+//        try {
+//          FileResource fileResource = cudamiFileResourceService.save(managedFileResource, bytes);
+//          redirectAttributes.addFlashAttribute("message", "You successfully uploaded " + originalFilename + "!");
+//          redirectAttributes.addFlashAttribute("isNew", true);
+//          return "redirect:/fileresources/new/metadata/" + fileResource.getUuid().toString();
+//        } catch (IdentifiableServiceException ex) {
+//          LOGGER.error("Error saving uploaded file data", ex);
+//          redirectAttributes.addFlashAttribute("message", "Error saving file resource!");
+//          return "redirect:/fileresources";
+//        }
+//      } catch (IOException ex) {
+//        LOGGER.error("Error saving uploaded file data", ex);
+//      }
+//    }
+//    redirectAttributes.addFlashAttribute("message", "Invalid file resource!");
+//    return "redirect:/fileresources";
   }
 
   @GetMapping(value = "/fileresources/new/metadata/{uuid}")
