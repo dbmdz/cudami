@@ -58,7 +58,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   @Override
   @Transactional(readOnly = false)
   public I save(I identifiable, Errors results) throws IdentifiableServiceException {
-    if (!results.hasErrors()) {
+    if (results == null || !results.hasErrors()) {
       try {
         identifiable = (I) repository.save(identifiable);
       } catch (Exception e) {

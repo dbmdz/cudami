@@ -47,12 +47,12 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
   @Override
   public PageResponse<FileResource> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder("SELECT f.filename as filename, f.mimetype as mimeType, f.size_in_bytes as sizeInBytes, i.uuid as uuid, i.label as label, i.description as description")
-            .append(" FROM fileresources f INNER JOIN identifiables i ON f.uuid=i.uuid");
+        .append(" FROM fileresources f INNER JOIN identifiables i ON f.uuid=i.uuid");
 
     addPageRequestParams(pageRequest, query);
     List<FileResourceImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
-            .mapToBean(FileResourceImpl.class)
-            .list());
+        .mapToBean(FileResourceImpl.class)
+        .list());
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -61,13 +61,13 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
   @Override
   public FileResource findOne(UUID uuid) {
     String query = "SELECT f.filename as filename, f.mimetype as mimeType, f.size_in_bytes as sizeInBytes, i.uuid as uuid, i.label as label, i.description as description"
-            + " FROM fileresources f INNER JOIN identifiables i ON f.uuid=i.uuid"
-            + " WHERE f.uuid = :uuid";
+                   + " FROM fileresources f INNER JOIN identifiables i ON f.uuid=i.uuid"
+                   + " WHERE f.uuid = :uuid";
 
     List<? extends FileResource> list = dbi.withHandle(h -> h.createQuery(query)
-            .bind("uuid", uuid)
-            .mapToBean(FileResourceImpl.class)
-            .list());
+        .bind("uuid", uuid)
+        .mapToBean(FileResourceImpl.class)
+        .list());
     if (list.isEmpty()) {
       return null;
     }
@@ -77,15 +77,16 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
   @Override
   public FileResource save(FileResource fileResource, InputStream binaryData) {
     try {
-      fileResourceRepository.write(fileResource, binaryData);
+      long size = fileResourceRepository.write(fileResource, binaryData);
+      fileResource.setSizeInBytes(size);
     } catch (ResourceIOException ex) {
       LOGGER.error("Error saving binary data of fileresource " + fileResource.getUuid().toString(), ex);
     }
 
     identifiableRepository.save(fileResource);
     dbi.withHandle(h -> h.createUpdate("INSERT INTO fileresources(filename, mimetype, size_in_bytes, uuid) VALUES (:filename, :mimeType, :sizeInBytes, :uuid)")
-            .bindBean(fileResource)
-            .execute());
+        .bindBean(fileResource)
+        .execute());
     return findOne(fileResource.getUuid());
   }
 
@@ -94,8 +95,8 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
     identifiableRepository.update(fileresource);
     // do not update/left out from statement: created, uuid
     dbi.withHandle(h -> h.createUpdate("UPDATE fileresources SET filename=:filename, mimetype=:mimeType, size_in_bytes=:sizeInBytes WHERE uuid=:uuid")
-            .bindBean(fileresource)
-            .execute());
+        .bindBean(fileresource)
+        .execute());
     return findOne(fileresource.getUuid());
   }
 
