@@ -45,6 +45,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -130,10 +131,17 @@ public class FileResourcesController extends AbstractController implements Messa
           post.setEntity(entity);
           HttpClient client = HttpClientBuilder.create().build();
           HttpResponse response = client.execute(post);
-          FileResource fileResource = objectMapper.readValue(response.getEntity().getContent(), FileResource.class);
-          redirectAttributes.addFlashAttribute("message", "You successfully uploaded " + filename + "!");
-          redirectAttributes.addFlashAttribute("isNew", true);
-          return "redirect:/fileresources/new/metadata/" + fileResource.getUuid().toString();
+
+          if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
+            FileResource fileResource = objectMapper.readValue(response.getEntity().getContent(), FileResource.class);
+            redirectAttributes.addFlashAttribute("message", "You successfully uploaded " + filename + "!");
+            redirectAttributes.addFlashAttribute("isNew", true);
+            return "redirect:/fileresources/new/metadata/" + fileResource.getUuid().toString();
+          } else {
+            LOGGER.info("Error saving uploaded file data");
+            redirectAttributes.addFlashAttribute("message", "Error saving file resource!");
+            return "redirect:/fileresources";
+          }
         }
       }
     } catch (IOException | FileUploadException e) {
