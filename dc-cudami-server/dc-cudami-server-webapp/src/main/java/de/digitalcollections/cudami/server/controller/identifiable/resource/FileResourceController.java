@@ -166,7 +166,10 @@ public class FileResourceController {
         if (!item.isFormField()) {
           stream = item.openStream();
           String contentType = item.getContentType();
-          final MimeType mimeType = MimeType.fromTypename(contentType);
+          MimeType mimeType = MimeType.fromTypename(contentType);
+          if (mimeType == null) {
+            mimeType = MimeType.MIME_APPLICATION_OCTET_STREAM;
+          }
           managedFileResource = fileResourceService.createManaged(mimeType);
 
           String originalFilename = item.getName();
