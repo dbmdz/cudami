@@ -38,12 +38,18 @@ spring:
       password: secret
   servlet:
     multipart:
-      # Values can use the suffixes "MB" or "KB" to indicate megabytes or kilobytes respectively.
-      file-size-threshold: 1MB
-      location: /tmp
-      max-file-size: 5MB
-      max-request-size: 25MB
-      # resolve-lazily: false
+      # disable resolving request to MultiPartRequest to get direct access to HttpServletRequest
+      enabled: false
+      max-file-size: -1
+      max-request-size: -1
+#  servlet:
+#    multipart:
+#      # Values can use the suffixes "MB" or "KB" to indicate megabytes or kilobytes respectively.
+#      file-size-threshold: 1MB
+#      location: /tmp
+#      max-file-size: 5MB
+#      max-request-size: 25MB
+#      # resolve-lazily: false
   thymeleaf:
     cache: false
     mode: HTML

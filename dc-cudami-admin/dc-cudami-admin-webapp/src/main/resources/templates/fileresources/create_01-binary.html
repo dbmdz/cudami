@@ -12,7 +12,7 @@
     <section layout:fragment="content">
       Schritt 1: Datei hochladen
       
-      <form id="editor-form" th:action="@{/fileresources/new/upload}" method="post" enctype="multipart/form-data" role="form">
+      <form id="editor-form" th:action="@{/fileresources/new/upload?__${_csrf.parameterName}__=__${_csrf.token}__}" method="post" enctype="multipart/form-data" role="form">
         <div class="row mainContent">
           <!--<div th:replace="fragments/feedback-messages :: form"></div>-->
 
