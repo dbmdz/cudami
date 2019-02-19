@@ -165,14 +165,18 @@ public class FileResourceController {
         FileItemStream item = iter.next();
         if (!item.isFormField()) {
           stream = item.openStream();
+          String originalFilename = item.getName();
           String contentType = item.getContentType();
+
           MimeType mimeType = MimeType.fromTypename(contentType);
+          if (mimeType == null) {
+            mimeType = MimeType.fromFilename(originalFilename);
+          }
           if (mimeType == null) {
             mimeType = MimeType.MIME_APPLICATION_OCTET_STREAM;
           }
           managedFileResource = fileResourceService.createManaged(mimeType);
 
-          String originalFilename = item.getName();
           managedFileResource.setFilename(originalFilename);
           LOGGER.info("filename = " + managedFileResource.getFilename());
 
@@ -181,6 +185,8 @@ public class FileResourceController {
 
           managedFileResource = cudamiFileResourceService.save(managedFileResource, stream);
           LOGGER.info("filesize = " + managedFileResource.getSizeInBytes());
+
+          stream.close();
         }
       }
     } catch (FileUploadException | IOException | IdentifiableServiceException ex) {
