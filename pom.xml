@@ -86,7 +86,7 @@
     <version.flyway>5.2.4</version.flyway>
     <version.gson>2.8.5</version.gson>
     <version.hamcrest-all>1.3</version.hamcrest-all>
-    <version.javax.servlet-api>3.1.0</version.javax.servlet-api> <!-- Available new major release 4.0.1 -->
+    <version.javax.servlet-api>4.0.1</version.javax.servlet-api> <!-- Available new major release 4.0.1 -->
     <version.junit>5.4.0</version.junit>
     <version.logstash-logback-encoder>5.3</version.logstash-logback-encoder>
     <version.mockito-core>2.23.4</version.mockito-core>
