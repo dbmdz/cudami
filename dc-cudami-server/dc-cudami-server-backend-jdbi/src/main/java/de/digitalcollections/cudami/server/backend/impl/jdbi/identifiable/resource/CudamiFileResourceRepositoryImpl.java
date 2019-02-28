@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
-import de.digitalcollections.commons.file.backend.api.FileResourceRepository;
+import de.digitalcollections.commons.file.backend.impl.managed.ManagedFileResourceRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.CudamiFileResourceRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
@@ -29,7 +29,7 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
   private final IdentifiableRepository identifiableRepository;
 
   @Autowired
-  FileResourceRepository fileResourceRepository;
+  ManagedFileResourceRepositoryImpl fileResourceRepository;
 
   @Autowired
   public CudamiFileResourceRepositoryImpl(Jdbi dbi, @Qualifier("identifiableRepositoryImpl") IdentifiableRepository identifiableRepository) {
@@ -46,7 +46,7 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
 
   @Override
   public PageResponse<FileResource> find(PageRequest pageRequest) {
-    StringBuilder query = new StringBuilder("SELECT f.filename as filename, f.mimetype as mimeType, f.size_in_bytes as sizeInBytes, i.uuid as uuid, i.label as label, i.description as description")
+    StringBuilder query = new StringBuilder("SELECT f.filename as filename, f.mimetype as mimeType, f.size_in_bytes as sizeInBytes, f.uri as uri, i.uuid as uuid, i.label as label, i.description as description")
         .append(" FROM fileresources f INNER JOIN identifiables i ON f.uuid=i.uuid");
 
     addPageRequestParams(pageRequest, query);
@@ -60,7 +60,7 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
 
   @Override
   public FileResource findOne(UUID uuid) {
-    String query = "SELECT f.filename as filename, f.mimetype as mimeType, f.size_in_bytes as sizeInBytes, i.uuid as uuid, i.label as label, i.description as description"
+    String query = "SELECT f.filename as filename, f.mimetype as mimeType, f.size_in_bytes as sizeInBytes, f.uri as uri, i.uuid as uuid, i.label as label, i.description as description"
                    + " FROM fileresources f INNER JOIN identifiables i ON f.uuid=i.uuid"
                    + " WHERE f.uuid = :uuid";
 
@@ -84,7 +84,7 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
     }
 
     identifiableRepository.save(fileResource);
-    dbi.withHandle(h -> h.createUpdate("INSERT INTO fileresources(filename, mimetype, size_in_bytes, uuid) VALUES (:filename, :mimeType, :sizeInBytes, :uuid)")
+    dbi.withHandle(h -> h.createUpdate("INSERT INTO fileresources(filename, mimetype, size_in_bytes, uri, uuid) VALUES (:filename, :mimeType, :sizeInBytes, :uri, :uuid)")
         .bindBean(fileResource)
         .execute());
     return findOne(fileResource.getUuid());
@@ -94,7 +94,7 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
   public FileResource update(FileResource fileresource) {
     identifiableRepository.update(fileresource);
     // do not update/left out from statement: created, uuid
-    dbi.withHandle(h -> h.createUpdate("UPDATE fileresources SET filename=:filename, mimetype=:mimeType, size_in_bytes=:sizeInBytes WHERE uuid=:uuid")
+    dbi.withHandle(h -> h.createUpdate("UPDATE fileresources SET filename=:filename, mimetype=:mimeType, size_in_bytes=:sizeInBytes, uri=:uri WHERE uuid=:uuid")
         .bindBean(fileresource)
         .execute());
     return findOne(fileresource.getUuid());
