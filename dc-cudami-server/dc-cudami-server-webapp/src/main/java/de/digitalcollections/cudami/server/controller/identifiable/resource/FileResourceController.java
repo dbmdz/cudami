@@ -1,12 +1,11 @@
 package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.commons.file.business.api.FileResourceService;
+import de.digitalcollections.commons.file.business.impl.managed.ManagedFileResourceServiceImpl;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.CudamiFileResourceService;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.api.identifiable.resource.MimeType;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
@@ -19,6 +18,8 @@ import de.digitalcollections.model.impl.paging.SortingImpl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InvalidObjectException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
@@ -56,7 +57,7 @@ public class FileResourceController {
   private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(FileResourceController.class);
 
   @Autowired
-  FileResourceService fileResourceService;
+  ManagedFileResourceServiceImpl fileResourceService;
 
   @Autowired
   LocaleService localeService;
@@ -166,25 +167,17 @@ public class FileResourceController {
         if (!item.isFormField()) {
           stream = item.openStream();
           String originalFilename = item.getName();
+          originalFilename = URLDecoder.decode(originalFilename, StandardCharsets.UTF_8);
           String contentType = item.getContentType();
 
-          MimeType mimeType = MimeType.fromTypename(contentType);
-          if (mimeType == null) {
-            mimeType = MimeType.fromFilename(originalFilename);
-          }
-          if (mimeType == null) {
-            mimeType = MimeType.MIME_APPLICATION_OCTET_STREAM;
-          }
-          managedFileResource = fileResourceService.createManaged(mimeType);
-
-          managedFileResource.setFilename(originalFilename);
+          managedFileResource = fileResourceService.create(contentType, originalFilename);
           LOGGER.info("filename = " + managedFileResource.getFilename());
 
           // set label to originalfilename for now. can be changed in next step of user input
           managedFileResource.setLabel(new LocalizedTextImpl(localeService.getDefault(), originalFilename));
 
           managedFileResource = cudamiFileResourceService.save(managedFileResource, stream);
-          LOGGER.info("filesize = " + managedFileResource.getSizeInBytes());
+          LOGGER.info("saved file '" + managedFileResource.getUri().toString() + "' (" + managedFileResource.getSizeInBytes() + " bytes)");
 
           stream.close();
         }

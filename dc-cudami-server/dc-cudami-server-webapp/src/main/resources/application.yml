@@ -40,12 +40,10 @@ management:
   server:
     port: 9001
 
-multiPatternResolvingFile: 'classpath:/multiPatternResolving-local.yml'
-
 resourceRepository:
-  managedPathFactory:
-    folderpath: '~/resourceRepository'
+  managed:
     namespace: 'dico'
+    folderpath: '~/resourceRepository'
 
 server:
   port: 9000
@@ -76,12 +74,10 @@ custom:
   database:
     port: 5432
 
-multiPatternResolvingFile: 'classpath:/multiPatternResolving-PROD.yml'
-
 resourceRepository:
-  managedPathFactory:
-    folderpath: '/local/resourceRepository'
+  managed:
     namespace: 'dico'
+    folderpath: '/local/resourceRepository'
 
 spring:
   profiles: PROD

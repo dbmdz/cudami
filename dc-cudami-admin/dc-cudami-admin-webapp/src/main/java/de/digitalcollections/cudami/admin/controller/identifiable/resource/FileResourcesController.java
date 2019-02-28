@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.commons.file.business.api.FileResourceService;
 import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
@@ -15,6 +14,8 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -69,9 +70,6 @@ public class FileResourcesController extends AbstractController implements Messa
   private MessageSource messageSource;
 
   @Autowired
-  FileResourceService fileResourceService;
-
-  @Autowired
   LocaleService localeService;
 
   @Autowired
@@ -122,6 +120,7 @@ public class FileResourcesController extends AbstractController implements Messa
         if (!item.isFormField()) {
           String contentType = item.getContentType();
           String filename = item.getName();
+          filename = URLEncoder.encode(filename, StandardCharsets.UTF_8); // filenames with umlauts caused exception...
 
           stream = item.openStream();
           HttpEntity entity = MultipartEntityBuilder.create()
