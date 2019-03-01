@@ -17,9 +17,9 @@
           <div th:replace="fragments/pagination-navigation :: pagination">
             ...
           </div>
-<!--          <div class="objectCounter lighter pull-right">
-            <span class="message" th:text="${page.totalItems}">Found 17 books.</span>
-          </div>-->
+          <!--          <div class="objectCounter lighter pull-right">
+                      <span class="message" th:text="${page.totalItems}">Found 17 books.</span>
+                    </div>-->
         </div>
       </div>
 
@@ -54,10 +54,12 @@
           </div>
         </div>
       </div>
-
-      <div th:replace="fragments/modals :: confirmYesNoDialog"></div>
     </section>
-  </body>
+
+  <th:block layout:fragment="beforeBodyEnds">
+    <div th:replace="fragments/modals :: confirmYesNoDialog"></div>
+  </th:block>
+</body>
 </html>
 
 

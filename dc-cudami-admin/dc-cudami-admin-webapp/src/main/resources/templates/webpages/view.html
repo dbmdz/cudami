@@ -87,7 +87,7 @@
         <div class="col-sm-12">
           <h3>
             <span th:text="#{linked_data}">Linked Data</span>
-            
+
             <button type="button" class="btn btn-default pull-right new-button" data-toggle="modal" data-target="#select-item-dialog" th:text="#{add}">Add</button>
           </h3>
           <table class="table table-bordered table-condensed table-striped table-hover table-responsive">
@@ -118,8 +118,10 @@
           </table>
         </div>
       </div>
-
-      <div th:replace="fragments/modals :: selectItemDialog"></div>
     </section>
-  </body>
+
+  <th:block layout:fragment="beforeBodyEnds">
+    <div th:replace="fragments/modals :: selectItemDialog"></div>
+  </th:block>
+</body>
 </html>

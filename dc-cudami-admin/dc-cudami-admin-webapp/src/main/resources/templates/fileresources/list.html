@@ -62,7 +62,11 @@
         </div>
       </div>
     </section>
-  </body>
+
+  <th:block layout:fragment="beforeBodyEnds">
+    <div th:replace="fragments/modals :: confirmYesNoDialog"></div>
+  </th:block>
+</body>
 </html>
 
 
