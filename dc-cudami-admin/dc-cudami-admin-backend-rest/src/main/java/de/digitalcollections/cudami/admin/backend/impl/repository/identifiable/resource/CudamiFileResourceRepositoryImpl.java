@@ -48,7 +48,8 @@ public class CudamiFileResourceRepositoryImpl<F extends FileResource> extends Id
   @Override
   public F save(FileResource fileResource, byte[] bytes) {
     String contentType = fileResource.getMimeType().getTypeName();
-    FormData formData = new FormData(contentType, bytes);
+    String fileName = fileResource.getFilename();
+    FormData formData = new FormData(contentType, fileName, bytes);
     return (F) endpoint.save(fileResource, formData);
   }
 
