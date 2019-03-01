@@ -90,8 +90,10 @@
           </table>
         </div>
       </div>
-
-      <div th:replace="fragments/modals :: selectItemDialog"></div>
     </section>
-  </body>
+
+  <th:block layout:fragment="beforeBodyEnds">
+    <div th:replace="fragments/modals :: selectItemDialog"></div>
+  </th:block>
+</body>
 </html>
