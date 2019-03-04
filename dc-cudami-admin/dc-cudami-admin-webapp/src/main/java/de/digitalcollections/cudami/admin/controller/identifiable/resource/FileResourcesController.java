@@ -120,7 +120,7 @@ public class FileResourcesController extends AbstractController implements Messa
         if (!item.isFormField()) {
           String contentType = item.getContentType();
           String filename = item.getName();
-          filename = URLEncoder.encode(filename, StandardCharsets.UTF_8); // filenames with umlauts caused exception...
+          filename = URLEncoder.encode(filename, StandardCharsets.UTF_8.toString()); // filenames with umlauts caused exception...
 
           stream = item.openStream();
           HttpEntity entity = MultipartEntityBuilder.create()
