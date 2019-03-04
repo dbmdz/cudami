@@ -167,7 +167,7 @@ public class FileResourceController {
         if (!item.isFormField()) {
           stream = item.openStream();
           String originalFilename = item.getName();
-          originalFilename = URLDecoder.decode(originalFilename, StandardCharsets.UTF_8);
+          originalFilename = URLDecoder.decode(originalFilename, StandardCharsets.UTF_8.toString());
           String contentType = item.getContentType();
 
           managedFileResource = fileResourceService.create(contentType, originalFilename);
