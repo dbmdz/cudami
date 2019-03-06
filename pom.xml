@@ -89,7 +89,7 @@
     <version.javax.servlet-api>3.1.0</version.javax.servlet-api> <!-- Available new major release 4.0.1 -->
     <version.junit>5.4.0</version.junit>
     <version.logstash-logback-encoder>5.3</version.logstash-logback-encoder>
-    <version.mockito-core>2.24.5</version.mockito-core>
+    <version.mockito-core>2.25.0</version.mockito-core>
     <version.passay>1.4.0</version.passay>
     <version.postgresql>42.2.5</version.postgresql>
     <version.querydsl>4.2.1</version.querydsl>
