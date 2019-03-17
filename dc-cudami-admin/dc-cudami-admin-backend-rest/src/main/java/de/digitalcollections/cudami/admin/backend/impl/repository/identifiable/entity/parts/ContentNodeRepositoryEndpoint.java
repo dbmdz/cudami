@@ -14,8 +14,8 @@ public interface ContentNodeRepositoryEndpoint extends RepositoryEndpoint {
 
   @RequestLine("GET /latest/contentnodes?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<ContentNode> find(
-          @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
-          @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
+      @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
+      @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
   );
 
   @RequestLine("GET /latest/contentnodes/{uuid}")
@@ -44,7 +44,7 @@ public interface ContentNodeRepositoryEndpoint extends RepositoryEndpoint {
   ContentNode saveWithParentContentNode(ContentNode contentNode, @Param("parentContentNodeUuid") UUID parentContentNodeUuid);
 
   @RequestLine("GET /latest/contentnodes/{uuid}/identifiables")
-  public List<Identifiable> getIdentifiables(UUID uuid);
+  public List<Identifiable> getIdentifiables(@Param("uuid") UUID uuid);
 
   @RequestLine("POST /latest/contentnodes/{uuid}/identifiables/{identifiableUuid}")
   @Headers("Content-Type: application/json")
