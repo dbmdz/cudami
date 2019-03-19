@@ -87,7 +87,7 @@
     <version.gson>2.8.5</version.gson>
     <version.hamcrest-all>1.3</version.hamcrest-all>
     <version.javax.servlet-api>4.0.1</version.javax.servlet-api>
-    <version.junit>5.4.0</version.junit>
+    <version.junit>5.4.1</version.junit>
     <version.logstash-logback-encoder>5.3</version.logstash-logback-encoder>
     <version.mockito-core>2.25.1</version.mockito-core>
     <version.passay>1.4.0</version.passay>
