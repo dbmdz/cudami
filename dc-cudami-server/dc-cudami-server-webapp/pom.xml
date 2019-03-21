@@ -15,7 +15,7 @@
 
   <properties>
     <version.jsondoc-ui-webjar>1.2.20</version.jsondoc-ui-webjar>
-    <version.spring-boot-starter-jsondoc>1.2.19</version.spring-boot-starter-jsondoc>
+    <version.spring-boot-starter-jsondoc>1.2.20</version.spring-boot-starter-jsondoc>
   </properties>
 
   <dependencies>
