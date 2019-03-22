@@ -58,10 +58,6 @@ h3 {
   padding: 5px 15px;
 }
 
-.btn .innerContent span {
-  white-space: normal;
-}
-
 .btn.disabled, .btn[disabled], fieldset[disabled] .btn {
   opacity: 0.25;
 }
@@ -122,10 +118,6 @@ table .actionButton:hover {
   padding: 10px;
   border-right: solid 1px #ccc;
 }
-.well {
-  background-color: #fbf9eb;
-  border: solid 1px #ccc;
-}
 
 div.editor {
   margin: 0;
@@ -135,50 +127,6 @@ div.editor {
   margin-bottom: 3px;
 }
 
-.outerContent{
-  float: left;
-  position: relative;
-}
-.innerContent{
-  position: absolute;
-  left: 3px;
-  right:3px;
-  top: 3px;
-  bottom: 3px;
-  border: 1px solid #d3d3d3;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center center;
-  padding: 10px;
-  padding-top: 20px;
-  text-align: center;
-}
-.innerContent .icon {
-  height: 75%;
-}
-.innerContent i {
-  color: #06b0ef;
-  font-size: 75px;
-}
-@media(max-width:767px){
-  .outerContent{
-    padding-bottom: 33.33%;
-  }
-}
-@media(min-width:768px){
-  .outerContent{
-    padding-bottom: 25%;
-  }
-}
-@media(min-width:992px){
-  .outerContent{
-    padding-bottom: 14.66%;
-  }
-}
-.innerContent:hover{
-  border-color: #4863a0;
-  transition: 0.4s;
-}
 iframe.editable {
   border: 5px dashed;
 }

@@ -58,7 +58,7 @@
             <span th:text="#{sub_content_nodes}">sub content nodes</span>
             <a class="btn btn-secondary float-right new-button" th:href="@{/contentnodes/new(parentType=contentNode, parentUuid=*{uuid})}" th:text="#{btn_new}">New</a>
           </h3>
-          <table class="table table-bordered table-sm table-striped table-hover table-responsive">
+          <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
             <thead>
               <tr>
                 <th class="center" th:text="#{label}">Label</th>
@@ -87,7 +87,7 @@
 
             <button type="button" class="btn btn-secondary float-right new-button" data-toggle="modal" data-target="#select-item-dialog" th:text="#{add}">Add</button>
           </h3>
-          <table class="table table-bordered table-sm table-striped table-hover table-responsive">
+          <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
             <thead>
               <tr>
                 <th class="center" th:text="#{label}">Label</th>
