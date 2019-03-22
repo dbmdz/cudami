@@ -64,12 +64,12 @@
                  th:text="${#strings.toString(#locale) == 'de' ? 'English' : 'Deutsch'}" class="nav-link">English</a>
             </li>
             <li class="dropdown nav-item">
-              <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown" role="button" aria-expanded="false">
+              <a href="#" class="dropdown-toggle nav-link" id="userMenuDropdownButton" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                 <span id="currentUserName" sec:authentication="name"></span> <span class="caret"></span>
                 <span style="display:none;" sec:authentication="principal.authorities">[ROLE_USER, ROLE_ADMIN]</span>
               </a>
-              <ul class="dropdown-menu" role="menu">
-                <li>
+              <ul class="dropdown-menu" aria-labelledby="userMenuDropdownButton" role="menu">
+                <li class="dropdown-item">
                   <form id="logoutForm" th:action="@{/logout}" role="logout" method="post"></form>
                   <a href="#" onclick="document.getElementById('logoutForm').submit();" th:text="#{menu_logout}">Logout</a>
                 </li>

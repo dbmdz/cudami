@@ -119,8 +119,8 @@
 
   function constructLocaleSwitcher(localeTag, localeName){
     return [
-      '<li class="locale-switcher active unsaved">',
-      '<a href="#" data-locale="' + localeTag + '">' + localeName + '</a>',
+      '<li class="nav-item locale-switcher unsaved">',
+      '<a class="nav-link active" href="#" data-locale="' + localeTag + '">' + localeName + '</a>',
       '</li>'
     ].join('\n');
   }
@@ -135,7 +135,7 @@
     });
 
     $('#add-language-dialog #confirm-language-selection').on('click', function(){
-      $('#locale-tabs > .locale-switcher').removeClass('active');
+      $('#locale-tabs > .locale-switcher > a').removeClass('active');
 
       var selectedLocaleTag = $("#add-language-dialog #locale-selector").val();
       var selectedLocaleName = $("#add-language-dialog #locale-selector :selected").text();
@@ -149,7 +149,7 @@
     });
 
     $('#locale-tabs').on('click', '.locale-switcher', function(){
-      $('#locale-tabs > .locale-switcher').removeClass('active');
+      $('#locale-tabs > .locale-switcher > a').removeClass('active');
       $(this).addClass('active');
 
       var selectedLocaleTag = $(this).find('a').data('locale');

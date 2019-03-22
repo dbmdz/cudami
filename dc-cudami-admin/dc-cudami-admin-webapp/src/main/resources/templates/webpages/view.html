@@ -40,12 +40,12 @@
       <div class="row main-content">
         <div class="col-sm-12">
           <ul class="nav nav-tabs">
-            <li th:each="locale,iter : ${availableLocales}" th:classappend="${iter.index} == 0 ? active">
-              <a th:href="${'#' + locale}" data-toggle="tab" th:text="${locale.getDisplayName(#locale)}">locale</a>
+            <li class="nav-item" th:each="locale,iter : ${availableLocales}">
+              <a class="nav-link" th:classappend="${iter.index} == 0 ? active" th:href="${'#' + locale}" data-toggle="tab" th:text="${locale.getDisplayName(#locale)}">locale</a>
             </li>
           </ul>
           <div class="tab-content">
-            <div th:each="locale,iter : ${availableLocales}" class="tab-pane" th:id="${locale}" th:classappend="${iter.index} == 0 ? active">
+            <div th:each="locale,iter : ${availableLocales}" th:id="${locale}" th:classappend="${iter.index} == 0 ? active">
               <div th:replace="fragments/identifiable::renderTeaser(${webpage}, ${locale})"></div>
               <th:block th:if="*{text} and ${webpage.text.localizedStructuredContent.containsKey(locale)}">
                 <div th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(*{text.localizedStructuredContent}, ${locale})"></div>

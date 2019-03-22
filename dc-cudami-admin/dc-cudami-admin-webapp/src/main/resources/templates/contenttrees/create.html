@@ -52,30 +52,27 @@
         <div class="row mainContent">
           <div class="col-sm-12">
             <ul class="nav nav-tabs" id="locale-tabs">
-              <li class="active locale-switcher">
-                <a href="#" th:attr="data-locale=${defaultLocale}" th:text="${defaultLocale.getDisplayName(#locale)}">default locale</a>
+              <li class="nav-item locale-switcher">
+                <a class="nav-link active" href="#" th:attr="data-locale=${defaultLocale}" th:text="${defaultLocale.getDisplayName(#locale)}">default locale</a>
               </li>
-              <li id="locale-adder">
-                <a href="#">
+              <li class="nav-item" id="locale-adder">
+                <a class="nav-link" href="#">
                   <i class="fas fa-plus" aria-hidden="true"></i>
                 </a>
               </li>
             </ul>
 
             <div class="tab-content">
-              <div class="active tab-pane">
-                <!-- identifiable fields -->
-                <div class="card">
-                  <div class="card-body bg-light">
-                    <div class="form-group">
-                      <label th:text="#{label}">label</label>
-                      <input class="form-control label-editor" type="text"/>
-                    </div>
+              <div class="card">
+                <div class="card-body bg-light">
+                  <div class="form-group">
+                    <label th:text="#{label}">label</label>
+                    <input class="form-control label-editor" type="text"/>
+                  </div>
 
-                    <div class="form-group">
-                      <label th:text="#{description}">description</label>
-                      <div class="editor" th:attr="data-content-id='description'"></div>
-                    </div>
+                  <div class="form-group">
+                    <label th:text="#{description}">description</label>
+                    <div class="editor" th:attr="data-content-id='description'"></div>
                   </div>
                 </div>
               </div>
