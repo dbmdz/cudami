@@ -22,7 +22,7 @@
           </div>
           <div class="col-sm-4">
             <span class="col-sm-6">
-              <a class="btn btn-default btn-block" type="button" th:href="@{'/contenttrees/' + *{uuid}}" th:text="#{abort}">abort</a>
+              <a class="btn btn-secondary btn-block" type="button" th:href="@{'/contenttrees/' + *{uuid}}" th:text="#{abort}">abort</a>
             </span>
             <span class="col-sm-6">
               <button class="btn btn-primary btn-block" type="submit" th:text="#{save}">
@@ -41,7 +41,7 @@
         <div class="row mainContent">
           <div class="form-group col-sm-12">
             <span class="col-sm-4">
-              <label for="id" class="col-sm-1 control-label" th:text="#{id}">ID</label>
+              <label for="id" class="col-sm-1 col-form-label" th:text="#{id}">ID</label>
               <div class="col-sm-9">
                 <input id="id" th:field="*{uuid}" type="text" class="form-control" readonly="readonly" th:placeholder="*{uuid}"/>
               </div>
@@ -65,15 +65,17 @@
             <div class="tab-content">
               <div class="active tab-pane">
                 <!-- identifiable fields -->
-                <div class="well">
-                  <div class="form-group">
-                    <label th:text="#{label}">label</label>
-                    <input class="form-control label-editor" type="text"/>
-                  </div>
+                <div class="card">
+                  <div class="card-body bg-light">
+                    <div class="form-group">
+                      <label th:text="#{label}">label</label>
+                      <input class="form-control label-editor" type="text"/>
+                    </div>
 
-                  <div class="form-group">
-                    <label th:text="#{description}">description</label>
-                    <div class="editor" th:attr="data-content-id='description'"></div>
+                    <div class="form-group">
+                      <label th:text="#{description}">description</label>
+                      <div class="editor" th:attr="data-content-id='description'"></div>
+                    </div>
                   </div>
                 </div>
               </div>

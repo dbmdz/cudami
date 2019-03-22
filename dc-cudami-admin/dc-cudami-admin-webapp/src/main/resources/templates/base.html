@@ -14,7 +14,7 @@
     <title layout:title-pattern="$LAYOUT_TITLE: $CONTENT_TITLE">cudami</title>
 
     <!-- Bootstrap core CSS -->
-    <link th:href="@{/webjars/bootswatch/3.3.7/yeti/bootstrap.min.css}" rel="stylesheet" />
+    <link th:href="@{/webjars/bootswatch/4.2.1/yeti/bootstrap.min.css}" rel="stylesheet" />
 
     <!-- Font awesome CSS -->
     <link th:href="@{/webjars/font-awesome/5.7.2/css/all.css}" rel="stylesheet" />
@@ -31,13 +31,15 @@
       <script th:src="@{/webjars/html5shiv/3.7.3/html5shiv.min.js}"></script>
       <script th:src="@{/webjars/respond/1.4.2/dest/respond.min.js}"></script>
     <![endif]-->
-    
+
     <script>
       function bytesToSize(bytes, separator = "") {
         const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
-        if (bytes == 0) return 'n/a'
+        if (bytes == 0)
+          return 'n/a'
         const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10)
-        if (i === 0) return `${bytes}${separator}${sizes[i]}`
+        if (i === 0)
+          return `${bytes}${separator}${sizes[i]}`
         return `${(bytes / (1024 ** i)).toFixed(1)}${separator}${sizes[i]}`
       }
     </script>
@@ -45,25 +47,24 @@
 
   <body>
 
-    <nav class="navbar">
+    <div class="navbar navbar-expand-md bg-white navbar-light fixed-top">
       <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" th:href="@{/}">
-            <img th:src="@{/images/logo-cudami.png}" height="39" style="margin-top:-5px;"/>
-            <!--            <i class="logo fas fa-code-branch"></i>-->
-            <!--<span class="logotext" title="cudami">cudami</span><br/><span style="font-size: 9px;white-space: nowrap;">cultural digital asset management</span>-->
-          </a>
-        </div>
-        <div id="navbar" class="collapse navbar-collapse">
-          <ul class="nav navbar-nav navbar-right" sec:authorize="isAuthenticated()">
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+        <a class="navbar-brand nav-link" th:href="@{/}">
+          <img th:src="@{/images/logo-cudami.png}" height="39" style="margin-top:-5px;"/>
+          <!--            <i class="logo fas fa-code-branch"></i>-->
+          <!--<span class="logotext" title="cudami">cudami</span><br/><span style="font-size: 9px;white-space: nowrap;">cultural digital asset management</span>-->
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div id="navbarResponsive" class="collapse navbar-collapse">
+          <ul class="navbar-nav ml-auto" sec:authorize="isAuthenticated()">
+            <li class="nav-item">
+              <a th:href="${#strings.toString(#locale) == 'de' ? '?language=en' : '?language=de'}"
+                 th:text="${#strings.toString(#locale) == 'de' ? 'English' : 'Deutsch'}" class="nav-link">English</a>
+            </li>
+            <li class="dropdown nav-item">
+              <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown" role="button" aria-expanded="false">
                 <span id="currentUserName" sec:authentication="name"></span> <span class="caret"></span>
                 <span style="display:none;" sec:authentication="principal.authorities">[ROLE_USER, ROLE_ADMIN]</span>
               </a>
@@ -75,16 +76,9 @@
               </ul>
             </li>
           </ul>
-
-          <ul class="nav navbar-nav navbar-right">
-            <li>
-              <a th:href="${#strings.toString(#locale) == 'de' ? '?language=en' : '?language=de'}"
-                 th:text="${#strings.toString(#locale) == 'de' ? 'English' : 'Deutsch'}">English</a>
-            </li>
-          </ul>
         </div>
       </div>
-    </nav>
+    </div>
 
     <div class="container">
       <div th:replace="fragments/feedback-messages :: global"></div>
@@ -97,11 +91,11 @@
 
     <script th:src="@{/webjars/jquery/3.3.1/dist/jquery.min.js}"></script>
     <script th:src="@{/webjars/jquery-ui-dist/1.12.1/jquery-ui.min.js}"></script>
-    <script th:src="@{/webjars/bootstrap/3.4.1/dist/js/bootstrap.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/4.3.1/dist/js/bootstrap.min.js}"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script th:src="@{/webjars/ie10-viewport-bug-workaround/1.0.3/dist/ie10-viewport-bug-workaround.min.js}"></script>
     <div th:replace="fragments/modals :: confirmYesNoDialog"></div>
-    
+
   <th:block layout:fragment="beforeBodyEnds"></th:block>
 </body>
 </html>

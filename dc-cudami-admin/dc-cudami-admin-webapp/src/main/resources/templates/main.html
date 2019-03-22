@@ -10,29 +10,32 @@
 
       <th:block sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
         <h3>cudami Administration</h3>
-        <div class="row">
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+
+        <div class="card-deck">
+          <div class="card">
             <a class="btn" th:href="@{/users}" th:title="#{users}">
-              <div class="innerContent">
+              <div class="card-body">
                 <div class="icon"><i class="fas fa-users"></i></div>
-                <span th:text="#{users}">Users</span>
               </div>
+              <div class="card-footer"th:text="#{users}">Users</div>
             </a>
           </div>
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+
+          <div class="card">
             <a class="btn disabled" th:href="@{/identifiers}" th:title="#{identifiers}">
-              <div class="innerContent">
+              <div class="card-body">
                 <div class="icon"><i class="fas fa-barcode"></i></div>
-                <span th:text="#{identifiers}">Identifiers</span>
               </div>
+              <div class="card-footer" th:text="#{identifiers}">Identifiers</div>
             </a>
           </div>
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+
+          <div class="card">
             <a class="btn disabled" th:href="@{/licenses}" th:title="#{licenses}">
-              <div class="innerContent">
-                <div class="icon"><i class="far fa-copyright"></i></div>
-                <span th:text="#{licenses}">Licenses</span>
+              <div class="card-body">
+                <div class="icon"><i class="fas fa-copyright"></i></div>
               </div>
+              <div class="card-footer" th:text="#{licenses}">Licenses</div>
             </a>
           </div>
         </div>
@@ -40,172 +43,198 @@
 
       <th:block sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_CONTENT_MANAGER')">
         <h3 th:text="#{objects}">Objects</h3>
-        <div class="row">
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a class="btn" th:href="@{/websites}" th:title="#{websites}">
-              <div class="innerContent">
-                <div class="icon"><i class="fas fa-globe"></i></div>
-                <span th:text="#{websites}">Websites</span>
-              </div>
-            </a>
-          </div>
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a class="btn" th:href="@{/contenttrees}" th:title="#{content_trees}">
-              <div class="innerContent">
-                <div class="icon"><i class="fas fa-share-alt"></i></div>
-                <span th:text="#{content_trees}">Content trees</span>
-              </div>
-            </a>
-          </div>
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a class="btn" th:href="@{/articles}" th:title="#{articles}">
-              <div class="innerContent">
-                <div class="icon"><i class="far fa-newspaper"></i></div>
-                <span th:text="#{articles}">Articles</span>
-              </div>
-            </a>
-          </div>
-          
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a class="btn disabled" th:href="@{/collections}" th:title="#{collections}">
-              <div class="innerContent">
-                <div class="icon"><i class="fas fa-list"></i></div>
-                <span th:text="#{collections}">Collections</span>
-              </div>
-            </a>
-          </div>
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a class="btn disabled" th:href="@{/projects}" th:title="#{digitization_projects}">
-              <div class="innerContent">
-                <div class="icon"><i class="fas fa-industry"></i></div>
-                <span th:text="#{digitization_projects}">(Digitalisierungs-) Projekte</span>
-              </div>
-            </a>
-          </div>
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a class="btn disabled" th:href="@{/books}" th:title="#{books}">
-              <div class="innerContent">
-                <div class="icon"><i class="fas fa-book"></i></div>
-                <span th:text="#{books}">Bücher</span>
-              </div>
-            </a>
-          </div>
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a class="btn disabled" th:href="@{/images}" th:title="#{photos_prints_drawings_paintings}">
-              <div class="innerContent">
-                <div class="icon"><i class="far fa-file-image"></i></div>
-                <span th:text="#{photos_prints_drawings_paintings}">Photos / Prints / Drawings / Paintings</span>
-              </div>
-            </a>
-          </div>
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a class="btn disabled" th:href="@{/3d}" th:title="#{3d_objects}">
-              <div class="innerContent">
-                <div class="icon"><i class="fas fa-cube"></i></div>
-                <span th:text="#{3d_objects}">3D Objects</span>
-              </div>
-            </a>
-          </div>
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a class="btn disabled" th:href="@{/audios}" th:title="#{audios}">
-              <div class="innerContent">
-                <div class="icon"><i class="far fa-file-audio"></i></div>
-                <span th:text="#{audio_recordings}">Audio Recordings</span>
-              </div>
-            </a>
-          </div>
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a class="btn disabled" th:href="@{/videos}" th:title="#{films_videos}">
-              <div class="innerContent">
-                <div class="icon"><i class="far fa-file-video"></i></div>
-                <span th:text="#{films_videos}">Films / Videos</span>
-              </div>
-            </a>
-          </div>
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+
+        <div class="card-deck">
+          <!--          
+          <div class="card">
             <a class="btn disabled" th:href="@{/persons}" th:title="#{persons}">
-              <div class="innerContent">
+              <div class="card-body">
                 <div class="icon"><i class="fas fa-users"></i></div>
-                <span th:text="#{persons}">Persons</span>
               </div>
+              <div class="card-footer"th:text="#{persons}">Persons</div>
             </a>
           </div>
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+
+          <div class="card">
             <a class="btn disabled" th:href="@{/institutions}" th:title="#{institutions}">
-              <div class="innerContent">
+              <div class="card-body">
                 <div class="icon"><i class="fas fa-university"></i></div>
-                <span th:text="#{institutions}">Institutions</span>
               </div>
+              <div class="card-footer"th:text="#{institutions}">Institutions</div>
             </a>
           </div>
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+
+          <div class="card">
             <a class="btn disabled" th:href="@{/places}" th:title="#{places}">
-              <div class="innerContent">
+              <div class="card-body">
                 <div class="icon"><i class="fas fa-map-marker-alt"></i></div>
-                <span th:text="#{places}">Places</span>
               </div>
+              <div class="card-footer"th:text="#{places}">Places</div>
             </a>
           </div>
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a class="btn disabled" th:href="@{/events}" th:title="#{events}">
-              <div class="innerContent">
-                <div class="icon"><i class="fas fa-calendar"></i></div>
-                <span th:text="#{events}">Events</span>
+                    <div class="card">
+                      <a class="btn disabled" th:href="@{/events}" th:title="#{events}">
+                        <div class="card-body">
+                          <div class="icon"><i class="fas fa-calendar"></i></div>
+                        </div>
+                        <div class="card-footer"th:text="#{events}">Events</div>
+                      </a>
+                    </div>
+                    
+                    <div class="card">
+                      <a class="btn disabled" th:href="@{/projects}" th:title="#{digitization_projects}">
+                        <div class="card-body">
+                          <div class="icon"><i class="fas fa-industry"></i></div>
+                        </div>
+                        <div class="card-footer"th:text="#{digitization_projects}">(Digitization-)Projects</div>
+                      </a>
+                    </div>-->
+
+          <div class="card">
+            <a class="btn" th:href="@{/websites}" th:title="#{websites}">
+              <div class="card-body">
+                <div class="icon"><i class="fas fa-globe"></i></div>
               </div>
+              <div class="card-footer" th:text="#{websites}">Websites</div>
+            </a>
+          </div>
+
+          <div class="card">
+            <a class="btn" th:href="@{/contenttrees}" th:title="#{content_trees}">
+              <div class="card-body">
+                <div class="icon"><i class="fas fa-share-alt"></i></div>
+              </div>
+              <div class="card-footer" th:text="#{content_trees}">Content trees</div>
+            </a>
+          </div>
+
+          <div class="card">
+            <a class="btn" th:href="@{/articles}" th:title="#{articles}">
+              <div class="card-body">
+                <div class="icon"><i class="far fa-newspaper"></i></div>
+              </div>
+              <div class="card-footer" th:text="#{articles}">Articles</div>
             </a>
           </div>
         </div>
-        
-        <h3 th:text="#{fileresources}">Files</h3>
-        <div class="row">
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a class="btn" th:href="@{/fileresources}" th:title="#{all}">
-              <div class="innerContent">
-                <div class="icon"><i class="fas fa-ellipsis-h"></i></div>
-                <span th:text="#{all}">all</span>
+
+        <div class="card-deck">
+          <div class="card">
+            <a class="btn" th:href="@{/collections}" th:title="#{collections}">
+              <div class="card-body">
+                <div class="icon"><i class="fas fa-list"></i></div>
               </div>
+              <div class="card-footer" th:text="#{collections}">Collections</div>
             </a>
           </div>
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a class="btn disabled" th:href="@{/fileresources/images}" th:title="#{images}">
-              <div class="innerContent">
+
+          <div class="card">
+            <a class="btn" th:href="@{/fileresourcebundles}" th:title="#{fileresourcebundles}">
+              <div class="card-body">
+                <div class="icon"><i class="fas fa-cubes"></i></div>
+              </div>
+              <div class="card-footer" th:text="#{fileresourcebundles}">File-Bundles</div>
+            </a>
+          </div>
+
+          <div class="card">
+            <a class="btn" th:href="@{/fileresources}" th:title="#{fileresources}">
+              <div class="card-body">
+                <div class="icon"><i class="fa fa-file"></i></div>
+              </div>
+              <div class="card-footer" th:text="#{fileresources}">Fileresources</div>
+            </a>
+          </div>
+<!--
+          <div class="card">
+            <a class="btn disabled" th:href="@{/books}" th:title="#{books}">
+              <div class="card-body">
+                <div class="icon"><i class="fas fa-book"></i></div>
+              </div>
+              <div class="card-footer" th:text="#{books}">Books</div>
+            </a>
+          </div>
+
+          <div class="card">
+            <a class="btn disabled" th:href="@{/images}" th:title="#{photos_prints_drawings_paintings}">
+              <div class="card-body">
                 <div class="icon"><i class="far fa-file-image"></i></div>
-                <span th:text="#{images}">Images</span>
               </div>
+              <div class="card-footer" th:text="#{photos_prints_drawings_paintings}">Photos / Prints / Drawings / Paintings</div>
             </a>
           </div>
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a class="btn disabled" th:href="@{/fileresources/videos}" th:title="#{videos}">
-              <div class="innerContent">
-                <div class="icon"><i class="far fa-file-video"></i></div>
-                <span th:text="#{videos}">Videos</span>
-              </div>
-            </a>
-          </div>
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a class="btn disabled" th:href="@{/fileresources/audios}" th:title="#{audios}">
-              <div class="innerContent">
-                <div class="icon"><i class="far fa-file-audio"></i></div>
-                <span th:text="#{audios}">Audios</span>
-              </div>
-            </a>
-          </div>
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
-            <a class="btn disabled" th:href="@{/fileresources/3d}" th:title="#{3d_data}">
-              <div class="innerContent">
+
+          <div class="card">
+            <a class="btn disabled" th:href="@{/3d}" th:title="#{3d_objects}">
+              <div class="card-body">
                 <div class="icon"><i class="fas fa-cube"></i></div>
-                <span th:text="#{3d_data}">3D Data</span>
               </div>
+              <div class="card-footer" th:text="#{3d_objects}">3D Objects</div>
             </a>
           </div>
-          <div class="col-xs-4 col-sm-3 col-md-2 outerContent">
+
+          <div class="card">
+            <a class="btn disabled" th:href="@{/audios}" th:title="#{audios}">
+              <div class="card-body">
+                <div class="icon"><i class="far fa-file-audio"></i></div>
+              </div>
+              <div class="card-footer" th:text="#{audio_recordings}">Audio Recordings</div>
+            </a>
+          </div>
+
+          <div class="card">
+            <a class="btn disabled" th:href="@{/videos}" th:title="#{films_videos}">
+              <div class="card-body">
+                <div class="icon"><i class="far fa-file-video"></i></div>
+              </div>
+              <div class="card-footer" th:text="#{films_videos}">Films / Videos</div>
+            </a>
+          </div>
+
+          <div class="card">
+            <a class="btn disabled" th:href="@{/fileresources/images}" th:title="#{images}">
+              <div class="card-body">
+                <div class="icon"><i class="far fa-file-image"></i></div>
+              </div>
+              <div class="card-footer" th:text="#{images}">Images</div>
+            </a>
+          </div>
+
+          <div class="card">
+            <a class="btn disabled" th:href="@{/fileresources/videos}" th:title="#{videos}">
+              <div class="card-body">
+                <div class="icon"><i class="far fa-file-video"></i></div>
+              </div>
+              <div class="card-footer" th:text="#{videos}">Videos</div>
+            </a>
+          </div>
+
+          <div class="card">
+            <a class="btn disabled" th:href="@{/fileresources/audios}" th:title="#{audios}">
+              <div class="card-body">
+                <div class="icon"><i class="far fa-file-audio"></i></div>
+              </div>
+              <div class="card-footer" th:text="#{audios}">Audios</div>
+            </a>
+          </div>
+
+          <div class="card">
+            <a class="btn disabled" th:href="@{/fileresources/3d}" th:title="#{3d_data}">
+              <div class="card-body">
+                <div class="icon"><i class="fas fa-cube"></i></div>
+              </div>
+              <div class="card-footer" th:text="#{3d_data}">3D Data</div>
+            </a>
+          </div>
+
+          <div class="card">
             <a class="btn disabled" th:href="@{/fileresources/textdocs}" th:title="#{text_documents}">
-              <div class="innerContent">
+              <div class="card-body">
                 <div class="icon"><i class="far fa-file-alt"></i></div>
-                <span th:text="#{text_documents}">Text Documents (PDF, DOC, ...)</span>
               </div>
+              <div class="card-footer" th:text="#{text_documents}">Text Documents (PDF, DOC, ...)</div>
             </a>
-          </div>
+          </div>-->
         </div>
       </th:block>
     </section>
