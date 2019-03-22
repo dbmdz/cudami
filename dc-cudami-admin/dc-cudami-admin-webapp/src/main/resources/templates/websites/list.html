@@ -10,14 +10,14 @@
   </head>
   <body>
     <section layout:fragment="content">
-      <h1><span th:text="#{websites}">Websites</span> <a class="btn btn-secondary pull-right" th:href="@{/websites/new}" th:text="#{btn_new}">New</a></h1>
+      <h1><span th:text="#{websites}">Websites</span> <a class="btn btn-secondary float-right" th:href="@{/websites/new}" th:text="#{btn_new}">New</a></h1>
 
       <div class="row">
         <div class="col-sm-12">
           <div th:replace="fragments/pagination-navigation :: pagination-bootstrap4">
             ...
           </div>
-          <!--          <div class="objectCounter lighter pull-right">
+          <!--          <div class="objectCounter lighter float-right">
                       <span class="message" th:text="${page.totalItems}">Found 17 books.</span>
                     </div>-->
         </div>
