@@ -15,7 +15,7 @@
           <b th:text="#{content_tree}">Content tree</b>
         </div>
         <div class="col-sm-3">
-          <a class="btn btn-default btn-block"
+          <a class="btn btn-secondary btn-block"
              th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
         </div>
       </div>
@@ -56,9 +56,9 @@
         <div class="col-sm-12">
           <h3>
             <span th:text="#{content_nodes}">root nodes</span>
-            <a class="btn btn-default pull-right new-button" th:href="@{/contentnodes/new(parentType=contentTree, parentUuid=*{uuid})}" th:text="#{btn_new}">New</a>
+            <a class="btn btn-secondary pull-right new-button" th:href="@{/contentnodes/new(parentType=contentTree, parentUuid=*{uuid})}" th:text="#{btn_new}">New</a>
           </h3>
-          <table class="table table-bordered table-condensed table-striped table-hover table-responsive">
+          <table class="table table-bordered table-sm table-striped table-hover table-responsive">
             <thead>
               <tr>
                 <th class="center" th:text="#{label}">Label</th>

@@ -10,11 +10,11 @@
   </head>
   <body>
     <section layout:fragment="content">
-      <h1><span th:text="#{content_trees}">Content Trees</span> <a class="btn btn-default pull-right" th:href="@{/contenttrees/new}" th:text="#{btn_new}">New</a></h1>
+      <h1><span th:text="#{content_trees}">Content Trees</span> <a class="btn btn-secondary pull-right" th:href="@{/contenttrees/new}" th:text="#{btn_new}">New</a></h1>
 
       <div class="row">
         <div class="col-sm-12" >
-          <div th:replace="fragments/pagination-navigation :: pagination">
+          <div th:replace="fragments/pagination-navigation :: pagination-bootstrap4">
             ...
           </div>
           <!--          <div class="objectCounter lighter">
@@ -23,7 +23,7 @@
         </div>
       </div>
 
-      <table class="table table-bordered table-condensed table-striped table-hover table-responsive">
+      <table class="table table-bordered table-sm table-striped table-hover table-responsive">
         <thead>
           <tr sd:page-object="${page.page}">
             <th class="center" th:text="#{label}">Label</th>
@@ -45,7 +45,7 @@
 
       <div class="row">
         <div class="col-sm-12" >
-          <div th:replace="fragments/pagination-navigation :: pagination">
+          <div th:replace="fragments/pagination-navigation :: pagination-bootstrap4">
             ...
           </div>
         </div>

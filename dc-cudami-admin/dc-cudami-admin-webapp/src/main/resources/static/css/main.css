@@ -10,6 +10,31 @@ a[href^="http"]:not(.no-external):after {
   padding-left: 3px;
 }
 
+body {
+  min-height: 75rem;
+  padding-top: 4.5rem;
+}
+
+.card {
+  margin-top: 10px;
+  /*max-width: 250px;*/
+  min-width: 150px;
+}
+
+.card .icon {
+  color: #06b0ef;
+  font-size: 65px;
+}
+
+.card .card-footer {
+  border: 0px;
+  background-color: transparent;
+}
+
+h3 {
+  margin-top: 10px;
+}
+
 .ProseMirror-menubar {
   border-top-left-radius: inherit;
   border-top-right-radius: inherit;
@@ -38,7 +63,7 @@ a[href^="http"]:not(.no-external):after {
 }
 
 .btn.disabled, .btn[disabled], fieldset[disabled] .btn {
-    opacity: 0.25;
+  opacity: 0.25;
 }
 
 h1 a.btn {
@@ -48,7 +73,7 @@ label, .control-label {
   font-size: inherit;
   font-weight: bold;
 }
-.navbar li a {
+.navbar-light .navbar-nav .nav-link {
   -webkit-transition: all .2s ease-out;
   -moz-transition: all .2s ease-out;
   -o-transition: all .2s ease-out;
