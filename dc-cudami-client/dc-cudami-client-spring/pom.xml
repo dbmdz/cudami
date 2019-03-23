@@ -13,7 +13,16 @@
   <artifactId>dc-cudami-client-spring</artifactId>
   <packaging>jar</packaging>
 
+  <properties>
+    <version.thymeleaf-extras>2.0.1</version.thymeleaf-extras>
+  </properties>
+
   <dependencies>
+    <dependency>
+      <groupId>com.connect-group</groupId>
+      <artifactId>thymeleaf-extras</artifactId>
+      <version>${version.thymeleaf-extras}</version>
+    </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-client-openfeign</artifactId>
