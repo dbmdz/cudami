@@ -5,6 +5,8 @@ import de.digitalcollections.cudami.admin.business.api.service.exceptions.Identi
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.CudamiFileResourceService;
 import de.digitalcollections.cudami.admin.business.impl.service.identifiable.IdentifiableServiceImpl;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import de.digitalcollections.model.api.identifiable.resource.exceptions.ResourceIOException;
+import java.io.InputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,5 +32,15 @@ public class CudamiFileResourceServiceImpl<F extends FileResource> extends Ident
       throw new IdentifiableServiceException(e.getMessage());
     }
     return (F) fileResource;
+  }
+
+  @Override
+  public F upload(InputStream inputStream, String filename, String contentType) throws ResourceIOException {
+    return (F) ((CudamiFileResourceRepository) repository).upload(inputStream, filename, contentType);
+  }
+
+  @Override
+  public F upload(byte[] bytes, String filename, String contentType) throws ResourceIOException {
+    return (F) ((CudamiFileResourceRepository) repository).upload(bytes, filename, contentType);
   }
 }

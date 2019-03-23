@@ -14,8 +14,6 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -25,13 +23,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.tomcat.util.http.fileupload.FileItemIterator;
 import org.apache.tomcat.util.http.fileupload.FileItemStream;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
@@ -46,7 +37,6 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -120,27 +110,12 @@ public class FileResourcesController extends AbstractController implements Messa
         if (!item.isFormField()) {
           String contentType = item.getContentType();
           String filename = item.getName();
-          filename = URLEncoder.encode(filename, StandardCharsets.UTF_8.toString()); // filenames with umlauts caused exception...
-
           stream = item.openStream();
-          HttpEntity entity = MultipartEntityBuilder.create()
-              .addBinaryBody(contentType, stream, ContentType.create(contentType), filename)
-              .build();
-          HttpPost post = new HttpPost(cudamiServerAddress + "/latest/fileresources/new/upload");
-          post.setEntity(entity);
-          HttpClient client = HttpClientBuilder.create().build();
-          HttpResponse response = client.execute(post);
 
-          if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
-            FileResource fileResource = objectMapper.readValue(response.getEntity().getContent(), FileResource.class);
-            redirectAttributes.addFlashAttribute("message", "You successfully uploaded " + filename + "!");
-            redirectAttributes.addFlashAttribute("isNew", true);
-            return "redirect:/fileresources/new/metadata/" + fileResource.getUuid().toString();
-          } else {
-            LOGGER.info("Error saving uploaded file data");
-            redirectAttributes.addFlashAttribute("message", "Error saving file resource!");
-            return "redirect:/fileresources";
-          }
+          FileResource fileResource = cudamiFileResourceService.upload(stream, filename, contentType);
+          redirectAttributes.addFlashAttribute("message", "You successfully uploaded " + filename + "!");
+          redirectAttributes.addFlashAttribute("isNew", true);
+          return "redirect:/fileresources/new/metadata/" + fileResource.getUuid().toString();
         }
       }
     } catch (IOException | FileUploadException e) {
@@ -161,9 +136,9 @@ public class FileResourcesController extends AbstractController implements Messa
     FileResource fileresource = cudamiFileResourceService.get(uuid);
     Locale defaultLocale = localeService.getDefault();
     List<Locale> locales = localeService.findAll().stream()
-        .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
-        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-        .collect(Collectors.toList());
+            .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
+            .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+            .collect(Collectors.toList());
 
     model.addAttribute("defaultLocale", defaultLocale);
     model.addAttribute("fileresource", fileresource);
@@ -224,9 +199,9 @@ public class FileResourcesController extends AbstractController implements Messa
     HashSet<Locale> availableLocales = (HashSet<Locale>) fileresource.getLabel().getLocales();
     Set<String> availableLocaleTags = availableLocales.stream().map(Locale::toLanguageTag).collect(Collectors.toSet());
     List<Locale> locales = localeService.findAll().stream()
-        .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
-        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-        .collect(Collectors.toList());
+            .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
+            .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+            .collect(Collectors.toList());
 
     model.addAttribute("fileresource", fileresource);
     model.addAttribute("availableLocales", availableLocales);
