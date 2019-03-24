@@ -6,7 +6,12 @@
 <th:block th:fragment="renderLocalizedStructuredContent(structuredContent, locale)">
   <th:block th:if="${structuredContent}">
     <th:block th:if="${locale}">
-      <th:block th:insert="~{::renderContentBlocks(${structuredContent.get(locale).contentBlocks})}"></th:block>
+      <th:block th:if="${structuredContent.get(locale)}">
+        <th:block th:insert="~{::renderContentBlocks(${structuredContent.get(locale).contentBlocks})}"></th:block>
+      </th:block>
+      <th:block th:unless="${structuredContent.get(locale)}">
+        <th:block th:insert="~{::renderContentBlocks(${structuredContent.values().stream().findFirst().get().contentBlocks})}"></th:block>
+      </th:block>
     </th:block>
     <th:block th:unless="${locale}">
       <th:block th:insert="~{::renderContentBlocks(${structuredContent.values().stream().findFirst().get().contentBlocks})}"></th:block>
