@@ -170,3 +170,7 @@ li.locale-switcher.unsaved > a::after {
 li.locale-switcher.invalid > a {
   color: red !important;
 }
+
+li > p {
+  margin: 0;
+}

@@ -20,7 +20,7 @@
 </th:block>
 
 <th:block th:fragment="renderContentBlocks(contentBlocks)">
-  <th:block th:each="block, iter : ${contentBlocks}" xtra:strip-whitespace="shallow">
+  <th:block th:each="block, iter : ${contentBlocks}">
     <th:block th:insert="~{::renderContentBlock(${block})}"></th:block>
   </th:block>
 </th:block>
