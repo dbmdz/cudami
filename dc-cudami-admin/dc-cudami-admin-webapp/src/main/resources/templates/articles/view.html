@@ -27,7 +27,7 @@
         </div>
       </div>
 
-      <div class="row main-content">
+      <div class="row">
         <div class="col-sm-12">
           <div class="container-fluid rows-striped">
             <div class="row">
@@ -57,12 +57,18 @@
       </div>
 
       <div class="row main-content">
-        <div class="col-sm-12">
-          <h3>
-            <span th:text="#{linked_data}">Linked Data</span>
-
+        <div class="col-sm-6">
+          <h2 th:text="#{linked_data}">Linked Data</h2>
+        </div>
+        <div class="col-sm-6">
+          <div class="float-right">
             <button type="button" class="btn btn-secondary float-right new-button" data-toggle="modal" data-target="#select-item-dialog" th:text="#{add}">Add</button>
-          </h3>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-sm-12">
           <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
             <thead>
               <tr>
