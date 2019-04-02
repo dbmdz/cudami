@@ -14,22 +14,16 @@
         <input type="hidden" id="label" th:field="*{label}" />
         <input type="hidden" id="description" class="content" th:field="*{description}" />
 
-        <div class="row mainContent">
-          <div th:replace="fragments/feedback-messages :: form-bootstrap4"></div>
-
-          <div class="col-sm-8">
-            <b th:text="#{content_node_create}">...</b>
+        <div class="row">
+          <div class="col-sm-6">
+            <b th:text="#{content_node_create}">Create a new content node</b>
           </div>
-          <div class="col-sm-4">
-            <span class="col-sm-6">
-              <a class="btn btn-secondary btn-block" type="button" th:href="@{'/contenttrees/' + ${parentUuid}}" th:if="${parentType} == 'contentTree'" th:text="#{abort}">abort</a>
-              <a class="btn btn-secondary btn-block" type="button" th:href="@{'/contentnodes/' + ${parentUuid}}" th:if="${parentType} == 'contentNode'" th:text="#{abort}">abort</a>
-            </span>
-            <span class="col-sm-6">
-              <button class="btn btn-primary btn-block" type="submit" th:text="#{save}">
-                save
-              </button>
-            </span>
+          <div class="col-sm-6">
+            <div class="float-right">
+              <a class="btn btn-secondary" type="button" th:href="@{'/contenttrees/' + ${parentUuid}}" th:if="${parentType} == 'contentTree'" th:text="#{abort}">abort</a>
+              <a class="btn btn-secondary" type="button" th:href="@{'/contentnodes/' + ${parentUuid}}" th:if="${parentType} == 'contentNode'" th:text="#{abort}">abort</a>
+              <button class="btn btn-primary" type="submit" th:text="#{save}">save</button>
+            </div>
           </div>
         </div>
 
@@ -40,17 +34,8 @@
         </div>
 
         <div class="row mainContent">
-          <div class="form-group col-sm-12">
-            <span class="col-sm-4">
-              <label for="id" class="col-sm-1 col-form-label" th:text="#{id}">ID</label>
-              <div class="col-sm-9">
-                <input id="id" th:field="*{uuid}" type="text" class="form-control" readonly="readonly" th:placeholder="*{uuid}"/>
-              </div>
-            </span>
-          </div>
-        </div>
+          <div th:replace="fragments/feedback-messages :: form-bootstrap4"></div>
 
-        <div class="row mainContent">
           <div class="col-sm-12">
             <ul class="nav nav-tabs" id="locale-tabs">
               <li class="nav-item locale-switcher">
