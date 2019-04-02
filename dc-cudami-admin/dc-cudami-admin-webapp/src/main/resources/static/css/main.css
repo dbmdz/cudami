@@ -108,7 +108,7 @@ table .actionButton:hover {
   background-color: white;
 }
 
-.main-content + .main-content {
+.main-content {
   margin-top: 20px;
 }
 

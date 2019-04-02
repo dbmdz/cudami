@@ -11,12 +11,13 @@
     <section layout:fragment="content" th:object="${contentTree}">
 
       <div class="row">
-        <div class="col-sm-9">
-          <b th:text="#{content_tree}">Content tree</b>
+        <div class="col-sm-6">
+          <h1 th:text="#{content_tree}">Content tree</h1>
         </div>
-        <div class="col-sm-3">
-          <a class="btn btn-secondary btn-block"
-             th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
+        <div class="col-sm-6">
+          <div class="float-right">
+            <a class="btn btn-secondary" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
+          </div>
         </div>
       </div>
 
@@ -26,7 +27,7 @@
         </div>
       </div>
 
-      <div class="row main-content">
+      <div class="row">
         <div class="col-sm-12">
           <div class="container-fluid rows-striped">
             <div class="row">
@@ -53,11 +54,18 @@
       </div>
 
       <div class="row main-content">
+        <div class="col-sm-6">
+          <h2 th:text="#{content_nodes}">Content nodes</h2>
+        </div>
+        <div class="col-sm-6">
+          <div class="float-right">
+            <a class="btn btn-secondary new-button" th:href="@{/contentnodes/new(parentType=contentTree, parentUuid=*{uuid})}" th:text="#{btn_new}">New</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
         <div class="col-sm-12">
-          <h3>
-            <span th:text="#{content_nodes}">root nodes</span>
-            <a class="btn btn-secondary float-right new-button" th:href="@{/contentnodes/new(parentType=contentTree, parentUuid=*{uuid})}" th:text="#{btn_new}">New</a>
-          </h3>
           <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
             <thead>
               <tr>
