@@ -11,12 +11,13 @@
     <section layout:fragment="content" th:object="${article}">
 
       <div class="row">
-        <div class="col-sm-9">
-          <b th:text="#{article}">Article</b>
+        <div class="col-sm-6">
+          <h1 th:text="#{article}">Article</h1>
         </div>
-        <div class="col-sm-3">
-          <a class="btn btn-secondary btn-block"
-             th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
+        <div class="col-sm-6">
+          <div class="float-right">
+            <a class="btn btn-secondary" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
+          </div>
         </div>
       </div>
 
