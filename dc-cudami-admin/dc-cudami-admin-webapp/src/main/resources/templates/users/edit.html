@@ -13,7 +13,7 @@
       <form th:object="${user}" th:action="@{#}" method="post" role="form">
         <div class="row">
           <div class="col-sm-6">
-            <b th:text="#{username}">Username / Email</b> <span th:text="*{email}">email@email.de</span>
+            <h1 th:text="#{user_edit(*{email})}">Edit user "email@email.de"</h1>
           </div>
           <div class="col-sm-6">
             <div class="float-right">
