@@ -28,11 +28,11 @@
           </div>
         </div>
 
-        <div class="row mainContent">
+        <div class="row">
           <div th:replace="fragments/feedback-messages :: form-bootstrap4"></div>
 
           <div  class="col-sm-12">
-            <div th:if="*{uuid}" class="form-group">
+            <div class="form-group">
               <label th:text="#{id}">ID</label>
               <div class="form-control" readonly th:text="*{uuid}">23</div>
             </div>
