@@ -6,7 +6,12 @@
 <th:block th:fragment="renderLocalizedStructuredContent(structuredContent, locale)">
   <th:block th:if="${structuredContent}">
     <th:block th:if="${locale}">
-      <th:block th:insert="~{::renderContentBlocks(${structuredContent.get(locale).contentBlocks})}"></th:block>
+      <th:block th:if="${structuredContent.get(locale)}">
+        <th:block th:insert="~{::renderContentBlocks(${structuredContent.get(locale).contentBlocks})}"></th:block>
+      </th:block>
+      <th:block th:unless="${structuredContent.get(locale)}">
+        <th:block th:insert="~{::renderContentBlocks(${structuredContent.values().stream().findFirst().get().contentBlocks})}"></th:block>
+      </th:block>
     </th:block>
     <th:block th:unless="${locale}">
       <th:block th:insert="~{::renderContentBlocks(${structuredContent.values().stream().findFirst().get().contentBlocks})}"></th:block>
@@ -87,6 +92,30 @@
     <p>
       <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
     </p>
+  </th:block>
+  
+  <th:block th:if="${block.class.simpleName == 'TableCellImpl'}" th:with="attr=${block.attributes}">
+    <td th:attr="colspan=${attr.get('colspan') != null}?${attr.get('colspan')}, rowspan=${attr.get('rowspan') != null}?${attr.get('rowspan')}, data-colwidth=${attr.get('colwidth') != null}?${attr.get('colwidth')}">
+      <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
+    </td>
+  </th:block>
+
+  <th:block th:if="${block.class.simpleName == 'TableHeaderImpl'}" th:with="attr=${block.attributes}">
+    <th th:attr="colspan=${attr.get('colspan') != null}?${attr.get('colspan')}, rowspan=${attr.get('rowspan') != null}?${attr.get('rowspan')}, data-colwidth=${attr.get('colwidth') != null}?${attr.get('colwidth')}">
+      <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
+    </th>
+  </th:block>
+
+  <th:block th:if="${block.class.simpleName == 'TableImpl'}">
+    <table>
+      <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
+    </table>
+  </th:block>
+  
+  <th:block th:if="${block.class.simpleName == 'TableRowImpl'}">
+    <tr>
+      <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
+    </tr>
   </th:block>
 
   <th:block th:if="${block.class.simpleName == 'TextImpl'}">

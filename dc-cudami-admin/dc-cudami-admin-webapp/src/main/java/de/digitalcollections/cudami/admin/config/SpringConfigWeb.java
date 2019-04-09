@@ -5,6 +5,7 @@ import com.github.mxab.thymeleaf.extras.dataattribute.dialect.DataAttributeDiale
 import de.digitalcollections.commons.servlet.filter.LogSessionIdFilter;
 import de.digitalcollections.commons.springmvc.config.SpringConfigCommonsMvc;
 import de.digitalcollections.commons.springmvc.controller.ErrorController;
+import de.digitalcollections.commons.springmvc.thymeleaf.SpacesDialect;
 import de.digitalcollections.cudami.admin.converter.GrantedAuthorityJsonFilter;
 import de.digitalcollections.cudami.admin.interceptors.CreateAdminUserInterceptor;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
@@ -30,6 +31,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+import org.thymeleaf.dialect.AbstractProcessorDialect;
 import org.thymeleaf.dialect.springdata.SpringDataDialect;
 import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect;
 
@@ -81,6 +83,11 @@ public class SpringConfigWeb implements WebMvcConfigurer {
   @Bean
   public SpringDataDialect springDataDialect() {
     return new SpringDataDialect();
+  }
+
+  @Bean
+  public AbstractProcessorDialect whiteSpaceNormalizedDialect() {
+    return new SpacesDialect();
   }
 
   @Bean

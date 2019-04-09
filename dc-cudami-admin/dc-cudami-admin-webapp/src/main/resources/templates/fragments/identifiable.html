@@ -12,7 +12,7 @@
         <label>
           <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${identifiable.label}, ${locale})"></th:block>
         </label>
-        <th:block th:if="${identifiable.description} and ${identifiable.description.localizedStructuredContent.containsKey(locale)}">
+        <th:block th:if="${identifiable.description} and ${identifiable.description.localizedStructuredContent}">
           <div th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${identifiable.description.localizedStructuredContent}, ${locale})"></div>
         </th:block>
       </div>
