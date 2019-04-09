@@ -10,76 +10,81 @@
   </head>
   <body>
     <section layout:fragment="content">
-      <h1><span th:text="#{users}">Users</span> <a class="btn btn-default" th:href="@{/users/new}" th:text="#{btn_new}">New</a></h1>
 
       <div class="row">
-        <div class="col-sm-12" >
-          <div th:replace="fragments/pagination-navigation :: pagination">
-            ...
+        <div class="col-sm-6">
+          <h1 th:text="#{users}">Users</h1>
+        </div>
+        <div class="col-sm-6">
+          <div class="float-right">
+            <a class="btn btn-secondary" th:href="@{/users/new}" th:text="#{btn_new}">New</a>
           </div>
-          <!--          <div class="objectCounter lighter">
-                      <span class="message" th:text="${page.totalItems}">Found 17 books.</span>
-                    </div>-->
         </div>
       </div>
 
-      <table class="table table-bordered table-condensed table-striped table-hover table-responsive">
-        <thead>
-          <tr sd:page-object="${page.page}">
-            <th class="center"><a class="sorted" sd:pagination-sort="lastname" th:text="#{lastname}">Lastname</a></th>
-            <th class="center"><a class="sorted" sd:pagination-sort="firstname" th:text="#{firstname}">Firstname</a></th>
-            <th class="center"><a class="sorted" sd:pagination-sort="email" th:text="#{username}">Username / Email</a></th>
-            <th class="center" th:text="#{roles}">Role(s)</th>
-            <th class="center" th:text="#{status}">Status</th>
-            <th class="center" th:text="#{actions}">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr th:each="user: ${page.content}">
-            <td>
-              <span th:text="${user.lastname}">Meier</span>
-            </td>
-            <td>
-              <span th:text="${user.firstname}">Hans</span>
-            </td>
-            <td>
-              <a th:href="@{'/users/' + ${user.uuid}}" th:text="${user.email}">hans@meier.de</a>
-            </td>
-            <td>
-        <th:block th:each="role,rowStat : ${user.roles}">
-          <span th:text="${role.name()}">ROLE_CONTENT_MANAGER</span>
-          <span th:unless="${rowStat.last}">, </span>
-        </th:block>
-        </td>
-        <td class="center">
-          <span th:title="#{${'tooltip_enabled.' + user.enabled}}" th:classappend="${user.enabled}? 'text-success' : 'text-danger'" class="fas fa-power-off"></span>
-        </td>
-        <td class="center">
-          <a th:href="@{'/users/' + ${user.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
-          <a th:href="@{'/users/' + ${user.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
-          <a th:if="${user.enabled}" href="#"
-             th:title="#{tooltip_deactivate_user}"
-             data:href="@{'/users/' + ${user.uuid} + '/deactivate'}"
-             data:message="#{msg.confirm_user_deactivation(${user.email})}"
-             data:title="#{title_warning}"
-             data-target="#confirmYesNoDialog"
-             data-toggle="modal">
-            <span class="fas fa-toggle-off actionButton"></span>
-          </a>
-          <a th:unless="${user.enabled}" th:href="@{'/users/' + ${user.uuid} + '/activate'}"
-             th:title="#{tooltip_activate_user}">
-            <span class="fas fa-toggle-on actionButton"></span>
-          </a>
-        </td>
-        </tr>
-        </tbody>
-      </table>
+      <div class="row">
+        <div class="col-sm-12">
+          <hr/>
+        </div>
+      </div>
 
       <div class="row">
         <div class="col-sm-12" >
-          <div th:replace="fragments/pagination-navigation :: pagination">
-            ...
-          </div>
+          <div th:replace="fragments/pagination-navigation :: pagination-bootstrap4"></div>
+
+          <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
+            <thead>
+              <tr sd:page-object="${page.page}">
+                <th class="center"><a class="sorted" sd:pagination-sort="lastname" th:text="#{lastname}">Lastname</a></th>
+                <th class="center"><a class="sorted" sd:pagination-sort="firstname" th:text="#{firstname}">Firstname</a></th>
+                <th class="center"><a class="sorted" sd:pagination-sort="email" th:text="#{username}">Username / Email</a></th>
+                <th class="center" th:text="#{roles}">Role(s)</th>
+                <th class="center" th:text="#{status}">Status</th>
+                <th class="center" th:text="#{actions}">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="user: ${page.content}">
+                <td>
+                  <span th:text="${user.lastname}">Meier</span>
+                </td>
+                <td>
+                  <span th:text="${user.firstname}">Hans</span>
+                </td>
+                <td>
+                  <a th:href="@{'/users/' + ${user.uuid}}" th:text="${user.email}">hans@meier.de</a>
+                </td>
+                <td>
+            <th:block th:each="role,rowStat : ${user.roles}">
+              <span th:text="${role.name()}">ROLE_CONTENT_MANAGER</span>
+              <span th:unless="${rowStat.last}">, </span>
+            </th:block>
+            </td>
+            <td class="center">
+              <span th:title="#{${'tooltip_enabled.' + user.enabled}}" th:classappend="${user.enabled}? 'text-success' : 'text-danger'" class="fas fa-power-off"></span>
+            </td>
+            <td class="center">
+              <a th:href="@{'/users/' + ${user.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
+              <a th:href="@{'/users/' + ${user.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
+              <a th:if="${user.enabled}" href="#"
+                 th:title="#{tooltip_deactivate_user}"
+                 data:href="@{'/users/' + ${user.uuid} + '/deactivate'}"
+                 data:message="#{msg.confirm_user_deactivation(${user.email})}"
+                 data:title="#{title_warning}"
+                 data-target="#confirmYesNoDialog"
+                 data-toggle="modal">
+                <span class="fas fa-toggle-off actionButton"></span>
+              </a>
+              <a th:unless="${user.enabled}" th:href="@{'/users/' + ${user.uuid} + '/activate'}"
+                 th:title="#{tooltip_activate_user}">
+                <span class="fas fa-toggle-on actionButton"></span>
+              </a>
+            </td>
+            </tr>
+            </tbody>
+          </table>
+
+          <div th:replace="fragments/pagination-navigation :: pagination-bootstrap4"></div>
         </div>
       </div>
     </section>

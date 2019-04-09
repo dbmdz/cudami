@@ -10,46 +10,60 @@
   <body>
     <section layout:fragment="content">
 
-      <div class="row mainContent">
-        <form th:object="${user}" th:action="@{#}" method="post" role="form" class="form-horizontal">
-          <div th:replace="fragments/feedback-messages :: form"></div>
-
-          <div id="sidebar" class="col-sm-3">
-            <button class="btn btn-primary btn-block" type="submit" th:text="#{save}">save</button>
+      <form th:object="${user}" th:action="@{#}" method="post" role="form">
+        <div class="row">
+          <div class="col-sm-6">
+            <h1 th:text="#{user_create}">Create a new user</h1>
           </div>
-
-          <div class="col-sm-9">
-            <div th:if="*{uuid}" class="row">
-              <div class="col-sm-3"><label class="pull-right" th:text="#{id}">ID</label></div>
-              <div class="col-sm-9"><span th:text="*{uuid}">23</span></div>
+          <div class="col-sm-6">
+            <div class="float-right">
+              <button class="btn btn-primary" type="submit" th:text="#{save}">save</button>
             </div>
+          </div>
+        </div>
 
+        <div class="row">
+          <div class="col-sm-12">
+            <hr/>
+          </div>
+        </div>
+
+        <div class="row">
+          <div th:replace="fragments/feedback-messages :: form-bootstrap4"></div>
+
+          <div  class="col-sm-12">
             <div class="form-group">
-              <label for="email" class="col-sm-3 control-label" th:text="#{username}">Username / Email</label>
-              <div class="col-sm-9" th:classappend="${#fields.hasErrors('email')}? has-error">
+              <label for="email" th:text="#{username}">Username / Email</label>
+              <div th:classappend="${#fields.hasErrors('email')}? has-error">
                 <input id="email" th:field="*{email}" type="text" class="form-control" th:placeholder="#{username}" autofocus="autofocus"/>
                 <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}">...</p>
               </div>
             </div>
 
-            <div class="form-group">
-              <label for="name" class="col-sm-3 control-label" th:text="|#{lastname}, #{firstname}">Lastname, Firstname</label>
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="lastname" th:text="#{lastname}">Lastname</label>
 
-              <div class="col-sm-5" th:classappend="${#fields.hasErrors('lastname')}? has-error">
-                <input id="name" th:field="*{lastname}" type="text" class="form-control" th:placeholder="#{lastname}"/>
-                <p th:if="${#fields.hasErrors('lastname')}" th:errors="*{lastname}">...</p>
+                <div th:classappend="${#fields.hasErrors('lastname')}? has-error">
+                  <input id="lastname" th:field="*{lastname}" type="text" class="form-control" th:placeholder="#{lastname}"/>
+                  <p th:if="${#fields.hasErrors('lastname')}" th:errors="*{lastname}">...</p>
+                </div>
               </div>
-              <div class="col-sm-4" th:classappend="${#fields.hasErrors('firstname')}? has-error">
-                <input th:field="*{firstname}" type="text" class="form-control" th:placeholder="#{firstname}"/>
-                <p th:if="${#fields.hasErrors('firstname')}" th:errors="*{firstname}">...</p>
+              <div class="form-group col-md-6">
+                <label for="firstname" th:text="#{firstname}">Firstname</label>
+
+                <div th:classappend="${#fields.hasErrors('firstname')}? has-error">
+                  <input id="firstname" th:field="*{firstname}" type="text" class="form-control" th:placeholder="#{firstname}"/>
+                  <p th:if="${#fields.hasErrors('firstname')}" th:errors="*{firstname}">...</p>
+                </div>
               </div>
             </div>
 
             <th:block th:unless="${createAdmin}">
               <div class="form-group">
-                <label for="role" class="col-sm-3 control-label" th:text="#{roles}">Role(s)</label>
+                <label for="role" th:text="#{roles}">Role(s)</label>
 
-                <div class="col-sm-5 col-md-4" th:classappend="${#fields.hasErrors('roles')}? has-error">
+                <div th:classappend="${#fields.hasErrors('roles')}? has-error">
                   <ul class="checkbox-list">
                     <li th:each="userRole : ${allRoles}">
                       <input type="checkbox" th:field="*{roles}" th:value="${userRole}" />
@@ -60,13 +74,11 @@
                 </div>
               </div>
               <div class="form-group">
-                <div class="col-sm-3"><label class="control-label pull-right" th:text="#{status}">Status</label></div>
-                <div class="col-sm-9">
-                  <div class="checkbox" th:classappend="${#fields.hasErrors('enabled')}? has-error">
-                    <label>
-                      <input th:field="*{enabled}" type="checkbox"/> <th:block th:text="#{active}">active</th:block>
-                    </label>
-                  </div>
+                <label th:text="#{status}">Status</label>
+                <div class="form-check" th:classappend="${#fields.hasErrors('enabled')}? has-error">
+                  <label>
+                    <input th:field="*{enabled}" type="checkbox"/> <th:block th:text="#{active}">active</th:block>
+                  </label>
                 </div>
               </div>
 
@@ -79,23 +91,19 @@
             <input style="display:none" type="text" name="fakeusernameremembered"/>
             <input style="display:none" type="password" name="fakepasswordremembered"/>
 
-            <div class="form-group">
-              <label for="pwd1" class="col-sm-3 control-label" th:text="#{new_password}">New password</label>
-
-              <div class="col-sm-5 col-md-4">
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="pwd1" th:text="#{new_password}">New password</label>
                 <input id="pwd1" name="pwd1" type="password" class="form-control" autocomplete="off"/>
               </div>
-            </div>
-            <div class="form-group">
-              <label for="pwd2" class="col-sm-3 control-label" th:text="#{verify_password}">Verify password</label>
-
-              <div class="col-sm-5 col-md-4">
+              <div class="form-group col-md-6">
+                <label for="pwd2" th:text="#{verify_password}">Verify password</label>
                 <input id="pwd2" name="pwd2" type="password" class="form-control" autocomplete="off"/>
               </div>
             </div>
           </div>
-        </form>
-      </div>
+        </div>
+      </form>
     </section>
 
   <th:block layout:fragment="beforeBodyEnds">

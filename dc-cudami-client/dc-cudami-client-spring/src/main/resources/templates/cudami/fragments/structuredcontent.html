@@ -122,13 +122,9 @@
     <th:block th:if="${block.marks}">
       <th:block th:each="mark, iter : ${block.marks}">
         <th:block th:if="${mark.type} == 'link'">
-          <th:block th:utext="'<a '"></th:block>
+          <th:block th:utext="'<a'"></th:block>
           <th:block th:each="attribute, iter : ${mark.attributes.entrySet()}">
-            <th:block th:text="${attribute.key} + '='"></th:block>
-            "
-            <th:block th:text="${attribute.value}"></th:block>
-            "
-          </th:block>
+            <th:block th:text=" ${attribute.key} + '='"></th:block>"<th:block th:text="${attribute.value}"></th:block>"</th:block>
           <th:block th:utext="'>'"></th:block>
         </th:block>
         <th:block th:unless="${mark.type} == 'link'" th:utext="'<' + ${mark.type} + '>'"></th:block>

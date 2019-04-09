@@ -11,12 +11,13 @@
     <section layout:fragment="content" th:object="${contentNode}">
 
       <div class="row">
-        <div class="col-sm-9">
-          <b th:text="#{content_node}">Content node</b>
+        <div class="col-sm-6">
+          <h1 th:text="#{content_node}">Content node</h1>
         </div>
-        <div class="col-sm-3">
-          <a class="btn btn-default btn-block"
-             th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
+        <div class="col-sm-6">
+          <div class="float-right">
+            <a class="btn btn-secondary" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
+          </div>
         </div>
       </div>
 
@@ -26,7 +27,7 @@
         </div>
       </div>
 
-      <div class="row main-content">
+      <div class="row">
         <div class="col-sm-12">
           <div class="container-fluid rows-striped">
             <div class="row">
@@ -39,26 +40,37 @@
 
       <div class="row main-content">
         <div class="col-sm-12">
-          <ul class="nav nav-tabs">
-            <li th:each="locale,iter : ${availableLocales}" th:classappend="${iter.index} == 0 ? active">
-              <a th:href="${'#' + locale}" data-toggle="tab" th:text="${locale.getDisplayName(#locale)}">locale</a>
+          <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item" th:each="locale,iter : ${availableLocales}">
+              <a class="nav-link" th:classappend="${iter.index} == 0 ? active" th:href="${'#' + locale}" data-toggle="tab" th:text="${locale.getDisplayName(#locale)}" role="tab">locale</a>
             </li>
           </ul>
           <div class="tab-content">
-            <div th:each="locale,iter : ${availableLocales}" class="tab-pane" th:id="${locale}" th:classappend="${iter.index} == 0 ? active">
-              <div th:replace="fragments/identifiable::renderTeaser(${contentNode}, ${locale})"></div>
+            <div th:each="locale,iter : ${availableLocales}" th:id="${locale}" class="tab-pane" th:classappend="${iter.index} == 0 ? active">
+              <div class="card">
+                <div class="card-body bg-light">
+                  <div th:replace="fragments/identifiable::renderTeaser(${contentNode}, ${locale})"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <div class="row main-content">
+        <div class="col-sm-6">
+          <h2 th:text="#{sub_content_nodes}">Sub content nodes</h2>
+        </div>
+        <div class="col-sm-6">
+          <div class="float-right">
+            <a class="btn btn-secondary new-button" th:href="@{/contentnodes/new(parentType=contentNode, parentUuid=*{uuid})}" th:text="#{btn_new}">New</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
         <div class="col-sm-12">
-          <h3>
-            <span th:text="#{sub_content_nodes}">sub content nodes</span>
-            <a class="btn btn-default pull-right new-button" th:href="@{/contentnodes/new(parentType=contentNode, parentUuid=*{uuid})}" th:text="#{btn_new}">New</a>
-          </h3>
-          <table class="table table-bordered table-condensed table-striped table-hover table-responsive">
+          <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
             <thead>
               <tr>
                 <th class="center" th:text="#{label}">Label</th>
@@ -81,13 +93,19 @@
       </div>
 
       <div class="row main-content">
-        <div class="col-sm-12">
-          <h3>
-            <span th:text="#{linked_data}">Linked Data</span>
+        <div class="col-sm-6">
+          <h2 th:text="#{linked_data}">Linked Data</h2>
+        </div>
+        <div class="col-sm-6">
+          <div class="float-right">
+            <button type="button" class="btn btn-secondary new-button" data-toggle="modal" data-target="#select-item-dialog" th:text="#{add}">Add</button>
+          </div>
+        </div>
+      </div>
 
-            <button type="button" class="btn btn-default pull-right new-button" data-toggle="modal" data-target="#select-item-dialog" th:text="#{add}">Add</button>
-          </h3>
-          <table class="table table-bordered table-condensed table-striped table-hover table-responsive">
+      <div class="row">
+        <div class="col-sm-12">
+          <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
             <thead>
               <tr>
                 <th class="center" th:text="#{label}">Label</th>

@@ -19,7 +19,7 @@
             </div>
             <div class="modal-footer">
               <a class="btn btn-danger" id="confirm" th:text="#{btn_yes}">Yes</a>
-              <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{btn_no}">No</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal" th:text="#{btn_no}">No</button>
             </div>
           </div>
         </div>
@@ -107,11 +107,11 @@
               <div class="row">
                 <div class="col-md-9" th:text="#{selected_item}">Selected item</div>
                 <div class="col-md-3">
-                  <button class="btn btn-primary pull-right" id="add-item" type="submit" th:text="#{ok}">Ok</a>
+                  <button class="btn btn-primary float-right" id="add-item" type="submit" th:text="#{ok}">Ok</a>
                 </div>
               </div>
               
-              <div class="col-md-12 well" id="selected-item" style="margin-top: 10px;">...</div>
+              <div class="col-md-12 card-body" id="selected-item" style="margin-top: 10px;">...</div>
 
               <div class="row">
                 <div class="col-md-12 ui-widget ui-front">

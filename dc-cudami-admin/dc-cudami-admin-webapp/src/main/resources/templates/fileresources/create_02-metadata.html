@@ -5,7 +5,7 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:text="|#{fileresources}: #{fileresources_create}|">Files: Upload a new file</title>
+    <title th:text="|#{fileresources}: #{fileresources_edit(${fileresource.filename})}|">Files: Edit file</title>
     <link rel=stylesheet th:href="@{/css/thirdparty/prosemirror.css}" />
   </head>
   <body>
@@ -14,67 +14,58 @@
         <input type="hidden" id="label" th:field="*{label}" />
         <input type="hidden" id="description" class="content" th:field="*{description}" />
 
-        <div class="row mainContent">
-          <div th:replace="fragments/feedback-messages :: form"></div>
-
-          <div class="col-sm-8">
-            <b th:text="#{fileresources_create}">...</b>
+        <div class="row">
+          <div class="col-sm-6">
+            <h1 th:text="|#{fileresources}: #{fileresources_edit(${fileresource.filename})}|">Files: Edit file "abc"</h1>
           </div>
-          <div class="col-sm-4">
-            <span class="col-sm-6">
+          <div class="col-sm-6">
+            <div class="float-right">
               <!-- TODO: on abort delete uploaded binary and database entry for cleanup, check on delete if license is null (so method can not be misused for deleting resources! -->
-              <a class="btn btn-default btn-block" type="button" th:href="@{/fileresources/delete/*{uuid}}" th:text="#{abort}">abort</a>
-            </span>
-            <span class="col-sm-6">
-              <button class="btn btn-primary btn-block" type="submit" th:text="#{next}">
-                next
-              </button>
-            </span>
+              <a class="btn btn-secondary" type="button" th:href="@{/fileresources/delete/*{uuid}}" th:text="#{abort}">abort</a>
+              <button class="btn btn-primary" type="submit" th:text="#{save}">save</button>
+            </div>
           </div>
         </div>
 
-        <div class="row mainContent">
+        <div class="row">
           <div class="col-sm-12">
             <hr/>
           </div>
         </div>
 
-        <div class="row mainContent">
-          <div class="form-group col-sm-12">
-            <span class="col-sm-6">
-              <label for="id" class="col-sm-1 control-label" th:text="#{id}">ID</label>
-              <div class="col-sm-9">
-                <input id="id" th:field="*{uuid}" type="text" class="form-control" readonly="readonly" th:placeholder="*{uuid}"/>
-              </div>
-            </span>
-          </div>
-        </div>
+        <div class="row">
+          <div th:replace="fragments/feedback-messages :: form-bootstrap4"></div>
 
-        <div class="row mainContent">
           <div class="col-sm-12">
-            <ul class="nav nav-tabs" id="locale-tabs">
-              <li class="locale-switcher" th:each="translation,iter : *{label.translations}" th:classappend="${iter.index} == 0 ? active">
-                <a href="#" th:attr="data-locale=${translation.locale}" th:text="${translation.locale.getDisplayName(#locale)}">locale</a>
+            <div th:if="*{uuid}" class="form-group">
+              <label th:text="#{id}">ID</label>
+              <div class="form-control" readonly th:text="*{uuid}">23</div>
+            </div>
+
+            <ul class="nav nav-tabs" id="locale-tabs" role="tablist">
+              <li class="nav-item locale-switcher" th:each="translation,iter : *{label.translations}">
+                <a class="nav-link" th:classappend="${iter.index} == 0 ? active" href="#" th:attr="data-locale=${translation.locale}" th:text="${translation.locale.getDisplayName(#locale)}" role="tab">locale</a>
               </li>
-              <li id="locale-adder">
-                <a href="#">
+              <li class="nav-item" id="locale-adder">
+                <a class="nav-link" href="#" role="tab">
                   <i class="fas fa-plus" aria-hidden="true"></i>
                 </a>
               </li>
             </ul>
 
             <div class="tab-content">
-              <div class="active tab-pane">
-                <!-- identifiable fields -->
-                <div class="well">
-                  <div class="form-group">
-                    <label th:text="#{label}">label</label>
-                    <input class="form-control label-editor" type="text"/>
-                  </div>
+              <div  class="tab-pane active">
+                <div class="card">
+                  <div class="card-body bg-light">
+                    <div class="form-group">
+                      <label th:text="#{label}">label</label>
+                      <input class="form-control label-editor" type="text"/>
+                    </div>
 
-                  <div class="form-group">
-                    <label th:text="#{description}">description</label>
-                    <div class="editor" th:attr="data-content-id='description'"></div>
+                    <div class="form-group">
+                      <label th:text="#{description}">description</label>
+                      <div class="editor" th:attr="data-content-id='description'"></div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -87,13 +78,6 @@
   <th:block layout:fragment="beforeBodyEnds">
     <script th:src="@{/js/thirdparty/prosemirror.js}"></script>
     <script th:src="@{/js/prosemirror-basic.js}"></script>
-    <script th:src="@{/js/thirdparty/bootstrap-filestyle.min.js}" type="text/javascript"></script>
-    <script>
-      $('#file_info').filestyle({
-        buttonName: 'btn-info'
-//        buttonText: ' Select a File'
-      });
-    </script>
     <div th:replace="fragments/modals :: addLanguageDialog"></div>
     <div th:replace="fragments/modals :: confirmYesNoDialog"></div>
     <div th:replace="fragments/modals :: formValidationDialog"></div>

@@ -10,34 +10,29 @@
   </head>
   <body>
     <section layout:fragment="content">
-      Schritt 1: Datei hochladen
-
       <form id="editor-form" th:action="@{/fileresources/new/upload?__${_csrf.parameterName}__=__${_csrf.token}__}" method="post" enctype="multipart/form-data" role="form">
-        <div class="row mainContent">
-          <!--<div th:replace="fragments/feedback-messages :: form"></div>-->
 
-          <div class="col-sm-8">
-            <b th:text="#{fileresources_create}">...</b>
+        <div class="row">
+          <div class="col-sm-6">
+            <h1 th:text="|#{fileresources}: #{fileresources_create}|">Files: Upload a new file</h1>
           </div>
-          <div class="col-sm-4">
-            <span class="col-sm-6">
-              <a class="btn btn-default btn-block" type="button" th:href="@{/fileresources}" th:text="#{abort}">abort</a>
-            </span>
-            <span class="col-sm-6">
-              <button id="uploadButton" class="btn btn-primary btn-block" type="submit" th:text="#{next}">
-                next
-              </button>
-            </span>
+          <div class="col-sm-6">
+            <div class="float-right">
+              <a class="btn btn-secondary" type="button" th:href="@{/fileresources}" th:text="#{abort}">abort</a>
+              <button id="uploadButton" class="btn btn-primary" type="submit" th:text="#{next}">next</button>
+            </div>
           </div>
         </div>
 
-        <div class="row mainContent">
+        <div class="row">
           <div class="col-sm-12">
             <hr/>
           </div>
         </div>
 
         <div class="row mainContent">
+          <!--<div th:replace="fragments/feedback-messages :: form-bootstrap4"></div>-->
+
           <div class="col-sm-12">
             <div id="progressBar" class="progress">
               <div id="bar" class="progress-bar progress-bar-striped" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
@@ -53,7 +48,6 @@
               <output id="selectedFiles"></output>
             </div>
           </div>
-
         </div>
       </form>
     </section>

@@ -8,41 +8,54 @@
     <title th:text="|#{users}: #{user} ${user.email}|">Users: user admin@unknown.org</title>
   </head>
   <body>
-    <section layout:fragment="content">
+    <section layout:fragment="content" th:object="${user}">
 
-      <div class="row mainContent">
-        <div id="sidebar" class="col-sm-3">
-          <a class="btn btn-default btn-block"
-             th:href="@{/users}"
-             th:text="#{back}">
-            back
-          </a>
-          <a class="btn btn-default btn-block"
-             th:href="@{${user.uuid} + '/edit'}"
-             th:text="#{edit}">
-            edit
-          </a>
-          <a class="btn btn-danger btn-block"
-             th:if="${user.enabled}" href="#"
-             th:title="#{tooltip_deactivate_user}"
-             th:text="#{btn_deactivate_user}"
-             data:href="@{${user.uuid} + '/deactivate'}"
-             data:message="#{msg.confirm_user_deactivation(${user.email})}"
-             data:title="#{title_warning}"
-             data-target="#confirmYesNoDialog"
-             data-toggle="modal">
-            deactivate user
-          </a>
-          <a class="btn btn-success btn-block"
-             th:unless="${user.enabled}"
-             th:href="@{${user.uuid} + '/activate'}"
-             th:title="#{tooltip_activate_user}"
-             th:text="#{btn_activate_user}">
-            activate user
-          </a>
+      <div class="row">
+        <div class="col-sm-8">
+          <h1 th:text="|#{username}: *{email}|">Username / Email: email@email.de</h1>
         </div>
+        <div class="col-sm-4">
+          <div class="float-right">
+            <a class="btn btn-secondary"
+               th:href="@{/users}"
+               th:text="#{back}">
+              back
+            </a>
+            <a class="btn btn-secondary"
+               th:href="@{*{uuid} + '/edit'}"
+               th:text="#{edit}">
+              edit
+            </a>
+            <a class="btn btn-danger"
+               th:if="*{enabled}" href="#"
+               th:title="#{tooltip_deactivate_user}"
+               th:text="#{btn_deactivate_user}"
+               data:href="@{*{uuid} + '/deactivate'}"
+               data:message="#{msg.confirm_user_deactivation(*{email})}"
+               data:title="#{title_warning}"
+               data-target="#confirmYesNoDialog"
+               data-toggle="modal">
+              deactivate user
+            </a>
+            <a class="btn btn-success"
+               th:unless="*{enabled}"
+               th:href="@{*{uuid} + '/activate'}"
+               th:title="#{tooltip_activate_user}"
+               th:text="#{btn_activate_user}">
+              activate user
+            </a>
+          </div>
+        </div>
+      </div>
 
-        <div class="col-sm-9" th:object="${user}">
+      <div class="row">
+        <div class="col-sm-12">
+          <hr/>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-sm-12">
           <div class="container-fluid rows-striped">
             <div class="row">
               <div class="col-md-3"><label th:text="#{id}">UUID</label></div>

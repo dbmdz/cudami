@@ -10,6 +10,31 @@ a[href^="http"]:not(.no-external):after {
   padding-left: 3px;
 }
 
+body {
+  min-height: 75rem;
+  padding-top: 4.5rem;
+}
+
+.card {
+  margin-top: 10px;
+  /*max-width: 250px;*/
+  min-width: 150px;
+}
+
+.card .icon {
+  color: #06b0ef;
+  font-size: 65px;
+}
+
+.card .card-footer {
+  border: 0px;
+  background-color: transparent;
+}
+
+h3 {
+  margin-top: 10px;
+}
+
 .ProseMirror-menubar {
   border-top-left-radius: inherit;
   border-top-right-radius: inherit;
@@ -33,12 +58,8 @@ a[href^="http"]:not(.no-external):after {
   padding: 5px 15px;
 }
 
-.btn .innerContent span {
-  white-space: normal;
-}
-
 .btn.disabled, .btn[disabled], fieldset[disabled] .btn {
-    opacity: 0.25;
+  opacity: 0.25;
 }
 
 h1 a.btn {
@@ -48,7 +69,7 @@ label, .control-label {
   font-size: inherit;
   font-weight: bold;
 }
-.navbar li a {
+.navbar-light .navbar-nav .nav-link {
   -webkit-transition: all .2s ease-out;
   -moz-transition: all .2s ease-out;
   -o-transition: all .2s ease-out;
@@ -87,7 +108,7 @@ table .actionButton:hover {
   background-color: white;
 }
 
-.main-content + .main-content {
+.main-content {
   margin-top: 20px;
 }
 
@@ -96,10 +117,6 @@ table .actionButton:hover {
   border-bottom: solid 1px #ccc;
   padding: 10px;
   border-right: solid 1px #ccc;
-}
-.well {
-  background-color: #fbf9eb;
-  border: solid 1px #ccc;
 }
 
 div.editor {
@@ -110,50 +127,6 @@ div.editor {
   margin-bottom: 3px;
 }
 
-.outerContent{
-  float: left;
-  position: relative;
-}
-.innerContent{
-  position: absolute;
-  left: 3px;
-  right:3px;
-  top: 3px;
-  bottom: 3px;
-  border: 1px solid #d3d3d3;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center center;
-  padding: 10px;
-  padding-top: 20px;
-  text-align: center;
-}
-.innerContent .icon {
-  height: 75%;
-}
-.innerContent i {
-  color: #06b0ef;
-  font-size: 75px;
-}
-@media(max-width:767px){
-  .outerContent{
-    padding-bottom: 33.33%;
-  }
-}
-@media(min-width:768px){
-  .outerContent{
-    padding-bottom: 25%;
-  }
-}
-@media(min-width:992px){
-  .outerContent{
-    padding-bottom: 14.66%;
-  }
-}
-.innerContent:hover{
-  border-color: #4863a0;
-  transition: 0.4s;
-}
 iframe.editable {
   border: 5px dashed;
 }
