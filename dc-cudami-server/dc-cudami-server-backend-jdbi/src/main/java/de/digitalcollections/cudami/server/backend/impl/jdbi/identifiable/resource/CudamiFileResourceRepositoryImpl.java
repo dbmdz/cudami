@@ -45,12 +45,13 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
 
   @Override
   public PageResponse<FileResource> find(PageRequest pageRequest) {
-    StringBuilder query = new StringBuilder("SELECT f.filename as filename, f.mimetype as mimeType, f.size_in_bytes as sizeInBytes, f.uri as uri, i.uuid as uuid, i.label as label, i.description as description, i.created as created, i.last_modified as lastModified")
+    StringBuilder query = new StringBuilder("SELECT f.filename as filename, f.mimetype as mimeType, f.size_in_bytes as sizeInBytes, f.uri as uri,")
+        .append(" i.uuid as uuid, i.label as label, i.description as description, i.created as created, i.last_modified as lastModified")
         .append(" FROM fileresources f INNER JOIN identifiables i ON f.uuid=i.uuid");
 
     addPageRequestParams(pageRequest, query);
     List<? extends FileResource> result = dbi.withHandle(h -> h.createQuery(query.toString())
-//        .mapToBean(FileResourceImpl.class)
+        //        .mapToBean(FileResourceImpl.class)
         .map(new FileResourceMapper())
         .list());
     long total = count();
@@ -60,13 +61,14 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
 
   @Override
   public FileResource findOne(UUID uuid) {
-    String query = "SELECT f.filename as filename, f.mimetype as mimeType, f.size_in_bytes as sizeInBytes, f.uri as uri, i.uuid as uuid, i.label as label, i.description as description, i.created as created, i.last_modified as lastModified"
-                   + " FROM fileresources f INNER JOIN identifiables i ON f.uuid=i.uuid"
-                   + " WHERE f.uuid = :uuid";
+    StringBuilder query = new StringBuilder("SELECT f.filename as filename, f.mimetype as mimeType, f.size_in_bytes as sizeInBytes, f.uri as uri,")
+        .append(" i.uuid as uuid, i.label as label, i.description as description, i.created as created, i.last_modified as lastModified")
+        .append(" FROM fileresources f INNER JOIN identifiables i ON f.uuid=i.uuid")
+        .append(" WHERE f.uuid = :uuid");
 
-    List<? extends FileResource> list = dbi.withHandle(h -> h.createQuery(query)
+    List<? extends FileResource> list = dbi.withHandle(h -> h.createQuery(query.toString())
         .bind("uuid", uuid)
-//        .mapToBean(FileResourceImpl.class)
+        //        .mapToBean(FileResourceImpl.class)
         .map(new FileResourceMapper())
         .list());
     if (list.isEmpty()) {
