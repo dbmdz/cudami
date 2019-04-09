@@ -10,48 +10,52 @@
   </head>
   <body>
     <section layout:fragment="content">
-      <h1><span th:text="#{websites}">Websites</span> <a class="btn btn-secondary float-right" th:href="@{/websites/new}" th:text="#{btn_new}">New</a></h1>
 
       <div class="row">
-        <div class="col-sm-12">
-          <div th:replace="fragments/pagination-navigation :: pagination-bootstrap4">
-            ...
+        <div class="col-sm-6">
+          <h1 th:text="#{websites}">Websites</h1>
+        </div>
+        <div class="col-sm-6">
+          <div class="float-right">
+            <a class="btn btn-secondary" th:href="@{/websites/new}" th:text="#{btn_new}">New</a>
           </div>
-          <!--          <div class="objectCounter lighter float-right">
-                      <span class="message" th:text="${page.totalItems}">Found 17 books.</span>
-                    </div>-->
         </div>
       </div>
 
-      <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
-        <thead>
-          <tr sd:page-object="${page.page}">
-            <th class="center" th:text="#{label}">Label</th>
-            <th class="center"><a class="sorted" sd:pagination-sort="url" th:text="#{url}">Url</a></th>
-            <!--<th class="center" th:text="#{registration_date}">Registration Date</th>-->
-            <th class="center" th:text="#{actions}">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr th:each="website: ${page.content}">
-            <td>
-              <a th:href="@{'/websites/' + ${website.uuid}}" th:if="${website.label}" th:text="${website.label.getText(defaultLocale)}">bavarikon</a>
-            </td>
-            <td><a th:href="${website.url}" th:text="${website.url}" target="_blank">http://www.bavarikon.de/</a></td>
-            <!--<td><a th:href="@{'/websites/' + ${website.uuid}}" th:text="${website.registrationDate}">23.01.1999</a></td>-->
-            <td class="center">
-              <a th:href="@{'/websites/' + ${website.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
-              <a th:href="@{'/websites/' + ${website.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="row">
+        <div class="col-sm-12">
+          <hr/>
+        </div>
+      </div>
 
       <div class="row">
-        <div class="col-sm-12" >
-          <div th:replace="fragments/pagination-navigation :: pagination-bootstrap4">
-            ...
-          </div>
+        <div class="col-sm-12">
+          <div th:replace="fragments/pagination-navigation :: pagination-bootstrap4"></div>
+
+          <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
+            <thead>
+              <tr sd:page-object="${page.page}">
+                <th class="center" th:text="#{label}">Label</th>
+                <th class="center"><a class="sorted" sd:pagination-sort="url" th:text="#{url}">Url</a></th>
+                <!--<th class="center" th:text="#{registration_date}">Registration Date</th>-->
+                <th class="center" th:text="#{actions}">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="website: ${page.content}">
+                <td>
+                  <a th:href="@{'/websites/' + ${website.uuid}}" th:if="${website.label}" th:text="${website.label.getText(defaultLocale)}">bavarikon</a>
+                </td>
+                <td><a th:href="${website.url}" th:text="${website.url}" target="_blank">http://www.bavarikon.de/</a></td>
+                <!--<td><a th:href="@{'/websites/' + ${website.uuid}}" th:text="${website.registrationDate}">23.01.1999</a></td>-->
+                <td class="center">
+                  <a th:href="@{'/websites/' + ${website.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
+                  <a th:href="@{'/websites/' + ${website.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div th:replace="fragments/pagination-navigation :: pagination-bootstrap4"></div>
         </div>
       </div>
     </section>

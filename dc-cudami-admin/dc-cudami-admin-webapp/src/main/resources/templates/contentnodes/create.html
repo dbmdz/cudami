@@ -37,28 +37,30 @@
           <div th:replace="fragments/feedback-messages :: form-bootstrap4"></div>
 
           <div class="col-sm-12">
-            <ul class="nav nav-tabs" id="locale-tabs">
+            <ul class="nav nav-tabs" id="locale-tabs" role="tablist">
               <li class="nav-item locale-switcher">
-                <a class="nav-link active" href="#" th:attr="data-locale=${defaultLocale}" th:text="${defaultLocale.getDisplayName(#locale)}">default locale</a>
+                <a class="nav-link active" href="#" th:attr="data-locale=${defaultLocale}" th:text="${defaultLocale.getDisplayName(#locale)}" role="tab">default locale</a>
               </li>
               <li class="nav-item" id="locale-adder">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="#" role="tab">
                   <i class="fas fa-plus" aria-hidden="true"></i>
                 </a>
               </li>
             </ul>
 
             <div class="tab-content">
-              <div class="card">
-                <div class="card-body bg-light">
-                  <div class="form-group">
-                    <label th:text="#{label}">label</label>
-                    <input class="form-control label-editor" type="text"/>
-                  </div>
+              <div  class="tab-pane active">
+                <div class="card">
+                  <div class="card-body bg-light">
+                    <div class="form-group">
+                      <label th:text="#{label}">label</label>
+                      <input class="form-control label-editor" type="text"/>
+                    </div>
 
-                  <div class="form-group">
-                    <label th:text="#{description}">description</label>
-                    <div class="editor" th:attr="data-content-id='description'"></div>
+                    <div class="form-group">
+                      <label th:text="#{description}">description</label>
+                      <div class="editor" th:attr="data-content-id='description'"></div>
+                    </div>
                   </div>
                 </div>
               </div>
