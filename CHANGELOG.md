@@ -4,11 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [3.1.2-SNAPSHOT]
 
 ### Added
 
+- Add Digital object management
 - CHANGELOG.md
+
+### Changed
+
+- Migrate from Bootstrap 3 to Bootstrap 4
 
 ## [3.1.1](https://github.com/dbmdz/cudami/releases/tag/3.1.1) - 2019-01-23
 
