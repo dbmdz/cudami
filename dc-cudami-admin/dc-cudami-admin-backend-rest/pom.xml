@@ -12,11 +12,16 @@
   <name>DigitalCollections: cudami Admin (Backend IMPL REST)</name>
   <artifactId>dc-cudami-admin-backend-rest</artifactId>
   <packaging>jar</packaging>
+  
+  <properties>
+    <version.dc-commons-feign>4.0.1</version.dc-commons-feign>
+  </properties>
 
   <dependencies>
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-feign</artifactId>
+      <version>${version.dc-commons-feign}</version>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
