@@ -14,6 +14,10 @@
   <packaging>jar</packaging>
 
   <properties>
+    <version.dc-commons-server>4.0.1</version.dc-commons-server>
+    <version.dc-commons-springaop>4.0.1</version.dc-commons-springaop>
+    <version.dc-commons-springdata>4.0.1</version.dc-commons-springdata>
+    <version.dc-commons-springmvc>4.1.0</version.dc-commons-springmvc>
     <version.thymeleaf-spring-data-dialect>3.4.0</version.thymeleaf-spring-data-dialect>
     <version.webjar-bootstrap>4.3.1</version.webjar-bootstrap>
     <version.webjar-bootswatch>4.2.1</version.webjar-bootswatch>
@@ -33,19 +37,22 @@
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-server</artifactId>
+      <version>${version.dc-commons-server}</version>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-springaop</artifactId>
+      <version>${version.dc-commons-springaop}</version>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-springdata</artifactId>
+      <version>${version.dc-commons-springdata}</version>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-springmvc</artifactId>
-      <version>4.1.0-SNAPSHOT</version>
+      <version>${version.dc-commons-springmvc}</version>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
