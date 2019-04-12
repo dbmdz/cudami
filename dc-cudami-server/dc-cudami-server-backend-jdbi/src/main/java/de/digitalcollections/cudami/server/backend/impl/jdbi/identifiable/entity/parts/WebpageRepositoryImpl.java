@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.parts;
 
-import de.digitalcollections.cudami.server.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.WebpageRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
@@ -34,16 +33,13 @@ public class WebpageRepositoryImpl<W extends Webpage, I extends Identifiable> ex
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpageRepositoryImpl.class);
 
   private final IdentifiableRepository identifiableRepository;
-  private final LocaleRepository localeRepository;
 
   @Autowired
   public WebpageRepositoryImpl(
-    @Qualifier("identifiableRepositoryImpl") IdentifiableRepository identifiableRepository,
-    LocaleRepository localeRepository,
-    Jdbi dbi) {
+      @Qualifier("identifiableRepositoryImpl") IdentifiableRepository identifiableRepository,
+      Jdbi dbi) {
     this.dbi = dbi;
     this.identifiableRepository = identifiableRepository;
-    this.localeRepository = localeRepository;
   }
 
   @Override
@@ -56,15 +52,15 @@ public class WebpageRepositoryImpl<W extends Webpage, I extends Identifiable> ex
   @Override
   public PageResponse<W> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder()
-      .append("SELECT wp.text as text, i.uuid as uuid, i.label as label, i.description as description")
-      .append(" FROM webpages wp INNER JOIN identifiables i ON wp.uuid=i.uuid");
+        .append("SELECT wp.text as text, i.uuid as uuid, i.label as label, i.description as description")
+        .append(" FROM webpages wp INNER JOIN identifiables i ON wp.uuid=i.uuid");
 
     addPageRequestParams(pageRequest, query);
 
 //    List<Map<String, Object>> list = dbi.withHandle(h -> h.createQuery(query.toString()).mapToMap().list());
     List<WebpageImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
-      .mapToBean(WebpageImpl.class)
-      .list());
+        .mapToBean(WebpageImpl.class)
+        .list());
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
 //    PageResponse pageResponse = new PageResponseImpl(null, pageRequest, total);
@@ -74,19 +70,17 @@ public class WebpageRepositoryImpl<W extends Webpage, I extends Identifiable> ex
   @Override
   public W findOne(UUID uuid) {
     String query = "SELECT wp.text as text, i.uuid as uuid, i.label as label, i.description as description"
-      + " FROM webpages wp INNER JOIN identifiables i ON wp.uuid=i.uuid"
-      + " WHERE wp.uuid = :uuid";
+                   + " FROM webpages wp INNER JOIN identifiables i ON wp.uuid=i.uuid"
+                   + " WHERE wp.uuid = :uuid";
 
-    List<WebpageImpl> list = dbi.withHandle(h -> h.createQuery(query)
-      .bind("uuid", uuid)
-      .mapToBean(WebpageImpl.class)
-      .list());
-    if (list.isEmpty()) {
-      return null;
+    W webpage = (W) dbi.withHandle(h -> h.createQuery(query)
+        .bind("uuid", uuid)
+        .mapToBean(WebpageImpl.class)
+        .findOnly());
+    if (webpage != null) {
+      webpage.setChildren(getChildren(webpage));
+      webpage.setIdentifiables(getIdentifiables(webpage));
     }
-    W webpage = (W) list.get(0);
-    webpage.setChildren(getChildren(webpage));
-    webpage.setIdentifiables(getIdentifiables(webpage));
     return webpage;
   }
 
@@ -138,14 +132,14 @@ public class WebpageRepositoryImpl<W extends Webpage, I extends Identifiable> ex
   public List<W> getChildren(UUID uuid) {
     // minimal data required for creating text links in a list
     String query = "SELECT ww.child_webpage_uuid as uuid, i.label as label"
-      + " FROM webpages wp INNER JOIN webpage_webpage ww ON wp.uuid=ww.parent_webpage_uuid INNER JOIN identifiables i ON ww.child_webpage_uuid=i.uuid"
-      + " WHERE wp.uuid = :uuid"
-      + " ORDER BY ww.sortIndex ASC";
+                   + " FROM webpages wp INNER JOIN webpage_webpage ww ON wp.uuid=ww.parent_webpage_uuid INNER JOIN identifiables i ON ww.child_webpage_uuid=i.uuid"
+                   + " WHERE wp.uuid = :uuid"
+                   + " ORDER BY ww.sortIndex ASC";
 
     List<WebpageImpl> list = dbi.withHandle(h -> h.createQuery(query)
-      .bind("uuid", uuid)
-      .mapToBean(WebpageImpl.class)
-      .list());
+        .bind("uuid", uuid)
+        .mapToBean(WebpageImpl.class)
+        .list());
 
     if (list.isEmpty()) {
       return new ArrayList<>();
@@ -158,8 +152,8 @@ public class WebpageRepositoryImpl<W extends Webpage, I extends Identifiable> ex
     identifiableRepository.save(webpage);
 
     dbi.withHandle(h -> h.createUpdate("INSERT INTO webpages(uuid, text) VALUES (:uuid, :text::JSONB)")
-      .bindBean(webpage)
-      .execute());
+        .bindBean(webpage)
+        .execute());
 
     return findOne(webpage.getUuid());
   }
@@ -169,17 +163,17 @@ public class WebpageRepositoryImpl<W extends Webpage, I extends Identifiable> ex
     identifiableRepository.save(webpage);
 
     dbi.withHandle(h -> h.createUpdate("INSERT INTO webpages(uuid, text) VALUES (:uuid, :text::JSONB)")
-      .bindBean(webpage)
-      .execute());
+        .bindBean(webpage)
+        .execute());
 
     Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "website_webpage", "website_uuid", parentWebsiteUuid);
     dbi.withHandle(h -> h.createUpdate(
-      "INSERT INTO website_webpage(website_uuid, webpage_uuid, sortIndex)"
-      + " VALUES (:parent_website_uuid, :uuid, :sortIndex)")
-      .bind("parent_website_uuid", parentWebsiteUuid)
-      .bind("sortIndex", sortIndex)
-      .bindBean(webpage)
-      .execute());
+        "INSERT INTO website_webpage(website_uuid, webpage_uuid, sortIndex)"
+        + " VALUES (:parent_website_uuid, :uuid, :sortIndex)")
+        .bind("parent_website_uuid", parentWebsiteUuid)
+        .bind("sortIndex", sortIndex)
+        .bindBean(webpage)
+        .execute());
 
     return findOne(webpage.getUuid());
   }
@@ -189,17 +183,17 @@ public class WebpageRepositoryImpl<W extends Webpage, I extends Identifiable> ex
     identifiableRepository.save(webpage);
 
     dbi.withHandle(h -> h.createUpdate("INSERT INTO webpages(uuid, text) VALUES (:uuid, :text::JSONB)")
-      .bindBean(webpage)
-      .execute());
+        .bindBean(webpage)
+        .execute());
 
     Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "webpage_webpage", "parent_webpage_uuid", parentWebpageUuid);
     dbi.withHandle(h -> h.createUpdate(
-      "INSERT INTO webpage_webpage(parent_webpage_uuid, child_webpage_uuid, sortIndex)"
-      + " VALUES (:parent_webpage_uuid, :uuid, :sortIndex)")
-      .bind("parent_webpage_uuid", parentWebpageUuid)
-      .bind("sortIndex", sortIndex)
-      .bindBean(webpage)
-      .execute());
+        "INSERT INTO webpage_webpage(parent_webpage_uuid, child_webpage_uuid, sortIndex)"
+        + " VALUES (:parent_webpage_uuid, :uuid, :sortIndex)")
+        .bind("parent_webpage_uuid", parentWebpageUuid)
+        .bind("sortIndex", sortIndex)
+        .bindBean(webpage)
+        .execute());
 
     return findOne(webpage.getUuid());
   }
@@ -208,8 +202,8 @@ public class WebpageRepositoryImpl<W extends Webpage, I extends Identifiable> ex
   public W update(W webpage) {
     identifiableRepository.update(webpage);
     dbi.withHandle(h -> h.createUpdate("UPDATE webpages SET text=:text::JSONB WHERE uuid=:uuid")
-      .bindBean(webpage)
-      .execute());
+        .bindBean(webpage)
+        .execute());
     return findOne(webpage.getUuid());
   }
 
@@ -222,14 +216,14 @@ public class WebpageRepositoryImpl<W extends Webpage, I extends Identifiable> ex
   public List<Identifiable> getIdentifiables(UUID uuid) {
     // minimal data required for creating text links in a list
     String query = "SELECT i.uuid as uuid, i.label as label"
-      + " FROM identifiables i INNER JOIN webpage_identifiables wi ON wi.identifiable_uuid=i.uuid"
-      + " WHERE wi.webpage_uuid = :uuid"
-      + " ORDER BY wi.sortIndex ASC";
+                   + " FROM identifiables i INNER JOIN webpage_identifiables wi ON wi.identifiable_uuid=i.uuid"
+                   + " WHERE wi.webpage_uuid = :uuid"
+                   + " ORDER BY wi.sortIndex ASC";
 
     List<IdentifiableImpl> list = dbi.withHandle(h -> h.createQuery(query)
-      .bind("uuid", uuid)
-      .mapToBean(IdentifiableImpl.class)
-      .list());
+        .bind("uuid", uuid)
+        .mapToBean(IdentifiableImpl.class)
+        .list());
 
     if (list.isEmpty()) {
       return new ArrayList<>();
@@ -241,12 +235,12 @@ public class WebpageRepositoryImpl<W extends Webpage, I extends Identifiable> ex
   public void addIdentifiable(UUID webpageUuid, UUID identifiableUuid) {
     Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "webpage_identifiables", "webpage_uuid", webpageUuid);
     dbi.withHandle(h -> h.createUpdate(
-      "INSERT INTO webpage_identifiables(webpage_uuid, identifiable_uuid, sortIndex)"
-      + " VALUES (:webpage_uuid, :identifiable_uuid, :sortIndex)")
-      .bind("webpage_uuid", webpageUuid)
-      .bind("identifiable_uuid", identifiableUuid)
-      .bind("sortIndex", sortIndex)
-      .execute());
+        "INSERT INTO webpage_identifiables(webpage_uuid, identifiable_uuid, sortIndex)"
+        + " VALUES (:webpage_uuid, :identifiable_uuid, :sortIndex)")
+        .bind("webpage_uuid", webpageUuid)
+        .bind("identifiable_uuid", identifiableUuid)
+        .bind("sortIndex", sortIndex)
+        .execute());
   }
 
   @Override
@@ -258,14 +252,14 @@ public class WebpageRepositoryImpl<W extends Webpage, I extends Identifiable> ex
   @Override
   public List<Identifiable> saveIdentifiables(UUID identifiablesContainerUuid, List<Identifiable> identifiables) {
     dbi.withHandle(h -> h.createUpdate("DELETE FROM webpage_identifiables WHERE webpagee_uuid = :uuid")
-      .bind("uuid", identifiablesContainerUuid).execute());
+        .bind("uuid", identifiablesContainerUuid).execute());
 
     PreparedBatch batch = dbi.withHandle(h -> h.prepareBatch("INSERT INTO webpage_identifiables(webpage_uuid, identifiable_uuid, sortIndex) VALUES(:uuid, :identifiableUuid, :sortIndex)"));
     for (Identifiable identifiable : identifiables) {
       batch.bind("uuid", identifiablesContainerUuid)
-        .bind("identifiableUuid", identifiable.getUuid())
-        .bind("sortIndex", identifiables.indexOf(identifiable))
-        .add();
+          .bind("identifiableUuid", identifiable.getUuid())
+          .bind("sortIndex", identifiables.indexOf(identifiable))
+          .add();
     }
     batch.execute();
     return getIdentifiables(identifiablesContainerUuid);

@@ -39,8 +39,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
 
     addPageRequestParams(pageRequest, query);
     List<IdentifiableImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
-            .mapToBean(IdentifiableImpl.class)
-            .list());
+        .mapToBean(IdentifiableImpl.class)
+        .list());
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -56,10 +56,10 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
     query.append(" LIMIT :maxResults");
 
     List<IdentifiableImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
-            .bind("searchTerm", searchTerm)
-            .bind("maxResults", maxResults)
-            .mapToBean(IdentifiableImpl.class)
-            .list());
+        .bind("searchTerm", searchTerm)
+        .bind("maxResults", maxResults)
+        .mapToBean(IdentifiableImpl.class)
+        .list());
     List<I> identifiables = convertToGenericList(result);
     return identifiables;
   }
@@ -74,20 +74,17 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
 
   @Override
   public I findOne(UUID uuid) {
-    List<? extends Identifiable> list = dbi.withHandle(h -> h.createQuery(
-            "SELECT * FROM identifiables WHERE uuid = :uuid")
-            .bind("uuid", uuid)
-            .mapToBean(IdentifiableImpl.class)
-            .list());
-    if (list.isEmpty()) {
-      return null;
-    }
-    return (I) list.get(0);
+    I identifiable = (I) dbi.withHandle(h -> h.createQuery(
+        "SELECT * FROM identifiables WHERE uuid = :uuid")
+        .bind("uuid", uuid)
+        .mapToBean(IdentifiableImpl.class)
+        .findOnly());
+    return identifiable;
   }
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[]{"created", "type", "lastModified"};
+    return new String[]{"created", "type", "last_modified"};
   }
 
   @Override
@@ -96,13 +93,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
     identifiable.setCreated(LocalDateTime.now());
     identifiable.setLastModified(LocalDateTime.now());
 
-    IdentifiableImpl result = null;
-
-    result = dbi.withHandle(h -> h
-            .createQuery("INSERT INTO identifiables(created, description, identifiable_type, label, last_modified, uuid) VALUES (:created, :description::JSONB, :type, :label::JSONB, :lastModified, :uuid) RETURNING *")
-            .bindBean(identifiable)
-            .mapToBean(IdentifiableImpl.class)
-            .findOnly());
+    IdentifiableImpl result = dbi.withHandle(h -> h
+        .createQuery("INSERT INTO identifiables(created, description, identifiable_type, label, last_modified, uuid) VALUES (:created, :description::JSONB, :type, :label::JSONB, :lastModified, :uuid) RETURNING *")
+        .bindBean(identifiable)
+        .mapToBean(IdentifiableImpl.class)
+        .findOnly());
     return (I) result;
   }
 
@@ -110,24 +105,22 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
   public I update(I identifiable) {
     identifiable.setLastModified(LocalDateTime.now());
 
-    IdentifiableImpl result = null;
-
     // do not update/left out from statement: created, uuid
-    result = dbi.withHandle(h -> h
-            .createQuery("UPDATE identifiables SET description=:description::JSONB, identifiable_type=:type, label=:label::JSONB, last_modified=:lastModified WHERE uuid=:uuid RETURNING *")
-            .bindBean(identifiable)
-            .mapToBean(IdentifiableImpl.class)
-            .findOnly());
+    IdentifiableImpl result = dbi.withHandle(h -> h
+        .createQuery("UPDATE identifiables SET description=:description::JSONB, identifiable_type=:type, label=:label::JSONB, last_modified=:lastModified WHERE uuid=:uuid RETURNING *")
+        .bindBean(identifiable)
+        .mapToBean(IdentifiableImpl.class)
+        .findOnly());
     return (I) result;
   }
 
   protected Integer selectNextSortIndexForParentChildren(Jdbi dbi, String tableName, String columNameParentUuid, UUID parentUuid) {
     // first child: max gets no results (= null)):
     Integer sortIndex = dbi.withHandle((Handle h) -> h
-            .createQuery("SELECT MAX(sortIndex) + 1 FROM " + tableName + " WHERE " + columNameParentUuid + " = :parent_uuid")
-            .bind("parent_uuid", parentUuid)
-            .mapTo(Integer.class)
-            .findOnly());
+        .createQuery("SELECT MAX(sortIndex) + 1 FROM " + tableName + " WHERE " + columNameParentUuid + " = :parent_uuid")
+        .bind("parent_uuid", parentUuid)
+        .mapTo(Integer.class)
+        .findOnly());
     if (sortIndex == null) {
       sortIndex = 0;
     }

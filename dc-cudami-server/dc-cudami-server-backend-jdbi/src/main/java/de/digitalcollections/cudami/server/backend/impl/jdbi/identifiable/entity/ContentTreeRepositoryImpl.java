@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
-import de.digitalcollections.cudami.server.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ContentTreeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
@@ -28,17 +27,14 @@ public class ContentTreeRepositoryImpl<C extends ContentTree> extends EntityRepo
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentTreeRepositoryImpl.class);
 
   private final EntityRepository entityRepository;
-  private final LocaleRepository localeRepository;
 
   @Autowired
   public ContentTreeRepositoryImpl(
-          @Qualifier("identifiableRepositoryImpl") IdentifiableRepository identifiableRepository,
-          @Qualifier("entityRepositoryImpl") EntityRepository entityRepository,
-          LocaleRepository localeRepository,
-          Jdbi dbi) {
+      @Qualifier("identifiableRepositoryImpl") IdentifiableRepository identifiableRepository,
+      @Qualifier("entityRepositoryImpl") EntityRepository entityRepository,
+      Jdbi dbi) {
     super(dbi, identifiableRepository);
     this.entityRepository = entityRepository;
-    this.localeRepository = localeRepository;
   }
 
   @Override
@@ -51,13 +47,13 @@ public class ContentTreeRepositoryImpl<C extends ContentTree> extends EntityRepo
   @Override
   public PageResponse<C> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder("SELECT ct.id as id, ct.uuid as uuid, i.label as label, i.description as description")
-            .append(" FROM contenttrees ct INNER JOIN entities e ON ct.uuid=e.uuid INNER JOIN identifiables i ON ct.uuid=i.uuid");
+        .append(" FROM contenttrees ct INNER JOIN entities e ON ct.uuid=e.uuid INNER JOIN identifiables i ON ct.uuid=i.uuid");
 
     addPageRequestParams(pageRequest, query);
 
     List<ContentTreeImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
-            .mapToBean(ContentTreeImpl.class)
-            .list());
+        .mapToBean(ContentTreeImpl.class)
+        .list());
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -66,18 +62,16 @@ public class ContentTreeRepositoryImpl<C extends ContentTree> extends EntityRepo
   @Override
   public C findOne(UUID uuid) {
     String query = "SELECT ct.uuid as uuid, i.label as label, i.description as description"
-            + " FROM contenttrees ct INNER JOIN entities e ON ct.uuid=e.uuid INNER JOIN identifiables i ON ct.uuid=i.uuid"
-            + " WHERE ct.uuid = :uuid";
+                   + " FROM contenttrees ct INNER JOIN entities e ON ct.uuid=e.uuid INNER JOIN identifiables i ON ct.uuid=i.uuid"
+                   + " WHERE ct.uuid = :uuid";
 
-    List<ContentTreeImpl> list = dbi.withHandle(h -> h.createQuery(query)
-            .bind("uuid", uuid)
-            .mapToBean(ContentTreeImpl.class)
-            .list());
-    if (list.isEmpty()) {
-      return null;
+    C contentTree = (C) dbi.withHandle(h -> h.createQuery(query)
+        .bind("uuid", uuid)
+        .mapToBean(ContentTreeImpl.class)
+        .findOnly());
+    if (contentTree != null) {
+      contentTree.setRootNodes(getRootNodes(contentTree));
     }
-    C contentTree = (C) list.get(0);
-    contentTree.setRootNodes(getRootNodes(contentTree));
     return contentTree;
   }
 
@@ -90,8 +84,8 @@ public class ContentTreeRepositoryImpl<C extends ContentTree> extends EntityRepo
   public C save(C contentTree) {
     entityRepository.save(contentTree);
     dbi.withHandle(h -> h.createUpdate("INSERT INTO contenttrees(uuid) VALUES (:uuid)")
-            .bindBean(contentTree)
-            .execute());
+        .bindBean(contentTree)
+        .execute());
     return findOne(contentTree.getUuid());
   }
 
@@ -111,14 +105,14 @@ public class ContentTreeRepositoryImpl<C extends ContentTree> extends EntityRepo
   public List<ContentNode> getRootNodes(UUID uuid) {
     // minimal data required for creating text links in a list
     String query = "SELECT cc.contentnode_uuid as uuid, i.label as label"
-            + " FROM contenttrees ct INNER JOIN contenttree_contentnode cc ON ct.uuid=cc.contenttree_uuid INNER JOIN identifiables i ON cc.contentnode_uuid=i.uuid"
-            + " WHERE ct.uuid = :uuid"
-            + " ORDER BY cc.sortIndex ASC";
+                   + " FROM contenttrees ct INNER JOIN contenttree_contentnode cc ON ct.uuid=cc.contenttree_uuid INNER JOIN identifiables i ON cc.contentnode_uuid=i.uuid"
+                   + " WHERE ct.uuid = :uuid"
+                   + " ORDER BY cc.sortIndex ASC";
 
     List<ContentNodeImpl> list = dbi.withHandle(h -> h.createQuery(query)
-            .bind("uuid", uuid)
-            .mapToBean(ContentNodeImpl.class)
-            .list());
+        .bind("uuid", uuid)
+        .mapToBean(ContentNodeImpl.class)
+        .list());
 
     if (list.isEmpty()) {
       return new ArrayList<>();
