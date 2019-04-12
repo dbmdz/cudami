@@ -37,12 +37,12 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   @Override
   public PageResponse<E> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder("SELECT e.entity_type as entityType, e.uuid as uuid, i.label as label, i.description as description")
-            .append(" FROM entities e INNER JOIN identifiables i ON e.uuid=i.uuid");
+        .append(" FROM entities e INNER JOIN identifiables i ON e.uuid=i.uuid");
 
     addPageRequestParams(pageRequest, query);
     List<EntityImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
-            .mapToBean(EntityImpl.class)
-            .list());
+        .mapToBean(EntityImpl.class)
+        .list());
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -51,30 +51,27 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   @Override
   public E findOne(UUID uuid) {
     String query = "SELECT e.entity_type as entityType, e.uuid as uuid, i.label as label, i.description as description"
-            + " FROM entities e INNER JOIN identifiables i ON e.uuid=i.uuid"
-            + " WHERE e.uuid = :uuid";
+                   + " FROM entities e INNER JOIN identifiables i ON e.uuid=i.uuid"
+                   + " WHERE e.uuid = :uuid";
 
-    List<? extends Entity> list = dbi.withHandle(h -> h.createQuery(query)
-            .bind("uuid", uuid)
-            .mapToBean(EntityImpl.class)
-            .list());
-    if (list.isEmpty()) {
-      return null;
-    }
-    return (E) list.get(0);
+    E entity = (E) dbi.withHandle(h -> h.createQuery(query)
+        .bind("uuid", uuid)
+        .mapToBean(EntityImpl.class)
+        .findOnly());
+    return entity;
   }
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[]{"created", "entityType", "lastModified"};
+    return new String[]{"created", "entity_type", "last_modified"};
   }
 
   @Override
   public E save(E entity) {
     identifiableRepository.save(entity);
     dbi.withHandle(h -> h.createUpdate("INSERT INTO entities(entity_type, uuid) VALUES (:entityType, :uuid)")
-            .bindBean(entity)
-            .execute());
+        .bindBean(entity)
+        .execute());
     return findOne(entity.getUuid());
   }
 
@@ -83,8 +80,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     identifiableRepository.update(entity);
     // do not update/left out from statement: created, uuid
     dbi.withHandle(h -> h.createUpdate("UPDATE entities SET entity_type=:entityType WHERE uuid=:uuid")
-            .bindBean(entity)
-            .execute());
+        .bindBean(entity)
+        .execute());
     return findOne(entity.getUuid());
   }
 }

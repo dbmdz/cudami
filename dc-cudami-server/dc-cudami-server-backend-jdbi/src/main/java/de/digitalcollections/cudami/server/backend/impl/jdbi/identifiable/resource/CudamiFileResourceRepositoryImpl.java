@@ -66,15 +66,12 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
         .append(" FROM fileresources f INNER JOIN identifiables i ON f.uuid=i.uuid")
         .append(" WHERE f.uuid = :uuid");
 
-    List<? extends FileResource> list = dbi.withHandle(h -> h.createQuery(query.toString())
+    FileResource fileResource = dbi.withHandle(h -> h.createQuery(query.toString())
         .bind("uuid", uuid)
         //        .mapToBean(FileResourceImpl.class)
         .map(new FileResourceMapper())
-        .list());
-    if (list.isEmpty()) {
-      return null;
-    }
-    return (FileResource) list.get(0);
+        .findOnly());
+    return fileResource;
   }
 
   @Override

@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
-import de.digitalcollections.cudami.server.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ArticleRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
@@ -34,29 +33,26 @@ public class ArticleRepositoryImpl<A extends Article, I extends Identifiable> ex
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticleRepositoryImpl.class);
 
   private final EntityRepository entityRepository;
-  private final LocaleRepository localeRepository;
 
   @Autowired
   public ArticleRepositoryImpl(
-    @Qualifier("identifiableRepositoryImpl") IdentifiableRepository identifiableRepository,
-    @Qualifier("entityRepositoryImpl") EntityRepository entityRepository,
-    LocaleRepository localeRepository,
-    Jdbi dbi) {
+      @Qualifier("identifiableRepositoryImpl") IdentifiableRepository identifiableRepository,
+      @Qualifier("entityRepositoryImpl") EntityRepository entityRepository,
+      Jdbi dbi) {
     super(dbi, identifiableRepository);
     this.entityRepository = entityRepository;
-    this.localeRepository = localeRepository;
   }
 
   @Override
   public void addIdentifiable(UUID articleUuid, UUID identifiableUuid) {
     Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "article_identifiables", "article_uuid", articleUuid);
     dbi.withHandle(h -> h.createUpdate(
-      "INSERT INTO article_identifiables(article_uuid, identifiable_uuid, sortIndex)"
-      + " VALUES (:article_uuid, :identifiable_uuid, :sortIndex)")
-      .bind("article_uuid", articleUuid)
-      .bind("identifiable_uuid", identifiableUuid)
-      .bind("sortIndex", sortIndex)
-      .execute());
+        "INSERT INTO article_identifiables(article_uuid, identifiable_uuid, sortIndex)"
+        + " VALUES (:article_uuid, :identifiable_uuid, :sortIndex)")
+        .bind("article_uuid", articleUuid)
+        .bind("identifiable_uuid", identifiableUuid)
+        .bind("sortIndex", sortIndex)
+        .execute());
   }
 
   @Override
@@ -69,14 +65,14 @@ public class ArticleRepositoryImpl<A extends Article, I extends Identifiable> ex
   @Override
   public PageResponse<A> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder("SELECT a.uuid as uuid, a.text as text, i.label as label, i.description as description")
-      .append(" FROM articles a INNER JOIN entities e ON a.uuid=e.uuid INNER JOIN identifiables i ON a.uuid=i.uuid");
+        .append(" FROM articles a INNER JOIN entities e ON a.uuid=e.uuid INNER JOIN identifiables i ON a.uuid=i.uuid");
 
     addPageRequestParams(pageRequest, query);
 
 //    List<Map<String, Object>> list = dbi.withHandle(h -> h.createQuery(query.toString()).mapToMap().list());
     List<ArticleImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
-      .mapToBean(ArticleImpl.class)
-      .list());
+        .mapToBean(ArticleImpl.class)
+        .list());
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
 //    PageResponse pageResponse = new PageResponseImpl(null, pageRequest, total);
@@ -86,18 +82,16 @@ public class ArticleRepositoryImpl<A extends Article, I extends Identifiable> ex
   @Override
   public A findOne(UUID uuid) {
     String query = "SELECT a.uuid as uuid, a.text as text, i.label as label, i.description as description"
-      + " FROM articles a INNER JOIN entities e ON a.uuid=e.uuid INNER JOIN identifiables i ON a.uuid=i.uuid"
-      + " WHERE a.uuid = :uuid";
+                   + " FROM articles a INNER JOIN entities e ON a.uuid=e.uuid INNER JOIN identifiables i ON a.uuid=i.uuid"
+                   + " WHERE a.uuid = :uuid";
 
-    List<ArticleImpl> list = dbi.withHandle(h -> h.createQuery(query)
-      .bind("uuid", uuid)
-      .mapToBean(ArticleImpl.class)
-      .list());
-    if (list.isEmpty()) {
-      return null;
+    A article = (A) dbi.withHandle(h -> h.createQuery(query)
+        .bind("uuid", uuid)
+        .mapToBean(ArticleImpl.class)
+        .findOnly());
+    if (article != null) {
+      article.setIdentifiables(getIdentifiables(article));
     }
-    A article = (A) list.get(0);
-    article.setIdentifiables(getIdentifiables(article));
     return article;
   }
 
@@ -145,8 +139,8 @@ public class ArticleRepositoryImpl<A extends Article, I extends Identifiable> ex
     entityRepository.save(article);
 
     dbi.withHandle(h -> h.createUpdate("INSERT INTO articles(uuid, text) VALUES (:uuid, :text::JSONB)")
-      .bindBean(article)
-      .execute());
+        .bindBean(article)
+        .execute());
 
     return findOne(article.getUuid());
   }
@@ -155,8 +149,8 @@ public class ArticleRepositoryImpl<A extends Article, I extends Identifiable> ex
   public A update(A article) {
     entityRepository.update(article);
     dbi.withHandle(h -> h.createUpdate("UPDATE articles SET text=:text::JSONB WHERE uuid=:uuid")
-      .bindBean(article)
-      .execute());
+        .bindBean(article)
+        .execute());
     return findOne(article.getUuid());
   }
 
@@ -169,14 +163,14 @@ public class ArticleRepositoryImpl<A extends Article, I extends Identifiable> ex
   public List<Identifiable> getIdentifiables(UUID identifiableUuid) {
     // minimal data required for creating text links in a list
     String query = "SELECT i.uuid as uuid, i.label as label"
-      + " FROM identifiables i INNER JOIN article_identifiables ai ON ai.identifiable_uuid=i.uuid"
-      + " WHERE ai.article_uuid = :uuid"
-      + " ORDER BY ai.sortIndex ASC";
+                   + " FROM identifiables i INNER JOIN article_identifiables ai ON ai.identifiable_uuid=i.uuid"
+                   + " WHERE ai.article_uuid = :uuid"
+                   + " ORDER BY ai.sortIndex ASC";
 
     List<IdentifiableImpl> list = dbi.withHandle(h -> h.createQuery(query)
-      .bind("uuid", identifiableUuid)
-      .mapToBean(IdentifiableImpl.class)
-      .list());
+        .bind("uuid", identifiableUuid)
+        .mapToBean(IdentifiableImpl.class)
+        .list());
 
     if (list.isEmpty()) {
       return new ArrayList<>();
@@ -193,14 +187,14 @@ public class ArticleRepositoryImpl<A extends Article, I extends Identifiable> ex
   @Override
   public List<Identifiable> saveIdentifiables(UUID identifiablesContainerUuid, List<Identifiable> identifiables) {
     dbi.withHandle(h -> h.createUpdate("DELETE FROM article_identifiables WHERE article_uuid = :uuid")
-      .bind("uuid", identifiablesContainerUuid).execute());
+        .bind("uuid", identifiablesContainerUuid).execute());
 
     PreparedBatch batch = dbi.withHandle(h -> h.prepareBatch("INSERT INTO article_identifiables(article_uuid, identifiable_uuid, sortIndex) VALUES(:uuid, :identifiableUuid, :sortIndex)"));
     for (Identifiable identifiable : identifiables) {
       batch.bind("uuid", identifiablesContainerUuid)
-        .bind("identifiableUuid", identifiable.getUuid())
-        .bind("sortIndex", identifiables.indexOf(identifiable))
-        .add();
+          .bind("identifiableUuid", identifiable.getUuid())
+          .bind("sortIndex", identifiables.indexOf(identifiable))
+          .add();
     }
     batch.execute();
     return getIdentifiables(identifiablesContainerUuid);

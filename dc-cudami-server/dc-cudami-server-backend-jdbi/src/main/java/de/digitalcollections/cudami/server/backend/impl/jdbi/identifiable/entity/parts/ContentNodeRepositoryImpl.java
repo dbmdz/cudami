@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.parts;
 
-import de.digitalcollections.cudami.server.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.ContentNodeRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
@@ -33,16 +32,13 @@ public class ContentNodeRepositoryImpl<C extends ContentNode, I extends Identifi
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentNodeRepositoryImpl.class);
 
   private final IdentifiableRepository identifiableRepository;
-  private final LocaleRepository localeRepository;
 
   @Autowired
   public ContentNodeRepositoryImpl(
       @Qualifier("identifiableRepositoryImpl") IdentifiableRepository identifiableRepository,
-      LocaleRepository localeRepository,
       Jdbi dbi) {
     this.dbi = dbi;
     this.identifiableRepository = identifiableRepository;
-    this.localeRepository = localeRepository;
   }
 
   @Override
@@ -77,16 +73,14 @@ public class ContentNodeRepositoryImpl<C extends ContentNode, I extends Identifi
         .append(" FROM contentnodes cn INNER JOIN identifiables i ON cn.uuid=i.uuid")
         .append(" WHERE cn.uuid = :uuid");
 
-    List<ContentNodeImpl> list = dbi.withHandle(h -> h.createQuery(query.toString())
+    C contentNode = (C) dbi.withHandle(h -> h.createQuery(query.toString())
         .bind("uuid", uuid)
         .mapToBean(ContentNodeImpl.class)
-        .list());
-    if (list.isEmpty()) {
-      return null;
+        .findOnly());
+    if (contentNode != null) {
+      contentNode.setChildren(getChildren(contentNode));
+      contentNode.setIdentifiables(getIdentifiables(contentNode));
     }
-    C contentNode = (C) list.get(0);
-    contentNode.setChildren(getChildren(contentNode));
-    contentNode.setIdentifiables(getIdentifiables(contentNode));
     return contentNode;
   }
 
