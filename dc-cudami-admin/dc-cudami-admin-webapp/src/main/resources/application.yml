@@ -30,6 +30,8 @@ server:
 
 # upload config: see org.springframework.boot.autoconfigure.web.MultipartProperties
 spring:
+  messages:
+    fallback-to-system-locale: false
   profiles:
     active: local
   security:
