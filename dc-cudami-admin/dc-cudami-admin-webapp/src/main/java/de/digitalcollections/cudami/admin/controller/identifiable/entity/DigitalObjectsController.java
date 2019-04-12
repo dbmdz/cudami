@@ -5,26 +5,18 @@ import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.business.api.service.LocaleService;
-import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.DigitalObjectService;
-import de.digitalcollections.model.api.identifiable.entity.Website;
+import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -68,96 +60,22 @@ public class DigitalObjectsController extends AbstractController implements Mess
 
   @RequestMapping(value = "/digitalobjects/new", method = RequestMethod.GET)
   public String create(Model model) {
-    Locale defaultLocale = localeService.getDefault();
-    List<Locale> locales = localeService.findAll().stream()
-            .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
-            .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-            .collect(Collectors.toList());
-
-    model.addAttribute("defaultLocale", defaultLocale);
-    model.addAttribute("locales", locales);
-    model.addAttribute("digitalobject", digitalObjectService.create());
-    return "digitalobjects/create";
+    throw new UnsupportedOperationException();
   }
 
   @RequestMapping(value = "/digitalobjects/new", method = RequestMethod.POST)
-  public String create(@ModelAttribute @Valid WebsiteImpl website, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
-    verifyBinding(results);
-    if (results.hasErrors()) {
-      return "websites/create";
-    }
-    Website websiteDb = null;
-    try {
-      websiteDb = (Website) digitalObjectService.save(website, results);
-      LOGGER.info("Successfully saved website");
-    } catch (Exception e) {
-      LOGGER.error("Cannot save website: ", e);
-      String message = messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale());
-      redirectAttributes.addFlashAttribute("error_message", message);
-      return "redirect:/websites";
-    }
-    if (results.hasErrors()) {
-      return "websites/create";
-    }
-    status.setComplete();
-    String message = messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
-    redirectAttributes.addFlashAttribute("success_message", message);
-    return "redirect:/websites/" + websiteDb.getUuid().toString();
+  public String create(@ModelAttribute @Valid DigitalObjectImpl digitalObject, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+    throw new UnsupportedOperationException();
   }
 
   @RequestMapping(value = "/digitalobjects/{uuid}/edit", method = RequestMethod.GET)
   public String edit(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
-//      model.addAttribute("contentNodeTypes", websiteViewService.getContentNodeTypes());
-//      model.addAttribute("navigationNodeTypes", websiteViewService.getNavigationNodeTypes());
-    Website website = (Website) digitalObjectService.get(uuid);
-    model.addAttribute("website", website);
-
-    HashSet<Locale> availableLocales = (HashSet<Locale>) website.getLabel().getLocales();
-    Set<String> availableLocaleTags = availableLocales.stream().map(Locale::toLanguageTag).collect(Collectors.toSet());
-    List<Locale> locales = localeService.findAll().stream()
-            .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
-            .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-            .collect(Collectors.toList());
-//      LOGGER.error("Cannot retrieve website with id=" + id + ": ", e);
-//      String message = messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale());
-//      redirectAttributes.addFlashAttribute("error_message", message);
-//      return "redirect:/websites";
-    model.addAttribute("availableLocales", availableLocales);
-    model.addAttribute("locales", locales);
-
-    return "websites/edit";
+    throw new UnsupportedOperationException();
   }
 
   @RequestMapping(value = "/digitalobjects/{pathUuid}/edit", method = RequestMethod.POST)
-  public String edit(@PathVariable UUID pathUuid, @ModelAttribute @Valid WebsiteImpl website, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
-    verifyBinding(results);
-    if (results.hasErrors()) {
-      return "websites/edit";
-    }
-
-    try {
-      // get website from db
-      Website websiteDb = (Website) digitalObjectService.get(pathUuid);
-      // just update the fields, that were editable
-      websiteDb.setUrl(website.getUrl());
-      websiteDb.setLabel(website.getLabel());
-      websiteDb.setDescription(website.getDescription());
-
-      digitalObjectService.update(websiteDb, results);
-    } catch (IdentifiableServiceException e) {
-      String message = "Cannot save website with uuid=" + pathUuid + ": " + e;
-      LOGGER.error(message, e);
-      redirectAttributes.addFlashAttribute("error_message", message);
-      return "redirect:/websites/" + pathUuid + "/edit";
-    }
-
-    if (results.hasErrors()) {
-      return "websites/edit";
-    }
-    status.setComplete();
-    String message = messageSource.getMessage("msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
-    redirectAttributes.addFlashAttribute("success_message", message);
-    return "redirect:/websites/" + pathUuid;
+  public String edit(@PathVariable UUID pathUuid, @ModelAttribute @Valid DigitalObjectImpl digitalObject, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+    throw new UnsupportedOperationException();
   }
 
   @RequestMapping(value = "/digitalobjects", method = RequestMethod.GET)
@@ -172,11 +90,11 @@ public class DigitalObjectsController extends AbstractController implements Mess
 
   @RequestMapping(value = "/digitalobjects/{uuid}", method = RequestMethod.GET)
   public String view(@PathVariable UUID uuid, Model model) {
-    Website website = (Website) digitalObjectService.get(uuid);
-    model.addAttribute("availableLocales", website.getLabel().getLocales());
+    DigitalObject digitalObject = (DigitalObject) digitalObjectService.get(uuid);
+    model.addAttribute("availableLocales", digitalObject.getLabel().getLocales());
     model.addAttribute("defaultLocale", localeService.getDefault());
-    model.addAttribute("website", website);
-    return "websites/view";
+    model.addAttribute("digitalObject", digitalObject);
+    return "digitalobjects/view";
   }
 
   // ----------------------------------------------------------------------------
