@@ -251,7 +251,7 @@ public class WebpageRepositoryImpl<W extends Webpage, I extends Identifiable> ex
 
   @Override
   public List<Identifiable> saveIdentifiables(UUID identifiablesContainerUuid, List<Identifiable> identifiables) {
-    dbi.withHandle(h -> h.createUpdate("DELETE FROM webpage_identifiables WHERE webpagee_uuid = :uuid")
+    dbi.withHandle(h -> h.createUpdate("DELETE FROM webpage_identifiables WHERE webpage_uuid = :uuid")
         .bind("uuid", identifiablesContainerUuid).execute());
 
     PreparedBatch batch = dbi.withHandle(h -> h.prepareBatch("INSERT INTO webpage_identifiables(webpage_uuid, identifiable_uuid, sortIndex) VALUES(:uuid, :identifiableUuid, :sortIndex)"));
