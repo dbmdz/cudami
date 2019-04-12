@@ -75,6 +75,15 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
   }
 
   @Override
+  public FileResource save(FileResource fileResource) {
+    identifiableRepository.save(fileResource);
+    dbi.withHandle(h -> h.createUpdate("INSERT INTO fileresources(filename, mimetype, size_in_bytes, uri, uuid) VALUES (:filename, :mimeType, :sizeInBytes, :uri, :uuid)")
+        .bindBean(fileResource)
+        .execute());
+    return findOne(fileResource.getUuid());
+  }
+
+  @Override
   public FileResource save(FileResource fileResource, InputStream binaryData) {
     try {
       long size = fileResourceRepository.write(fileResource, binaryData);
