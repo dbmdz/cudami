@@ -1,1 +1,22 @@
 include: "https://raw.githubusercontent.com/dbmdz/development/master/ci/.gitlab-ci-base.yml"
+
+stages:
+  - build
+  - test
+  - publish
+  - deploy
+  - release
+
+####################
+### Stage deploy ###
+####################
+
+deploy:
+  dependencies:
+    - publish_snapshot
+  only:
+    - master
+  script:
+    - if [[ ! "$PROJECT_VERSION" =~ .*SNAPSHOT ]]; then exit 0; fi
+    - curl -X POST -F token=$TRIGGER_TOKEN -F ref=master -F "variables[PROJECT_VERSION]=$PROJECT_VERSION" $TRIGGER_URL
+  stage: deploy
