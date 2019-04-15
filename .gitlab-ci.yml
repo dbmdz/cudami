@@ -12,8 +12,12 @@ stages:
 ####################
 
 deploy:
+  before_script:
+    - PROJECT_VERSION=$(xmllint --xpath '/*[local-name()="project"]/*[local-name()="version"]/text()' pom.xml)
   dependencies:
     - publish_snapshot
+  except:
+    - tags
   only:
     - master
   script:
