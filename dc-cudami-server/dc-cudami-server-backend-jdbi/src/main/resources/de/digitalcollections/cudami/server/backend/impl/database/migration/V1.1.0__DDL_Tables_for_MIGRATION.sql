@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS new_article_fileresources (
 
 CREATE TABLE IF NOT EXISTS new_digitalobjects (
   uuid UUID PRIMARY KEY NOT NULL
-) INHERITS (new_identifiables);
+) INHERITS (new_entities);
 
 CREATE TABLE IF NOT EXISTS new_digitalobject_fileresources (
   digitalobject_uuid UUID NOT NULL,
