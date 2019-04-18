@@ -77,30 +77,6 @@ CREATE TABLE IF NOT EXISTS new_contentnode_contentnodes (
 
 -- fileresources
 
-
-
--- article - fileresources - relations
-
-CREATE TABLE IF NOT EXISTS new_articles (
-  uuid UUID PRIMARY KEY NOT NULL,
-  text JSONB
-) INHERITS (new_entities);
-
-CREATE TABLE IF NOT EXISTS new_article_fileresources (
-  article_uuid UUID NOT NULL,
-  fileresource_uuid UUID NOT NULL UNIQUE,
-  sortIndex SMALLINT,
-
-  PRIMARY KEY (article_uuid, fileresource_uuid),
-  FOREIGN KEY (article_uuid) REFERENCES new_articles(uuid),
-  FOREIGN KEY (fileresource_uuid) REFERENCES new_fileresources(uuid)
-);
-
-
-CREATE TABLE IF NOT EXISTS new_digitalobjects (
-  uuid UUID PRIMARY KEY NOT NULL,
-) INHERITS (new_identifiables);
-
 CREATE TABLE IF NOT EXISTS new_fileresources (
   uuid UUID PRIMARY KEY NOT NULL,
   filename VARCHAR NOT NULL,
@@ -125,7 +101,28 @@ CREATE TABLE IF NOT EXISTS new_fileresources_video (
   duration int -- (in seconds)
 ) INHERITS (new_fileresources);
 
+-- article - fileresources - relations
 
+CREATE TABLE IF NOT EXISTS new_articles (
+  uuid UUID PRIMARY KEY NOT NULL,
+  text JSONB
+) INHERITS (new_entities);
+
+CREATE TABLE IF NOT EXISTS new_article_fileresources (
+  article_uuid UUID NOT NULL,
+  fileresource_uuid UUID NOT NULL UNIQUE,
+  sortIndex SMALLINT,
+
+  PRIMARY KEY (article_uuid, fileresource_uuid),
+  FOREIGN KEY (article_uuid) REFERENCES new_articles(uuid),
+  FOREIGN KEY (fileresource_uuid) REFERENCES new_fileresources(uuid)
+);
+
+-- digitalobject - fileresources - relations
+
+CREATE TABLE IF NOT EXISTS new_digitalobjects (
+  uuid UUID PRIMARY KEY NOT NULL
+) INHERITS (new_identifiables);
 
 CREATE TABLE IF NOT EXISTS new_digitalobject_fileresources (
   digitalobject_uuid UUID NOT NULL,
@@ -137,6 +134,8 @@ CREATE TABLE IF NOT EXISTS new_digitalobject_fileresources (
   FOREIGN KEY (fileresource_uuid) REFERENCES new_fileresources(uuid)
 );
 
+-- contentnode - fileresources - relations
+
 CREATE TABLE IF NOT EXISTS new_contentnode_fileresources (
   contentnode_uuid UUID NOT NULL,
   fileresource_uuid UUID NOT NULL UNIQUE,
@@ -146,6 +145,8 @@ CREATE TABLE IF NOT EXISTS new_contentnode_fileresources (
   FOREIGN KEY (contentnode_uuid) REFERENCES new_contentnodes(uuid),
   FOREIGN KEY (fileresource_uuid) REFERENCES new_fileresources(uuid)
 );
+
+-- webpage - fileresources - relations
 
 CREATE TABLE IF NOT EXISTS new_webpage_fileresources (
   webpage_uuid UUID NOT NULL,
