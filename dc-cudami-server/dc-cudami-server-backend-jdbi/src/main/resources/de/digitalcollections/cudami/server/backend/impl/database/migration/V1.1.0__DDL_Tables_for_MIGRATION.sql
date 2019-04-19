@@ -114,8 +114,12 @@ CREATE TABLE IF NOT EXISTS new_article_fileresources (
   sortIndex SMALLINT,
 
   PRIMARY KEY (article_uuid, fileresource_uuid),
-  FOREIGN KEY (article_uuid) REFERENCES new_articles(uuid),
-  FOREIGN KEY (fileresource_uuid) REFERENCES new_fileresources(uuid)
+  FOREIGN KEY (article_uuid) REFERENCES new_articles(uuid)
+ -- new_fileresources foreign key does not work on parent tables: caveat of inheritance!!!
+--   FOREIGN KEY (fileresource_uuid) REFERENCES new_fileresources(uuid)
+--   FOREIGN KEY (fileresource_uuid) REFERENCES new_identifiables(uuid)
+-- This would work, but is to specific (excludes video and audio fileresources...)
+  -- FOREIGN KEY (fileresource_uuid) REFERENCES new_fileresources_image(uuid)
 );
 
 -- digitalobject - fileresources - relations
@@ -130,8 +134,12 @@ CREATE TABLE IF NOT EXISTS new_digitalobject_fileresources (
   sortIndex SMALLINT,
 
   PRIMARY KEY (digitalobject_uuid, fileresource_uuid),
-  FOREIGN KEY (digitalobject_uuid) REFERENCES new_digitalobjects(uuid),
-  FOREIGN KEY (fileresource_uuid) REFERENCES new_fileresources(uuid)
+  FOREIGN KEY (digitalobject_uuid) REFERENCES new_digitalobjects(uuid)
+ -- new_fileresources foreign key does not work on parent tables: caveat of inheritance!!!
+--   FOREIGN KEY (fileresource_uuid) REFERENCES new_fileresources(uuid)
+--   FOREIGN KEY (fileresource_uuid) REFERENCES new_identifiables(uuid)
+-- This would work, but is to specific (excludes video and audio fileresources...)
+  -- FOREIGN KEY (fileresource_uuid) REFERENCES new_fileresources_image(uuid)
 );
 
 -- contentnode - fileresources - relations
@@ -142,8 +150,23 @@ CREATE TABLE IF NOT EXISTS new_contentnode_fileresources (
   sortIndex SMALLINT,
 
   PRIMARY KEY (contentnode_uuid, fileresource_uuid),
-  FOREIGN KEY (contentnode_uuid) REFERENCES new_contentnodes(uuid),
-  FOREIGN KEY (fileresource_uuid) REFERENCES new_fileresources(uuid)
+  FOREIGN KEY (contentnode_uuid) REFERENCES new_contentnodes(uuid)
+ -- new_fileresources foreign key does not work on parent tables: caveat of inheritance!!!
+--   FOREIGN KEY (fileresource_uuid) REFERENCES new_fileresources(uuid)
+--   FOREIGN KEY (fileresource_uuid) REFERENCES new_identifiables(uuid)
+-- This would work, but is to specific (excludes video and audio fileresources...)
+  -- FOREIGN KEY (fileresource_uuid) REFERENCES new_fileresources_image(uuid)
+);
+
+CREATE TABLE IF NOT EXISTS new_contentnode_entities (
+  contentnode_uuid UUID NOT NULL,
+  entity_uuid UUID NOT NULL UNIQUE,
+  sortIndex SMALLINT,
+
+  PRIMARY KEY (contentnode_uuid, entity_uuid),
+  FOREIGN KEY (contentnode_uuid) REFERENCES new_contentnodes(uuid)
+ -- new_entities foreign key does not work on parent tables: caveat of inheritance!!!
+--   FOREIGN KEY (entity_uuid) REFERENCES new_entities(uuid)
 );
 
 -- webpage - fileresources - relations
@@ -154,6 +177,10 @@ CREATE TABLE IF NOT EXISTS new_webpage_fileresources (
   sortIndex SMALLINT,
 
   PRIMARY KEY (webpage_uuid, fileresource_uuid),
-  FOREIGN KEY (webpage_uuid) REFERENCES new_webpages(uuid),
-  FOREIGN KEY (fileresource_uuid) REFERENCES new_fileresources(uuid)
+  FOREIGN KEY (webpage_uuid) REFERENCES new_webpages(uuid)
+ -- new_fileresources foreign key does not work on parent tables: caveat of inheritance!!!
+--   FOREIGN KEY (fileresource_uuid) REFERENCES new_fileresources(uuid)
+--   FOREIGN KEY (fileresource_uuid) REFERENCES new_identifiables(uuid)
+-- This would work, but is to specific (excludes video and audio fileresources...)
+  -- FOREIGN KEY (fileresource_uuid) REFERENCES new_fileresources_image(uuid)
 );
