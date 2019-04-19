@@ -39,13 +39,28 @@ INSERT INTO new_fileresources_audio(uuid, created, description, identifiable_typ
 SELECT i.uuid as uuid, i.created as created, i.description as description, i.identifiable_type as identifiable_type, i.label as label, i.last_modified as last_modified, f.filename as filename, f.mimetype as mimetype, f.size_in_bytes as size_in_bytes, f.uri as uri, f.duration as duration
 FROM fileresources_audio f INNER JOIN identifiables i ON f.uuid=i.uuid;
 
+INSERT INTO new_fileresources_audio(uuid, created, description, identifiable_type, label, last_modified, filename, mimetype, size_in_bytes, uri)
+SELECT i.uuid as uuid, i.created as created, i.description as description, i.identifiable_type as identifiable_type, i.label as label, i.last_modified as last_modified, f.filename as filename, f.mimetype as mimetype, f.size_in_bytes as size_in_bytes, f.uri as uri
+FROM fileresources f INNER JOIN identifiables i ON f.uuid=i.uuid
+WHERE f.mimetype like 'audio%' AND f.uuid NOT IN (SELECT uuid FROM fileresources_audio);
+
 INSERT INTO new_fileresources_image(uuid, created, description, identifiable_type, label, last_modified, filename, mimetype, size_in_bytes, uri, height, width)
 SELECT i.uuid as uuid, i.created as created, i.description as description, i.identifiable_type as identifiable_type, i.label as label, i.last_modified as last_modified, f.filename as filename, f.mimetype as mimetype, f.size_in_bytes as size_in_bytes, f.uri as uri, f.height as height, f.width as width
 FROM fileresources_image f INNER JOIN identifiables i ON f.uuid=i.uuid;
 
+INSERT INTO new_fileresources_image(uuid, created, description, identifiable_type, label, last_modified, filename, mimetype, size_in_bytes, uri)
+SELECT i.uuid as uuid, i.created as created, i.description as description, i.identifiable_type as identifiable_type, i.label as label, i.last_modified as last_modified, f.filename as filename, f.mimetype as mimetype, f.size_in_bytes as size_in_bytes, f.uri as uri
+FROM fileresources f INNER JOIN identifiables i ON f.uuid=i.uuid
+WHERE f.mimetype like 'image%' AND f.uuid NOT IN (SELECT uuid FROM fileresources_image);
+
 INSERT INTO new_fileresources_video(uuid, created, description, identifiable_type, label, last_modified, filename, mimetype, size_in_bytes, uri, duration)
 SELECT i.uuid as uuid, i.created as created, i.description as description, i.identifiable_type as identifiable_type, i.label as label, i.last_modified as last_modified, f.filename as filename, f.mimetype as mimetype, f.size_in_bytes as size_in_bytes, f.uri as uri, f.duration as duration
 FROM fileresources_video f INNER JOIN identifiables i ON f.uuid=i.uuid;
+
+INSERT INTO new_fileresources_video(uuid, created, description, identifiable_type, label, last_modified, filename, mimetype, size_in_bytes, uri)
+SELECT i.uuid as uuid, i.created as created, i.description as description, i.identifiable_type as identifiable_type, i.label as label, i.last_modified as last_modified, f.filename as filename, f.mimetype as mimetype, f.size_in_bytes as size_in_bytes, f.uri as uri
+FROM fileresources f INNER JOIN identifiables i ON f.uuid=i.uuid
+WHERE f.mimetype like 'video%' AND f.uuid NOT IN (SELECT uuid FROM fileresources_video);
 
 INSERT INTO new_webpages(uuid, created, description, identifiable_type, label, last_modified, text)
 SELECT i.uuid as uuid, i.created as created, i.description as description, i.identifiable_type as identifiable_type, i.label as label, i.last_modified as last_modified, w.text as text
@@ -58,16 +73,23 @@ FROM websites w INNER JOIN entities e ON w.uuid=e.uuid INNER JOIN identifiables 
 -- relation tables
 
 INSERT INTO new_article_fileresources(article_uuid, fileresource_uuid, sortindex)
-SELECT article_uuid, identifiable_uuid, sortindex
-FROM article_identifiables;
+SELECT ai.article_uuid, ai.identifiable_uuid, ai.sortindex
+FROM article_identifiables ai, new_identifiables i
+WHERE ai.identifiable_uuid = i.uuid AND i.identifiable_type = 'RESOURCE';
 
 INSERT INTO new_contentnode_contentnodes(parent_contentnode_uuid, child_contentnode_uuid, sortindex)
 SELECT parent_contentnode_uuid, child_contentnode_uuid, sortindex
 FROM contentnode_contentnode;
 
--- INSERT INTO new_contentnode_fileresources(contentnode_uuid, fileresource_uuid, sortindex)
--- SELECT contentnode_uuid, identifiable_uuid, sortindex
--- FROM contentnode_identifiables;
+INSERT INTO new_contentnode_fileresources(contentnode_uuid, fileresource_uuid, sortindex)
+SELECT ci.contentnode_uuid, ci.identifiable_uuid, ci.sortindex
+FROM contentnode_identifiables ci, new_identifiables i
+WHERE ci.identifiable_uuid = i.uuid AND i.identifiable_type = 'RESOURCE';
+
+INSERT INTO new_contentnode_entities(contentnode_uuid, entity_uuid, sortindex)
+SELECT ci.contentnode_uuid, ci.identifiable_uuid, ci.sortindex
+FROM contentnode_identifiables ci, new_identifiables i
+WHERE ci.identifiable_uuid = i.uuid AND i.identifiable_type = 'ENTITY';
 
 INSERT INTO new_contenttree_contentnodes(contenttree_uuid, contentnode_uuid, sortindex)
 SELECT contenttree_uuid, contentnode_uuid, sortindex
@@ -78,8 +100,9 @@ SELECT digitalobject_uuid, fileresource_uuid, sortindex
 FROM digitalobject_fileresources;
 
 INSERT INTO new_webpage_fileresources(webpage_uuid, fileresource_uuid, sortindex)
-SELECT webpage_uuid, identifiable_uuid, sortindex
-FROM webpage_identifiables;
+SELECT wi.webpage_uuid, wi.identifiable_uuid, wi.sortindex
+FROM webpage_identifiables wi, new_identifiables i
+WHERE wi.identifiable_uuid = i.uuid AND i.identifiable_type = 'RESOURCE';
 
 INSERT INTO new_webpage_webpages(parent_webpage_uuid, child_webpage_uuid, sortindex)
 SELECT parent_webpage_uuid, child_webpage_uuid, sortindex
