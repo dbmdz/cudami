@@ -11,10 +11,12 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.statement.PreparedBatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
@@ -139,7 +141,9 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public List<EntityRelation> getRelations(E subjectEntity) {
-    StringBuilder query = new StringBuilder("SELECT rel.predicate as predicate, e.uuid as uuid, e.created as created, e.description as description. e.identifiable_type as identifiable_type, e.label as label, e.last_modified as last_modified, e.entity_type as entity_type")
+    // query predicate and object entity (subject entity is given)
+    StringBuilder query = new StringBuilder("SELECT rel.predicate as predicate,")
+        .append(" e.uuid as uuid, e.created as created, e.description as description, e.identifiable_type as identifiable_type, e.label as label, e.last_modified as last_modified, e.entity_type as entity_type")
         .append(" FROM rel_entity_entities rel INNER JOIN entities e ON rel.object_uuid=e.uuid")
         .append(" WHERE rel.subject_uuid = :uuid");
 
@@ -158,17 +162,70 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public LinkedHashSet<FileResource> saveRelatedFileResources(E entity, LinkedHashSet<FileResource> fileResources) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return saveRelatedFileResources(entity.getUuid(), fileResources);
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveRelatedFileResources(UUID entityUuid, LinkedHashSet<UUID> fileResourcesUuids) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  public LinkedHashSet<FileResource> saveRelatedFileResources(UUID entityUuid, LinkedHashSet<FileResource> fileResources) {
+    if (fileResources == null) {
+      return null;
+    }
+    // as we store the whole list new: delete old entries
+    dbi.withHandle(h -> h.createUpdate("DELETE FROM rel_entity_fileresources WHERE entity_uuid = :uuid")
+        .bind("uuid", entityUuid).execute());
+
+    dbi.useHandle(handle -> {
+      PreparedBatch preparedBatch = handle.prepareBatch("INSERT INTO rel_entity_fileresources(entity_uuid, fileresource_uuid, sortIndex) VALUES(:uuid, :fileResourceUuid, :sortIndex)");
+      for (FileResource fileResource : fileResources) {
+        preparedBatch.bind("uuid", entityUuid)
+            .bind("fileResourceUuid", fileResource.getUuid())
+            .bind("sortIndex", getIndex(fileResources, fileResource))
+            .add();
+      }
+      preparedBatch.execute();
+    });
+    return getRelatedFileResources(entityUuid);
   }
 
   @Override
   public List<EntityRelation> saveRelations(List<EntityRelation> relations) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    if (relations == null) {
+      return null;
+    }
+    // get subject uuid:
+    UUID subjectUuid = relations.get(0).getSubject().getUuid();
+    // as we store the whole list new: delete old entries
+    dbi.withHandle(h -> h.createUpdate("DELETE FROM rel_entity_entities WHERE entity_uuid = :uuid")
+        .bind("uuid", subjectUuid)
+        .execute());
+
+    dbi.useHandle(handle -> {
+      PreparedBatch preparedBatch = handle.prepareBatch("INSERT INTO rel_entity_entities(subject_uuid, predicate, object_uuid) VALUES(:subjectUuid, :predicate, :objectUuid)");
+      for (EntityRelation relation : relations) {
+        preparedBatch.bind("subjectUuid", subjectUuid)
+            .bind("predicate", relation.getPredicate())
+            .bind("objectUuid", relation.getObject().getUuid())
+            .add();
+      }
+      preparedBatch.execute();
+    });
+    return getRelations(subjectUuid);
   }
 
+  private int getIndex(LinkedHashSet<FileResource> fileResources, FileResource fileResource) {
+    boolean found = false;
+    int pos = -1;
+    for (Iterator<FileResource> iterator = fileResources.iterator(); iterator.hasNext();) {
+      pos = pos + 1;
+      FileResource fr = iterator.next();
+      if (fr.getUuid().equals(fileResource.getUuid())) {
+        found = true;
+        break;
+      }
+    }
+    if (found) {
+      return pos;
+    }
+    return -1;
+  }
 }
