@@ -21,6 +21,11 @@ public interface EntityRepository<E extends Entity> extends IdentifiableReposito
 
   List<EntityRelation> getRelations(UUID subjectEntityUuid);
 
+  /**
+   * Save list of entities related to an entity.Prerequisites: entities have been saved before (exist already) and subject is for all relations the same
+   * @param relations a list of entity-predicate-entity relations
+   * @return the list of the relations for the same subject-entity
+   */
   List<EntityRelation> saveRelations(List<EntityRelation> relations);
 
   void addRelatedFileresource(E entity, FileResource fileResource);
@@ -31,7 +36,13 @@ public interface EntityRepository<E extends Entity> extends IdentifiableReposito
 
   LinkedHashSet<FileResource> getRelatedFileResources(UUID entityUuid);
 
+  /**
+   * Save list of file resources related to an entity. Prerequisite: file resources have been saved before (exist already)
+   * @param entity entity the fileresources are related to
+   * @param fileResources the fileresources that are related to the entity
+   * @return the list of the related fileresources
+   */
   LinkedHashSet<FileResource> saveRelatedFileResources(E entity, LinkedHashSet<FileResource> fileResources);
 
-  LinkedHashSet<FileResource> saveRelatedFileResources(UUID entityUuid, LinkedHashSet<UUID> fileResourcesUuids);
+  LinkedHashSet<FileResource> saveRelatedFileResources(UUID entityUuid, LinkedHashSet<FileResource> fileResources);
 }
