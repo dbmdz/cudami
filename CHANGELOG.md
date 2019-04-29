@@ -8,12 +8,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ### Added
 
-- Add Digital object management
+- Add digital object management (digital objects and contained file resources)
+- Add entity to entities relations
+- Add entity to file resources relations
 - CHANGELOG.md
 
 ### Changed
 
 - Migrate from Bootstrap 3 to Bootstrap 4
+- Migrate database schema and SQL from multiple joins to PostgreSql inheritance (where applicable)
 
 ## [3.1.1](https://github.com/dbmdz/cudami/releases/tag/3.1.1) - 2019-01-23
 
