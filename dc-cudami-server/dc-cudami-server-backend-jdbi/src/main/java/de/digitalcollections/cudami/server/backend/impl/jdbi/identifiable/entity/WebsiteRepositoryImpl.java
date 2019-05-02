@@ -1,14 +1,14 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
+import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -17,23 +17,16 @@ import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class WebsiteRepositoryImpl<W extends WebsiteImpl> extends EntityRepositoryImpl<W> implements WebsiteRepository<W> {
+public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website> implements WebsiteRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsiteRepositoryImpl.class);
 
-  private final EntityRepository entityRepository;
-
   @Autowired
-  public WebsiteRepositoryImpl(
-      @Qualifier("identifiableRepositoryImpl") IdentifiableRepository identifiableRepository,
-      @Qualifier("entityRepositoryImpl") EntityRepository entityRepository,
-      Jdbi dbi) {
-    super(dbi, identifiableRepository);
-    this.entityRepository = entityRepository;
+  public WebsiteRepositoryImpl(Jdbi dbi) {
+    super(dbi);
   }
 
   @Override
@@ -44,9 +37,9 @@ public class WebsiteRepositoryImpl<W extends WebsiteImpl> extends EntityReposito
   }
 
   @Override
-  public PageResponse<W> find(PageRequest pageRequest) {
-    StringBuilder query = new StringBuilder("SELECT ws.id as id, ws.uuid as uuid, ws.url as url, ws.registration_date as registration_date, i.label as label, i.description as description")
-        .append(" FROM websites ws INNER JOIN entities e ON ws.uuid=e.uuid INNER JOIN identifiables i ON ws.uuid=i.uuid");
+  public PageResponse<Website> find(PageRequest pageRequest) {
+    StringBuilder query = new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS + ", url, registration_date")
+        .append(" FROM websites");
 
     addPageRequestParams(pageRequest, query);
 
@@ -59,12 +52,12 @@ public class WebsiteRepositoryImpl<W extends WebsiteImpl> extends EntityReposito
   }
 
   @Override
-  public W findOne(UUID uuid) {
-    String query = "SELECT ws.uuid as uuid, ws.url as url, ws.registration_date as registration_date, i.label as label, i.description as description"
-                   + " FROM websites ws INNER JOIN entities e ON ws.uuid=e.uuid INNER JOIN identifiables i ON ws.uuid=i.uuid"
-                   + " WHERE ws.uuid = :uuid";
+  public Website findOne(UUID uuid) {
+    String query = "SELECT " + IDENTIFIABLE_COLUMNS + ", url, registration_date"
+                   + " FROM websites"
+                   + " WHERE uuid = :uuid";
 
-    W website = (W) dbi.withHandle(h -> h.createQuery(query)
+    Website website = dbi.withHandle(h -> h.createQuery(query)
         .bind("uuid", uuid)
         .mapToBean(WebsiteImpl.class)
         .findOnly());
@@ -80,20 +73,52 @@ public class WebsiteRepositoryImpl<W extends WebsiteImpl> extends EntityReposito
   }
 
   @Override
-  public List<Webpage> getRootPages(W website) {
+  public Website save(Website website) {
+    website.setUuid(UUID.randomUUID());
+    website.setCreated(LocalDateTime.now());
+    website.setLastModified(LocalDateTime.now());
+
+    Website result = dbi.withHandle(h -> h
+        .createQuery("INSERT INTO websites(uuid, created, description, identifiable_type, label, last_modified, entity_type, url, registration_date) VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :entityType, :url, :registrationDate) RETURNING *")
+        .bindBean(website)
+        .mapToBean(WebsiteImpl.class)
+        .findOnly());
+    return result;
+  }
+
+  @Override
+  public Website update(Website website) {
+    website.setLastModified(LocalDateTime.now());
+
+    // do not update/left out from statement (not changed since insert): uuid, created, identifiable_type, entity_type
+    Website result = dbi.withHandle(h -> h
+        .createQuery("UPDATE websites SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, url=:url, registration_date=:registrationDate WHERE uuid=:uuid RETURNING *")
+        .bindBean(website)
+        .mapToBean(WebsiteImpl.class)
+        .findOnly());
+    return result;
+  }
+
+  @Override
+  public List<Webpage> getRootPages(Website website) {
     UUID uuid = website.getUuid();
     return getRootPages(uuid);
   }
 
   @Override
   public List<Webpage> getRootPages(UUID uuid) {
-    // minimal data required for creating text links in a list
-    String query = "SELECT ww.webpage_uuid as uuid, i.label as label"
-                   + " FROM websites ws INNER JOIN website_webpage ww ON ws.uuid=ww.website_uuid INNER JOIN identifiables i ON ww.webpage_uuid=i.uuid"
-                   + " WHERE ws.uuid = :uuid"
-                   + " ORDER BY ww.sortIndex ASC";
+    // minimal data required (= identifiable fields) for creating text links/teasers in a list
+    String sql = "SELECT " + IDENTIFIABLE_COLUMNS
+                 + " FROM webpages INNER JOIN website_webpages ww ON uuid = ww.webpage_uuid"
+                 + " WHERE ww.website_uuid = :uuid"
+                 + " ORDER BY ww.sortIndex ASC";
 
-    List<WebpageImpl> list = dbi.withHandle(h -> h.createQuery(query)
+//    String query = "SELECT ww.webpage_uuid as uuid, i.label as label"
+//                   + " FROM websites ws INNER JOIN website_webpage ww ON ws.uuid=ww.website_uuid INNER JOIN identifiables i ON ww.webpage_uuid=i.uuid"
+//                   + " WHERE ws.uuid = :uuid"
+//                   + " ORDER BY ww.sortIndex ASC";
+
+    List<WebpageImpl> list = dbi.withHandle(h -> h.createQuery(sql)
         .bind("uuid", uuid)
         .mapToBean(WebpageImpl.class)
         .list());
@@ -102,24 +127,5 @@ public class WebsiteRepositoryImpl<W extends WebsiteImpl> extends EntityReposito
       return new ArrayList<>();
     }
     return list.stream().map(WebpageImpl.class::cast).collect(Collectors.toList());
-  }
-
-  @Override
-  public W save(W website) {
-    entityRepository.save(website);
-    dbi.withHandle(h -> h.createUpdate("INSERT INTO websites(url, registration_date, uuid) VALUES (:url, :registrationDate, :uuid)")
-        .bindBean(website)
-        .execute());
-    return findOne(website.getUuid());
-  }
-
-  @Override
-  public W update(W website) {
-    entityRepository.update(website);
-    // do not update/left out from statement: created, uuid
-    dbi.withHandle(h -> h.createUpdate("UPDATE websites SET url=:url, registration_date=:registrationDate WHERE uuid=:uuid")
-        .bindBean(website)
-        .execute());
-    return findOne(website.getUuid());
   }
 }

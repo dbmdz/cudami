@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.parts
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.WebpageService;
-import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import java.util.Locale;
 import java.util.UUID;
@@ -24,15 +23,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class WebpageHtmlController {
 
   @Autowired
-  private WebpageService<Webpage, Identifiable> webpageService;
+  private WebpageService webpageService;
 
   @ApiMethod(description = "get a webpage as HTML")
   @RequestMapping(value = {"/latest/webpages/{uuid}.html", "/v2/webpages/{uuid}.html", "/v1/webpages/{uuid}.html"}, produces = {MediaType.TEXT_HTML_VALUE}, method = RequestMethod.GET)
   public String getWebpageAsHtml(
-          @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
-          @ApiQueryParam(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
-          @RequestParam(name = "pLocale", required = false) Locale pLocale,
-          Model model
+      @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
+      @ApiQueryParam(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+      @RequestParam(name = "pLocale", required = false) Locale pLocale,
+      Model model
   ) throws IdentifiableServiceException {
     Webpage webpage;
     if (pLocale == null) {

@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ArticleService;
-import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.entity.Article;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -12,7 +11,6 @@ import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
@@ -27,12 +25,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -40,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ArticleController {
 
   @Autowired
-  private ArticleService<Article, Identifiable> articleService;
+  private ArticleService articleService;
 
   @ApiMethod(description = "get all articles")
   @RequestMapping(value = {"/latest/articles", "/v2/articles"}, produces = "application/json", method = RequestMethod.GET)
@@ -92,19 +88,20 @@ public class ArticleController {
     return articleService.update(article);
   }
 
-  @ApiMethod(description = "get identifiables related to article")
-  @RequestMapping(value = {"/latest/articles/{uuid}/identifiables", "/v2/articles/{uuid}/identifiables"}, produces = "application/json", method = RequestMethod.GET)
-  @ApiResponseObject
-  public List<Identifiable> getIdentifiables(@PathVariable UUID uuid) {
-    return articleService.getIdentifiables(uuid);
-  }
-
-  @ApiMethod(description = "add identifiable to article")
-  @PostMapping(value = {"/latest/articles/{uuid}/identifiables/{identifiableUuid}", "/v2/articles/{uuid}/identifiables/{identifiableUuid}"})
-  @ResponseStatus(value = HttpStatus.OK)
-  @ApiResponseObject
-  public void addIdentifiable(@PathVariable UUID uuid, @PathVariable UUID identifiableUuid) {
-    articleService.addIdentifiable(uuid, identifiableUuid);
-  }
+  // FIXME
+//  @ApiMethod(description = "get identifiables related to article")
+//  @RequestMapping(value = {"/latest/articles/{uuid}/identifiables", "/v2/articles/{uuid}/identifiables"}, produces = "application/json", method = RequestMethod.GET)
+//  @ApiResponseObject
+//  public List<Identifiable> getIdentifiables(@PathVariable UUID uuid) {
+//    return articleService.getIdentifiables(uuid);
+//  }
+//
+//  @ApiMethod(description = "add identifiable to article")
+//  @PostMapping(value = {"/latest/articles/{uuid}/identifiables/{identifiableUuid}", "/v2/articles/{uuid}/identifiables/{identifiableUuid}"})
+//  @ResponseStatus(value = HttpStatus.OK)
+//  @ApiResponseObject
+//  public void addIdentifiable(@PathVariable UUID uuid, @PathVariable UUID identifiableUuid) {
+//    articleService.addIdentifiable(uuid, identifiableUuid);
+//  }
   // TODO: saveIdentifiables
 }

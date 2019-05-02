@@ -2,14 +2,13 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.ContentNodeRepository;
-import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.ContentNodeService;
-import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
-import de.digitalcollections.model.api.identifiable.Identifiable;
+import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
+import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,42 +18,17 @@ import org.springframework.stereotype.Service;
 /**
  * Service for ContentNode handling.
  *
- * @param <I> identifiable instance
+ * @param <E> entity type
  */
 @Service
 //@Transactional(readOnly = true)
-public class ContentNodeServiceImpl<I extends Identifiable> extends IdentifiableServiceImpl<ContentNode> implements ContentNodeService<ContentNode, I> {
+public class ContentNodeServiceImpl<E extends Entity> extends EntityPartServiceImpl<ContentNode, E> implements ContentNodeService<E> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentNodeServiceImpl.class);
 
   @Autowired
-  private LocaleService localeService;
-
-  @Autowired
-  public ContentNodeServiceImpl(ContentNodeRepository<ContentNode, I> repository) {
+  public ContentNodeServiceImpl(ContentNodeRepository<E> repository) {
     super(repository);
-  }
-
-  @Override
-  public void addIdentifiable(UUID contentNodeUuid, UUID identifiableUuid) {
-    ((ContentNodeRepository) repository).addIdentifiable(contentNodeUuid, identifiableUuid);
-  }
-
-  @Override
-  public ContentNode get(UUID uuid, Locale locale) throws IdentifiableServiceException {
-    ContentNode contentNode = repository.findOne(uuid, locale);
-
-    // content node does not exist in requested language, so try with default locale
-    if (contentNode == null) {
-      contentNode = repository.findOne(uuid, localeService.getDefault());
-    }
-
-    // content node does not exist in default locale, so just return first existing language
-    if (contentNode == null) {
-      contentNode = repository.findOne(uuid, null);
-    }
-
-    return contentNode;
   }
 
   @Override
@@ -65,6 +39,26 @@ public class ContentNodeServiceImpl<I extends Identifiable> extends Identifiable
   @Override
   public List<ContentNode> getChildren(UUID uuid) {
     return ((NodeRepository) repository).getChildren(uuid);
+  }
+
+  @Override
+  public LinkedHashSet<E> getEntities(ContentNode contentNode) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
+  public LinkedHashSet<E> getEntities(UUID contentNodeUuid) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
+  public LinkedHashSet<E> saveEntities(ContentNode contentNode, LinkedHashSet<E> entities) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
+  public LinkedHashSet<E> saveEntities(UUID contentNodeUuid, LinkedHashSet<E> entities) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
@@ -90,22 +84,22 @@ public class ContentNodeServiceImpl<I extends Identifiable> extends Identifiable
   }
 
   @Override
-  public List<Identifiable> getIdentifiables(ContentNode contentNode) {
-    return getIdentifiables(contentNode.getUuid());
+  public LinkedHashSet<FileResource> getFileResources(ContentNode contentNode) {
+    return getFileResources(contentNode.getUuid());
   }
 
   @Override
-  public List<Identifiable> getIdentifiables(UUID identifiableUuid) {
-    return ((ContentNodeRepository) repository).getIdentifiables(identifiableUuid);
+  public LinkedHashSet<FileResource> getFileResources(UUID contentNodeUuid) {
+    return ((ContentNodeRepository) repository).getFileResources(contentNodeUuid);
   }
 
   @Override
-  public List<Identifiable> saveIdentifiables(ContentNode contentNode, List<Identifiable> identifiables) {
-    return saveIdentifiables(contentNode.getUuid(), identifiables);
+  public LinkedHashSet<FileResource> saveFileResources(ContentNode contentNode, LinkedHashSet<FileResource> fileResources) {
+    return saveFileResources(contentNode.getUuid(), fileResources);
   }
 
   @Override
-  public List<Identifiable> saveIdentifiables(UUID identifiablesContainerUuid, List<Identifiable> identifiables) {
-    return ((ContentNodeRepository) repository).saveIdentifiables(identifiablesContainerUuid, identifiables);
+  public LinkedHashSet<FileResource> saveFileResources(UUID contentNodeUuid, LinkedHashSet<FileResource> fileResources) {
+    return ((ContentNodeRepository) repository).saveFileResources(contentNodeUuid, fileResources);
   }
 }

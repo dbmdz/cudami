@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.server.controller.v1.identifiable.entity.pa
 import com.fasterxml.jackson.core.JsonProcessingException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.WebpageService;
-import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.jackson.v1.V1DigitalCollectionsObjectMapper;
 import de.digitalcollections.model.xml.xstream.v1.V1DigitalCollectionsXStreamMarshaller;
@@ -35,7 +34,7 @@ public class V1WebpageController {
   private final V1DigitalCollectionsXStreamMarshaller v1XStreamMarshaller = new V1DigitalCollectionsXStreamMarshaller();
 
   @Autowired
-  private WebpageService<Webpage, Identifiable> webpageService;
+  private WebpageService webpageService;
 
   @ApiMethod(description = "get a webpage as JSON (Version 1), depending on extension or <tt>format</tt> request parameter or accept header")
   @RequestMapping(value = {"/v1/webpages/{uuid}.json", "/v1/webpages/{uuid}"}, produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
@@ -73,7 +72,7 @@ public class V1WebpageController {
   private Webpage loadWebpage(Locale pLocale, UUID uuid) throws IdentifiableServiceException {
     Webpage webpage;
     if (pLocale == null) {
-      webpage = webpageService.get(uuid);
+      webpage = (Webpage) webpageService.get(uuid);
     } else {
       webpage = webpageService.get(uuid, pLocale);
     }

@@ -7,7 +7,6 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -23,8 +22,14 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableRepositoryImpl.class);
 
-  @Autowired
+  protected final static String IDENTIFIABLE_COLUMNS = "uuid, created, description, label, last_modified";
+
   protected Jdbi dbi;
+
+  @Autowired
+  public IdentifiableRepositoryImpl(Jdbi dbi) {
+    this.dbi = dbi;
+  }
 
   @Override
   public long count() {
@@ -89,29 +94,31 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
 
   @Override
   public I save(I identifiable) {
-    identifiable.setUuid(UUID.randomUUID());
-    identifiable.setCreated(LocalDateTime.now());
-    identifiable.setLastModified(LocalDateTime.now());
-
-    IdentifiableImpl result = dbi.withHandle(h -> h
-        .createQuery("INSERT INTO identifiables(created, description, identifiable_type, label, last_modified, uuid) VALUES (:created, :description::JSONB, :type, :label::JSONB, :lastModified, :uuid) RETURNING *")
-        .bindBean(identifiable)
-        .mapToBean(IdentifiableImpl.class)
-        .findOnly());
-    return (I) result;
+    throw new UnsupportedOperationException("use save of specific/inherited identifiable repository");
+//    identifiable.setUuid(UUID.randomUUID());
+//    identifiable.setCreated(LocalDateTime.now());
+//    identifiable.setLastModified(LocalDateTime.now());
+//
+//    IdentifiableImpl result = dbi.withHandle(h -> h
+//        .createQuery("INSERT INTO identifiables(created, description, identifiable_type, label, last_modified, uuid) VALUES (:created, :description::JSONB, :type, :label::JSONB, :lastModified, :uuid) RETURNING *")
+//        .bindBean(identifiable)
+//        .mapToBean(IdentifiableImpl.class)
+//        .findOnly());
+//    return (I) result;
   }
 
   @Override
   public I update(I identifiable) {
-    identifiable.setLastModified(LocalDateTime.now());
-
-    // do not update/left out from statement: created, uuid
-    IdentifiableImpl result = dbi.withHandle(h -> h
-        .createQuery("UPDATE identifiables SET description=:description::JSONB, identifiable_type=:type, label=:label::JSONB, last_modified=:lastModified WHERE uuid=:uuid RETURNING *")
-        .bindBean(identifiable)
-        .mapToBean(IdentifiableImpl.class)
-        .findOnly());
-    return (I) result;
+    throw new UnsupportedOperationException("use update of specific/inherited identifiable repository");
+//    identifiable.setLastModified(LocalDateTime.now());
+//
+//    // do not update/left out from statement: created, uuid
+//    IdentifiableImpl result = dbi.withHandle(h -> h
+//        .createQuery("UPDATE identifiables SET description=:description::JSONB, identifiable_type=:type, label=:label::JSONB, last_modified=:lastModified WHERE uuid=:uuid RETURNING *")
+//        .bindBean(identifiable)
+//        .mapToBean(IdentifiableImpl.class)
+//        .findOnly());
+//    return (I) result;
   }
 
   protected Integer selectNextSortIndexForParentChildren(Jdbi dbi, String tableName, String columNameParentUuid, UUID parentUuid) {

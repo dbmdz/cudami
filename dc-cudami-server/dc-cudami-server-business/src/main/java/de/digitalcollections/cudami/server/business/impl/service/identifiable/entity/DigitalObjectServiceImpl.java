@@ -16,12 +16,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 //@Transactional(readOnly = true)
-public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject> implements DigitalObjectService<DigitalObject> {
+public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject> implements DigitalObjectService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectServiceImpl.class);
 
   @Autowired
-  public DigitalObjectServiceImpl(DigitalObjectRepository<DigitalObject> repository) {
+  public DigitalObjectServiceImpl(DigitalObjectRepository repository) {
     super(repository);
   }
 
