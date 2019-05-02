@@ -7,16 +7,14 @@ import java.util.UUID;
 
 /**
  * Service for Digital Object.
- *
- * @param <D> domain object
  */
-public interface DigitalObjectService<D extends DigitalObject> extends EntityService<D> {
+public interface DigitalObjectService extends EntityService<DigitalObject> {
 
-  LinkedHashSet<FileResource> getFileResources(D digitalObject);
+  LinkedHashSet<FileResource> getFileResources(DigitalObject digitalObject);
 
   LinkedHashSet<FileResource> getFileResources(UUID digitalObjectUuid);
 
-  LinkedHashSet<FileResource> saveFileResources(D digitalObject, LinkedHashSet<FileResource> fileResources);
+  LinkedHashSet<FileResource> saveFileResources(DigitalObject digitalObject, LinkedHashSet<FileResource> fileResources);
 
   LinkedHashSet<FileResource> saveFileResources(UUID digitalObjectUuid, LinkedHashSet<FileResource> fileResources);
 }

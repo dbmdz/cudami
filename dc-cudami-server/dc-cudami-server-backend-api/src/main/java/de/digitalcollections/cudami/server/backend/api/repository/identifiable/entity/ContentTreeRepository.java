@@ -7,12 +7,10 @@ import java.util.UUID;
 
 /**
  * Repository for ContentTree persistence handling.
- *
- * @param <C> content tree instance
  */
-public interface ContentTreeRepository<C extends ContentTree> extends EntityRepository<C> {
+public interface ContentTreeRepository extends EntityRepository<ContentTree> {
 
-  List<ContentNode> getRootNodes(C contentTree);
+  List<ContentNode> getRootNodes(ContentTree contentTree);
 
   List<ContentNode> getRootNodes(UUID uuid);
 }

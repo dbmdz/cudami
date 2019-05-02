@@ -7,12 +7,10 @@ import java.util.UUID;
 
 /**
  * Service for ContentTree.
- *
- * @param <C> domain object
  */
-public interface ContentTreeService<C extends ContentTree> extends EntityService<C> {
+public interface ContentTreeService extends EntityService<ContentTree> {
 
-  List<ContentNode> getRootNodes(C contentTree);
+  List<ContentNode> getRootNodes(ContentTree contentTree);
 
   List<ContentNode> getRootNodes(UUID uuid);
 }

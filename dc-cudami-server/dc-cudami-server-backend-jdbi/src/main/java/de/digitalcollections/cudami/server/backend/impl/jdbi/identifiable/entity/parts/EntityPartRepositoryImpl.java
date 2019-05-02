@@ -1,79 +1,82 @@
-package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
+package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.parts;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
-import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.EntityPartRepository;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
-import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
+import de.digitalcollections.model.api.identifiable.entity.parts.EntityPart;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.UUID;
+import org.jdbi.v3.core.Jdbi;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
-@Service
-//@Transactional(readOnly = true)
-public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl<E> implements EntityService<E> {
+@Repository
+public class EntityPartRepositoryImpl<EP extends EntityPart, E extends Entity> extends IdentifiableRepositoryImpl<EP> implements EntityPartRepository<EP, E> {
 
   @Autowired
-  public EntityServiceImpl(@Qualifier("entityRepositoryImpl") EntityRepository<E> repository) {
-    super(repository);
+  public EntityPartRepositoryImpl(Jdbi dbi) {
+    super(dbi);
   }
 
   @Override
-  public void addRelatedFileresource(E entity, FileResource fileResource) {
+  public void addRelatedEntity(EntityPart entityPart, Entity entity) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public void addRelatedFileresource(UUID entityUuid, UUID fileResourceUuid) {
+  public void addRelatedEntity(UUID entityPartUuid, UUID entityUuid) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public void addRelation(EntityRelation<E> relation) {
+  public void addRelatedFileresource(EntityPart entityPart, FileResource fileResource) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid) {
+  public void addRelatedFileresource(UUID entityPartUuid, UUID fileResourceUuid) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public LinkedHashSet<FileResource> getRelatedFileResources(E entity) {
+  public LinkedHashSet getRelatedEntities(EntityPart entityPart) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public LinkedHashSet<FileResource> getRelatedFileResources(UUID entityUuid) {
+  public LinkedHashSet getRelatedEntities(UUID entityPartUuid) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public List<EntityRelation> getRelations(E subjectEntity) {
+  public LinkedHashSet getRelatedFileResources(EntityPart entityPart) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public List<EntityRelation> getRelations(UUID subjectEntityUuid) {
+  public LinkedHashSet getRelatedFileResources(UUID entityPartUuid) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveRelatedFileResources(E entity, LinkedHashSet<FileResource> fileResources) {
+  public LinkedHashSet saveRelatedEntities(EntityPart entityPart, LinkedHashSet entities) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveRelatedFileResources(UUID entityUuid, LinkedHashSet<FileResource> fileResources) {
+  public LinkedHashSet saveRelatedEntities(UUID entityPartUuid, LinkedHashSet entities) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public List<EntityRelation> saveRelations(List<EntityRelation> relations) {
+  public LinkedHashSet saveRelatedFileResources(EntityPart entityPart, LinkedHashSet fileResources) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
+
+  @Override
+  public LinkedHashSet saveRelatedFileResources(UUID entityPartUuid, LinkedHashSet fileResources) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
 }

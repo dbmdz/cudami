@@ -2,8 +2,9 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.parts
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.WebpageService;
-import de.digitalcollections.model.api.identifiable.Identifiable;
+import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
+import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
@@ -12,7 +13,7 @@ import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
@@ -26,6 +27,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,18 +42,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class WebpageController {
 
   @Autowired
-  private WebpageService<Webpage, Identifiable> webpageService;
+  private WebpageService<Entity> webpageService;
 
   @ApiMethod(description = "get all webpages")
   @RequestMapping(value = {"/latest/webpages", "/v2/webpages"},
-    produces = "application/json", method = RequestMethod.GET)
+                  produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public PageResponse<Webpage> findAll(
-    @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-    @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-    @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
-    @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC") Direction sortDirection,
-    @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE") NullHandling nullHandling
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC") Direction sortDirection,
+      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE") NullHandling nullHandling
   ) {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
@@ -64,9 +66,9 @@ public class WebpageController {
   @RequestMapping(value = {"/latest/webpages/{uuid}", "/v2/webpages/{uuid}"}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, method = RequestMethod.GET)
   @ApiResponseObject
   public ResponseEntity<Webpage> getWebpage(
-    @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
-    @ApiQueryParam(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
-    @RequestParam(name = "pLocale", required = false) Locale pLocale
+      @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
+      @ApiQueryParam(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+      @RequestParam(name = "pLocale", required = false) Locale pLocale
   ) throws IdentifiableServiceException {
 
     Webpage webpage;
@@ -100,18 +102,22 @@ public class WebpageController {
     return webpageService.update(webpage);
   }
 
-  @ApiMethod(description = "get identifiables related to webpage")
-  @RequestMapping(value = {"/latest/webpages/{uuid}/identifiables", "/v2/webpages/{uuid}/identifiables"}, produces = "application/json", method = RequestMethod.GET)
+  @ApiMethod(description = "get file resources related to webpage")
+  @GetMapping(value = {
+    "/latest/webpages/{uuid}/related/fileresources",
+    "/v2/webpages/{uuid}/related/fileresources"}, produces = "application/json")
   @ApiResponseObject
-  public List<Identifiable> getIdentifiables(@PathVariable UUID uuid) {
-    return webpageService.getIdentifiables(uuid);
+  public LinkedHashSet<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
+    return webpageService.getRelatedFileResources(uuid);
   }
 
-  @ApiMethod(description = "add identifiable to webpage")
-  @PostMapping(value = {"/latest/webpages/{uuid}/identifiables/{identifiableUuid}", "/v2/webpages/{uuid}/identifiables/{identifiableUuid}"})
+  @ApiMethod(description = "add file resource related to webpage")
+  @PostMapping(value = {
+    "/latest/webpages/{uuid}/related/fileresources/{fileResourceUuid}",
+    "/v2/webpages/{uuid}/related/fileresources/{fileResourceUuid}"})
   @ResponseStatus(value = HttpStatus.OK)
   @ApiResponseObject
-  public void addIdentifiable(@PathVariable UUID uuid, @PathVariable UUID identifiableUuid) {
-    webpageService.addIdentifiable(uuid, identifiableUuid);
+  public void addRelatedFileResource(@PathVariable UUID uuid, @PathVariable UUID fileResourceUuid) {
+    webpageService.addRelatedFileresource(uuid, fileResourceUuid);
   }
 }

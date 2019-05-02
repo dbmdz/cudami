@@ -2,8 +2,9 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.parts
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.ContentNodeService;
-import de.digitalcollections.model.api.identifiable.Identifiable;
+import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
+import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
@@ -12,6 +13,7 @@ import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -27,12 +29,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ContentNodeController {
 
   @Autowired
-  private ContentNodeService<ContentNode, Identifiable> service;
+  private ContentNodeService<Entity> service;
 
   @ApiMethod(description = "get all content nodes")
   @RequestMapping(value = {"/latest/contentnodes", "/v2/contentnodes"},
@@ -116,25 +116,26 @@ public class ContentNodeController {
     return service.getChildren(uuid);
   }
 
-  @ApiMethod(description = "get identifiables of content node")
-  @RequestMapping(value = {"/latest/contentnodes/{uuid}/identifiables", "/v2/contentnodes/{uuid}/identifiables"}, produces = "application/json", method = RequestMethod.GET)
+  @ApiMethod(description = "get file resources of content node")
+  @RequestMapping(value = {"/latest/contentnodes/{uuid}/fileresources", "/v2/contentnodes/{uuid}/fileresources"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
-  public List<Identifiable> getIdentifiables(@PathVariable UUID uuid) {
-    return service.getIdentifiables(uuid);
+  public LinkedHashSet<FileResource> getFileResources(@PathVariable UUID uuid) {
+    return service.getFileResources(uuid);
   }
 
-  @ApiMethod(description = "save identifiables of content node")
-  @PostMapping(value = {"/latest/contentnodes/{uuid}/identifiables", "/v2/contentnodes/{uuid}/identifiables"}, produces = "application/json")
-  @ApiResponseObject
-  public List<Identifiable> saveIdentifiables(@PathVariable UUID uuid, @RequestBody List<Identifiable> identifiables) {
-    return service.saveIdentifiables(uuid, identifiables);
-  }
-
-  @ApiMethod(description = "add identifiable to content node")
-  @PostMapping(value = {"/latest/contentnodes/{uuid}/identifiables/{identifiableUuid}", "/v2/contentnodes/{uuid}/identifiables/{identifiableUuid}"})
-  @ResponseStatus(value = HttpStatus.OK)
-  @ApiResponseObject
-  public void addIdentifiable(@PathVariable UUID uuid, @PathVariable UUID identifiableUuid) {
-    service.addIdentifiable(uuid, identifiableUuid);
-  }
+  // FIXME
+//  @ApiMethod(description = "save identifiables of content node")
+//  @PostMapping(value = {"/latest/contentnodes/{uuid}/identifiables", "/v2/contentnodes/{uuid}/identifiables"}, produces = "application/json")
+//  @ApiResponseObject
+//  public LinkedHashSet<FileResource> saveIdentifiables(@PathVariable UUID uuid, @RequestBody LinkedHashSet<FileResource> fileResources) {
+//    return service.saveFileResources(uuid, fileResources);
+//  }
+//
+//  @ApiMethod(description = "add identifiable to content node")
+//  @PostMapping(value = {"/latest/contentnodes/{uuid}/identifiables/{identifiableUuid}", "/v2/contentnodes/{uuid}/identifiables/{identifiableUuid}"})
+//  @ResponseStatus(value = HttpStatus.OK)
+//  @ApiResponseObject
+//  public void addIdentifiable(@PathVariable UUID uuid, @PathVariable UUID identifiableUuid) {
+//    service.addIdentifiable(uuid, identifiableUuid);
+//  }
 }

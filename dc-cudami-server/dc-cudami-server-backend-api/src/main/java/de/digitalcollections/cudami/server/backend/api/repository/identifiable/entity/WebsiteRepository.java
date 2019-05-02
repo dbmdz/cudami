@@ -7,12 +7,10 @@ import java.util.UUID;
 
 /**
  * Repository for Website persistence handling.
- *
- * @param <W> website instance
  */
-public interface WebsiteRepository<W extends Website> extends EntityRepository<W> {
+public interface WebsiteRepository extends EntityRepository<Website> {
 
-  List<Webpage> getRootPages(W website);
+  List<Webpage> getRootPages(Website website);
 
   List<Webpage> getRootPages(UUID uuid);
 }

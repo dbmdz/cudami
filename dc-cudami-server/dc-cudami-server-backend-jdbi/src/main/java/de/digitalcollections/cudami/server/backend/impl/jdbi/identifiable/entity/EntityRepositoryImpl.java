@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
@@ -18,19 +17,14 @@ import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class EntityRepositoryImpl<E extends Entity> extends IdentifiableRepositoryImpl<E> implements EntityRepository<E> {
 
-  protected final Jdbi dbi;
-  private final IdentifiableRepository identifiableRepository;
-
   @Autowired
-  public EntityRepositoryImpl(Jdbi dbi, @Qualifier("identifiableRepositoryImpl") IdentifiableRepository identifiableRepository) {
-    this.dbi = dbi;
-    this.identifiableRepository = identifiableRepository;
+  public EntityRepositoryImpl(Jdbi dbi) {
+    super(dbi);
   }
 
   @Override
@@ -42,8 +36,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public PageResponse<E> find(PageRequest pageRequest) {
-    StringBuilder query = new StringBuilder("SELECT e.entity_type as entityType, e.uuid as uuid, i.label as label, i.description as description")
-        .append(" FROM entities e INNER JOIN identifiables i ON e.uuid=i.uuid");
+    StringBuilder query = new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS + ", entityType")
+        .append(" FROM entities");
 
     addPageRequestParams(pageRequest, query);
     List<EntityImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
@@ -56,9 +50,9 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public E findOne(UUID uuid) {
-    String query = "SELECT e.entity_type as entityType, e.uuid as uuid, i.label as label, i.description as description"
-                   + " FROM entities e INNER JOIN identifiables i ON e.uuid=i.uuid"
-                   + " WHERE e.uuid = :uuid";
+    String query = "SELECT " + IDENTIFIABLE_COLUMNS + ", entityType"
+                   + " FROM entities"
+                   + " WHERE uuid = :uuid";
 
     E entity = (E) dbi.withHandle(h -> h.createQuery(query)
         .bind("uuid", uuid)
@@ -74,21 +68,12 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public E save(E entity) {
-    identifiableRepository.save(entity);
-    dbi.withHandle(h -> h.createUpdate("INSERT INTO entities(entity_type, uuid) VALUES (:entityType, :uuid)")
-        .bindBean(entity)
-        .execute());
-    return findOne(entity.getUuid());
+    throw new UnsupportedOperationException("use save of specific/inherited entity repository");
   }
 
   @Override
   public E update(E entity) {
-    identifiableRepository.update(entity);
-    // do not update/left out from statement: created, uuid
-    dbi.withHandle(h -> h.createUpdate("UPDATE entities SET entity_type=:entityType WHERE uuid=:uuid")
-        .bindBean(entity)
-        .execute());
-    return findOne(entity.getUuid());
+    throw new UnsupportedOperationException("use update of specific/inherited entity repository");
   }
 
   @Override

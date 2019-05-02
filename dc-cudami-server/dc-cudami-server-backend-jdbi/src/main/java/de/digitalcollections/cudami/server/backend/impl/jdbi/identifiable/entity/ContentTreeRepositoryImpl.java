@@ -1,8 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ContentTreeRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.model.api.identifiable.entity.ContentTree;
 import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -10,6 +8,7 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.ContentTreeImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.ContentNodeImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -18,23 +17,16 @@ import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ContentTreeRepositoryImpl<C extends ContentTree> extends EntityRepositoryImpl<C> implements ContentTreeRepository<C> {
+public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree> implements ContentTreeRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentTreeRepositoryImpl.class);
 
-  private final EntityRepository entityRepository;
-
   @Autowired
-  public ContentTreeRepositoryImpl(
-      @Qualifier("identifiableRepositoryImpl") IdentifiableRepository identifiableRepository,
-      @Qualifier("entityRepositoryImpl") EntityRepository entityRepository,
-      Jdbi dbi) {
-    super(dbi, identifiableRepository);
-    this.entityRepository = entityRepository;
+  public ContentTreeRepositoryImpl(Jdbi dbi) {
+    super(dbi);
   }
 
   @Override
@@ -45,9 +37,9 @@ public class ContentTreeRepositoryImpl<C extends ContentTree> extends EntityRepo
   }
 
   @Override
-  public PageResponse<C> find(PageRequest pageRequest) {
-    StringBuilder query = new StringBuilder("SELECT ct.id as id, ct.uuid as uuid, i.label as label, i.description as description")
-        .append(" FROM contenttrees ct INNER JOIN entities e ON ct.uuid=e.uuid INNER JOIN identifiables i ON ct.uuid=i.uuid");
+  public PageResponse<ContentTree> find(PageRequest pageRequest) {
+    StringBuilder query = new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS)
+        .append(" FROM contenttrees");
 
     addPageRequestParams(pageRequest, query);
 
@@ -60,12 +52,12 @@ public class ContentTreeRepositoryImpl<C extends ContentTree> extends EntityRepo
   }
 
   @Override
-  public C findOne(UUID uuid) {
-    String query = "SELECT ct.uuid as uuid, i.label as label, i.description as description"
-                   + " FROM contenttrees ct INNER JOIN entities e ON ct.uuid=e.uuid INNER JOIN identifiables i ON ct.uuid=i.uuid"
-                   + " WHERE ct.uuid = :uuid";
+  public ContentTree findOne(UUID uuid) {
+    String query = "SELECT " + IDENTIFIABLE_COLUMNS
+                   + " FROM contenttrees"
+                   + " WHERE uuid = :uuid";
 
-    C contentTree = (C) dbi.withHandle(h -> h.createQuery(query)
+    ContentTree contentTree = dbi.withHandle(h -> h.createQuery(query)
         .bind("uuid", uuid)
         .mapToBean(ContentTreeImpl.class)
         .findOnly());
@@ -81,35 +73,52 @@ public class ContentTreeRepositoryImpl<C extends ContentTree> extends EntityRepo
   }
 
   @Override
-  public C save(C contentTree) {
-    entityRepository.save(contentTree);
-    dbi.withHandle(h -> h.createUpdate("INSERT INTO contenttrees(uuid) VALUES (:uuid)")
+  public ContentTree save(ContentTree contentTree) {
+    contentTree.setUuid(UUID.randomUUID());
+    contentTree.setCreated(LocalDateTime.now());
+    contentTree.setLastModified(LocalDateTime.now());
+
+    ContentTree result = dbi.withHandle(h -> h
+        .createQuery("INSERT INTO contenttrees(uuid, created, description, identifiable_type, label, last_modified, entity_type) VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :entityType) RETURNING *")
         .bindBean(contentTree)
-        .execute());
-    return findOne(contentTree.getUuid());
+        .mapToBean(ContentTreeImpl.class)
+        .findOnly());
+    return result;
   }
 
   @Override
-  public C update(C contentTree) {
-    entityRepository.update(contentTree);
-    return findOne(contentTree.getUuid());
+  public ContentTree update(ContentTree contentTree) {
+    contentTree.setLastModified(LocalDateTime.now());
+
+    // do not update/left out from statement (not changed since insert): uuid, created, identifiable_type, entity_type
+    ContentTree result = dbi.withHandle(h -> h
+        .createQuery("UPDATE contenttrees SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified WHERE uuid=:uuid RETURNING *")
+        .bindBean(contentTree)
+        .mapToBean(ContentTreeImpl.class)
+        .findOnly());
+    return result;
   }
 
   @Override
-  public List<ContentNode> getRootNodes(C contentTree) {
+  public List<ContentNode> getRootNodes(ContentTree contentTree) {
     UUID uuid = contentTree.getUuid();
     return getRootNodes(uuid);
   }
 
   @Override
   public List<ContentNode> getRootNodes(UUID uuid) {
-    // minimal data required for creating text links in a list
-    String query = "SELECT cc.contentnode_uuid as uuid, i.label as label"
-                   + " FROM contenttrees ct INNER JOIN contenttree_contentnode cc ON ct.uuid=cc.contenttree_uuid INNER JOIN identifiables i ON cc.contentnode_uuid=i.uuid"
-                   + " WHERE ct.uuid = :uuid"
-                   + " ORDER BY cc.sortIndex ASC";
+    // minimal data required (= identifiable fields) for creating text links/teasers in a list
+    String sql = "SELECT " + IDENTIFIABLE_COLUMNS
+        + " FROM contentnodes INNER JOIN contenttree_contentnodes cc ON uuid = cc.contentnode_uuid"
+        + " WHERE cc.contenttree_uuid = :uuid"
+        + " ORDER BY cc.sortIndex ASC";
 
-    List<ContentNodeImpl> list = dbi.withHandle(h -> h.createQuery(query)
+//    String query = "SELECT cc.contentnode_uuid as uuid, i.label as label"
+//                   + " FROM contenttrees ct INNER JOIN contenttree_contentnode cc ON ct.uuid=cc.contenttree_uuid INNER JOIN identifiables i ON cc.contentnode_uuid=i.uuid"
+//                   + " WHERE ct.uuid = :uuid"
+//                   + " ORDER BY cc.sortIndex ASC";
+
+    List<ContentNodeImpl> list = dbi.withHandle(h -> h.createQuery(sql)
         .bind("uuid", uuid)
         .mapToBean(ContentNodeImpl.class)
         .list());
