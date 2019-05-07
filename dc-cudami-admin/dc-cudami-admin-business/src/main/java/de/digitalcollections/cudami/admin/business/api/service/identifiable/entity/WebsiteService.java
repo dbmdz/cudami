@@ -6,10 +6,8 @@ import java.util.List;
 
 /**
  * Service for Website.
- *
- * @param <W> domain object
  */
-public interface WebsiteService<W extends Website> extends EntityService<W> {
+public interface WebsiteService extends EntityService<Website> {
 
-  List<Webpage> getRootNodes(W website);
+  List<Webpage> getRootPages(Website website);
 }

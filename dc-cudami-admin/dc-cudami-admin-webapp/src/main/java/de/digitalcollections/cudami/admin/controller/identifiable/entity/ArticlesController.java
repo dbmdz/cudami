@@ -7,7 +7,6 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.business.api.service.LocaleService;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.ArticleService;
-import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.entity.Article;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -36,7 +35,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -56,7 +54,7 @@ public class ArticlesController extends AbstractController implements MessageSou
   LocaleService localeService;
 
   @Autowired
-  ArticleService<Article, Identifiable> service;
+  ArticleService service;
 
   @Override
   public void setMessageSource(MessageSource messageSource) {
@@ -175,11 +173,11 @@ public class ArticlesController extends AbstractController implements MessageSou
     return "articles/view";
   }
 
-  @RequestMapping(value = "/articles/{uuid}/identifiables", method = RequestMethod.POST)
-  public String addIdentifiable(@PathVariable UUID uuid, @RequestParam(name = "identifiableUuid") UUID identifiableUuid, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
-    service.addIdentifiable(uuid, identifiableUuid);
-    return "redirect:/articles/" + uuid;
-  }
+//  @RequestMapping(value = "/articles/{uuid}/identifiables", method = RequestMethod.POST)
+//  public String addIdentifiable(@PathVariable UUID uuid, @RequestParam(name = "identifiableUuid") UUID identifiableUuid, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+//    service.addIdentifiable(uuid, identifiableUuid);
+//    return "redirect:/articles/" + uuid;
+//  }
 
   public void setService(ArticleService service) {
     this.service = service;

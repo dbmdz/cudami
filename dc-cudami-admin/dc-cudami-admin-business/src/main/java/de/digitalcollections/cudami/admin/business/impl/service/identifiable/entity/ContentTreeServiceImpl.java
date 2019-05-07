@@ -13,10 +13,10 @@ import org.springframework.stereotype.Service;
  */
 @Service
 //@Transactional(readOnly = true)
-public class ContentTreeServiceImpl extends EntityServiceImpl<ContentTree> implements ContentTreeService<ContentTree> {
+public class ContentTreeServiceImpl extends EntityServiceImpl<ContentTree> implements ContentTreeService {
 
   @Autowired
-  public ContentTreeServiceImpl(ContentTreeRepository<ContentTree> repository) {
+  public ContentTreeServiceImpl(ContentTreeRepository repository) {
     super(repository);
   }
 

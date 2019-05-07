@@ -1,8 +1,8 @@
-package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.parts;
+package de.digitalcollections.cudami.admin.business.impl.service.identifiable.entity.parts;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.EntityPartRepository;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.EntityPartService;
-import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
+import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.EntityPartRepository;
+import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.EntityPartService;
+import de.digitalcollections.cudami.admin.business.impl.service.identifiable.IdentifiableServiceImpl;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.EntityPart;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;

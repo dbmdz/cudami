@@ -7,13 +7,14 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
 // FIXME: duplicate methods (replace by functional call with specific endpoint instance?)
-public class WebsiteRepositoryImpl<W extends Website> extends EntityRepositoryImpl<W> implements WebsiteRepository<W> {
+public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website> implements WebsiteRepository {
 
   @Autowired
   private WebsiteRepositoryEndpoint endpoint;
@@ -24,34 +25,44 @@ public class WebsiteRepositoryImpl<W extends Website> extends EntityRepositoryIm
   }
 
   @Override
-  public W create() {
-    return (W) new WebsiteImpl();
+  public Website create() {
+    return new WebsiteImpl();
   }
 
   @Override
-  public PageResponse<W> find(PageRequest pageRequest) {
+  public PageResponse<Website> find(PageRequest pageRequest) {
     FindParams f = getFindParams(pageRequest);
     PageResponse<Website> pageResponse = endpoint.find(f.getPageNumber(), f.getPageSize(), f.getSortField(), f.getSortDirection(), f.getNullHandling());
     return getGenericPageResponse(pageResponse);
   }
 
   @Override
-  public W findOne(UUID uuid) {
-    return (W) endpoint.findOne(uuid);
+  public Website findOne(UUID uuid) {
+    return endpoint.findOne(uuid);
   }
 
   @Override
-  public W save(W identifiable) {
-    return (W) endpoint.save(identifiable);
+  public Website findOne(UUID uuid, Locale locale) {
+    return endpoint.findOne(uuid, locale.toString());
   }
 
   @Override
-  public W update(W identifiable) {
-    return (W) endpoint.update(identifiable.getUuid(), identifiable);
+  public List<Webpage> getRootPages(UUID uuid) {
+    return endpoint.getRootPages(uuid);
   }
 
   @Override
-  public List<Webpage> getRootPages(W website) {
-    return (List<Webpage>) endpoint.getRootPages(website.getUuid());
+  public List<Webpage> getRootPages(Website website) {
+    return getRootPages(website.getUuid());
+  }
+
+  @Override
+  public Website save(Website website) {
+    return endpoint.save(website);
+  }
+
+  @Override
+  public Website update(Website website) {
+    return endpoint.update(website.getUuid(), website);
   }
 }

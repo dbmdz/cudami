@@ -12,14 +12,23 @@ import java.util.UUID;
 
 public interface ContentTreeRepositoryEndpoint extends RepositoryEndpoint {
 
+  @RequestLine("GET /latest/contenttrees/count")
+  long count();
+
   @RequestLine("GET /latest/contenttrees?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<ContentTree> find(
-          @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
-          @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
+      @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
+      @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
   );
 
   @RequestLine("GET /latest/contenttrees/{uuid}")
   ContentTree findOne(@Param("uuid") UUID uuid);
+
+  @RequestLine("GET /latest/contenttrees/{uuid}?locale={locale}")
+  ContentTree findOne(@Param("uuid") UUID uuid, @Param("locale") String locale);
+
+  @RequestLine("GET /latest/contenttrees/{uuid}/rootNodes")
+  List<ContentNode> getRootNodes(@Param("uuid") UUID uuid);
 
   @RequestLine("POST /latest/contenttrees")
   @Headers("Content-Type: application/json")
@@ -28,10 +37,4 @@ public interface ContentTreeRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine("PUT /latest/contenttrees/{uuid}")
   @Headers("Content-Type: application/json")
   ContentTree update(@Param("uuid") UUID uuid, ContentTree contentTree);
-
-  @RequestLine("GET /latest/contenttrees/count")
-  long count();
-
-  @RequestLine("GET /latest/contenttrees/{uuid}/rootNodes")
-  List<ContentNode> getRootNodes(@Param("uuid") UUID uuid);
 }

@@ -79,7 +79,8 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website> impleme
     website.setLastModified(LocalDateTime.now());
 
     Website result = dbi.withHandle(h -> h
-        .createQuery("INSERT INTO websites(uuid, created, description, identifiable_type, label, last_modified, entity_type, url, registration_date) VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :entityType, :url, :registrationDate) RETURNING *")
+        .createQuery("INSERT INTO websites(uuid, created, description, identifiable_type, label, last_modified, entity_type, url, registration_date)"
+                     + " VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :entityType, :url, :registrationDate) RETURNING *")
         .bindBean(website)
         .mapToBean(WebsiteImpl.class)
         .findOnly());
@@ -117,7 +118,6 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website> impleme
 //                   + " FROM websites ws INNER JOIN website_webpage ww ON ws.uuid=ww.website_uuid INNER JOIN identifiables i ON ww.webpage_uuid=i.uuid"
 //                   + " WHERE ws.uuid = :uuid"
 //                   + " ORDER BY ww.sortIndex ASC";
-
     List<WebpageImpl> list = dbi.withHandle(h -> h.createQuery(sql)
         .bind("uuid", uuid)
         .mapToBean(WebpageImpl.class)

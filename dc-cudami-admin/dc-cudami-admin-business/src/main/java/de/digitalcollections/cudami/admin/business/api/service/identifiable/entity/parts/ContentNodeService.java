@@ -1,23 +1,37 @@
 package de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
-import de.digitalcollections.cudami.admin.business.api.service.identifiable.IdentifiablesContainerService;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.NodeService;
-import de.digitalcollections.model.api.identifiable.Identifiable;
+import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
+import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import java.util.LinkedHashSet;
 import java.util.UUID;
-import org.springframework.validation.Errors;
 
 /**
  * Service for ContentNode.
  *
- * @param <C> contentnode isntance
- * @param <I> identifiable instance
+ * @param <E> entity type
  */
-public interface ContentNodeService<C extends ContentNode, I extends Identifiable> extends NodeService<C>, IdentifiablesContainerService<C, I> {
+public interface ContentNodeService<E extends Entity> extends NodeService<ContentNode>, EntityPartService<ContentNode, E> {
 
-  ContentNode saveWithParentContentTree(C contentNode, UUID parentContentTreeUUID, Errors results) throws IdentifiableServiceException;
+  LinkedHashSet<E> getEntities(ContentNode contentNode);
 
-  ContentNode saveWithParentContentNode(C contentNode, UUID parentContentTreeUUID, Errors results) throws IdentifiableServiceException;
+  LinkedHashSet<E> getEntities(UUID contentNodeUuid);
 
+  LinkedHashSet<E> saveEntities(ContentNode contentNode, LinkedHashSet<E> entities);
+
+  LinkedHashSet<E> saveEntities(UUID contentNodeUuid, LinkedHashSet<E> entities);
+
+  LinkedHashSet<FileResource> getFileResources(ContentNode contentNode);
+
+  LinkedHashSet<FileResource> getFileResources(UUID contentNodeUuid);
+
+  LinkedHashSet<FileResource> saveFileResources(ContentNode contentNode, LinkedHashSet<FileResource> fileResources);
+
+  LinkedHashSet<FileResource> saveFileResources(UUID contentNodeUuid, LinkedHashSet<FileResource> fileResources);
+
+  ContentNode saveWithParentContentTree(ContentNode contentNode, UUID parentContentTreeUuid) throws IdentifiableServiceException;
+
+  ContentNode saveWithParentContentNode(ContentNode contentNode, UUID parentContentNodeUuid) throws IdentifiableServiceException;
 }

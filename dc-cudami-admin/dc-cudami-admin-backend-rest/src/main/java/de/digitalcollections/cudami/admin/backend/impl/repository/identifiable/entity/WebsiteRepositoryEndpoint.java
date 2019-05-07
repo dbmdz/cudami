@@ -12,14 +12,23 @@ import java.util.UUID;
 
 public interface WebsiteRepositoryEndpoint extends RepositoryEndpoint {
 
+  @RequestLine("GET /latest/websites/count")
+  long count();
+
   @RequestLine("GET /latest/websites?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<Website> find(
-          @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
-          @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
+      @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
+      @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
   );
 
   @RequestLine("GET /latest/websites/{uuid}")
   Website findOne(@Param("uuid") UUID uuid);
+
+  @RequestLine("GET /latest/websites/{uuid}?locale={locale}")
+  Website findOne(@Param("uuid") UUID uuid, @Param("locale") String locale);
+
+  @RequestLine("GET /latest/websites/{uuid}/rootPages")
+  List<Webpage> getRootPages(@Param("uuid") UUID uuid);
 
   @RequestLine("POST /latest/websites")
   @Headers("Content-Type: application/json")
@@ -28,10 +37,4 @@ public interface WebsiteRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine("PUT /latest/websites/{uuid}")
   @Headers("Content-Type: application/json")
   Website update(@Param("uuid") UUID uuid, Website website);
-
-  @RequestLine("GET /latest/websites/count")
-  long count();
-
-  @RequestLine("GET /latest/websites/{uuid}/rootPages")
-  List<Webpage> getRootPages(@Param("uuid") UUID uuid);
 }

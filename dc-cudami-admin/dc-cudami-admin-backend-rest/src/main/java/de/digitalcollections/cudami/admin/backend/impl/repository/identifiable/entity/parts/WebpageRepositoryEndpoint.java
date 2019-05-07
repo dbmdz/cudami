@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.entity.parts;
 
 import de.digitalcollections.cudami.admin.backend.impl.repository.RepositoryEndpoint;
-import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageResponse;
 import feign.Headers;
@@ -14,12 +13,15 @@ public interface WebpageRepositoryEndpoint extends RepositoryEndpoint {
 
   @RequestLine("GET /latest/webpages?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<Webpage> find(
-          @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
-          @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
+      @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
+      @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
   );
 
   @RequestLine("GET /latest/webpages/{uuid}")
   Webpage findOne(@Param("uuid") UUID uuid);
+
+  @RequestLine("GET /latest/webpages/{uuid}?locale={locale}")
+  Webpage findOne(@Param("uuid") UUID uuid, @Param("locale") String locale);
 
   @RequestLine("POST /latest/webpages")
   @Headers("Content-Type: application/json")
@@ -42,15 +44,4 @@ public interface WebpageRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine("POST /latest/webpages/{parentWebpageUuid}/webpage")
   @Headers("Content-Type: application/json")
   Webpage saveWithParentWebpage(Webpage webpage, @Param("parentWebpageUuid") UUID parentWebpageUuid);
-
-  @RequestLine("GET /latest/webpages/{uuid}/identifiables")
-  public List<Identifiable> getIdentifiables(UUID uuid);
-
-  @RequestLine("POST /latest/webpages/{uuid}/identifiables/{identifiableUuid}")
-  @Headers("Content-Type: application/json")
-  void addIdentifiable(@Param("uuid") UUID webpageUuid, @Param("identifiableUuid") UUID identifiableUuid);
-
-  @RequestLine("POST /latest/webpages/{uuid}/identifiables")
-  @Headers("Content-Type: application/json")
-  public List<Identifiable> saveIdentifiables(@Param("uuid") UUID uuid, List<Identifiable> identifiables);
 }

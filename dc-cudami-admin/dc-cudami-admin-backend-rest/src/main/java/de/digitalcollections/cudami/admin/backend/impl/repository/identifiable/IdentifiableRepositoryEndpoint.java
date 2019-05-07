@@ -23,6 +23,9 @@ public interface IdentifiableRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine("GET /latest/identifiables/{uuid}")
   Identifiable findOne(@Param("uuid") UUID uuid);
 
+  @RequestLine("GET /latest/identifiables/{uuid}?locale={locale}")
+  Identifiable findOne(@Param("uuid") UUID uuid, @Param("locale") String locale);
+
   @RequestLine("POST /latest/identifiables")
   @Headers("Content-Type: application/json")
   Identifiable save(Identifiable identifiable);

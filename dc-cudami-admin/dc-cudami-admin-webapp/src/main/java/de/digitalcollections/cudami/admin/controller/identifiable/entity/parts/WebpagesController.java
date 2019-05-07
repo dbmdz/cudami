@@ -95,10 +95,10 @@ public class WebpagesController extends AbstractController implements MessageSou
     Webpage webpageDb = null;
     try {
       if (Objects.equals(parentType, "website")) {
-        webpageDb = webpageService.saveWithParentWebsite(webpage, parentUuid, results);
+        webpageDb = webpageService.saveWithParentWebsite(webpage, parentUuid);
         LOGGER.info("Successfully saved top-level webpage");
       } else if (Objects.equals(parentType, "webpage")) {
-        webpageDb = webpageService.saveWithParentWebpage(webpage, parentUuid, results);
+        webpageDb = webpageService.saveWithParentWebpage(webpage, parentUuid);
         LOGGER.info("Successfully saved webpage");
       }
     } catch (Exception e) {
@@ -188,11 +188,11 @@ public class WebpagesController extends AbstractController implements MessageSou
     return "webpages/view";
   }
 
-  @RequestMapping(value = "/webpages/{uuid}/identifiables", method = RequestMethod.POST)
-  public String addIdentifiable(@PathVariable UUID uuid, @RequestParam(name = "identifiableUuid") UUID identifiableUuid, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
-    webpageService.addIdentifiable(uuid, identifiableUuid);
-    return "redirect:/webpages/" + uuid;
-  }
+//  @RequestMapping(value = "/webpages/{uuid}/identifiables", method = RequestMethod.POST)
+//  public String addIdentifiable(@PathVariable UUID uuid, @RequestParam(name = "identifiableUuid") UUID identifiableUuid, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+//    webpageService.addIdentifiable(uuid, identifiableUuid);
+//    return "redirect:/webpages/" + uuid;
+//  }
 
   public void setWebpageService(WebpageService webpageService) {
     this.webpageService = webpageService;
