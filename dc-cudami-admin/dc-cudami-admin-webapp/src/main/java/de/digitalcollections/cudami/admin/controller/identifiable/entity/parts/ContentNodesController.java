@@ -72,9 +72,9 @@ public class ContentNodesController extends AbstractController implements Messag
   public String create(Model model, @RequestParam("parentType") String parentType, @RequestParam("parentUuid") String parentUuid) {
     Locale defaultLocale = localeService.getDefault();
     List<Locale> locales = localeService.findAll().stream()
-            .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
-            .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-            .collect(Collectors.toList());
+        .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
+        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+        .collect(Collectors.toList());
 
     model.addAttribute("contentNode", contentNodeService.create());
     model.addAttribute("defaultLocale", defaultLocale);
@@ -86,8 +86,8 @@ public class ContentNodesController extends AbstractController implements Messag
 
   @RequestMapping(value = "/contentnodes/new", method = RequestMethod.POST)
   public String create(@ModelAttribute @Valid ContentNodeImpl contentNode, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes,
-          @RequestParam("parentType") String parentType,
-          @RequestParam("parentUuid") UUID parentUuid) {
+                       @RequestParam("parentType") String parentType,
+                       @RequestParam("parentUuid") UUID parentUuid) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "contentnodes/create";
@@ -127,9 +127,9 @@ public class ContentNodesController extends AbstractController implements Messag
     HashSet<Locale> availableLocales = (HashSet<Locale>) contentNode.getLabel().getLocales();
     Set<String> availableLocaleTags = availableLocales.stream().map(Locale::toLanguageTag).collect(Collectors.toSet());
     List<Locale> locales = localeService.findAll().stream()
-            .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
-            .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-            .collect(Collectors.toList());
+        .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
+        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+        .collect(Collectors.toList());
 
     model.addAttribute("contentNode", contentNode);
     model.addAttribute("availableLocales", availableLocales);
@@ -152,7 +152,7 @@ public class ContentNodesController extends AbstractController implements Messag
       contentNodeDb.setLabel(contentNode.getLabel());
       contentNodeDb.setDescription(contentNode.getDescription());
 
-      contentNodeService.update(contentNodeDb, results);
+      contentNodeService.update(contentNodeDb);
     } catch (IdentifiableServiceException e) {
       String message = "Cannot save content node with uuid=" + uuid + ": " + e;
       LOGGER.error(message, e);
@@ -192,7 +192,6 @@ public class ContentNodesController extends AbstractController implements Messag
 //    contentNodeService.addIdentifiable(uuid, identifiableUuid);
 //    return "redirect:/contentnodes/" + uuid;
 //  }
-
   public void setContentNodeService(ContentNodeService contentNodeService) {
     this.contentNodeService = contentNodeService;
   }

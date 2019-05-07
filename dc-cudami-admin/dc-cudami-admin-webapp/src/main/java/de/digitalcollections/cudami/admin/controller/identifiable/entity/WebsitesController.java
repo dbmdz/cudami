@@ -70,9 +70,9 @@ public class WebsitesController extends AbstractController implements MessageSou
   public String create(Model model) {
     Locale defaultLocale = localeService.getDefault();
     List<Locale> locales = localeService.findAll().stream()
-            .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
-            .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-            .collect(Collectors.toList());
+        .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
+        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+        .collect(Collectors.toList());
 
     model.addAttribute("defaultLocale", defaultLocale);
     model.addAttribute("locales", locales);
@@ -88,7 +88,7 @@ public class WebsitesController extends AbstractController implements MessageSou
     }
     Website websiteDb = null;
     try {
-      websiteDb = (Website) websiteService.save(website, results);
+      websiteDb = websiteService.save(website);
       LOGGER.info("Successfully saved website");
     } catch (Exception e) {
       LOGGER.error("Cannot save website: ", e);
@@ -109,15 +109,15 @@ public class WebsitesController extends AbstractController implements MessageSou
   public String edit(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
 //      model.addAttribute("contentNodeTypes", websiteViewService.getContentNodeTypes());
 //      model.addAttribute("navigationNodeTypes", websiteViewService.getNavigationNodeTypes());
-    Website website = (Website) websiteService.get(uuid);
+    Website website = websiteService.get(uuid);
     model.addAttribute("website", website);
 
     HashSet<Locale> availableLocales = (HashSet<Locale>) website.getLabel().getLocales();
     Set<String> availableLocaleTags = availableLocales.stream().map(Locale::toLanguageTag).collect(Collectors.toSet());
     List<Locale> locales = localeService.findAll().stream()
-            .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
-            .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-            .collect(Collectors.toList());
+        .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
+        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+        .collect(Collectors.toList());
 //      LOGGER.error("Cannot retrieve website with id=" + id + ": ", e);
 //      String message = messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale());
 //      redirectAttributes.addFlashAttribute("error_message", message);
@@ -143,7 +143,7 @@ public class WebsitesController extends AbstractController implements MessageSou
       websiteDb.setLabel(website.getLabel());
       websiteDb.setDescription(website.getDescription());
 
-      websiteService.update(websiteDb, results);
+      websiteService.update(websiteDb);
     } catch (IdentifiableServiceException e) {
       String message = "Cannot save website with uuid=" + pathUuid + ": " + e;
       LOGGER.error(message, e);

@@ -68,7 +68,6 @@ public class FileResourceController {
   @Autowired
   private CudamiFileResourceService cudamiFileResourceService;
 
-  // TODO: see FileResourceRepositoryEndpoint: count()
   @ApiMethod(description = "get all fileresources")
   @GetMapping(value = {"/latest/fileresources", "/v2/fileresources"}, produces = "application/json")
   @ApiResponseObject

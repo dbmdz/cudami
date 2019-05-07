@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.Errors;
 
 @Service
 //@Transactional(readOnly = true)
@@ -63,31 +62,25 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
 
   @Override
   @Transactional(readOnly = false)
-  public I save(I identifiable, Errors results) throws IdentifiableServiceException {
-    if (results == null || !results.hasErrors()) {
-      try {
-        identifiable = (I) repository.save(identifiable);
-      } catch (Exception e) {
-        LOGGER.error("Cannot save identifiable " + identifiable + ": ", e);
-        throw new IdentifiableServiceException(e.getMessage());
-      }
+  public I save(I identifiable) throws IdentifiableServiceException {
+    try {
+      identifiable = (I) repository.save(identifiable);
+      return identifiable;
+    } catch (Exception e) {
+      LOGGER.error("Cannot save identifiable " + identifiable + ": ", e);
+      throw new IdentifiableServiceException(e.getMessage());
     }
-    // FIXME: what if results has errors? throw exception?
-    return identifiable;
   }
 
   @Override
   @Transactional(readOnly = false)
-  public I update(I identifiable, Errors results) throws IdentifiableServiceException {
-    if (!results.hasErrors()) {
-      try {
-        identifiable = (I) repository.update(identifiable);
-      } catch (Exception e) {
-        LOGGER.error("Cannot update identifiable " + identifiable + ": ", e);
-        throw new IdentifiableServiceException(e.getMessage());
-      }
+  public I update(I identifiable) throws IdentifiableServiceException {
+    try {
+      identifiable = (I) repository.update(identifiable);
+      return identifiable;
+    } catch (Exception e) {
+      LOGGER.error("Cannot update identifiable " + identifiable + ": ", e);
+      throw new IdentifiableServiceException(e.getMessage());
     }
-    // FIXME: what if results has errors? throw exception?
-    return identifiable;
   }
 }

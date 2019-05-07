@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-// FIXME: duplicate methods (replace by functional call with specific endpoint instance?)
 public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website> implements WebsiteRepository {
 
   @Autowired

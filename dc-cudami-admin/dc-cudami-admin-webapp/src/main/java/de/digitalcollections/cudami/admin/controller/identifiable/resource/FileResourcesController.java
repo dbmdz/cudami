@@ -164,7 +164,7 @@ public class FileResourcesController extends AbstractController implements Messa
 
       // TODO update license
       // ...
-      cudamiFileResourceService.update(fileResourceDb, results);
+      cudamiFileResourceService.update(fileResourceDb);
     } catch (IdentifiableServiceException e) {
       String message = "Cannot save fileresource with uuid=" + fileResourceUuid + ": " + e;
       LOGGER.error(message, e);
@@ -227,7 +227,7 @@ public class FileResourcesController extends AbstractController implements Messa
       fileResourceDb.setLabel(fileResource.getLabel());
       fileResourceDb.setDescription(fileResource.getDescription());
 
-      cudamiFileResourceService.update(fileResourceDb, results);
+      cudamiFileResourceService.update(fileResourceDb);
     } catch (IdentifiableServiceException e) {
       String message = "Cannot save fileresource with uuid=" + pathUuid + ": " + e;
       LOGGER.error(message, e);

@@ -70,9 +70,9 @@ public class ArticlesController extends AbstractController implements MessageSou
   public String create(Model model) {
     Locale defaultLocale = localeService.getDefault();
     List<Locale> locales = localeService.findAll().stream()
-            .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
-            .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-            .collect(Collectors.toList());
+        .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
+        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+        .collect(Collectors.toList());
 
     model.addAttribute("article", service.create());
     model.addAttribute("defaultLocale", defaultLocale);
@@ -88,7 +88,7 @@ public class ArticlesController extends AbstractController implements MessageSou
     }
     Article articleDb = null;
     try {
-      articleDb = service.save(article, results);
+      articleDb = service.save(article);
       LOGGER.info("Successfully saved article");
     } catch (Exception e) {
       LOGGER.error("Cannot save article: ", e);
@@ -113,9 +113,9 @@ public class ArticlesController extends AbstractController implements MessageSou
     HashSet<Locale> availableLocales = (HashSet<Locale>) article.getLabel().getLocales();
     Set<String> availableLocaleTags = availableLocales.stream().map(Locale::toLanguageTag).collect(Collectors.toSet());
     List<Locale> locales = localeService.findAll().stream()
-            .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
-            .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-            .collect(Collectors.toList());
+        .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
+        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+        .collect(Collectors.toList());
 
     model.addAttribute("availableLocales", article.getLabel().getLocales());
     model.addAttribute("locales", locales);
@@ -138,7 +138,7 @@ public class ArticlesController extends AbstractController implements MessageSou
       articleDb.setDescription(article.getDescription());
       articleDb.setText(article.getText());
 
-      service.update(articleDb, results);
+      service.update(articleDb);
     } catch (IdentifiableServiceException e) {
       String message = "Cannot save article with uuid=" + pathUuid + ": " + e;
       LOGGER.error(message, e);
@@ -178,7 +178,6 @@ public class ArticlesController extends AbstractController implements MessageSou
 //    service.addIdentifiable(uuid, identifiableUuid);
 //    return "redirect:/articles/" + uuid;
 //  }
-
   public void setService(ArticleService service) {
     this.service = service;
   }
