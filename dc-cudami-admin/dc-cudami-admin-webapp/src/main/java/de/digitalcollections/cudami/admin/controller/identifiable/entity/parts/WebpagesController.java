@@ -72,9 +72,9 @@ public class WebpagesController extends AbstractController implements MessageSou
   public String create(Model model, @RequestParam("parentType") String parentType, @RequestParam("parentUuid") String parentUuid) {
     Locale defaultLocale = localeService.getDefault();
     List<Locale> locales = localeService.findAll().stream()
-            .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
-            .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-            .collect(Collectors.toList());
+        .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
+        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+        .collect(Collectors.toList());
 
     model.addAttribute("defaultLocale", defaultLocale);
     model.addAttribute("locales", locales);
@@ -86,8 +86,8 @@ public class WebpagesController extends AbstractController implements MessageSou
 
   @RequestMapping(value = "/webpages/new", method = RequestMethod.POST)
   public String create(@ModelAttribute @Valid WebpageImpl webpage, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes,
-          @RequestParam("parentType") String parentType,
-          @RequestParam("parentUuid") UUID parentUuid) {
+                       @RequestParam("parentType") String parentType,
+                       @RequestParam("parentUuid") UUID parentUuid) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "webpages/create";
@@ -127,9 +127,9 @@ public class WebpagesController extends AbstractController implements MessageSou
     HashSet<Locale> availableLocales = (HashSet<Locale>) webpage.getLabel().getLocales();
     Set<String> availableLocaleTags = availableLocales.stream().map(Locale::toLanguageTag).collect(Collectors.toSet());
     List<Locale> locales = localeService.findAll().stream()
-            .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
-            .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-            .collect(Collectors.toList());
+        .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
+        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+        .collect(Collectors.toList());
 
     model.addAttribute("webpage", webpage);
     model.addAttribute("availableLocales", availableLocales);
@@ -153,7 +153,7 @@ public class WebpagesController extends AbstractController implements MessageSou
       webpageDb.setDescription(webpage.getDescription());
       webpageDb.setText(webpage.getText());
 
-      webpageService.update(webpageDb, results);
+      webpageService.update(webpageDb);
     } catch (IdentifiableServiceException e) {
       String message = "Cannot save webpage with uuid=" + pathUuid + ": " + e;
       LOGGER.error(message, e);
@@ -193,7 +193,6 @@ public class WebpagesController extends AbstractController implements MessageSou
 //    webpageService.addIdentifiable(uuid, identifiableUuid);
 //    return "redirect:/webpages/" + uuid;
 //  }
-
   public void setWebpageService(WebpageService webpageService) {
     this.webpageService = webpageService;
   }

@@ -70,9 +70,9 @@ public class ContentTreesController extends AbstractController implements Messag
   public String create(Model model) {
     Locale defaultLocale = localeService.getDefault();
     List<Locale> locales = localeService.findAll().stream()
-            .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
-            .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-            .collect(Collectors.toList());
+        .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
+        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+        .collect(Collectors.toList());
 
     model.addAttribute("contentTree", contentTreeService.create());
     model.addAttribute("defaultLocale", defaultLocale);
@@ -88,7 +88,7 @@ public class ContentTreesController extends AbstractController implements Messag
     }
     ContentTree contentTreeDb = null;
     try {
-      contentTreeDb = (ContentTree) contentTreeService.save(contentTree, results);
+      contentTreeDb = contentTreeService.save(contentTree);
       LOGGER.info("Successfully saved content tree");
     } catch (Exception e) {
       LOGGER.error("Cannot save content tree: ", e);
@@ -115,9 +115,9 @@ public class ContentTreesController extends AbstractController implements Messag
     HashSet<Locale> availableLocales = (HashSet<Locale>) contentTree.getLabel().getLocales();
     Set<String> availableLocaleTags = availableLocales.stream().map(Locale::toLanguageTag).collect(Collectors.toSet());
     List<Locale> locales = localeService.findAll().stream()
-            .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
-            .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-            .collect(Collectors.toList());
+        .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
+        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+        .collect(Collectors.toList());
 //      LOGGER.error("Cannot retrieve website with id=" + id + ": ", e);
 //      String message = messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale());
 //      redirectAttributes.addFlashAttribute("error_message", message);
@@ -142,7 +142,7 @@ public class ContentTreesController extends AbstractController implements Messag
       contentTreeDb.setLabel(contentTree.getLabel());
       contentTreeDb.setDescription(contentTree.getDescription());
 
-      contentTreeService.update(contentTreeDb, results);
+      contentTreeService.update(contentTreeDb);
     } catch (IdentifiableServiceException e) {
       String message = "Cannot save content tree with uuid=" + pathUuid + ": " + e;
       LOGGER.error(message, e);
