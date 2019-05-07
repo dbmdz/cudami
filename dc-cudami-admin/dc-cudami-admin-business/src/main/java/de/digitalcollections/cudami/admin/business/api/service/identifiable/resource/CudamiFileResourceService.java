@@ -6,11 +6,11 @@ import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.exceptions.ResourceIOException;
 import java.io.InputStream;
 
-public interface CudamiFileResourceService<F extends FileResource> extends IdentifiableService<F> {
+public interface CudamiFileResourceService extends IdentifiableService<FileResource> {
 
-  public F save(FileResource fileResource, byte[] bytes) throws IdentifiableServiceException;
+  FileResource save(FileResource fileResource, byte[] bytes) throws IdentifiableServiceException;
 
-  public F upload(InputStream inputStream, String filename, String contentType) throws ResourceIOException;
-  
-  public F upload(byte[] bytes, String filename, String contentType) throws ResourceIOException;
+  public FileResource upload(InputStream inputStream, String filename, String contentType) throws ResourceIOException;
+
+  public FileResource upload(byte[] bytes, String filename, String contentType) throws ResourceIOException;
 }

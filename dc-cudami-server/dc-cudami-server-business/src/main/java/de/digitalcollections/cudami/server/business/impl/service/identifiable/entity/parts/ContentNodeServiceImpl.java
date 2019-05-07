@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.parts;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.ContentNodeRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.ContentNodeService;
@@ -33,32 +32,32 @@ public class ContentNodeServiceImpl<E extends Entity> extends EntityPartServiceI
 
   @Override
   public List<ContentNode> getChildren(ContentNode contentNode) {
-    return ((NodeRepository) repository).getChildren(contentNode);
+    return ((ContentNodeRepository) repository).getChildren(contentNode);
   }
 
   @Override
   public List<ContentNode> getChildren(UUID uuid) {
-    return ((NodeRepository) repository).getChildren(uuid);
+    return ((ContentNodeRepository) repository).getChildren(uuid);
   }
 
   @Override
   public LinkedHashSet<E> getEntities(ContentNode contentNode) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return getEntities(contentNode.getUuid());
   }
 
   @Override
   public LinkedHashSet<E> getEntities(UUID contentNodeUuid) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return ((ContentNodeRepository) repository).getEntities(contentNodeUuid);
   }
 
   @Override
   public LinkedHashSet<E> saveEntities(ContentNode contentNode, LinkedHashSet<E> entities) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return saveEntities(contentNode.getUuid(), entities);
   }
 
   @Override
   public LinkedHashSet<E> saveEntities(UUID contentNodeUuid, LinkedHashSet<E> entities) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return ((ContentNodeRepository) repository).saveEntities(contentNodeUuid, entities);
   }
 
   @Override

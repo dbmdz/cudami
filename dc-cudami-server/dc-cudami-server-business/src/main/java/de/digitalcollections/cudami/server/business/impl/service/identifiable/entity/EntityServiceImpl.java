@@ -24,56 +24,56 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
 
   @Override
   public void addRelatedFileresource(E entity, FileResource fileResource) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    ((EntityRepository) repository).addRelatedFileresource(entity, fileResource);
   }
 
   @Override
   public void addRelatedFileresource(UUID entityUuid, UUID fileResourceUuid) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    ((EntityRepository) repository).addRelatedFileresource(entityUuid, fileResourceUuid);
   }
 
   @Override
   public void addRelation(EntityRelation<E> relation) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    ((EntityRepository) repository).addRelation(relation);
   }
 
   @Override
   public void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    ((EntityRepository) repository).addRelation(subjectEntityUuid, predicate, objectEntityUuid);
   }
 
   @Override
   public LinkedHashSet<FileResource> getRelatedFileResources(E entity) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return ((EntityRepository) repository).getRelatedFileResources(entity);
   }
 
   @Override
   public LinkedHashSet<FileResource> getRelatedFileResources(UUID entityUuid) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return ((EntityRepository) repository).getRelatedFileResources(entityUuid);
   }
 
   @Override
   public List<EntityRelation> getRelations(E subjectEntity) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return ((EntityRepository) repository).getRelations(subjectEntity);
   }
 
   @Override
   public List<EntityRelation> getRelations(UUID subjectEntityUuid) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return ((EntityRepository) repository).getRelations(subjectEntityUuid);
   }
 
   @Override
   public LinkedHashSet<FileResource> saveRelatedFileResources(E entity, LinkedHashSet<FileResource> fileResources) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return ((EntityRepository) repository).saveRelatedFileResources(entity, fileResources);
   }
 
   @Override
   public LinkedHashSet<FileResource> saveRelatedFileResources(UUID entityUuid, LinkedHashSet<FileResource> fileResources) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return ((EntityRepository) repository).saveRelatedFileResources(entityUuid, fileResources);
   }
 
   @Override
   public List<EntityRelation> saveRelations(List<EntityRelation> relations) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return ((EntityRepository) repository).saveRelations(relations);
   }
 }

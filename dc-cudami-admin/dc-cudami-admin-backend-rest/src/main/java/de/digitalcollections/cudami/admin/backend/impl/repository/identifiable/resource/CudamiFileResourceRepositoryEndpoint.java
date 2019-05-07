@@ -11,10 +11,13 @@ import java.util.UUID;
 
 public interface CudamiFileResourceRepositoryEndpoint extends RepositoryEndpoint {
 
+  @RequestLine("GET /latest/fileresources/count")
+  long count();
+
   @RequestLine("GET /latest/fileresources?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<FileResource> find(
-          @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
-          @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
+      @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
+      @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
   );
 
   @RequestLine("GET /latest/fileresources/{uuid}")
@@ -38,6 +41,4 @@ public interface CudamiFileResourceRepositoryEndpoint extends RepositoryEndpoint
   @Headers("Content-Type: application/json")
   FileResource update(@Param("uuid") UUID uuid, FileResource fileresource);
 
-  @RequestLine("GET /latest/fileresources/count")
-  long count();
 }

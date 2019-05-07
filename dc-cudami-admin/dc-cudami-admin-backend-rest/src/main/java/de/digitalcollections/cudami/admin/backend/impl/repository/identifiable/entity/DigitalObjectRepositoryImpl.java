@@ -2,16 +2,19 @@ package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.
 
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
+import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
 // FIXME: duplicate methods (replace by functional call with specific endpoint instance?)
-public class DigitalObjectRepositoryImpl<D extends DigitalObject> extends EntityRepositoryImpl<D> implements DigitalObjectRepository<D> {
+public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObject> implements DigitalObjectRepository {
 
   @Autowired
   private DigitalObjectRepositoryEndpoint endpoint;
@@ -22,29 +25,54 @@ public class DigitalObjectRepositoryImpl<D extends DigitalObject> extends Entity
   }
 
   @Override
-  public D create() {
-    return (D) new DigitalObjectImpl();
+  public DigitalObject create() {
+    return new DigitalObjectImpl();
   }
 
   @Override
-  public PageResponse<D> find(PageRequest pageRequest) {
+  public PageResponse<DigitalObject> find(PageRequest pageRequest) {
     FindParams f = getFindParams(pageRequest);
     PageResponse<DigitalObject> pageResponse = endpoint.find(f.getPageNumber(), f.getPageSize(), f.getSortField(), f.getSortDirection(), f.getNullHandling());
     return getGenericPageResponse(pageResponse);
   }
 
   @Override
-  public D findOne(UUID uuid) {
-    return (D) endpoint.findOne(uuid);
+  public DigitalObject findOne(UUID uuid) {
+    return endpoint.findOne(uuid);
   }
 
   @Override
-  public D save(D identifiable) {
-    return (D) endpoint.save(identifiable);
+  public DigitalObject findOne(UUID uuid, Locale locale) {
+    return endpoint.findOne(uuid, locale.toString());
   }
 
   @Override
-  public D update(D identifiable) {
-    return (D) endpoint.update(identifiable.getUuid(), identifiable);
+  public LinkedHashSet<FileResource> getFileResources(DigitalObject digitalObject) {
+    return getFileResources(digitalObject.getUuid());
+  }
+
+  @Override
+  public LinkedHashSet<FileResource> getFileResources(UUID digitalObjectUuid) {
+    return endpoint.getFileResources(digitalObjectUuid);
+  }
+
+  @Override
+  public DigitalObject save(DigitalObject digitalObject) {
+    return endpoint.save(digitalObject);
+  }
+
+  @Override
+  public LinkedHashSet<FileResource> saveFileResources(DigitalObject digitalObject, LinkedHashSet<FileResource> fileResources) {
+    return saveFileResources(digitalObject.getUuid(), fileResources);
+  }
+
+  @Override
+  public LinkedHashSet<FileResource> saveFileResources(UUID digitalObjectUuid, LinkedHashSet<FileResource> fileResources) {
+    return endpoint.saveFileResources(digitalObjectUuid, fileResources);
+  }
+
+  @Override
+  public DigitalObject update(DigitalObject digitalObject) {
+    return endpoint.update(digitalObject.getUuid(), digitalObject);
   }
 }

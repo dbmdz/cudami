@@ -7,6 +7,7 @@ import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,11 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   @Override
   public I get(UUID uuid) {
     return (I) repository.findOne(uuid);
+  }
+
+  @Override
+  public I get(UUID uuid, Locale locale) {
+    return (I) repository.findOne(uuid, locale);
   }
 
   @Override

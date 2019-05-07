@@ -7,12 +7,13 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.ContentTreeImpl;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ContentTreeRepositoryImpl<C extends ContentTree> extends EntityRepositoryImpl<C> implements ContentTreeRepository<C> {
+public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree> implements ContentTreeRepository {
 
   @Autowired
   private ContentTreeRepositoryEndpoint endpoint;
@@ -23,34 +24,44 @@ public class ContentTreeRepositoryImpl<C extends ContentTree> extends EntityRepo
   }
 
   @Override
-  public C create() {
-    return (C) new ContentTreeImpl();
+  public ContentTree create() {
+    return new ContentTreeImpl();
   }
 
   @Override
-  public PageResponse<C> find(PageRequest pageRequest) {
+  public PageResponse<ContentTree> find(PageRequest pageRequest) {
     FindParams f = getFindParams(pageRequest);
     PageResponse<ContentTree> pageResponse = endpoint.find(f.getPageNumber(), f.getPageSize(), f.getSortField(), f.getSortDirection(), f.getNullHandling());
     return getGenericPageResponse(pageResponse);
   }
 
   @Override
-  public C findOne(UUID uuid) {
-    return (C) endpoint.findOne(uuid);
+  public ContentTree findOne(UUID uuid) {
+    return endpoint.findOne(uuid);
   }
 
   @Override
-  public C save(C identifiable) {
-    return (C) endpoint.save(identifiable);
+  public ContentTree findOne(UUID uuid, Locale locale) {
+    return endpoint.findOne(uuid, locale.toString());
   }
 
   @Override
-  public C update(C identifiable) {
-    return (C) endpoint.update(identifiable.getUuid(), identifiable);
+  public List<ContentNode> getRootNodes(ContentTree contentTree) {
+    return getRootNodes(contentTree.getUuid());
   }
 
   @Override
-  public List<ContentNode> getRootNodes(C contentTree) {
-    return (List<ContentNode>) endpoint.getRootNodes(contentTree.getUuid());
+  public List<ContentNode> getRootNodes(UUID uuid) {
+    return endpoint.getRootNodes(uuid);
+  }
+
+  @Override
+  public ContentTree save(ContentTree contentTree) {
+    return endpoint.save(contentTree);
+  }
+
+  @Override
+  public ContentTree update(ContentTree contentTree) {
+    return endpoint.update(contentTree.getUuid(), contentTree);
   }
 }

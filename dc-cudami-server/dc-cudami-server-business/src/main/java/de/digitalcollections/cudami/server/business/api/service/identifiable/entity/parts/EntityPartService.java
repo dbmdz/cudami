@@ -6,13 +6,13 @@ import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import java.util.LinkedHashSet;
 import java.util.UUID;
 
-public interface EntityPartService<EP extends EntityPart, E extends Entity> {
+public interface EntityPartService<P extends EntityPart, E extends Entity> {
 
-  void addRelatedEntity(EP entityPart, E entity);
+  void addRelatedEntity(P entityPart, E entity);
 
   void addRelatedEntity(UUID entityPartUuid, UUID entityUuid);
 
-  LinkedHashSet<E> getRelatedEntities(EP entityPart);
+  LinkedHashSet<E> getRelatedEntities(P entityPart);
 
   LinkedHashSet<E> getRelatedEntities(UUID entityPartUuid);
 
@@ -22,15 +22,15 @@ public interface EntityPartService<EP extends EntityPart, E extends Entity> {
    * @param entities the entities that are related to the entity part
    * @return the list of the related entities
    */
-  LinkedHashSet<E> saveRelatedEntities(EP entityPart, LinkedHashSet<E> entities);
+  LinkedHashSet<E> saveRelatedEntities(P entityPart, LinkedHashSet<E> entities);
 
   LinkedHashSet<E> saveRelatedEntities(UUID entityPartUuid, LinkedHashSet<E> entities);
 
-  void addRelatedFileresource(EP entityPart, FileResource fileResource);
+  void addRelatedFileresource(P entityPart, FileResource fileResource);
 
   void addRelatedFileresource(UUID entityPartUuid, UUID fileResourceUuid);
 
-  LinkedHashSet<FileResource> getRelatedFileResources(EP entityPart);
+  LinkedHashSet<FileResource> getRelatedFileResources(P entityPart);
 
   LinkedHashSet<FileResource> getRelatedFileResources(UUID entityPartUuid);
 
@@ -40,7 +40,7 @@ public interface EntityPartService<EP extends EntityPart, E extends Entity> {
    * @param fileResources the file resources that are related to the entity part
    * @return the list of the related file resources
    */
-  LinkedHashSet<FileResource> saveRelatedFileResources(EP entityPart, LinkedHashSet<FileResource> fileResources);
+  LinkedHashSet<FileResource> saveRelatedFileResources(P entityPart, LinkedHashSet<FileResource> fileResources);
 
   LinkedHashSet<FileResource> saveRelatedFileResources(UUID entityPartUuid, LinkedHashSet<FileResource> fileResources);
 }

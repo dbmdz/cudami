@@ -95,10 +95,10 @@ public class ContentNodesController extends AbstractController implements Messag
     ContentNode contentNodeDb = null;
     try {
       if (Objects.equals(parentType, "contentTree")) {
-        contentNodeDb = contentNodeService.saveWithParentContentTree(contentNode, parentUuid, results);
+        contentNodeDb = contentNodeService.saveWithParentContentTree(contentNode, parentUuid);
         LOGGER.info("Successfully saved top-level content node");
       } else if (Objects.equals(parentType, "contentNode")) {
-        contentNodeDb = contentNodeService.saveWithParentContentNode(contentNode, parentUuid, results);
+        contentNodeDb = contentNodeService.saveWithParentContentNode(contentNode, parentUuid);
         LOGGER.info("Successfully saved content node");
       }
     } catch (Exception e) {
@@ -187,11 +187,11 @@ public class ContentNodesController extends AbstractController implements Messag
     return "contentnodes/view";
   }
 
-  @RequestMapping(value = "/contentnodes/{uuid}/identifiables", method = RequestMethod.POST)
-  public String addIdentifiable(@PathVariable UUID uuid, @RequestParam(name = "identifiableUuid") UUID identifiableUuid, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
-    contentNodeService.addIdentifiable(uuid, identifiableUuid);
-    return "redirect:/contentnodes/" + uuid;
-  }
+//  @RequestMapping(value = "/contentnodes/{uuid}/identifiables", method = RequestMethod.POST)
+//  public String addIdentifiable(@PathVariable UUID uuid, @RequestParam(name = "identifiableUuid") UUID identifiableUuid, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+//    contentNodeService.addIdentifiable(uuid, identifiableUuid);
+//    return "redirect:/contentnodes/" + uuid;
+//  }
 
   public void setContentNodeService(ContentNodeService contentNodeService) {
     this.contentNodeService = contentNodeService;

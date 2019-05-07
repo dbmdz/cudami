@@ -4,6 +4,7 @@ import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public interface IdentifiableRepository<I extends Identifiable> {
@@ -17,6 +18,8 @@ public interface IdentifiableRepository<I extends Identifiable> {
   List<I> find(String searchTerm, int maxResults);
 
   I findOne(UUID uuid);
+
+  I findOne(UUID uuid, Locale locale);
 
   I save(I identifiable);
 

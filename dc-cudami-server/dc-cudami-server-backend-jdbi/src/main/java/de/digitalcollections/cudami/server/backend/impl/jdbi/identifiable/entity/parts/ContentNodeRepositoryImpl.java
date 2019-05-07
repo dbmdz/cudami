@@ -165,6 +165,7 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
 
   @Override
   public LinkedHashSet<E> getEntities(ContentNode contentNode) {
+    // FIXME
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 

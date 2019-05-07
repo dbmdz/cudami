@@ -8,6 +8,7 @@ import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.en
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.WebsiteRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.ContentNodeRepository;
+import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.EntityPartRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.WebpageRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.CudamiFileResourceRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.security.UserRepository;
@@ -28,24 +29,6 @@ public class SpringConfigBackendForTest {
   }
 
   @Bean
-  @Qualifier("identifiableRepositoryImpl")
-  public IdentifiableRepository identifiableRepositoryImpl() {
-    return Mockito.mock(IdentifiableRepository.class);
-  }
-
-  @Bean
-  @Qualifier("resourceRepositoryImpl")
-  public CudamiFileResourceRepository resourceRepositoryImpl() {
-    return Mockito.mock(CudamiFileResourceRepository.class);
-  }
-
-  @Bean
-  @Qualifier("entityRepositoryImpl")
-  public EntityRepository entityRepositoryImpl() {
-    return Mockito.mock(EntityRepository.class);
-  }
-
-  @Bean
   public ContentNodeRepository contentNodeRepository() {
     return Mockito.mock(ContentNodeRepository.class);
   }
@@ -61,8 +44,31 @@ public class SpringConfigBackendForTest {
   }
 
   @Bean
+  public EntityPartRepository entityPartRepositoryImpl() {
+    return Mockito.mock(EntityPartRepository.class);
+  }
+
+  @Bean
+  @Qualifier("entityRepositoryImpl")
+  public EntityRepository entityRepositoryImpl() {
+    return Mockito.mock(EntityRepository.class);
+  }
+
+  @Bean
+  @Qualifier("identifiableRepositoryImpl")
+  public IdentifiableRepository identifiableRepositoryImpl() {
+    return Mockito.mock(IdentifiableRepository.class);
+  }
+
+  @Bean
   public LocaleRepository localeRepository() {
     return Mockito.mock(LocaleRepository.class);
+  }
+
+  @Bean
+  @Qualifier("resourceRepositoryImpl")
+  public CudamiFileResourceRepository resourceRepositoryImpl() {
+    return Mockito.mock(CudamiFileResourceRepository.class);
   }
 
   @Bean

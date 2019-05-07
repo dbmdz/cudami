@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class EntityPartRepositoryImpl<EP extends EntityPart, E extends Entity> extends IdentifiableRepositoryImpl<EP> implements EntityPartRepository<EP, E> {
+public class EntityPartRepositoryImpl<P extends EntityPart, E extends Entity> extends IdentifiableRepositoryImpl<P> implements EntityPartRepository<P, E> {
 
   @Autowired
   public EntityPartRepositoryImpl(Jdbi dbi) {

@@ -22,7 +22,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableRepositoryImpl.class);
 
-  protected final static String IDENTIFIABLE_COLUMNS = "uuid, created, description, label, last_modified";
+  protected static final String IDENTIFIABLE_COLUMNS = "uuid, created, description, label, last_modified";
 
   protected Jdbi dbi;
 

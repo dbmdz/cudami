@@ -9,6 +9,7 @@ import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -134,6 +135,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> implements Ident
   @Override
   public I findOne(UUID uuid) {
     return (I) endpoint.findOne(uuid);
+  }
+
+  @Override
+  public I findOne(UUID uuid, Locale locale) {
+    return (I) endpoint.findOne(uuid, locale.toString());
   }
 
   @Override

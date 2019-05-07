@@ -14,33 +14,33 @@ import org.springframework.stereotype.Service;
 
 @Service
 //@Transactional(readOnly = true)
-public class CudamiFileResourceServiceImpl<F extends FileResource> extends IdentifiableServiceImpl<F> implements CudamiFileResourceService<F> {
+public class CudamiFileResourceServiceImpl extends IdentifiableServiceImpl<FileResource> implements CudamiFileResourceService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CudamiFileResourceServiceImpl.class);
 
   @Autowired
-  public CudamiFileResourceServiceImpl(CudamiFileResourceRepository<F> repository) {
+  public CudamiFileResourceServiceImpl(CudamiFileResourceRepository repository) {
     super(repository);
   }
 
   @Override
-  public F save(FileResource fileResource, byte[] bytes) throws IdentifiableServiceException {
+  public FileResource save(FileResource fileResource, byte[] bytes) throws IdentifiableServiceException {
     try {
-      fileResource = (F) ((CudamiFileResourceRepository) repository).save(fileResource, bytes);
+      fileResource = ((CudamiFileResourceRepository) repository).save(fileResource, bytes);
     } catch (Exception e) {
       LOGGER.error("Cannot save fileResource " + fileResource + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
     }
-    return (F) fileResource;
+    return fileResource;
   }
 
   @Override
-  public F upload(InputStream inputStream, String filename, String contentType) throws ResourceIOException {
-    return (F) ((CudamiFileResourceRepository) repository).upload(inputStream, filename, contentType);
+  public FileResource upload(InputStream inputStream, String filename, String contentType) throws ResourceIOException {
+    return ((CudamiFileResourceRepository) repository).upload(inputStream, filename, contentType);
   }
 
   @Override
-  public F upload(byte[] bytes, String filename, String contentType) throws ResourceIOException {
-    return (F) ((CudamiFileResourceRepository) repository).upload(bytes, filename, contentType);
+  public FileResource upload(byte[] bytes, String filename, String contentType) throws ResourceIOException {
+    return ((CudamiFileResourceRepository) repository).upload(bytes, filename, contentType);
   }
 }

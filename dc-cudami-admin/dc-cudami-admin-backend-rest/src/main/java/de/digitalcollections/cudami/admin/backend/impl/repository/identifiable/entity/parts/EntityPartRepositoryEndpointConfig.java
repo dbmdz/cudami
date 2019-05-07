@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class ContentNodeRepositoryEndpointConfig {
+public class EntityPartRepositoryEndpointConfig {
 
   @Value(value = "${cudami.server.address}")
   private String cudamiServerAddress;
@@ -20,12 +20,12 @@ public class ContentNodeRepositoryEndpointConfig {
   ObjectMapper objectMapper;
 
   @Bean
-  public ContentNodeRepositoryEndpoint contentNodeRepositoryEndpoint() {
-    ContentNodeRepositoryEndpoint endpoint = Feign.builder()
+  public EntityPartRepositoryEndpoint entityPartRepositoryEndpoint() {
+    EntityPartRepositoryEndpoint endpoint = Feign.builder()
         .decoder(new JacksonDecoder(objectMapper))
         .encoder(new JacksonEncoder(objectMapper))
         .errorDecoder(new EndpointErrorDecoder())
-        .target(ContentNodeRepositoryEndpoint.class, cudamiServerAddress);
+        .target(EntityPartRepositoryEndpoint.class, cudamiServerAddress);
     return endpoint;
   }
 }

@@ -1,13 +1,12 @@
-package de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts;
+package de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts;
 
-import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.EntityPart;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import java.util.LinkedHashSet;
 import java.util.UUID;
 
-public interface EntityPartRepository<P extends EntityPart, E extends Entity> extends IdentifiableRepository<P> {
+public interface EntityPartService<P extends EntityPart, E extends Entity> {
 
   void addRelatedEntity(P entityPart, E entity);
 
