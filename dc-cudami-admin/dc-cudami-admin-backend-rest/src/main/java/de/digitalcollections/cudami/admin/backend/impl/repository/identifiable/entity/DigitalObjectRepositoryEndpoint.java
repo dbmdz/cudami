@@ -28,14 +28,14 @@ public interface DigitalObjectRepositoryEndpoint extends RepositoryEndpoint {
   DigitalObject findOne(@Param("uuid") UUID uuid, @Param("locale") String locale);
 
   @RequestLine("GET /latest/digitalobjects/{uuid}/fileresources")
-  LinkedHashSet<FileResource> getFileResources(UUID uuid);
+  LinkedHashSet<FileResource> getFileResources(@Param("uuid") UUID uuid);
 
   @RequestLine("POST /latest/digitalobjects")
   @Headers("Content-Type: application/json")
   DigitalObject save(DigitalObject digitalObject);
 
   @RequestLine("POST /latest/digitalobjects/{uuid}/fileresources")
-  LinkedHashSet<FileResource> saveFileResources(UUID uuid, LinkedHashSet<FileResource> fileResources);
+  LinkedHashSet<FileResource> saveFileResources(@Param("uuid") UUID uuid, LinkedHashSet<FileResource> fileResources);
 
   @RequestLine("PUT /latest/digitalobjects/{uuid}")
   @Headers("Content-Type: application/json")
