@@ -28,6 +28,35 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
+  public void addRelatedFileresource(E entity, FileResource fileResource) {
+    addRelatedFileresource(entity.getUuid(), fileResource.getUuid());
+  }
+
+  @Override
+  public void addRelatedFileresource(UUID entityUuid, UUID fileResourceUuid) {
+    Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "rel_entity_fileresources", "entity_uuid", entityUuid);
+    dbi.withHandle(h -> h.createUpdate("INSERT INTO rel_entity_fileresources(entity_uuid, fileresource_uuid, sortindex) VALUES (:entity_uuid, :fileresource_uuid, :sortindex)")
+        .bind("entity_uuid", entityUuid)
+        .bind("fileresource_uuid", fileResourceUuid)
+        .bind("sortindex", sortIndex)
+        .execute());
+  }
+
+  @Override
+  public void addRelation(EntityRelation<E> relation) {
+    addRelation(relation.getSubject().getUuid(), relation.getPredicate(), relation.getObject().getUuid());
+  }
+
+  @Override
+  public void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid) {
+    dbi.withHandle(h -> h.createUpdate("INSERT INTO rel_entity_entities(subject_uuid, predicate, object_uuid) VALUES (:subject_uuid, :predicate, :object_uuid)")
+        .bind("subject_uuid", subjectEntityUuid)
+        .bind("predicate", predicate)
+        .bind("object_uuid", objectEntityUuid)
+        .execute());
+  }
+
+  @Override
   public long count() {
     String sql = "SELECT count(*) FROM entities";
     long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOnly());
@@ -66,43 +95,21 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     return new String[]{"created", "entity_type", "last_modified"};
   }
 
-  @Override
-  public E save(E entity) {
-    throw new UnsupportedOperationException("use save of specific/inherited entity repository");
-  }
-
-  @Override
-  public E update(E entity) {
-    throw new UnsupportedOperationException("use update of specific/inherited entity repository");
-  }
-
-  @Override
-  public void addRelatedFileresource(E entity, FileResource fileResource) {
-    addRelatedFileresource(entity.getUuid(), fileResource.getUuid());
-  }
-
-  @Override
-  public void addRelatedFileresource(UUID entityUuid, UUID fileResourceUuid) {
-    Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "rel_entity_fileresources", "entity_uuid", entityUuid);
-    dbi.withHandle(h -> h.createUpdate("INSERT INTO rel_entity_fileresources(entity_uuid, fileresource_uuid, sortindex) VALUES (:entity_uuid, :fileresource_uuid, :sortindex)")
-        .bind("entity_uuid", entityUuid)
-        .bind("fileresource_uuid", fileResourceUuid)
-        .bind("sortindex", sortIndex)
-        .execute());
-  }
-
-  @Override
-  public void addRelation(EntityRelation<E> relation) {
-    addRelation(relation.getSubject().getUuid(), relation.getPredicate(), relation.getObject().getUuid());
-  }
-
-  @Override
-  public void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid) {
-    dbi.withHandle(h -> h.createUpdate("INSERT INTO rel_entity_entities(subject_uuid, predicate, object_uuid) VALUES (:subject_uuid, :predicate, :object_uuid)")
-        .bind("subject_uuid", subjectEntityUuid)
-        .bind("predicate", predicate)
-        .bind("object_uuid", objectEntityUuid)
-        .execute());
+  private int getIndex(LinkedHashSet<FileResource> fileResources, FileResource fileResource) {
+    boolean found = false;
+    int pos = -1;
+    for (Iterator<FileResource> iterator = fileResources.iterator(); iterator.hasNext();) {
+      pos = pos + 1;
+      FileResource fr = iterator.next();
+      if (fr.getUuid().equals(fileResource.getUuid())) {
+        found = true;
+        break;
+      }
+    }
+    if (found) {
+      return pos;
+    }
+    return -1;
   }
 
   @Override
@@ -143,6 +150,11 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   public List<EntityRelation> getRelations(UUID subjectEntityUuid) {
     E subjectEntity = findOne(subjectEntityUuid);
     return getRelations(subjectEntity);
+  }
+
+  @Override
+  public E save(E entity) {
+    throw new UnsupportedOperationException("use save of specific/inherited entity repository");
   }
 
   @Override
@@ -197,20 +209,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     return getRelations(subjectUuid);
   }
 
-  private int getIndex(LinkedHashSet<FileResource> fileResources, FileResource fileResource) {
-    boolean found = false;
-    int pos = -1;
-    for (Iterator<FileResource> iterator = fileResources.iterator(); iterator.hasNext();) {
-      pos = pos + 1;
-      FileResource fr = iterator.next();
-      if (fr.getUuid().equals(fileResource.getUuid())) {
-        found = true;
-        break;
-      }
-    }
-    if (found) {
-      return pos;
-    }
-    return -1;
+  @Override
+  public E update(E entity) {
+    throw new UnsupportedOperationException("use update of specific/inherited entity repository");
   }
 }

@@ -7,6 +7,8 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -133,5 +135,23 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
     }
     final Integer sortIndexDb = sortIndex;
     return sortIndexDb;
+  }
+
+
+  protected int getIndex(LinkedHashSet<? extends Identifiable> list, Identifiable identifiable) {
+    boolean found = false;
+    int pos = -1;
+    for (Iterator iterator = list.iterator(); iterator.hasNext();) {
+      pos = pos + 1;
+      Identifiable idf = (Identifiable) iterator.next();
+      if (idf.getUuid().equals(identifiable.getUuid())) {
+        found = true;
+        break;
+      }
+    }
+    if (found) {
+      return pos;
+    }
+    return -1;
   }
 }

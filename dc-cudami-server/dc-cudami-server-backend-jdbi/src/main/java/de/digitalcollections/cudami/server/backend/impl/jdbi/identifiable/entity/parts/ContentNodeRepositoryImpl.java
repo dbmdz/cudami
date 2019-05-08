@@ -6,7 +6,9 @@ import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.ContentNodeImpl;
+import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,65 +79,6 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
   }
 
   @Override
-  public ContentNode save(ContentNode contentNode) {
-    contentNode.setUuid(UUID.randomUUID());
-    contentNode.setCreated(LocalDateTime.now());
-    contentNode.setLastModified(LocalDateTime.now());
-
-    ContentNode result = dbi.withHandle(h -> h
-        .createQuery("INSERT INTO contentnodes(uuid, created, description, identifiable_type, label, last_modified) VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified) RETURNING *")
-        .bindBean(contentNode)
-        .mapToBean(ContentNodeImpl.class)
-        .findOnly());
-    return result;
-  }
-
-  @Override
-  public ContentNode saveWithParentContentTree(ContentNode contentNode, UUID parentContentTreeUuid) {
-    ContentNode savedContentNode = save(contentNode);
-
-    Integer sortindex = selectNextSortIndexForParentChildren(dbi, "contenttree_contentnode", "contenttree_uuid", parentContentTreeUuid);
-    dbi.withHandle(h -> h.createUpdate(
-        "INSERT INTO contenttree_contentnode(contenttree_uuid, contentnode_uuid, sortindex)"
-        + " VALUES (:parent_contenttree_uuid, :uuid, :sortindex)")
-        .bind("parent_contenttree_uuid", parentContentTreeUuid)
-        .bind("sortindex", sortindex)
-        .bindBean(savedContentNode)
-        .execute());
-
-    return findOne(savedContentNode.getUuid());
-  }
-
-  @Override
-  public ContentNode saveWithParentContentNode(ContentNode contentNode, UUID parentContentNodeUuid) {
-    ContentNode savedContentNode = save(contentNode);
-
-    Integer sortindex = selectNextSortIndexForParentChildren(dbi, "contentnode_contentnode", "parent_contentnode_uuid", parentContentNodeUuid);
-    dbi.withHandle(h -> h.createUpdate(
-        "INSERT INTO contentnode_contentnode(parent_contentnode_uuid, child_contentnode_uuid, sortindex)"
-        + " VALUES (:parent_contentnode_uuid, :uuid, :sortindex)")
-        .bind("parent_contentnode_uuid", parentContentNodeUuid)
-        .bind("sortindex", sortindex)
-        .bindBean(savedContentNode)
-        .execute());
-
-    return findOne(savedContentNode.getUuid());
-  }
-
-  @Override
-  public ContentNode update(ContentNode contentNode) {
-    contentNode.setLastModified(LocalDateTime.now());
-
-    // do not update/left out from statement (not changed since insert): uuid, created, identifiable_type, entity_type
-    ContentNode result = dbi.withHandle(h -> h
-        .createQuery("UPDATE contentnodes SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified WHERE uuid=:uuid RETURNING *")
-        .bindBean(contentNode)
-        .mapToBean(ContentNodeImpl.class)
-        .findOnly());
-    return result;
-  }
-
-  @Override
   public List<ContentNode> getChildren(ContentNode contentNode) {
     return getChildren(contentNode.getUuid());
   }
@@ -165,102 +109,175 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
 
   @Override
   public LinkedHashSet<E> getEntities(ContentNode contentNode) {
-    // FIXME
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return getEntities(contentNode.getUuid());
   }
 
   @Override
   public LinkedHashSet<E> getEntities(UUID contentNodeUuid) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    // minimal data required (= identifiable fields) for creating text links/teasers in a list
+    String sql = "SELECT " + IDENTIFIABLE_COLUMNS + ", entity_type"
+                 + " FROM entities INNER JOIN contentnode_entities ce ON uuid = ce.entity_uuid"
+                 + " WHERE ce.contentnode_uuid = :uuid"
+                 + " ORDER BY ce.sortIndex ASC";
+
+    List<EntityImpl> list = dbi.withHandle(h -> h.createQuery(sql)
+        .bind("uuid", contentNodeUuid)
+        .mapToBean(EntityImpl.class)
+        .list());
+
+    if (list.isEmpty()) {
+      return new LinkedHashSet<>();
+    }
+
+    // TODO maybe does not work, then we have to refactor to LinkedHashSet<Entity>...
+    LinkedHashSet<E> result = list.stream()
+        .map(s -> (E) s)
+        .collect(Collectors.toCollection(LinkedHashSet::new));
+    return result;
   }
 
   @Override
   public LinkedHashSet<FileResource> getFileResources(ContentNode contentNode) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return getFileResources(contentNode.getUuid());
   }
 
   @Override
   public LinkedHashSet<FileResource> getFileResources(UUID contentNodeUuid) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    // minimal data required (= identifiable fields) for creating text links/teasers in a list
+    String sql = "SELECT " + IDENTIFIABLE_COLUMNS + ", filename, mimetype, size_in_bytes, uri"
+                 + " FROM fileresources INNER JOIN contentnode_fileresources cf ON uuid = cf.fileresource_uuid"
+                 + " WHERE cf.contentnode_uuid = :uuid"
+                 + " ORDER BY cf.sortIndex ASC";
+
+    List<FileResourceImpl> list = dbi.withHandle(h -> h.createQuery(sql)
+        .bind("uuid", contentNodeUuid)
+        .mapToBean(FileResourceImpl.class)
+        .list());
+
+    if (list.isEmpty()) {
+      return new LinkedHashSet<>();
+    }
+
+    LinkedHashSet<FileResource> result = list.stream()
+        .map(s -> (FileResource) s)
+        .collect(Collectors.toCollection(LinkedHashSet::new));
+    return result;
+  }
+
+  @Override
+  public ContentNode save(ContentNode contentNode) {
+    contentNode.setUuid(UUID.randomUUID());
+    contentNode.setCreated(LocalDateTime.now());
+    contentNode.setLastModified(LocalDateTime.now());
+
+    ContentNode result = dbi.withHandle(h -> h
+        .createQuery("INSERT INTO contentnodes(uuid, created, description, identifiable_type, label, last_modified) VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified) RETURNING *")
+        .bindBean(contentNode)
+        .mapToBean(ContentNodeImpl.class)
+        .findOnly());
+    return result;
   }
 
   @Override
   public LinkedHashSet<E> saveEntities(ContentNode contentNode, LinkedHashSet<E> entities) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return saveEntities(contentNode.getUuid(), entities);
   }
 
   @Override
   public LinkedHashSet<E> saveEntities(UUID contentNodeUuid, LinkedHashSet<E> entities) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    // as we store the whole list new: delete old entries
+    dbi.withHandle(h -> h.createUpdate("DELETE FROM contentnode_entities WHERE contentnode_uuid = :uuid")
+        .bind("uuid", contentNodeUuid).execute());
+
+    if (entities != null) {
+      // we assume that the entities are already saved...
+      dbi.useHandle(handle -> {
+        PreparedBatch preparedBatch = handle.prepareBatch("INSERT INTO contentnode_entities(contentnode_uuid, entity_uuid, sortIndex) VALUES(:uuid, :entityUuid, :sortIndex)");
+        for (Entity entity : entities) {
+          preparedBatch.bind("uuid", contentNodeUuid)
+              .bind("entityUuid", entity.getUuid())
+              .bind("sortIndex", getIndex(entities, entity))
+              .add();
+        }
+        preparedBatch.execute();
+      });
+    }
+    return getEntities(contentNodeUuid);
   }
 
   @Override
   public LinkedHashSet<FileResource> saveFileResources(ContentNode contentNode, LinkedHashSet<FileResource> fileResources) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return saveFileResources(contentNode.getUuid(), fileResources);
   }
 
   @Override
   public LinkedHashSet<FileResource> saveFileResources(UUID contentNodeUuid, LinkedHashSet<FileResource> fileResources) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    // as we store the whole list new: delete old entries
+    dbi.withHandle(h -> h.createUpdate("DELETE FROM contentnode_fileresources WHERE contentnode_uuid = :uuid")
+        .bind("uuid", contentNodeUuid).execute());
+
+    if (fileResources != null) {
+      // we assume that the fileresources are already saved... so commented
+//      for (FileResource fileResource : fileResources) {
+//        cudamiFileResourceRepository.save(fileResource);
+//      }
+
+      dbi.useHandle(handle -> {
+        PreparedBatch preparedBatch = handle.prepareBatch("INSERT INTO contentnode_fileresources(contentnode_uuid, fileresource_uuid, sortIndex) VALUES(:uuid, :fileResourceUuid, :sortIndex)");
+        for (FileResource fileResource : fileResources) {
+          preparedBatch.bind("uuid", contentNodeUuid)
+              .bind("fileResourceUuid", fileResource.getUuid())
+              .bind("sortIndex", getIndex(fileResources, fileResource))
+              .add();
+        }
+        preparedBatch.execute();
+      });
+    }
+    return getFileResources(contentNodeUuid);
   }
 
-//  @Override
-//  public List<Identifiable> getIdentifiables(C contentNode) {
-//    return getIdentifiables(contentNode.getUuid());
-//  }
-//
-//  @Override
-//  public List<Identifiable> getIdentifiables(UUID uuid) {
-//    // minimal data required for creating text links in a list
-//    String query = "SELECT i.uuid as uuid, i.label as label"
-//                   + " FROM identifiables i INNER JOIN contentnode_identifiables ci ON ci.identifiable_uuid=i.uuid"
-//                   + " WHERE ci.contentnode_uuid = :uuid"
-//                   + " ORDER BY ci.sortindex ASC";
-//
-//    List<IdentifiableImpl> list = dbi.withHandle(h -> h.createQuery(query)
-//        .bind("uuid", uuid)
-//        .mapToBean(IdentifiableImpl.class)
-//        .list());
-//
-//    if (list.isEmpty()) {
-//      return new ArrayList<>();
-//    }
-//    return list.stream().map(Identifiable.class::cast).collect(Collectors.toList());
-//  }
-//
-//  @Override
-//  public void addIdentifiable(UUID identifiablesContainerUuid, UUID identifiableUuid) {
-//    Integer sortindex = selectNextSortIndexForParentChildren(dbi, "contentnode_identifiables", "contentnode_uuid", identifiablesContainerUuid);
-//    dbi.withHandle(h -> h.createUpdate(
-//        "INSERT INTO contentnode_identifiables(contentnode_uuid, identifiable_uuid, sortindex)"
-//        + " VALUES (:contentnode_uuid, :identifiable_uuid, :sortindex)")
-//        .bind("contentnode_uuid", identifiablesContainerUuid)
-//        .bind("identifiable_uuid", identifiableUuid)
-//        .bind("sortindex", sortindex)
-//        .execute());
-//  }
-//
-//  @Override
-//  public List<Identifiable> saveIdentifiables(C contentNode, List<Identifiable> identifiables) {
-//    UUID uuid = contentNode.getUuid();
-//    return saveIdentifiables(uuid, identifiables);
-//  }
-//
-//  @Override
-//  public List<Identifiable> saveIdentifiables(UUID identifiablesContainerUuid, List<Identifiable> identifiables) {
-//    dbi.withHandle(h -> h.createUpdate("DELETE FROM contentnode_identifiables WHERE contentnode_uuid = :uuid")
-//        .bind("uuid", identifiablesContainerUuid).execute());
-//
-//    dbi.useHandle(handle -> {
-//      PreparedBatch preparedBatch = handle.prepareBatch("INSERT INTO contentnode_identifiables(contentnode_uuid, identifiable_uuid, sortindex) VALUES(:uuid, :identifiableUuid, :sortindex)");
-//      for (Identifiable identifiable : identifiables) {
-//        preparedBatch.bind("uuid", identifiablesContainerUuid)
-//            .bind("identifiableUuid", identifiable.getUuid())
-//            .bind("sortindex", identifiables.indexOf(identifiable))
-//            .add();
-//      }
-//      preparedBatch.execute();
-//    });
-//    return getIdentifiables(identifiablesContainerUuid);
-//  }
+  @Override
+  public ContentNode saveWithParentContentNode(ContentNode contentNode, UUID parentContentNodeUuid) {
+    ContentNode savedContentNode = save(contentNode);
+
+    Integer sortindex = selectNextSortIndexForParentChildren(dbi, "contentnode_contentnode", "parent_contentnode_uuid", parentContentNodeUuid);
+    dbi.withHandle(h -> h.createUpdate(
+        "INSERT INTO contentnode_contentnode(parent_contentnode_uuid, child_contentnode_uuid, sortindex)"
+        + " VALUES (:parent_contentnode_uuid, :uuid, :sortindex)")
+        .bind("parent_contentnode_uuid", parentContentNodeUuid)
+        .bind("sortindex", sortindex)
+        .bindBean(savedContentNode)
+        .execute());
+
+    return findOne(savedContentNode.getUuid());
+  }
+
+  @Override
+  public ContentNode saveWithParentContentTree(ContentNode contentNode, UUID parentContentTreeUuid) {
+    ContentNode savedContentNode = save(contentNode);
+
+    Integer sortindex = selectNextSortIndexForParentChildren(dbi, "contenttree_contentnode", "contenttree_uuid", parentContentTreeUuid);
+    dbi.withHandle(h -> h.createUpdate(
+        "INSERT INTO contenttree_contentnode(contenttree_uuid, contentnode_uuid, sortindex)"
+        + " VALUES (:parent_contenttree_uuid, :uuid, :sortindex)")
+        .bind("parent_contenttree_uuid", parentContentTreeUuid)
+        .bind("sortindex", sortindex)
+        .bindBean(savedContentNode)
+        .execute());
+
+    return findOne(savedContentNode.getUuid());
+  }
+
+  @Override
+  public ContentNode update(ContentNode contentNode) {
+    contentNode.setLastModified(LocalDateTime.now());
+
+    // do not update/left out from statement (not changed since insert): uuid, created, identifiable_type, entity_type
+    ContentNode result = dbi.withHandle(h -> h
+        .createQuery("UPDATE contentnodes SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified WHERE uuid=:uuid RETURNING *")
+        .bindBean(contentNode)
+        .mapToBean(ContentNodeImpl.class)
+        .findOnly());
+    return result;
+  }
 }
