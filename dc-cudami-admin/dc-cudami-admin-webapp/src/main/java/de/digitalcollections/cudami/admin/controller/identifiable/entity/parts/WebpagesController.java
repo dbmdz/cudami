@@ -8,11 +8,13 @@ import de.digitalcollections.cudami.admin.business.api.service.LocaleService;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.WebpageService;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
+import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -185,6 +187,10 @@ public class WebpagesController extends AbstractController implements MessageSou
     model.addAttribute("availableLocales", webpage.getLabel().getLocales());
     model.addAttribute("defaultLocale", localeService.getDefault());
     model.addAttribute("webpage", webpage);
+
+    LinkedHashSet<FileResource> relatedFileResources = webpageService.getRelatedFileResources(webpage);
+    model.addAttribute("relatedFileResources", relatedFileResources);
+    
     return "webpages/view";
   }
 

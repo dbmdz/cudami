@@ -81,7 +81,7 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
     webpage.setLastModified(LocalDateTime.now());
 
     Webpage result = dbi.withHandle(h -> h
-        .createQuery("INSERT INTO webpages(uuid, created, description, identifiable_type, label, last_modified, entity_type, text) VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :entityType, :text::JSONB) RETURNING *")
+        .createQuery("INSERT INTO webpages(uuid, created, description, identifiable_type, label, last_modified, text) VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :text::JSONB) RETURNING *")
         .bindBean(webpage)
         .mapToBean(WebpageImpl.class)
         .findOnly());
@@ -93,9 +93,9 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
   public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid) {
     Webpage savedWebpage = save(webpage);
 
-    Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "website_webpage", "website_uuid", parentWebsiteUuid);
+    Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "website_webpages", "website_uuid", parentWebsiteUuid);
     dbi.withHandle(h -> h.createUpdate(
-        "INSERT INTO website_webpage(website_uuid, webpage_uuid, sortIndex)"
+        "INSERT INTO website_webpages(website_uuid, webpage_uuid, sortIndex)"
         + " VALUES (:parent_website_uuid, :uuid, :sortIndex)")
         .bind("parent_website_uuid", parentWebsiteUuid)
         .bind("sortIndex", sortIndex)
@@ -109,9 +109,9 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
   public Webpage saveWithParentWebpage(Webpage webpage, UUID parentWebpageUuid) {
     Webpage savedWebpage = save(webpage);
 
-    Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "webpage_webpage", "parent_webpage_uuid", parentWebpageUuid);
+    Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "webpage_webpages", "parent_webpage_uuid", parentWebpageUuid);
     dbi.withHandle(h -> h.createUpdate(
-        "INSERT INTO webpage_webpage(parent_webpage_uuid, child_webpage_uuid, sortIndex)"
+        "INSERT INTO webpage_webpages(parent_webpage_uuid, child_webpage_uuid, sortIndex)"
         + " VALUES (:parent_webpage_uuid, :uuid, :sortIndex)")
         .bind("parent_webpage_uuid", parentWebpageUuid)
         .bind("sortIndex", sortIndex)
@@ -147,11 +147,6 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
                  + " WHERE ww.parent_webpage_uuid = :uuid"
                  + " ORDER BY ww.sortIndex ASC";
 
-//    String query = "SELECT ww.child_webpage_uuid as uuid, i.label as label"
-//                   + " FROM webpages wp INNER JOIN webpage_webpage ww ON wp.uuid=ww.parent_webpage_uuid INNER JOIN identifiables i ON ww.child_webpage_uuid=i.uuid"
-//                   + " WHERE wp.uuid = :uuid"
-//                   + " ORDER BY ww.sortIndex ASC";
-
     List<WebpageImpl> list = dbi.withHandle(h -> h.createQuery(sql)
         .bind("uuid", uuid)
         .mapToBean(WebpageImpl.class)
@@ -162,61 +157,4 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
     }
     return list.stream().map(s -> (Webpage) s).collect(Collectors.toList());
   }
-//  @Override
-//  public List<Identifiable> getIdentifiables(W webpage) {
-//    return getIdentifiables(webpage.getUuid());
-//  }
-//
-//  @Override
-//  public List<Identifiable> getIdentifiables(UUID uuid) {
-//    // minimal data required for creating text links in a list
-//    String query = "SELECT i.uuid as uuid, i.label as label"
-//                   + " FROM identifiables i INNER JOIN webpage_identifiables wi ON wi.identifiable_uuid=i.uuid"
-//                   + " WHERE wi.webpage_uuid = :uuid"
-//                   + " ORDER BY wi.sortIndex ASC";
-//
-//    List<IdentifiableImpl> list = dbi.withHandle(h -> h.createQuery(query)
-//        .bind("uuid", uuid)
-//        .mapToBean(IdentifiableImpl.class)
-//        .list());
-//
-//    if (list.isEmpty()) {
-//      return new ArrayList<>();
-//    }
-//    return list.stream().map(Identifiable.class::cast).collect(Collectors.toList());
-//  }
-//
-//  @Override
-//  public void addIdentifiable(UUID webpageUuid, UUID identifiableUuid) {
-//    Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "webpage_identifiables", "webpage_uuid", webpageUuid);
-//    dbi.withHandle(h -> h.createUpdate(
-//        "INSERT INTO webpage_identifiables(webpage_uuid, identifiable_uuid, sortIndex)"
-//        + " VALUES (:webpage_uuid, :identifiable_uuid, :sortIndex)")
-//        .bind("webpage_uuid", webpageUuid)
-//        .bind("identifiable_uuid", identifiableUuid)
-//        .bind("sortIndex", sortIndex)
-//        .execute());
-//  }
-//
-//  @Override
-//  public List<Identifiable> saveIdentifiables(W webpage, List<Identifiable> identifiables) {
-//    UUID uuid = webpage.getUuid();
-//    return saveIdentifiables(uuid, identifiables);
-//  }
-//
-//  @Override
-//  public List<Identifiable> saveIdentifiables(UUID identifiablesContainerUuid, List<Identifiable> identifiables) {
-//    dbi.withHandle(h -> h.createUpdate("DELETE FROM webpage_identifiables WHERE webpage_uuid = :uuid")
-//        .bind("uuid", identifiablesContainerUuid).execute());
-//
-//    PreparedBatch batch = dbi.withHandle(h -> h.prepareBatch("INSERT INTO webpage_identifiables(webpage_uuid, identifiable_uuid, sortIndex) VALUES(:uuid, :identifiableUuid, :sortIndex)"));
-//    for (Identifiable identifiable : identifiables) {
-//      batch.bind("uuid", identifiablesContainerUuid)
-//          .bind("identifiableUuid", identifiable.getUuid())
-//          .bind("sortIndex", identifiables.indexOf(identifiable))
-//          .add();
-//    }
-//    batch.execute();
-//    return getIdentifiables(identifiablesContainerUuid);
-//  }
 }

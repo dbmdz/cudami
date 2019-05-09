@@ -240,9 +240,9 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
   public ContentNode saveWithParentContentNode(ContentNode contentNode, UUID parentContentNodeUuid) {
     ContentNode savedContentNode = save(contentNode);
 
-    Integer sortindex = selectNextSortIndexForParentChildren(dbi, "contentnode_contentnode", "parent_contentnode_uuid", parentContentNodeUuid);
+    Integer sortindex = selectNextSortIndexForParentChildren(dbi, "contentnode_contentnodes", "parent_contentnode_uuid", parentContentNodeUuid);
     dbi.withHandle(h -> h.createUpdate(
-        "INSERT INTO contentnode_contentnode(parent_contentnode_uuid, child_contentnode_uuid, sortindex)"
+        "INSERT INTO contentnode_contentnodes(parent_contentnode_uuid, child_contentnode_uuid, sortindex)"
         + " VALUES (:parent_contentnode_uuid, :uuid, :sortindex)")
         .bind("parent_contentnode_uuid", parentContentNodeUuid)
         .bind("sortindex", sortindex)
@@ -256,9 +256,9 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
   public ContentNode saveWithParentContentTree(ContentNode contentNode, UUID parentContentTreeUuid) {
     ContentNode savedContentNode = save(contentNode);
 
-    Integer sortindex = selectNextSortIndexForParentChildren(dbi, "contenttree_contentnode", "contenttree_uuid", parentContentTreeUuid);
+    Integer sortindex = selectNextSortIndexForParentChildren(dbi, "contenttree_contentnodes", "contenttree_uuid", parentContentTreeUuid);
     dbi.withHandle(h -> h.createUpdate(
-        "INSERT INTO contenttree_contentnode(contenttree_uuid, contentnode_uuid, sortindex)"
+        "INSERT INTO contenttree_contentnodes(contenttree_uuid, contentnode_uuid, sortindex)"
         + " VALUES (:parent_contenttree_uuid, :uuid, :sortindex)")
         .bind("parent_contenttree_uuid", parentContentTreeUuid)
         .bind("sortindex", sortindex)
@@ -272,7 +272,7 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
   public ContentNode update(ContentNode contentNode) {
     contentNode.setLastModified(LocalDateTime.now());
 
-    // do not update/left out from statement (not changed since insert): uuid, created, identifiable_type, entity_type
+    // do not update/left out from statement (not changed since insert): uuid, created, identifiable_type
     ContentNode result = dbi.withHandle(h -> h
         .createQuery("UPDATE contentnodes SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified WHERE uuid=:uuid RETURNING *")
         .bindBean(contentNode)

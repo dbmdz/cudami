@@ -66,6 +66,8 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
 
   @Override
   public FileResource findOne(UUID uuid) {
+    // TODO maybe just get mimetype value and make fileresource specific queries....
+
     StringBuilder query = new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS + ", filename, mimetype, size_in_bytes, uri")
         .append(" FROM fileresources")
         .append(" WHERE uuid = :uuid");

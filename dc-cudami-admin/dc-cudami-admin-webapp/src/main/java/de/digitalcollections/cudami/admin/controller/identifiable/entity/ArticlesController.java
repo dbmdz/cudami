@@ -8,11 +8,13 @@ import de.digitalcollections.cudami.admin.business.api.service.LocaleService;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.ArticleService;
 import de.digitalcollections.model.api.identifiable.entity.Article;
+import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.ArticleImpl;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -170,6 +172,10 @@ public class ArticlesController extends AbstractController implements MessageSou
     model.addAttribute("availableLocales", article.getLabel().getLocales());
     model.addAttribute("defaultLocale", localeService.getDefault());
     model.addAttribute("article", article);
+
+    LinkedHashSet<FileResource> relatedFileResources = service.getRelatedFileResources(article);
+    model.addAttribute("relatedFileResources", relatedFileResources);
+
     return "articles/view";
   }
 
