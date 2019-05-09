@@ -8,11 +8,13 @@ import de.digitalcollections.cudami.admin.business.api.service.LocaleService;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.ContentNodeService;
 import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
+import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.parts.ContentNodeImpl;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -184,6 +186,9 @@ public class ContentNodesController extends AbstractController implements Messag
     model.addAttribute("availableLocales", contentNode.getLabel().getLocales());
     model.addAttribute("defaultLocale", localeService.getDefault());
     model.addAttribute("contentNode", contentNode);
+
+    LinkedHashSet<FileResource> relatedFileResources = contentNodeService.getRelatedFileResources(contentNode);
+    model.addAttribute("relatedFileResources", relatedFileResources);
     return "contentnodes/view";
   }
 

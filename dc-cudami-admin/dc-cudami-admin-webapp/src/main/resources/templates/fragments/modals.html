@@ -125,11 +125,11 @@
       </div>
       <script type="text/javascript" th:inline="javascript">
         $(function() {
-          $("#item-form").prop('action', window.location.pathname + '/identifiables');
+          $("#item-form").prop('action', window.location.pathname + '/fileresources');
           
           var autocompleteElement = $("#item").autocomplete({
               minLength: 2,
-              source: "/identifiables",
+              source: "/fileresources",
               focus: function(event, ui) {
                 $("#item").val(ui.item.label.translations[0].text);
                 return false;
