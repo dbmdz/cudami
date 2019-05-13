@@ -108,7 +108,9 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
 
   @Override
   public FileResource save(FileResource fileResource) {
-    fileResource.setUuid(UUID.randomUUID());
+    if (fileResource.getUuid() == null) {
+      fileResource.setUuid(UUID.randomUUID());
+    }
     fileResource.setCreated(LocalDateTime.now());
     fileResource.setLastModified(LocalDateTime.now());
 

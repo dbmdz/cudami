@@ -146,18 +146,16 @@ public class FileResourcesController extends AbstractController implements Messa
     return "fileresources/create_02-metadata";
   }
 
-  @PostMapping(value = "/fileresources/new/metadata")
-  public String metadata(@ModelAttribute @Valid FileResourceImpl fileResource, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  @PostMapping(value = "/fileresources/new/metadata/{uuid}")
+  public String metadata(@PathVariable UUID uuid, @ModelAttribute @Valid FileResourceImpl fileResource, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "fileresources/create_02-metadata";
     }
 
-    UUID fileResourceUuid = fileResource.getUuid();
-
     try {
       // get object from db
-      FileResource fileResourceDb = cudamiFileResourceService.get(fileResourceUuid);
+      FileResource fileResourceDb = cudamiFileResourceService.get(uuid);
       // just update the fields, that were editable
       fileResourceDb.setLabel(fileResource.getLabel());
       fileResourceDb.setDescription(fileResource.getDescription());
@@ -166,11 +164,11 @@ public class FileResourcesController extends AbstractController implements Messa
       // ...
       cudamiFileResourceService.update(fileResourceDb);
     } catch (IdentifiableServiceException e) {
-      String message = "Cannot save fileresource with uuid=" + fileResourceUuid + ": " + e;
+      String message = "Cannot save fileresource with uuid=" + uuid + ": " + e;
       LOGGER.error(message, e);
       redirectAttributes.addFlashAttribute("error_message", message);
       redirectAttributes.addFlashAttribute("isNew", true);
-      return "redirect:/fileresources/" + fileResourceUuid + "/edit";
+      return "redirect:/fileresources/" + uuid + "/edit";
     }
 
     if (results.hasErrors()) {
@@ -180,7 +178,7 @@ public class FileResourcesController extends AbstractController implements Messa
     String message = messageSource.getMessage("msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
 //    return "redirect:/fileresources/new/" + fileResourceUuid + "/license";
-    return "redirect:/fileresources/" + fileResourceUuid;
+    return "redirect:/fileresources/" + uuid;
   }
 
   @GetMapping(value = "/fileresources/{uuid}")

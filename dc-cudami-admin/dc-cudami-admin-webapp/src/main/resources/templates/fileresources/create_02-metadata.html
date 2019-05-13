@@ -10,7 +10,7 @@
   </head>
   <body>
     <section layout:fragment="content">
-      <form id="editor-form" th:object="${fileresource}" th:action="@{/fileresources/new/metadata}" method="post" role="form" th:attr="data-default-locale=${defaultLocale}">
+      <form id="editor-form" th:object="${fileresource}" th:action="@{#}" method="post" role="form" th:attr="data-default-locale=${defaultLocale}">
         <input type="hidden" id="label" th:field="*{label}" />
         <input type="hidden" id="description" class="content" th:field="*{description}" />
 
