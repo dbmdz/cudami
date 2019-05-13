@@ -9,7 +9,6 @@ import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.identifiable.resource.TextFileResource;
 import de.digitalcollections.model.api.identifiable.resource.VideoFileResource;
-import de.digitalcollections.model.api.identifiable.resource.exceptions.ResourceIOException;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.resource.ApplicationFileResourceImpl;
@@ -18,11 +17,17 @@ import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceI
 import de.digitalcollections.model.impl.identifiable.resource.TextFileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.VideoFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,10 +156,31 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
     try {
       long size = fileResourceRepository.write(fileResource, binaryData);
       fileResource.setSizeInBytes(size);
-    } catch (ResourceIOException ex) {
+
+      if (fileResource instanceof ImageFileResource) {
+        setImageProperties((ImageFileResource) fileResource);
+      }
+    } catch (IOException ex) {
       LOGGER.error("Error saving binary data of fileresource " + fileResource.getUuid().toString(), ex);
     }
     return save(fileResource);
+  }
+
+  private void setImageProperties(ImageFileResource fileResource) throws IOException {
+
+    try (ImageInputStream in = ImageIO.createImageInputStream(new File(fileResource.getUri()))) {
+      final Iterator<ImageReader> readers = ImageIO.getImageReaders(in);
+      if (readers.hasNext()) {
+        ImageReader reader = readers.next();
+        try {
+          reader.setInput(in);
+          fileResource.setWidth(reader.getWidth(0));
+          fileResource.setHeight(reader.getHeight(0));
+        } finally {
+          reader.dispose();
+        }
+      }
+    }
   }
 
   @Override
