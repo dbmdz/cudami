@@ -30,7 +30,7 @@ public class FileResourceMapper implements RowMapper<FileResource> {
     ColumnMapper<LocalizedText> ltMapper = columnMappers.findFor(LocalizedText.class).orElseThrow(() -> new NoSuchMapperException("LocalizedText"));
 
     FileResource result;
-    String mimeType = rs.getString("mimeType");
+    String mimeType = rs.getString("mimetype");
     String primaryType = "application";
     if (mimeType != null) {
       primaryType = mimeType.substring(0, mimeType.indexOf("/"));
@@ -55,13 +55,13 @@ public class FileResourceMapper implements RowMapper<FileResource> {
     result.setCreated(rs.getTimestamp("created").toLocalDateTime());
     result.setDescription(lscMapper.map(rs, "description", ctx));
     result.setLabel(ltMapper.map(rs, "label", ctx));
-    result.setLastModified(rs.getTimestamp("lastModified").toLocalDateTime());
+    result.setLastModified(rs.getTimestamp("last_modified").toLocalDateTime());
     result.setUuid(rs.getObject("uuid", UUID.class));
 
     // fileresource columns
     result.setFilename(rs.getString("filename"));
     result.setMimeType(MimeType.fromTypename(mimeType));
-    result.setSizeInBytes(rs.getLong("sizeInBytes"));
+    result.setSizeInBytes(rs.getLong("size_in_bytes"));
     String uriStr = rs.getString("uri");
     if (uriStr != null) {
       result.setUri(URI.create(uriStr));

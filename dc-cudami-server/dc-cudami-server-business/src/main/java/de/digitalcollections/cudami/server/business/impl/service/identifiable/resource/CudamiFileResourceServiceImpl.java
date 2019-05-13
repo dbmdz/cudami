@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.res
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import java.io.InputStream;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,11 @@ public class CudamiFileResourceServiceImpl extends IdentifiableServiceImpl<FileR
   @Autowired
   public CudamiFileResourceServiceImpl(CudamiFileResourceRepository repository) {
     super(repository);
+  }
+
+  @Override
+  public FileResource get(UUID uuid) {
+    return ((CudamiFileResourceRepository) repository).findOne(uuid);
   }
 
   @Override
