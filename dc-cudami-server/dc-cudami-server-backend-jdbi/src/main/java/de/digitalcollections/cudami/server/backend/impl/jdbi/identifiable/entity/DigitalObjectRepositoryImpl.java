@@ -59,7 +59,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   public DigitalObject findOne(UUID uuid) {
     String query = "SELECT " + IDENTIFIABLE_COLUMNS
                    + " FROM digitalobjects"
-                   + " WHERE i.uuid = :uuid";
+                   + " WHERE uuid = :uuid";
 
     DigitalObject digitalObject = dbi.withHandle(h -> h.createQuery(query)
         .bind("uuid", uuid)
