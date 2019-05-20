@@ -155,7 +155,7 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
     // save file resource identifiers
     List<Identifier> identifiers = fileResource.getIdentifiers();
     for (Identifier identifier : identifiers) {
-      identifier.setIdentifiableUuid(fileResource.getUuid());
+      identifier.setIdentifiable(fileResource.getUuid());
       // newly created file resource, no pre existing identifiers, so just save
       identifierRepository.save(identifier);
     }

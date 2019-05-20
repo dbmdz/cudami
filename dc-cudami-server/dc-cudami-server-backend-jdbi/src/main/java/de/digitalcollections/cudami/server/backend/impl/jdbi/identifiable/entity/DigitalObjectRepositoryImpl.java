@@ -125,7 +125,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     // save digital object identifiers
     List<Identifier> identifiers = digitalObject.getIdentifiers();
     for (Identifier identifier : identifiers) {
-      identifier.setIdentifiableUuid(digitalObject.getUuid());
+      identifier.setIdentifiable(digitalObject.getUuid());
       // newly created digital object, no pre existing identifiers, so just save
       identifierRepository.save(identifier);
     }

@@ -51,7 +51,7 @@ public class IdentifierRepositoryImpl extends AbstractPagingAndSortingRepository
 
   @Override
   public List<Identifier> find(String searchTerm, int maxResults) {
-    StringBuilder query = new StringBuilder("SELECT identifiable_uuid, namespace, identifier FROM identifiers WHERE namespace ILIKE '%' || :searchTerm || '%'");
+    StringBuilder query = new StringBuilder("SELECT uuid, identifiable, namespace, identifier FROM identifiers WHERE namespace ILIKE '%' || :searchTerm || '%'");
     query.append(" LIMIT :maxResults");
 
     List<IdentifierImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
@@ -74,8 +74,8 @@ public class IdentifierRepositoryImpl extends AbstractPagingAndSortingRepository
   @Override
   public List<Identifier> findByIdentifiable(UUID identifiableUuid) {
     List<IdentifierImpl> result = dbi.withHandle(h -> h.createQuery(
-        "SELECT * FROM identifiers WHERE identifiable_uuid = :uuid")
-        .bind("uuid", identifiableUuid)
+        "SELECT * FROM identifiers WHERE identifiable = :identifiable")
+        .bind("identifiable", identifiableUuid)
         .mapToBean(IdentifierImpl.class)
         .list());
     List<Identifier> identifier = convertToGenericList(result);
@@ -95,14 +95,16 @@ public class IdentifierRepositoryImpl extends AbstractPagingAndSortingRepository
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[]{"identifiable_uuid", "namespace", "identifier"};
+    return new String[]{"identifiable", "namespace", "id"};
   }
 
   @Override
   public Identifier save(Identifier identifier) {
+    identifier.setUuid(UUID.randomUUID());
+
     Identifier result = dbi.withHandle(h -> h
-        .createQuery("INSERT INTO identifiers(identifiable_uuid, namespace, identifier)"
-                     + " VALUES (:uuid, :namespace, :identifier) RETURNING *")
+        .createQuery("INSERT INTO identifiers(uuid, identifiable, namespace, identifier)"
+                     + " VALUES (:uuid, :identifiable, :namespace, :id) RETURNING *")
         .bindBean(identifier)
         .mapToBean(IdentifierImpl.class)
         .findOnly());
@@ -111,6 +113,6 @@ public class IdentifierRepositoryImpl extends AbstractPagingAndSortingRepository
 
   @Override
   public Identifier update(Identifier identifier) {
-    throw new UnsupportedOperationException("An update on identifiable_uuid, namespace and identifier has no use case.");
+    throw new UnsupportedOperationException("An update on identifiable, namespace and identifier has no use case.");
   }
 }
