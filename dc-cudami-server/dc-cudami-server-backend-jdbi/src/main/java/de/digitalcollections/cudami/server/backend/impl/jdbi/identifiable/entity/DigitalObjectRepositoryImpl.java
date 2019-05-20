@@ -1,7 +1,9 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.CudamiFileResourceRepository;
+import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -26,11 +28,13 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectRepositoryImpl.class);
 
   private final CudamiFileResourceRepository cudamiFileResourceRepository;
+  private final IdentifierRepository identifierRepository;
 
   @Autowired
-  public DigitalObjectRepositoryImpl(Jdbi dbi, CudamiFileResourceRepository cudamiFileResourceRepository) {
+  public DigitalObjectRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository, CudamiFileResourceRepository cudamiFileResourceRepository) {
     super(dbi);
     this.cudamiFileResourceRepository = cudamiFileResourceRepository;
+    this.identifierRepository = identifierRepository;
   }
 
   @Override
@@ -118,6 +122,14 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     final LinkedHashSet<FileResource> fileResources = digitalObject.getFileResources();
     saveFileResources(digitalObject, fileResources);
 
+    // save digital object identifiers
+    List<Identifier> identifiers = digitalObject.getIdentifiers();
+    for (Identifier identifier : identifiers) {
+      identifier.setIdentifiableUuid(digitalObject.getUuid());
+      // newly created digital object, no pre existing identifiers, so just save
+      identifierRepository.save(identifier);
+    }
+
     return result;
   }
 
@@ -137,10 +149,12 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         .bind("uuid", digitalObjectUuid).execute());
 
     if (fileResources != null) {
+      // first save fileresources
       for (FileResource fileResource : fileResources) {
-        cudamiFileResourceRepository.save(fileResource);
+        fileResource = cudamiFileResourceRepository.save(fileResource);
       }
 
+      // second: save relations to digital object
       dbi.useHandle(handle -> {
         PreparedBatch preparedBatch = handle.prepareBatch("INSERT INTO digitalobject_fileresources(digitalobject_uuid, fileresource_uuid, sortIndex) VALUES(:uuid, :fileResourceUuid, :sortIndex)");
         for (FileResource fileResource : fileResources) {

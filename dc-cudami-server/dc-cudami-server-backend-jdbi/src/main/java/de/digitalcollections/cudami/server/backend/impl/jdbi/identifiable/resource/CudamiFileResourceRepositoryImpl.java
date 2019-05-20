@@ -1,8 +1,10 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
 import de.digitalcollections.commons.file.backend.impl.managed.ManagedFileResourceRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.CudamiFileResourceRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
+import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.resource.ApplicationFileResource;
 import de.digitalcollections.model.api.identifiable.resource.AudioFileResource;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
@@ -40,11 +42,13 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
   private static final Logger LOGGER = LoggerFactory.getLogger(CudamiFileResourceRepositoryImpl.class);
 
   ManagedFileResourceRepositoryImpl fileResourceRepository;
+  private final IdentifierRepository identifierRepository;
 
   @Autowired
-  public CudamiFileResourceRepositoryImpl(Jdbi dbi, ManagedFileResourceRepositoryImpl fileResourceRepository) {
+  public CudamiFileResourceRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository, ManagedFileResourceRepositoryImpl fileResourceRepository) {
     super(dbi);
     this.fileResourceRepository = fileResourceRepository;
+    this.identifierRepository = identifierRepository;
   }
 
   @Override
@@ -148,7 +152,16 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
       throw new IllegalArgumentException("unknown file resource type " + fileResource.getMimeType().toString());
     }
 
-    return findOne(fileResource.getUuid());
+    // save file resource identifiers
+    List<Identifier> identifiers = fileResource.getIdentifiers();
+    for (Identifier identifier : identifiers) {
+      identifier.setIdentifiableUuid(fileResource.getUuid());
+      // newly created file resource, no pre existing identifiers, so just save
+      identifierRepository.save(identifier);
+    }
+    
+    FileResource dbFileResource = findOne(fileResource.getUuid());
+    return dbFileResource;
   }
 
   @Override
