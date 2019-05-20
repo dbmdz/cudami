@@ -1,8 +1,9 @@
 CREATE TABLE IF NOT EXISTS identifiers (
-  identifiable_uuid UUID NOT NULL,
+  uuid UUID primary key,
 
+  identifiable UUID NOT NULL,
   namespace VARCHAR NOT NULL,
-  identifier VARCHAR NOT NULL,
-
-  PRIMARY KEY (identifiable_uuid, namespace, identifier)
+  identifier VARCHAR NOT NULL
 );
+
+create unique index idx_identifiers_uniq on identifiers(identifiable, namespace, identifier);
