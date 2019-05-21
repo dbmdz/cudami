@@ -1,0 +1,15 @@
+FROM maven:3.6.0-jdk-11-slim
+
+ENV HYMIR_VERSION 4.0.4
+
+ADD https://github.com/dbmdz/iiif-server-hymir/releases/download/$HYMIR_VERSION/hymir-$HYMIR_VERSION-exec.jar hymir.jar
+
+ENV OPENJPEG_VERSION 2.3.1
+
+ENV LD_LIBRARY_PATH $PWD/openjpeg-v$OPENJPEG_VERSION-linux-x86_64/lib
+
+ADD https://github.com/uclouvain/openjpeg/releases/download/v$OPENJPEG_VERSION/openjpeg-v$OPENJPEG_VERSION-linux-x86_64.tar.gz /tmp/openjpeg.tar.gz
+
+RUN tar -xvf /tmp/openjpeg.tar.gz
+
+ENTRYPOINT [ "sh", "-c", "java -jar /hymir.jar" ]
