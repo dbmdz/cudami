@@ -175,7 +175,7 @@ $ sudo service docker restart
 To get cudami quickly up running, you can start all backend services using Docker Compose:
 
 ```shell
-$ cd dc-cudami-server
+$ cd docker
 $ docker-compose build
 $ docker-compose up -d
 ```
