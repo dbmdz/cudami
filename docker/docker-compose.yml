@@ -12,6 +12,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-iiif
+    environment:
+      HYMIR_VERSION: "4.0.4"
+      OPENJPEG_VERSION: "2.3.1"
     ports:
       - "23232:9000"
     volumes:
