@@ -10,11 +10,11 @@ services:
       POSTGRES_DB: "cudami"
   iiif:
     build:
+      args:
+        HYMIR_VERSION: "4.1.1"
+        OPENJPEG_VERSION: "2.3.1"
       context: .
       dockerfile: Dockerfile-iiif
-    environment:
-      HYMIR_VERSION: "4.0.4"
-      OPENJPEG_VERSION: "2.3.1"
     ports:
       - "23232:9000"
     volumes:

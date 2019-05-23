@@ -1,5 +1,9 @@
 FROM maven:3.6.0-jdk-11-slim
 
+ARG HYMIR_VERSION
+
+ARG OPENJPEG_VERSION
+
 ADD https://github.com/dbmdz/iiif-server-hymir/releases/download/$HYMIR_VERSION/hymir-$HYMIR_VERSION-exec.jar hymir.jar
 
 ENV LD_LIBRARY_PATH $PWD/openjpeg-v$OPENJPEG_VERSION-linux-x86_64/lib
