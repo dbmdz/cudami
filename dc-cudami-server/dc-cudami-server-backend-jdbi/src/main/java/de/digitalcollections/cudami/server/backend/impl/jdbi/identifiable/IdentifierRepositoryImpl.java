@@ -54,32 +54,22 @@ public class IdentifierRepositoryImpl extends AbstractPagingAndSortingRepository
     StringBuilder query = new StringBuilder("SELECT uuid, identifiable, namespace, identifier FROM identifiers WHERE namespace ILIKE '%' || :searchTerm || '%'");
     query.append(" LIMIT :maxResults");
 
-    List<IdentifierImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
+    List<Identifier> result = dbi.withHandle(h -> h.createQuery(query.toString())
         .bind("searchTerm", searchTerm)
         .bind("maxResults", maxResults)
         .mapToBean(IdentifierImpl.class)
-        .list());
-    List<Identifier> identifier = convertToGenericList(result);
-    return identifier;
-  }
-
-  protected List<Identifier> convertToGenericList(List<IdentifierImpl> identifier) {
-    if (identifier == null) {
-      return null;
-    }
-    List<Identifier> genericContent = identifier.stream().map(s -> (Identifier) s).collect(Collectors.toList());
-    return genericContent;
+        .stream().map(Identifier.class::cast).collect(Collectors.toList()));
+    return result;
   }
 
   @Override
-  public List<Identifier> findByIdentifiable(UUID identifiableUuid) {
-    List<IdentifierImpl> result = dbi.withHandle(h -> h.createQuery(
+  public List<Identifier> findByIdentifiable(UUID identifiable) {
+    List<Identifier> result = dbi.withHandle(h -> h.createQuery(
         "SELECT * FROM identifiers WHERE identifiable = :identifiable")
-        .bind("identifiable", identifiableUuid)
+        .bind("identifiable", identifiable)
         .mapToBean(IdentifierImpl.class)
-        .list());
-    List<Identifier> identifier = convertToGenericList(result);
-    return identifier;
+        .stream().map(Identifier.class::cast).collect(Collectors.toList()));
+    return result;
   }
 
   @Override
