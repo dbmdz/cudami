@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSo
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.util.List;
@@ -78,7 +77,7 @@ public class IdentifierRepositoryImpl extends AbstractPagingAndSortingRepository
         "SELECT * FROM identifiers WHERE namespace = :namespace, identifier = :identifier")
         .bind("namespace", namespace)
         .bind("identifier", id)
-        .mapToBean(IdentifiableImpl.class)
+        .mapToBean(IdentifierImpl.class)
         .findOnly());
     return identifier;
   }
