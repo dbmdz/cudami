@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.en
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import java.util.LinkedHashSet;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -33,6 +34,16 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject> i
   @Override
   public LinkedHashSet<FileResource> getFileResources(UUID digitalObjectUuid) {
     return ((DigitalObjectRepository) repository).getFileResources(digitalObjectUuid);
+  }
+
+  @Override
+  public LinkedHashSet<ImageFileResource> getImageFileResources(DigitalObject digitalObject) {
+    return getImageFileResources(digitalObject.getUuid());
+  }
+
+  @Override
+  public LinkedHashSet<ImageFileResource> getImageFileResources(UUID digitalObjectUuid) {
+    return ((DigitalObjectRepository) repository).getImageFileResources(digitalObjectUuid);
   }
 
   @Override

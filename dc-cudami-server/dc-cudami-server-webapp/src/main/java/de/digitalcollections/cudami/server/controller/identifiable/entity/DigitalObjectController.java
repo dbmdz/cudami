@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
@@ -11,6 +12,7 @@ import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
@@ -37,11 +39,11 @@ public class DigitalObjectController {
                   produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public PageResponse<DigitalObject> findAll(
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
-      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC") Direction sortDirection,
-      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE") NullHandling nullHandling
+    @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+    @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+    @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
+    @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC") Direction sortDirection,
+    @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE") NullHandling nullHandling
   ) {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
@@ -69,6 +71,13 @@ public class DigitalObjectController {
   public DigitalObject update(@PathVariable UUID uuid, @RequestBody DigitalObject digitalObject, BindingResult errors) throws IdentifiableServiceException {
     assert Objects.equals(uuid, digitalObject.getUuid());
     return (DigitalObject) service.update(digitalObject);
+  }
+
+  @ApiMethod(description = "get image file resources of a digital object")
+  @RequestMapping(value = {"/latest/digitalobjects/{uuid}/fileresources/images", "/v2/digitalobjects/{uuid}/fileresources/images"}, produces = "application/json", method = RequestMethod.GET)
+  @ApiResponseObject
+  public LinkedHashSet<ImageFileResource> getImageFileResources(@PathVariable UUID uuid) {
+    return service.getImageFileResources(uuid);
   }
 
   @ApiMethod(description = "get count of digital objects")

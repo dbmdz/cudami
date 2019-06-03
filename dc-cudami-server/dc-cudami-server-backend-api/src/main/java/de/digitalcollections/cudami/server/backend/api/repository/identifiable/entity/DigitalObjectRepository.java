@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.backend.api.repository.identifiable.
 
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import java.util.LinkedHashSet;
 import java.util.UUID;
 
@@ -10,9 +11,17 @@ import java.util.UUID;
  */
 public interface DigitalObjectRepository extends EntityRepository<DigitalObject> {
 
-  LinkedHashSet<FileResource> getFileResources(DigitalObject digitalObject);
+  default LinkedHashSet<FileResource> getFileResources(DigitalObject digitalObject) {
+    return getFileResources(digitalObject.getUuid());
+  }
 
   LinkedHashSet<FileResource> getFileResources(UUID digitalObjectUuid);
+
+  default LinkedHashSet<ImageFileResource> getImageFileResources(DigitalObject digitalObject) {
+    return getImageFileResources(digitalObject.getUuid());
+  }
+
+  LinkedHashSet<ImageFileResource> getImageFileResources(UUID digitalObjectUuid);
 
   LinkedHashSet<FileResource> saveFileResources(DigitalObject digitalObject, LinkedHashSet<FileResource> fileResources);
 
