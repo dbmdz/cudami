@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
@@ -53,6 +54,11 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   @Override
   public LinkedHashSet<FileResource> getFileResources(UUID digitalObjectUuid) {
     return endpoint.getFileResources(digitalObjectUuid);
+  }
+
+  @Override
+  public LinkedHashSet<ImageFileResource> getImageFileResources(UUID uuid) {
+    return endpoint.getImageFileResources(uuid);
   }
 
   @Override

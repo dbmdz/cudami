@@ -6,9 +6,11 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.r
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
+import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
 import java.util.Iterator;
@@ -78,11 +80,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public LinkedHashSet<FileResource> getFileResources(DigitalObject digitalObject) {
-    return getFileResources(digitalObject.getUuid());
-  }
-
-  @Override
   public LinkedHashSet<FileResource> getFileResources(UUID digitalObjectUuid) {
     // TODO getting uuids and then select each fileresource from table may be to unperformant...
     // but copying whole select from cudamifileresourcerepository and do joins may be overkill, too?
@@ -104,6 +101,21 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       result.add(cudamiFileResourceRepository.findOne(uuid));
     });
     return result;
+  }
+
+  @Override
+  public LinkedHashSet<ImageFileResource> getImageFileResources(UUID digitalObjectUuid) {
+    String query = "select i.*"
+                   + " from fileresources_image as i"
+                   + " left join digitalobject_fileresources as df on i.uuid=df.fileresource_uuid"
+                   + " WHERE df.digitalobject_uuid = :uuid"
+                   + " ORDER BY df.sortIndex ASC";
+
+    List<ImageFileResourceImpl> result = dbi.withHandle(h -> h.createQuery(query)
+                                                     .bind("uuid", digitalObjectUuid)
+                                                     .mapToBean(ImageFileResourceImpl.class)
+                                                     .list());
+    return new LinkedHashSet<>(result);
   }
 
   @Override
