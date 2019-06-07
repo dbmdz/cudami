@@ -36,16 +36,19 @@
             <thead>
               <tr sd:page-object="${page.page}">
                 <th class="center" th:text="#{label}">Label</th>
+                <th class="center" th:text="#{namespace}">Namespace</th>
+                <th class="center" th:text="#{pattern}">Pattern</th>
                 <th class="center" th:text="#{actions}">Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr th:each="identifiertype: ${page.content}">
                 <td>
-                  <a th:href="@{'/identifiertypes/' + ${identifiertype.uuid}}" th:if="${identifiertype.label}" th:text="${identifiertype.label}">bavarikon</a>
+                  <span th:if="${identifiertype.label}" th:text="${identifiertype.label}">bavarikon</span>
                 </td>
+                <td><span th:text="${identifiertype.namespace}">...</span></td>
+                <td><span th:text="${identifiertype.pattern}">...</span></td>
                 <td class="center">
-                  <a th:href="@{'/identifiertypes/' + ${identifiertype.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
                   <a th:href="@{'/identifiertypes/' + ${identifiertype.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
                 </td>
               </tr>
