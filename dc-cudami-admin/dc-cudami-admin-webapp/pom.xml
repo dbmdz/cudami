@@ -18,7 +18,7 @@
     <version.dc-commons-springaop>4.0.1</version.dc-commons-springaop>
     <version.dc-commons-springdata>4.0.1</version.dc-commons-springdata>
     <version.dc-commons-springmvc>4.1.1-SNAPSHOT</version.dc-commons-springmvc>
-    <version.thymeleaf-spring-data-dialect>3.4.0</version.thymeleaf-spring-data-dialect>
+    <version.thymeleaf-spring-data-dialect>3.4.1</version.thymeleaf-spring-data-dialect>
     <version.webjar-bootstrap>4.3.1</version.webjar-bootstrap>
     <version.webjar-bootswatch>4.2.1</version.webjar-bootswatch>
     <version.webjar-fontawesome>5.8.2</version.webjar-fontawesome>
