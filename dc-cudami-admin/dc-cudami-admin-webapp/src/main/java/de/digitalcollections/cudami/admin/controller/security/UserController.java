@@ -92,7 +92,7 @@ public class UserController extends AbstractController implements MessageSourceA
   }
 
   @RequestMapping(value = "/users/new", method = RequestMethod.POST)
-  public String create(@RequestParam("pwd1") String password1, @RequestParam("pwd2") String password2, @ModelAttribute @Valid UserImpl user, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  public String create(@RequestParam("pwd1") String password1, @RequestParam("pwd2") String password2, @ModelAttribute(name = "user") @Valid UserImpl user, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "users/create";
@@ -114,8 +114,8 @@ public class UserController extends AbstractController implements MessageSourceA
   }
 
   @RequestMapping(value = "/users/{uuid}/edit", method = RequestMethod.POST)
-  public String edit(@PathVariable UUID uuid, @RequestParam("pwd1") String password1, @RequestParam("pwd2") String password2, @ModelAttribute @Valid UserImpl user, BindingResult results,
-          Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  public String edit(@PathVariable UUID uuid, @RequestParam("pwd1") String password1, @RequestParam("pwd2") String password2, @ModelAttribute(name = "user") @Valid UserImpl user, BindingResult results,
+                     Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "users/edit";
