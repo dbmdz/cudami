@@ -7,7 +7,7 @@ import de.digitalcollections.cudami.client.feign.config.BackendUrls;
 import de.digitalcollections.cudami.client.feign.config.BackendUrlsFromConfig;
 import de.digitalcollections.cudami.client.feign.exceptions.CudamiRestErrorDecoder;
 import de.digitalcollections.cudami.client.feign.impl.ClientFactory;
-import de.digitalcollections.model.jackson.DigitalCollectionsModelModule;
+import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import feign.Feign;
 import feign.Logger;
 import feign.ReflectiveFeign;
@@ -47,8 +47,7 @@ public class Cudami {
   }
 
   public Cudami(BackendUrls backendUrls) {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new DigitalCollectionsModelModule());
+    ObjectMapper mapper = new DigitalCollectionsObjectMapper();
 
     Feign.Builder feign = ReflectiveFeign.builder()
             .decoder(new JacksonDecoder(mapper))
