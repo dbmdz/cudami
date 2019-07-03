@@ -26,7 +26,9 @@ public class CudamiFileResourceServiceImpl extends IdentifiableServiceImpl<FileR
   @Override
   public FileResource save(FileResource fileResource, byte[] bytes) throws IdentifiableServiceException {
     try {
-      fileResource = ((CudamiFileResourceRepository) repository).save(fileResource, bytes);
+      // FIXME save/upload over feign endpoint does not work (anymore?)
+//      fileResource = ((CudamiFileResourceRepository) repository).save(fileResource, bytes);
+      fileResource = upload(bytes, fileResource.getFilename(), fileResource.getMimeType().getTypeName());
     } catch (Exception e) {
       LOGGER.error("Cannot save fileResource " + fileResource + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
