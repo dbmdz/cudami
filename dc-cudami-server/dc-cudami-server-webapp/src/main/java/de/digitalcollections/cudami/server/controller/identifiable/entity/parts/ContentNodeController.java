@@ -29,6 +29,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -116,6 +117,21 @@ public class ContentNodeController {
     return service.getChildren(uuid);
   }
 
+  @ApiMethod(description = "get entities of content node")
+  @RequestMapping(value = {"/latest/contentnodes/{uuid}/entities", "/v2/contentnodes/{uuid}/entities"}, produces = "application/json", method = RequestMethod.GET)
+  @ApiResponseObject
+  public LinkedHashSet<Entity> getEntities(@PathVariable UUID uuid) {
+    return service.getEntities(uuid);
+  }
+
+  // FIXME
+  @ApiMethod(description = "save entities of content node")
+  @PostMapping(value = {"/latest/contentnodes/{uuid}/entities", "/v2/contentnodes/{uuid}/entities"}, produces = "application/json")
+  @ApiResponseObject
+  public LinkedHashSet<Entity> saveEntities(@PathVariable UUID uuid, @RequestBody LinkedHashSet<Entity> entities) {
+    return service.saveEntities(uuid, entities);
+  }
+  
   @ApiMethod(description = "get file resources of content node")
   @RequestMapping(value = {"/latest/contentnodes/{uuid}/fileresources", "/v2/contentnodes/{uuid}/fileresources"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
@@ -124,13 +140,13 @@ public class ContentNodeController {
   }
 
   // FIXME
-//  @ApiMethod(description = "save identifiables of content node")
-//  @PostMapping(value = {"/latest/contentnodes/{uuid}/identifiables", "/v2/contentnodes/{uuid}/identifiables"}, produces = "application/json")
-//  @ApiResponseObject
-//  public LinkedHashSet<FileResource> saveIdentifiables(@PathVariable UUID uuid, @RequestBody LinkedHashSet<FileResource> fileResources) {
-//    return service.saveFileResources(uuid, fileResources);
-//  }
-//
+  @ApiMethod(description = "save fileresources of content node")
+  @PostMapping(value = {"/latest/contentnodes/{uuid}/fileresources", "/v2/contentnodes/{uuid}/fileresources"}, produces = "application/json")
+  @ApiResponseObject
+  public LinkedHashSet<FileResource> saveFileresources(@PathVariable UUID uuid, @RequestBody LinkedHashSet<FileResource> fileResources) {
+    return service.saveFileResources(uuid, fileResources);
+  }
+
 //  @ApiMethod(description = "add identifiable to content node")
 //  @PostMapping(value = {"/latest/contentnodes/{uuid}/identifiables/{identifiableUuid}", "/v2/contentnodes/{uuid}/identifiables/{identifiableUuid}"})
 //  @ResponseStatus(value = HttpStatus.OK)

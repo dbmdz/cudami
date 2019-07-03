@@ -19,8 +19,8 @@ public interface ContentNodeRepositoryEndpoint extends RepositoryEndpoint {
 
   @RequestLine("GET /latest/contentnodes?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<ContentNode> find(
-      @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
-      @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
+          @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
+          @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
   );
 
   @RequestLine("GET /latest/contentnodes/{uuid}")
@@ -36,16 +36,18 @@ public interface ContentNodeRepositoryEndpoint extends RepositoryEndpoint {
   LinkedHashSet<Entity> getEntities(@Param("uuid") UUID uuid);
 
   @RequestLine("GET /latest/contentnodes/{uuid}/fileresources")
-  LinkedHashSet<FileResource> getFileResources(UUID uuid);
+  LinkedHashSet<FileResource> getFileResources(@Param("uuid") UUID uuid);
 
   @RequestLine("POST /latest/contentnodes")
   @Headers("Content-Type: application/json")
   ContentNode save(ContentNode contentNode);
 
   @RequestLine("POST /latest/contentnodes/{uuid}/entities")
+  @Headers("Content-Type: application/json")
   LinkedHashSet<Entity> saveEntities(@Param("uuid") UUID uuid, LinkedHashSet<Entity> entities);
 
   @RequestLine("POST /latest/contentnodes/{uuid}/fileresources")
+  @Headers("Content-Type: application/json")
   LinkedHashSet<FileResource> saveFileResources(@Param("uuid") UUID uuid, LinkedHashSet<FileResource> fileResources);
 
   @RequestLine("POST /latest/contenttrees/{parentContentTreeUuid}/contentnode")

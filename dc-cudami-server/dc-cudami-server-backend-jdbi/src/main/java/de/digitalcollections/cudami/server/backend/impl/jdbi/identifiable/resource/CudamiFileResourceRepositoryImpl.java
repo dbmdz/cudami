@@ -149,7 +149,6 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
 
   @Override
   public FileResource findByIdentifier(String namespace, String id) {
-
     String query = "select f.*"
                    + " from fileresources as f"
                    + " left join identifiers as id on f.uuid = id.identifiable"
@@ -233,10 +232,12 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
 
     // save file resource identifiers
     List<Identifier> identifiers = fileResource.getIdentifiers();
-    for (Identifier identifier : identifiers) {
-      identifier.setIdentifiable(fileResource.getUuid());
-      // newly created file resource, no pre existing identifiers, so just save
-      identifierRepository.save(identifier);
+    if (identifiers != null) {
+      for (Identifier identifier : identifiers) {
+        identifier.setIdentifiable(fileResource.getUuid());
+        // newly created file resource, no pre existing identifiers, so just save
+        identifierRepository.save(identifier);
+      }
     }
 
     FileResource dbFileResource = findOne(fileResource.getUuid());
@@ -312,8 +313,6 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
     } else {
       throw new IllegalArgumentException("unknown file resource type " + fileResource.getMimeType().toString());
     }
-
     return result;
   }
-
 }
