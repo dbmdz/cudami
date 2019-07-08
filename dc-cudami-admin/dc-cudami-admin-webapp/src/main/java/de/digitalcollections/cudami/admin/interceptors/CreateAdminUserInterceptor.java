@@ -45,7 +45,7 @@ public class CreateAdminUserInterceptor extends HandlerInterceptorAdapter implem
 
   @Override
   public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView)
-    throws Exception {
+      throws Exception {
     final Object doCreateAdminUser = request.getAttribute("createAdminUser");
     if (doCreateAdminUser != null) {
       boolean createAdminUser = (boolean) doCreateAdminUser;
