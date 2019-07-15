@@ -28,6 +28,11 @@ public class CudamiFileResourceServiceImpl extends IdentifiableServiceImpl<FileR
   }
 
   @Override
+  public FileResource getByIdentifier(String namespace, String id) throws IdentifiableServiceException {
+    return ((CudamiFileResourceRepository) repository).findByIdentifier(namespace, id);
+  }
+
+  @Override
   public FileResource save(FileResource fileResource, InputStream binaryData) throws IdentifiableServiceException {
     try {
       return ((CudamiFileResourceRepository) repository).save(fileResource, binaryData);

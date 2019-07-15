@@ -22,4 +22,6 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
   LinkedHashSet<FileResource> saveFileResources(DigitalObject digitalObject, LinkedHashSet<FileResource> fileResources);
 
   LinkedHashSet<FileResource> saveFileResources(UUID digitalObjectUuid, LinkedHashSet<FileResource> fileResources);
+
+  DigitalObject getByIdentifier(String nameSpace, String id);
 }

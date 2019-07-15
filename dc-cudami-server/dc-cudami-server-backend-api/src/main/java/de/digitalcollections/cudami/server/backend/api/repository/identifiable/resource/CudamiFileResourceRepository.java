@@ -7,4 +7,6 @@ import java.io.InputStream;
 public interface CudamiFileResourceRepository extends IdentifiableRepository<FileResource> {
 
   FileResource save(FileResource fileResource, InputStream binaryData);
+
+  FileResource findByIdentifier(String namespace, String id);
 }
