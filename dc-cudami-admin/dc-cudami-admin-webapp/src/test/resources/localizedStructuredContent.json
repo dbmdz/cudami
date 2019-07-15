@@ -1,301 +1,299 @@
 {
-  "localizedStructuredContent": {
-    "en_US": {
-      "type": "doc",
-      "content": [
-        {
-          "type": "heading",
-          "content": [
-            {
-              "type": "text",
-              "text": "Impressum"
-            }
-          ],
-          "attrs": {
-            "level": 3
+  "en_US": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "heading",
+        "content": [
+          {
+            "type": "text",
+            "text": "Impressum"
           }
-        },
-        {
-          "type": "heading",
-          "content": [
-            {
-              "type": "text",
-              "text": "Bayerische Staatsbibliothek"
-            }
-          ],
-          "attrs": {
-            "level": 4
-          }
-        },
-        {
-          "type": "paragraph",
-          "content": [
-            {
-              "type": "text",
-              "text": "Ludwigstraße 16"
-            }
-          ]
-        },
-        {
-          "type": "hard_break"
-        },
-        {
-          "type": "heading",
-          "content": [
-            {
-              "type": "text",
-              "text": "Gesetzlicher Vertreter:"
-            }
-          ],
-          "attrs": {
-            "level": 4
-          }
-        },
-        {
-          "type": "paragraph",
-          "content": [
-            {
-              "type": "text",
-              "text": "Generaldirektor Dr. Klaus Ceynowa"
-            }
-          ]
-        },
-        {
-          "type": "paragraph",
-          "content": [
-            {
-              "type": "text",
-              "text": "Telefon:",
-              "marks": [
-                {
-                  "type": "strong"
-                }
-              ]
-            },
-            {
-              "type": "text",
-              "text": " +49 89 28638-0"
-            },
-            {
-              "type": "hard_break"
-            },
-            {
-              "type": "text",
-              "text": "Fax:",
-              "marks": [
-                {
-                  "type": "strong"
-                },
-                {
-                  "type": "em"
-                }
-              ]
-            },
-            {
-              "type": "text",
-              "text": " +49 89 28638-2200"
-            },
-            {
-              "type": "hard_break"
-            },
-            {
-              "type": "text",
-              "text": "E-Mail:",
-              "marks": [
-                {
-                  "type": "strong"
-                }
-              ]
-            },
-            {
-              "type": "text",
-              "text": " direktion [AT] bsb-muenchen.de"
-            },
-            {
-              "type": "hard_break"
-            },
-            {
-              "type": "text",
-              "text": "Internet:",
-              "marks": [
-                {
-                  "type": "strong"
-                }
-              ]
-            },
-            {
-              "type": "text",
-              "text": " "
-            },
-            {
-              "type": "text",
-              "text": "https://www.bsb-muenchen.de",
-              "marks": [
-                {
-                  "type": "link",
-                  "attrs": {
-                    "href": "https://www.bsb-muenchen.de"
-                  }
-                }
-              ]
-            },
-            {
-              "type": "hard_break"
-            },
-            {
-              "type": "text",
-              "text": "Umsatzsteueridentifikationsnummer:",
-              "marks": [
-                {
-                  "type": "strong"
-                }
-              ]
-            },
-            {
-              "type": "text",
-              "text": " DE 811335517"
-            }
-          ]
-        },
-        {
-          "type": "paragraph",
-          "content": [
-            {
-              "type": "text",
-              "text": "Die Bayerische Staatsbibliothek ist eine dem Bayerischen Staatsministerium für Bildung und Kultus, Wissenschaft und Kunst nachgeordnete Behörde der Mittelstufe mit dem Sitz in München"
-            }
-          ]
-        },
-        {
-          "type": "hard_break"
-        },
-        {
-          "type": "text",
-          "text": "Bayerischen Staatsministerium für Bildung und Kultus, Wissenschaft und Kunst",
-          "marks": [
-            {
-              "type": "link",
-              "attrs": {
-                "href": "https://www.km.bayern.de"
-              }
-            }
-          ]
-        },
-        {
-          "type": "bullet_list",
-          "content": [
-            {
-              "type": "list_item",
-              "content": [
-                {
-                  "type": "paragraph",
-                  "content": [
-                    {
-                      "type": "text",
-                      "text": "test 1"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "list_item",
-              "content": [
-                {
-                  "type": "paragraph",
-                  "content": [
-                    {
-                      "type": "text",
-                      "text": "test 2"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "list_item",
-              "content": [
-                {
-                  "type": "paragraph",
-                  "content": [
-                    {
-                      "type": "text",
-                      "text": "test 3"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "paragraph",
-          "content": [
-            {
-              "type": "text",
-              "text": "Mehr Text."
-            }
-          ]
-        },
-        {
-          "type": "ordered_list",
-          "content": [
-            {
-              "type": "list_item",
-              "content": [
-                {
-                  "type": "paragraph",
-                  "content": [
-                    {
-                      "type": "text",
-                      "text": "test 1"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "list_item",
-              "content": [
-                {
-                  "type": "paragraph",
-                  "content": [
-                    {
-                      "type": "text",
-                      "text": "test 2"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "list_item",
-              "content": [
-                {
-                  "type": "paragraph",
-                  "content": [
-                    {
-                      "type": "text",
-                      "text": "test 3"
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "attrs": {
-            "order": 1
-          }
-        },
-        {
-          "type": "iframe",
-          "attrs": {
-            "src": "https://statistiken.digitale-sammlungen.de/index.php?module=CoreAdminHome&amp;action=optOut&amp;language=de",
-            "height": "auto",
-            "width": "98%"
-          }
+        ],
+        "attrs": {
+          "level": 3
         }
-      ]
-    }
+      },
+      {
+        "type": "heading",
+        "content": [
+          {
+            "type": "text",
+            "text": "Bayerische Staatsbibliothek"
+          }
+        ],
+        "attrs": {
+          "level": 4
+        }
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Ludwigstraße 16"
+          }
+        ]
+      },
+      {
+        "type": "hard_break"
+      },
+      {
+        "type": "heading",
+        "content": [
+          {
+            "type": "text",
+            "text": "Gesetzlicher Vertreter:"
+          }
+        ],
+        "attrs": {
+          "level": 4
+        }
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Generaldirektor Dr. Klaus Ceynowa"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Telefon:",
+            "marks": [
+              {
+                "type": "strong"
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "text": " +49 89 28638-0"
+          },
+          {
+            "type": "hard_break"
+          },
+          {
+            "type": "text",
+            "text": "Fax:",
+            "marks": [
+              {
+                "type": "strong"
+              },
+              {
+                "type": "em"
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "text": " +49 89 28638-2200"
+          },
+          {
+            "type": "hard_break"
+          },
+          {
+            "type": "text",
+            "text": "E-Mail:",
+            "marks": [
+              {
+                "type": "strong"
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "text": " direktion [AT] bsb-muenchen.de"
+          },
+          {
+            "type": "hard_break"
+          },
+          {
+            "type": "text",
+            "text": "Internet:",
+            "marks": [
+              {
+                "type": "strong"
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "text": " "
+          },
+          {
+            "type": "text",
+            "text": "https://www.bsb-muenchen.de",
+            "marks": [
+              {
+                "type": "link",
+                "attrs": {
+                  "href": "https://www.bsb-muenchen.de"
+                }
+              }
+            ]
+          },
+          {
+            "type": "hard_break"
+          },
+          {
+            "type": "text",
+            "text": "Umsatzsteueridentifikationsnummer:",
+            "marks": [
+              {
+                "type": "strong"
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "text": " DE 811335517"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Die Bayerische Staatsbibliothek ist eine dem Bayerischen Staatsministerium für Bildung und Kultus, Wissenschaft und Kunst nachgeordnete Behörde der Mittelstufe mit dem Sitz in München"
+          }
+        ]
+      },
+      {
+        "type": "hard_break"
+      },
+      {
+        "type": "text",
+        "text": "Bayerischen Staatsministerium für Bildung und Kultus, Wissenschaft und Kunst",
+        "marks": [
+          {
+            "type": "link",
+            "attrs": {
+              "href": "https://www.km.bayern.de"
+            }
+          }
+        ]
+      },
+      {
+        "type": "bullet_list",
+        "content": [
+          {
+            "type": "list_item",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "test 1"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "list_item",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "test 2"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "list_item",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "test 3"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Mehr Text."
+          }
+        ]
+      },
+      {
+        "type": "ordered_list",
+        "content": [
+          {
+            "type": "list_item",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "test 1"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "list_item",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "test 2"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "list_item",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "test 3"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "attrs": {
+          "order": 1
+        }
+      },
+      {
+        "type": "iframe",
+        "attrs": {
+          "src": "https://statistiken.digitale-sammlungen.de/index.php?module=CoreAdminHome&amp;action=optOut&amp;language=de",
+          "height": "auto",
+          "width": "98%"
+        }
+      }
+    ]
   }
 }

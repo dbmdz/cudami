@@ -103,13 +103,13 @@
   function cleanupJson(){
     $('.content').each(function(_, contentElement){
       var contentJson = JSON.parse($(this).val());
-      Object.keys(contentJson.localizedStructuredContent).forEach(function(currentLocale){
-        var contentJsonString = JSON.stringify(contentJson.localizedStructuredContent[currentLocale]);
+      Object.keys(contentJson).forEach(function(currentLocale){
+        var contentJsonString = JSON.stringify(contentJson[currentLocale]);
         if(contentJsonString === initialEditorJsonString){
-          delete contentJson.localizedStructuredContent[currentLocale];
+          delete contentJson[currentLocale];
         }
       });
-      if($.isEmptyObject(contentJson.localizedStructuredContent)){
+      if($.isEmptyObject(contentJson)){
         $(contentElement).val('');
       }else{
         $(contentElement).val(JSON.stringify(contentJson));
@@ -178,7 +178,7 @@
   function initializeEditorsInForm(){
     $('.content').each(function(_, contentElement){
       if($(this).val() === ''){
-        $(this).val('{"localizedStructuredContent":{"' + defaultLocale + '":' + initialEditorJsonString + '}}');
+        $(this).val('{"' + defaultLocale + '":' + initialEditorJsonString + '}');
       }
       var contentJson = JSON.parse($(this).val());
       var currentEditor = document.querySelector(
@@ -192,7 +192,7 @@
           // from JSON:
           doc: prosemirrorModel.Node.fromJSON(
             schema,
-            contentJson.localizedStructuredContent[activeLocale] || JSON.parse(initialEditorJsonString)
+            contentJson[activeLocale] || JSON.parse(initialEditorJsonString)
           ),
           plugins: prosemirrorExampleSetup.exampleSetup({schema: schema, menuContent: menu.fullMenu})
         }),
@@ -201,7 +201,7 @@
           var currentEditorView = editorViews[this.contentElement.id];
           currentEditorView.updateState(currentEditorView.state.apply(tr));
           // current state as json in text area
-          this.contentJson.localizedStructuredContent[getActiveLocale()] = currentEditorView.state.doc.toJSON();
+          this.contentJson[getActiveLocale()] = currentEditorView.state.doc.toJSON();
           $(this.contentElement).val(JSON.stringify(this.contentJson));
         }.bind({
           'contentElement': contentElement, 'contentJson': contentJson, 'getActiveLocale': getActiveLocale
@@ -291,7 +291,7 @@
       newState = prosemirrorState.EditorState.create({
         doc: prosemirrorModel.Node.fromJSON(
           schema,
-          contentJson.localizedStructuredContent[activeLocale] || JSON.parse(initialEditorJsonString)
+          contentJson[activeLocale] || JSON.parse(initialEditorJsonString)
         ),
         plugins: prosemirrorExampleSetup.exampleSetup({schema: schema, menuContent: menu.fullMenu})
       });

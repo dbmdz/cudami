@@ -51,9 +51,9 @@
                 <div class="card-body bg-light">
                   <div th:replace="fragments/identifiable::renderTeaser(${article}, ${locale})"></div>
                 </div>
-                <th:block th:if="*{text} and ${article.text.localizedStructuredContent.containsKey(locale)}">
+                <th:block th:if="*{text} and ${article.text.containsKey(locale)}">
                   <div class="card-body">
-                    <div th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(*{text.localizedStructuredContent}, ${locale})"></div>
+                    <div th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(*{text}, ${locale})"></div>
                   </div>
                 </th:block>
               </div>

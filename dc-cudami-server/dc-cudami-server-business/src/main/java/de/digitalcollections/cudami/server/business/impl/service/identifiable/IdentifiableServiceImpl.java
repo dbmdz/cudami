@@ -86,8 +86,8 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     translations.removeIf((Translation translation) -> !translation.getLocale().equals(fLocale));
 
     // filter description
-    if (identifiable.getDescription() != null && identifiable.getDescription().getLocalizedStructuredContent() != null) {
-      identifiable.getDescription().getLocalizedStructuredContent().entrySet().removeIf(entry -> !entry.getKey().equals(fLocale));
+    if (identifiable.getDescription() != null) {
+      identifiable.getDescription().entrySet().removeIf(entry -> !entry.getKey().equals(fLocale));
     }
 
     return identifiable;
