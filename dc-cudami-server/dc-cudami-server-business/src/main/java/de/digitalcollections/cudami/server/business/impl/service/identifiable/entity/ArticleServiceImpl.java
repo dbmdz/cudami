@@ -34,8 +34,8 @@ public class ArticleServiceImpl extends EntityServiceImpl<Article> implements Ar
     }
 
     // filter out not requested translations of fields not already filtered
-    if (article.getText() != null && article.getText().getLocalizedStructuredContent() != null) {
-      article.getText().getLocalizedStructuredContent().entrySet().removeIf((Map.Entry entry) -> !entry.getKey().equals(locale));
+    if (article.getText() != null) {
+      article.getText().entrySet().removeIf((Map.Entry entry) -> !entry.getKey().equals(locale));
     }
     return article;
   }

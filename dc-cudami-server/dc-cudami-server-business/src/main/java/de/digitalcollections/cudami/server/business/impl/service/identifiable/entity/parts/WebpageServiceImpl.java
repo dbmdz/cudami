@@ -39,8 +39,8 @@ public class WebpageServiceImpl<E extends Entity> extends EntityPartServiceImpl<
     }
 
     // filter out not requested translations of fields not already filtered
-    if (webpage.getText() != null && webpage.getText().getLocalizedStructuredContent() != null) {
-      webpage.getText().getLocalizedStructuredContent().entrySet().removeIf((Map.Entry entry) -> !entry.getKey().equals(locale));
+    if (webpage.getText() != null) {
+      webpage.getText().entrySet().removeIf((Map.Entry entry) -> !entry.getKey().equals(locale));
     }
     return webpage;
   }

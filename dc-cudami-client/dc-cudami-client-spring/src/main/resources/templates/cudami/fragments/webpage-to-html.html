@@ -13,14 +13,14 @@
     <!-- description of webpage: -->
     <th:block th:if="${webpage.description}">
       <div class="webpage-description">
-        <th:block th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${webpage.description.localizedStructuredContent}, ${locale})"></th:block>
+        <th:block th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${webpage.description}, ${locale})"></th:block>
       </div>
     </th:block>
 
     <!-- text of webpage: -->
     <th:block th:if="${webpage.text}">
       <div class="webpage-text">
-        <th:block th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${webpage.text.localizedStructuredContent}, ${locale})"></th:block>
+        <th:block th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${webpage.text}, ${locale})"></th:block>
       </div>
     </th:block>
   </div>
