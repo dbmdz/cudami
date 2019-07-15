@@ -36,21 +36,21 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
   @Override
   public long count() {
     String sql = "SELECT count(*) FROM contentnodes";
-    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOnly());
+    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
     return count;
   }
 
   @Override
   public PageResponse<ContentNode> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder()
-        .append("SELECT " + IDENTIFIABLE_COLUMNS)
-        .append(" FROM contentnodes");
+      .append("SELECT " + IDENTIFIABLE_COLUMNS)
+      .append(" FROM contentnodes");
 
     addPageRequestParams(pageRequest, query);
 
     List<ContentNodeImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
-        .mapToBean(ContentNodeImpl.class)
-        .list());
+      .mapToBean(ContentNodeImpl.class)
+      .list());
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -59,14 +59,14 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
   @Override
   public ContentNode findOne(UUID uuid) {
     StringBuilder query = new StringBuilder()
-        .append("SELECT " + IDENTIFIABLE_COLUMNS)
-        .append(" FROM contentnodes")
-        .append(" WHERE uuid = :uuid");
+      .append("SELECT " + IDENTIFIABLE_COLUMNS)
+      .append(" FROM contentnodes")
+      .append(" WHERE uuid = :uuid");
 
     ContentNode contentNode = dbi.withHandle(h -> h.createQuery(query.toString())
-        .bind("uuid", uuid)
-        .mapToBean(ContentNodeImpl.class)
-        .findOnly());
+      .bind("uuid", uuid)
+      .mapToBean(ContentNodeImpl.class)
+      .findOne().orElse(null));
     if (contentNode != null) {
       contentNode.setChildren(getChildren(contentNode));
     }
@@ -97,9 +97,9 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
 //        .append(" WHERE cn.uuid = :uuid")
 //        .append(" ORDER BY cc.sortindex ASC");
     List<ContentNodeImpl> list = dbi.withHandle(h -> h.createQuery(sql)
-        .bind("uuid", uuid)
-        .mapToBean(ContentNodeImpl.class)
-        .list());
+      .bind("uuid", uuid)
+      .mapToBean(ContentNodeImpl.class)
+      .list());
 
     if (list.isEmpty()) {
       return new ArrayList<>();
@@ -121,9 +121,9 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
                  + " ORDER BY ce.sortIndex ASC";
 
     List<EntityImpl> list = dbi.withHandle(h -> h.createQuery(sql)
-        .bind("uuid", contentNodeUuid)
-        .mapToBean(EntityImpl.class)
-        .list());
+      .bind("uuid", contentNodeUuid)
+      .mapToBean(EntityImpl.class)
+      .list());
 
     if (list.isEmpty()) {
       return new LinkedHashSet<>();
@@ -131,8 +131,8 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
 
     // TODO maybe does not work, then we have to refactor to LinkedHashSet<Entity>...
     LinkedHashSet<E> result = list.stream()
-        .map(s -> (E) s)
-        .collect(Collectors.toCollection(LinkedHashSet::new));
+      .map(s -> (E) s)
+      .collect(Collectors.toCollection(LinkedHashSet::new));
     return result;
   }
 
@@ -150,17 +150,17 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
                  + " ORDER BY cf.sortIndex ASC";
 
     List<FileResourceImpl> list = dbi.withHandle(h -> h.createQuery(sql)
-        .bind("uuid", contentNodeUuid)
-        .mapToBean(FileResourceImpl.class)
-        .list());
+      .bind("uuid", contentNodeUuid)
+      .mapToBean(FileResourceImpl.class)
+      .list());
 
     if (list.isEmpty()) {
       return new LinkedHashSet<>();
     }
 
     LinkedHashSet<FileResource> result = list.stream()
-        .map(s -> (FileResource) s)
-        .collect(Collectors.toCollection(LinkedHashSet::new));
+      .map(s -> (FileResource) s)
+      .collect(Collectors.toCollection(LinkedHashSet::new));
     return result;
   }
 
@@ -171,10 +171,10 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
     contentNode.setLastModified(LocalDateTime.now());
 
     ContentNode result = dbi.withHandle(h -> h
-        .createQuery("INSERT INTO contentnodes(uuid, created, description, identifiable_type, label, last_modified) VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified) RETURNING *")
-        .bindBean(contentNode)
-        .mapToBean(ContentNodeImpl.class)
-        .findOnly());
+      .createQuery("INSERT INTO contentnodes(uuid, created, description, identifiable_type, label, last_modified) VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified) RETURNING *")
+      .bindBean(contentNode)
+      .mapToBean(ContentNodeImpl.class)
+      .findOne().orElse(null));
     return result;
   }
 
@@ -187,7 +187,7 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
   public LinkedHashSet<E> saveEntities(UUID contentNodeUuid, LinkedHashSet<E> entities) {
     // as we store the whole list new: delete old entries
     dbi.withHandle(h -> h.createUpdate("DELETE FROM contentnode_entities WHERE contentnode_uuid = :uuid")
-        .bind("uuid", contentNodeUuid).execute());
+      .bind("uuid", contentNodeUuid).execute());
 
     if (entities != null) {
       // we assume that the entities are already saved...
@@ -195,9 +195,9 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
         PreparedBatch preparedBatch = handle.prepareBatch("INSERT INTO contentnode_entities(contentnode_uuid, entity_uuid, sortIndex) VALUES(:uuid, :entityUuid, :sortIndex)");
         for (Entity entity : entities) {
           preparedBatch.bind("uuid", contentNodeUuid)
-              .bind("entityUuid", entity.getUuid())
-              .bind("sortIndex", getIndex(entities, entity))
-              .add();
+            .bind("entityUuid", entity.getUuid())
+            .bind("sortIndex", getIndex(entities, entity))
+            .add();
         }
         preparedBatch.execute();
       });
@@ -214,7 +214,7 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
   public LinkedHashSet<FileResource> saveFileResources(UUID contentNodeUuid, LinkedHashSet<FileResource> fileResources) {
     // as we store the whole list new: delete old entries
     dbi.withHandle(h -> h.createUpdate("DELETE FROM contentnode_fileresources WHERE contentnode_uuid = :uuid")
-        .bind("uuid", contentNodeUuid).execute());
+      .bind("uuid", contentNodeUuid).execute());
 
     if (fileResources != null) {
       // we assume that the fileresources are already saved... so commented
@@ -226,9 +226,9 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
         PreparedBatch preparedBatch = handle.prepareBatch("INSERT INTO contentnode_fileresources(contentnode_uuid, fileresource_uuid, sortIndex) VALUES(:uuid, :fileResourceUuid, :sortIndex)");
         for (FileResource fileResource : fileResources) {
           preparedBatch.bind("uuid", contentNodeUuid)
-              .bind("fileResourceUuid", fileResource.getUuid())
-              .bind("sortIndex", getIndex(fileResources, fileResource))
-              .add();
+            .bind("fileResourceUuid", fileResource.getUuid())
+            .bind("sortIndex", getIndex(fileResources, fileResource))
+            .add();
         }
         preparedBatch.execute();
       });
@@ -242,12 +242,12 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
 
     Integer sortindex = selectNextSortIndexForParentChildren(dbi, "contentnode_contentnodes", "parent_contentnode_uuid", parentContentNodeUuid);
     dbi.withHandle(h -> h.createUpdate(
-        "INSERT INTO contentnode_contentnodes(parent_contentnode_uuid, child_contentnode_uuid, sortindex)"
-        + " VALUES (:parent_contentnode_uuid, :uuid, :sortindex)")
-        .bind("parent_contentnode_uuid", parentContentNodeUuid)
-        .bind("sortindex", sortindex)
-        .bindBean(savedContentNode)
-        .execute());
+      "INSERT INTO contentnode_contentnodes(parent_contentnode_uuid, child_contentnode_uuid, sortindex)"
+      + " VALUES (:parent_contentnode_uuid, :uuid, :sortindex)")
+      .bind("parent_contentnode_uuid", parentContentNodeUuid)
+      .bind("sortindex", sortindex)
+      .bindBean(savedContentNode)
+      .execute());
 
     return findOne(savedContentNode.getUuid());
   }
@@ -258,12 +258,12 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
 
     Integer sortindex = selectNextSortIndexForParentChildren(dbi, "contenttree_contentnodes", "contenttree_uuid", parentContentTreeUuid);
     dbi.withHandle(h -> h.createUpdate(
-        "INSERT INTO contenttree_contentnodes(contenttree_uuid, contentnode_uuid, sortindex)"
-        + " VALUES (:parent_contenttree_uuid, :uuid, :sortindex)")
-        .bind("parent_contenttree_uuid", parentContentTreeUuid)
-        .bind("sortindex", sortindex)
-        .bindBean(savedContentNode)
-        .execute());
+      "INSERT INTO contenttree_contentnodes(contenttree_uuid, contentnode_uuid, sortindex)"
+      + " VALUES (:parent_contenttree_uuid, :uuid, :sortindex)")
+      .bind("parent_contenttree_uuid", parentContentTreeUuid)
+      .bind("sortindex", sortindex)
+      .bindBean(savedContentNode)
+      .execute());
 
     return findOne(savedContentNode.getUuid());
   }
@@ -274,10 +274,10 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
 
     // do not update/left out from statement (not changed since insert): uuid, created, identifiable_type
     ContentNode result = dbi.withHandle(h -> h
-        .createQuery("UPDATE contentnodes SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified WHERE uuid=:uuid RETURNING *")
-        .bindBean(contentNode)
-        .mapToBean(ContentNodeImpl.class)
-        .findOnly());
+      .createQuery("UPDATE contentnodes SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified WHERE uuid=:uuid RETURNING *")
+      .bindBean(contentNode)
+      .mapToBean(ContentNodeImpl.class)
+      .findOne().orElse(null));
     return result;
   }
 }

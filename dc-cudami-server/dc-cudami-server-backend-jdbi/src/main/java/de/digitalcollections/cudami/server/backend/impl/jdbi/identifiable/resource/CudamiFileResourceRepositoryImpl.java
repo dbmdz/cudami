@@ -54,20 +54,20 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
   @Override
   public long count() {
     String sql = "SELECT count(*) FROM fileresources";
-    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOnly());
+    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
     return count;
   }
 
   @Override
   public PageResponse<FileResource> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS + ", filename, mimetype, size_in_bytes, uri")
-        .append(" FROM fileresources");
+      .append(" FROM fileresources");
 
     addPageRequestParams(pageRequest, query);
     List<? extends FileResource> result = dbi.withHandle(h -> h.createQuery(query.toString())
-        //        .mapToBean(FileResourceImpl.class)
-        .map(new FileResourceMapper())
-        .list());
+      //        .mapToBean(FileResourceImpl.class)
+      .map(new FileResourceMapper())
+      .list());
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -78,37 +78,37 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
     // TODO maybe just get mimetype value and make fileresource specific queries....
 
     StringBuilder query = new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS + ", filename, mimetype, size_in_bytes, uri")
-        .append(" FROM fileresources")
-        .append(" WHERE uuid = :uuid");
+      .append(" FROM fileresources")
+      .append(" WHERE uuid = :uuid");
 
     FileResource fileResource = dbi.withHandle(h -> h.createQuery(query.toString())
-        .bind("uuid", uuid)
-        //        .mapToBean(FileResourceImpl.class)
-        .map(new FileResourceMapper())
-        .findOnly());
+      .bind("uuid", uuid)
+      //        .mapToBean(FileResourceImpl.class)
+      .map(new FileResourceMapper())
+      .findOne().orElse(null));
 
     if (fileResource instanceof ApplicationFileResource) {
       // no special fields, yet
     } else if (fileResource instanceof AudioFileResource) {
       int result = dbi.withHandle(h -> h.createQuery("SELECT duration FROM fileresources_audio WHERE uuid = :uuid")
-          .bind("uuid", uuid)
-          .mapTo(Integer.class)
-          .findOnly());
+        .bind("uuid", uuid)
+        .mapTo(Integer.class)
+        .findOne().orElse(null));
       ((AudioFileResource) fileResource).setDuration(result);
     } else if (fileResource instanceof ImageFileResource) {
       Map<String, Object> result = dbi.withHandle(h -> h.createQuery("SELECT width, height FROM fileresources_image WHERE uuid = :uuid")
-          .bind("uuid", uuid)
-          .mapToMap()
-          .findOnly());
+        .bind("uuid", uuid)
+        .mapToMap()
+        .findOne().orElse(null));
       ((ImageFileResource) fileResource).setWidth((int) result.get("width"));
       ((ImageFileResource) fileResource).setHeight((int) result.get("height"));
     } else if (fileResource instanceof TextFileResource) {
       // no special fields, yet
     } else if (fileResource instanceof VideoFileResource) {
       int result = dbi.withHandle(h -> h.createQuery("SELECT duration FROM fileresources_video WHERE uuid = :uuid")
-          .bind("uuid", uuid)
-          .mapTo(Integer.class)
-          .findOnly());
+        .bind("uuid", uuid)
+        .mapTo(Integer.class)
+        .findOne().orElse(null));
       ((VideoFileResource) fileResource).setDuration(result);
     }
 
@@ -129,25 +129,25 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
     if (fileResource instanceof ApplicationFileResource) {
       // no special columns
       dbi.withHandle(h -> h.createUpdate("INSERT INTO fileresources_application(" + baseColumnsSql + ") VALUES (" + basePropertiesSql + ")")
-          .bindBean(fileResource)
-          .execute());
+        .bindBean(fileResource)
+        .execute());
     } else if (fileResource instanceof AudioFileResource) {
       dbi.withHandle(h -> h.createUpdate("INSERT INTO fileresources_audio(" + baseColumnsSql + ", duration) VALUES (" + basePropertiesSql + ", :duration)")
-          .bindBean(fileResource)
-          .execute());
+        .bindBean(fileResource)
+        .execute());
     } else if (fileResource instanceof ImageFileResource) {
       dbi.withHandle(h -> h.createUpdate("INSERT INTO fileresources_image(" + baseColumnsSql + ", width, height) VALUES (" + basePropertiesSql + ", :width, :height)")
-          .bindBean(fileResource)
-          .execute());
+        .bindBean(fileResource)
+        .execute());
     } else if (fileResource instanceof TextFileResource) {
       // no special columns
       dbi.withHandle(h -> h.createUpdate("INSERT INTO fileresources_text(" + baseColumnsSql + ") VALUES (" + basePropertiesSql + ")")
-          .bindBean(fileResource)
-          .execute());
+        .bindBean(fileResource)
+        .execute());
     } else if (fileResource instanceof VideoFileResource) {
       dbi.withHandle(h -> h.createUpdate("INSERT INTO fileresources_video(" + baseColumnsSql + ", duration) VALUES (" + basePropertiesSql + ", :duration)")
-          .bindBean(fileResource)
-          .execute());
+        .bindBean(fileResource)
+        .execute());
     } else {
       throw new IllegalArgumentException("unknown file resource type " + fileResource.getMimeType().toString());
     }
@@ -206,30 +206,30 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
     if (fileResource instanceof ApplicationFileResource) {
       // no special columns
       result = dbi.withHandle(h -> h.createQuery("UPDATE fileresources_application SET " + baseColumnsSql + " WHERE uuid=:uuid RETURNING *")
-          .bindBean(fileResource)
-          .mapToBean(ApplicationFileResourceImpl.class)
-          .findOnly());
+        .bindBean(fileResource)
+        .mapToBean(ApplicationFileResourceImpl.class)
+        .findOne().orElse(null));
     } else if (fileResource instanceof AudioFileResource) {
       result = dbi.withHandle(h -> h.createQuery("UPDATE fileresources_audio SET " + baseColumnsSql + ", duration=:duration WHERE uuid=:uuid RETURNING *")
-          .bindBean(fileResource)
-          .mapToBean(AudioFileResourceImpl.class)
-          .findOnly());
+        .bindBean(fileResource)
+        .mapToBean(AudioFileResourceImpl.class)
+        .findOne().orElse(null));
     } else if (fileResource instanceof ImageFileResource) {
       result = dbi.withHandle(h -> h.createQuery("UPDATE fileresources_image SET " + baseColumnsSql + ", width=:width, height=:height WHERE uuid=:uuid RETURNING *")
-          .bindBean(fileResource)
-          .mapToBean(ImageFileResourceImpl.class)
-          .findOnly());
+        .bindBean(fileResource)
+        .mapToBean(ImageFileResourceImpl.class)
+        .findOne().orElse(null));
     } else if (fileResource instanceof TextFileResource) {
       // no special columns
       result = dbi.withHandle(h -> h.createQuery("UPDATE fileresources_text SET " + baseColumnsSql + " WHERE uuid=:uuid RETURNING *")
-          .bindBean(fileResource)
-          .mapToBean(TextFileResourceImpl.class)
-          .findOnly());
+        .bindBean(fileResource)
+        .mapToBean(TextFileResourceImpl.class)
+        .findOne().orElse(null));
     } else if (fileResource instanceof VideoFileResource) {
       result = dbi.withHandle(h -> h.createQuery("UPDATE fileresources_video SET " + baseColumnsSql + ", duration=:duration WHERE uuid=:uuid RETURNING *")
-          .bindBean(fileResource)
-          .mapToBean(VideoFileResourceImpl.class)
-          .findOnly());
+        .bindBean(fileResource)
+        .mapToBean(VideoFileResourceImpl.class)
+        .findOne().orElse(null));
     } else {
       throw new IllegalArgumentException("unknown file resource type " + fileResource.getMimeType().toString());
     }
