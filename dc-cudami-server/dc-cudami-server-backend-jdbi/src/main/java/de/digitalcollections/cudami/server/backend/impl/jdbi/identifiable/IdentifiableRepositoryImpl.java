@@ -62,21 +62,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
     query.append(" SELECT uuid, label, description, identifiable_type FROM flattened WHERE text ILIKE '%' || :searchTerm || '%'");
     query.append(" LIMIT :maxResults");
 
-    List<IdentifiableImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
-      .bind("searchTerm", searchTerm)
-      .bind("maxResults", maxResults)
-      .mapToBean(IdentifiableImpl.class)
-      .list());
-    List<I> identifiables = convertToGenericList(result);
-    return identifiables;
-  }
-
-  protected List<I> convertToGenericList(List<IdentifiableImpl> identifiables) {
-    if (identifiables == null) {
-      return null;
-    }
-    List<I> genericContent = identifiables.stream().map(s -> (I) s).collect(Collectors.toList());
-    return genericContent;
+    List<I> result = dbi.withHandle(h -> h.createQuery(query.toString())
+        .bind("searchTerm", searchTerm)
+        .bind("maxResults", maxResults)
+        .mapToBean(IdentifiableImpl.class)
+        .stream().map(s -> (I) s).collect(Collectors.toList()));
+    return result;
   }
 
   @Override

@@ -1,12 +1,16 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.CudamiFileResourceRepository;
+import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
+import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
 import java.util.Iterator;
@@ -26,11 +30,13 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectRepositoryImpl.class);
 
   private final CudamiFileResourceRepository cudamiFileResourceRepository;
+  private final IdentifierRepository identifierRepository;
 
   @Autowired
-  public DigitalObjectRepositoryImpl(Jdbi dbi, CudamiFileResourceRepository cudamiFileResourceRepository) {
+  public DigitalObjectRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository, CudamiFileResourceRepository cudamiFileResourceRepository) {
     super(dbi);
     this.cudamiFileResourceRepository = cudamiFileResourceRepository;
+    this.identifierRepository = identifierRepository;
   }
 
   @Override
@@ -59,7 +65,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   public DigitalObject findOne(UUID uuid) {
     String query = "SELECT " + IDENTIFIABLE_COLUMNS
                    + " FROM digitalobjects"
-                   + " WHERE i.uuid = :uuid";
+                   + " WHERE uuid = :uuid";
 
     DigitalObject digitalObject = dbi.withHandle(h -> h.createQuery(query)
       .bind("uuid", uuid)
@@ -71,11 +77,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   @Override
   protected String[] getAllowedOrderByFields() {
     return new String[]{"last_modified"};
-  }
-
-  @Override
-  public LinkedHashSet<FileResource> getFileResources(DigitalObject digitalObject) {
-    return getFileResources(digitalObject.getUuid());
   }
 
   @Override
@@ -103,6 +104,21 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
+  public LinkedHashSet<ImageFileResource> getImageFileResources(UUID digitalObjectUuid) {
+    String query = "select i.*"
+                   + " from fileresources_image as i"
+                   + " left join digitalobject_fileresources as df on i.uuid=df.fileresource_uuid"
+                   + " WHERE df.digitalobject_uuid = :uuid"
+                   + " ORDER BY df.sortIndex ASC";
+
+    List<ImageFileResourceImpl> result = dbi.withHandle(h -> h.createQuery(query)
+                                                     .bind("uuid", digitalObjectUuid)
+                                                     .mapToBean(ImageFileResourceImpl.class)
+                                                     .list());
+    return new LinkedHashSet<>(result);
+  }
+
+  @Override
   public DigitalObject save(DigitalObject digitalObject) {
     digitalObject.setUuid(UUID.randomUUID());
     digitalObject.setCreated(LocalDateTime.now());
@@ -117,6 +133,14 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     // for now we implement first interesting use case: new digital object with new fileresources...
     final LinkedHashSet<FileResource> fileResources = digitalObject.getFileResources();
     saveFileResources(digitalObject, fileResources);
+
+    // save digital object identifiers
+    List<Identifier> identifiers = digitalObject.getIdentifiers();
+    for (Identifier identifier : identifiers) {
+      identifier.setIdentifiable(digitalObject.getUuid());
+      // newly created digital object, no pre existing identifiers, so just save
+      identifierRepository.save(identifier);
+    }
 
     return result;
   }
@@ -137,10 +161,12 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       .bind("uuid", digitalObjectUuid).execute());
 
     if (fileResources != null) {
+      // first save fileresources
       for (FileResource fileResource : fileResources) {
-        cudamiFileResourceRepository.save(fileResource);
+        fileResource = cudamiFileResourceRepository.save(fileResource);
       }
 
+      // second: save relations to digital object
       dbi.useHandle(handle -> {
         PreparedBatch preparedBatch = handle.prepareBatch("INSERT INTO digitalobject_fileresources(digitalobject_uuid, fileresource_uuid, sortIndex) VALUES(:uuid, :fileResourceUuid, :sortIndex)");
         for (FileResource fileResource : fileResources) {

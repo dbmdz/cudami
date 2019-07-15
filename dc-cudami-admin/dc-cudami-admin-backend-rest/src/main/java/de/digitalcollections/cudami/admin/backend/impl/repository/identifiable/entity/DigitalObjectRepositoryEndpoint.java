@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.
 import de.digitalcollections.cudami.admin.backend.impl.repository.RepositoryEndpoint;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.paging.PageResponse;
 import feign.Headers;
 import feign.Param;
@@ -17,8 +18,8 @@ public interface DigitalObjectRepositoryEndpoint extends RepositoryEndpoint {
 
   @RequestLine("GET /latest/digitalobjects?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<DigitalObject> find(
-      @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
-      @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
+    @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
+    @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
   );
 
   @RequestLine("GET /latest/digitalobjects/{uuid}")
@@ -29,6 +30,10 @@ public interface DigitalObjectRepositoryEndpoint extends RepositoryEndpoint {
 
   @RequestLine("GET /latest/digitalobjects/{uuid}/fileresources")
   LinkedHashSet<FileResource> getFileResources(@Param("uuid") UUID uuid);
+
+  // http://localhost:9000/latest/digitalobjects/8f543eca-da48-4d21-854a-0c0158110f9b/fileresources/images
+  @RequestLine("GET /latest/digitalobjects/{uuid}/fileresources/images")
+  LinkedHashSet<ImageFileResource> getImageFileResources(@Param("uuid") UUID uuid);
 
   @RequestLine("POST /latest/digitalobjects")
   @Headers("Content-Type: application/json")

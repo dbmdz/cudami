@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.config;
 
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.IdentifiableRepository;
+import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.IdentifierTypeRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.ArticleRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.ContentTreeRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.DigitalObjectRepository;
@@ -24,26 +25,31 @@ import org.springframework.context.annotation.Configuration;
 public class SpringConfigBackendForTest {
 
   @Bean
-  public ArticleRepository articleRepository() {
+  @Qualifier("articleRepositoryImpl")
+  public ArticleRepository articleRepositoryImpl() {
     return Mockito.mock(ArticleRepository.class);
   }
 
   @Bean
-  public ContentNodeRepository contentNodeRepository() {
+  @Qualifier("contentNodeRepositoryImpl")
+  public ContentNodeRepository contentNodeRepositoryImpl() {
     return Mockito.mock(ContentNodeRepository.class);
   }
 
   @Bean
-  public ContentTreeRepository contentTreeRepository() {
+  @Qualifier("contentTreeRepositoryImpl")
+  public ContentTreeRepository contentTreeRepositoryImpl() {
     return Mockito.mock(ContentTreeRepository.class);
   }
 
   @Bean
-  public DigitalObjectRepository digitalObjectRepository() {
+  @Qualifier("digitalObjectRepositoryImpl")
+  public DigitalObjectRepository digitalObjectRepositoryImpl() {
     return Mockito.mock(DigitalObjectRepository.class);
   }
 
   @Bean
+  @Qualifier("entityPartRepositoryImpl")
   public EntityPartRepository entityPartRepositoryImpl() {
     return Mockito.mock(EntityPartRepository.class);
   }
@@ -61,7 +67,14 @@ public class SpringConfigBackendForTest {
   }
 
   @Bean
-  public LocaleRepository localeRepository() {
+  @Qualifier("identifierTypeRepositoryImpl")
+  public IdentifierTypeRepository identifierTypeRepositoryImpl() {
+    return Mockito.mock(IdentifierTypeRepository.class);
+  }
+
+  @Bean
+  @Qualifier("localeRepositoryImpl")
+  public LocaleRepository localeRepositoryImpl() {
     return Mockito.mock(LocaleRepository.class);
   }
 
@@ -72,17 +85,20 @@ public class SpringConfigBackendForTest {
   }
 
   @Bean
-  public UserRepository userRepository() {
+  @Qualifier("userRepositoryImpl")
+  public UserRepository userRepositoryImpl() {
     return Mockito.mock(UserRepository.class);
   }
 
   @Bean
-  public WebpageRepository webpageRepository() {
+  @Qualifier("webpageRepositoryImpl")
+  public WebpageRepository webpageRepositoryImpl() {
     return Mockito.mock(WebpageRepository.class);
   }
 
   @Bean
-  public WebsiteRepository websiteRepository() {
+  @Qualifier("websiteRepositoryImpl")
+  public WebsiteRepository websiteRepositoryImpl() {
     return Mockito.mock(WebsiteRepository.class);
   }
 }

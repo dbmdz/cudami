@@ -1,0 +1,22 @@
+version: '3'
+services:
+  database:
+    image: postgres:10.3
+    ports:
+      - "22222:5432"
+    environment:
+      POSTGRES_USER: "cudami"
+      POSTGRES_PASSWORD: "somepassword"
+      POSTGRES_DB: "cudami"
+  iiif:
+    build:
+      args:
+        HYMIR_VERSION: "4.1.1"
+        OPENJPEG_VERSION: "2.3.1"
+      context: .
+      dockerfile: Dockerfile-iiif
+    ports:
+      - "23232:9000"
+    volumes:
+      - ./iiif_rules.yml:/application.yml
+      - ~/resourceRepository/dico:/iiif/upload

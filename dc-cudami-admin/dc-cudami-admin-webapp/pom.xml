@@ -16,15 +16,15 @@
   <properties>
     <version.dc-commons-server>4.0.1</version.dc-commons-server>
     <version.dc-commons-springaop>4.0.1</version.dc-commons-springaop>
-    <version.dc-commons-springdata>4.0.1</version.dc-commons-springdata>
-    <version.dc-commons-springmvc>4.1.0</version.dc-commons-springmvc>
-    <version.thymeleaf-spring-data-dialect>3.4.0</version.thymeleaf-spring-data-dialect>
+    <version.dc-commons-springdata>4.0.3</version.dc-commons-springdata>
+    <version.dc-commons-springmvc>4.1.1-SNAPSHOT</version.dc-commons-springmvc>
+    <version.thymeleaf-spring-data-dialect>3.4.1</version.thymeleaf-spring-data-dialect>
     <version.webjar-bootstrap>4.3.1</version.webjar-bootstrap>
     <version.webjar-bootswatch>4.2.1</version.webjar-bootswatch>
-    <version.webjar-fontawesome>5.7.2</version.webjar-fontawesome>
+    <version.webjar-fontawesome>5.9.0</version.webjar-fontawesome>
     <version.webjar-html5shiv>3.7.3-1</version.webjar-html5shiv>
     <version.webjar-ie10-viewport-bug-workaround>1.0.3</version.webjar-ie10-viewport-bug-workaround>
-    <version.webjar-jquery>3.3.1</version.webjar-jquery>
+    <version.webjar-jquery>3.4.1</version.webjar-jquery>
     <version.webjar-jquery-ui>1.12.1</version.webjar-jquery-ui>
     <version.webjar-respond>1.4.2</version.webjar-respond>
   </properties>

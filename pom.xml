@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.1.4.RELEASE</version>
+    <version>2.1.5.RELEASE</version>
   </parent>
 
   <groupId>de.digitalcollections.cudami</groupId>
@@ -74,11 +74,11 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <version.aspectjweaver>1.9.3</version.aspectjweaver>
+    <version.aspectjweaver>1.9.4</version.aspectjweaver>
     <version.assertj-core>3.12.2</version.assertj-core>
     <version.commons-beanutils>1.9.3</version.commons-beanutils>
     <version.commons-dbcp2>2.6.0</version.commons-dbcp2>
-    <version.commons-lang3>3.8.1</version.commons-lang3>
+    <version.commons-lang3>3.9</version.commons-lang3>
     <version.dc-model>3.1.0-SNAPSHOT</version.dc-model>
     <version.feign>10.2.0</version.feign>
     <version.feign-form-spring>3.5.0</version.feign-form-spring>
@@ -88,8 +88,8 @@
     <version.javax.servlet-api>4.0.1</version.javax.servlet-api>
     <version.junit>5.4.2</version.junit>
     <version.logstash-logback-encoder>5.3</version.logstash-logback-encoder>
-    <version.mockito-core>2.27.0</version.mockito-core>
-    <version.passay>1.4.0</version.passay>
+    <version.mockito-core>3.0.0</version.mockito-core>
+    <version.passay>1.5.0</version.passay>
     <version.postgresql>42.2.5</version.postgresql>
     <version.querydsl>4.2.1</version.querydsl>
     <version.slf4j>1.7.26</version.slf4j>
@@ -99,11 +99,11 @@
 
     <!-- plugins -->
     <version.jacoco-maven-plugin>0.8.4</version.jacoco-maven-plugin>
-    <version.maven-checkstyle-plugin>3.0.0</version.maven-checkstyle-plugin>
+    <version.maven-checkstyle-plugin>3.1.0</version.maven-checkstyle-plugin>
     <version.maven-gpg-plugin>1.6</version.maven-gpg-plugin>
     <version.maven-surefire-plugin>3.0.0-M3</version.maven-surefire-plugin>
     <version.nexus-staging-maven-plugin>1.6.8</version.nexus-staging-maven-plugin>
-    <version.spotbugs-maven-plugin>3.1.11</version.spotbugs-maven-plugin>
+    <version.spotbugs-maven-plugin>3.1.12</version.spotbugs-maven-plugin>
   </properties>
 
   <dependencyManagement>
