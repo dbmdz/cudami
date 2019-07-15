@@ -60,8 +60,8 @@
         <div id="navbarResponsive" class="collapse navbar-collapse">
           <ul class="navbar-nav ml-auto" sec:authorize="isAuthenticated()">
             <li class="nav-item">
-              <a th:href="${#strings.toString(#locale) == 'de' ? '?language=en' : '?language=de'}"
-                 th:text="${#strings.toString(#locale) == 'de' ? 'English' : 'Deutsch'}" class="nav-link">English</a>
+            <th:block th:unless="${#strings.toString(#locale) == 'en'}"><a th:href="@{''(language=en)}" class="nav-link">English</a></th:block>
+            <th:block th:if="${#strings.toString(#locale) == 'en'}"><a th:href="@{''(language=de)}" class="nav-link">Deutsch</a></th:block>
             </li>
             <li class="dropdown nav-item">
               <a href="#" class="dropdown-toggle nav-link" id="userMenuDropdownButton" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">

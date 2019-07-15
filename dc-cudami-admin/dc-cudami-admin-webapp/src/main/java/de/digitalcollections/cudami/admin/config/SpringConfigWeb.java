@@ -9,11 +9,9 @@ import de.digitalcollections.commons.springmvc.thymeleaf.SpacesDialect;
 import de.digitalcollections.cudami.admin.converter.GrantedAuthorityJsonFilter;
 import de.digitalcollections.cudami.admin.interceptors.CreateAdminUserInterceptor;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
-import java.util.Locale;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -29,8 +27,8 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistration
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.thymeleaf.dialect.AbstractProcessorDialect;
 import org.thymeleaf.dialect.springdata.SpringDataDialect;
 import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect;
@@ -49,9 +47,6 @@ import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect;
 public class SpringConfigWeb implements WebMvcConfigurer {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfigWeb.class);
-
-  @Value("${cudami.defaultLocale-gui}")
-  private String defaultLocaleTag;
 
   static final String ENCODING = "UTF-8";
 
@@ -95,25 +90,24 @@ public class SpringConfigWeb implements WebMvcConfigurer {
     return new SpringSecurityDialect();
   }
 
-  @Override
-  public void addInterceptors(InterceptorRegistry registry) {
+  @Bean
+  public LocaleChangeInterceptor localeChangeInterceptor() {
     LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
     localeChangeInterceptor.setParamName("language");
-    registry.addInterceptor(localeChangeInterceptor);
+    return localeChangeInterceptor;
+  }
+
+  @Override
+  public void addInterceptors(InterceptorRegistry registry) {
+    registry.addInterceptor(localeChangeInterceptor());
 
     InterceptorRegistration createAdminUserInterceptorRegistration = registry.addInterceptor(createAdminUserInterceptor());
     createAdminUserInterceptorRegistration.addPathPatterns("/login");
   }
 
-  @Bean(name = "localeResolver")
-  public CookieLocaleResolver localeResolver() {
-    CookieLocaleResolver localeResolver = new CookieLocaleResolver();
-    Locale defaultLocale = Locale.forLanguageTag(defaultLocaleTag);
-    LOGGER.info("##### Setting users' default locale for GUI to '{}' (persisted in cookie)", defaultLocale);
-    localeResolver.setDefaultLocale(defaultLocale);
-//    localeResolver.setCookieName("my-locale-cookie");
-    localeResolver.setCookieMaxAge(14 * 24 * 60 * 60); // 14 days (as content managers will work in office it should be relatively long)
-    return localeResolver;
+  @Bean
+  public SessionLocaleResolver localeResolver() {
+    return new SessionLocaleResolver();
   }
 
   @Bean
