@@ -5,7 +5,7 @@ import {
   Label
 } from 'reactstrap';
 
-const FormIdComponent = (props) => {
+const FormIdInput = (props) => {
   return (
     <FormGroup>
       <Label className='font-weight-bold' for='id'>ID</Label>
@@ -14,4 +14,4 @@ const FormIdComponent = (props) => {
   )
 };
 
-export default FormIdComponent;
+export default FormIdInput;

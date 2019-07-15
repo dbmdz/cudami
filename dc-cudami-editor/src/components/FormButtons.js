@@ -4,7 +4,7 @@ import {
   ButtonGroup
 } from 'reactstrap';
 
-const FormButtonsComponent = () => {
+const FormButtons = () => {
   return (
     <div className='float-right'>
       <ButtonGroup>
@@ -15,4 +15,4 @@ const FormButtonsComponent = () => {
   )
 };
 
-export default FormButtonsComponent;
+export default FormButtons;

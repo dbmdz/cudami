@@ -5,7 +5,7 @@ import {
   Label
 } from 'reactstrap';
 
-const FormUrlComponent = (props) => {
+const FormUrlInput = (props) => {
   return (
     <FormGroup>
       <Label className='font-weight-bold' for='url'>URL</Label>
@@ -14,4 +14,4 @@ const FormUrlComponent = (props) => {
   )
 };
 
-export default FormUrlComponent;
+export default FormUrlInput;
