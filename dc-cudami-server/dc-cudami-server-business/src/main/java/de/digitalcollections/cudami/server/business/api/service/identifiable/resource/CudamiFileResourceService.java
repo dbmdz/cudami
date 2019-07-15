@@ -8,4 +8,6 @@ import java.io.InputStream;
 public interface CudamiFileResourceService extends IdentifiableService<FileResource> {
 
   FileResource save(FileResource fileResource, InputStream binaryData) throws IdentifiableServiceException;
+
+  FileResource getByIdentifier(String namespace, String id) throws IdentifiableServiceException;
 }

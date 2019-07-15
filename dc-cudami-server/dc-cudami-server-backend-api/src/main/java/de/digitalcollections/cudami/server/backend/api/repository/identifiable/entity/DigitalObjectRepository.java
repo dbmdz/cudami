@@ -26,4 +26,6 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
   LinkedHashSet<FileResource> saveFileResources(DigitalObject digitalObject, LinkedHashSet<FileResource> fileResources);
 
   LinkedHashSet<FileResource> saveFileResources(UUID digitalObjectUuid, LinkedHashSet<FileResource> fileResources);
+
+  DigitalObject findByIdentifier(String namespace, String id);
 }

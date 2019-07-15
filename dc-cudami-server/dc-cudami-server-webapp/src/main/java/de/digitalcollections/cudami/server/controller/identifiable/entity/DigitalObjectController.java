@@ -18,6 +18,8 @@ import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +33,8 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The digital object controller", name = "Digital object controller")
 public class DigitalObjectController {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectController.class);
+
   @Autowired
   private DigitalObjectService service;
 
@@ -43,8 +47,7 @@ public class DigitalObjectController {
     @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
     @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
     @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC") Direction sortDirection,
-    @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE") NullHandling nullHandling
-  ) {
+    @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE") NullHandling nullHandling) {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
@@ -55,14 +58,26 @@ public class DigitalObjectController {
   @RequestMapping(value = {"/latest/digitalobjects/{uuid}", "/v2/digitalobjects/{uuid}"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public DigitalObject findById(@PathVariable UUID uuid) {
-    return (DigitalObject) service.get(uuid);
+    return service.get(uuid);
+  }
+
+  @ApiMethod(description = "get digital object by namespace and id")
+  @RequestMapping(value = {"/latest/digitalobjects/identifier/{namespace}:{id}", "/v2/digitalobjects/identifier/{namespace}:{id}"}, produces = "application/json", method = RequestMethod.GET)
+  @ApiResponseObject
+  public DigitalObject findByIdIdentifier(@PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
+    DigitalObject digitalObject = service.getByIdentifier(namespace, id);
+    if (digitalObject == null) {
+      // FIXME throw resource not found http exception
+      throw new IdentifiableServiceException("DigitalObject " + namespace + ":" + id + " not found");
+    }
+    return digitalObject;
   }
 
   @ApiMethod(description = "save a newly created digital object")
   @RequestMapping(value = {"/latest/digitalobjects", "/v2/digitalobjects"}, produces = "application/json", method = RequestMethod.POST)
   @ApiResponseObject
   public DigitalObject save(@RequestBody DigitalObject digitalObject, BindingResult errors) throws IdentifiableServiceException {
-    return (DigitalObject) service.save(digitalObject);
+    return service.save(digitalObject);
   }
 
   @ApiMethod(description = "update a digital object")
@@ -70,7 +85,7 @@ public class DigitalObjectController {
   @ApiResponseObject
   public DigitalObject update(@PathVariable UUID uuid, @RequestBody DigitalObject digitalObject, BindingResult errors) throws IdentifiableServiceException {
     assert Objects.equals(uuid, digitalObject.getUuid());
-    return (DigitalObject) service.update(digitalObject);
+    return service.update(digitalObject);
   }
 
   @ApiMethod(description = "get image file resources of a digital object")
