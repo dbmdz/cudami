@@ -22,7 +22,7 @@ public class UserRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl i
   @Override
   public long count() {
     String sql = "SELECT count(*) FROM users";
-    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOnly());
+    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
     return count;
   }
 
@@ -37,8 +37,8 @@ public class UserRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl i
 
     addPageRequestParams(pageRequest, query);
     List<UserImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
-            .mapToBean(UserImpl.class)
-            .list());
+      .mapToBean(UserImpl.class)
+      .list());
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -47,18 +47,18 @@ public class UserRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl i
   @Override
   public List<UserImpl> findActiveAdminUsers() {
     return dbi.withHandle(h -> h.createQuery(
-            "SELECT * FROM users WHERE '" + Role.ADMIN.name() + "' = any(roles)")
-            .mapToBean(UserImpl.class)
-            .list());
+      "SELECT * FROM users WHERE '" + Role.ADMIN.name() + "' = any(roles)")
+      .mapToBean(UserImpl.class)
+      .list());
   }
 
   @Override
   public UserImpl findByEmail(String email) {
     List<UserImpl> users = dbi.withHandle(h -> h.createQuery(
-            "SELECT * FROM users WHERE email = :email")
-            .bind("email", email)
-            .mapToBean(UserImpl.class)
-            .list());
+      "SELECT * FROM users WHERE email = :email")
+      .bind("email", email)
+      .mapToBean(UserImpl.class)
+      .list());
     if (users.isEmpty()) {
       return null;
     }
@@ -68,10 +68,10 @@ public class UserRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl i
   @Override
   public UserImpl findOne(UUID uuid) {
     List<UserImpl> users = dbi.withHandle(h -> h.createQuery(
-            "SELECT * FROM users WHERE uuid = :uuid")
-            .bind("uuid", uuid)
-            .mapToBean(UserImpl.class)
-            .list());
+      "SELECT * FROM users WHERE uuid = :uuid")
+      .bind("uuid", uuid)
+      .mapToBean(UserImpl.class)
+      .list());
     if (users.isEmpty()) {
       return null;
     }
@@ -95,22 +95,22 @@ public class UserRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl i
 //    return (S) result;
 
     UserImpl result = dbi.withHandle(h -> h
-            .registerArrayType(Role.class, "varchar")
-            .createQuery("INSERT INTO users(email, enabled, firstname, lastname, passwordHash, roles, uuid) VALUES (:email, :enabled, :firstname, :lastname, :passwordHash, :roles, :uuid) RETURNING *")
-            .bindBean(user)
-            .mapToBean(UserImpl.class)
-            .findOnly());
+      .registerArrayType(Role.class, "varchar")
+      .createQuery("INSERT INTO users(email, enabled, firstname, lastname, passwordHash, roles, uuid) VALUES (:email, :enabled, :firstname, :lastname, :passwordHash, :roles, :uuid) RETURNING *")
+      .bindBean(user)
+      .mapToBean(UserImpl.class)
+      .findOne().orElse(null));
     return result;
   }
 
   @Override
   public UserImpl update(UserImpl user) {
     UserImpl result = dbi.withHandle(h -> h
-            .registerArrayType(Role.class, "varchar")
-            .createQuery("UPDATE users SET email=:email, enabled=:enabled, firstname=:firstname, lastname=:lastname, passwordHash=:passwordHash, roles=:roles, uuid=:uuid WHERE uuid=:uuid RETURNING *")
-            .bindBean(user)
-            .mapToBean(UserImpl.class)
-            .findOnly());
+      .registerArrayType(Role.class, "varchar")
+      .createQuery("UPDATE users SET email=:email, enabled=:enabled, firstname=:firstname, lastname=:lastname, passwordHash=:passwordHash, roles=:roles, uuid=:uuid WHERE uuid=:uuid RETURNING *")
+      .bindBean(user)
+      .mapToBean(UserImpl.class)
+      .findOne().orElse(null));
     return result;
   }
 

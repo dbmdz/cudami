@@ -32,20 +32,20 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website> impleme
   @Override
   public long count() {
     String sql = "SELECT count(*) FROM websites";
-    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOnly());
+    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
     return count;
   }
 
   @Override
   public PageResponse<Website> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS + ", url, registration_date")
-        .append(" FROM websites");
+      .append(" FROM websites");
 
     addPageRequestParams(pageRequest, query);
 
     List<WebsiteImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
-        .mapToBean(WebsiteImpl.class)
-        .list());
+      .mapToBean(WebsiteImpl.class)
+      .list());
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -58,9 +58,9 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website> impleme
                    + " WHERE uuid = :uuid";
 
     Website website = dbi.withHandle(h -> h.createQuery(query)
-        .bind("uuid", uuid)
-        .mapToBean(WebsiteImpl.class)
-        .findOnly());
+      .bind("uuid", uuid)
+      .mapToBean(WebsiteImpl.class)
+      .findOne().orElse(null));
     if (website != null) {
       website.setRootPages(getRootPages(website));
     }
@@ -79,11 +79,11 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website> impleme
     website.setLastModified(LocalDateTime.now());
 
     Website result = dbi.withHandle(h -> h
-        .createQuery("INSERT INTO websites(uuid, created, description, identifiable_type, label, last_modified, entity_type, url, registration_date)"
-                     + " VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :entityType, :url, :registrationDate) RETURNING *")
-        .bindBean(website)
-        .mapToBean(WebsiteImpl.class)
-        .findOnly());
+      .createQuery("INSERT INTO websites(uuid, created, description, identifiable_type, label, last_modified, entity_type, url, registration_date)"
+                   + " VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :entityType, :url, :registrationDate) RETURNING *")
+      .bindBean(website)
+      .mapToBean(WebsiteImpl.class)
+      .findOne().orElse(null));
     return result;
   }
 
@@ -93,10 +93,10 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website> impleme
 
     // do not update/left out from statement (not changed since insert): uuid, created, identifiable_type, entity_type
     Website result = dbi.withHandle(h -> h
-        .createQuery("UPDATE websites SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, url=:url, registration_date=:registrationDate WHERE uuid=:uuid RETURNING *")
-        .bindBean(website)
-        .mapToBean(WebsiteImpl.class)
-        .findOnly());
+      .createQuery("UPDATE websites SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, url=:url, registration_date=:registrationDate WHERE uuid=:uuid RETURNING *")
+      .bindBean(website)
+      .mapToBean(WebsiteImpl.class)
+      .findOne().orElse(null));
     return result;
   }
 
@@ -119,9 +119,9 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website> impleme
 //                   + " WHERE ws.uuid = :uuid"
 //                   + " ORDER BY ww.sortIndex ASC";
     List<WebpageImpl> list = dbi.withHandle(h -> h.createQuery(sql)
-        .bind("uuid", uuid)
-        .mapToBean(WebpageImpl.class)
-        .list());
+      .bind("uuid", uuid)
+      .mapToBean(WebpageImpl.class)
+      .list());
 
     if (list.isEmpty()) {
       return new ArrayList<>();

@@ -36,20 +36,20 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   @Override
   public long count() {
     String sql = "SELECT count(*) FROM digitalobjects";
-    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOnly());
+    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
     return count;
   }
 
   @Override
   public PageResponse<DigitalObject> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS)
-        .append(" FROM digitalobjects");
+      .append(" FROM digitalobjects");
 
     addPageRequestParams(pageRequest, query);
 
     List<DigitalObjectImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
-        .mapToBean(DigitalObjectImpl.class)
-        .list());
+      .mapToBean(DigitalObjectImpl.class)
+      .list());
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -62,9 +62,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                    + " WHERE i.uuid = :uuid";
 
     DigitalObject digitalObject = dbi.withHandle(h -> h.createQuery(query)
-        .bind("uuid", uuid)
-        .mapToBean(DigitalObjectImpl.class)
-        .findOnly());
+      .bind("uuid", uuid)
+      .mapToBean(DigitalObjectImpl.class)
+      .findOne().orElse(null));
     return digitalObject;
   }
 
@@ -88,9 +88,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                    + " ORDER BY df.sortIndex ASC";
 
     List<UUID> list = dbi.withHandle(h -> h.createQuery(query)
-        .bind("uuid", digitalObjectUuid)
-        .mapTo(UUID.class)
-        .list());
+      .bind("uuid", digitalObjectUuid)
+      .mapTo(UUID.class)
+      .list());
 
     LinkedHashSet<FileResource> result = new LinkedHashSet<>();
     if (list.isEmpty()) {
@@ -109,10 +109,10 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     digitalObject.setLastModified(LocalDateTime.now());
 
     DigitalObject result = dbi.withHandle(h -> h
-        .createQuery("INSERT INTO digitalobjects(uuid, created, description, identifiable_type, label, last_modified, entity_type) VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :entityType) RETURNING *")
-        .bindBean(digitalObject)
-        .mapToBean(DigitalObjectImpl.class)
-        .findOnly());
+      .createQuery("INSERT INTO digitalobjects(uuid, created, description, identifiable_type, label, last_modified, entity_type) VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :entityType) RETURNING *")
+      .bindBean(digitalObject)
+      .mapToBean(DigitalObjectImpl.class)
+      .findOne().orElse(null));
 
     // for now we implement first interesting use case: new digital object with new fileresources...
     final LinkedHashSet<FileResource> fileResources = digitalObject.getFileResources();
@@ -134,7 +134,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
     // as we store the whole list new: delete old entries
     dbi.withHandle(h -> h.createUpdate("DELETE FROM digitalobject_fileresources WHERE digitalobject_uuid = :uuid")
-        .bind("uuid", digitalObjectUuid).execute());
+      .bind("uuid", digitalObjectUuid).execute());
 
     if (fileResources != null) {
       for (FileResource fileResource : fileResources) {
@@ -145,9 +145,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         PreparedBatch preparedBatch = handle.prepareBatch("INSERT INTO digitalobject_fileresources(digitalobject_uuid, fileresource_uuid, sortIndex) VALUES(:uuid, :fileResourceUuid, :sortIndex)");
         for (FileResource fileResource : fileResources) {
           preparedBatch.bind("uuid", digitalObjectUuid)
-              .bind("fileResourceUuid", fileResource.getUuid())
-              .bind("sortIndex", getIndex(fileResources, fileResource))
-              .add();
+            .bind("fileResourceUuid", fileResource.getUuid())
+            .bind("sortIndex", getIndex(fileResources, fileResource))
+            .add();
         }
         preparedBatch.execute();
       });
@@ -178,10 +178,10 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
     // do not update/left out from statement (not changed since insert): uuid, created, identifiable_type, entity_type
     DigitalObject result = dbi.withHandle(h -> h
-        .createQuery("UPDATE digitalobjects SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified WHERE uuid=:uuid RETURNING *")
-        .bindBean(digitalObject)
-        .mapToBean(DigitalObjectImpl.class)
-        .findOnly());
+      .createQuery("UPDATE digitalobjects SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified WHERE uuid=:uuid RETURNING *")
+      .bindBean(digitalObject)
+      .mapToBean(DigitalObjectImpl.class)
+      .findOne().orElse(null));
     return result;
   }
 }

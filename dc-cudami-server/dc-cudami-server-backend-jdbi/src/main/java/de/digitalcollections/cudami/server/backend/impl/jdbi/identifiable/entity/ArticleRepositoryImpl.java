@@ -28,20 +28,20 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article> impleme
   @Override
   public long count() {
     String sql = "SELECT count(*) FROM articles";
-    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOnly());
+    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
     return count;
   }
 
   @Override
   public PageResponse<Article> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS + ", text")
-        .append(" FROM articles");
+      .append(" FROM articles");
 
     addPageRequestParams(pageRequest, query);
 
     List<ArticleImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
-        .mapToBean(ArticleImpl.class)
-        .list());
+      .mapToBean(ArticleImpl.class)
+      .list());
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -54,9 +54,9 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article> impleme
                    + " WHERE uuid = :uuid";
 
     Article article = dbi.withHandle(h -> h.createQuery(query)
-        .bind("uuid", uuid)
-        .mapToBean(ArticleImpl.class)
-        .findOnly());
+      .bind("uuid", uuid)
+      .mapToBean(ArticleImpl.class)
+      .findOne().orElse(null));
     return article;
   }
 
@@ -72,10 +72,10 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article> impleme
     article.setLastModified(LocalDateTime.now());
 
     Article result = dbi.withHandle(h -> h
-        .createQuery("INSERT INTO articles(uuid, created, description, identifiable_type, label, last_modified, entity_type, text) VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :entityType, :text::JSONB) RETURNING *")
-        .bindBean(article)
-        .mapToBean(ArticleImpl.class)
-        .findOnly());
+      .createQuery("INSERT INTO articles(uuid, created, description, identifiable_type, label, last_modified, entity_type, text) VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :entityType, :text::JSONB) RETURNING *")
+      .bindBean(article)
+      .mapToBean(ArticleImpl.class)
+      .findOne().orElse(null));
 
     return result;
   }
@@ -85,10 +85,10 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article> impleme
     article.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert): uuid, created, identifiable_type, entity_type
     Article result = dbi.withHandle(h -> h
-        .createQuery("UPDATE articles SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, text=:text::JSONB WHERE uuid=:uuid RETURNING *")
-        .bindBean(article)
-        .mapToBean(ArticleImpl.class)
-        .findOnly());
+      .createQuery("UPDATE articles SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, text=:text::JSONB WHERE uuid=:uuid RETURNING *")
+      .bindBean(article)
+      .mapToBean(ArticleImpl.class)
+      .findOne().orElse(null));
     return result;
   }
 }
