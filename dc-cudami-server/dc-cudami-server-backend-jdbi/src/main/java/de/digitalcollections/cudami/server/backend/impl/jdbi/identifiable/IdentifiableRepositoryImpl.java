@@ -36,7 +36,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
   @Override
   public long count() {
     String sql = "SELECT count(*) FROM identifiables";
-    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOnly());
+    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
     return count;
   }
 
@@ -46,8 +46,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
 
     addPageRequestParams(pageRequest, query);
     List<IdentifiableImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
-        .mapToBean(IdentifiableImpl.class)
-        .list());
+      .mapToBean(IdentifiableImpl.class)
+      .list());
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -73,10 +73,10 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
   @Override
   public I findOne(UUID uuid) {
     I identifiable = (I) dbi.withHandle(h -> h.createQuery(
-        "SELECT * FROM identifiables WHERE uuid = :uuid")
-        .bind("uuid", uuid)
-        .mapToBean(IdentifiableImpl.class)
-        .findOnly());
+      "SELECT * FROM identifiables WHERE uuid = :uuid")
+      .bind("uuid", uuid)
+      .mapToBean(IdentifiableImpl.class)
+      .findOne().orElse(null));
     return identifiable;
   }
 
@@ -117,10 +117,10 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
   protected Integer selectNextSortIndexForParentChildren(Jdbi dbi, String tableName, String columNameParentUuid, UUID parentUuid) {
     // first child: max gets no results (= null)):
     Integer sortIndex = dbi.withHandle((Handle h) -> h
-        .createQuery("SELECT MAX(sortIndex) + 1 FROM " + tableName + " WHERE " + columNameParentUuid + " = :parent_uuid")
-        .bind("parent_uuid", parentUuid)
-        .mapTo(Integer.class)
-        .findOnly());
+      .createQuery("SELECT MAX(sortIndex) + 1 FROM " + tableName + " WHERE " + columNameParentUuid + " = :parent_uuid")
+      .bind("parent_uuid", parentUuid)
+      .mapTo(Integer.class)
+      .findOne().orElse(null));
     if (sortIndex == null) {
       sortIndex = 0;
     }

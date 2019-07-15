@@ -59,7 +59,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   @Override
   public long count() {
     String sql = "SELECT count(*) FROM entities";
-    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOnly());
+    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
     return count;
   }
 
@@ -86,7 +86,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     E entity = (E) dbi.withHandle(h -> h.createQuery(query)
         .bind("uuid", uuid)
         .mapToBean(EntityImpl.class)
-        .findOnly());
+        .findOne().orElse(null));
     return entity;
   }
 

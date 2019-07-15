@@ -14,7 +14,7 @@
   <packaging>jar</packaging>
 
   <properties>
-    <version.dc-commons-server>4.0.1</version.dc-commons-server>
+    <version.dc-commons-server>4.0.3</version.dc-commons-server>
     <version.dc-commons-springaop>4.0.3</version.dc-commons-springaop>
     <version.dc-commons-springdata>4.0.3</version.dc-commons-springdata>
     <version.dc-commons-springmvc>4.1.1-SNAPSHOT</version.dc-commons-springmvc>
