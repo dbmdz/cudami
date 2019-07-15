@@ -96,7 +96,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
 //        .createQuery("INSERT INTO identifiables(created, description, identifiable_type, label, last_modified, uuid) VALUES (:created, :description::JSONB, :type, :label::JSONB, :lastModified, :uuid) RETURNING *")
 //        .bindBean(identifiable)
 //        .mapToBean(IdentifiableImpl.class)
-//        .findOnly());
+//        .findOne().orElse(null));
 //    return (I) result;
   }
 
@@ -110,7 +110,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
 //        .createQuery("UPDATE identifiables SET description=:description::JSONB, identifiable_type=:type, label=:label::JSONB, last_modified=:lastModified WHERE uuid=:uuid RETURNING *")
 //        .bindBean(identifiable)
 //        .mapToBean(IdentifiableImpl.class)
-//        .findOnly());
+//        .findOne().orElse(null));
 //    return (I) result;
   }
 
