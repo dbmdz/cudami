@@ -90,7 +90,7 @@
     <version.logstash-logback-encoder>5.3</version.logstash-logback-encoder>
     <version.mockito-core>3.0.0</version.mockito-core>
     <version.passay>1.5.0</version.passay>
-    <version.postgresql>42.2.5</version.postgresql>
+    <version.postgresql>42.2.6</version.postgresql>
     <version.querydsl>4.2.1</version.querydsl>
     <version.slf4j>1.7.26</version.slf4j>
     <version.snakeyaml>1.24</version.snakeyaml>
