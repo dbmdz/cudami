@@ -31,7 +31,7 @@ public class IdentifierRepositoryImpl extends AbstractPagingAndSortingRepository
   @Override
   public long count() {
     String sql = "SELECT count(*) FROM identifiers";
-    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOnly());
+    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
     return count;
   }
 
@@ -41,8 +41,8 @@ public class IdentifierRepositoryImpl extends AbstractPagingAndSortingRepository
 
     addPageRequestParams(pageRequest, query);
     List<IdentifierImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
-        .mapToBean(IdentifierImpl.class)
-        .list());
+      .mapToBean(IdentifierImpl.class)
+      .list());
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -54,31 +54,31 @@ public class IdentifierRepositoryImpl extends AbstractPagingAndSortingRepository
     query.append(" LIMIT :maxResults");
 
     List<Identifier> result = dbi.withHandle(h -> h.createQuery(query.toString())
-        .bind("searchTerm", searchTerm)
-        .bind("maxResults", maxResults)
-        .mapToBean(IdentifierImpl.class)
-        .stream().map(Identifier.class::cast).collect(Collectors.toList()));
+      .bind("searchTerm", searchTerm)
+      .bind("maxResults", maxResults)
+      .mapToBean(IdentifierImpl.class)
+      .stream().map(Identifier.class::cast).collect(Collectors.toList()));
     return result;
   }
 
   @Override
   public List<Identifier> findByIdentifiable(UUID identifiable) {
     List<Identifier> result = dbi.withHandle(h -> h.createQuery(
-        "SELECT * FROM identifiers WHERE identifiable = :identifiable")
-        .bind("identifiable", identifiable)
-        .mapToBean(IdentifierImpl.class)
-        .stream().map(Identifier.class::cast).collect(Collectors.toList()));
+      "SELECT * FROM identifiers WHERE identifiable = :identifiable")
+      .bind("identifiable", identifiable)
+      .mapToBean(IdentifierImpl.class)
+      .stream().map(Identifier.class::cast).collect(Collectors.toList()));
     return result;
   }
 
   @Override
   public Identifier findOne(String namespace, String id) {
     Identifier identifier = (Identifier) dbi.withHandle(h -> h.createQuery(
-        "SELECT * FROM identifiers WHERE namespace = :namespace, identifier = :identifier")
-        .bind("namespace", namespace)
-        .bind("identifier", id)
-        .mapToBean(IdentifierImpl.class)
-        .findOnly());
+      "SELECT * FROM identifiers WHERE namespace = :namespace, identifier = :identifier")
+      .bind("namespace", namespace)
+      .bind("identifier", id)
+      .mapToBean(IdentifierImpl.class)
+      .findOne().orElse(null));
     return identifier;
   }
 
@@ -92,11 +92,11 @@ public class IdentifierRepositoryImpl extends AbstractPagingAndSortingRepository
     identifier.setUuid(UUID.randomUUID());
 
     Identifier result = dbi.withHandle(h -> h
-        .createQuery("INSERT INTO identifiers(uuid, identifiable, namespace, identifier)"
-                     + " VALUES (:uuid, :identifiable, :namespace, :id) RETURNING *")
-        .bindBean(identifier)
-        .mapToBean(IdentifierImpl.class)
-        .findOnly());
+      .createQuery("INSERT INTO identifiers(uuid, identifiable, namespace, identifier)"
+                   + " VALUES (:uuid, :identifiable, :namespace, :id) RETURNING *")
+      .bindBean(identifier)
+      .mapToBean(IdentifierImpl.class)
+      .findOne().orElse(null));
     return result;
   }
 

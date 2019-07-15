@@ -31,7 +31,7 @@ public class IdentifierTypeRepositoryImpl extends AbstractPagingAndSortingReposi
   @Override
   public long count() {
     String sql = "SELECT count(*) FROM identifiertypes";
-    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOnly());
+    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
     return count;
   }
 
@@ -41,8 +41,8 @@ public class IdentifierTypeRepositoryImpl extends AbstractPagingAndSortingReposi
 
     addPageRequestParams(pageRequest, query);
     List<IdentifierTypeImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
-        .mapToBean(IdentifierTypeImpl.class)
-        .list());
+      .mapToBean(IdentifierTypeImpl.class)
+      .list());
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -51,20 +51,20 @@ public class IdentifierTypeRepositoryImpl extends AbstractPagingAndSortingReposi
   @Override
   public IdentifierType findByNamespace(String namespace) {
     IdentifierType identifierType = (IdentifierType) dbi.withHandle(h -> h.createQuery(
-        "SELECT * FROM identifiertypes WHERE namespace = :namespace")
-        .bind("namespace", namespace)
-        .mapToBean(IdentifierTypeImpl.class)
-        .stream().map(IdentifierType.class::cast).collect(Collectors.toList()));
+      "SELECT * FROM identifiertypes WHERE namespace = :namespace")
+      .bind("namespace", namespace)
+      .mapToBean(IdentifierTypeImpl.class)
+      .stream().map(IdentifierType.class::cast).collect(Collectors.toList()));
     return identifierType;
   }
 
   @Override
   public IdentifierType findOne(UUID uuid) {
     IdentifierType identifierType = (IdentifierType) dbi.withHandle(h -> h.createQuery(
-        "SELECT * FROM identifiertypes WHERE uuid = :uuid")
-        .bind("uuid", uuid)
-        .mapToBean(IdentifierTypeImpl.class)
-        .findOnly());
+      "SELECT * FROM identifiertypes WHERE uuid = :uuid")
+      .bind("uuid", uuid)
+      .mapToBean(IdentifierTypeImpl.class)
+      .findOne().orElse(null));
     return identifierType;
   }
 
@@ -78,11 +78,11 @@ public class IdentifierTypeRepositoryImpl extends AbstractPagingAndSortingReposi
     identifierType.setUuid(UUID.randomUUID());
 
     IdentifierType result = dbi.withHandle(h -> h
-        .createQuery("INSERT INTO identifiertypes(uuid, label, namespace, pattern)"
-                     + " VALUES (:uuid, :label, :namespace, :pattern) RETURNING *")
-        .bindBean(identifierType)
-        .mapToBean(IdentifierTypeImpl.class)
-        .findOnly());
+      .createQuery("INSERT INTO identifiertypes(uuid, label, namespace, pattern)"
+                   + " VALUES (:uuid, :label, :namespace, :pattern) RETURNING *")
+      .bindBean(identifierType)
+      .mapToBean(IdentifierTypeImpl.class)
+      .findOne().orElse(null));
     return result;
   }
 
@@ -90,10 +90,10 @@ public class IdentifierTypeRepositoryImpl extends AbstractPagingAndSortingReposi
   public IdentifierType update(IdentifierType identifierType) {
     // do not update/left out from statement (not changed since insert): uuid
     IdentifierType result = dbi.withHandle(h -> h
-        .createQuery("UPDATE identifiertypes SET label=:label, namespace=:namespace, pattern=:pattern WHERE uuid=:uuid RETURNING *")
-        .bindBean(identifierType)
-        .mapToBean(IdentifierTypeImpl.class)
-        .findOnly());
+      .createQuery("UPDATE identifiertypes SET label=:label, namespace=:namespace, pattern=:pattern WHERE uuid=:uuid RETURNING *")
+      .bindBean(identifierType)
+      .mapToBean(IdentifierTypeImpl.class)
+      .findOne().orElse(null));
     return result;
   }
 }

@@ -91,7 +91,7 @@ public class UserRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl i
 //            .bindBean(user)
 //            .bind("roles", user.getRoles().stream().map(Role::name).toArray(String[]::new))
 //            .mapToBean(UserImpl.class)
-//            .findOnly());
+//            .findOne().orElse(null));
 //    return (S) result;
 
     UserImpl result = dbi.withHandle(h -> h
