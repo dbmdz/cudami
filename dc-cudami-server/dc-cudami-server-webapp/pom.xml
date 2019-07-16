@@ -16,7 +16,7 @@
   <properties>
     <version.dc-commons-file>4.1.0-SNAPSHOT</version.dc-commons-file>
     <version.jsondoc-ui-webjar>1.2.21</version.jsondoc-ui-webjar>
-    <version.spring-boot-starter-jsondoc>1.2.19</version.spring-boot-starter-jsondoc>
+    <version.spring-boot-starter-jsondoc>1.2.21</version.spring-boot-starter-jsondoc>
   </properties>
 
   <dependencies>
