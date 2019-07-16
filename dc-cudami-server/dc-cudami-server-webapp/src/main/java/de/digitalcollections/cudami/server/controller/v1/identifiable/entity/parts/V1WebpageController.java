@@ -52,7 +52,6 @@ public class V1WebpageController {
       @RequestParam(name = "pLocale", required = false) Locale pLocale
   ) throws IdentifiableServiceException, JsonProcessingException {
     Webpage webpage = loadWebpage(pLocale, uuid);
-    //String result = objectMapper.writeValueAsString(webpage);
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(webpage));
     JSONObject description = new JSONObject();
     description.put("documents", result.getJSONObject("description"));
