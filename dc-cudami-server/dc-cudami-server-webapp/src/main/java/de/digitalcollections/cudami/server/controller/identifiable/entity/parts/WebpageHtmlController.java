@@ -49,7 +49,7 @@ public class WebpageHtmlController {
     if (webpage == null) {
       return null;
     }
-    Locale returnedLocale = webpage.getLabel().getTranslations().stream().findFirst().get().getLocale();
+    Locale returnedLocale = webpage.getLabel().getLocales().iterator().next();
     return returnedLocale;
   }
 }
