@@ -15,7 +15,7 @@
 
   <properties>
     <version.dc-commons-file>4.1.0-SNAPSHOT</version.dc-commons-file>
-    <version.json>20180813</version.json>
+    <version.dc-commons-springmvc>4.1.1-SNAPSHOT</version.dc-commons-springmvc>
     <version.jsondoc-ui-webjar>1.2.21</version.jsondoc-ui-webjar>
     <version.spring-boot-starter-jsondoc>1.2.21</version.spring-boot-starter-jsondoc>
   </properties>
@@ -25,6 +25,11 @@
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-file</artifactId>
       <version>${version.dc-commons-file}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.commons</groupId>
+      <artifactId>dc-commons-springmvc</artifactId>
+      <version>${version.dc-commons-springmvc}</version>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
