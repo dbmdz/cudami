@@ -9,6 +9,7 @@ import de.digitalcollections.model.xml.xstream.v1.V1DigitalCollectionsXStreamMar
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import org.jdom2.Document;
@@ -16,6 +17,7 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
@@ -55,10 +57,9 @@ public class V1WebpageController {
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(webpage));
     JSONObject description = new JSONObject();
     description.put("documents", result.getJSONObject("description"));
-    result.put("description", description);
-    JSONObject text = new JSONObject();
-    text.put("documents", result.getJSONObject("text"));
-    result.put("text", text);
+    result.put("description", convertLocalizedStructuredContentJson(result.getJSONObject("description")));
+    result.put("label", convertLocalizedTextJson(result.getJSONObject("label")));
+    result.put("text", convertLocalizedStructuredContentJson(result.getJSONObject("text")));
     result.put("type", "RESOURCE");
     return new ResponseEntity<>(result.toString(), HttpStatus.OK);
   }
@@ -75,33 +76,48 @@ public class V1WebpageController {
     StringWriter sw = new StringWriter();
     v1XStreamMarshaller.marshalWriter(webpage, sw);
     String result = sw.toString();
-    return new ResponseEntity<>(addDocumentsLayer(result), HttpStatus.OK);
+    return new ResponseEntity<>(migrateWebpageXml(result), HttpStatus.OK);
   }
 
-  private String addDocumentsLayer(String xml) {
-    try {
-      SAXBuilder saxBuilder = new SAXBuilder();
-      Document doc = saxBuilder.build(new StringReader(xml));
+  private JSONObject convertLocalizedStructuredContentJson(JSONObject json) {
+    JSONObject localizedStructuredContent = new JSONObject();
+    localizedStructuredContent.put("documents", json);
+    return localizedStructuredContent;
+  }
 
-      Element description = doc.getRootElement().getChild("description");
-      Element descriptionContent = description.getChild("entry");
-      description.removeChildren("entry");
-      description.setContent(createDocumentsElement(descriptionContent));
+  private void convertLocalizedStructuredContentXml(Element xml) {
+    Element content = xml.getChild("entry");
+    xml.setContent(createDocumentsElement(content));
+  }
 
-      Element text = doc.getRootElement().getChild("text");
-      Element textContent = text.getChild("entry");
-      text.removeChild("entry");
-      text.setContent(createDocumentsElement(textContent));
+  private JSONObject convertLocalizedTextJson(JSONObject json) {
+    JSONObject result = new JSONObject();
+    JSONArray translations = new JSONArray();
+    json.keySet().forEach((locale) -> {
+      JSONObject translation = new JSONObject();
+      translation.put("locale", locale);
+      translation.put("text", json.get(locale));
+      translations.put(translation);
+    });
+    result.put("translations", translations);
+    return result;
+  }
 
-      return new XMLOutputter().outputString(doc);
-    } catch (IOException | JDOMException ex) {
-      return xml;
-    }
+  private void convertLocalizedTextXml(Element xml) {
+    List<Element> contents = xml.getChildren("entry");
+    Element translations = new Element("translations");
+    contents.forEach((entry) -> {
+      Element translation = new Element("translation");
+      translation.addContent(entry.getChild("locale").clone());
+      translation.addContent(entry.getChild("string").clone());
+      translations.addContent(translation);
+    });
+    xml.setContent(translations);
   }
 
   private Element createDocumentsElement(Element content) {
     Element documents = new Element("documents");
-    documents.setContent(content);
+    documents.setContent(content.clone());
     return documents;
   }
 
@@ -113,5 +129,18 @@ public class V1WebpageController {
       webpage = webpageService.get(uuid, pLocale);
     }
     return webpage;
+  }
+
+  private String migrateWebpageXml(String xml) {
+    try {
+      SAXBuilder saxBuilder = new SAXBuilder();
+      Document doc = saxBuilder.build(new StringReader(xml));
+      convertLocalizedStructuredContentXml(doc.getRootElement().getChild("description"));
+      convertLocalizedStructuredContentXml(doc.getRootElement().getChild("text"));
+      convertLocalizedTextXml(doc.getRootElement().getChild("label"));
+      return new XMLOutputter().outputString(doc);
+    } catch (IOException | JDOMException ex) {
+      return xml;
+    }
   }
 }
