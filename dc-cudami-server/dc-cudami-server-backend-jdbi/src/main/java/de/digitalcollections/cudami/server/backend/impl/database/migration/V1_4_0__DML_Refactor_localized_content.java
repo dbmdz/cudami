@@ -6,6 +6,7 @@ import java.util.Map;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.flywaydb.core.internal.jdbc.JdbcTemplate;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
@@ -19,6 +20,16 @@ public class V1_4_0__DML_Refactor_localized_content extends BaseJavaMigration {
     migrateLocalizedStructuredContent(jdbcTemplate, "description", "identifiables");
     migrateLocalizedStructuredContent(jdbcTemplate, "text", "articles");
     migrateLocalizedStructuredContent(jdbcTemplate, "text", "webpages");
+    migrateLocalizedText(jdbcTemplate);
+  }
+
+  private String convertLocalizedStructuredContent(String currentJson) {
+    JSONObject localizedStructuredContent = new JSONObject(currentJson).getJSONObject("localizedStructuredContent");
+    JSONObject result = new JSONObject();
+    localizedStructuredContent.keySet().forEach((locale) -> {
+      result.put(locale, localizedStructuredContent.get(locale));
+    });
+    return result.toString();
   }
 
   private void migrateLocalizedStructuredContent(JdbcTemplate jdbcTemplate, String tableField, String tableName) throws SQLException {
@@ -35,12 +46,27 @@ public class V1_4_0__DML_Refactor_localized_content extends BaseJavaMigration {
     }
   }
 
-  private String convertLocalizedStructuredContent(String currentJson) {
-    JSONObject localizedStructuredContent = new JSONObject(currentJson).getJSONObject("localizedStructuredContent");
-    JSONObject newJson = new JSONObject();
-    localizedStructuredContent.keySet().forEach((locale) -> {
-      newJson.put(locale, localizedStructuredContent.get(locale));
+  private String convertLocalizedText(String currentJson) {
+    JSONArray labelTranslations = new JSONObject(currentJson).getJSONArray("translations");
+    JSONObject result = new JSONObject();
+    labelTranslations.forEach((translation) -> {
+      JSONObject currentTranslation = (JSONObject) translation;
+      result.put((String) currentTranslation.get("locale"), currentTranslation.get("text"));
     });
-    return newJson.toString();
+    return result.toString();
+  }
+
+  private void migrateLocalizedText(JdbcTemplate jdbcTemplate) throws SQLException {
+    String selectQuery = "SELECT label,uuid FROM identifiables";
+    String updateQuery = "UPDATE identifiables SET label=?::JSONB WHERE uuid=?::uuid";
+
+    List<Map<String, String>> identifiables = jdbcTemplate.queryForList(selectQuery);
+    for (Map<String, String> identifiable : identifiables) {
+      jdbcTemplate.update(
+          updateQuery,
+          convertLocalizedText(identifiable.get("label")),
+          identifiable.get("uuid")
+      );
+    }
   }
 }
