@@ -331,9 +331,6 @@
               <configLocation>https://raw.githubusercontent.com/dbmdz/development/master/code-quality/checkstyle.xml</configLocation>
               <consoleOutput>true</consoleOutput>
               <encoding>UTF-8</encoding>
-              <excludes>
-                **/database/migration/*
-              </excludes>
               <failsOnError>true</failsOnError>
               <linkXRef>false</linkXRef>
             </configuration>

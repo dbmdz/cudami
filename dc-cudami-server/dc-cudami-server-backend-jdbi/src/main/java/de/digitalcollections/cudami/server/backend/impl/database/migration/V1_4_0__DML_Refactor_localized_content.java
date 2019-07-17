@@ -10,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
+@SuppressWarnings("checkstyle:typename")
 public class V1_4_0__DML_Refactor_localized_content extends BaseJavaMigration {
 
   @Override
