@@ -118,10 +118,6 @@ public class WebsitesController extends AbstractController implements MessageSou
         .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
         .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
         .collect(Collectors.toList());
-//      LOGGER.error("Cannot retrieve website with id=" + id + ": ", e);
-//      String message = messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale());
-//      redirectAttributes.addFlashAttribute("error_message", message);
-//      return "redirect:/websites";
     model.addAttribute("availableLocales", availableLocales);
     model.addAttribute("locales", locales);
 
