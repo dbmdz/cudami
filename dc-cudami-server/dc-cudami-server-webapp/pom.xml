@@ -14,6 +14,7 @@
   <packaging>jar</packaging>
 
   <properties>
+    <version.dc-commons-springmvc>4.1.1-SNAPSHOT</version.dc-commons-springmvc>
     <version.json>20180813</version.json>
     <version.jsondoc-ui-webjar>1.2.21</version.jsondoc-ui-webjar>
     <version.spring-boot-starter-jsondoc>1.2.21</version.spring-boot-starter-jsondoc>
@@ -23,6 +24,11 @@
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-client-spring</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.commons</groupId>
+      <artifactId>dc-commons-springmvc</artifactId>
+      <version>${version.dc-commons-springmvc}</version>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
