@@ -18,16 +18,8 @@ export async function loadIdentifiable (baseUrl, type, uuid) {
       }
     },
     "label": {
-      "translations": [
-        {
-          "locale": "de_DE",
-          "text": "Deutscher Titel"
-        },
-        {
-          "locale": "en",
-          "text": "Englischer Titel"
-        }
-      ]
+      "de_DE": "Deutscher Titel",
+      "en": "Englischer Titel"
     },
     "lastModified": "2018-08-21T16:22:52.033",
     "text": {

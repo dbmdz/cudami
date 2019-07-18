@@ -86,7 +86,7 @@ class IdentifiableForm extends Component {
         {this.getFormComponent()}
         <pre className='mt-3'>
           <code>
-            {JSON.stringify(this.state.identifiable.description, null, 4)}
+            {JSON.stringify(this.state.identifiable, null, 4)}
           </code>
         </pre>
       </Container>

@@ -14,8 +14,11 @@ const LocaleTabContent = (props) => {
       <Card>
         <CardBody className='bg-light'>
           <FormLabelInput
-            label={props.text}
+            label={props.label}
             locale={props.locale}
+            onUpdate={evt => {
+              props.onUpdate('label', evt.target.value)
+            }}
           />
           <FormEditor
             document={props.description}

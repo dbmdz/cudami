@@ -39,20 +39,26 @@ const WebsiteForm = (props) => {
             url={props.identifiable.url}
           />
           <Nav tabs>
-            {props.identifiable.label.translations.map((translation, index) => <LocaleTab
+            {Object.entries(props.identifiable.label).map((entry, index) => <LocaleTab
               activeLocale={props.activeLocale}
               key={index}
-              locale={translation.locale}
+              locale={entry[0]}
               onClick={(locale => props.onToggleLocale(locale))}
             />)}
           </Nav>
           <TabContent activeTab={props.activeLocale}>
-            {props.identifiable.label.translations.map((translation, index) => <LocaleTabContent
-              description={props.identifiable.description[translation.locale]}
+            {Object.entries(props.identifiable.label).map((entry, index) => <LocaleTabContent
+              description={props.identifiable.description[entry[0]]}
               key={index}
-              locale={translation.locale}
-              onUpdate={(updateKey, updateValue) => props.onUpdate({...props.identifiable, [updateKey]: {...props.identifiable.description, [translation.locale]: updateValue}})}
-              text={translation.text}
+              label={entry[1]}
+              locale={entry[0]}
+              onUpdate={(updateKey, updateValue) => props.onUpdate({
+                ...props.identifiable,
+                [updateKey]: {
+                  ...props.identifiable[updateKey],
+                  [entry[0]]: updateValue
+                }
+              })}
             />)}
           </TabContent>
         </Col>
