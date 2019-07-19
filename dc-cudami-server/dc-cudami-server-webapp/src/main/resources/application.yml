@@ -41,9 +41,16 @@ management:
     port: 9001
 
 resourceRepository:
-  managed:
-    namespace: 'dico'
-    folderpath: '~/resourceRepository'
+  resolved:
+    patterns:
+      - pattern: '^([0-9a-f]{4})([0-9a-f]{4})-([0-9a-f]{4})-([1-5][0-9a-f]{3})-([89ab][0-9a-f]{3})-([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{4})$'
+        substitutions:
+          - '~/resourceRepository/dico/$1/$2/$3/$4/$5/$6/$7/$8/$0.gif'
+          - '~/resourceRepository/dico/$1/$2/$3/$4/$5/$6/$7/$8/$0.jpg'
+          - '~/resourceRepository/dico/$1/$2/$3/$4/$5/$6/$7/$8/$0.mp3'
+          - '~/resourceRepository/dico/$1/$2/$3/$4/$5/$6/$7/$8/$0.mp4'
+          - '~/resourceRepository/dico/$1/$2/$3/$4/$5/$6/$7/$8/$0.pdf'
+          - '~/resourceRepository/dico/$1/$2/$3/$4/$5/$6/$7/$8/$0.png'
 
 server:
   port: 9000
@@ -75,9 +82,16 @@ custom:
     port: 5432
 
 resourceRepository:
-  managed:
-    namespace: 'dico'
-    folderpath: '/local/resourceRepository'
+  resolved:
+    patterns:
+      - pattern: '^([0-9a-f]{4})([0-9a-f]{4})-([0-9a-f]{4})-([1-5][0-9a-f]{3})-([89ab][0-9a-f]{3})-([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{4})$'
+        substitutions:
+          - '/local/resourceRepository/dico/$1/$2/$3/$4/$5/$6/$7/$8/$0.gif'
+          - '/local/resourceRepository/dico/$1/$2/$3/$4/$5/$6/$7/$8/$0.jpg'
+          - '/local/resourceRepository/dico/$1/$2/$3/$4/$5/$6/$7/$8/$0.mp3'
+          - '/local/resourceRepository/dico/$1/$2/$3/$4/$5/$6/$7/$8/$0.mp4'
+          - '/local/resourceRepository/dico/$1/$2/$3/$4/$5/$6/$7/$8/$0.pdf'
+          - '/local/resourceRepository/dico/$1/$2/$3/$4/$5/$6/$7/$8/$0.png'
 
 spring:
   profiles: PROD

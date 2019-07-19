@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
-import de.digitalcollections.commons.file.backend.impl.managed.ManagedFileResourceRepositoryImpl;
+import de.digitalcollections.commons.file.backend.api.FileResourceRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.CudamiFileResourceRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
@@ -51,11 +51,11 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
                                    + " id.uuid id_uuid, identifiable id_identifiable, namespace id_namspace, identifier id_identifier"
                                    + " from fileresources as f left join identifiers as id on f.uuid = id.identifiable";
 
-  ManagedFileResourceRepositoryImpl fileResourceRepository;
+  FileResourceRepository fileResourceRepository;
   private final IdentifierRepository identifierRepository;
 
   @Autowired
-  public CudamiFileResourceRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository, ManagedFileResourceRepositoryImpl fileResourceRepository) {
+  public CudamiFileResourceRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository, FileResourceRepository fileResourceRepository) {
     super(dbi);
     this.fileResourceRepository = fileResourceRepository;
     this.identifierRepository = identifierRepository;
@@ -98,12 +98,12 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
       .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
       .reduceRows(
         new LinkedHashMap<UUID, FileResource>(), (map, rowView) -> {
-        FileResource fr = map.computeIfAbsent(rowView.getColumn("f_uuid", UUID.class), id -> rowView.getRow(FileResourceImpl.class));
-        if (rowView.getColumn("id_uuid", UUID.class) != null) {
-          fr.addIdentifier(rowView.getRow(IdentifierImpl.class));
-        }
-        return map;
-      })
+          FileResource fr = map.computeIfAbsent(rowView.getColumn("f_uuid", UUID.class), id -> rowView.getRow(FileResourceImpl.class));
+          if (rowView.getColumn("id_uuid", UUID.class) != null) {
+            fr.addIdentifier(rowView.getRow(IdentifierImpl.class));
+          }
+          return map;
+        })
       .values()
       .stream()
       .findFirst());
@@ -260,7 +260,6 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
   }
 
   private void setImageProperties(ImageFileResource fileResource) throws IOException {
-
     try (ImageInputStream in = ImageIO.createImageInputStream(new File(fileResource.getUri()))) {
       final Iterator<ImageReader> readers = ImageIO.getImageReaders(in);
       if (readers.hasNext()) {
