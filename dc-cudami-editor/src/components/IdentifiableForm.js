@@ -72,26 +72,33 @@ class IdentifiableForm extends Component {
     this.setState({
       activeLocale
     })
-  }
+  };
 
   updateIdentifiable = (identifiable) => {
     this.setState({
       identifiable
     });
-  }
+  };
 
   render(){
     return this.state.identifiable
       ? <Container>
         {this.getFormComponent()}
-        <pre className='mt-3'>
-          <code>
-            {JSON.stringify(this.state.identifiable, null, 4)}
-          </code>
-        </pre>
+        {
+          this.props.debug &&
+          <pre className='mt-3'>
+            <code>
+              {JSON.stringify(this.state.identifiable, null, 4)}
+            </code>
+          </pre>
+        }
       </Container>
       : <></>;
   }
 }
+
+IdentifiableForm.defaultProps = {
+  debug: false
+};
 
 export default IdentifiableForm;
