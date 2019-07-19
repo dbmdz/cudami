@@ -3,6 +3,7 @@ import {
   Container
 } from 'reactstrap';
 
+import './IdentifiableForm.css';
 import WebsiteForm from './WebsiteForm';
 import { loadIdentifiable } from '../Api';
 
@@ -82,7 +83,7 @@ class IdentifiableForm extends Component {
 
   render(){
     return this.state.identifiable
-      ? <Container>
+      ? <Container id='cudami-editor'>
         {this.getFormComponent()}
         {
           this.props.debug &&
