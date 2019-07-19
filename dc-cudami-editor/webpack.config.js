@@ -1,9 +1,9 @@
 const path = require('path');
 
-module.exports = {
+const config = {
   cache: true,
   devtool: 'sourcemaps',
-  entry: './src/index.js',
+  entry: './src/lib/CudamiEditor.js',
   mode: 'production',
   module: {
     rules: [
@@ -32,13 +32,18 @@ module.exports = {
     ],
   },
   output: {
-    filename: 'editor.bundle.js',
-    path: path.join(
-      __dirname, '..', 'dc-cudami-admin', 'dc-cudami-admin-webapp',
-      'target', 'classes', 'static', 'js'
-    )
+    filename: 'cudami-editor.bundle.js',
+    library: 'CudamiEditor',
+    libraryExport: 'default',
+    libraryTarget: 'umd',
+    path: null
   },
   resolve: {
     extensions: ['.js'],
   }
 }
+
+module.exports = (_env, options) => {
+  config.output.path = options.outputPath || path.join(__dirname, 'dist');
+  return config;
+};

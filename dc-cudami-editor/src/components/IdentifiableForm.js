@@ -17,7 +17,7 @@ class IdentifiableForm extends Component {
 
   async componentDidMount(){
     const identifiable = await loadIdentifiable(
-      this.props.baseUrl, this.props.type, this.props.uuid
+      this.props.type, this.props.uuid
     );
     this.setState({
       identifiable
@@ -93,9 +93,5 @@ class IdentifiableForm extends Component {
       : <></>;
   }
 }
-
-IdentifiableForm.defaultProps = {
-  baseUrl: ''
-};
 
 export default IdentifiableForm;

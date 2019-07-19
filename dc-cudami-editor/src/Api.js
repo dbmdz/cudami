@@ -1,4 +1,4 @@
-export async function loadIdentifiable (baseUrl, type, uuid) {
+export async function loadIdentifiable (type, uuid) {
   return {
     "created": "2018-08-21T16:22:52.033",
     "description": {
@@ -45,7 +45,7 @@ export async function loadIdentifiable (baseUrl, type, uuid) {
     "url": "http://bsb.de"
   };
   /*try {
-    const result = await fetch(`${baseUrl}/latest/${type}/${uuid}.json`);
+    const result = await fetch(`/latest/${type}/${uuid}.json`);
     return result.json();
   } catch(err) {
     return {};
