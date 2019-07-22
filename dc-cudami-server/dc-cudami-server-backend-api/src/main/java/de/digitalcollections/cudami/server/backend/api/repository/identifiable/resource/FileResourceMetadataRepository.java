@@ -2,11 +2,9 @@ package de.digitalcollections.cudami.server.backend.api.repository.identifiable.
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import java.io.InputStream;
+import de.digitalcollections.model.api.identifiable.resource.MimeType;
 
-public interface CudamiFileResourceRepository extends IdentifiableRepository<FileResource> {
+public interface FileResourceMetadataRepository extends IdentifiableRepository<FileResource> {
 
-  FileResource save(FileResource fileResource, InputStream binaryData);
-
-  FileResource findByIdentifier(String namespace, String id);
+  FileResource createByMimeType(MimeType mimeType);
 }

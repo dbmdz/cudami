@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSortingRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifiable;
+import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
@@ -78,6 +79,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
       .mapToBean(IdentifiableImpl.class)
       .findOne().orElse(null));
     return identifiable;
+  }
+
+  @Override
+  public I findOne(Identifier identifier) {
+    throw new UnsupportedOperationException("Not supported. Use findOne of specific/inherited identifiable repository.");
   }
 
   @Override

@@ -1,10 +1,9 @@
 package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.commons.file.business.api.FileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.CudamiFileResourceService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceService;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.MimeType;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -66,9 +65,6 @@ public class FileResourceController {
   @Autowired
   private ObjectMapper objectMapper;
 
-  @Autowired
-  private CudamiFileResourceService cudamiFileResourceService;
-
   @ApiMethod(description = "get all fileresources")
   @GetMapping(value = {"/latest/fileresources", "/v2/fileresources"}, produces = "application/json")
   @ApiResponseObject
@@ -81,7 +77,7 @@ public class FileResourceController {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
-    return cudamiFileResourceService.find(pageRequest);
+    return fileResourceService.find(pageRequest);
   }
 
   @ApiMethod(description = "get a fileresource as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
@@ -94,9 +90,9 @@ public class FileResourceController {
 
     FileResource fileResource;
     if (pLocale == null) {
-      fileResource = cudamiFileResourceService.get(uuid);
+      fileResource = fileResourceService.get(uuid);
     } else {
-      fileResource = cudamiFileResourceService.get(uuid, pLocale);
+      fileResource = fileResourceService.get(uuid, pLocale);
     }
     return new ResponseEntity<>(fileResource, HttpStatus.OK);
   }
@@ -107,7 +103,7 @@ public class FileResourceController {
   @ApiResponseObject
   public ResponseEntity<FileResource> getByIdentifier(@PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
 
-    FileResource fileResource = cudamiFileResourceService.getByIdentifier(namespace, id);
+    FileResource fileResource = fileResourceService.getByIdentifier(namespace, id);
     return new ResponseEntity<>(fileResource, HttpStatus.OK);
   }
 
@@ -139,7 +135,7 @@ public class FileResourceController {
     }
 
     try {
-      cudamiFileResourceService.save(fileResource, inputStream);
+      fileResourceService.save(fileResource, inputStream);
     } catch (IdentifiableServiceException ex) {
       LOGGER.error("Error saving fileresource and binary data for uploaded file", ex);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -152,7 +148,7 @@ public class FileResourceController {
   @ApiResponseObject
   public FileResource update(@PathVariable UUID uuid, @RequestBody FileResource fileResource, BindingResult errors) throws IdentifiableServiceException {
     assert Objects.equals(uuid, fileResource.getUuid());
-    return cudamiFileResourceService.update(fileResource);
+    return fileResourceService.update(fileResource);
   }
 
   @PostMapping(value = {"/latest/fileresources/new/upload", "/v2/fileresources/new/upload"})
@@ -185,7 +181,7 @@ public class FileResourceController {
           // set label to originalfilename for now. can be changed in next step of user input
           fileResource.setLabel(new LocalizedTextImpl(localeService.getDefault(), originalFilename));
 
-          fileResource = cudamiFileResourceService.save(fileResource, stream);
+          fileResource = fileResourceService.save(fileResource, stream);
           LOGGER.info("saved file '" + fileResource.getUri().toString() + "' (" + fileResource.getSizeInBytes() + " bytes)");
 
           stream.close();

@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
+import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
@@ -88,6 +89,11 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         .mapToBean(EntityImpl.class)
         .findOne().orElse(null));
     return entity;
+  }
+
+  @Override
+  public E findOne(Identifier identifier) {
+    throw new UnsupportedOperationException("Not supported yet.");
   }
 
   @Override

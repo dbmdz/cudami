@@ -14,20 +14,19 @@
   <packaging>jar</packaging>
 
   <properties>
-    <version.dc-commons-file>5.0.0-SNAPSHOT</version.dc-commons-file>
     <version.jsondoc-ui-webjar>1.2.21</version.jsondoc-ui-webjar>
     <version.spring-boot-starter-jsondoc>1.2.21</version.spring-boot-starter-jsondoc>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>de.digitalcollections.commons</groupId>
-      <artifactId>dc-commons-file</artifactId>
-      <version>${version.dc-commons-file}</version>
+      <groupId>de.digitalcollections.cudami</groupId>
+      <artifactId>dc-cudami-client-spring</artifactId>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
-      <artifactId>dc-cudami-client-spring</artifactId>
+      <artifactId>dc-cudami-server-backend-file</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>

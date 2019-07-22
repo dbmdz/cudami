@@ -1,14 +1,14 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
-import de.digitalcollections.commons.file.backend.api.FileResourceRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.CudamiFileResourceRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.resource.ApplicationFileResource;
 import de.digitalcollections.model.api.identifiable.resource.AudioFileResource;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
+import de.digitalcollections.model.api.identifiable.resource.MimeType;
 import de.digitalcollections.model.api.identifiable.resource.TextFileResource;
 import de.digitalcollections.model.api.identifiable.resource.VideoFileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -21,19 +21,12 @@ import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceI
 import de.digitalcollections.model.impl.identifiable.resource.TextFileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.VideoFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.slf4j.Logger;
@@ -42,22 +35,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<FileResource> implements CudamiFileResourceRepository {
+public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryImpl<FileResource> implements FileResourceMetadataRepository {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(CudamiFileResourceRepositoryImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(FileResourceMetadataRepositoryImpl.class);
 
   static final String SELECT_ALL = "select f.uuid f_uuid, created f_created, description f_description, identifiable_type f_identifiable_type,"
                                    + " label f_label, last_modified f_last_modified, filename f_filename, mimetype f_mimetype, size_in_bytes f_size_in_bytes, uri f_uri,"
                                    + " id.uuid id_uuid, identifiable id_identifiable, namespace id_namspace, identifier id_identifier"
                                    + " from fileresources as f left join identifiers as id on f.uuid = id.identifiable";
 
-  FileResourceRepository fileResourceRepository;
   private final IdentifierRepository identifierRepository;
 
   @Autowired
-  public CudamiFileResourceRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository, FileResourceRepository fileResourceRepository) {
+  public FileResourceMetadataRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     super(dbi);
-    this.fileResourceRepository = fileResourceRepository;
     this.identifierRepository = identifierRepository;
   }
 
@@ -66,6 +57,35 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
     String sql = "SELECT count(*) FROM fileresources";
     long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
     return count;
+  }
+
+  @Override
+  public FileResource createByMimeType(MimeType mimeType) {
+    if (mimeType == null) {
+      mimeType = MimeType.MIME_APPLICATION_OCTET_STREAM;
+    }
+    FileResource result;
+    String primaryType = mimeType.getPrimaryType();
+    switch (primaryType) {
+      case "audio":
+        result = new AudioFileResourceImpl();
+        break;
+      case "image":
+        result = new ImageFileResourceImpl();
+        break;
+      case "text":
+        result = new TextFileResourceImpl();
+        break;
+      case "video":
+        result = new VideoFileResourceImpl();
+        break;
+      default:
+        result = new ApplicationFileResourceImpl();
+    }
+    result.setMimeType(mimeType);
+    final UUID uuid = UUID.randomUUID();
+    result.setUuid(uuid);
+    return result;
   }
 
   @Override
@@ -98,12 +118,12 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
       .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
       .reduceRows(
         new LinkedHashMap<UUID, FileResource>(), (map, rowView) -> {
-          FileResource fr = map.computeIfAbsent(rowView.getColumn("f_uuid", UUID.class), id -> rowView.getRow(FileResourceImpl.class));
-          if (rowView.getColumn("id_uuid", UUID.class) != null) {
-            fr.addIdentifier(rowView.getRow(IdentifierImpl.class));
-          }
-          return map;
-        })
+        FileResource fr = map.computeIfAbsent(rowView.getColumn("f_uuid", UUID.class), id -> rowView.getRow(FileResourceImpl.class));
+        if (rowView.getColumn("id_uuid", UUID.class) != null) {
+          fr.addIdentifier(rowView.getRow(IdentifierImpl.class));
+        }
+        return map;
+      })
       .values()
       .stream()
       .findFirst());
@@ -112,13 +132,12 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
     }
     FileResource fileResource = fileResourceOpt.get();
 
-    /*
-    FileResource fileResource = dbi.withHandle(h -> h.createQuery(query.toString())
-                                                     .bind("uuid", uuid)
-                                                     //        .mapToBean(FileResourceImpl.class)
-                                                     .map(new FileResourceMapper())
-                                                     .findOne().orElse(null));
-     */
+    addSpecificMetadata(fileResource, uuid);
+
+    return fileResource;
+  }
+
+  private void addSpecificMetadata(FileResource fileResource, UUID uuid) {
     if (fileResource instanceof ApplicationFileResource) {
       // no special fields, yet
     } else if (fileResource instanceof AudioFileResource) {
@@ -143,12 +162,17 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
         .findOne().orElse(null));
       ((VideoFileResource) fileResource).setDuration(result);
     }
-
-    return fileResource;
   }
 
   @Override
-  public FileResource findByIdentifier(String namespace, String id) {
+  public FileResource findOne(Identifier identifier) {
+    if (identifier.getUuid() != null) {
+      return findOne(identifier.getUuid());
+    }
+
+    String namespace = identifier.getNamespace();
+    String id = identifier.getId();
+
     String query = "select f.*"
                    + " from fileresources as f"
                    + " left join identifiers as id on f.uuid = id.identifiable"
@@ -165,30 +189,7 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
       .map(new FileResourceMapper())
       .findOne().orElse(null));
 
-    if (fileResource instanceof ApplicationFileResource) {
-      // no special fields, yet
-    } else if (fileResource instanceof AudioFileResource) {
-      int result = dbi.withHandle(h -> h.createQuery("SELECT duration FROM fileresources_audio WHERE uuid = :uuid")
-        .bind("uuid", fileResource.getUuid())
-        .mapTo(Integer.class)
-        .findOne().orElse(null));
-      ((AudioFileResource) fileResource).setDuration(result);
-    } else if (fileResource instanceof ImageFileResource) {
-      Map<String, Object> result = dbi.withHandle(h -> h.createQuery("SELECT width, height FROM fileresources_image WHERE uuid = :uuid")
-        .bind("uuid", fileResource.getUuid())
-        .mapToMap()
-        .findOne().orElse(null));
-      ((ImageFileResource) fileResource).setWidth((int) result.get("width"));
-      ((ImageFileResource) fileResource).setHeight((int) result.get("height"));
-    } else if (fileResource instanceof TextFileResource) {
-      // no special fields, yet
-    } else if (fileResource instanceof VideoFileResource) {
-      int result = dbi.withHandle(h -> h.createQuery("SELECT duration FROM fileresources_video WHERE uuid = :uuid")
-        .bind("uuid", fileResource.getUuid())
-        .mapTo(Integer.class)
-        .findOne().orElse(null));
-      ((VideoFileResource) fileResource).setDuration(result);
-    }
+    addSpecificMetadata(fileResource, fileResource.getUuid());
 
     return fileResource;
   }
@@ -242,37 +243,6 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
 
     FileResource dbFileResource = findOne(fileResource.getUuid());
     return dbFileResource;
-  }
-
-  @Override
-  public FileResource save(FileResource fileResource, InputStream binaryData) {
-    try {
-      long size = fileResourceRepository.write(fileResource, binaryData);
-      fileResource.setSizeInBytes(size);
-
-      if (fileResource instanceof ImageFileResource) {
-        setImageProperties((ImageFileResource) fileResource);
-      }
-    } catch (IOException ex) {
-      LOGGER.error("Error saving binary data of fileresource " + fileResource.getUuid().toString(), ex);
-    }
-    return save(fileResource);
-  }
-
-  private void setImageProperties(ImageFileResource fileResource) throws IOException {
-    try (ImageInputStream in = ImageIO.createImageInputStream(new File(fileResource.getUri()))) {
-      final Iterator<ImageReader> readers = ImageIO.getImageReaders(in);
-      if (readers.hasNext()) {
-        ImageReader reader = readers.next();
-        try {
-          reader.setInput(in);
-          fileResource.setWidth(reader.getWidth(0));
-          fileResource.setHeight(reader.getHeight(0));
-        } finally {
-          reader.dispose();
-        }
-      }
-    }
   }
 
   @Override

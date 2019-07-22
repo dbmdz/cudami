@@ -155,6 +155,11 @@
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.cudami</groupId>
+        <artifactId>dc-cudami-server-backend-file</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>de.digitalcollections.cudami</groupId>
         <artifactId>dc-cudami-server-backend-jdbi</artifactId>
         <version>${project.version}</version>
       </dependency>
