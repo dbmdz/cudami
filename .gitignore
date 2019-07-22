@@ -5,4 +5,5 @@
 /dc-cudami-admin/dc-cudami-admin-business/nbproject/
 /nb-configuration.xml
 **/nbactions.xml
+dist
 node_modules
