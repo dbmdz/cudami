@@ -75,6 +75,20 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
   }
 
   @Override
+  public Webpage getParent(UUID uuid) {
+    StringBuilder query = new StringBuilder()
+      .append("SELECT " + IDENTIFIABLE_COLUMNS)
+      .append(" FROM webpages INNER JOIN webpage_webpages ww ON uuid = ww.parent_webpage_uuid")
+      .append(" WHERE ww.child_webpage_uuid = :uuid");
+
+    Webpage webpage = dbi.withHandle(h -> h.createQuery(query.toString())
+      .bind("uuid", uuid)
+      .mapToBean(WebpageImpl.class)
+      .findOne().orElse(null));
+    return webpage;
+  }
+
+  @Override
   public Webpage save(Webpage webpage) {
     webpage.setUuid(UUID.randomUUID());
     webpage.setCreated(LocalDateTime.now());

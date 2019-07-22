@@ -72,6 +72,11 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
   }
 
   @Override
+  public ContentNode getParent(UUID nodeUuid) {
+    return endpoint.getParent(nodeUuid);
+  }
+
+  @Override
   public ContentNode save(ContentNode contentNode) {
     return endpoint.save(contentNode);
   }
