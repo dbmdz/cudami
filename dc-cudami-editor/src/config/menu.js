@@ -198,7 +198,7 @@ export default {
     },
     hr: {
       title: 'Insert horizontal rule',
-      content: 'H1',
+      content: icons.hr,
       enable: canInsert(schema.nodes.horizontal_rule),
       run: (state, dispatch) => {
         const hr = schema.nodes.horizontal_rule.create()
