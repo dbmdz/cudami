@@ -5,12 +5,13 @@ import {
   MenuBar
 } from '@aeaton/react-prosemirror';
 import {
-  menu,
-  options
-} from '@aeaton/react-prosemirror-config-default';
-import {
   Label
 } from 'reactstrap';
+
+import {
+  menu,
+  options
+} from '../config/index';
 
 const FormEditor = (props) => {
   if (props.document) {
