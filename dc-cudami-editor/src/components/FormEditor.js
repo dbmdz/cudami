@@ -8,13 +8,14 @@ import {
   Label
 } from 'reactstrap';
 
+import './FormEditor.css';
 import {
   menu,
   options
 } from '../config';
 
 class FormEditor extends Component {
-  constructor (props) {
+  constructor(props){
     super(props);
     this.editorOptions = {
       ...options,

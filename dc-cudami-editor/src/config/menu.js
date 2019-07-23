@@ -2,6 +2,7 @@ import { joinUp, lift, setBlockType, toggleMark, wrapIn } from 'prosemirror-comm
 import { redo, undo } from 'prosemirror-history'
 import { wrapInList } from 'prosemirror-schema-list'
 // import { addColumnAfter, addColumnBefore } from 'prosemirror-tables'
+import { publish, subscribe, unsubscribe } from 'pubsub-js'
 
 import schema from './schema'
 import icons from './icons'
@@ -203,6 +204,19 @@ export default {
       run: (state, dispatch) => {
         const hr = schema.nodes.horizontal_rule.create()
         dispatch(state.tr.replaceSelectionWith(hr))
+      }
+    },
+    iframe: {
+      title: 'Insert iframe',
+      content: icons.iframe,
+      enable: canInsert(schema.nodes.iframe),
+      run: (state, dispatch) => {
+        const token = subscribe('editor.add-iframe', (_msg, data) => {
+          const iframe = schema.nodes.iframe.createAndFill(data);
+          dispatch(state.tr.replaceSelectionWith(iframe));
+          unsubscribe(token);
+        });
+        publish('editor.show-iframe-modal');
       }
     },
     table: {

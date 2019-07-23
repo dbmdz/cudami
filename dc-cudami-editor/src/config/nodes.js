@@ -3,6 +3,8 @@ import { orderedList, bulletList, listItem } from 'prosemirror-schema-list'
 import { tableNodes } from 'prosemirror-tables'
 import { footnoteNodes } from '@aeaton/prosemirror-footnotes'
 
+import iFrameNode from './custom/IframeNode';
+
 const listNodes = {
   ordered_list: {
     ...orderedList,
@@ -18,7 +20,7 @@ const listNodes = {
     ...listItem,
     content: 'paragraph block*'
   }
-};
+}
 
 export default {
   ...nodes,
@@ -27,5 +29,6 @@ export default {
     tableGroup: 'block',
     cellContent: 'block+'
   }),
-  ...footnoteNodes
-};
+  ...footnoteNodes,
+  ...iFrameNode
+}

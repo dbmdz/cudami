@@ -10,6 +10,7 @@ import {
   loadAvailableLocales,
   loadIdentifiable
 } from '../Api';
+import IFrameAdderModal from './modals/IFrameAdderModal';
 
 class IdentifiableForm extends Component {
   constructor(props){
@@ -19,6 +20,7 @@ class IdentifiableForm extends Component {
       availableLocales: [],
       identifiable: null,
       modalsOpen: {
+        iframeAdder: false,
         localeAdder: false
       }
     };
@@ -142,6 +144,10 @@ class IdentifiableForm extends Component {
               </code>
             </pre>
           }
+          <IFrameAdderModal
+            isOpen={this.state.modalsOpen.iframeAdder}
+            onToggle={() => this.toggleModal('iframeAdder')}
+          />
           <LocaleAdderModal
             availableLocales={this.state.availableLocales}
             isOpen={this.state.modalsOpen.localeAdder}

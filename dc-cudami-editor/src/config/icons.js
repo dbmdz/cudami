@@ -21,7 +21,8 @@ import {
   faSuperscript,
   faTable,
   faUnderline,
-  faUndo
+  faUndo,
+  faWindowMaximize
 } from '@fortawesome/free-solid-svg-icons';
 
 export default {
@@ -34,6 +35,7 @@ export default {
   footnote: <FontAwesomeIcon icon={faAsterisk} />,
   heading: <FontAwesomeIcon icon={faHeading} />,
   hr: <FontAwesomeIcon icon={faMinus} />,
+  iframe: <FontAwesomeIcon icon={faWindowMaximize} />,
   image: <FontAwesomeIcon icon={faImage} />,
   italic: <FontAwesomeIcon icon={faItalic} />,
   join_up: <FontAwesomeIcon icon={faAngleUp} />,
