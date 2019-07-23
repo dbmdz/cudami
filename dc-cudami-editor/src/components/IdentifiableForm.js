@@ -12,7 +12,7 @@ import {
 } from '../Api';
 
 class IdentifiableForm extends Component {
-  constructor (props) {
+  constructor(props){
     super(props);
     this.state = {
       activeLocale: props.activeLocale,

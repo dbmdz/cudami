@@ -40,16 +40,16 @@ const WebsiteForm = (props) => {
             url={props.identifiable.url}
           />
           <Nav tabs>
-            {Object.entries(props.identifiable.label).map((entry, index) => <LocaleTab
+            {Object.entries(props.identifiable.label).map(([locale]) => <LocaleTab
               activeLocale={props.activeLocale}
-              key={index}
-              locale={entry[0]}
+              key={locale}
+              locale={locale}
               onClick={(locale => props.onToggleLocale(locale))}
             />)}
             <LocaleAdder onClick={props.onAddLocale} />
           </Nav>
           <TabContent activeTab={props.activeLocale}>
-            {Object.entries(props.identifiable.label).map(([locale, text], index) => <LocaleTabContent
+            {Object.entries(props.identifiable.label).map(([locale, text]) => <LocaleTabContent
               description={props.identifiable.description[locale]}
               key={locale}
               label={text}
