@@ -41,7 +41,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
 
   static final String SELECT_ALL = "select f.uuid f_uuid, created f_created, description f_description, identifiable_type f_identifiable_type,"
                                    + " label f_label, last_modified f_last_modified, filename f_filename, mimetype f_mimetype, size_in_bytes f_size_in_bytes, uri f_uri,"
-                                   + " id.uuid id_uuid, identifiable id_identifiable, namespace id_namspace, identifier id_identifier"
+                                   + " id.uuid id_uuid, identifiable id_identifiable, namespace id_namespace, identifier id_id"
                                    + " from fileresources as f left join identifiers as id on f.uuid = id.identifiable";
 
   private final IdentifierRepository identifierRepository;
