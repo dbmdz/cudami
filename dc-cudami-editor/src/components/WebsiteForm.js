@@ -10,6 +10,7 @@ import {
 import FormIdInput from './FormIdInput';
 import FormUrlInput from './FormUrlInput';
 import FormButtons from './FormButtons';
+import LocaleAdder from './LocaleAdder';
 import LocaleTab from './LocaleTab';
 import LocaleTabContent from './LocaleTabContent';
 
@@ -45,18 +46,19 @@ const WebsiteForm = (props) => {
               locale={entry[0]}
               onClick={(locale => props.onToggleLocale(locale))}
             />)}
+            <LocaleAdder onClick={props.onAddLocale} />
           </Nav>
           <TabContent activeTab={props.activeLocale}>
-            {Object.entries(props.identifiable.label).map((entry, index) => <LocaleTabContent
-              description={props.identifiable.description[entry[0]]}
-              key={index}
-              label={entry[1]}
-              locale={entry[0]}
+            {Object.entries(props.identifiable.label).map(([locale, text], index) => <LocaleTabContent
+              description={props.identifiable.description[locale]}
+              key={locale}
+              label={text}
+              locale={locale}
               onUpdate={(updateKey, updateValue) => props.onUpdate({
                 ...props.identifiable,
                 [updateKey]: {
                   ...props.identifiable[updateKey],
-                  [entry[0]]: updateValue
+                  [locale]: updateValue
                 }
               })}
             />)}

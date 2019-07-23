@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import {
   Editor,
   Floater,
@@ -11,36 +11,43 @@ import {
 import {
   menu,
   options
-} from '../config/index';
+} from '../config';
 
-const FormEditor = (props) => {
-  if (props.document) {
-    options.doc = options.schema.nodeFromJSON(props.document);
+class FormEditor extends Component {
+  constructor (props) {
+    super(props);
+    this.editorOptions = {
+      ...options,
+      doc: props.document ? options.schema.nodeFromJSON(props.document) : undefined
+    };
   }
-  return (
-    <>
-      <Label className='font-weight-bold'>{props.type}</Label>
-      <div className='border'>
-        <Editor
-          options={options}
-          onChange={doc => {
-            props.onUpdate(JSON.parse(JSON.stringify(doc)));
-          }}
-          render={({ editor, view }) => (
-            <>
-              <MenuBar menu={menu} view={view} />
 
-              <Floater view={view}>
-                <MenuBar menu={{ marks: menu.marks }} view={view} />
-              </Floater>
+  render(){
+    return (
+      <>
+        <Label className='font-weight-bold'>{this.props.type}</Label>
+        <div className='border'>
+          <Editor
+            options={this.editorOptions}
+            onChange={doc => {
+              this.props.onUpdate(JSON.parse(JSON.stringify(doc)));
+            }}
+            render={({ editor, view }) => (
+              <>
+                <MenuBar menu={menu} view={view} />
 
-              {editor}
-            </>
-          )}
-        />
-      </div>
-    </>
-  )
-};
+                <Floater view={view}>
+                  <MenuBar menu={{ marks: menu.marks }} view={view} />
+                </Floater>
+
+                {editor}
+              </>
+            )}
+          />
+        </div>
+      </>
+    );
+  }
+}
 
 export default FormEditor;

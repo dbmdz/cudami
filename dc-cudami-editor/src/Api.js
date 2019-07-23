@@ -1,3 +1,7 @@
+export async function loadAvailableLocales () {
+  return ['es', 'fr'];
+};
+
 export async function loadIdentifiable (type, uuid) {
   return {
     "created": "2018-08-21T16:22:52.033",
@@ -50,4 +54,4 @@ export async function loadIdentifiable (type, uuid) {
   } catch(err) {
     return {};
   }*/
-}
+};
