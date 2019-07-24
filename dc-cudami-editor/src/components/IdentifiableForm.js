@@ -10,6 +10,7 @@ import {
   loadAvailableLocales,
   loadIdentifiable
 } from '../Api';
+import initI18n from '../I18n'
 import IFrameAdderModal from './modals/IFrameAdderModal';
 
 class IdentifiableForm extends Component {
@@ -27,6 +28,7 @@ class IdentifiableForm extends Component {
   }
 
   async componentDidMount(){
+    initI18n(this.props.uiLocale);
     const identifiable = await loadIdentifiable(
       this.props.type, this.props.uuid
     );

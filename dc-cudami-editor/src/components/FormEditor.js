@@ -7,6 +7,7 @@ import {
 import {
   Label
 } from 'reactstrap';
+import { withTranslation } from 'react-i18next';
 
 import './FormEditor.css';
 import {
@@ -24,9 +25,11 @@ class FormEditor extends Component {
   }
 
   render(){
+    const { t } = this.props;
+    const translatedMenu = menu(t);
     return (
       <>
-        <Label className='font-weight-bold'>{this.props.type}</Label>
+        <Label className='font-weight-bold'>{t(this.props.type)}</Label>
         <div className='border'>
           <Editor
             options={this.editorOptions}
@@ -35,10 +38,10 @@ class FormEditor extends Component {
             }}
             render={({ editor, view }) => (
               <>
-                <MenuBar menu={menu} view={view} />
+                <MenuBar menu={translatedMenu} view={view} />
 
                 <Floater view={view}>
-                  <MenuBar menu={{ marks: menu.marks }} view={view} />
+                  <MenuBar menu={{ marks: translatedMenu.marks }} view={view} />
                 </Floater>
 
                 {editor}
@@ -51,4 +54,4 @@ class FormEditor extends Component {
   }
 }
 
-export default FormEditor;
+export default withTranslation()(FormEditor);

@@ -7,11 +7,13 @@ import {
   ModalFooter,
   ModalHeader
 } from 'reactstrap';
+import { useTranslation } from 'react-i18next';
 
 const LocaleAdderModal = (props) => {
+  const { t } = useTranslation();
   return (
     <Modal isOpen={props.isOpen} toggle={props.onToggle}>
-      <ModalHeader toggle={props.onToggle}>Sprache auswählen</ModalHeader>
+      <ModalHeader toggle={props.onToggle}>{t('chooseLocale')}</ModalHeader>
       <ModalBody>
         <Input
           onChange={(evt) => props.onSelect(evt.target.value)}
@@ -21,7 +23,7 @@ const LocaleAdderModal = (props) => {
         </Input>
       </ModalBody>
       <ModalFooter>
-        <Button color='primary' onClick={props.onSubmit}>Hinzufügen</Button>
+        <Button color='primary' onClick={props.onSubmit}>{t('add')}</Button>
       </ModalFooter>
     </Modal>
   );

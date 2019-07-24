@@ -5,13 +5,15 @@ import {
   NavItem,
   NavLink
 } from 'reactstrap';
+import { useTranslation } from 'react-i18next';
 
 const LocaleAdder = (props) => {
+  const { t } = useTranslation();
   return (
     <NavItem>
       <NavLink
         onClick={() => props.onClick('localeAdder')}
-        title='Sprache hinzufügen'
+        title={t('addLocale')}
       >
         <FontAwesomeIcon icon={faPlus} />
       </NavLink>

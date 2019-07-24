@@ -12,6 +12,7 @@ import {
   ModalFooter,
   ModalHeader
 } from 'reactstrap';
+import { withTranslation } from 'react-i18next';
 
 class IFrameAdderModal extends Component {
   constructor(props){
@@ -37,9 +38,10 @@ class IFrameAdderModal extends Component {
   };
 
   render(){
+    const { t } = this.props;
     return (
       <Modal isOpen={this.props.isOpen} toggle={this.props.onToggle}>
-        <ModalHeader toggle={this.props.onToggle}>IFrame Hinzufügen</ModalHeader>
+        <ModalHeader toggle={this.props.onToggle}>{t('addIframe')}</ModalHeader>
         <ModalBody>
           <FormGroup>
             <Input
@@ -53,7 +55,7 @@ class IFrameAdderModal extends Component {
           <FormGroup>
             <Input
               onChange={evt => this.setState({width: evt.target.value})}
-              placeholder='Breite'
+              placeholder={t('width')}
               required='required'
               type='text'
               value={this.state.width}
@@ -62,7 +64,7 @@ class IFrameAdderModal extends Component {
           <FormGroup>
             <Input
               onChange={evt => this.setState({height: evt.target.value})}
-              placeholder='Höhe'
+              placeholder={t('height')}
               required='required'
               type='text'
               value={this.state.height}
@@ -70,11 +72,11 @@ class IFrameAdderModal extends Component {
           </FormGroup>
         </ModalBody>
         <ModalFooter>
-          <Button color='primary' onClick={this.addIframeToEditor}>Hinzufügen</Button>
+          <Button color='primary' onClick={this.addIframeToEditor}>{t('add')}</Button>
         </ModalFooter>
       </Modal>
     );
   }
 }
 
-export default IFrameAdderModal;
+export default withTranslation()(IFrameAdderModal);

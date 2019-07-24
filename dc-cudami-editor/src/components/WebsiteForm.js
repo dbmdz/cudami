@@ -6,6 +6,7 @@ import {
   Row,
   TabContent
 } from 'reactstrap';
+import { useTranslation } from 'react-i18next';
 
 import FormIdInput from './FormIdInput';
 import FormUrlInput from './FormUrlInput';
@@ -15,15 +16,16 @@ import LocaleTab from './LocaleTab';
 import LocaleTabContent from './LocaleTabContent';
 
 const WebsiteForm = (props) => {
+  const { t } = useTranslation();
   return (
     <Form>
       <Row>
-        <Col xs='6' sm='6'>
+        <Col xs='6' sm='9'>
           <h1>
-            Website <a href={props.identifiable.url}>{props.identifiable.url}</a> bearbeiten
+            {t('editWebsite', {url: props.identifiable.url})}
           </h1>
         </Col>
-        <Col xs='6' sm='6'>
+        <Col xs='6' sm='3'>
           <FormButtons />
         </Col>
       </Row>
