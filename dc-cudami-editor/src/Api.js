@@ -22,12 +22,12 @@ export async function loadIdentifiable (type, uuid) {
       }
     },
     "label": {
-      "de_DE": "Deutscher Titel",
+      "de": "Deutscher Titel",
       "en": "Englischer Titel"
     },
     "lastModified": "2018-08-21T16:22:52.033",
     "text": {
-      "de_DE": {
+      "de": {
         "type": "doc",
         "content": [
           {
