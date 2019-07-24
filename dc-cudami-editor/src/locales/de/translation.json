@@ -1,0 +1,46 @@
+{
+  "translation": {
+    "abort": "Abbrechen",
+    "add": "Hinzufügen",
+    "addIframe": "Iframe hinzufügen",
+    "addLocale": "Sprache hinzufügen",
+    "blocks": {
+      "blockquote": "Zitat einfügen",
+      "bulletList": "In Aufzählungsliste umwandeln",
+      "codeBlock": "In Codeblock umwandeln",
+      "h1": "In Überschrift Typ 1 umwandeln",
+      "joinUp": "Mit dem obigen Block verbinden",
+      "lift": "Aus dem umschließenden Block herausheben",
+      "orderedList": "In geordnete Liste umwandeln",
+      "paragraph": "In Paragraph umwandeln"
+    },
+    "chooseLocale": "Sprache auswählen",
+    "description": "Kurzbeschreibung",
+    "editWebsite": "Website {{ url }} bearbeiten",
+    "height": "Höhe",
+    "history": {
+      "redo": "Letzte rückgängig gemachte Änderung wiederholen",
+      "undo": "Letzte Änderung rückgängig machen"
+    },
+    "insert": {
+      "footnote": "Fußnote einfügen",
+      "hr": "Horizontale Linie einfügen",
+      "iframe": "Iframe einfügen",
+      "image": "Bild einfügen",
+      "table": "Tabelle einfügen"
+    },
+    "label": "Titel",
+    "marks": {
+      "code": "Code-Stil",
+      "em": "Kursiv",
+      "link": "Verlinkung",
+      "strikethrough": "Durchgestrichen",
+      "strong": "Fett",
+      "subscript": "Tiefgestellt",
+      "superscript": "Hochgestellt",
+      "underline": "Unterstrichen"
+    },
+    "save": "Speichern",
+    "width": "Breite"
+  }
+}

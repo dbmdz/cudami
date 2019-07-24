@@ -1,0 +1,46 @@
+{
+  "translation": {
+    "abort": "Abort",
+    "add": "Add",
+    "addIframe": "Add iframe",
+    "addLocale": "Add language",
+    "blocks": {
+      "blockquote": "Add block quote",
+      "bulletList": "Change to bulleted list",
+      "codeBlock": "Change to code block",
+      "h1": "Change to heading level 1",
+      "joinUp": "Join with above block",
+      "lift": "Lift out of enclosing block",
+      "orderedList": "Change to numbered list",
+      "paragraph": "Change to paragraph"
+    },
+    "chooseLocale": "Choose a language",
+    "description": "Abstract",
+    "editWebsite": "Edit website {{ url }}",
+    "height": "Height",
+    "history": {
+      "redo": "Redo last undone change",
+      "undo": "Undo last change"
+    },
+    "insert": {
+      "footnote": "Insert footnote",
+      "hr": "Insert horizontal rule",
+      "iframe": "Insert iframe",
+      "image": "Insert image",
+      "table": "Insert table"
+    },
+    "label": "Label",
+    "marks": {
+      "code": "Code style",
+      "em": "Italic",
+      "link": "Hyperlink",
+      "strikethrough": "Strikethrough",
+      "strong": "Bold",
+      "subscript": "Subscript",
+      "superscript": "Superscript",
+      "underline": "Underline"
+    },
+    "save": "Save",
+    "width": "Width"
+  }
+}
