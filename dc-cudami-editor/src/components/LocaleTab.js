@@ -13,7 +13,7 @@ const LocaleTab = (props) => {
         className={props.locale === props.activeLocale ? 'active' : ''}
         onClick={() => props.onClick(props.locale)}
       >
-        {t(`languageNames:${props.locale}`)}
+        {t(`languageNames:${props.locale.split('_')[0]}`)}
       </NavLink>
     </NavItem>
   );
