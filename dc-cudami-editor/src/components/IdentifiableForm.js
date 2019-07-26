@@ -8,7 +8,9 @@ import LocaleAdderModal from './modals/LocaleAdderModal';
 import WebsiteForm from './WebsiteForm';
 import {
   loadAvailableLocales,
-  loadIdentifiable
+  loadIdentifiable,
+  saveIdentifiable,
+  updateIdentifiable
 } from '../Api';
 import initI18n from '../I18n'
 import IFrameAdderModal from './modals/IFrameAdderModal';
@@ -98,6 +100,7 @@ class IdentifiableForm extends Component {
           activeLocale={this.state.activeLocale}
           identifiable={this.state.identifiable}
           onAddLocale={this.toggleModal}
+          onSave={this.sendIdentifiable}
           onToggleLocale={this.toggleLocale}
           onUpdate={this.updateIdentifiable}
         />;
@@ -105,6 +108,14 @@ class IdentifiableForm extends Component {
         return <></>;
     }
   }
+
+  sendIdentifiable =  () => {
+    if (this.state.identifiable.uuid) {
+      updateIdentifiable(this.state.identifiable, this.props.type, this.state.identifiable.uuid);
+    } else {
+      saveIdentifiable(this.state.identifiable, this.props.type);
+    }
+  };
 
   setSelectedLocale = (selectedLocale) => {
     this.setState({

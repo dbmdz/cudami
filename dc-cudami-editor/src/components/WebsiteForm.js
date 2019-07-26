@@ -18,7 +18,7 @@ import LocaleTabContent from './LocaleTabContent';
 const WebsiteForm = (props) => {
   const { t } = useTranslation();
   return (
-    <Form>
+    <Form onSubmit={(evt) => evt.preventDefault()}>
       <Row>
         <Col xs='6' sm='9'>
           <h1>
@@ -26,7 +26,7 @@ const WebsiteForm = (props) => {
           </h1>
         </Col>
         <Col xs='6' sm='3'>
-          <FormButtons />
+          <FormButtons onSave={props.onSave} />
         </Col>
       </Row>
       <Row>
