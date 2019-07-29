@@ -39,7 +39,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectRepositoryImpl.class);
 
-  private final FileResourceMetadataRepository cudamiFileResourceRepository;
+  private final FileResourceMetadataRepository fileResourceMetadataRepository;
   private final IdentifierRepository identifierRepository;
 
   static final String SELECT_ALL_FR
@@ -68,9 +68,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       + " left join fileresources_application as fp on df.fileresource_uuid = fp.uuid";
 
   @Autowired
-  public DigitalObjectRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository, FileResourceMetadataRepository cudamiFileResourceRepository) {
+  public DigitalObjectRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository, FileResourceMetadataRepository fileResourceMetadataRepository) {
     super(dbi);
-    this.cudamiFileResourceRepository = cudamiFileResourceRepository;
+    this.fileResourceMetadataRepository = fileResourceMetadataRepository;
     this.identifierRepository = identifierRepository;
   }
 
@@ -258,7 +258,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     if (fileResources != null) {
       // first save fileresources
       for (FileResource fileResource : fileResources) {
-        fileResource = cudamiFileResourceRepository.save(fileResource);
+        fileResource = fileResourceMetadataRepository.save(fileResource);
       }
 
       // second: save relations to digital object
