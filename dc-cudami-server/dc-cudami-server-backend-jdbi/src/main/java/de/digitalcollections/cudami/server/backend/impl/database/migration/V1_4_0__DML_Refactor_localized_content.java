@@ -8,15 +8,19 @@ import org.flywaydb.core.api.migration.Context;
 import org.flywaydb.core.internal.jdbc.JdbcTemplate;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 @SuppressWarnings("checkstyle:typename")
 public class V1_4_0__DML_Refactor_localized_content extends BaseJavaMigration {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(V1_4_0__DML_Refactor_localized_content.class);
+
   @Override
   public void migrate(Context context) throws Exception {
     JdbcTemplate jdbcTemplate = new JdbcTemplate(
-        new SingleConnectionDataSource(context.getConnection(), true).getConnection()
+      new SingleConnectionDataSource(context.getConnection(), true).getConnection()
     );
     migrateLocalizedStructuredContent(jdbcTemplate, "description", "identifiables");
     migrateLocalizedStructuredContent(jdbcTemplate, "text", "articles");
@@ -37,13 +41,18 @@ public class V1_4_0__DML_Refactor_localized_content extends BaseJavaMigration {
     String selectQuery = String.format("SELECT uuid,%s FROM %s", tableField, tableName);
     String updateQuery = String.format("UPDATE %s SET %s=?::JSONB WHERE uuid=?::uuid", tableName, tableField);
 
+    LOGGER.info("Migrating from select: " + selectQuery + " to update: " + updateQuery);
+
     List<Map<String, String>> identifiables = jdbcTemplate.queryForList(selectQuery);
     for (Map<String, String> identifiable : identifiables) {
-      jdbcTemplate.update(
-          updateQuery,
-          convertLocalizedStructuredContent(identifiable.get(tableField)),
-          identifiable.get("uuid")
-      );
+      LOGGER.info("Migrating " + tableField + " of identifiable: " + identifiable.get("uuid"));
+      final String currentJson = identifiable.get(tableField);
+      if (currentJson != null) {
+        jdbcTemplate.update(updateQuery,
+                            convertLocalizedStructuredContent(currentJson),
+                            identifiable.get("uuid")
+        );
+      }
     }
   }
 
@@ -52,7 +61,9 @@ public class V1_4_0__DML_Refactor_localized_content extends BaseJavaMigration {
     JSONObject result = new JSONObject();
     labelTranslations.forEach((translation) -> {
       JSONObject currentTranslation = (JSONObject) translation;
-      result.put((String) currentTranslation.get("locale"), currentTranslation.get("text"));
+      if (currentTranslation.has("text")) {
+        result.put((String) currentTranslation.get("locale"), currentTranslation.get("text"));
+      }
     });
     return result.toString();
   }
@@ -63,11 +74,15 @@ public class V1_4_0__DML_Refactor_localized_content extends BaseJavaMigration {
 
     List<Map<String, String>> identifiables = jdbcTemplate.queryForList(selectQuery);
     for (Map<String, String> identifiable : identifiables) {
-      jdbcTemplate.update(
+      LOGGER.info("Migrating label of identifiable: " + identifiable.get("uuid"));
+      final String currentJson = identifiable.get("label");
+      if (currentJson != null) {
+        jdbcTemplate.update(
           updateQuery,
-          convertLocalizedText(identifiable.get("label")),
+          convertLocalizedText(currentJson),
           identifiable.get("uuid")
-      );
+        );
+      }
     }
   }
 }
