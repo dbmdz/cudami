@@ -7,6 +7,7 @@ import de.digitalcollections.model.api.identifiable.resource.MimeType;
 import de.digitalcollections.model.impl.identifiable.resource.ApplicationFileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.AudioFileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
+import de.digitalcollections.model.impl.identifiable.resource.LinkedDataFileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.TextFileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.VideoFileResourceImpl;
 import java.net.URI;
@@ -32,8 +33,10 @@ public class FileResourceMapper implements RowMapper<FileResource> {
     FileResource result;
     String mimeType = rs.getString("mimetype");
     String primaryType = "application";
+    String subType = null;
     if (mimeType != null) {
       primaryType = mimeType.substring(0, mimeType.indexOf("/"));
+      subType = mimeType.substring(mimeType.lastIndexOf("/") + 1);
     }
     switch (primaryType) {
       case "audio":
@@ -47,6 +50,13 @@ public class FileResourceMapper implements RowMapper<FileResource> {
         break;
       case "video":
         result = new VideoFileResourceImpl();
+        break;
+      case "application":
+        if ("ld+json".equals(subType)) {
+          result = new LinkedDataFileResourceImpl();
+          break;
+        }
+        result = new ApplicationFileResourceImpl();
         break;
       default:
         result = new ApplicationFileResourceImpl();

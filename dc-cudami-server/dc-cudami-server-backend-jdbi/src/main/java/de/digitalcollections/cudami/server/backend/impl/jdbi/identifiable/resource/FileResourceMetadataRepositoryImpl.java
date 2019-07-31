@@ -8,6 +8,7 @@ import de.digitalcollections.model.api.identifiable.resource.ApplicationFileReso
 import de.digitalcollections.model.api.identifiable.resource.AudioFileResource;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
+import de.digitalcollections.model.api.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.api.identifiable.resource.MimeType;
 import de.digitalcollections.model.api.identifiable.resource.TextFileResource;
 import de.digitalcollections.model.api.identifiable.resource.VideoFileResource;
@@ -18,9 +19,11 @@ import de.digitalcollections.model.impl.identifiable.resource.ApplicationFileRes
 import de.digitalcollections.model.impl.identifiable.resource.AudioFileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
+import de.digitalcollections.model.impl.identifiable.resource.LinkedDataFileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.TextFileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.VideoFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -78,6 +81,13 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
         break;
       case "video":
         result = new VideoFileResourceImpl();
+        break;
+      case "application":
+        if ("ld+json".equals(mimeType.getSubType())) {
+          result = new LinkedDataFileResourceImpl();
+          break;
+        }
+        result = new ApplicationFileResourceImpl();
         break;
       default:
         result = new ApplicationFileResourceImpl();
@@ -153,6 +163,13 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
         .findOne().orElse(null));
       ((ImageFileResource) fileResource).setWidth((int) result.get("width"));
       ((ImageFileResource) fileResource).setHeight((int) result.get("height"));
+    } else if (fileResource instanceof LinkedDataFileResource) {
+      Map<String, Object> result = dbi.withHandle(h -> h.createQuery("SELECT context, object_type FROM fileresources_linkeddata WHERE uuid = :uuid")
+        .bind("uuid", uuid)
+        .mapToMap()
+        .findOne().orElse(null));
+      ((LinkedDataFileResource) fileResource).setContext(URI.create((String) result.get("context")));
+      ((LinkedDataFileResource) fileResource).setObjectType((String) result.get("object_type"));
     } else if (fileResource instanceof TextFileResource) {
       // no special fields, yet
     } else if (fileResource instanceof VideoFileResource) {
@@ -218,6 +235,10 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
       dbi.withHandle(h -> h.createUpdate("INSERT INTO fileresources_image(" + baseColumnsSql + ", width, height) VALUES (" + basePropertiesSql + ", :width, :height)")
         .bindBean(fileResource)
         .execute());
+    } else if (fileResource instanceof LinkedDataFileResource) {
+      dbi.withHandle(h -> h.createUpdate("INSERT INTO fileresources_linkeddata(" + baseColumnsSql + ", context, object_type) VALUES (" + basePropertiesSql + ", :context, :objectType)")
+        .bindBean(fileResource)
+        .execute());
     } else if (fileResource instanceof TextFileResource) {
       // no special columns
       dbi.withHandle(h -> h.createUpdate("INSERT INTO fileresources_text(" + baseColumnsSql + ") VALUES (" + basePropertiesSql + ")")
@@ -267,6 +288,11 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
       result = dbi.withHandle(h -> h.createQuery("UPDATE fileresources_image SET " + baseColumnsSql + ", width=:width, height=:height WHERE uuid=:uuid RETURNING *")
         .bindBean(fileResource)
         .mapToBean(ImageFileResourceImpl.class)
+        .findOne().orElse(null));
+    } else if (fileResource instanceof LinkedDataFileResource) {
+      result = dbi.withHandle(h -> h.createQuery("UPDATE fileresources_linkeddata SET " + baseColumnsSql + ", context=:context, object_type=:objectType WHERE uuid=:uuid RETURNING *")
+        .bindBean(fileResource)
+        .mapToBean(LinkedDataFileResourceImpl.class)
         .findOne().orElse(null));
     } else if (fileResource instanceof TextFileResource) {
       // no special columns
