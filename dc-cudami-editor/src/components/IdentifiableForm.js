@@ -11,8 +11,8 @@ import {
   loadIdentifiable,
   saveIdentifiable,
   updateIdentifiable
-} from '../Api';
-import initI18n from '../I18n'
+} from '../api';
+import initI18n from '../i18n'
 import IFrameAdderModal from './modals/IFrameAdderModal';
 
 class IdentifiableForm extends Component {
