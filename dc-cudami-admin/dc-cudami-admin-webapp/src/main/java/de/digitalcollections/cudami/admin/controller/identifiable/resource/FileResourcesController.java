@@ -134,11 +134,11 @@ public class FileResourcesController extends AbstractController implements Messa
   @GetMapping(value = "/fileresources/new/metadata/{uuid}")
   public String metadata(@PathVariable UUID uuid, Model model) {
     FileResource fileresource = cudamiFileResourceService.get(uuid);
-    Locale defaultLocale = localeService.getDefault();
-    List<Locale> locales = localeService.findAll().stream()
-        .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
-        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-        .collect(Collectors.toList());
+    Locale defaultLocale = localeService.getDefaultLocale();
+    List<Locale> locales = localeService.getSupportedLocales().stream()
+      .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
+      .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+      .collect(Collectors.toList());
 
     model.addAttribute("defaultLocale", defaultLocale);
     model.addAttribute("fileresource", fileresource);
@@ -185,7 +185,7 @@ public class FileResourcesController extends AbstractController implements Messa
   public String view(@PathVariable UUID uuid, Model model) {
     FileResource resource = cudamiFileResourceService.get(uuid);
     model.addAttribute("availableLocales", resource.getLabel().getLocales());
-    model.addAttribute("defaultLocale", localeService.getDefault());
+    model.addAttribute("defaultLocale", localeService.getDefaultLocale());
     model.addAttribute("fileresource", resource);
     return "fileresources/view";
   }
@@ -196,10 +196,10 @@ public class FileResourcesController extends AbstractController implements Messa
 
     HashSet<Locale> availableLocales = (HashSet<Locale>) fileresource.getLabel().getLocales();
     Set<String> availableLocaleTags = availableLocales.stream().map(Locale::toLanguageTag).collect(Collectors.toSet());
-    List<Locale> locales = localeService.findAll().stream()
-        .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
-        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-        .collect(Collectors.toList());
+    List<Locale> locales = localeService.getSupportedLocales().stream()
+      .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
+      .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+      .collect(Collectors.toList());
 
     model.addAttribute("fileresource", fileresource);
     model.addAttribute("availableLocales", availableLocales);

@@ -72,11 +72,11 @@ public class ContentNodesController extends AbstractController implements Messag
 
   @RequestMapping(value = "/contentnodes/new", method = RequestMethod.GET)
   public String create(Model model, @RequestParam("parentType") String parentType, @RequestParam("parentUuid") String parentUuid) {
-    Locale defaultLocale = localeService.getDefault();
-    List<Locale> locales = localeService.findAll().stream()
-        .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
-        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-        .collect(Collectors.toList());
+    Locale defaultLocale = localeService.getDefaultLocale();
+    List<Locale> locales = localeService.getSupportedLocales().stream()
+      .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
+      .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+      .collect(Collectors.toList());
 
     model.addAttribute("contentNode", contentNodeService.create());
     model.addAttribute("defaultLocale", defaultLocale);
@@ -128,10 +128,10 @@ public class ContentNodesController extends AbstractController implements Messag
 
     HashSet<Locale> availableLocales = (HashSet<Locale>) contentNode.getLabel().getLocales();
     Set<String> availableLocaleTags = availableLocales.stream().map(Locale::toLanguageTag).collect(Collectors.toSet());
-    List<Locale> locales = localeService.findAll().stream()
-        .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
-        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-        .collect(Collectors.toList());
+    List<Locale> locales = localeService.getSupportedLocales().stream()
+      .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
+      .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+      .collect(Collectors.toList());
 
     model.addAttribute("contentNode", contentNode);
     model.addAttribute("availableLocales", availableLocales);
@@ -184,7 +184,7 @@ public class ContentNodesController extends AbstractController implements Messag
   public String view(@PathVariable UUID uuid, Model model) {
     ContentNode contentNode = (ContentNode) contentNodeService.get(uuid);
     model.addAttribute("availableLocales", contentNode.getLabel().getLocales());
-    model.addAttribute("defaultLocale", localeService.getDefault());
+    model.addAttribute("defaultLocale", localeService.getDefaultLocale());
     model.addAttribute("contentNode", contentNode);
 
     LinkedHashSet<FileResource> relatedFileResources = contentNodeService.getRelatedFileResources(contentNode);

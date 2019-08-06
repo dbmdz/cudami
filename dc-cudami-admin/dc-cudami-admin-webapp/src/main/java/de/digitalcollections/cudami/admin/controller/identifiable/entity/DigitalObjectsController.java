@@ -83,7 +83,7 @@ public class DigitalObjectsController extends AbstractController implements Mess
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = digitalObjectService.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
-    model.addAttribute("defaultLocale", localeService.getDefault());
+    model.addAttribute("defaultLocale", localeService.getDefaultLocale());
     model.addAttribute("page", new PageWrapper(page, "/digitalobjects"));
     return "digitalobjects/list";
   }
@@ -92,7 +92,7 @@ public class DigitalObjectsController extends AbstractController implements Mess
   public String view(@PathVariable UUID uuid, Model model) {
     DigitalObject digitalObject = (DigitalObject) digitalObjectService.get(uuid);
     model.addAttribute("availableLocales", digitalObject.getLabel().getLocales());
-    model.addAttribute("defaultLocale", localeService.getDefault());
+    model.addAttribute("defaultLocale", localeService.getDefaultLocale());
     model.addAttribute("digitalObject", digitalObject);
     return "digitalobjects/view";
   }

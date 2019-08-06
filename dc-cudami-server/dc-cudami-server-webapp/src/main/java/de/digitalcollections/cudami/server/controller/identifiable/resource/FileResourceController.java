@@ -179,7 +179,7 @@ public class FileResourceController {
           LOGGER.info("filename = " + fileResource.getFilename());
 
           // set label to originalfilename for now. can be changed in next step of user input
-          fileResource.setLabel(new LocalizedTextImpl(localeService.getDefault(), originalFilename));
+          fileResource.setLabel(new LocalizedTextImpl(localeService.getDefaultLocale(), originalFilename));
 
           fileResource = fileResourceService.save(fileResource, stream);
           LOGGER.info("saved file '" + fileResource.getUri().toString() + "' (" + fileResource.getSizeInBytes() + " bytes)");

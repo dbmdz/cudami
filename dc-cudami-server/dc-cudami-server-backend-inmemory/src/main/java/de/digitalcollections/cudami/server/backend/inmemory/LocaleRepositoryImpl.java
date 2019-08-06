@@ -10,16 +10,29 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class LocaleRepositoryImpl implements LocaleRepository {
 
+  @Value("${cudami.defaults.language}")
+  private String defaultLanguage;
+
   @Value("${cudami.defaults.locale}")
   private Locale defaultLocale;
 
   @Override
-  public List<Locale> findAll() {
+  public List<String> findAllLanguages() {
+    return Arrays.asList(Locale.getISOLanguages());
+  }
+
+  @Override
+  public List<Locale> findAllLocales() {
     return Arrays.asList(Locale.getAvailableLocales());
   }
 
   @Override
-  public Locale getDefault() {
+  public String getDefaultLanguage() {
+    return defaultLanguage;
+  }
+
+  @Override
+  public Locale getDefaultLocale() {
     return defaultLocale;
   }
 }

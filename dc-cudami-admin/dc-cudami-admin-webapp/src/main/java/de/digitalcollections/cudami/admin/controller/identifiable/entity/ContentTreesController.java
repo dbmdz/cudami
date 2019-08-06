@@ -68,11 +68,11 @@ public class ContentTreesController extends AbstractController implements Messag
 
   @RequestMapping(value = "/contenttrees/new", method = RequestMethod.GET)
   public String create(Model model) {
-    Locale defaultLocale = localeService.getDefault();
-    List<Locale> locales = localeService.findAll().stream()
-        .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
-        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-        .collect(Collectors.toList());
+    Locale defaultLocale = localeService.getDefaultLocale();
+    List<Locale> locales = localeService.getSupportedLocales().stream()
+      .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
+      .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+      .collect(Collectors.toList());
 
     model.addAttribute("contentTree", contentTreeService.create());
     model.addAttribute("defaultLocale", defaultLocale);
@@ -114,10 +114,10 @@ public class ContentTreesController extends AbstractController implements Messag
 
     HashSet<Locale> availableLocales = (HashSet<Locale>) contentTree.getLabel().getLocales();
     Set<String> availableLocaleTags = availableLocales.stream().map(Locale::toLanguageTag).collect(Collectors.toSet());
-    List<Locale> locales = localeService.findAll().stream()
-        .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
-        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-        .collect(Collectors.toList());
+    List<Locale> locales = localeService.getSupportedLocales().stream()
+      .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
+      .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+      .collect(Collectors.toList());
 //      LOGGER.error("Cannot retrieve website with id=" + id + ": ", e);
 //      String message = messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale());
 //      redirectAttributes.addFlashAttribute("error_message", message);

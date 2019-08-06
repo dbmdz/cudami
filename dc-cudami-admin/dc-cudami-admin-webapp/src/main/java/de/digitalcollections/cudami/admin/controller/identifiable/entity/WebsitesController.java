@@ -68,11 +68,11 @@ public class WebsitesController extends AbstractController implements MessageSou
 
   @RequestMapping(value = "/websites/new", method = RequestMethod.GET)
   public String create(Model model) {
-    Locale defaultLocale = localeService.getDefault();
-    List<Locale> locales = localeService.findAll().stream()
-        .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
-        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-        .collect(Collectors.toList());
+    Locale defaultLocale = localeService.getDefaultLocale();
+    List<Locale> locales = localeService.getSupportedLocales().stream()
+      .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
+      .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+      .collect(Collectors.toList());
 
     model.addAttribute("defaultLocale", defaultLocale);
     model.addAttribute("locales", locales);
@@ -114,10 +114,10 @@ public class WebsitesController extends AbstractController implements MessageSou
 
     HashSet<Locale> availableLocales = (HashSet<Locale>) website.getLabel().getLocales();
     Set<String> availableLocaleTags = availableLocales.stream().map(Locale::toLanguageTag).collect(Collectors.toSet());
-    List<Locale> locales = localeService.findAll().stream()
-        .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
-        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-        .collect(Collectors.toList());
+    List<Locale> locales = localeService.getSupportedLocales().stream()
+      .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
+      .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+      .collect(Collectors.toList());
     model.addAttribute("availableLocales", availableLocales);
     model.addAttribute("locales", locales);
 
@@ -161,7 +161,7 @@ public class WebsitesController extends AbstractController implements MessageSou
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = websiteService.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
-    model.addAttribute("defaultLocale", localeService.getDefault());
+    model.addAttribute("defaultLocale", localeService.getDefaultLocale());
     model.addAttribute("page", new PageWrapper(page, "/websites"));
     return "websites/list";
   }
@@ -170,7 +170,7 @@ public class WebsitesController extends AbstractController implements MessageSou
   public String view(@PathVariable UUID uuid, Model model) {
     Website website = (Website) websiteService.get(uuid);
     model.addAttribute("availableLocales", website.getLabel().getLocales());
-    model.addAttribute("defaultLocale", localeService.getDefault());
+    model.addAttribute("defaultLocale", localeService.getDefaultLocale());
     model.addAttribute("website", website);
     return "websites/view";
   }

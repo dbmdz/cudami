@@ -19,8 +19,13 @@ public class LocaleRepositoryImpl implements LocaleRepository {
   private LocaleRepositoryEndpoint endpoint;
 
   @Override
-  public List<Locale> findAll() {
-    List<String> localeCodes = endpoint.find();
+  public List<String> findAllLanguages() {
+    return endpoint.findAllLanguages();
+  }
+
+  @Override
+  public List<Locale> findAllLocales() {
+    List<String> localeCodes = endpoint.findAllLocales();
     List<Locale> result = new ArrayList<>();
     for (String localeCode : localeCodes) {
       try {
@@ -34,8 +39,13 @@ public class LocaleRepositoryImpl implements LocaleRepository {
   }
 
   @Override
-  public Locale getDefault() {
-    String defaultLocaleCode = endpoint.getDefault();
+  public String getDefaultLanguage() {
+    return endpoint.getDefaultLanguage();
+  }
+
+  @Override
+  public Locale getDefaultLocale() {
+    String defaultLocaleCode = endpoint.getDefaultLocale();
     return LocaleUtils.toLocale(defaultLocaleCode);
   }
 }

@@ -16,8 +16,18 @@ public class CudamiClientImpl implements CudamiClient {
   }
 
   @Override
-  public List<Locale> getAllLocales() throws Exception {
-    return backend.getAllLocales();
+  public List<String> getSupportedLanguages() throws Exception {
+    return backend.getSupportedLanguages();
+  }
+
+  @Override
+  public String getDefaultLanguage() throws Exception {
+    return backend.getDefaultLanguage();
+  }
+
+  @Override
+  public List<Locale> getSupportedLocales() throws Exception {
+    return backend.getSupportedLocales();
   }
 
   @Override

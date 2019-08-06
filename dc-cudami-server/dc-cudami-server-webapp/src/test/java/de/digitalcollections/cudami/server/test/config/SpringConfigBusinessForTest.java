@@ -68,7 +68,7 @@ public class SpringConfigBusinessForTest {
     final LocaleService dummy = Mockito.mock(LocaleService.class);
     Locale defaultLocale = Locale.ENGLISH;
 
-    Mockito.when(dummy.getDefault()).thenReturn(defaultLocale);
+    Mockito.when(dummy.getDefaultLocale()).thenReturn(defaultLocale);
     return dummy;
   }
 

@@ -8,7 +8,11 @@ import java.util.Locale;
  */
 public interface LocaleRepository {
 
-  public List<Locale> findAll();
+  List<String> findAllLanguages();
 
-  public Locale getDefault();
+  List<Locale> findAllLocales();
+
+  String getDefaultLanguage();
+
+  Locale getDefaultLocale();
 }

@@ -5,9 +5,15 @@ import java.util.List;
 
 public interface LocaleRepositoryEndpoint {
 
+  @RequestLine("GET /latest/languages")
+  List<String> findAllLanguages();
+
+  @RequestLine("GET /latest/languages/default")
+  String getDefaultLanguage();
+
   @RequestLine("GET /latest/locales")
-  List<String> find();
+  List<String> findAllLocales();
 
   @RequestLine("GET /latest/locales/default")
-  String getDefault();
+  String getDefaultLocale();
 }

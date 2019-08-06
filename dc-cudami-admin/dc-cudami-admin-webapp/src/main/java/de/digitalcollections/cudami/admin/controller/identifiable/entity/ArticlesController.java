@@ -70,8 +70,8 @@ public class ArticlesController extends AbstractController implements MessageSou
 
   @RequestMapping(value = "/articles/new", method = RequestMethod.GET)
   public String create(Model model) {
-    Locale defaultLocale = localeService.getDefault();
-    List<Locale> locales = localeService.findAll().stream()
+    Locale defaultLocale = localeService.getDefaultLocale();
+    List<Locale> locales = localeService.getSupportedLocales().stream()
         .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
         .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
         .collect(Collectors.toList());
@@ -114,7 +114,7 @@ public class ArticlesController extends AbstractController implements MessageSou
 
     HashSet<Locale> availableLocales = (HashSet<Locale>) article.getLabel().getLocales();
     Set<String> availableLocaleTags = availableLocales.stream().map(Locale::toLanguageTag).collect(Collectors.toSet());
-    List<Locale> locales = localeService.findAll().stream()
+    List<Locale> locales = localeService.getSupportedLocales().stream()
         .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
         .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
         .collect(Collectors.toList());
@@ -170,7 +170,7 @@ public class ArticlesController extends AbstractController implements MessageSou
   public String view(@PathVariable UUID uuid, Model model) {
     Article article = (Article) service.get(uuid);
     model.addAttribute("availableLocales", article.getLabel().getLocales());
-    model.addAttribute("defaultLocale", localeService.getDefault());
+    model.addAttribute("defaultLocale", localeService.getDefaultLocale());
     model.addAttribute("article", article);
 
     LinkedHashSet<FileResource> relatedFileResources = service.getRelatedFileResources(article);
