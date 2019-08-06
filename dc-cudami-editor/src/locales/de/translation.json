@@ -16,6 +16,7 @@
     },
     "chooseLocale": "Sprache auswählen",
     "description": "Kurzbeschreibung",
+    "editContentTree": "Inhaltsbaum bearbeiten",
     "editWebpage": "Webseite bearbeiten",
     "editWebsite": "Website {{ url }} bearbeiten",
     "height": "Höhe",

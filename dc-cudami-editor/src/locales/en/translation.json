@@ -16,6 +16,7 @@
     },
     "chooseLocale": "Choose a language",
     "description": "Abstract",
+    "editContentTree": "Edit content tree",
     "editWebpage": "Edit webpage",
     "editWebsite": "Edit website {{ url }}",
     "height": "Height",

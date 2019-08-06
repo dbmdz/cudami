@@ -6,6 +6,7 @@ import {
 
 import './IdentifiableForm.css';
 import LocaleAdderModal from './modals/LocaleAdderModal';
+import ContentTreeForm from './ContentTreeForm';
 import WebpageForm from './WebpageForm';
 import WebsiteForm from './WebsiteForm';
 import {
@@ -85,14 +86,18 @@ class IdentifiableForm extends Component {
           activeLocale={this.state.activeLocale}
           identifiable={this.state.identifiable}
           onUpdate={this.updateIdentifiable}
-        />;
+        />;*/
       case 'contentTree':
         return <ContentTreeForm
           activeLocale={this.state.activeLocale}
+          canAddLocale={this.state.availableLocales.length > 0}
           identifiable={this.state.identifiable}
+          onAddLocale={this.toggleModal}
+          onSave={this.sendIdentifiable}
+          onToggleLocale={this.toggleLocale}
           onUpdate={this.updateIdentifiable}
         />;
-      case 'fileResource':
+      /*case 'fileResource':
         return <FileResourceForm
           activeLocale={this.state.activeLocale}
           identifiable={this.state.identifiable}
