@@ -33,24 +33,29 @@ class IdentifiableForm extends Component {
   }
 
   async componentDidMount(){
-    initI18n(this.props.uiLocale);
+    const i18n = initI18n(this.props.uiLocale);
     const availableLocales = this.props.mockApi ? getAvailableLocales() : await loadAvailableLocales();
     const identifiable = await loadIdentifiable(
       this.props.type,
       this.props.uuid
     );
     this.setState({
-      availableLocales,
+      availableLocales: availableLocales.map(locale => {
+        return {
+          displayName: i18n.t(`languageNames:${locale.split('_')[0]}`),
+          name: locale
+        };
+      }).sort((a, b) => (a.displayName > b.displayName) ? 1 : -1),
       identifiable
     });
   }
 
   addLocale = (modalName) => {
-    const selectedLocale = this.state.selectedLocale || this.state.availableLocales[0];
+    const selectedLocale = this.state.selectedLocale || this.state.availableLocales[0].name;
     this.setState({
       activeLocale: selectedLocale,
       availableLocales: this.state.availableLocales.filter(
-        locale => locale !== selectedLocale
+        locale => locale.name !== selectedLocale
       ),
       identifiable: {
         ...this.state.identifiable,

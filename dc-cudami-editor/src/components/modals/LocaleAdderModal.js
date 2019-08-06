@@ -19,7 +19,7 @@ const LocaleAdderModal = (props) => {
           onChange={(evt) => props.onSelect(evt.target.value)}
           type='select'
         >
-          {props.availableLocales.map((locale) => <option key={locale}>{locale}</option>)}
+          {props.availableLocales.map(locale => <option key={locale.name} value={locale.name}>{locale.displayName}</option>)}
         </Input>
       </ModalBody>
       <ModalFooter>
