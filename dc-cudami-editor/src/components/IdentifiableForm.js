@@ -41,12 +41,15 @@ class IdentifiableForm extends Component {
       this.props.uuid
     );
     this.setState({
-      availableLocales: availableLocales.map(locale => {
-        return {
-          displayName: i18n.t(`languageNames:${locale.split('_')[0]}`),
-          name: locale
-        };
-      }).sort((a, b) => (a.displayName > b.displayName) ? 1 : -1),
+      availableLocales: availableLocales.reduce((locales, locale) => {
+        if (!(locale in identifiable.label)) {
+          locales.push({
+            displayName: i18n.t(`languageNames:${locale}`),
+            name: locale
+          });
+        }
+        return locales;
+      }, []).sort((a, b) => (a.displayName > b.displayName) ? 1 : -1),
       identifiable
     });
   }
