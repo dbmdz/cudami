@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {
-  Container
+  Container,
+  Label
 } from 'reactstrap';
 
 import './IdentifiableForm.css';
@@ -153,11 +154,14 @@ class IdentifiableForm extends Component {
           {this.getFormComponent()}
           {
             this.props.debug &&
-            <pre className='mt-3'>
-              <code>
-                {JSON.stringify(this.state.identifiable, null, 4)}
-              </code>
-            </pre>
+            <>
+              <Label className='font-weight-bold mt-3'>JSON (debug)</Label>
+              <pre className='border'>
+                <code>
+                  {JSON.stringify(this.state.identifiable, null, 4)}
+                </code>
+              </pre>
+            </>
           }
           <IFrameAdderModal
             isOpen={this.state.modalsOpen.iframeAdder}
