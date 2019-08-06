@@ -40,7 +40,7 @@ public class LocaleRepositoryImpl implements LocaleRepository {
 
   @Override
   public String getDefaultLanguage() {
-    return endpoint.getDefaultLanguage();
+    return endpoint.getDefaultLanguage().getLanguage();
   }
 
   @Override

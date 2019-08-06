@@ -8,6 +8,7 @@ cudami:
     port: 22222
     username: cudami
   defaults:
+    language: en
     locale: en_US
   repositoryFolderPath: '~/cudami/fileResources'
 

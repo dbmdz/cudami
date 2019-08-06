@@ -20,8 +20,8 @@ public class LocaleController {
   @ApiMethod(description = "get default language")
   @GetMapping(value = {"/latest/languages/default", "/v2/languages/default"})
   @ApiResponseObject
-  public String getDefaultLanguage() {
-    return service.getDefaultLanguage();
+  public Locale getDefaultLanguage() {
+    return new Locale(service.getDefaultLanguage());
   }
 
   @ApiMethod(description = "get default locale")

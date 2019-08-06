@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.admin.backend.impl.repository;
 
 import feign.RequestLine;
 import java.util.List;
+import java.util.Locale;
 
 public interface LocaleRepositoryEndpoint {
 
@@ -9,7 +10,7 @@ public interface LocaleRepositoryEndpoint {
   List<String> findAllLanguages();
 
   @RequestLine("GET /latest/languages/default")
-  String getDefaultLanguage();
+  Locale getDefaultLanguage();
 
   @RequestLine("GET /latest/locales")
   List<String> findAllLocales();
