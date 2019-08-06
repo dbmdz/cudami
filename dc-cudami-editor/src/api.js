@@ -1,3 +1,7 @@
+export function getAvailableLocales () {
+  return ['es', 'fr'];
+}
+
 export async function loadAvailableLocales () {
   try {
     const result = await fetch('/api/locales');
@@ -8,8 +12,9 @@ export async function loadAvailableLocales () {
 };
 
 export async function loadIdentifiable (type, uuid) {
+  const url = uuid === 'mock' ? `__mock__/${type}.json` : `/api/${type}s/${uuid}`;
   try {
-    const result = await fetch(`/api/${type}s/${uuid}`);
+    const result = await fetch(url);
     return result.json();
   } catch(err) {
     return {};

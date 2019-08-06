@@ -1,0 +1,44 @@
+{
+  "created": "2019-08-05T16:54:29.71132",
+  "description": {
+    "de": {
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Das ist meine erste Webseite."
+            }
+          ]
+        }
+      ],
+      "type": "doc"
+    },
+    "en": {
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "This is my first website."
+            }
+          ]
+        }
+      ],
+      "type": "doc"
+    }
+  },
+  "entityType": "WEBSITE",
+  "identifiers": [],
+  "label": {
+    "de": "Meine erste Webseite",
+    "en": "My first website"
+  },
+  "lastModified": "2019-08-05T16:54:29.711332",
+  "rootPages": [],
+  "type": "ENTITY",
+  "url": "https://my-first-website.com",
+  "uuid": "bc5cd963-bd86-4302-a15b-fb9ff3511105"
+}

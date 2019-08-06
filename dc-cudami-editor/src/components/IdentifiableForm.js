@@ -7,6 +7,7 @@ import './IdentifiableForm.css';
 import LocaleAdderModal from './modals/LocaleAdderModal';
 import WebsiteForm from './WebsiteForm';
 import {
+  getAvailableLocales,
   loadAvailableLocales,
   loadIdentifiable,
   saveIdentifiable,
@@ -31,10 +32,11 @@ class IdentifiableForm extends Component {
 
   async componentDidMount(){
     initI18n(this.props.uiLocale);
+    const availableLocales = this.props.mockApi ? getAvailableLocales() : await loadAvailableLocales();
     const identifiable = await loadIdentifiable(
-      this.props.type, this.props.uuid
+      this.props.type,
+      this.props.uuid
     );
-    const availableLocales = await loadAvailableLocales();
     this.setState({
       availableLocales,
       identifiable
@@ -174,7 +176,8 @@ class IdentifiableForm extends Component {
 }
 
 IdentifiableForm.defaultProps = {
-  debug: false
+  debug: false,
+  mockApi: false
 };
 
 export default IdentifiableForm;
