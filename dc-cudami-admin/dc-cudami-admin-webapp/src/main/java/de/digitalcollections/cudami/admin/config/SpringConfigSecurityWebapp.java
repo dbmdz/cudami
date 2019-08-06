@@ -38,8 +38,8 @@ public class SpringConfigSecurityWebapp extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     // Webapp:
     http.authorizeRequests()
-            .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-            .antMatchers("/api/**", "/setup/**").permitAll();
+        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+        .antMatchers("/api/**", "/setup/**").permitAll().and().csrf().disable();
 
     // FIXME: replace with serverside token repository?
     final InMemoryTokenRepositoryImpl inMemoryTokenRepositoryImpl = new InMemoryTokenRepositoryImpl();
