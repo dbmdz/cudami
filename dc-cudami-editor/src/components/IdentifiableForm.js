@@ -93,7 +93,7 @@ class IdentifiableForm extends Component {
           canAddLocale={this.state.availableLocales.length > 0}
           identifiable={this.state.identifiable}
           onAddLocale={this.toggleModal}
-          onSave={this.sendIdentifiable}
+          onSave={this.submitIdentifiable}
           onToggleLocale={this.toggleLocale}
           onUpdate={this.updateIdentifiable}
         />;
@@ -109,7 +109,7 @@ class IdentifiableForm extends Component {
           canAddLocale={this.state.availableLocales.length > 0}
           identifiable={this.state.identifiable}
           onAddLocale={this.toggleModal}
-          onSave={this.sendIdentifiable}
+          onSave={this.submitIdentifiable}
           onToggleLocale={this.toggleLocale}
           onUpdate={this.updateIdentifiable}
         />;
@@ -119,7 +119,7 @@ class IdentifiableForm extends Component {
           canAddLocale={this.state.availableLocales.length > 0}
           identifiable={this.state.identifiable}
           onAddLocale={this.toggleModal}
-          onSave={this.sendIdentifiable}
+          onSave={this.submitIdentifiable}
           onToggleLocale={this.toggleLocale}
           onUpdate={this.updateIdentifiable}
         />;
@@ -128,18 +128,18 @@ class IdentifiableForm extends Component {
     }
   }
 
-  sendIdentifiable =  () => {
+  setSelectedLocale = (selectedLocale) => {
+    this.setState({
+      selectedLocale
+    });
+  };
+
+  submitIdentifiable =  () => {
     if (this.state.identifiable.uuid) {
       updateIdentifiable(this.state.identifiable, this.props.type, this.state.identifiable.uuid);
     } else {
       saveIdentifiable(this.state.identifiable, this.props.type);
     }
-  };
-
-  setSelectedLocale = (selectedLocale) => {
-    this.setState({
-      selectedLocale
-    });
   };
 
   toggleLocale = (activeLocale) => {
