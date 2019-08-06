@@ -44,7 +44,7 @@ const WebpageForm = (props) => {
               locale={locale}
               onClick={(locale => props.onToggleLocale(locale))}
             />)}
-            <LocaleAdder onClick={props.onAddLocale} />
+            {props.canAddLocale && <LocaleAdder onClick={props.onAddLocale} />}
           </Nav>
           <TabContent activeTab={props.activeLocale}>
             {Object.entries(props.identifiable.label).map(([locale, text]) => <LocaleTabContent

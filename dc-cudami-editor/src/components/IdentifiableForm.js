@@ -101,6 +101,7 @@ class IdentifiableForm extends Component {
       case 'webpage':
         return <WebpageForm
           activeLocale={this.state.activeLocale}
+          canAddLocale={this.state.availableLocales.length > 0}
           identifiable={this.state.identifiable}
           onAddLocale={this.toggleModal}
           onSave={this.sendIdentifiable}
@@ -110,6 +111,7 @@ class IdentifiableForm extends Component {
       case 'website':
         return <WebsiteForm
           activeLocale={this.state.activeLocale}
+          canAddLocale={this.state.availableLocales.length > 0}
           identifiable={this.state.identifiable}
           onAddLocale={this.toggleModal}
           onSave={this.sendIdentifiable}
