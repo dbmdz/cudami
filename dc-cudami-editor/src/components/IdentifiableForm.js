@@ -6,6 +6,7 @@ import {
 
 import './IdentifiableForm.css';
 import LocaleAdderModal from './modals/LocaleAdderModal';
+import WebpageForm from './WebpageForm';
 import WebsiteForm from './WebsiteForm';
 import {
   getAvailableLocales,
@@ -91,13 +92,16 @@ class IdentifiableForm extends Component {
           activeLocale={this.state.activeLocale}
           identifiable={this.state.identifiable}
           onUpdate={this.updateIdentifiable}
-        />;
+        />;*/
       case 'webpage':
         return <WebpageForm
           activeLocale={this.state.activeLocale}
           identifiable={this.state.identifiable}
+          onAddLocale={this.toggleModal}
+          onSave={this.sendIdentifiable}
+          onToggleLocale={this.toggleLocale}
           onUpdate={this.updateIdentifiable}
-        />;*/
+        />;
       case 'website':
         return <WebsiteForm
           activeLocale={this.state.activeLocale}

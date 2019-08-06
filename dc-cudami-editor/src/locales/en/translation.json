@@ -16,6 +16,7 @@
     },
     "chooseLocale": "Choose a language",
     "description": "Abstract",
+    "editWebpage": "Edit webpage",
     "editWebsite": "Edit website {{ url }}",
     "height": "Height",
     "history": {
@@ -41,6 +42,7 @@
       "underline": "Underline"
     },
     "save": "Save",
+    "text": "Long text",
     "width": "Width"
   }
 }

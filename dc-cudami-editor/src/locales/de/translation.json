@@ -16,6 +16,7 @@
     },
     "chooseLocale": "Sprache auswählen",
     "description": "Kurzbeschreibung",
+    "editWebpage": "Webseite bearbeiten",
     "editWebsite": "Website {{ url }} bearbeiten",
     "height": "Höhe",
     "history": {
@@ -41,6 +42,7 @@
       "underline": "Unterstrichen"
     },
     "save": "Speichern",
+    "text": "Langtext",
     "width": "Breite"
   }
 }
