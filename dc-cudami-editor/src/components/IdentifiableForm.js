@@ -5,13 +5,13 @@ import {
 } from 'reactstrap';
 
 import './IdentifiableForm.css';
-import LocaleAdderModal from './modals/LocaleAdderModal';
+import LanguageAdderModal from './modals/LanguageAdderModal';
 import ContentTreeForm from './ContentTreeForm';
 import WebpageForm from './WebpageForm';
 import WebsiteForm from './WebsiteForm';
 import {
-  getAvailableLocales,
-  loadAvailableLocales,
+  getAvailableLanguages,
+  loadAvailableLanguages,
   loadIdentifiable,
   saveIdentifiable,
   updateIdentifiable
@@ -23,56 +23,56 @@ class IdentifiableForm extends Component {
   constructor(props){
     super(props);
     this.state = {
-      activeLocale: props.activeLocale,
-      availableLocales: [],
+      activeLanguage: props.activeLanguage,
+      availableLanguages: [],
       identifiable: null,
       modalsOpen: {
         iframeAdder: false,
-        localeAdder: false
+        languageAdder: false
       }
     };
   }
 
   async componentDidMount(){
     const i18n = initI18n(this.props.uiLocale);
-    const availableLocales = this.props.mockApi ? getAvailableLocales() : await loadAvailableLocales();
+    const availableLanguages = this.props.mockApi ? getAvailableLanguages() : await loadAvailableLanguages();
     const identifiable = await loadIdentifiable(
       this.props.type,
       this.props.uuid
     );
     this.setState({
-      availableLocales: availableLocales.reduce((locales, locale) => {
-        if (!(locale in identifiable.label)) {
-          locales.push({
-            displayName: i18n.t(`languageNames:${locale}`),
-            name: locale
+      availableLanguages: availableLanguages.reduce((languages, language) => {
+        if (!(language in identifiable.label)) {
+          languages.push({
+            displayName: i18n.t(`languageNames:${language}`),
+            name: language
           });
         }
-        return locales;
+        return languages;
       }, []).sort((a, b) => (a.displayName > b.displayName) ? 1 : -1),
       identifiable
     });
   }
 
-  addLocale = (modalName) => {
-    const selectedLocale = this.state.selectedLocale || this.state.availableLocales[0].name;
+  addLanguage = (modalName) => {
+    const selectedLanguage = this.state.selectedLanguage || this.state.availableLanguages[0].name;
     this.setState({
-      activeLocale: selectedLocale,
-      availableLocales: this.state.availableLocales.filter(
-        locale => locale.name !== selectedLocale
+      activeLanguage: selectedLanguage,
+      availableLanguages: this.state.availableLanguages.filter(
+        language => language.name !== selectedLanguage
       ),
       identifiable: {
         ...this.state.identifiable,
         label: {
           ...this.state.identifiable.label,
-          [selectedLocale]: ''
+          [selectedLanguage]: ''
         }
       },
       modalsOpen: {
         ...this.state.modalsOpen,
         [modalName]: !this.state.modalsOpen[modalName]
       },
-      selectedLocale: undefined
+      selectedLanguage: undefined
     });
   }
 
@@ -80,50 +80,50 @@ class IdentifiableForm extends Component {
     switch (this.props.type) {
       /*case 'article':
         return <ArticleForm
-          activeLocale={this.state.activeLocale}
+          activeLanguage={this.state.activeLanguage}
           identifiable={this.state.identifiable}
           onUpdate={this.updateIdentifiable}
         />;
       case 'contentNode':
         return <ContentNodeForm
-          activeLocale={this.state.activeLocale}
+          activeLanguage={this.state.activeLanguage}
           identifiable={this.state.identifiable}
           onUpdate={this.updateIdentifiable}
         />;*/
       case 'contentTree':
         return <ContentTreeForm
-          activeLocale={this.state.activeLocale}
-          canAddLocale={this.state.availableLocales.length > 0}
+          activeLanguage={this.state.activeLanguage}
+          canAddLanguage={this.state.availableLanguages.length > 0}
           identifiable={this.state.identifiable}
-          onAddLocale={this.toggleModal}
+          onAddLanguage={this.toggleModal}
           onSave={this.submitIdentifiable}
-          onToggleLocale={this.toggleLocale}
+          onToggleLanguage={this.toggleLanguage}
           onUpdate={this.updateIdentifiable}
         />;
       /*case 'fileResource':
         return <FileResourceForm
-          activeLocale={this.state.activeLocale}
+          activeLanguage={this.state.activeLanguage}
           identifiable={this.state.identifiable}
           onUpdate={this.updateIdentifiable}
         />;*/
       case 'webpage':
         return <WebpageForm
-          activeLocale={this.state.activeLocale}
-          canAddLocale={this.state.availableLocales.length > 0}
+          activeLanguage={this.state.activeLanguage}
+          canAddLanguage={this.state.availableLanguages.length > 0}
           identifiable={this.state.identifiable}
-          onAddLocale={this.toggleModal}
+          onAddLanguage={this.toggleModal}
           onSave={this.submitIdentifiable}
-          onToggleLocale={this.toggleLocale}
+          onToggleLanguage={this.toggleLanguage}
           onUpdate={this.updateIdentifiable}
         />;
       case 'website':
         return <WebsiteForm
-          activeLocale={this.state.activeLocale}
-          canAddLocale={this.state.availableLocales.length > 0}
+          activeLanguage={this.state.activeLanguage}
+          canAddLanguage={this.state.availableLanguages.length > 0}
           identifiable={this.state.identifiable}
-          onAddLocale={this.toggleModal}
+          onAddLanguage={this.toggleModal}
           onSave={this.submitIdentifiable}
-          onToggleLocale={this.toggleLocale}
+          onToggleLanguage={this.toggleLanguage}
           onUpdate={this.updateIdentifiable}
         />;
       default:
@@ -131,9 +131,9 @@ class IdentifiableForm extends Component {
     }
   }
 
-  setSelectedLocale = (selectedLocale) => {
+  setSelectedLanguage = (selectedLanguage) => {
     this.setState({
-      selectedLocale
+      selectedLanguage
     });
   };
 
@@ -145,9 +145,9 @@ class IdentifiableForm extends Component {
     }
   };
 
-  toggleLocale = (activeLocale) => {
+  toggleLanguage = (activeLanguage) => {
     this.setState({
-      activeLocale
+      activeLanguage
     })
   };
 
@@ -157,7 +157,7 @@ class IdentifiableForm extends Component {
         ...this.state.modalsOpen,
         [name]: !this.state.modalsOpen[name]
       },
-      selectedLocale: undefined
+      selectedLanguage: undefined
     });
   };
 
@@ -186,12 +186,12 @@ class IdentifiableForm extends Component {
             isOpen={this.state.modalsOpen.iframeAdder}
             onToggle={() => this.toggleModal('iframeAdder')}
           />
-          <LocaleAdderModal
-            availableLocales={this.state.availableLocales}
-            isOpen={this.state.modalsOpen.localeAdder}
-            onSelect={this.setSelectedLocale}
-            onSubmit={() => this.addLocale('localeAdder')}
-            onToggle={() => this.toggleModal('localeAdder')}
+          <LanguageAdderModal
+            availableLanguages={this.state.availableLanguages}
+            isOpen={this.state.modalsOpen.languageAdder}
+            onSelect={this.setSelectedLanguage}
+            onSubmit={() => this.addLanguage('languageAdder')}
+            onToggle={() => this.toggleModal('languageAdder')}
           />
         </Container>
       : <></>;

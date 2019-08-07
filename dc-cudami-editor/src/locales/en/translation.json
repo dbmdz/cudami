@@ -3,7 +3,7 @@
     "abort": "Abort",
     "add": "Add",
     "addIframe": "Add iframe",
-    "addLocale": "Add language",
+    "addLanguage": "Add language",
     "blocks": {
       "blockquote": "Add block quote",
       "bulletList": "Change to bulleted list",
@@ -14,7 +14,7 @@
       "orderedList": "Change to numbered list",
       "paragraph": "Change to paragraph"
     },
-    "chooseLocale": "Choose a language",
+    "chooseLanguage": "Choose a language",
     "description": "Abstract",
     "editContentTree": "Edit content tree",
     "editWebpage": "Edit webpage",

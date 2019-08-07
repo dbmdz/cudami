@@ -1,10 +1,10 @@
-export function getAvailableLocales () {
+export function getAvailableLanguages () {
   return ['es', 'fr'];
 }
 
-export async function loadAvailableLocales () {
+export async function loadAvailableLanguages () {
   try {
-    const result = await fetch('/api/locales');
+    const result = await fetch('/api/languages');
     return result.json();
   } catch(err) {
     return [];

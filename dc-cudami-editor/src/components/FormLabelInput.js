@@ -10,9 +10,9 @@ const FormLabelComponent = (props) => {
   const { t } = useTranslation();
   return (
     <FormGroup>
-      <Label className='font-weight-bold' for={'label-' + props.locale}>{t('label')}</Label>
+      <Label className='font-weight-bold' for={'label-' + props.language}>{t('label')}</Label>
       <Input
-        id={'label-' + props.locale}
+        id={'label-' + props.language}
         onChange={props.onUpdate}
         type='text'
         value={props.label}

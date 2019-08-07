@@ -8,14 +8,14 @@ import {
 import FormEditor from './FormEditor';
 import FormLabelInput from './FormLabelInput';
 
-const LocaleTabContent = (props) => {
+const LanguageTabContent = (props) => {
   return (
-    <TabPane tabId={props.locale}>
+    <TabPane tabId={props.language}>
       <Card>
         <CardBody className='bg-light'>
           <FormLabelInput
             label={props.label}
-            locale={props.locale}
+            language={props.language}
             onUpdate={evt => {
               props.onUpdate('label', evt.target.value)
             }}
@@ -36,4 +36,4 @@ const LocaleTabContent = (props) => {
   );
 }
 
-export default LocaleTabContent;
+export default LanguageTabContent;

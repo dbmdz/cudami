@@ -10,9 +10,9 @@ import { useTranslation } from 'react-i18next';
 
 import FormIdInput from './FormIdInput';
 import FormButtons from './FormButtons';
-import LocaleAdder from './LocaleAdder';
-import LocaleTab from './LocaleTab';
-import LocaleTabContent from './LocaleTabContent';
+import LanguageAdder from './LanguageAdder';
+import LanguageTab from './LanguageTab';
+import LanguageTabContent from './LanguageTabContent';
 
 const ContentNodeForm = (props) => {
   const { t } = useTranslation();
@@ -37,25 +37,25 @@ const ContentNodeForm = (props) => {
         <Col sm='12'>
           <FormIdInput id={props.identifiable.uuid} />
           <Nav tabs>
-            {Object.entries(props.identifiable.label).map(([locale]) => <LocaleTab
-              activeLocale={props.activeLocale}
-              key={locale}
-              locale={locale}
-              onClick={(locale => props.onToggleLocale(locale))}
+            {Object.entries(props.identifiable.label).map(([language]) => <LanguageTab
+              activeLanguage={props.activeLanguage}
+              key={language}
+              language={language}
+              onClick={(language => props.onToggleLanguage(language))}
             />)}
-            {props.canAddLocale && <LocaleAdder onClick={props.onAddLocale} />}
+            {props.canAddLanguage && <LanguageAdder onClick={props.onAddLanguage} />}
           </Nav>
-          <TabContent activeTab={props.activeLocale}>
-            {Object.entries(props.identifiable.label).map(([locale, text]) => <LocaleTabContent
-              description={props.identifiable.description[locale]}
-              key={locale}
+          <TabContent activeTab={props.activeLanguage}>
+            {Object.entries(props.identifiable.label).map(([language, text]) => <LanguageTabContent
+              description={props.identifiable.description[language]}
+              key={language}
               label={text}
-              locale={locale}
+              language={language}
               onUpdate={(updateKey, updateValue) => props.onUpdate({
                 ...props.identifiable,
                 [updateKey]: {
                   ...props.identifiable[updateKey],
-                  [locale]: updateValue
+                  [language]: updateValue
                 }
               })}
             />)}

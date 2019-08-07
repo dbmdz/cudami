@@ -5,18 +5,18 @@ import {
 } from 'reactstrap';
 import { useTranslation } from 'react-i18next';
 
-const LocaleTab = (props) => {
+const LanguageTab = (props) => {
   const { t } = useTranslation();
   return (
     <NavItem>
       <NavLink
-        className={props.locale === props.activeLocale ? 'active' : ''}
-        onClick={() => props.onClick(props.locale)}
+        className={props.language === props.activeLanguage ? 'active' : ''}
+        onClick={() => props.onClick(props.language)}
       >
-        {t(`languageNames:${props.locale}`)}
+        {t(`languageNames:${props.language}`)}
       </NavLink>
     </NavItem>
   );
 }
 
-export default LocaleTab;
+export default LanguageTab;

@@ -3,7 +3,7 @@
     "abort": "Abbrechen",
     "add": "Hinzufügen",
     "addIframe": "Iframe hinzufügen",
-    "addLocale": "Sprache hinzufügen",
+    "addLanguage": "Sprache hinzufügen",
     "blocks": {
       "blockquote": "Zitat einfügen",
       "bulletList": "In Aufzählungsliste umwandeln",
@@ -14,7 +14,7 @@
       "orderedList": "In geordnete Liste umwandeln",
       "paragraph": "In Paragraph umwandeln"
     },
-    "chooseLocale": "Sprache auswählen",
+    "chooseLanguage": "Sprache auswählen",
     "description": "Kurzbeschreibung",
     "editContentTree": "Inhaltsbaum bearbeiten",
     "editWebpage": "Webseite bearbeiten",

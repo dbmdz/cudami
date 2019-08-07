@@ -9,17 +9,17 @@ import {
 } from 'reactstrap';
 import { useTranslation } from 'react-i18next';
 
-const LocaleAdderModal = (props) => {
+const LanguageAdderModal = (props) => {
   const { t } = useTranslation();
   return (
     <Modal isOpen={props.isOpen} toggle={props.onToggle}>
-      <ModalHeader toggle={props.onToggle}>{t('chooseLocale')}</ModalHeader>
+      <ModalHeader toggle={props.onToggle}>{t('chooseLanguage')}</ModalHeader>
       <ModalBody>
         <Input
           onChange={(evt) => props.onSelect(evt.target.value)}
           type='select'
         >
-          {props.availableLocales.map(locale => <option key={locale.name} value={locale.name}>{locale.displayName}</option>)}
+          {props.availableLanguages.map(language => <option key={language.name} value={language.name}>{language.displayName}</option>)}
         </Input>
       </ModalBody>
       <ModalFooter>
@@ -29,4 +29,4 @@ const LocaleAdderModal = (props) => {
   );
 };
 
-export default LocaleAdderModal;
+export default LanguageAdderModal;

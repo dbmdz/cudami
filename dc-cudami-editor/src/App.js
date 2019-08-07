@@ -6,7 +6,7 @@ import IdentifiableForm from './components/IdentifiableForm';
 const App = () => {
   return (
     <IdentifiableForm
-      activeLocale="de"
+      activeLanguage="en"
       debug={true}
       mockApi={true}
       type="webpage"

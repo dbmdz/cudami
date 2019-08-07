@@ -7,7 +7,7 @@ import IdentifiableForm from '../components/IdentifiableForm';
 export default function (config) {
   ReactDOM.render(
     <IdentifiableForm
-      activeLocale={config.activeLocale}
+      activeLanguage={config.activeLanguage}
       debug={config.debug}
       type={config.type}
       uiLocale={config.uiLocale}
