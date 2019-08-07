@@ -14,7 +14,7 @@ import LanguageAdder from './LanguageAdder';
 import LanguageTab from './LanguageTab';
 import LanguageTabContent from './LanguageTabContent';
 
-const ContentNodeForm = (props) => {
+const ContentTreeForm = (props) => {
   const { t } = useTranslation();
   return (
     <Form onSubmit={(evt) => evt.preventDefault()}>
@@ -66,4 +66,4 @@ const ContentNodeForm = (props) => {
   )
 };
 
-export default ContentNodeForm;
+export default ContentTreeForm;
