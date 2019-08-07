@@ -37,10 +37,19 @@ class IdentifiableForm extends Component {
   async componentDidMount(){
     const i18n = initI18n(this.props.uiLocale);
     const availableLanguages = this.props.mockApi ? getAvailableLanguages() : await loadAvailableLanguages();
-    const identifiable = await loadIdentifiable(
-      this.props.type,
-      this.props.uuid
+    let identifiable = await loadIdentifiable(
+      this.props.type, this.props.uuid || 'new'
     );
+    if (!identifiable.uuid) {
+      identifiable = {
+        ...identifiable,
+        description: {},
+        label: {
+          [this.state.activeLanguage]: ''
+        },
+        text: ['article', 'webpage'].includes(this.props.type) ? {} : undefined
+      }
+    }
     this.setState({
       availableLanguages: availableLanguages.reduce((languages, language) => {
         if (!(language in identifiable.label)) {
@@ -143,8 +152,8 @@ class IdentifiableForm extends Component {
   };
 
   submitIdentifiable = () => {
-    if (this.state.identifiable.uuid) {
-      updateIdentifiable(this.state.identifiable, this.props.type, this.state.identifiable.uuid);
+    if (this.props.uuid) {
+      updateIdentifiable(this.state.identifiable, this.props.type, this.props.uuid);
     } else {
       saveIdentifiable(this.state.identifiable, this.props.type);
     }

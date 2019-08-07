@@ -22,7 +22,21 @@ export async function loadIdentifiable (type, uuid) {
 };
 
 export async function saveIdentifiable (identifiable, type) {
-
+  try {
+    const response = await fetch(`/api/${type}s/new`, {
+      body: JSON.stringify(identifiable),
+      headers: {
+        'Content-Type': 'application/json',
+        credentials: 'same-origin'
+      },
+      method: 'POST',
+    });
+    if (response.redirected) {
+      window.location.href = response.url;
+    }
+  } catch(err) {
+    console.log('An error occured');
+  }
 };
 
 export async function updateIdentifiable (identifiable, type, uuid) {
