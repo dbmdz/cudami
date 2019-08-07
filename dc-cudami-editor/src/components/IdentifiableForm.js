@@ -6,6 +6,7 @@ import {
 
 import './IdentifiableForm.css';
 import LanguageAdderModal from './modals/LanguageAdderModal';
+import ContentNodeForm from './ContentNodeForm';
 import ContentTreeForm from './ContentTreeForm';
 import WebpageForm from './WebpageForm';
 import WebsiteForm from './WebsiteForm';
@@ -83,13 +84,17 @@ class IdentifiableForm extends Component {
           activeLanguage={this.state.activeLanguage}
           identifiable={this.state.identifiable}
           onUpdate={this.updateIdentifiable}
-        />;
+        />;*/
       case 'contentNode':
         return <ContentNodeForm
           activeLanguage={this.state.activeLanguage}
+          canAddLanguage={this.state.availableLanguages.length > 0}
           identifiable={this.state.identifiable}
+          onAddLanguage={this.toggleModal}
+          onSave={this.submitIdentifiable}
+          onToggleLanguage={this.toggleLanguage}
           onUpdate={this.updateIdentifiable}
-        />;*/
+        />;
       case 'contentTree':
         return <ContentTreeForm
           activeLanguage={this.state.activeLanguage}

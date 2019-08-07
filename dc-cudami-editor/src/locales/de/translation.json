@@ -16,6 +16,7 @@
     },
     "chooseLanguage": "Sprache auswählen",
     "description": "Kurzbeschreibung",
+    "editContentNode": "Inhaltsknoten bearbeiten",
     "editContentTree": "Inhaltsbaum bearbeiten",
     "editWebpage": "Webseite bearbeiten",
     "editWebsite": "Website {{ url }} bearbeiten",

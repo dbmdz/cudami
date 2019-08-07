@@ -16,6 +16,7 @@
     },
     "chooseLanguage": "Choose a language",
     "description": "Abstract",
+    "editContentNode": "Edit content node",
     "editContentTree": "Edit content tree",
     "editWebpage": "Edit webpage",
     "editWebsite": "Edit website {{ url }}",
