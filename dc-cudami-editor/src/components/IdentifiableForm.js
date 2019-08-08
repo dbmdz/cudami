@@ -6,8 +6,10 @@ import {
 
 import './IdentifiableForm.css';
 import LanguageAdderModal from './modals/LanguageAdderModal';
+import ArticleForm from './ArticleForm';
 import ContentNodeForm from './ContentNodeForm';
 import ContentTreeForm from './ContentTreeForm';
+import FileResourceForm from './FileResourceForm';
 import WebpageForm from './WebpageForm';
 import WebsiteForm from './WebsiteForm';
 import {
@@ -88,12 +90,16 @@ class IdentifiableForm extends Component {
 
   getFormComponent(){
     switch (this.props.type) {
-      /*case 'article':
+      case 'article':
         return <ArticleForm
           activeLanguage={this.state.activeLanguage}
+          canAddLanguage={this.state.availableLanguages.length > 0}
           identifiable={this.state.identifiable}
+          onAddLanguage={this.toggleModal}
+          onSubmit={this.submitIdentifiable}
+          onToggleLanguage={this.toggleLanguage}
           onUpdate={this.updateIdentifiable}
-        />;*/
+        />;
       case 'contentNode':
         return <ContentNodeForm
           activeLanguage={this.state.activeLanguage}
@@ -114,12 +120,16 @@ class IdentifiableForm extends Component {
           onToggleLanguage={this.toggleLanguage}
           onUpdate={this.updateIdentifiable}
         />;
-      /*case 'fileResource':
+      case 'fileResource':
         return <FileResourceForm
           activeLanguage={this.state.activeLanguage}
+          canAddLanguage={this.state.availableLanguages.length > 0}
           identifiable={this.state.identifiable}
+          onAddLanguage={this.toggleModal}
+          onSubmit={this.submitIdentifiable}
+          onToggleLanguage={this.toggleLanguage}
           onUpdate={this.updateIdentifiable}
-        />;*/
+        />;
       case 'webpage':
         return <WebpageForm
           activeLanguage={this.state.activeLanguage}
