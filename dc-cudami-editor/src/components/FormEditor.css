@@ -1,3 +1,7 @@
 #cudami-editor iframe.editable {
   border: 5px dashed;
 }
+
+#cudami-editor .border-2 {
+  border-width: 2px !important;
+}
