@@ -13,12 +13,14 @@ const FormButtons = (props) => {
         <Button
           className='mr-1'
           color='secondary'
+          type='button'
         >
           {t('abort')}
         </Button>
         <Button
           color='primary'
           onClick={() => props.onSave()}
+          type='submit'
         >
           {t('save')}
         </Button>
