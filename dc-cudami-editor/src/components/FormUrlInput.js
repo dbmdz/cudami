@@ -9,7 +9,13 @@ const FormUrlInput = (props) => {
   return (
     <FormGroup>
       <Label className='font-weight-bold' for='url'>URL</Label>
-      <Input id='url' name='url' onChange={props.onChange} type='url' value={props.url} />
+      <Input
+        id='url'
+        onChange={props.onChange}
+        required='required'
+        type='url'
+        value={props.url}
+      />
     </FormGroup>
   )
 };
