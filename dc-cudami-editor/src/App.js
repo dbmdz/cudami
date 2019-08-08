@@ -10,7 +10,7 @@ const App = () => {
       debug={true}
       mockApi={true}
       type="webpage"
-      uiLocale="de"
+      uiLocale="en"
       uuid="mock"
     />
   );
