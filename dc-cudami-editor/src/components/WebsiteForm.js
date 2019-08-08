@@ -36,7 +36,7 @@ const WebsiteForm = (props) => {
       </Row>
       <Row>
         <Col sm='12'>
-          <FormIdInput id={props.identifiable.uuid} />
+          {props.identifiable.uuid && <FormIdInput id={props.identifiable.uuid} />}
           <FormUrlInput
             onChange={evt => props.onUpdate({...props.identifiable, url: evt.target.value})}
             url={props.identifiable.url}

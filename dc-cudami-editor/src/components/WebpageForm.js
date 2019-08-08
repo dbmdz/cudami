@@ -36,7 +36,7 @@ const WebpageForm = (props) => {
       </Row>
       <Row>
         <Col sm='12'>
-          <FormIdInput id={props.identifiable.uuid} />
+          {props.identifiable.uuid && <FormIdInput id={props.identifiable.uuid} />}
           <Nav tabs>
             {Object.entries(props.identifiable.label).map(([language]) => <LanguageTab
               activeLanguage={props.activeLanguage}
