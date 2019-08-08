@@ -18,7 +18,10 @@ import LanguageTabContent from './LanguageTabContent';
 const WebpageForm = (props) => {
   const { t } = useTranslation();
   return (
-    <Form onSubmit={evt => evt.preventDefault()}>
+    <Form onSubmit={evt => {
+      evt.preventDefault();
+      props.onSubmit();
+    }}>
       <Row>
         <Col xs='6' sm='9'>
           <h1>
@@ -26,7 +29,7 @@ const WebpageForm = (props) => {
           </h1>
         </Col>
         <Col xs='6' sm='3'>
-          <FormButtons onSave={props.onSave} />
+          <FormButtons />
         </Col>
       </Row>
       <Row>

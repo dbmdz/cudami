@@ -100,7 +100,7 @@ class IdentifiableForm extends Component {
           canAddLanguage={this.state.availableLanguages.length > 0}
           identifiable={this.state.identifiable}
           onAddLanguage={this.toggleModal}
-          onSave={this.submitIdentifiable}
+          onSubmit={this.submitIdentifiable}
           onToggleLanguage={this.toggleLanguage}
           onUpdate={this.updateIdentifiable}
         />;
@@ -110,7 +110,7 @@ class IdentifiableForm extends Component {
           canAddLanguage={this.state.availableLanguages.length > 0}
           identifiable={this.state.identifiable}
           onAddLanguage={this.toggleModal}
-          onSave={this.submitIdentifiable}
+          onSubmit={this.submitIdentifiable}
           onToggleLanguage={this.toggleLanguage}
           onUpdate={this.updateIdentifiable}
         />;
@@ -126,7 +126,7 @@ class IdentifiableForm extends Component {
           canAddLanguage={this.state.availableLanguages.length > 0}
           identifiable={this.state.identifiable}
           onAddLanguage={this.toggleModal}
-          onSave={this.submitIdentifiable}
+          onSubmit={this.submitIdentifiable}
           onToggleLanguage={this.toggleLanguage}
           onUpdate={this.updateIdentifiable}
         />;
@@ -136,7 +136,7 @@ class IdentifiableForm extends Component {
           canAddLanguage={this.state.availableLanguages.length > 0}
           identifiable={this.state.identifiable}
           onAddLanguage={this.toggleModal}
-          onSave={this.submitIdentifiable}
+          onSubmit={this.submitIdentifiable}
           onToggleLanguage={this.toggleLanguage}
           onUpdate={this.updateIdentifiable}
         />;

@@ -19,7 +19,6 @@ const FormButtons = (props) => {
         </Button>
         <Button
           color='primary'
-          onClick={() => props.onSave()}
           type='submit'
         >
           {t('save')}
