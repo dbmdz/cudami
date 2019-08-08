@@ -22,7 +22,7 @@ const WebsiteForm = (props) => {
       <Row>
         <Col xs='6' sm='9'>
           <h1>
-            {t('editWebsite', {url: props.identifiable.url})}
+            {props.identifiable.uuid ? t('editWebsite', {url: props.identifiable.url}) : t('createWebsite')}
           </h1>
         </Col>
         <Col xs='6' sm='3'>

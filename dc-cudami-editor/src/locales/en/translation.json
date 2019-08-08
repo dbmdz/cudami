@@ -15,6 +15,10 @@
       "paragraph": "Change to paragraph"
     },
     "chooseLanguage": "Choose a language",
+    "createContentNode": "Create a new content node",
+    "createContentTree": "Create a new content tree",
+    "createWebpage": "Create a new webpage",
+    "createWebsite": "Create a new website",
     "description": "Abstract",
     "editContentNode": "Edit content node",
     "editContentTree": "Edit content tree",

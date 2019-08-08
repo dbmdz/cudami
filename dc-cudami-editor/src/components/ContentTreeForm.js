@@ -21,7 +21,7 @@ const ContentTreeForm = (props) => {
       <Row>
         <Col xs='6' sm='9'>
           <h1>
-            {t('editContentTree')}
+            {props.identifiable.uuid ? t('editContentTree') : t('createContentTree')}
           </h1>
         </Col>
         <Col xs='6' sm='3'>

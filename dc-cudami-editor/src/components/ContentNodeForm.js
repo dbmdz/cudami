@@ -21,7 +21,7 @@ const ContentNodeForm = (props) => {
       <Row>
         <Col xs='6' sm='9'>
           <h1>
-            {t('editContentNode')}
+            {props.identifiable.uuid ? t('editContentNode') : t('createContentNode')}
           </h1>
         </Col>
         <Col xs='6' sm='3'>

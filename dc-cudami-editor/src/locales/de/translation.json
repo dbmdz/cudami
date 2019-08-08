@@ -15,6 +15,10 @@
       "paragraph": "In Paragraph umwandeln"
     },
     "chooseLanguage": "Sprache auswählen",
+    "createContentNode": "Neuen Inhaltsknoten anlegen",
+    "createContentTree": "Neuen Inhaltsbaum anlegen",
+    "createWebpage": "Neue Webseite anlegen",
+    "createWebsite": "Neue Website anlegen",
     "description": "Kurzbeschreibung",
     "editContentNode": "Inhaltsknoten bearbeiten",
     "editContentTree": "Inhaltsbaum bearbeiten",
