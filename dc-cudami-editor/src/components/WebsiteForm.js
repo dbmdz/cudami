@@ -18,7 +18,7 @@ import LanguageTabContent from './LanguageTabContent';
 const WebsiteForm = (props) => {
   const { t } = useTranslation();
   return (
-    <Form onSubmit={(evt) => evt.preventDefault()}>
+    <Form onSubmit={evt => evt.preventDefault()}>
       <Row>
         <Col xs='6' sm='9'>
           <h1>
