@@ -9,7 +9,7 @@ const FormIdInput = (props) => {
   return (
     <FormGroup>
       <Label className='font-weight-bold' for='id'>ID</Label>
-      <Input id='id' name='id' readOnly='readonly' type='text' defaultValue={props.id} />
+      <Input id='id' name='id' readOnly='readonly' type='text' value={props.id} />
     </FormGroup>
   )
 };
