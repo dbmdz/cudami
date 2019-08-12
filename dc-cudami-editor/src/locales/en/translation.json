@@ -39,6 +39,7 @@
       "image": "Insert image",
       "table": "Insert table"
     },
+    "invalidLabels": "Please fill in the field \"$t(label)\" in the following languages:",
     "label": "Label",
     "marks": {
       "code": "Code style",

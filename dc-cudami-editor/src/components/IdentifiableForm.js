@@ -21,6 +21,7 @@ import {
 } from '../api';
 import initI18n from '../i18n'
 import IFrameAdderModal from './modals/IFrameAdderModal';
+import FormErrors from './FormErrors';
 
 class IdentifiableForm extends Component {
   constructor(props){
@@ -29,6 +30,7 @@ class IdentifiableForm extends Component {
       activeLanguage: props.activeLanguage,
       availableLanguages: [],
       identifiable: null,
+      invalidLanguages: [],
       modalsOpen: {
         iframeAdder: false,
         languageAdder: false
@@ -155,6 +157,23 @@ class IdentifiableForm extends Component {
     }
   }
 
+  isFormValid = () => {
+    let invalidLanguages = [];
+    const label = this.state.identifiable.label;
+    for (let language in label) {
+      if (label[language] === '') {
+        invalidLanguages.push(language);
+      }
+    }
+    if (invalidLanguages.length > 0) {
+      this.setState({
+        invalidLanguages
+      });
+      return false;
+    }
+    return true;
+  };
+
   setSelectedLanguage = (selectedLanguage) => {
     this.setState({
       selectedLanguage
@@ -162,10 +181,12 @@ class IdentifiableForm extends Component {
   };
 
   submitIdentifiable = () => {
-    if (this.props.uuid) {
-      updateIdentifiable(this.state.identifiable, this.props.type, this.props.uuid);
-    } else {
-      saveIdentifiable(this.state.identifiable, this.props.type);
+    if (this.isFormValid()){
+      if (this.props.uuid) {
+        updateIdentifiable(this.state.identifiable, this.props.type, this.props.uuid);
+      } else {
+        saveIdentifiable(this.state.identifiable, this.props.type);
+      }
     }
   };
 
@@ -194,6 +215,7 @@ class IdentifiableForm extends Component {
   render(){
     return this.state.identifiable
       ? <Container id='cudami-editor'>
+          {this.state.invalidLanguages.length > 0 && <FormErrors invalidLanguages={this.state.invalidLanguages} />}
           {this.getFormComponent()}
           {
             this.props.debug &&
