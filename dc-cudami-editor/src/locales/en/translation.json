@@ -2,7 +2,6 @@
   "translation": {
     "abort": "Abort",
     "add": "Add",
-    "addIframe": "Add iframe",
     "addLanguage": "Add language",
     "blocks": {
       "blockquote": "Add block quote",
@@ -39,6 +38,7 @@
       "image": "Insert image",
       "table": "Insert table"
     },
+    "insertLink": "Insert hyperlink",
     "invalidLabels": "Please fill in the field \"$t(label)\" in the following languages:",
     "label": "Label",
     "marks": {
@@ -51,6 +51,8 @@
       "superscript": "Superscript",
       "underline": "Underline"
     },
+    "numberOfColumns": "Number of columns",
+    "numberOfRows": "Number of rows",
     "save": "Save",
     "text": "Long text",
     "width": "Width"

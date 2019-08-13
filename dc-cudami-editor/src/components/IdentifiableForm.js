@@ -5,11 +5,11 @@ import {
 } from 'reactstrap';
 
 import './IdentifiableForm.css';
-import LanguageAdderModal from './modals/LanguageAdderModal';
 import ArticleForm from './ArticleForm';
 import ContentNodeForm from './ContentNodeForm';
 import ContentTreeForm from './ContentTreeForm';
 import FileResourceForm from './FileResourceForm';
+import FormErrors from './FormErrors';
 import WebpageForm from './WebpageForm';
 import WebsiteForm from './WebsiteForm';
 import {
@@ -19,9 +19,11 @@ import {
   saveIdentifiable,
   updateIdentifiable
 } from '../api';
-import initI18n from '../i18n'
 import IFrameAdderModal from './modals/IFrameAdderModal';
-import FormErrors from './FormErrors';
+import LanguageAdderModal from './modals/LanguageAdderModal';
+import LinkAdderModal from './modals/LinkAdderModal';
+import TableAdderModal from './modals/TableAdderModal';
+import initI18n from '../i18n';
 
 class IdentifiableForm extends Component {
   constructor(props){
@@ -33,7 +35,9 @@ class IdentifiableForm extends Component {
       invalidLanguages: [],
       modalsOpen: {
         iframeAdder: false,
-        languageAdder: false
+        languageAdder: false,
+        linkAdder: false,
+        tableAdder: false
       }
     };
   }
@@ -228,6 +232,14 @@ class IdentifiableForm extends Component {
             isOpen={this.state.modalsOpen.languageAdder}
             onClick={language => this.addLanguage(language, 'languageAdder')}
             onToggle={() => this.toggleModal('languageAdder')}
+          />
+          <LinkAdderModal
+            isOpen={this.state.modalsOpen.linkAdder}
+            onToggle={() => this.toggleModal('linkAdder')}
+          />
+          <TableAdderModal
+            isOpen={this.state.modalsOpen.tableAdder}
+            onToggle={() => this.toggleModal('tableAdder')}
           />
         </Container>
       : <></>;

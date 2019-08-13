@@ -101,15 +101,18 @@ export default function (t) {
         enable: state => !state.selection.empty,
         run (state, dispatch) {
           if (markActive(schema.marks.link)(state)) {
-            toggleMark(schema.marks.link)(state, dispatch)
-            return true
+            toggleMark(schema.marks.link)(state, dispatch);
+            return true;
           }
 
-          const href = promptForURL()
-          if (!href) return false
-
-          toggleMark(schema.marks.link, { href })(state, dispatch)
-          // view.focus()
+          const token = subscribe('editor.add-link', (_msg, data) => {
+            if (!data.href) {
+              return false;
+            }
+            toggleMark(schema.marks.link, data)(state, dispatch);
+            unsubscribe(token);
+          });
+          publish('editor.show-link-modal');
         }
       }
     },
@@ -225,27 +228,24 @@ export default function (t) {
         content: icons.table,
         enable: canInsert(schema.nodes.table),
         run: (state, dispatch) => {
-          // const { from } = state.selection
-          let rowCount = window && window.prompt('How many rows?', 2)
-          let colCount = window && window.prompt('How many columns?', 2)
+          const token = subscribe('editor.add-table', (_msg, data) => {
+            let columnCount = data.columns;
+            const cells = []
+            while (columnCount--) {
+              cells.push(schema.nodes.table_cell.createAndFill())
+            }
 
-          const cells = []
-          while (colCount--) {
-            cells.push(schema.nodes.table_cell.createAndFill())
-          }
+            let rowCount = data.rows;
+            const rows = []
+            while (rowCount--) {
+              rows.push(schema.nodes.table_row.createAndFill(null, cells))
+            }
 
-          const rows = []
-          while (rowCount--) {
-            rows.push(schema.nodes.table_row.createAndFill(null, cells))
-          }
-
-          const table = schema.nodes.table.createAndFill(null, rows)
-          dispatch(state.tr.replaceSelectionWith(table))
-
-          // const tr = state.tr.replaceSelectionWith(table)
-          // tr.setSelection(Selection.near(tr.doc.resolve(from)))
-          // dispatch(tr.scrollIntoView())
-          // view.focus()
+            const table = schema.nodes.table.createAndFill(null, rows)
+            dispatch(state.tr.replaceSelectionWith(table))
+            unsubscribe(token);
+          });
+          publish('editor.show-table-modal');
         }
       }
     },

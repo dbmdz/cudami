@@ -41,13 +41,12 @@ class IFrameAdderModal extends Component {
     const { t } = this.props;
     return (
       <Modal isOpen={this.props.isOpen} toggle={this.props.onToggle}>
-        <ModalHeader toggle={this.props.onToggle}>{t('addIframe')}</ModalHeader>
+        <ModalHeader toggle={this.props.onToggle}>{t('insert.iframe')}</ModalHeader>
         <ModalBody>
           <FormGroup>
             <Input
               onChange={evt => this.setState({src: evt.target.value})}
               placeholder='URL'
-              required='required'
               type='text'
               value={this.state.src}
             />
@@ -56,7 +55,6 @@ class IFrameAdderModal extends Component {
             <Input
               onChange={evt => this.setState({width: evt.target.value})}
               placeholder={t('width')}
-              required='required'
               type='text'
               value={this.state.width}
             />
@@ -65,7 +63,6 @@ class IFrameAdderModal extends Component {
             <Input
               onChange={evt => this.setState({height: evt.target.value})}
               placeholder={t('height')}
-              required='required'
               type='text'
               value={this.state.height}
             />

@@ -2,7 +2,6 @@
   "translation": {
     "abort": "Abbrechen",
     "add": "Hinzufügen",
-    "addIframe": "Iframe hinzufügen",
     "addLanguage": "Sprache hinzufügen",
     "blocks": {
       "blockquote": "Zitat einfügen",
@@ -39,6 +38,7 @@
       "image": "Bild einfügen",
       "table": "Tabelle einfügen"
     },
+    "insertLink": "Verlinkung einfügen",
     "invalidLabels": "Bitte füllen Sie in den folgenden Sprachen das Feld \"$t(label)\" noch aus):",
     "label": "Titel",
     "marks": {
@@ -51,6 +51,8 @@
       "superscript": "Hochgestellt",
       "underline": "Unterstrichen"
     },
+    "numberOfColumns": "Anzahl an Spalten",
+    "numberOfRows": "Anzahl an Zeilen",
     "save": "Speichern",
     "text": "Langtext",
     "width": "Breite"
