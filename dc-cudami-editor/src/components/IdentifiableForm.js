@@ -68,25 +68,23 @@ class IdentifiableForm extends Component {
     });
   }
 
-  addLanguage = (modalName) => {
-    const selectedLanguage = this.state.selectedLanguage || this.state.availableLanguages[0].name;
+  addLanguage = (selectedLanguage, modalName) => {
     this.setState({
-      activeLanguage: selectedLanguage,
+      activeLanguage: selectedLanguage.name,
       availableLanguages: this.state.availableLanguages.filter(
-        language => language.name !== selectedLanguage
+        language => language.name !== selectedLanguage.name
       ),
       identifiable: {
         ...this.state.identifiable,
         label: {
           ...this.state.identifiable.label,
-          [selectedLanguage]: ''
+          [selectedLanguage.name]: ''
         }
       },
       modalsOpen: {
         ...this.state.modalsOpen,
         [modalName]: !this.state.modalsOpen[modalName]
-      },
-      selectedLanguage: undefined
+      }
     });
   }
 
@@ -174,12 +172,6 @@ class IdentifiableForm extends Component {
     return true;
   };
 
-  setSelectedLanguage = (selectedLanguage) => {
-    this.setState({
-      selectedLanguage
-    });
-  };
-
   submitIdentifiable = () => {
     if (this.isFormValid()){
       if (this.props.uuid) {
@@ -201,8 +193,7 @@ class IdentifiableForm extends Component {
       modalsOpen: {
         ...this.state.modalsOpen,
         [name]: !this.state.modalsOpen[name]
-      },
-      selectedLanguage: undefined
+      }
     });
   };
 
@@ -235,8 +226,7 @@ class IdentifiableForm extends Component {
           <LanguageAdderModal
             availableLanguages={this.state.availableLanguages}
             isOpen={this.state.modalsOpen.languageAdder}
-            onSelect={this.setSelectedLanguage}
-            onSubmit={() => this.addLanguage('languageAdder')}
+            onClick={language => this.addLanguage(language, 'languageAdder')}
             onToggle={() => this.toggleModal('languageAdder')}
           />
         </Container>
