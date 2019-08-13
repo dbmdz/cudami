@@ -10,7 +10,7 @@ const FormErrors = (props) => {
     <Alert color="danger">
       {t('invalidLabels')}
       <ul className="mb-0">
-        {props.invalidLanguages.map(language => <li>{t(`languageNames:${language}`)}</li>)}
+        {props.invalidLanguages.map(language => <li key={language}>{t(`languageNames:${language}`)}</li>)}
       </ul>
     </Alert>
   )
