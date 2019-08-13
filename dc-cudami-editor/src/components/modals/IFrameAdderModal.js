@@ -61,7 +61,7 @@ class IFrameAdderModal extends Component {
               value={this.state.width}
             />
           </FormGroup>
-          <FormGroup>
+          <FormGroup className="mb-0">
             <Input
               onChange={evt => this.setState({height: evt.target.value})}
               placeholder={t('height')}
