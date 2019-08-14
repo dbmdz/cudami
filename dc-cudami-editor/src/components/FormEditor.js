@@ -10,6 +10,7 @@ import {
 import { withTranslation } from 'react-i18next';
 
 import './FormEditor.css';
+import FormEditorMenu from './FormEditorMenu';
 import {
   menu,
   options
@@ -38,7 +39,7 @@ class FormEditor extends Component {
             }}
             render={({ editor, view }) => (
               <>
-                <MenuBar menu={translatedMenu} view={view} />
+                <FormEditorMenu menu={translatedMenu} view={view} />
 
                 <Floater view={view}>
                   <MenuBar menu={{ marks: translatedMenu.marks }} view={view} />

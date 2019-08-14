@@ -131,20 +131,22 @@ export default function (t) {
         enable: setBlockType(schema.nodes.code_block),
         run: setBlockType(schema.nodes.code_block)
       },
-      h1: {
-        title: t('blocks.h1'),
+      heading: {
+        title: t('blocks.heading'),
         content: icons.heading,
         active: blockActive(schema.nodes.heading, { level: 1 }),
         enable: setBlockType(schema.nodes.heading, { level: 1 }),
-        run: setBlockType(schema.nodes.heading, { level: 1 })
+        children: [
+          {
+            content: t('blocks.headingLevel', { level: 1 }),
+            run: setBlockType(schema.nodes.heading, { level: 1 })
+          },
+          {
+            content: t('blocks.headingLevel', { level: 2 }),
+            run: setBlockType(schema.nodes.heading, { level: 2 })
+          }
+        ]
       },
-      /*h2: {
-        title: 'Change to heading level 2',
-        content: 'H2',
-        active: blockActive(schema.nodes.heading, { level: 2 }),
-        enable: setBlockType(schema.nodes.heading, { level: 2 }),
-        run: setBlockType(schema.nodes.heading, { level: 2 })
-      },*/
       blockquote: {
         title: t('blocks.blockquote'),
         content: icons.blockquote,
