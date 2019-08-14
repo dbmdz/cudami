@@ -9,12 +9,13 @@ import {
 import './FormEditorMenu.css';
 
 const Button = ({ dispatch, fullWidth, item, state }) => {
+  const disabled = item.enable && !item.enable(state);
   return (
     <button
       className={
         classNames({
           active: item.active && item.active(state),
-          disabled: item.enable && !item.enable(state),
+          disabled: disabled,
           "full-width": fullWidth,
           "menu-button": true,
           "text-left": fullWidth
@@ -22,7 +23,7 @@ const Button = ({ dispatch, fullWidth, item, state }) => {
       }
       onClick={evt => {
         evt.preventDefault();
-        if (item.run) {
+        if (!disabled && item.run) {
           item.run(state, dispatch);
         }
       }}
