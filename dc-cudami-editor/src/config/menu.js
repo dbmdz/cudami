@@ -7,14 +7,6 @@ import { publish, subscribe, unsubscribe } from 'pubsub-js'
 import schema from './schema'
 import icons from './icons'
 
-const markActive = type => state => {
-  const { from, $from, to, empty } = state.selection
-
-  return empty
-    ? type.isInSet(state.storedMarks || $from.marks())
-    : state.doc.rangeHasMark(from, to, type)
-}
-
 const blockActive = (type, attrs = {}) => state => {
   const { $from, to, node } = state.selection
 
@@ -37,6 +29,14 @@ const canInsert = type => state => {
   }
 
   return false
+}
+
+const markActive = type => state => {
+  const { from, $from, to, empty } = state.selection
+
+  return empty
+    ? type.isInSet(state.storedMarks || $from.marks())
+    : state.doc.rangeHasMark(from, to, type)
 }
 
 const promptForURL = () => {
