@@ -30,6 +30,10 @@
   color: #ccc;
 }
 
+#cudami-editor .disabled.menu-button {
+  cursor: default;
+}
+
 #cudami-editor .menu-group {
   margin-right: 5px;
 }
