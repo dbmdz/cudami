@@ -31,6 +31,18 @@ const canInsert = type => state => {
   return false
 }
 
+const headingActive = () => state => {
+  let active = false;
+  const levels = [1, 2, 3, 4, 5, 6];
+  for (let level of levels) {
+    if (blockActive(schema.nodes.heading, { level })(state)) {
+      active = true;
+      break;
+    }
+  }
+  return active;
+}
+
 const markActive = type => state => {
   const { from, $from, to, empty } = state.selection
 
@@ -134,15 +146,19 @@ export default function (t) {
       heading: {
         title: t('blocks.heading'),
         content: icons.heading,
-        active: blockActive(schema.nodes.heading, { level: 1 }),
-        enable: setBlockType(schema.nodes.heading, { level: 1 }),
+        active: headingActive(),
+        enable: () => true,
         children: [
           {
+            active: blockActive(schema.nodes.heading, { level: 1 }),
             content: t('blocks.headingLevel', { level: 1 }),
+            enable: setBlockType(schema.nodes.heading, { level: 1 }),
             run: setBlockType(schema.nodes.heading, { level: 1 })
           },
           {
+            active: blockActive(schema.nodes.heading, { level: 2 }),
             content: t('blocks.headingLevel', { level: 2 }),
+            enable: setBlockType(schema.nodes.heading, { level: 2 }),
             run: setBlockType(schema.nodes.heading, { level: 2 })
           }
         ]
