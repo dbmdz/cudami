@@ -30,9 +30,6 @@ import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.MessageSource;
-import org.springframework.context.MessageSourceAware;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,7 +41,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -52,35 +48,23 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  * Controller for resource management pages.
  */
 @Controller
-@SessionAttributes(value = {"fileresource"})
-public class FileResourcesController extends AbstractController implements MessageSourceAware {
+public class FileResourcesController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FileResourcesController.class);
-
-  private MessageSource messageSource;
 
   @Autowired
   LocaleService localeService;
 
   @Autowired
-  CudamiFileResourceService cudamiFileResourceService;
-
-  @Value(value = "${cudami.server.address}")
-  private String cudamiServerAddress;
+  CudamiFileResourceService service;
 
   @Autowired
   ObjectMapper objectMapper;
 
-  @Autowired
-  @Override
-  public void setMessageSource(MessageSource messageSource) {
-    this.messageSource = messageSource;
-  }
-
   @GetMapping("/fileresources")
   public String list(Model model, @PageableDefault(sort = {"label"}, size = 25) Pageable pageable) {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
-    final PageResponse pageResponse = cudamiFileResourceService.find(pageRequest);
+    final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
     model.addAttribute("page", new PageWrapper(page, "/fileresources"));
     return "fileresources/list";
@@ -112,7 +96,7 @@ public class FileResourcesController extends AbstractController implements Messa
           String filename = item.getName();
           stream = item.openStream();
 
-          FileResource fileResource = cudamiFileResourceService.upload(stream, filename, contentType);
+          FileResource fileResource = service.upload(stream, filename, contentType);
           redirectAttributes.addFlashAttribute("message", "You successfully uploaded " + filename + "!");
           redirectAttributes.addFlashAttribute("isNew", true);
           return "redirect:/fileresources/new/metadata/" + fileResource.getUuid().toString();
@@ -133,12 +117,12 @@ public class FileResourcesController extends AbstractController implements Messa
 
   @GetMapping(value = "/fileresources/new/metadata/{uuid}")
   public String metadata(@PathVariable UUID uuid, Model model) {
-    FileResource fileresource = cudamiFileResourceService.get(uuid);
+    FileResource fileresource = service.get(uuid);
     Locale defaultLocale = localeService.getDefaultLocale();
     List<Locale> locales = localeService.getSupportedLocales().stream()
-      .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
-      .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-      .collect(Collectors.toList());
+        .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
+        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+        .collect(Collectors.toList());
 
     model.addAttribute("defaultLocale", defaultLocale);
     model.addAttribute("fileresource", fileresource);
@@ -155,14 +139,14 @@ public class FileResourcesController extends AbstractController implements Messa
 
     try {
       // get object from db
-      FileResource fileResourceDb = cudamiFileResourceService.get(uuid);
+      FileResource fileResourceDb = service.get(uuid);
       // just update the fields, that were editable
       fileResourceDb.setLabel(fileResource.getLabel());
       fileResourceDb.setDescription(fileResource.getDescription());
 
       // TODO update license
       // ...
-      cudamiFileResourceService.update(fileResourceDb);
+      service.update(fileResourceDb);
     } catch (IdentifiableServiceException e) {
       String message = "Cannot save fileresource with uuid=" + uuid + ": " + e;
       LOGGER.error(message, e);
@@ -175,7 +159,7 @@ public class FileResourcesController extends AbstractController implements Messa
       return "fileresources/create_02-metadata";
     }
     status.setComplete();
-    String message = messageSource.getMessage("msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
+    String message = "";//messageSource.getMessage("msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
 //    return "redirect:/fileresources/new/" + fileResourceUuid + "/license";
     return "redirect:/fileresources/" + uuid;
@@ -183,7 +167,7 @@ public class FileResourcesController extends AbstractController implements Messa
 
   @GetMapping(value = "/fileresources/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) {
-    FileResource resource = cudamiFileResourceService.get(uuid);
+    FileResource resource = service.get(uuid);
     model.addAttribute("availableLocales", resource.getLabel().getLocales());
     model.addAttribute("defaultLocale", localeService.getDefaultLocale());
     model.addAttribute("fileresource", resource);
@@ -192,14 +176,14 @@ public class FileResourcesController extends AbstractController implements Messa
 
   @GetMapping(value = "/fileresources/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
-    FileResource fileresource = cudamiFileResourceService.get(uuid);
+    FileResource fileresource = service.get(uuid);
 
     HashSet<Locale> availableLocales = (HashSet<Locale>) fileresource.getLabel().getLocales();
     Set<String> availableLocaleTags = availableLocales.stream().map(Locale::toLanguageTag).collect(Collectors.toSet());
     List<Locale> locales = localeService.getSupportedLocales().stream()
-      .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
-      .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-      .collect(Collectors.toList());
+        .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
+        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
+        .collect(Collectors.toList());
 
     model.addAttribute("fileresource", fileresource);
     model.addAttribute("availableLocales", availableLocales);
@@ -220,12 +204,12 @@ public class FileResourcesController extends AbstractController implements Messa
 
     try {
       // get object from db
-      FileResource fileResourceDb = cudamiFileResourceService.get(pathUuid);
+      FileResource fileResourceDb = service.get(pathUuid);
       // just update the fields, that were editable
       fileResourceDb.setLabel(fileResource.getLabel());
       fileResourceDb.setDescription(fileResource.getDescription());
 
-      cudamiFileResourceService.update(fileResourceDb);
+      service.update(fileResourceDb);
     } catch (IdentifiableServiceException e) {
       String message = "Cannot save fileresource with uuid=" + pathUuid + ": " + e;
       LOGGER.error(message, e);
@@ -237,7 +221,7 @@ public class FileResourcesController extends AbstractController implements Messa
       return "fileresources/edit";
     }
     status.setComplete();
-    String message = messageSource.getMessage("msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
+    String message = ""; //messageSource.getMessage("msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
     return "redirect:/fileresources/" + pathUuid;
   }
