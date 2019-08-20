@@ -31,7 +31,7 @@ class FormEditor extends Component {
     return (
       <>
         <Label className='font-weight-bold'>{t(this.props.type)}</Label>
-        <div className='border border-2'>
+        <div className='text-editor'>
           <Editor
             options={this.editorOptions}
             onChange={doc => {

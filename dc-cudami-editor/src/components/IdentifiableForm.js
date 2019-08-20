@@ -209,7 +209,7 @@ class IdentifiableForm extends Component {
 
   render(){
     return this.state.identifiable
-      ? <Container id='cudami-editor'>
+      ? <Container className='cudami-editor'>
           {this.state.invalidLanguages.length > 0 && <FormErrors invalidLanguages={this.state.invalidLanguages} />}
           {this.getFormComponent()}
           {
