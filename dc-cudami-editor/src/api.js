@@ -12,7 +12,7 @@ export async function loadAvailableLanguages () {
 };
 
 export async function loadIdentifiable (type, uuid) {
-  const url = uuid === 'mock' ? `__mock__/${type}.json` : `/api/${type}s/${uuid}`;
+  const url = uuid === 'mock' ? `__mock__/${type}.json` : `/api/${type.toLowerCase()}s/${uuid}`;
   try {
     const result = await fetch(url);
     return result.json();
@@ -23,7 +23,7 @@ export async function loadIdentifiable (type, uuid) {
 
 export async function saveIdentifiable (identifiable, type) {
   try {
-    const response = await fetch(`/api/${type}s/new`, {
+    const response = await fetch(`/api/${type.toLowerCase()}s/new`, {
       body: JSON.stringify(identifiable),
       headers: {
         'Content-Type': 'application/json',
@@ -41,7 +41,7 @@ export async function saveIdentifiable (identifiable, type) {
 
 export async function updateIdentifiable (identifiable, type, uuid) {
   try {
-    const response = await fetch(`/api/${type}s/${uuid}`, {
+    const response = await fetch(`/api/${type.toLowerCase()}s/${uuid}`, {
       body: JSON.stringify(identifiable),
       headers: {
         'Content-Type': 'application/json',
