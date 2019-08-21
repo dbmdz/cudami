@@ -12,34 +12,33 @@ import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
-import java.util.Comparator;
-import java.util.HashSet;
+import java.net.URI;
 import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.context.MessageSourceAware;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -47,43 +46,110 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  * Controller for webpage management pages.
  */
 @Controller
-@SessionAttributes(value = {"webpage"})
-public class WebpagesController extends AbstractController implements MessageSourceAware {
+public class WebpagesController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpagesController.class);
-
-  private MessageSource messageSource;
 
   @Autowired
   LocaleService localeService;
 
   @Autowired
-  WebpageService webpageService;
-
-  @Override
-  public void setMessageSource(MessageSource messageSource) {
-    this.messageSource = messageSource;
-  }
+  WebpageService service;
 
   @ModelAttribute("menu")
   protected String module() {
     return "webpages";
   }
 
-  @RequestMapping(value = "/webpages/new", method = RequestMethod.GET)
+  @GetMapping("/webpages/new")
   public String create(Model model, @RequestParam("parentType") String parentType, @RequestParam("parentUuid") String parentUuid) {
-    Locale defaultLocale = localeService.getDefaultLocale();
-    List<Locale> locales = localeService.getSupportedLocales().stream()
-      .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
-      .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-      .collect(Collectors.toList());
-
-    model.addAttribute("defaultLocale", defaultLocale);
-    model.addAttribute("locales", locales);
+    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
-    model.addAttribute("webpage", webpageService.create());
     return "webpages/create";
+  }
+
+  @GetMapping("/api/webpages/new")
+  @ResponseBody
+  public Webpage create() {
+    return (Webpage) service.create();
+  }
+
+  @GetMapping("/webpages/{uuid}/edit")
+  public String edit(@PathVariable UUID uuid, Model model) {
+    Webpage webpage = (Webpage) service.get(uuid);
+    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("uuid", webpage.getUuid());
+    return "webpages/edit";
+  }
+
+  @GetMapping("/api/webpages/{uuid}")
+  @ResponseBody
+  public Webpage get(@PathVariable UUID uuid) {
+    return (Webpage) service.get(uuid);
+  }
+
+  @GetMapping("/webpages")
+  public String list(Model model, @PageableDefault(sort = {"email"}, size = 25) Pageable pageable) {
+    final PageRequest pageRequest = PageableConverter.convert(pageable);
+    final PageResponse pageResponse = service.find(pageRequest);
+    Page page = PageConverter.convert(pageResponse, pageRequest);
+    model.addAttribute("page", new PageWrapper(page, "/webpages"));
+    return "webpages/list";
+  }
+
+  @PostMapping("/api/webpages/new")
+  public ResponseEntity save(
+      @RequestBody Webpage webpage,
+      @RequestParam("parentType") String parentType,
+      @RequestParam("parentUuid") UUID parentUuid
+  ) throws IdentifiableServiceException {
+    Webpage webpageDb = null;
+    HttpHeaders headers = new HttpHeaders();
+    try {
+      if (parentType.equals("website")) {
+        webpageDb = service.saveWithParentWebsite(webpage, parentUuid);
+        headers.setLocation(URI.create("/webpages/" + webpageDb.getUuid().toString()));
+      } else if (parentType.equals("webpage")) {
+        webpageDb = service.saveWithParentWebpage(webpage, parentUuid);
+        headers.setLocation(URI.create("/webpages/" + webpageDb.getUuid().toString()));
+      }
+    } catch (Exception e) {
+      if (parentType.equals("website")) {
+        LOGGER.error("Cannot save top-level webpage: ", e);
+      } else if (parentType.equals("webpage")) {
+        LOGGER.error("Cannot save webpage: ", e);
+      }
+      headers.setLocation(URI.create("/webpages/create"));
+    }
+    return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
+  }
+
+  @PutMapping("/api/webpages/{uuid}")
+  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Webpage webpage) throws IdentifiableServiceException {
+    HttpHeaders headers = new HttpHeaders();
+    try {
+      service.update(webpage);
+      headers.setLocation(URI.create("/webpages/" + uuid));
+    } catch (Exception e) {
+      String message = "Cannot save webpage with uuid=" + uuid + ": " + e;
+      LOGGER.error(message, e);
+      headers.setLocation(URI.create("/webpages/" + uuid + "/edit"));
+    }
+    return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
+  }
+
+  @GetMapping("/webpages/{uuid}")
+  public String view(@PathVariable UUID uuid, Model model) {
+    Webpage webpage = (Webpage) service.get(uuid);
+    model.addAttribute("availableLocales", webpage.getLabel().getLocales());
+    model.addAttribute("defaultLocale", localeService.getDefaultLocale());
+    model.addAttribute("webpage", webpage);
+
+    LinkedHashSet<FileResource> relatedFileResources = service.getRelatedFileResources(webpage);
+    model.addAttribute("relatedFileResources", relatedFileResources);
+
+    return "webpages/view";
   }
 
   @RequestMapping(value = "/webpages/new", method = RequestMethod.POST)
@@ -97,10 +163,10 @@ public class WebpagesController extends AbstractController implements MessageSou
     Webpage webpageDb = null;
     try {
       if (Objects.equals(parentType, "website")) {
-        webpageDb = webpageService.saveWithParentWebsite(webpage, parentUuid);
+        webpageDb = service.saveWithParentWebsite(webpage, parentUuid);
         LOGGER.info("Successfully saved top-level webpage");
       } else if (Objects.equals(parentType, "webpage")) {
-        webpageDb = webpageService.saveWithParentWebpage(webpage, parentUuid);
+        webpageDb = service.saveWithParentWebpage(webpage, parentUuid);
         LOGGER.info("Successfully saved webpage");
       }
     } catch (Exception e) {
@@ -109,7 +175,7 @@ public class WebpagesController extends AbstractController implements MessageSou
       } else if (Objects.equals(parentType, "webpage")) {
         LOGGER.error("Cannot save webpage: ", e);
       }
-      String message = messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale());
+      String message = ""; //messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale());
       redirectAttributes.addFlashAttribute("error_message", message);
       return "redirect:/websites";
     }
@@ -117,27 +183,9 @@ public class WebpagesController extends AbstractController implements MessageSou
       return "webpages/create";
     }
     status.setComplete();
-    String message = messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
+    String message = ""; //messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
     return "redirect:/webpages/" + webpageDb.getUuid().toString();
-  }
-
-  @RequestMapping(value = "/webpages/{uuid}/edit", method = RequestMethod.GET)
-  public String edit(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
-    Webpage webpage = (Webpage) webpageService.get(uuid);
-
-    HashSet<Locale> availableLocales = (HashSet<Locale>) webpage.getLabel().getLocales();
-    Set<String> availableLocaleTags = availableLocales.stream().map(Locale::toLanguageTag).collect(Collectors.toSet());
-    List<Locale> locales = localeService.getSupportedLocales().stream()
-      .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
-      .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-      .collect(Collectors.toList());
-
-    model.addAttribute("webpage", webpage);
-    model.addAttribute("availableLocales", availableLocales);
-    model.addAttribute("locales", locales);
-
-    return "webpages/edit";
   }
 
   @RequestMapping(value = "/webpages/{pathUuid}/edit", method = RequestMethod.POST)
@@ -149,13 +197,13 @@ public class WebpagesController extends AbstractController implements MessageSou
 
     try {
       // get webpage from db
-      Webpage webpageDb = (Webpage) webpageService.get(pathUuid);
+      Webpage webpageDb = (Webpage) service.get(pathUuid);
       // just update the fields, that were editable
       webpageDb.setLabel(webpage.getLabel());
       webpageDb.setDescription(webpage.getDescription());
       webpageDb.setText(webpage.getText());
 
-      webpageService.update(webpageDb);
+      service.update(webpageDb);
     } catch (IdentifiableServiceException e) {
       String message = "Cannot save webpage with uuid=" + pathUuid + ": " + e;
       LOGGER.error(message, e);
@@ -167,39 +215,9 @@ public class WebpagesController extends AbstractController implements MessageSou
       return "webpages/edit";
     }
     status.setComplete();
-    String message = messageSource.getMessage("msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
+    String message = ""; //messageSource.getMessage("msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
     return "redirect:/webpages/" + pathUuid;
   }
 
-  @RequestMapping(value = "/webpages", method = RequestMethod.GET)
-  public String list(Model model, @PageableDefault(sort = {"email"}, size = 25) Pageable pageable) {
-    final PageRequest pageRequest = PageableConverter.convert(pageable);
-    final PageResponse pageResponse = webpageService.find(pageRequest);
-    Page page = PageConverter.convert(pageResponse, pageRequest);
-    model.addAttribute("page", new PageWrapper(page, "/webpages"));
-    return "webpages/list";
-  }
-
-  @RequestMapping(value = "/webpages/{uuid}", method = RequestMethod.GET)
-  public String view(@PathVariable UUID uuid, Model model) {
-    Webpage webpage = (Webpage) webpageService.get(uuid);
-    model.addAttribute("availableLocales", webpage.getLabel().getLocales());
-    model.addAttribute("defaultLocale", localeService.getDefaultLocale());
-    model.addAttribute("webpage", webpage);
-
-    LinkedHashSet<FileResource> relatedFileResources = webpageService.getRelatedFileResources(webpage);
-    model.addAttribute("relatedFileResources", relatedFileResources);
-
-    return "webpages/view";
-  }
-
-//  @RequestMapping(value = "/webpages/{uuid}/identifiables", method = RequestMethod.POST)
-//  public String addIdentifiable(@PathVariable UUID uuid, @RequestParam(name = "identifiableUuid") UUID identifiableUuid, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
-//    webpageService.addIdentifiable(uuid, identifiableUuid);
-//    return "redirect:/webpages/" + uuid;
-//  }
-  public void setWebpageService(WebpageService webpageService) {
-    this.webpageService = webpageService;
-  }
 }

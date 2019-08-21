@@ -21,9 +21,13 @@ export async function loadIdentifiable (type, uuid) {
   }
 };
 
-export async function saveIdentifiable (identifiable, type) {
+export async function saveIdentifiable (identifiable, parentType, parentUuid, type) {
   try {
-    const response = await fetch(`/api/${type.toLowerCase()}s/new`, {
+    let url = `/api/${type.toLowerCase()}s/new`;
+    if (parentType && parentUuid) {
+      url = `${url}?parentType=${parentType}&parentUuid=${parentUuid}`
+    }
+    const response = await fetch(url, {
       body: JSON.stringify(identifiable),
       headers: {
         'Content-Type': 'application/json',

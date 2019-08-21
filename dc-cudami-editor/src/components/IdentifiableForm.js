@@ -179,9 +179,18 @@ class IdentifiableForm extends Component {
   submitIdentifiable = () => {
     if (this.isFormValid()){
       if (this.props.uuid) {
-        updateIdentifiable(this.state.identifiable, this.props.type, this.props.uuid);
+        updateIdentifiable(
+          this.state.identifiable,
+          this.props.type,
+          this.props.uuid
+        );
       } else {
-        saveIdentifiable(this.state.identifiable, this.props.type);
+        saveIdentifiable(
+          this.state.identifiable,
+          this.props.parentType,
+          this.props.parentUuid,
+          this.props.type
+        );
       }
     }
   };

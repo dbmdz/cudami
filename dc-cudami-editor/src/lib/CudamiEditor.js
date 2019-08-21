@@ -9,6 +9,8 @@ export default function (config) {
     <IdentifiableForm
       activeLanguage={config.activeLanguage}
       debug={config.debug}
+      parentType={config.parentType}
+      parentUuid={config.parentUuid}
       type={config.type}
       uiLocale={config.uiLocale}
       uuid={config.uuid}
