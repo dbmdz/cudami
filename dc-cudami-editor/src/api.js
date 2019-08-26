@@ -43,9 +43,9 @@ export async function saveIdentifiable (identifiable, parentType, parentUuid, ty
   }
 };
 
-export async function updateIdentifiable (identifiable, type, uuid) {
+export async function updateIdentifiable (identifiable, type) {
   try {
-    const response = await fetch(`/api/${type.toLowerCase()}s/${uuid}`, {
+    const response = await fetch(`/api/${type.toLowerCase()}s/${identifiable.uuid}`, {
       body: JSON.stringify(identifiable),
       headers: {
         'Content-Type': 'application/json',
