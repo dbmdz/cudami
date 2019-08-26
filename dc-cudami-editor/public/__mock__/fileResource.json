@@ -32,6 +32,8 @@
     }
   },
   "filename": "my-first-file-resource.txt",
+  "filenameExtension": "txt",
+  "fileresourceType":"fileresource",
   "identifiers": [],
   "label": {
     "de": "Meine erste Datei",
@@ -39,6 +41,9 @@
   },
   "lastModified": "2019-08-05T16:54:29.711332",
   "mimeType": "text/plain",
+  "readonly": false,
+  "sizeInBytes": 12345,
   "type": "RESOURCE",
-  "uuid": "c49e862e-b6cc-4540-a295-7bd5aea9025d"
+  "uuid": "c49e862e-b6cc-4540-a295-7bd5aea9025d",
+  "uri": "file:///foo/bar.txt"
 }
