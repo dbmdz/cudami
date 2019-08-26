@@ -5,7 +5,7 @@ import {
 } from 'reactstrap';
 import { useTranslation } from 'react-i18next';
 
-const FormButtons = (props) => {
+const FormButtons = () => {
   const { t } = useTranslation();
   return (
     <div className='float-right'>
