@@ -96,7 +96,7 @@ public class ContentTreesController extends AbstractController {
       headers.setLocation(URI.create("/contenttrees/" + contentTreeDb.getUuid().toString()));
     } catch (Exception e) {
       LOGGER.error("Cannot save content tree: ", e);
-      headers.setLocation(URI.create("/contenttrees/create"));
+      headers.setLocation(URI.create("/contenttrees/new"));
     }
     return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }

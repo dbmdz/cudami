@@ -120,7 +120,7 @@ public class WebpagesController extends AbstractController {
       } else if (parentType.equals("webpage")) {
         LOGGER.error("Cannot save webpage: ", e);
       }
-      headers.setLocation(URI.create("/webpages/create"));
+      headers.setLocation(URI.create("/webpages/new"));
     }
     return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }

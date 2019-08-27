@@ -96,7 +96,7 @@ public class ArticlesController extends AbstractController {
       headers.setLocation(URI.create("/articles/" + articleDb.getUuid().toString()));
     } catch (Exception e) {
       LOGGER.error("Cannot save article: ", e);
-      headers.setLocation(URI.create("/articles/create"));
+      headers.setLocation(URI.create("/articles/new"));
     }
     return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }

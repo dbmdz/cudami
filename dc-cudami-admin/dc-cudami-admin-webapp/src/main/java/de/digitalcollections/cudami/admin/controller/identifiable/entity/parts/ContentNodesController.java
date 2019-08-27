@@ -112,7 +112,7 @@ public class ContentNodesController extends AbstractController {
       } else if (parentType.equals("contentNode")) {
         LOGGER.error("Cannot save content node: ", e);
       }
-      headers.setLocation(URI.create("/contentnodes/create"));
+      headers.setLocation(URI.create("/contentnodes/new"));
     }
     return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }

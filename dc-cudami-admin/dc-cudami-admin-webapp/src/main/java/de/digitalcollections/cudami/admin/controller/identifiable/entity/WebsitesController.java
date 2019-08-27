@@ -96,7 +96,7 @@ public class WebsitesController extends AbstractController {
       headers.setLocation(URI.create("/websites/" + websiteDb.getUuid().toString()));
     } catch (Exception e) {
       LOGGER.error("Cannot save website: ", e);
-      headers.setLocation(URI.create("/websites/create"));
+      headers.setLocation(URI.create("/websites/new"));
     }
     return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }
