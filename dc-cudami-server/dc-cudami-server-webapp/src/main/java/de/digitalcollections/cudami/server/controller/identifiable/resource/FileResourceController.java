@@ -12,6 +12,7 @@ import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.paging.enums.Direction;
 import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
+import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
@@ -179,7 +180,8 @@ public class FileResourceController {
           LOGGER.info("filename = " + fileResource.getFilename());
 
           // set label to originalfilename for now. can be changed in next step of user input
-          fileResource.setLabel(new LocalizedTextImpl(localeService.getDefaultLocale(), originalFilename));
+          fileResource.setDescription(new LocalizedStructuredContentImpl());
+          fileResource.setLabel(new LocalizedTextImpl(new Locale(localeService.getDefaultLanguage()), originalFilename));
 
           fileResource = fileResourceService.save(fileResource, stream);
           LOGGER.info("saved file '" + fileResource.getUri().toString() + "' (" + fileResource.getSizeInBytes() + " bytes)");

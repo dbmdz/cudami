@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.resource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
@@ -11,18 +10,11 @@ import de.digitalcollections.cudami.admin.business.api.service.identifiable.reso
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.net.URI;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import org.apache.tomcat.util.http.fileupload.FileItemIterator;
 import org.apache.tomcat.util.http.fileupload.FileItemStream;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
@@ -30,18 +22,21 @@ import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
@@ -58,8 +53,37 @@ public class FileResourcesController extends AbstractController {
   @Autowired
   CudamiFileResourceService service;
 
-  @Autowired
-  ObjectMapper objectMapper;
+  @ModelAttribute("menu")
+  protected String module() {
+    return "fileresources";
+  }
+
+  @GetMapping(value = "/fileresources/new")
+  public String create(Model model) {
+    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    return "fileresources/create";
+  }
+
+  @GetMapping("/api/fileresources/new")
+  @ResponseBody
+  public FileResource create() {
+    return service.create();
+  }
+
+  @GetMapping("/fileresources/{uuid}/edit")
+  public String edit(@PathVariable UUID uuid, Model model) {
+    FileResource fileResource = service.get(uuid);
+    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("filename", fileResource.getFilename());
+    model.addAttribute("uuid", fileResource.getUuid());
+    return "fileresources/edit";
+  }
+
+  @GetMapping("/api/fileresources/{uuid}")
+  @ResponseBody
+  public FileResource get(@PathVariable UUID uuid) {
+    return service.get(uuid);
+  }
 
   @GetMapping("/fileresources")
   public String list(Model model, @PageableDefault(sort = {"label"}, size = 25) Pageable pageable) {
@@ -70,20 +94,47 @@ public class FileResourcesController extends AbstractController {
     return "fileresources/list";
   }
 
-  @GetMapping(value = "/fileresources/new")
-  public String create(Model model) {
-    return "fileresources/create_01-binary";
+  @PostMapping("/api/fileresources/new")
+  public ResponseEntity save(@RequestBody FileResource fileResource) throws IdentifiableServiceException {
+    FileResource fileResourceDb = null;
+    HttpHeaders headers = new HttpHeaders();
+    try {
+      fileResourceDb = service.save(fileResource);
+      headers.setLocation(URI.create("/fileresources/" + fileResourceDb.getUuid().toString()));
+    } catch (Exception e) {
+      LOGGER.error("Cannot save fileresource: ", e);
+      headers.setLocation(URI.create("/fileresources/new"));
+    }
+    return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }
 
-  // FIXME: add proper error and validation handling (using results and feedbackmessages instead "message" flash attribute)
-  @PostMapping("/fileresources/new/upload")
-  public String upload(HttpServletRequest request, RedirectAttributes redirectAttributes) throws InterruptedException, IOException {
+  @PutMapping("/api/fileresources/{uuid}")
+  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody FileResource fileResource) throws IdentifiableServiceException {
+    HttpHeaders headers = new HttpHeaders();
+    try {
+      // get object from db
+      FileResource fileResourceDb = service.get(uuid);
+      // just update the fields, that were editable
+      fileResourceDb.setLabel(fileResource.getLabel());
+      fileResourceDb.setDescription(fileResource.getDescription());
+      service.update(fileResourceDb);
+      headers.setLocation(URI.create("/fileresources/" + uuid));
+    } catch (Exception e) {
+      String message = "Cannot save fileresource with uuid=" + uuid + ": " + e;
+      LOGGER.error(message, e);
+      headers.setLocation(URI.create("/fileresources/" + uuid + "/edit"));
+    }
+    return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
+  }
 
+  @PostMapping("/api/fileresources/new/upload")
+  @ResponseBody
+  public FileResource upload(HttpServletRequest request, RedirectAttributes redirectAttributes) throws InterruptedException, IOException {
     boolean isMultipart = ServletFileUpload.isMultipartContent(request);
     if (!isMultipart) {
       // Inform user about invalid request
       redirectAttributes.addFlashAttribute("message", "Invalid file resource!");
-      return "redirect:/fileresources";
+      return null;
     }
     InputStream stream = null;
     try {
@@ -97,72 +148,20 @@ public class FileResourcesController extends AbstractController {
           stream = item.openStream();
 
           FileResource fileResource = service.upload(stream, filename, contentType);
-          redirectAttributes.addFlashAttribute("message", "You successfully uploaded " + filename + "!");
-          redirectAttributes.addFlashAttribute("isNew", true);
-          return "redirect:/fileresources/new/metadata/" + fileResource.getUuid().toString();
+          return fileResource;
         }
       }
     } catch (IOException | FileUploadException e) {
       LOGGER.error("Error saving uploaded file data", e);
       redirectAttributes.addFlashAttribute("message", "Error saving file resource!");
-      return "redirect:/fileresources";
+      return null;
     } finally {
       if (stream != null) {
         stream.close();
       }
     }
-    redirectAttributes.addFlashAttribute("message", "Invalid file resource!");
-    return "redirect:/fileresources";
-  }
-
-  @GetMapping(value = "/fileresources/new/metadata/{uuid}")
-  public String metadata(@PathVariable UUID uuid, Model model) {
-    FileResource fileresource = service.get(uuid);
-    Locale defaultLocale = localeService.getDefaultLocale();
-    List<Locale> locales = localeService.getSupportedLocales().stream()
-        .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
-        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-        .collect(Collectors.toList());
-
-    model.addAttribute("defaultLocale", defaultLocale);
-    model.addAttribute("fileresource", fileresource);
-    model.addAttribute("locales", locales);
-    return "fileresources/create_02-metadata";
-  }
-
-  @PostMapping(value = "/fileresources/new/metadata/{uuid}")
-  public String metadata(@PathVariable UUID uuid, @ModelAttribute @Valid FileResourceImpl fileResource, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
-    verifyBinding(results);
-    if (results.hasErrors()) {
-      return "fileresources/create_02-metadata";
-    }
-
-    try {
-      // get object from db
-      FileResource fileResourceDb = service.get(uuid);
-      // just update the fields, that were editable
-      fileResourceDb.setLabel(fileResource.getLabel());
-      fileResourceDb.setDescription(fileResource.getDescription());
-
-      // TODO update license
-      // ...
-      service.update(fileResourceDb);
-    } catch (IdentifiableServiceException e) {
-      String message = "Cannot save fileresource with uuid=" + uuid + ": " + e;
-      LOGGER.error(message, e);
-      redirectAttributes.addFlashAttribute("error_message", message);
-      redirectAttributes.addFlashAttribute("isNew", true);
-      return "redirect:/fileresources/" + uuid + "/edit";
-    }
-
-    if (results.hasErrors()) {
-      return "fileresources/create_02-metadata";
-    }
-    status.setComplete();
-    String message = "";//messageSource.getMessage("msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
-    redirectAttributes.addFlashAttribute("success_message", message);
-//    return "redirect:/fileresources/new/" + fileResourceUuid + "/license";
-    return "redirect:/fileresources/" + uuid;
+    LOGGER.warn("Invalid file resource!");
+    return null;
   }
 
   @GetMapping(value = "/fileresources/{uuid}")
@@ -172,57 +171,5 @@ public class FileResourcesController extends AbstractController {
     model.addAttribute("defaultLocale", localeService.getDefaultLocale());
     model.addAttribute("fileresource", resource);
     return "fileresources/view";
-  }
-
-  @GetMapping(value = "/fileresources/{uuid}/edit")
-  public String edit(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
-    FileResource fileresource = service.get(uuid);
-
-    HashSet<Locale> availableLocales = (HashSet<Locale>) fileresource.getLabel().getLocales();
-    Set<String> availableLocaleTags = availableLocales.stream().map(Locale::toLanguageTag).collect(Collectors.toSet());
-    List<Locale> locales = localeService.getSupportedLocales().stream()
-        .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
-        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-        .collect(Collectors.toList());
-
-    model.addAttribute("fileresource", fileresource);
-    model.addAttribute("availableLocales", availableLocales);
-    model.addAttribute("locales", locales);
-    if (redirectAttributes.containsAttribute("isNew")) {
-      return "fileresources/create_02-metadata";
-    } else {
-      return "fileresources/edit";
-    }
-  }
-
-  @PostMapping(value = "/fileresources/{pathUuid}/edit")
-  public String edit(@PathVariable UUID pathUuid, @ModelAttribute @Valid FileResourceImpl fileResource, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
-    verifyBinding(results);
-    if (results.hasErrors()) {
-      return "fileresources/edit";
-    }
-
-    try {
-      // get object from db
-      FileResource fileResourceDb = service.get(pathUuid);
-      // just update the fields, that were editable
-      fileResourceDb.setLabel(fileResource.getLabel());
-      fileResourceDb.setDescription(fileResource.getDescription());
-
-      service.update(fileResourceDb);
-    } catch (IdentifiableServiceException e) {
-      String message = "Cannot save fileresource with uuid=" + pathUuid + ": " + e;
-      LOGGER.error(message, e);
-      redirectAttributes.addFlashAttribute("error_message", message);
-      return "redirect:/fileresources/" + pathUuid + "/edit";
-    }
-
-    if (results.hasErrors()) {
-      return "fileresources/edit";
-    }
-    status.setComplete();
-    String message = ""; //messageSource.getMessage("msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
-    redirectAttributes.addFlashAttribute("success_message", message);
-    return "redirect:/fileresources/" + pathUuid;
   }
 }

@@ -14,6 +14,7 @@
       "orderedList": "Change to numbered list",
       "paragraph": "Change to paragraph"
     },
+    "chooseFile": "Choose file",
     "chooseLanguage": "Choose a language",
     "createArticle": "Create a new article",
     "createContentNode": "Create a new content node",
@@ -27,6 +28,7 @@
     "editFileResource": "Edit file \"{{ name }}\"",
     "editWebpage": "Edit webpage",
     "editWebsite": "Edit website {{ url }}",
+    "file": "File",
     "height": "Height",
     "history": {
       "redo": "Redo last undone change",
@@ -52,10 +54,12 @@
       "superscript": "Superscript",
       "underline": "Underline"
     },
+    "next": "Next",
     "numberOfColumns": "Number of columns",
     "numberOfRows": "Number of rows",
     "save": "Save",
     "text": "Long text",
+    "uploadFileResource": "Upload a new file",
     "width": "Width"
   }
 }

@@ -5,7 +5,7 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:text="|#{fileresources}: #{fileresources_edit(${filename})}|">Files: Edit file "abc"</title>
+    <title th:text="|#{fileresources}: #{fileresources_create}|">Files: Upload a new file</title>
   </head>
   <body>
     <section layout:fragment="content">
@@ -14,10 +14,10 @@
       <script th:inline="javascript">
         CudamiEditor({
           activeLanguage: /*[[${activeLanguage}]]*/,
+          debug: true,
           id: "editor",
           type: "fileResource",
-          uiLocale: /*[[${#locale.language}]]*/,
-          uuid: /*[[${uuid}]]*/
+          uiLocale: /*[[${#locale.language}]]*/
         });
       </script>
     </section>

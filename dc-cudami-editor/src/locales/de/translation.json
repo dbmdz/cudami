@@ -14,6 +14,7 @@
       "orderedList": "In geordnete Liste umwandeln",
       "paragraph": "In Paragraph umwandeln"
     },
+    "chooseFile": "Datei auswählen",
     "chooseLanguage": "Sprache auswählen",
     "createArticle": "Neuen Artikel anlegen",
     "createContentNode": "Neuen Inhaltsknoten anlegen",
@@ -27,6 +28,7 @@
     "editFileResource": "Datei \"{{ name }}\" bearbeiten",
     "editWebpage": "Webseite bearbeiten",
     "editWebsite": "Website {{ url }} bearbeiten",
+    "file": "Datei",
     "height": "Höhe",
     "history": {
       "redo": "Letzte rückgängig gemachte Änderung wiederholen",
@@ -52,10 +54,12 @@
       "superscript": "Hochgestellt",
       "underline": "Unterstrichen"
     },
+    "next": "Weiter",
     "numberOfColumns": "Anzahl an Spalten",
     "numberOfRows": "Anzahl an Zeilen",
     "save": "Speichern",
     "text": "Langtext",
+    "uploadFileResource": "Neue Datei hochladen",
     "width": "Breite"
   }
 }

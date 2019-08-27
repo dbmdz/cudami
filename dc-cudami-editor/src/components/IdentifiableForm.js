@@ -133,6 +133,7 @@ class IdentifiableForm extends Component {
           onSubmit={this.submitIdentifiable}
           onToggleLanguage={this.toggleLanguage}
           onUpdate={this.updateIdentifiable}
+          type={this.props.type}
         />;
       case 'webpage':
         return <WebpageForm
