@@ -60,3 +60,26 @@ export async function updateIdentifiable (identifiable, type) {
     console.log('An error occured');
   }
 };
+
+export async function uploadFile (file, type, updateProgress) {
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.onerror = () => reject(request.statusText);
+    request.onload = () => {
+      if (request.status >= 200 && request.status < 300) {
+        resolve(request.response);
+      } else {
+        reject(request.statusText);
+      }
+    }
+    request.upload.addEventListener('progress', evt => {
+      if (evt.lengthComputable) {
+        updateProgress(Math.round((evt.loaded / evt.total) * 100));
+      }
+    });
+    request.open('POST', `/api/${type.toLowerCase()}s/new/upload`, true);
+    const formData = new FormData();
+    formData.append('userfile', file, file.name);
+    request.send(formData);
+  });
+};
