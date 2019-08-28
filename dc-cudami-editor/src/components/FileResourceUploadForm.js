@@ -35,15 +35,14 @@ class FileResourceUploadForm extends Component {
   render(){
     const { t } = this.props;
     return (
-      <Form onSubmit={evt => {
+      <Form onSubmit={async (evt) => {
         evt.preventDefault();
-        uploadFile(
+        const responseJson = await uploadFile(
           this.state.file,
           this.props.type,
           this.updateProgress
-        ).then(json => {
-          this.props.onUpdate(JSON.parse(json));
-        });
+        );
+        this.props.onUpdate(JSON.parse(responseJson));
       }}>
         <Row>
           <Col xs='6' sm='9'>
