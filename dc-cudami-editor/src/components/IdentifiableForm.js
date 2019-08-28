@@ -93,71 +93,25 @@ class IdentifiableForm extends Component {
   }
 
   getFormComponent(){
-    switch (this.props.type) {
-      case 'article':
-        return <ArticleForm
-          activeLanguage={this.state.activeLanguage}
-          canAddLanguage={this.state.availableLanguages.length > 0}
-          identifiable={this.state.identifiable}
-          onAddLanguage={this.toggleModal}
-          onSubmit={this.submitIdentifiable}
-          onToggleLanguage={this.toggleLanguage}
-          onUpdate={this.updateIdentifiable}
-        />;
-      case 'contentNode':
-        return <ContentNodeForm
-          activeLanguage={this.state.activeLanguage}
-          canAddLanguage={this.state.availableLanguages.length > 0}
-          identifiable={this.state.identifiable}
-          onAddLanguage={this.toggleModal}
-          onSubmit={this.submitIdentifiable}
-          onToggleLanguage={this.toggleLanguage}
-          onUpdate={this.updateIdentifiable}
-        />;
-      case 'contentTree':
-        return <ContentTreeForm
-          activeLanguage={this.state.activeLanguage}
-          canAddLanguage={this.state.availableLanguages.length > 0}
-          identifiable={this.state.identifiable}
-          onAddLanguage={this.toggleModal}
-          onSubmit={this.submitIdentifiable}
-          onToggleLanguage={this.toggleLanguage}
-          onUpdate={this.updateIdentifiable}
-        />;
-      case 'fileResource':
-        return <FileResourceForm
-          activeLanguage={this.state.activeLanguage}
-          canAddLanguage={this.state.availableLanguages.length > 0}
-          identifiable={this.state.identifiable}
-          onAddLanguage={this.toggleModal}
-          onSubmit={this.submitIdentifiable}
-          onToggleLanguage={this.toggleLanguage}
-          onUpdate={this.updateIdentifiable}
-          type={this.props.type}
-        />;
-      case 'webpage':
-        return <WebpageForm
-          activeLanguage={this.state.activeLanguage}
-          canAddLanguage={this.state.availableLanguages.length > 0}
-          identifiable={this.state.identifiable}
-          onAddLanguage={this.toggleModal}
-          onSubmit={this.submitIdentifiable}
-          onToggleLanguage={this.toggleLanguage}
-          onUpdate={this.updateIdentifiable}
-        />;
-      case 'website':
-        return <WebsiteForm
-          activeLanguage={this.state.activeLanguage}
-          canAddLanguage={this.state.availableLanguages.length > 0}
-          identifiable={this.state.identifiable}
-          onAddLanguage={this.toggleModal}
-          onSubmit={this.submitIdentifiable}
-          onToggleLanguage={this.toggleLanguage}
-          onUpdate={this.updateIdentifiable}
-        />;
-      default:
-        return <></>;
-    }
+    const FORM_COMPONENT_MAPPING = {
+      article: ArticleForm,
+      contentNode: ContentNodeForm,
+      contentTree: ContentTreeForm,
+      fileResource: FileResourceForm,
+      webpage: WebpageForm,
+      website: WebsiteForm
+    };
+    const FormComponent = FORM_COMPONENT_MAPPING[this.props.type];
+    return <FormComponent
+      activeLanguage={this.state.activeLanguage}
+      canAddLanguage={this.state.availableLanguages.length > 0}
+      identifiable={this.state.identifiable}
+      onAddLanguage={this.toggleModal}
+      onSubmit={this.submitIdentifiable}
+      onToggleLanguage={this.toggleLanguage}
+      onUpdate={this.updateIdentifiable}
+      type={this.props.type}
+    />;
   }
 
   isFormValid = () => {
