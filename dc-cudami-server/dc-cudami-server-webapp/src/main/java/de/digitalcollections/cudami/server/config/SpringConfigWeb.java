@@ -108,6 +108,11 @@ public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
     return xmlConverter;
   }
 
+  /**
+   * Needed to get rid of all the whitespaces in the rendered thymeleaf HTML
+   *
+   * @return the dialect
+   */
   @Bean
   public AbstractProcessorDialect whiteSpaceNormalizedDialect() {
     return new SpacesDialect();
