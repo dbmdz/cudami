@@ -7,9 +7,13 @@ import java.util.Locale;
 
 public interface CudamiClient extends Client {
 
-  List<Locale> getAllLocales() throws Exception;
+  String getDefaultLanguage() throws Exception;
 
   Locale getDefaultLocale() throws Exception;
+
+  List<String> getSupportedLanguages() throws Exception;
+
+  List<Locale> getSupportedLocales() throws Exception;
 
   Webpage getWebpage(String uuid);
 

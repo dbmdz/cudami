@@ -7,28 +7,41 @@ import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Api(description = "The locale/language controller", name = "Locale controller")
+@Api(description = "The locale/language controller", name = "Locale and language controller")
 public class LocaleController {
 
   @Autowired
   private LocaleService service;
 
-  @ApiMethod(description = "get all supported locales")
-  @RequestMapping(value = {"/latest/locales", "/v2/locales", "/v1/locales"}, method = {RequestMethod.GET})
+  @ApiMethod(description = "get default language")
+  @GetMapping(value = {"/latest/languages/default", "/v2/languages/default"})
   @ApiResponseObject
-  public List<Locale> getAll() {
-    return service.getAll();
+  public Locale getDefaultLanguage() {
+    return new Locale(service.getDefaultLanguage());
   }
 
   @ApiMethod(description = "get default locale")
-  @RequestMapping(value = {"/latest/locales/default", "/v2/locales/default", "/v1/locales/default"}, method = {RequestMethod.GET})
+  @GetMapping(value = {"/latest/locales/default", "/v2/locales/default", "/v1/locales/default"})
   @ApiResponseObject
-  public Locale getDefault() {
-    return service.getDefault();
+  public Locale getDefaultLocale() {
+    return service.getDefaultLocale();
+  }
+
+  @ApiMethod(description = "get all supported languages")
+  @GetMapping(value = {"/latest/languages", "/v2/laguages"})
+  @ApiResponseObject
+  public List<String> getSupportedLanguages() {
+    return service.getSupportedLanguages();
+  }
+
+  @ApiMethod(description = "get all supported locales")
+  @GetMapping(value = {"/latest/locales", "/v2/locales", "/v1/locales"})
+  @ApiResponseObject
+  public List<Locale> getSupportedLocales() {
+    return service.getSupportedLocales();
   }
 }

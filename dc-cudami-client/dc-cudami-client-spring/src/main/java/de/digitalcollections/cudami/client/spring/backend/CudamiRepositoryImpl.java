@@ -21,7 +21,7 @@ public class CudamiRepositoryImpl implements CudamiRepository {
 
   @Override
   public List<Locale> getAllLocales() throws Exception {
-    return cudamiClient.getAllLocales();
+    return cudamiClient.getSupportedLocales();
   }
 
   @Override

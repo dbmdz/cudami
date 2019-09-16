@@ -19,5 +19,6 @@
     <module>dc-cudami-server-backend-api</module>
     <module>dc-cudami-server-backend-inmemory</module>
     <module>dc-cudami-server-backend-jdbi</module>
+    <module>dc-cudami-server-backend-file</module>
   </modules>
 </project>

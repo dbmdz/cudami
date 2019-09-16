@@ -22,16 +22,22 @@ public class LocaleServiceImpl implements LocaleService {
   private LocaleRepository repository;
 
   @Override
-  public List<Locale> getAll() {
-    return repository.findAll();
+  public String getDefaultLanguage() {
+    return repository.getDefaultLanguage();
   }
 
   @Override
-  public Locale getDefault() {
-    return repository.getDefault();
+  public Locale getDefaultLocale() {
+    return repository.getDefaultLocale();
   }
 
-  public void setWebsiteRepository(LocaleRepository localeRepository) {
-    this.repository = localeRepository;
+  @Override
+  public List<String> getSupportedLanguages() {
+    return repository.findAllLanguages();
+  }
+
+  @Override
+  public List<Locale> getSupportedLocales() {
+    return repository.findAllLocales();
   }
 }

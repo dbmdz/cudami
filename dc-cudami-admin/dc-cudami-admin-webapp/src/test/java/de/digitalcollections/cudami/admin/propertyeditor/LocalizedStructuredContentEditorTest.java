@@ -75,7 +75,7 @@ public class LocalizedStructuredContentEditorTest implements InitializingBean {
     documentEditor.setAsText(json);
 
     LocalizedStructuredContentImpl result = (LocalizedStructuredContentImpl) documentEditor.getValue();
-    assertThat(result.getLocalizedStructuredContent().size()).isEqualTo(expResult.getLocalizedStructuredContent().size());
+    assertThat(result.size()).isEqualTo(expResult.size());
   }
 
 }

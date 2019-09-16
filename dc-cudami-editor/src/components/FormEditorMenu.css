@@ -1,0 +1,47 @@
+.cudami-editor .menu-bar {
+  align-items: baseline;
+  border-bottom: 1px solid #ccc;
+  display: flex;
+}
+
+.cudami-editor .menu-button {
+  background: white;
+  border: none;
+  border-radius: 0;
+  color: #777;
+  padding: 5px 10px;
+}
+
+.cudami-editor .full-width.menu-button {
+  width: 100%;
+}
+
+.cudami-editor .menu-button:focus {
+  outline: none;
+}
+
+.cudami-editor .menu-button:hover {
+  background: transparent;
+  color: black;
+}
+
+.cudami-editor .active.menu-button,
+.cudami-editor .disabled.menu-button {
+  color: #ccc;
+}
+
+.cudami-editor .disabled.menu-button {
+  cursor: default;
+}
+
+.cudami-editor .menu-group {
+  margin-right: 5px;
+}
+
+.cudami-editor .menu-group > .dropdown {
+  display: inline-block;
+}
+
+.cudami-editor .menu-group > .dropdown:hover > .menu-button:not(.disabled) + .dropdown-menu {
+  display: block;
+}

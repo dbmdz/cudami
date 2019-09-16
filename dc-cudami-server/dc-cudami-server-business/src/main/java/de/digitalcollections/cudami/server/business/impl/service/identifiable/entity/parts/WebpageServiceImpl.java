@@ -39,8 +39,8 @@ public class WebpageServiceImpl<E extends Entity> extends EntityPartServiceImpl<
     }
 
     // filter out not requested translations of fields not already filtered
-    if (webpage.getText() != null && webpage.getText().getLocalizedStructuredContent() != null) {
-      webpage.getText().getLocalizedStructuredContent().entrySet().removeIf((Map.Entry entry) -> !entry.getKey().equals(locale));
+    if (webpage.getText() != null) {
+      webpage.getText().entrySet().removeIf((Map.Entry entry) -> !entry.getKey().equals(locale));
     }
     return webpage;
   }
@@ -53,6 +53,16 @@ public class WebpageServiceImpl<E extends Entity> extends EntityPartServiceImpl<
   @Override
   public List<Webpage> getChildren(UUID uuid) {
     return ((NodeRepository) repository).getChildren(uuid);
+  }
+
+  @Override
+  public Webpage getParent(Webpage webpage) {
+    return getParent(webpage.getUuid());
+  }
+
+  @Override
+  public Webpage getParent(UUID webpageUuid) {
+    return (Webpage) ((WebpageRepository) repository).getParent(webpageUuid);
   }
 
   @Override

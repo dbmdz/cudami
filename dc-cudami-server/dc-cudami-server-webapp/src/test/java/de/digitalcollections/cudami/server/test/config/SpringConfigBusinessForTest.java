@@ -8,7 +8,6 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.ContentNodeService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.WebpageService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.CudamiFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.security.UserService;
 import java.util.Locale;
 import org.flywaydb.core.Flyway;
@@ -16,6 +15,7 @@ import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceService;
 
 @Configuration
 public class SpringConfigBusinessForTest {
@@ -40,8 +40,8 @@ public class SpringConfigBusinessForTest {
 
   @Primary
   @Bean
-  public CudamiFileResourceService cudamiFileResourceService() {
-    return Mockito.mock(CudamiFileResourceService.class);
+  public FileResourceService cudamiFileResourceService() {
+    return Mockito.mock(FileResourceService.class);
   }
 
   @Primary
@@ -68,7 +68,7 @@ public class SpringConfigBusinessForTest {
     final LocaleService dummy = Mockito.mock(LocaleService.class);
     Locale defaultLocale = Locale.ENGLISH;
 
-    Mockito.when(dummy.getDefault()).thenReturn(defaultLocale);
+    Mockito.when(dummy.getDefaultLocale()).thenReturn(defaultLocale);
     return dummy;
   }
 

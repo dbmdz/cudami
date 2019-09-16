@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable;
 
 import de.digitalcollections.model.api.identifiable.Identifiable;
+import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.List;
@@ -13,6 +14,8 @@ public interface IdentifiableRepository<I extends Identifiable> {
   PageResponse<I> find(PageRequest pageRequest);
 
   List<I> find(String searchTerm, int maxResults);
+
+  I findOne(Identifier identifier);
 
   I findOne(UUID uuid);
 

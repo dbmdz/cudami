@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.commons.springmvc.thymeleaf.SpacesDialect;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import de.digitalcollections.model.xml.xstream.DigitalCollectionsXStreamMarshaller;
 import java.net.InetAddress;
@@ -20,6 +21,7 @@ import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.thymeleaf.dialect.AbstractProcessorDialect;
 
 @Configuration
 @EnableAspectJAutoProxy
@@ -104,6 +106,16 @@ public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
     xmlConverter.setMarshaller(xstreamMarshaller);
     xmlConverter.setUnmarshaller(xstreamMarshaller);
     return xmlConverter;
+  }
+
+  /**
+   * Needed to get rid of all the whitespaces in the rendered thymeleaf HTML
+   *
+   * @return the dialect
+   */
+  @Bean
+  public AbstractProcessorDialect whiteSpaceNormalizedDialect() {
+    return new SpacesDialect();
   }
 
 }

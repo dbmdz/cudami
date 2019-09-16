@@ -1,0 +1,65 @@
+{
+  "translation": {
+    "abort": "Abort",
+    "add": "Add",
+    "addLanguage": "Add language",
+    "blocks": {
+      "blockquote": "Add block quote",
+      "bulletList": "Change to bulleted list",
+      "codeBlock": "Change to code block",
+      "heading": "Change to heading",
+      "headingLevel": "Level {{ level }}",
+      "joinUp": "Join with above block",
+      "lift": "Lift out of enclosing block",
+      "orderedList": "Change to numbered list",
+      "paragraph": "Change to paragraph"
+    },
+    "chooseFile": "Choose file",
+    "chooseLanguage": "Choose a language",
+    "createArticle": "Create a new article",
+    "createContentNode": "Create a new content node",
+    "createContentTree": "Create a new content tree",
+    "createWebpage": "Create a new webpage",
+    "createWebsite": "Create a new website",
+    "description": "Abstract",
+    "editArticle": "Edit article",
+    "editContentNode": "Edit content node",
+    "editContentTree": "Edit content tree",
+    "editFileResource": "Edit file \"{{ name }}\"",
+    "editWebpage": "Edit webpage",
+    "editWebsite": "Edit website {{ url }}",
+    "file": "File",
+    "height": "Height",
+    "history": {
+      "redo": "Redo last undone change",
+      "undo": "Undo last change"
+    },
+    "insert": {
+      "footnote": "Insert footnote",
+      "hr": "Insert horizontal rule",
+      "iframe": "Insert iframe",
+      "image": "Insert image",
+      "table": "Insert table"
+    },
+    "insertLink": "Insert hyperlink",
+    "invalidLabels": "Please fill in the field \"$t(label)\" in the following languages:",
+    "label": "Label",
+    "marks": {
+      "code": "Code style",
+      "em": "Italic",
+      "link": "Hyperlink",
+      "strikethrough": "Strikethrough",
+      "strong": "Bold",
+      "subscript": "Subscript",
+      "superscript": "Superscript",
+      "underline": "Underline"
+    },
+    "next": "Next",
+    "numberOfColumns": "Number of columns",
+    "numberOfRows": "Number of rows",
+    "save": "Save",
+    "text": "Long text",
+    "uploadFileResource": "Upload a new file",
+    "width": "Width"
+  }
+}

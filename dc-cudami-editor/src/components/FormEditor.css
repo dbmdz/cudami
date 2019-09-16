@@ -1,0 +1,7 @@
+.cudami-editor iframe.editable {
+  border: 5px dashed;
+}
+
+.cudami-editor .text-editor {
+  border: 1px solid #ccc;
+}

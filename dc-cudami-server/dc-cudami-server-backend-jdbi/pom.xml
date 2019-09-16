@@ -14,17 +14,11 @@
   <packaging>jar</packaging>
 
   <properties>
-    <version.dc-commons-file>4.1.0-SNAPSHOT</version.dc-commons-file>
     <version.dc-commons-jdbi>4.0.3</version.dc-commons-jdbi>
     <version.jdbi>3.9.0</version.jdbi>
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>de.digitalcollections.commons</groupId>
-      <artifactId>dc-commons-file</artifactId>
-      <version>${version.dc-commons-file}</version>
-    </dependency>
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-jdbi</artifactId>
@@ -74,6 +68,10 @@
       <groupId>org.jdbi</groupId>
       <artifactId>jdbi3-sqlobject</artifactId>
       <version>${version.jdbi}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
     </dependency>
     <dependency>
       <groupId>org.postgresql</groupId>

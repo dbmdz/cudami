@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.CudamiFileResourceRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMapper;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
@@ -39,7 +39,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectRepositoryImpl.class);
 
-  private final CudamiFileResourceRepository cudamiFileResourceRepository;
+  private final FileResourceMetadataRepository fileResourceMetadataRepository;
   private final IdentifierRepository identifierRepository;
 
   static final String SELECT_ALL_FR
@@ -68,9 +68,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       + " left join fileresources_application as fp on df.fileresource_uuid = fp.uuid";
 
   @Autowired
-  public DigitalObjectRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository, CudamiFileResourceRepository cudamiFileResourceRepository) {
+  public DigitalObjectRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository, FileResourceMetadataRepository fileResourceMetadataRepository) {
     super(dbi);
-    this.cudamiFileResourceRepository = cudamiFileResourceRepository;
+    this.fileResourceMetadataRepository = fileResourceMetadataRepository;
     this.identifierRepository = identifierRepository;
   }
 
@@ -153,6 +153,11 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     } else {
       return null;
     }
+  }
+
+  @Override
+  public DigitalObject findOne(Identifier identifier) {
+    throw new UnsupportedOperationException("Not supported yet.");
   }
 
   @Override
@@ -253,7 +258,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     if (fileResources != null) {
       // first save fileresources
       for (FileResource fileResource : fileResources) {
-        fileResource = cudamiFileResourceRepository.save(fileResource);
+        fileResource = fileResourceMetadataRepository.save(fileResource);
       }
 
       // second: save relations to digital object

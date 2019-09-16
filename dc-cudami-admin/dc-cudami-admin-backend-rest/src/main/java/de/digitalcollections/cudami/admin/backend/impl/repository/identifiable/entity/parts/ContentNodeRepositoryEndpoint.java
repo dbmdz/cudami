@@ -38,6 +38,9 @@ public interface ContentNodeRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine("GET /latest/contentnodes/{uuid}/fileresources")
   LinkedHashSet<FileResource> getFileResources(@Param("uuid") UUID uuid);
 
+  @RequestLine("GET /latest/contentnodes/{uuid}/parent")
+  ContentNode getParent(@Param("uuid") UUID uuid);
+
   @RequestLine("POST /latest/contentnodes")
   @Headers("Content-Type: application/json")
   ContentNode save(ContentNode contentNode);

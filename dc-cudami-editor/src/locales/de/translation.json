@@ -1,0 +1,65 @@
+{
+  "translation": {
+    "abort": "Abbrechen",
+    "add": "Hinzufügen",
+    "addLanguage": "Sprache hinzufügen",
+    "blocks": {
+      "blockquote": "Zitat einfügen",
+      "bulletList": "In Aufzählungsliste umwandeln",
+      "codeBlock": "In Codeblock umwandeln",
+      "heading": "In Überschrift umwandeln",
+      "headingLevel": "Ebene {{ level }}",
+      "joinUp": "Mit dem obigen Block verbinden",
+      "lift": "Aus dem umschließenden Block herausheben",
+      "orderedList": "In geordnete Liste umwandeln",
+      "paragraph": "In Paragraph umwandeln"
+    },
+    "chooseFile": "Datei auswählen",
+    "chooseLanguage": "Sprache auswählen",
+    "createArticle": "Neuen Artikel anlegen",
+    "createContentNode": "Neuen Inhaltsknoten anlegen",
+    "createContentTree": "Neuen Inhaltsbaum anlegen",
+    "createWebpage": "Neue Webseite anlegen",
+    "createWebsite": "Neue Website anlegen",
+    "description": "Kurzbeschreibung",
+    "editArticle": "Artikel bearbeiten",
+    "editContentNode": "Inhaltsknoten bearbeiten",
+    "editContentTree": "Inhaltsbaum bearbeiten",
+    "editFileResource": "Datei \"{{ name }}\" bearbeiten",
+    "editWebpage": "Webseite bearbeiten",
+    "editWebsite": "Website {{ url }} bearbeiten",
+    "file": "Datei",
+    "height": "Höhe",
+    "history": {
+      "redo": "Letzte rückgängig gemachte Änderung wiederholen",
+      "undo": "Letzte Änderung rückgängig machen"
+    },
+    "insert": {
+      "footnote": "Fußnote einfügen",
+      "hr": "Horizontale Linie einfügen",
+      "iframe": "Iframe einfügen",
+      "image": "Bild einfügen",
+      "table": "Tabelle einfügen"
+    },
+    "insertLink": "Verlinkung einfügen",
+    "invalidLabels": "Bitte füllen Sie in den folgenden Sprachen das Feld \"$t(label)\" noch aus):",
+    "label": "Titel",
+    "marks": {
+      "code": "Code-Stil",
+      "em": "Kursiv",
+      "link": "Verlinkung",
+      "strikethrough": "Durchgestrichen",
+      "strong": "Fett",
+      "subscript": "Tiefgestellt",
+      "superscript": "Hochgestellt",
+      "underline": "Unterstrichen"
+    },
+    "next": "Weiter",
+    "numberOfColumns": "Anzahl an Spalten",
+    "numberOfRows": "Anzahl an Zeilen",
+    "save": "Speichern",
+    "text": "Langtext",
+    "uploadFileResource": "Neue Datei hochladen",
+    "width": "Breite"
+  }
+}

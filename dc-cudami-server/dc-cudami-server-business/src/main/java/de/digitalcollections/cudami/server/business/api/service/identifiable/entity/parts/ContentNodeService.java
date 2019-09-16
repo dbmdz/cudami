@@ -16,6 +16,7 @@ import java.util.UUID;
  */
 public interface ContentNodeService<E extends Entity> extends NodeService<ContentNode>, EntityPartService<ContentNode, E> {
 
+  @Override
   ContentNode get(UUID uuid, Locale locale) throws IdentifiableServiceException;
 
   LinkedHashSet<E> getEntities(ContentNode contentNode);

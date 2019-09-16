@@ -11,193 +11,135 @@ import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.entity.parts.ContentNodeImpl;
-import java.util.Comparator;
-import java.util.HashSet;
+import java.net.URI;
 import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.context.MessageSourceAware;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.bind.support.SessionStatus;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * Controller for content node management pages.
  */
 @Controller
-@SessionAttributes(value = {"contentNode"})
-public class ContentNodesController extends AbstractController implements MessageSourceAware {
+public class ContentNodesController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentNodesController.class);
-
-  private MessageSource messageSource;
 
   @Autowired
   LocaleService localeService;
 
   @Autowired
-  ContentNodeService contentNodeService;
-
-  @Override
-  public void setMessageSource(MessageSource messageSource) {
-    this.messageSource = messageSource;
-  }
+  ContentNodeService service;
 
   @ModelAttribute("menu")
   protected String module() {
     return "contentnodes";
   }
 
-  @RequestMapping(value = "/contentnodes/new", method = RequestMethod.GET)
+  @GetMapping("/contentnodes/new")
   public String create(Model model, @RequestParam("parentType") String parentType, @RequestParam("parentUuid") String parentUuid) {
-    Locale defaultLocale = localeService.getDefault();
-    List<Locale> locales = localeService.findAll().stream()
-        .filter(locale -> !(defaultLocale.equals(locale) || locale.getDisplayName().isEmpty()))
-        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-        .collect(Collectors.toList());
-
-    model.addAttribute("contentNode", contentNodeService.create());
-    model.addAttribute("defaultLocale", defaultLocale);
-    model.addAttribute("locales", locales);
+    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
     return "contentnodes/create";
   }
 
-  @RequestMapping(value = "/contentnodes/new", method = RequestMethod.POST)
-  public String create(@ModelAttribute @Valid ContentNodeImpl contentNode, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes,
-                       @RequestParam("parentType") String parentType,
-                       @RequestParam("parentUuid") UUID parentUuid) {
-    verifyBinding(results);
-    if (results.hasErrors()) {
-      return "contentnodes/create";
-    }
-    ContentNode contentNodeDb = null;
-    try {
-      if (Objects.equals(parentType, "contentTree")) {
-        contentNodeDb = contentNodeService.saveWithParentContentTree(contentNode, parentUuid);
-        LOGGER.info("Successfully saved top-level content node");
-      } else if (Objects.equals(parentType, "contentNode")) {
-        contentNodeDb = contentNodeService.saveWithParentContentNode(contentNode, parentUuid);
-        LOGGER.info("Successfully saved content node");
-      }
-    } catch (Exception e) {
-      if (Objects.equals(parentType, "contentTree")) {
-        LOGGER.info("Cannot save top-level content node: ", e);
-      } else if (Objects.equals(parentType, "contentNode")) {
-        LOGGER.error("Cannot save content node: ", e);
-      }
-      String message = messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale());
-      redirectAttributes.addFlashAttribute("error_message", message);
-      return "redirect:/contenttrees";
-    }
-    if (results.hasErrors()) {
-      return "contentNodes/create";
-    }
-    status.setComplete();
-    String message = messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
-    redirectAttributes.addFlashAttribute("success_message", message);
-    return "redirect:/contentnodes/" + contentNodeDb.getUuid().toString();
+  @GetMapping("/api/contentnodes/new")
+  @ResponseBody
+  public ContentNode create() {
+    return (ContentNode) service.create();
   }
 
-  @RequestMapping(value = "/contentnodes/{uuid}/edit", method = RequestMethod.GET)
-  public String edit(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
-    ContentNode contentNode = (ContentNode) contentNodeService.get(uuid);
-
-    HashSet<Locale> availableLocales = (HashSet<Locale>) contentNode.getLabel().getLocales();
-    Set<String> availableLocaleTags = availableLocales.stream().map(Locale::toLanguageTag).collect(Collectors.toSet());
-    List<Locale> locales = localeService.findAll().stream()
-        .filter(locale -> !(availableLocaleTags.contains(locale.toLanguageTag()) || locale.getDisplayName().isEmpty()))
-        .sorted(Comparator.comparing(locale -> locale.getDisplayName(LocaleContextHolder.getLocale())))
-        .collect(Collectors.toList());
-
-    model.addAttribute("contentNode", contentNode);
-    model.addAttribute("availableLocales", availableLocales);
-    model.addAttribute("locales", locales);
-
+  @GetMapping("/contentnodes/{uuid}/edit")
+  public String edit(@PathVariable UUID uuid, Model model) {
+    ContentNode contentNode = (ContentNode) service.get(uuid);
+    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("uuid", contentNode.getUuid());
     return "contentnodes/edit";
   }
 
-  @RequestMapping(value = "/contentnodes/{uuid}/edit", method = RequestMethod.POST)
-  public String edit(@PathVariable UUID uuid, @ModelAttribute @Valid ContentNodeImpl contentNode, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
-    verifyBinding(results);
-    if (results.hasErrors()) {
-      return "contentnodes/edit";
-    }
-
-    try {
-      // get content node from db
-      ContentNode contentNodeDb = (ContentNode) contentNodeService.get(uuid);
-      // just update the fields, that were editable
-      contentNodeDb.setLabel(contentNode.getLabel());
-      contentNodeDb.setDescription(contentNode.getDescription());
-
-      contentNodeService.update(contentNodeDb);
-    } catch (IdentifiableServiceException e) {
-      String message = "Cannot save content node with uuid=" + uuid + ": " + e;
-      LOGGER.error(message, e);
-      redirectAttributes.addFlashAttribute("error_message", message);
-      return "redirect:/contentnodes/" + uuid + "/edit";
-    }
-
-    if (results.hasErrors()) {
-      return "contentnodes/edit";
-    }
-    status.setComplete();
-    String message = messageSource.getMessage("msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
-    redirectAttributes.addFlashAttribute("success_message", message);
-    return "redirect:/contentnodes/" + uuid;
+  @GetMapping("/api/contentnodes/{uuid}")
+  @ResponseBody
+  public ContentNode get(@PathVariable UUID uuid) {
+    return (ContentNode) service.get(uuid);
   }
 
-  @RequestMapping(value = "/contentnodes", method = RequestMethod.GET)
+  @GetMapping("/contentnodes")
   public String list(Model model, @PageableDefault(sort = {"uuid"}) Pageable pageable) {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
-    final PageResponse pageResponse = contentNodeService.find(pageRequest);
+    final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
     model.addAttribute("page", new PageWrapper(page, "/contentnodes"));
     return "contentnodes/list";
   }
 
-  @RequestMapping(value = "/contentnodes/{uuid}", method = RequestMethod.GET)
-  public String view(@PathVariable UUID uuid, Model model) {
-    ContentNode contentNode = (ContentNode) contentNodeService.get(uuid);
-    model.addAttribute("availableLocales", contentNode.getLabel().getLocales());
-    model.addAttribute("defaultLocale", localeService.getDefault());
-    model.addAttribute("contentNode", contentNode);
-
-    LinkedHashSet<FileResource> relatedFileResources = contentNodeService.getRelatedFileResources(contentNode);
-    model.addAttribute("relatedFileResources", relatedFileResources);
-    return "contentnodes/view";
+  @PostMapping("/api/contentnodes/new")
+  public ResponseEntity save(
+      @RequestBody ContentNode contentNode,
+      @RequestParam("parentType") String parentType,
+      @RequestParam("parentUuid") UUID parentUuid
+  ) throws IdentifiableServiceException {
+    ContentNode contentNodeDb = null;
+    HttpHeaders headers = new HttpHeaders();
+    try {
+      if (parentType.equals("contentTree")) {
+        contentNodeDb = service.saveWithParentContentTree(contentNode, parentUuid);
+        headers.setLocation(URI.create("/contentnodes/" + contentNodeDb.getUuid().toString()));
+      } else if (parentType.equals("contentNode")) {
+        contentNodeDb = service.saveWithParentContentNode(contentNode, parentUuid);
+        headers.setLocation(URI.create("/contentnodes/" + contentNodeDb.getUuid().toString()));
+      }
+    } catch (Exception e) {
+      if (parentType.equals("contentTree")) {
+        LOGGER.error("Cannot save top-level content node: ", e);
+      } else if (parentType.equals("contentNode")) {
+        LOGGER.error("Cannot save content node: ", e);
+      }
+      headers.setLocation(URI.create("/contentnodes/new"));
+    }
+    return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }
 
-//  @RequestMapping(value = "/contentnodes/{uuid}/identifiables", method = RequestMethod.POST)
-//  public String addIdentifiable(@PathVariable UUID uuid, @RequestParam(name = "identifiableUuid") UUID identifiableUuid, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
-//    contentNodeService.addIdentifiable(uuid, identifiableUuid);
-//    return "redirect:/contentnodes/" + uuid;
-//  }
-  public void setContentNodeService(ContentNodeService contentNodeService) {
-    this.contentNodeService = contentNodeService;
+  @PutMapping("/api/contentnodes/{uuid}")
+  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody ContentNode contentNode) throws IdentifiableServiceException {
+    HttpHeaders headers = new HttpHeaders();
+    try {
+      service.update(contentNode);
+      headers.setLocation(URI.create("/contentnodes/" + uuid));
+    } catch (Exception e) {
+      String message = "Cannot save content node with uuid=" + uuid + ": " + e;
+      LOGGER.error(message, e);
+      headers.setLocation(URI.create("/contentnodes/" + uuid + "/edit"));
+    }
+    return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
+  }
+
+  @GetMapping("/contentnodes/{uuid}")
+  public String view(@PathVariable UUID uuid, Model model) {
+    ContentNode contentNode = (ContentNode) service.get(uuid);
+    model.addAttribute("availableLocales", contentNode.getLabel().getLocales());
+    model.addAttribute("defaultLocale", localeService.getDefaultLocale());
+    model.addAttribute("contentNode", contentNode);
+
+    LinkedHashSet<FileResource> relatedFileResources = service.getRelatedFileResources(contentNode);
+    model.addAttribute("relatedFileResources", relatedFileResources);
+    return "contentnodes/view";
   }
 }

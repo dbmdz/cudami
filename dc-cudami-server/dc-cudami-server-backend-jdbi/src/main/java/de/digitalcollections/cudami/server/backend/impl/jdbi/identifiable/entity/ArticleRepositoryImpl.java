@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ArticleRepository;
+import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Article;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -58,6 +59,11 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article> impleme
       .mapToBean(ArticleImpl.class)
       .findOne().orElse(null));
     return article;
+  }
+
+  @Override
+  public Article findOne(Identifier identifier) {
+    throw new UnsupportedOperationException("Not supported yet.");
   }
 
   @Override

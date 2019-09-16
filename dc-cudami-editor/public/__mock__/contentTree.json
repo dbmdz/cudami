@@ -1,0 +1,42 @@
+{
+  "created": "2019-08-05T16:54:29.71132",
+  "description": {
+    "de": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Das ist mein erster Inhaltsbaum."
+            }
+          ]
+        }
+      ]
+    },
+    "en": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "This is my first content tree."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "entityType": "CONTENT_TREE",
+  "identifiers": [],
+  "label": {
+    "de": "Mein erster Inhaltsbaum",
+    "en": "My first content tree"
+  },
+  "lastModified": "2019-08-05T16:54:29.711332",
+  "type": "ENTITY",
+  "uuid": "fea43112-7cd3-478a-bd11-c8a9f9ea4f4d"
+}

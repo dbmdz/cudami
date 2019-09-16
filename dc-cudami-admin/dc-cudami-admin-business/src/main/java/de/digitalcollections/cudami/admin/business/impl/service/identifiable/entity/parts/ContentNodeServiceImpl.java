@@ -51,6 +51,16 @@ public class ContentNodeServiceImpl<E extends Entity> extends EntityPartServiceI
   }
 
   @Override
+  public ContentNode getParent(ContentNode node) {
+    return getParent(node.getUuid());
+  }
+
+  @Override
+  public ContentNode getParent(UUID nodeUuid) {
+    return (ContentNode) ((ContentNodeRepository) repository).getParent(nodeUuid);
+  }
+
+  @Override
   public LinkedHashSet<E> saveEntities(ContentNode contentNode, LinkedHashSet<E> entities) {
     return saveEntities(contentNode.getUuid(), entities);
   }

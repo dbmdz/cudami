@@ -56,6 +56,11 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
   }
 
   @Override
+  public Webpage getParent(UUID uuid) {
+    return endpoint.getParent(uuid);
+  }
+
+  @Override
   public Webpage save(Webpage identifiable) {
     return endpoint.save(identifiable);
   }

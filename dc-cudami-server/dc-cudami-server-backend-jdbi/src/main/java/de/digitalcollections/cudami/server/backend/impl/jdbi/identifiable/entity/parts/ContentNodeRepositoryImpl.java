@@ -79,6 +79,20 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
   }
 
   @Override
+  public ContentNode getParent(UUID uuid) {
+    StringBuilder query = new StringBuilder()
+      .append("SELECT " + IDENTIFIABLE_COLUMNS)
+      .append(" FROM contentnodes INNER JOIN contentnode_contentnodes cc ON uuid = cc.parent_contentnode_uuid")
+      .append(" WHERE cc.child_contentnode_uuid = :uuid");
+
+    ContentNode contentNode = dbi.withHandle(h -> h.createQuery(query.toString())
+      .bind("uuid", uuid)
+      .mapToBean(ContentNodeImpl.class)
+      .findOne().orElse(null));
+    return contentNode;
+  }
+
+  @Override
   public List<ContentNode> getChildren(ContentNode contentNode) {
     return getChildren(contentNode.getUuid());
   }

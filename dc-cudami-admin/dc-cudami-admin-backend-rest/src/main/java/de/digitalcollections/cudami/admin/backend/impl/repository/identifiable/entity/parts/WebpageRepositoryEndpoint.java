@@ -13,8 +13,8 @@ public interface WebpageRepositoryEndpoint extends RepositoryEndpoint {
 
   @RequestLine("GET /latest/webpages?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<Webpage> find(
-      @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
-      @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
+    @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
+    @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
   );
 
   @RequestLine("GET /latest/webpages/{uuid}")
@@ -36,6 +36,9 @@ public interface WebpageRepositoryEndpoint extends RepositoryEndpoint {
 
   @RequestLine("GET /latest/webpages/{uuid}/children")
   List<Webpage> getChildren(@Param("uuid") UUID uuid);
+
+  @RequestLine("GET /latest/webpages/{uuid}/parent")
+  Webpage getParent(UUID uuid);
 
   @RequestLine("POST /latest/websites/{parentWebsiteUuid}/webpage")
   @Headers("Content-Type: application/json")

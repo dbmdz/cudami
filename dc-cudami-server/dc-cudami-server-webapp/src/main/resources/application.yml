@@ -8,7 +8,9 @@ cudami:
     port: 22222
     username: cudami
   defaults:
+    language: en
     locale: en_US
+  repositoryFolderPath: '~/cudami/fileResources'
 
 info:
   app:
@@ -40,11 +42,6 @@ management:
   server:
     port: 9001
 
-resourceRepository:
-  managed:
-    namespace: 'dico'
-    folderpath: '~/resourceRepository'
-
 server:
   port: 9000
   server-header: "@project.name@ v@project.version@"
@@ -70,14 +67,12 @@ spring:
 ---
 
 # PROD
+cudami:
+  repositoryFolderPath: '/local/cudami/fileResources'
+
 custom:
   database:
     port: 5432
-
-resourceRepository:
-  managed:
-    namespace: 'dico'
-    folderpath: '/local/resourceRepository'
 
 spring:
   profiles: PROD

@@ -40,6 +40,16 @@ public class WebpageServiceImpl<E extends Entity> extends EntityPartServiceImpl<
   }
 
   @Override
+  public Webpage getParent(Webpage webpage) {
+    return getParent(webpage.getUuid());
+  }
+
+  @Override
+  public Webpage getParent(UUID webpageUuid) {
+    return (Webpage) ((WebpageRepository) repository).getParent(webpageUuid);
+  }
+
+  @Override
   //  @Transactional(readOnly = false)
   public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid) throws IdentifiableServiceException {
     try {

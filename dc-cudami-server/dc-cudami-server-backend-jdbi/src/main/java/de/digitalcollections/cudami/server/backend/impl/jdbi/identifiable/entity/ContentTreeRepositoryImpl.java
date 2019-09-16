@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ContentTreeRepository;
+import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.ContentTree;
 import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -65,6 +66,11 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
       contentTree.setRootNodes(getRootNodes(contentTree));
     }
     return contentTree;
+  }
+
+  @Override
+  public ContentTree findOne(Identifier identifier) {
+    throw new UnsupportedOperationException("Not supported yet.");
   }
 
   @Override

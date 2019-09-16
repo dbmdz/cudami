@@ -1,0 +1,43 @@
+{
+  "children": [],
+  "created": "2019-08-05T16:54:29.71132",
+  "description": {
+    "de": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Das ist mein erster Inhaltsknoten."
+            }
+          ]
+        }
+      ]
+    },
+    "en": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "This is my first content node."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "entityPartType": "CONTENT_NODE",
+  "identifiers": [],
+  "label": {
+    "de": "Mein erster Inhaltsknoten",
+    "en": "My first content node"
+  },
+  "lastModified": "2019-08-05T16:54:29.711332",
+  "type": "ENTITY_PART",
+  "uuid": "277f79d6-2224-460c-b037-e8191a133761"
+}
