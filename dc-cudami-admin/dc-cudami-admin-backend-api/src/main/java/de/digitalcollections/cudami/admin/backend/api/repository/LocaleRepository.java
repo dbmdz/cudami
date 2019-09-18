@@ -31,7 +31,7 @@ public interface LocaleRepository {
   String getDefaultLocale();
 
   @Configuration
-  class LocaleRepositoryConfig {
+  class Config {
 
     @Value(value = "${cudami.server.address}")
     private String cudamiServerAddress;
