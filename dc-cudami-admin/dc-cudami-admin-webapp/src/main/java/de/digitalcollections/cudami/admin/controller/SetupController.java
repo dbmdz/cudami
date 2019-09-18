@@ -29,8 +29,12 @@ public class SetupController extends AbstractController implements MessageSource
 
   private MessageSource messageSource;
 
-  @Autowired
   UserService userService;
+
+  @Autowired
+  public SetupController(UserService userService) {
+    this.userService = userService;
+  }
 
   @Override
   public void setMessageSource(MessageSource messageSource) {

@@ -40,8 +40,12 @@ public class IdentifierTypeController extends AbstractController implements Mess
 
   private MessageSource messageSource;
 
-  @Autowired
   IdentifierTypeService service;
+
+  @Autowired
+  public IdentifierTypeController(IdentifierTypeService service) {
+    this.service = service;
+  }
 
   @Override
   public void setMessageSource(MessageSource messageSource) {

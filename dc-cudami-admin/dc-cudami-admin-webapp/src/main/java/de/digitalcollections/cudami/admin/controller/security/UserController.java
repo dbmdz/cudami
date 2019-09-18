@@ -45,8 +45,12 @@ public class UserController extends AbstractController implements MessageSourceA
 
   private MessageSource messageSource;
 
-  @Autowired
   UserService userService;
+
+  @Autowired
+  public UserController(UserService userService) {
+    this.userService = userService;
+  }
 
   @Override
   public void setMessageSource(MessageSource messageSource) {

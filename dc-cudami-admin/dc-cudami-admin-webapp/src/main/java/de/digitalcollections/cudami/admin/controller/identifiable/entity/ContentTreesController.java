@@ -41,11 +41,14 @@ public class ContentTreesController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentTreesController.class);
 
-  @Autowired
   LocaleRepository localeRepository;
+  ContentTreeService service;
 
   @Autowired
-  ContentTreeService service;
+  public ContentTreesController(LocaleRepository localeRepository, ContentTreeService service) {
+    this.localeRepository = localeRepository;
+    this.service = service;
+  }
 
   @ModelAttribute("menu")
   protected String module() {

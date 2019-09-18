@@ -41,11 +41,14 @@ public class ArticlesController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticlesController.class);
 
-  @Autowired
   LocaleRepository localeRepository;
+  ArticleService service;
 
   @Autowired
-  ArticleService service;
+  public ArticlesController(LocaleRepository localeRepository, ArticleService service) {
+    this.localeRepository = localeRepository;
+    this.service = service;
+  }
 
   @ModelAttribute("menu")
   protected String module() {

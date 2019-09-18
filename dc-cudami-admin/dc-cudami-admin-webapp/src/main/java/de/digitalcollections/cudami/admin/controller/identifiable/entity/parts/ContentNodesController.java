@@ -42,11 +42,14 @@ public class ContentNodesController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentNodesController.class);
 
-  @Autowired
   LocaleRepository localeRepository;
+  ContentNodeService service;
 
   @Autowired
-  ContentNodeService service;
+  public ContentNodesController(LocaleRepository localeRepository, ContentNodeService service) {
+    this.localeRepository = localeRepository;
+    this.service = service;
+  }
 
   @ModelAttribute("menu")
   protected String module() {

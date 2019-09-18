@@ -15,10 +15,10 @@ public class LocalizedStructuredContentEditor extends PropertyEditorSupport {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LocalizedStructuredContentEditor.class);
 
-  @Autowired
   private ObjectMapper objectMapper;
 
-  public void setObjectMapper(ObjectMapper objectMapper) {
+  @Autowired
+  public LocalizedStructuredContentEditor(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
   }
 

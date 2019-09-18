@@ -37,8 +37,12 @@ public class DigitalObjectsController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectsController.class);
 
-  @Autowired
   DigitalObjectService service;
+
+  @Autowired
+  public DigitalObjectsController(DigitalObjectService service) {
+    this.service = service;
+  }
 
   @ModelAttribute("menu")
   protected String module() {

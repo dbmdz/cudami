@@ -13,8 +13,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class IdentifiableController extends AbstractController {
 
-  @Autowired
   IdentifiableService<Identifiable> service;
+
+  @Autowired
+  public IdentifiableController(IdentifiableService<Identifiable> service) {
+    this.service = service;
+  }
 
   @GetMapping(value = "/identifiables")
   @ResponseBody

@@ -47,11 +47,14 @@ public class FileResourcesController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FileResourcesController.class);
 
-  @Autowired
   LocaleRepository localeRepository;
+  CudamiFileResourceService service;
 
   @Autowired
-  CudamiFileResourceService service;
+  public FileResourcesController(LocaleRepository localeRepository, CudamiFileResourceService service) {
+    this.localeRepository = localeRepository;
+    this.service = service;
+  }
 
   @ModelAttribute("menu")
   protected String module() {

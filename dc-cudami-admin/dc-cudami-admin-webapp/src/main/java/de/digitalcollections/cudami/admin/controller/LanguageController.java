@@ -9,8 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class LanguageController {
 
-  @Autowired
   LocaleRepository repository;
+
+  @Autowired
+  public LanguageController(LocaleRepository repository) {
+    this.repository = repository;
+  }
 
   @GetMapping("/api/languages")
   public List<String> getLanguages() {
