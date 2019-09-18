@@ -26,7 +26,7 @@ public class CreateAdminUserInterceptor extends HandlerInterceptorAdapter implem
   private MessageSource messageSource;
 
   @Autowired
-  private UserService userService;
+  private UserService service;
 
   @Override
   public void setMessageSource(MessageSource messageSource) {
@@ -36,7 +36,7 @@ public class CreateAdminUserInterceptor extends HandlerInterceptorAdapter implem
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
     LOGGER.info("checking if admin user exists...");
-    boolean activeAdminUserExists = userService.doesActiveAdminUserExist();
+    boolean activeAdminUserExists = service.doesActiveAdminUserExist();
     if (!activeAdminUserExists) {
       request.setAttribute("createAdminUser", true);
     }
