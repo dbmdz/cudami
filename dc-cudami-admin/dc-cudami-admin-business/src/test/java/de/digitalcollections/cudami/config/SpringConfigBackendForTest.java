@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.config;
 
-import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.IdentifierTypeRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.ArticleRepository;
@@ -70,12 +69,6 @@ public class SpringConfigBackendForTest {
   @Qualifier("identifierTypeRepositoryImpl")
   public IdentifierTypeRepository identifierTypeRepositoryImpl() {
     return Mockito.mock(IdentifierTypeRepository.class);
-  }
-
-  @Bean
-  @Qualifier("localeRepositoryImpl")
-  public LocaleRepository localeRepositoryImpl() {
-    return Mockito.mock(LocaleRepository.class);
   }
 
   @Bean

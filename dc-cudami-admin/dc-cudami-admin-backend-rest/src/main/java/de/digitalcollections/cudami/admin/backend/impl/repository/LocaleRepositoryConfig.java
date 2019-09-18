@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class LocaleRepositoryEndpointConfig {
+public class LocaleRepositoryConfig {
 
   @Value(value = "${cudami.server.address}")
   private String cudamiServerAddress;
@@ -20,12 +20,12 @@ public class LocaleRepositoryEndpointConfig {
   ObjectMapper objectMapper;
 
   @Bean
-  public LocaleRepositoryEndpoint localeRepositoryEndpoint() {
-    LocaleRepositoryEndpoint endpoint = Feign.builder()
-            .decoder(new JacksonDecoder(objectMapper))
-            .encoder(new JacksonEncoder(objectMapper))
-            .errorDecoder(new EndpointErrorDecoder())
-            .target(LocaleRepositoryEndpoint.class, cudamiServerAddress);
+  public LocaleRepository localeRepository() {
+    LocaleRepository endpoint = Feign.builder()
+        .decoder(new JacksonDecoder(objectMapper))
+        .encoder(new JacksonEncoder(objectMapper))
+        .errorDecoder(new EndpointErrorDecoder())
+        .target(LocaleRepository.class, cudamiServerAddress);
     return endpoint;
   }
 }

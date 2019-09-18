@@ -4,7 +4,7 @@ import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.business.api.service.LocaleService;
+import de.digitalcollections.cudami.admin.backend.impl.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.ArticleService;
 import de.digitalcollections.model.api.identifiable.entity.Article;
@@ -42,7 +42,7 @@ public class ArticlesController extends AbstractController {
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticlesController.class);
 
   @Autowired
-  LocaleService localeService;
+  LocaleRepository localeEndpoint;
 
   @Autowired
   ArticleService service;
@@ -54,7 +54,7 @@ public class ArticlesController extends AbstractController {
 
   @GetMapping("/articles/new")
   public String create(Model model) {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeEndpoint.getDefaultLanguage());
     return "articles/create";
   }
 
@@ -67,7 +67,7 @@ public class ArticlesController extends AbstractController {
   @GetMapping("/articles/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) {
     Article article = service.get(uuid);
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeEndpoint.getDefaultLanguage());
     model.addAttribute("uuid", article.getUuid());
     return "articles/edit";
   }

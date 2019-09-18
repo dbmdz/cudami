@@ -4,7 +4,7 @@ import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.business.api.service.LocaleService;
+import de.digitalcollections.cudami.admin.backend.impl.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.CudamiFileResourceService;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
@@ -48,7 +48,7 @@ public class FileResourcesController extends AbstractController {
   private static final Logger LOGGER = LoggerFactory.getLogger(FileResourcesController.class);
 
   @Autowired
-  LocaleService localeService;
+  LocaleRepository localeEndpoint;
 
   @Autowired
   CudamiFileResourceService service;
@@ -60,7 +60,7 @@ public class FileResourcesController extends AbstractController {
 
   @GetMapping(value = "/fileresources/new")
   public String create(Model model) {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeEndpoint.getDefaultLanguage());
     return "fileresources/create";
   }
 
@@ -73,7 +73,7 @@ public class FileResourcesController extends AbstractController {
   @GetMapping("/fileresources/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) {
     FileResource fileResource = service.get(uuid);
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeEndpoint.getDefaultLanguage());
     model.addAttribute("filename", fileResource.getFilename());
     model.addAttribute("uuid", fileResource.getUuid());
     return "fileresources/edit";

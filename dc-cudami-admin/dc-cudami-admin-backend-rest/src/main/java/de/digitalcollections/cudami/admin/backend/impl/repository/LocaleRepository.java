@@ -4,7 +4,7 @@ import feign.RequestLine;
 import java.util.List;
 import java.util.Locale;
 
-public interface LocaleRepositoryEndpoint {
+public interface LocaleRepository {
 
   @RequestLine("GET /latest/languages")
   List<String> findAllLanguages();
