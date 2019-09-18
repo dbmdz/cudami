@@ -85,9 +85,4 @@ public class DigitalObjectsController extends AbstractController {
     model.addAttribute("digitalObject", digitalObject);
     return "digitalobjects/view";
   }
-
-  // ----------------------------------------------------------------------------
-  public void setWebsiteService(DigitalObjectService digitalObjectService) {
-    this.service = digitalObjectService;
-  }
 }
