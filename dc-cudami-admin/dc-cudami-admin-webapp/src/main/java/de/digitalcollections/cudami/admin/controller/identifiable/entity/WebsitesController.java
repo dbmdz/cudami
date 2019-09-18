@@ -85,7 +85,6 @@ public class WebsitesController extends AbstractController {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
-    model.addAttribute("defaultLanguage", localeRepository.getDefaultLanguage());
     model.addAttribute("page", new PageWrapper(page, "/websites"));
     return "websites/list";
   }

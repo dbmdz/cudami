@@ -85,7 +85,7 @@
             <tbody>
               <tr th:each="subpage :*{children}">
                 <td>
-                  <a th:href="@{'/webpages/' + ${subpage.uuid}}" th:text="${subpage.label.getText(defaultLanguage)}">Label</a>
+                  <a th:href="@{'/webpages/' + ${subpage.uuid}}" th:text="${subpage.label.text}">Label</a>
                 </td>
                 <td class="center">
                   <a th:href="@{'/webpages/' + ${subpage.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
@@ -123,9 +123,9 @@
               <tr th:each="relatedFileResource: ${relatedFileResources}">
                 <td>
                   <!-- TODO
-                  <a th:href="@{'/fileresources/' + ${relatedFileResource.uuid}}" th:text="${relatedFileResource.label.getText(defaultLanguage)}">Label</a>
+                  <a th:href="@{'/fileresources/' + ${relatedFileResource.uuid}}" th:text="${relatedFileResource.label.text}">Label</a>
                   -->
-                  <span th:text="${relatedFileResource.label.getText(defaultLanguage)}">Label</span>
+                  <span th:text="${relatedFileResource.label.text}">Label</span>
                 </td>
                 <!-- TODO
                 <td class="center">

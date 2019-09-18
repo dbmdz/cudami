@@ -138,7 +138,6 @@ public class WebpagesController extends AbstractController {
   public String view(@PathVariable UUID uuid, Model model) {
     Webpage webpage = (Webpage) service.get(uuid);
     model.addAttribute("availableLanguages", webpage.getLabel().getLocales());
-    model.addAttribute("defaultLanguage", localeRepository.getDefaultLanguage());
     model.addAttribute("webpage", webpage);
 
     LinkedHashSet<FileResource> relatedFileResources = service.getRelatedFileResources(webpage);
