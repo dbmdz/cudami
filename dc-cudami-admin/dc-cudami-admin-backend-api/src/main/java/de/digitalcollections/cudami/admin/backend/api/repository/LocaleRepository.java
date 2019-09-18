@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Repository for Locale persistence handling.
+ */
 public interface LocaleRepository {
 
   @RequestLine("GET /latest/languages")
