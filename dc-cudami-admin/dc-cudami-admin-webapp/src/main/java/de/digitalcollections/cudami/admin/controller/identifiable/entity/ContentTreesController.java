@@ -118,8 +118,9 @@ public class ContentTreesController extends AbstractController {
   @GetMapping("/contenttrees/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) {
     ContentTree contentTree = (ContentTree) service.get(uuid);
-    model.addAttribute("availableLocales", contentTree.getLabel().getLocales());
+    model.addAttribute("availableLanguages", contentTree.getLabel().getLocales());
     model.addAttribute("contentTree", contentTree);
+
     return "contenttrees/view";
   }
 }

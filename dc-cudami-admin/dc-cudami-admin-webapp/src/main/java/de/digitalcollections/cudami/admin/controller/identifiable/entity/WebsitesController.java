@@ -118,9 +118,9 @@ public class WebsitesController extends AbstractController {
   @GetMapping("/websites/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) {
     Website website = (Website) service.get(uuid);
-    model.addAttribute("availableLocales", website.getLabel().getLocales());
-    model.addAttribute("defaultLocale", localeService.getDefaultLocale());
+    model.addAttribute("availableLanguages", website.getLabel().getLocales());
     model.addAttribute("website", website);
+
     return "websites/view";
   }
 }

@@ -118,9 +118,8 @@ public class ArticlesController extends AbstractController {
   @GetMapping("/articles/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) {
     Article article = (Article) service.get(uuid);
-    model.addAttribute("availableLocales", article.getLabel().getLocales());
-    model.addAttribute("defaultLocale", localeService.getDefaultLocale());
     model.addAttribute("article", article);
+    model.addAttribute("availableLanguages", article.getLabel().getLocales());
 
     LinkedHashSet<FileResource> relatedFileResources = service.getRelatedFileResources(article);
     model.addAttribute("relatedFileResources", relatedFileResources);

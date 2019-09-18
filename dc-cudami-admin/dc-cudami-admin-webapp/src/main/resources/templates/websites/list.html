@@ -44,7 +44,7 @@
             <tbody>
               <tr th:each="website: ${page.content}">
                 <td>
-                  <a th:href="@{'/websites/' + ${website.uuid}}" th:if="${website.label}" th:text="${website.label.getText(defaultLocale)}">bavarikon</a>
+                  <a th:href="@{'/websites/' + ${website.uuid}}" th:if="${website.label}" th:text="${website.label.text}">bavarikon</a>
                 </td>
                 <td><a th:href="${website.url}" th:text="${website.url}" target="_blank">http://www.bavarikon.de/</a></td>
                 <!--<td><a th:href="@{'/websites/' + ${website.uuid}}" th:text="${website.registrationDate}">23.01.1999</a></td>-->

@@ -167,8 +167,7 @@ public class FileResourcesController extends AbstractController {
   @GetMapping(value = "/fileresources/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) {
     FileResource resource = service.get(uuid);
-    model.addAttribute("availableLocales", resource.getLabel().getLocales());
-    model.addAttribute("defaultLocale", localeService.getDefaultLocale());
+    model.addAttribute("availableLanguages", resource.getLabel().getLocales());
     model.addAttribute("fileresource", resource);
     return "fileresources/view";
   }

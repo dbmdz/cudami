@@ -134,12 +134,12 @@ public class ContentNodesController extends AbstractController {
   @GetMapping("/contentnodes/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) {
     ContentNode contentNode = (ContentNode) service.get(uuid);
-    model.addAttribute("availableLocales", contentNode.getLabel().getLocales());
-    model.addAttribute("defaultLocale", localeService.getDefaultLocale());
+    model.addAttribute("availableLanguages", contentNode.getLabel().getLocales());
     model.addAttribute("contentNode", contentNode);
 
     LinkedHashSet<FileResource> relatedFileResources = service.getRelatedFileResources(contentNode);
     model.addAttribute("relatedFileResources", relatedFileResources);
+
     return "contentnodes/view";
   }
 }

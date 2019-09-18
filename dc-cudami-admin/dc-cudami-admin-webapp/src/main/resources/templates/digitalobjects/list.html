@@ -42,7 +42,7 @@
             <tbody>
               <tr th:each="digitalobject: ${page.content}">
                 <td>
-                  <a th:href="@{'/digitalobjects/' + ${digitalobject.uuid}}" th:if="${digitalobject.label}" th:text="${digitalobject.label.getText(defaultLocale)}">bsb10001000</a>
+                  <a th:href="@{'/digitalobjects/' + ${digitalobject.uuid}}" th:if="${digitalobject.label}" th:text="${digitalobject.label.text}">bsb10001000</a>
                 </td>
                 <td class="center">
                   <a th:href="@{'/digitalobjects/' + ${digitalobject.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>

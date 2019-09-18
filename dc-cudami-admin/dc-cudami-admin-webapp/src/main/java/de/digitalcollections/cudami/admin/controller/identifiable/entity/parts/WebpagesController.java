@@ -134,7 +134,7 @@ public class WebpagesController extends AbstractController {
   @GetMapping("/webpages/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) {
     Webpage webpage = (Webpage) service.get(uuid);
-    model.addAttribute("availableLocales", webpage.getLabel().getLocales());
+    model.addAttribute("availableLanguages", webpage.getLabel().getLocales());
     model.addAttribute("defaultLanguage", localeEndpoint.getDefaultLanguage());
     model.addAttribute("webpage", webpage);
 
