@@ -16,7 +16,6 @@ import java.util.UUID;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.context.MessageSourceAware;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,20 +40,16 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  */
 @Controller
 @SessionAttributes(value = {"user"})
-public class UserController extends AbstractController implements MessageSourceAware {
+public class UserController extends AbstractController {
 
-  private MessageSource messageSource;
+  private final MessageSource messageSource;
 
-  UserService userService;
+  UserService service;
 
   @Autowired
-  public UserController(UserService userService) {
-    this.userService = userService;
-  }
-
-  @Override
-  public void setMessageSource(MessageSource messageSource) {
+  public UserController(MessageSource messageSource, UserService service) {
     this.messageSource = messageSource;
+    this.service = service;
   }
 
   @ModelAttribute("menu")
@@ -75,7 +70,7 @@ public class UserController extends AbstractController implements MessageSourceA
 
   @RequestMapping(value = "/users/{uuid}/activate", method = RequestMethod.GET)
   public String activate(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
-    User user = userService.activate(uuid);
+    User user = service.activate(uuid);
     String message = messageSource.getMessage("msg.user_activated", new Object[]{user.getEmail()}, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
     return "redirect:/users";
@@ -83,7 +78,7 @@ public class UserController extends AbstractController implements MessageSourceA
 
   @RequestMapping(value = "/users/{uuid}/deactivate", method = RequestMethod.GET)
   public String deactivate(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
-    User user = userService.deactivate(uuid);
+    User user = service.deactivate(uuid);
     String message = messageSource.getMessage("msg.user_deactivated", new Object[]{user.getEmail()}, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("warning_message", message);
     return "redirect:/users";
@@ -91,7 +86,7 @@ public class UserController extends AbstractController implements MessageSourceA
 
   @RequestMapping(value = "/users/new", method = RequestMethod.GET)
   public String create(Model model) {
-    model.addAttribute("user", userService.create());
+    model.addAttribute("user", service.create());
     return "users/create";
   }
 
@@ -101,7 +96,7 @@ public class UserController extends AbstractController implements MessageSourceA
     if (results.hasErrors()) {
       return "users/create";
     }
-    User userDb = userService.create(user, password1, password2, (Errors) results);
+    User userDb = service.create(user, password1, password2, (Errors) results);
     if (results.hasErrors()) {
       return "users/create";
     }
@@ -113,7 +108,7 @@ public class UserController extends AbstractController implements MessageSourceA
 
   @RequestMapping(value = "/users/{uuid}/edit", method = RequestMethod.GET)
   public String edit(@PathVariable UUID uuid, Model model) {
-    model.addAttribute("user", userService.findOne(uuid));
+    model.addAttribute("user", service.findOne(uuid));
     return "users/edit";
   }
 
@@ -124,7 +119,7 @@ public class UserController extends AbstractController implements MessageSourceA
     if (results.hasErrors()) {
       return "users/edit";
     }
-    userService.update(user, password1, password2, (Errors) results);
+    service.update(user, password1, password2, (Errors) results);
     if (results.hasErrors()) {
       return "users/edit";
     }
@@ -139,7 +134,7 @@ public class UserController extends AbstractController implements MessageSourceA
 //    List<User> users = userService.getAll();
 //    model.addAttribute("users", users);
     final PageRequest pageRequest = PageableConverter.convert(pageable);
-    final PageResponse pageResponse = userService.find(pageRequest);
+    final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
     model.addAttribute("page", new PageWrapper(page, "/users"));
     return "users/list";
@@ -147,7 +142,7 @@ public class UserController extends AbstractController implements MessageSourceA
 
   @RequestMapping(value = "/users/{uuid}", method = RequestMethod.GET)
   public String view(@PathVariable UUID uuid, Model model) {
-    model.addAttribute("user", userService.findOne(uuid));
+    model.addAttribute("user", service.findOne(uuid));
     return "users/view";
   }
 }
