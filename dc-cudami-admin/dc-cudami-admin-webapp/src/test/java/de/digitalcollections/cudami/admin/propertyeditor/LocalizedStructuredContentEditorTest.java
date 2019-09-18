@@ -29,8 +29,7 @@ public class LocalizedStructuredContentEditorTest implements InitializingBean {
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    this.documentEditor = new LocalizedStructuredContentEditor();
-    this.documentEditor.setObjectMapper(objectMapper);
+    this.documentEditor = new LocalizedStructuredContentEditor(objectMapper);
   }
 
   private LocalizedStructuredContent createLocalizedStructuredContent(String filename) {
