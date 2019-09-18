@@ -14,8 +14,6 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.context.MessageSourceAware;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -35,19 +33,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  */
 @Controller
 @SessionAttributes(value = {"digitalobject"})
-public class DigitalObjectsController extends AbstractController implements MessageSourceAware {
+public class DigitalObjectsController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectsController.class);
 
-  private MessageSource messageSource;
-
   @Autowired
   DigitalObjectService service;
-
-  @Override
-  public void setMessageSource(MessageSource messageSource) {
-    this.messageSource = messageSource;
-  }
 
   @ModelAttribute("menu")
   protected String module() {
