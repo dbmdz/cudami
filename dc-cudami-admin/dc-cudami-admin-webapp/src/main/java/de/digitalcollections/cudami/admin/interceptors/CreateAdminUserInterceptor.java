@@ -21,9 +21,9 @@ import org.springframework.web.servlet.view.RedirectView;
  */
 public class CreateAdminUserInterceptor extends HandlerInterceptorAdapter implements MessageSourceAware {
 
-  private MessageSource messageSource;
-
   private static final Logger LOGGER = LoggerFactory.getLogger(CreateAdminUserInterceptor.class);
+
+  private MessageSource messageSource;
 
   @Autowired
   private UserService userService;
