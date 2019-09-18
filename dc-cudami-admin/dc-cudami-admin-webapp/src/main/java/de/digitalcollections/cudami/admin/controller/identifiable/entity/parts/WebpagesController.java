@@ -43,7 +43,7 @@ public class WebpagesController extends AbstractController {
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpagesController.class);
 
   @Autowired
-  LocaleRepository localeEndpoint;
+  LocaleRepository localeRepository;
 
   @Autowired
   WebpageService service;
@@ -55,7 +55,7 @@ public class WebpagesController extends AbstractController {
 
   @GetMapping("/webpages/new")
   public String create(Model model, @RequestParam("parentType") String parentType, @RequestParam("parentUuid") String parentUuid) {
-    model.addAttribute("activeLanguage", localeEndpoint.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
     return "webpages/create";
@@ -70,7 +70,7 @@ public class WebpagesController extends AbstractController {
   @GetMapping("/webpages/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) {
     Webpage webpage = (Webpage) service.get(uuid);
-    model.addAttribute("activeLanguage", localeEndpoint.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     model.addAttribute("uuid", webpage.getUuid());
     return "webpages/edit";
   }
@@ -135,7 +135,7 @@ public class WebpagesController extends AbstractController {
   public String view(@PathVariable UUID uuid, Model model) {
     Webpage webpage = (Webpage) service.get(uuid);
     model.addAttribute("availableLanguages", webpage.getLabel().getLocales());
-    model.addAttribute("defaultLanguage", localeEndpoint.getDefaultLanguage());
+    model.addAttribute("defaultLanguage", localeRepository.getDefaultLanguage());
     model.addAttribute("webpage", webpage);
 
     LinkedHashSet<FileResource> relatedFileResources = service.getRelatedFileResources(webpage);

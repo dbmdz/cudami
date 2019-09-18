@@ -43,7 +43,7 @@ public class ContentNodesController extends AbstractController {
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentNodesController.class);
 
   @Autowired
-  LocaleRepository localeEndpoint;
+  LocaleRepository localeRepository;
 
   @Autowired
   ContentNodeService service;
@@ -55,7 +55,7 @@ public class ContentNodesController extends AbstractController {
 
   @GetMapping("/contentnodes/new")
   public String create(Model model, @RequestParam("parentType") String parentType, @RequestParam("parentUuid") String parentUuid) {
-    model.addAttribute("activeLanguage", localeEndpoint.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
     return "contentnodes/create";
@@ -70,7 +70,7 @@ public class ContentNodesController extends AbstractController {
   @GetMapping("/contentnodes/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) {
     ContentNode contentNode = (ContentNode) service.get(uuid);
-    model.addAttribute("activeLanguage", localeEndpoint.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     model.addAttribute("uuid", contentNode.getUuid());
     return "contentnodes/edit";
   }

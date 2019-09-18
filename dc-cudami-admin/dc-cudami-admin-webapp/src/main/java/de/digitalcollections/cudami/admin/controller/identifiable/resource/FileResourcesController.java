@@ -48,7 +48,7 @@ public class FileResourcesController extends AbstractController {
   private static final Logger LOGGER = LoggerFactory.getLogger(FileResourcesController.class);
 
   @Autowired
-  LocaleRepository localeEndpoint;
+  LocaleRepository localeRepository;
 
   @Autowired
   CudamiFileResourceService service;
@@ -60,7 +60,7 @@ public class FileResourcesController extends AbstractController {
 
   @GetMapping(value = "/fileresources/new")
   public String create(Model model) {
-    model.addAttribute("activeLanguage", localeEndpoint.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     return "fileresources/create";
   }
 
@@ -73,7 +73,7 @@ public class FileResourcesController extends AbstractController {
   @GetMapping("/fileresources/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) {
     FileResource fileResource = service.get(uuid);
-    model.addAttribute("activeLanguage", localeEndpoint.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     model.addAttribute("filename", fileResource.getFilename());
     model.addAttribute("uuid", fileResource.getUuid());
     return "fileresources/edit";

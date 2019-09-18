@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class LanguageController {
 
   @Autowired
-  LocaleRepository endpoint;
+  LocaleRepository repository;
 
   @GetMapping("/api/languages")
   public List<String> getLanguages() {
-    return endpoint.findAllLanguages();
+    return repository.findAllLanguages();
   }
 }

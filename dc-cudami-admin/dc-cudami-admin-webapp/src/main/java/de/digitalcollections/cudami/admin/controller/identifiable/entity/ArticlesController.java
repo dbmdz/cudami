@@ -42,7 +42,7 @@ public class ArticlesController extends AbstractController {
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticlesController.class);
 
   @Autowired
-  LocaleRepository localeEndpoint;
+  LocaleRepository localeRepository;
 
   @Autowired
   ArticleService service;
@@ -54,7 +54,7 @@ public class ArticlesController extends AbstractController {
 
   @GetMapping("/articles/new")
   public String create(Model model) {
-    model.addAttribute("activeLanguage", localeEndpoint.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     return "articles/create";
   }
 
@@ -67,7 +67,7 @@ public class ArticlesController extends AbstractController {
   @GetMapping("/articles/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) {
     Article article = service.get(uuid);
-    model.addAttribute("activeLanguage", localeEndpoint.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     model.addAttribute("uuid", article.getUuid());
     return "articles/edit";
   }

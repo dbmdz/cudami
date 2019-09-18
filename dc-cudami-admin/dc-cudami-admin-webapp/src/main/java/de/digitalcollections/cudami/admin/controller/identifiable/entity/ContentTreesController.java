@@ -42,7 +42,7 @@ public class ContentTreesController extends AbstractController {
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentTreesController.class);
 
   @Autowired
-  LocaleRepository localeEndpoint;
+  LocaleRepository localeRepository;
 
   @Autowired
   ContentTreeService service;
@@ -54,7 +54,7 @@ public class ContentTreesController extends AbstractController {
 
   @GetMapping("/contenttrees/new")
   public String create(Model model) {
-    model.addAttribute("activeLanguage", localeEndpoint.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     return "contenttrees/create";
   }
 
@@ -67,7 +67,7 @@ public class ContentTreesController extends AbstractController {
   @RequestMapping(value = "/contenttrees/{uuid}/edit", method = RequestMethod.GET)
   public String edit(@PathVariable UUID uuid, Model model) {
     ContentTree contentTree = service.get(uuid);
-    model.addAttribute("activeLanguage", localeEndpoint.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     model.addAttribute("uuid", contentTree.getUuid());
     return "contenttrees/edit";
   }
