@@ -42,7 +42,7 @@ public class DigitalObjectsController extends AbstractController implements Mess
   private MessageSource messageSource;
 
   @Autowired
-  DigitalObjectService digitalObjectService;
+  DigitalObjectService service;
 
   @Override
   public void setMessageSource(MessageSource messageSource) {
@@ -77,24 +77,22 @@ public class DigitalObjectsController extends AbstractController implements Mess
   @RequestMapping(value = "/digitalobjects", method = RequestMethod.GET)
   public String list(Model model, @PageableDefault(sort = {"lastModified"}, size = 25) Pageable pageable) {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
-    final PageResponse pageResponse = digitalObjectService.find(pageRequest);
+    final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
-    model.addAttribute("defaultLocale", localeService.getDefaultLocale());
     model.addAttribute("page", new PageWrapper(page, "/digitalobjects"));
     return "digitalobjects/list";
   }
 
   @RequestMapping(value = "/digitalobjects/{uuid}", method = RequestMethod.GET)
   public String view(@PathVariable UUID uuid, Model model) {
-    DigitalObject digitalObject = (DigitalObject) digitalObjectService.get(uuid);
+    DigitalObject digitalObject = (DigitalObject) service.get(uuid);
     model.addAttribute("availableLocales", digitalObject.getLabel().getLocales());
-    model.addAttribute("defaultLocale", localeService.getDefaultLocale());
     model.addAttribute("digitalObject", digitalObject);
     return "digitalobjects/view";
   }
 
   // ----------------------------------------------------------------------------
   public void setWebsiteService(DigitalObjectService digitalObjectService) {
-    this.digitalObjectService = digitalObjectService;
+    this.service = digitalObjectService;
   }
 }
