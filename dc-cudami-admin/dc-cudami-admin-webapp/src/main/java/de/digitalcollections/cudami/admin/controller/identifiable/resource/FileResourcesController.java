@@ -4,7 +4,7 @@ import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.backend.impl.repository.LocaleRepository;
+import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.CudamiFileResourceService;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;

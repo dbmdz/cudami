@@ -57,11 +57,11 @@
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-admin-backend-api</artifactId>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-admin-backend-rest</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>

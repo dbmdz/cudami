@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.admin.controller;
 
-import de.digitalcollections.cudami.admin.backend.impl.repository.LocaleRepository;
+import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
