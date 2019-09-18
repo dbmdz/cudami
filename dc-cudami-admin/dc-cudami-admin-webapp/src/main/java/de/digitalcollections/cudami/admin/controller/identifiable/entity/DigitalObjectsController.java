@@ -4,7 +4,6 @@ import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.business.api.service.LocaleService;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -41,9 +40,6 @@ public class DigitalObjectsController extends AbstractController implements Mess
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectsController.class);
 
   private MessageSource messageSource;
-
-  @Autowired
-  LocaleService localeService;
 
   @Autowired
   DigitalObjectService digitalObjectService;
