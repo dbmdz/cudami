@@ -4,7 +4,7 @@ import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.business.api.service.LocaleService;
+import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.WebpageService;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
@@ -42,11 +42,14 @@ public class WebpagesController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpagesController.class);
 
-  @Autowired
-  LocaleService localeService;
+  LocaleRepository localeRepository;
+  WebpageService service;
 
   @Autowired
-  WebpageService service;
+  public WebpagesController(LocaleRepository localeRepository, WebpageService service) {
+    this.localeRepository = localeRepository;
+    this.service = service;
+  }
 
   @ModelAttribute("menu")
   protected String module() {
@@ -55,7 +58,7 @@ public class WebpagesController extends AbstractController {
 
   @GetMapping("/webpages/new")
   public String create(Model model, @RequestParam("parentType") String parentType, @RequestParam("parentUuid") String parentUuid) {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
     return "webpages/create";
@@ -70,7 +73,7 @@ public class WebpagesController extends AbstractController {
   @GetMapping("/webpages/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) {
     Webpage webpage = (Webpage) service.get(uuid);
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     model.addAttribute("uuid", webpage.getUuid());
     return "webpages/edit";
   }
@@ -134,8 +137,7 @@ public class WebpagesController extends AbstractController {
   @GetMapping("/webpages/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) {
     Webpage webpage = (Webpage) service.get(uuid);
-    model.addAttribute("availableLocales", webpage.getLabel().getLocales());
-    model.addAttribute("defaultLocale", localeService.getDefaultLocale());
+    model.addAttribute("availableLanguages", webpage.getLabel().getLocales());
     model.addAttribute("webpage", webpage);
 
     LinkedHashSet<FileResource> relatedFileResources = service.getRelatedFileResources(webpage);

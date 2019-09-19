@@ -13,10 +13,31 @@
   <artifactId>dc-cudami-admin-backend-api</artifactId>
   <packaging>jar</packaging>
 
+  <properties>
+    <version.dc-commons-feign>4.0.3</version.dc-commons-feign>
+  </properties>
+
   <dependencies>
+    <dependency>
+      <groupId>de.digitalcollections.commons</groupId>
+      <artifactId>dc-commons-feign</artifactId>
+      <version>${version.dc-commons-feign}</version>
+    </dependency>
     <dependency>
       <groupId>de.digitalcollections.model</groupId>
       <artifactId>dc-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.github.openfeign</groupId>
+      <artifactId>feign-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.github.openfeign</groupId>
+      <artifactId>feign-jackson</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.github.openfeign.form</groupId>
+      <artifactId>feign-form-spring</artifactId>
     </dependency>
   </dependencies>
 </project>

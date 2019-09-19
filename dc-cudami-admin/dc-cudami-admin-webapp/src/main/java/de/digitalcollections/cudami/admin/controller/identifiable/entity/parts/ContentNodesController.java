@@ -4,7 +4,7 @@ import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.business.api.service.LocaleService;
+import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.ContentNodeService;
 import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
@@ -42,11 +42,14 @@ public class ContentNodesController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentNodesController.class);
 
-  @Autowired
-  LocaleService localeService;
+  LocaleRepository localeRepository;
+  ContentNodeService service;
 
   @Autowired
-  ContentNodeService service;
+  public ContentNodesController(LocaleRepository localeRepository, ContentNodeService service) {
+    this.localeRepository = localeRepository;
+    this.service = service;
+  }
 
   @ModelAttribute("menu")
   protected String module() {
@@ -55,7 +58,7 @@ public class ContentNodesController extends AbstractController {
 
   @GetMapping("/contentnodes/new")
   public String create(Model model, @RequestParam("parentType") String parentType, @RequestParam("parentUuid") String parentUuid) {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
     return "contentnodes/create";
@@ -70,7 +73,7 @@ public class ContentNodesController extends AbstractController {
   @GetMapping("/contentnodes/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) {
     ContentNode contentNode = (ContentNode) service.get(uuid);
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     model.addAttribute("uuid", contentNode.getUuid());
     return "contentnodes/edit";
   }
@@ -134,12 +137,12 @@ public class ContentNodesController extends AbstractController {
   @GetMapping("/contentnodes/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) {
     ContentNode contentNode = (ContentNode) service.get(uuid);
-    model.addAttribute("availableLocales", contentNode.getLabel().getLocales());
-    model.addAttribute("defaultLocale", localeService.getDefaultLocale());
+    model.addAttribute("availableLanguages", contentNode.getLabel().getLocales());
     model.addAttribute("contentNode", contentNode);
 
     LinkedHashSet<FileResource> relatedFileResources = service.getRelatedFileResources(contentNode);
     model.addAttribute("relatedFileResources", relatedFileResources);
+
     return "contentnodes/view";
   }
 }

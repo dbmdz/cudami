@@ -4,7 +4,7 @@ import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.business.api.service.LocaleService;
+import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.ArticleService;
 import de.digitalcollections.model.api.identifiable.entity.Article;
@@ -41,11 +41,14 @@ public class ArticlesController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticlesController.class);
 
-  @Autowired
-  LocaleService localeService;
+  LocaleRepository localeRepository;
+  ArticleService service;
 
   @Autowired
-  ArticleService service;
+  public ArticlesController(LocaleRepository localeRepository, ArticleService service) {
+    this.localeRepository = localeRepository;
+    this.service = service;
+  }
 
   @ModelAttribute("menu")
   protected String module() {
@@ -54,7 +57,7 @@ public class ArticlesController extends AbstractController {
 
   @GetMapping("/articles/new")
   public String create(Model model) {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     return "articles/create";
   }
 
@@ -67,7 +70,7 @@ public class ArticlesController extends AbstractController {
   @GetMapping("/articles/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) {
     Article article = service.get(uuid);
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     model.addAttribute("uuid", article.getUuid());
     return "articles/edit";
   }
@@ -118,9 +121,8 @@ public class ArticlesController extends AbstractController {
   @GetMapping("/articles/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) {
     Article article = (Article) service.get(uuid);
-    model.addAttribute("availableLocales", article.getLabel().getLocales());
-    model.addAttribute("defaultLocale", localeService.getDefaultLocale());
     model.addAttribute("article", article);
+    model.addAttribute("availableLanguages", article.getLabel().getLocales());
 
     LinkedHashSet<FileResource> relatedFileResources = service.getRelatedFileResources(article);
     model.addAttribute("relatedFileResources", relatedFileResources);

@@ -4,7 +4,7 @@ import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.business.api.service.LocaleService;
+import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.model.api.identifiable.entity.Website;
@@ -39,11 +39,14 @@ public class WebsitesController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsitesController.class);
 
-  @Autowired
-  LocaleService localeService;
+  LocaleRepository localeRepository;
+  WebsiteService service;
 
   @Autowired
-  WebsiteService service;
+  public WebsitesController(LocaleRepository localeRepository, WebsiteService service) {
+    this.localeRepository = localeRepository;
+    this.service = service;
+  }
 
   @ModelAttribute("menu")
   protected String module() {
@@ -52,7 +55,7 @@ public class WebsitesController extends AbstractController {
 
   @GetMapping("/websites/new")
   public String create(Model model) {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     return "websites/create";
   }
 
@@ -65,7 +68,7 @@ public class WebsitesController extends AbstractController {
   @GetMapping("/websites/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) {
     Website website = service.get(uuid);
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     model.addAttribute("url", website.getUrl());
     model.addAttribute("uuid", website.getUuid());
     return "websites/edit";
@@ -82,7 +85,6 @@ public class WebsitesController extends AbstractController {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
-    model.addAttribute("defaultLocale", localeService.getDefaultLocale());
     model.addAttribute("page", new PageWrapper(page, "/websites"));
     return "websites/list";
   }
@@ -118,9 +120,9 @@ public class WebsitesController extends AbstractController {
   @GetMapping("/websites/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) {
     Website website = (Website) service.get(uuid);
-    model.addAttribute("availableLocales", website.getLabel().getLocales());
-    model.addAttribute("defaultLocale", localeService.getDefaultLocale());
+    model.addAttribute("availableLanguages", website.getLabel().getLocales());
     model.addAttribute("website", website);
+
     return "websites/view";
   }
 }

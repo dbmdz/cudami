@@ -47,7 +47,7 @@
             <tbody>
               <tr th:each="fileresource : ${page.content}">
                 <td>
-                  <a th:href="@{'/fileresources/' + ${fileresource.uuid}}" th:if="${fileresource.label}" th:text="${fileresource.label.getText(defaultLocale)}">image001.jpg</a>
+                  <a th:href="@{'/fileresources/' + ${fileresource.uuid}}" th:if="${fileresource.label}" th:text="${fileresource.label.text}">image001.jpg</a>
                 </td>
                 <td><span th:text="${fileresource.filename}">image001.jpg</span></td>
                 <td><span th:text="${fileresource.mimeType.getTypeName()}">image/jpeg</span></td>

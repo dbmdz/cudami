@@ -4,7 +4,7 @@ import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.business.api.service.LocaleService;
+import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.ContentTreeService;
 import de.digitalcollections.model.api.identifiable.entity.ContentTree;
@@ -41,11 +41,14 @@ public class ContentTreesController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentTreesController.class);
 
-  @Autowired
-  LocaleService localeService;
+  LocaleRepository localeRepository;
+  ContentTreeService service;
 
   @Autowired
-  ContentTreeService service;
+  public ContentTreesController(LocaleRepository localeRepository, ContentTreeService service) {
+    this.localeRepository = localeRepository;
+    this.service = service;
+  }
 
   @ModelAttribute("menu")
   protected String module() {
@@ -54,7 +57,7 @@ public class ContentTreesController extends AbstractController {
 
   @GetMapping("/contenttrees/new")
   public String create(Model model) {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     return "contenttrees/create";
   }
 
@@ -67,7 +70,7 @@ public class ContentTreesController extends AbstractController {
   @RequestMapping(value = "/contenttrees/{uuid}/edit", method = RequestMethod.GET)
   public String edit(@PathVariable UUID uuid, Model model) {
     ContentTree contentTree = service.get(uuid);
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     model.addAttribute("uuid", contentTree.getUuid());
     return "contenttrees/edit";
   }
@@ -118,8 +121,9 @@ public class ContentTreesController extends AbstractController {
   @GetMapping("/contenttrees/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) {
     ContentTree contentTree = (ContentTree) service.get(uuid);
-    model.addAttribute("availableLocales", contentTree.getLabel().getLocales());
+    model.addAttribute("availableLanguages", contentTree.getLabel().getLocales());
     model.addAttribute("contentTree", contentTree);
+
     return "contenttrees/view";
   }
 }

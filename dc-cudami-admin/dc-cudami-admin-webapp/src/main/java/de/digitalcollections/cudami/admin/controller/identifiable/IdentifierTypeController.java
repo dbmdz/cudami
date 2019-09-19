@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.context.MessageSourceAware;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,18 +33,18 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @SessionAttributes(value = {"identifierType"})
-public class IdentifierTypeController extends AbstractController implements MessageSourceAware {
+public class IdentifierTypeController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifierTypeController.class);
 
-  private MessageSource messageSource;
+  private final MessageSource messageSource;
 
-  @Autowired
   IdentifierTypeService service;
 
-  @Override
-  public void setMessageSource(MessageSource messageSource) {
+  @Autowired
+  public IdentifierTypeController(MessageSource messageSource, IdentifierTypeService service) {
     this.messageSource = messageSource;
+    this.service = service;
   }
 
   @ModelAttribute("menu")

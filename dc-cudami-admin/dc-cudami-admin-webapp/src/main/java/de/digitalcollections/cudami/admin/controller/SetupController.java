@@ -6,7 +6,6 @@ import de.digitalcollections.model.impl.security.UserImpl;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.context.MessageSourceAware;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,16 +24,16 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  */
 @Controller
 @SessionAttributes(value = {"user"})
-public class SetupController extends AbstractController implements MessageSourceAware {
+public class SetupController extends AbstractController {
 
-  private MessageSource messageSource;
+  private final MessageSource messageSource;
 
-  @Autowired
   UserService userService;
 
-  @Override
-  public void setMessageSource(MessageSource messageSource) {
+  @Autowired
+  public SetupController(MessageSource messageSource, UserService userService) {
     this.messageSource = messageSource;
+    this.userService = userService;
   }
 
   @ModelAttribute("createAdmin")

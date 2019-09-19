@@ -41,19 +41,19 @@
       <div class="row main-content">
         <div class="col-sm-12">
           <ul class="nav nav-tabs" role="tablist">
-            <li class="nav-item" th:each="locale,iter : ${availableLocales}">
-              <a class="nav-link" th:classappend="${iter.index} == 0 ? active" th:href="${'#' + locale}" data-toggle="tab" th:text="${locale.getDisplayName(#locale)}" role="tab">locale</a>
+            <li class="nav-item" th:each="language,iter : ${availableLanguages}">
+              <a class="nav-link" th:classappend="${iter.index} == 0 ? active" th:href="${'#' + language}" data-toggle="tab" th:text="${language.getDisplayName(#locale)}" role="tab">language</a>
             </li>
           </ul>
           <div class="tab-content">
-            <div th:each="locale,iter : ${availableLocales}" th:id="${locale}" class="tab-pane" th:classappend="${iter.index} == 0 ? active">
+            <div th:each="language,iter : ${availableLanguages}" th:id="${language}" class="tab-pane" th:classappend="${iter.index} == 0 ? active">
               <div class="card">
                 <div class="card-body bg-light">
-                  <div th:replace="fragments/identifiable::renderTeaser(${webpage}, ${locale})"></div>
+                  <div th:replace="fragments/identifiable::renderTeaser(${webpage}, ${language})"></div>
                 </div>
-                <th:block th:if="*{text} and ${webpage.text.containsKey(locale)}">
+                <th:block th:if="*{text} and ${webpage.text.containsKey(language)}">
                   <div class="card-body">
-                    <div th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(*{text}, ${locale})"></div>
+                    <div th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(*{text}, ${language})"></div>
                   </div>
                 </th:block>
               </div>
@@ -85,7 +85,7 @@
             <tbody>
               <tr th:each="subpage :*{children}">
                 <td>
-                  <a th:href="@{'/webpages/' + ${subpage.uuid}}" th:text="${subpage.label.getText(defaultLocale)}">Label</a>
+                  <a th:href="@{'/webpages/' + ${subpage.uuid}}" th:text="${subpage.label.text}">Label</a>
                 </td>
                 <td class="center">
                   <a th:href="@{'/webpages/' + ${subpage.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
@@ -123,9 +123,9 @@
               <tr th:each="relatedFileResource: ${relatedFileResources}">
                 <td>
                   <!-- TODO
-                  <a th:href="@{'/fileresources/' + ${relatedFileResource.uuid}}" th:text="${relatedFileResource.label.getText(defaultLocale)}">Label</a>
+                  <a th:href="@{'/fileresources/' + ${relatedFileResource.uuid}}" th:text="${relatedFileResource.label.text}">Label</a>
                   -->
-                  <span th:text="${relatedFileResource.label.getText(defaultLocale)}">Label</span>
+                  <span th:text="${relatedFileResource.label.text}">Label</span>
                 </td>
                 <!-- TODO
                 <td class="center">

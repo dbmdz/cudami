@@ -4,7 +4,6 @@ import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.business.api.service.LocaleService;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -15,8 +14,6 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.context.MessageSourceAware;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -36,21 +33,15 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  */
 @Controller
 @SessionAttributes(value = {"digitalobject"})
-public class DigitalObjectsController extends AbstractController implements MessageSourceAware {
+public class DigitalObjectsController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectsController.class);
 
-  private MessageSource messageSource;
+  DigitalObjectService service;
 
   @Autowired
-  LocaleService localeService;
-
-  @Autowired
-  DigitalObjectService digitalObjectService;
-
-  @Override
-  public void setMessageSource(MessageSource messageSource) {
-    this.messageSource = messageSource;
+  public DigitalObjectsController(DigitalObjectService service) {
+    this.service = service;
   }
 
   @ModelAttribute("menu")
@@ -81,24 +72,17 @@ public class DigitalObjectsController extends AbstractController implements Mess
   @RequestMapping(value = "/digitalobjects", method = RequestMethod.GET)
   public String list(Model model, @PageableDefault(sort = {"lastModified"}, size = 25) Pageable pageable) {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
-    final PageResponse pageResponse = digitalObjectService.find(pageRequest);
+    final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
-    model.addAttribute("defaultLocale", localeService.getDefaultLocale());
     model.addAttribute("page", new PageWrapper(page, "/digitalobjects"));
     return "digitalobjects/list";
   }
 
   @RequestMapping(value = "/digitalobjects/{uuid}", method = RequestMethod.GET)
   public String view(@PathVariable UUID uuid, Model model) {
-    DigitalObject digitalObject = (DigitalObject) digitalObjectService.get(uuid);
+    DigitalObject digitalObject = (DigitalObject) service.get(uuid);
     model.addAttribute("availableLocales", digitalObject.getLabel().getLocales());
-    model.addAttribute("defaultLocale", localeService.getDefaultLocale());
     model.addAttribute("digitalObject", digitalObject);
     return "digitalobjects/view";
-  }
-
-  // ----------------------------------------------------------------------------
-  public void setWebsiteService(DigitalObjectService digitalObjectService) {
-    this.digitalObjectService = digitalObjectService;
   }
 }

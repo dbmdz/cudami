@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.entity.parts;
 
-import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.ContentNodeRepository;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
@@ -17,9 +16,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepositoryImpl<ContentNode, E> implements ContentNodeRepository<E> {
-
-  @Autowired
-  LocaleRepository localeRepository;
 
   @Autowired
   private ContentNodeRepositoryEndpoint endpoint;
