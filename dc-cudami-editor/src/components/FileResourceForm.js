@@ -19,7 +19,7 @@ import LanguageTabContent from './LanguageTabContent';
 const FileResourceForm = (props) => {
   const { t } = useTranslation();
   if (!props.identifiable.uuid) {
-    return <FileResourceUploadForm type={props.type} onUpdate={props.onUpdate} />;
+    return <FileResourceUploadForm apiContextPath={props.apiContextPath} type={props.type} onUpdate={props.onUpdate} />;
   }
   return (
     <Form onSubmit={evt => {

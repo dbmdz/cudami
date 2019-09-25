@@ -2,7 +2,7 @@ cudami:
   defaultLocale-gui: en
   server:
     address: http://localhost:9000
-  
+
 info:
   app:
     encoding: @project.build.sourceEncoding@

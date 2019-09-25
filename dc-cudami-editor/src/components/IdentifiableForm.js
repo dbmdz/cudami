@@ -44,8 +44,9 @@ class IdentifiableForm extends Component {
 
   async componentDidMount(){
     const i18n = initI18n(this.props.uiLocale);
-    const availableLanguages = this.props.mockApi ? getAvailableLanguages() : await loadAvailableLanguages();
+    const availableLanguages = this.props.mockApi ? getAvailableLanguages() : await loadAvailableLanguages(this.props.apiContextPath);
     let identifiable = await loadIdentifiable(
+      this.props.apiContextPath,
       this.props.type, this.props.uuid || 'new'
     );
     if (!identifiable.uuid) {
@@ -104,6 +105,7 @@ class IdentifiableForm extends Component {
     const FormComponent = FORM_COMPONENT_MAPPING[this.props.type];
     return <FormComponent
       activeLanguage={this.state.activeLanguage}
+      apiContextPath={this.props.apiContextPath}
       canAddLanguage={this.state.availableLanguages.length > 0}
       identifiable={this.state.identifiable}
       onAddLanguage={this.toggleModal}
@@ -135,11 +137,13 @@ class IdentifiableForm extends Component {
     if (this.isFormValid()){
       if (this.state.identifiable.uuid) {
         updateIdentifiable(
+          this.props.apiContextPath,
           this.state.identifiable,
           this.props.type
         );
       } else {
         saveIdentifiable(
+          this.props.apiContextPath,
           this.state.identifiable,
           this.props.parentType,
           this.props.parentUuid,
@@ -205,11 +209,12 @@ class IdentifiableForm extends Component {
             onToggle={() => this.toggleModal('tableAdder')}
           />
         </Container>
-      : <></>;
+      : null;
   }
 }
 
 IdentifiableForm.defaultProps = {
+  apiContextPath: '/',
   debug: false,
   mockApi: false
 };

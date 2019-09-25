@@ -8,6 +8,7 @@ export default function (config) {
   ReactDOM.render(
     <IdentifiableForm
       activeLanguage={config.activeLanguage}
+      apiContextPath={config.apiContextPath}
       debug={config.debug}
       parentType={config.parentType}
       parentUuid={config.parentUuid}
