@@ -38,6 +38,7 @@ class FileResourceUploadForm extends Component {
       <Form onSubmit={async (evt) => {
         evt.preventDefault();
         const responseJson = await uploadFile(
+          this.props.apiContextPath,
           this.state.file,
           this.props.type,
           this.updateProgress
