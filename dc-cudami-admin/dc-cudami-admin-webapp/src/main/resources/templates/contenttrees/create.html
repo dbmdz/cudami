@@ -14,6 +14,7 @@
       <script th:inline="javascript">
         CudamiEditor({
           activeLanguage: /*[[${activeLanguage}]]*/,
+          apiContextPath: /*[[@{/}]]*/ '',
           id: "editor",
           type: "contentTree",
           uiLocale: /*[[${#locale.language}]]*/
