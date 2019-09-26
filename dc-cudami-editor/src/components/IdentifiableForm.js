@@ -91,7 +91,7 @@ class IdentifiableForm extends Component {
     });
   }
 
-  getFormComponent(){
+  getFormComponent = () => {
     const FORM_COMPONENT_MAPPING = {
       article: ArticleForm,
       contentNode: ContentNodeForm,
