@@ -49,16 +49,14 @@ class IdentifiableForm extends Component {
       this.props.apiContextPath,
       this.props.type, this.props.uuid || 'new'
     );
-    if (!identifiable.uuid) {
-      identifiable = {
-        ...identifiable,
-        description: {},
-        label: {
-          [this.state.activeLanguage]: ''
-        },
-        text: ['article', 'webpage'].includes(this.props.type) ? {} : undefined
-      }
-    }
+    identifiable = {
+      description: {},
+      label: {
+        [this.state.activeLanguage]: ''
+      },
+      text: ['article', 'webpage'].includes(this.props.type) ? {} : undefined,
+      ...identifiable
+    };
     this.setState({
       availableLanguages: availableLanguages.reduce((languages, language) => {
         if (!(language in identifiable.label)) {
@@ -93,7 +91,7 @@ class IdentifiableForm extends Component {
     });
   }
 
-  getFormComponent(){
+  getFormComponent = () => {
     const FORM_COMPONENT_MAPPING = {
       article: ArticleForm,
       contentNode: ContentNodeForm,
