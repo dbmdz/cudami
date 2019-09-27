@@ -91,6 +91,19 @@ class IdentifiableForm extends Component {
     });
   }
 
+  cleanUpJson = (editorJson) => {
+    const initialEditorDocString = '{"type":"doc","content":[{"type":"paragraph"}]}';
+    return Object.entries(editorJson).reduce((json, [language, doc]) => {
+      if (JSON.stringify(doc) === initialEditorDocString) {
+        return json;
+      }
+      return {
+        ...json,
+        [language]: doc
+      };
+    }, {});
+  }
+
   getFormComponent = () => {
     const FORM_COMPONENT_MAPPING = {
       article: ArticleForm,
@@ -133,16 +146,23 @@ class IdentifiableForm extends Component {
 
   submitIdentifiable = () => {
     if (this.isFormValid()){
-      if (this.state.identifiable.uuid) {
+      const identifiable = {
+        ...this.state.identifiable,
+        description: this.cleanUpJson(this.state.identifiable.description)
+      }
+      if (identifiable.text) {
+        identifiable.text = this.cleanUpJson(this.state.identifiable.text)
+      }
+      if (identifiable.uuid) {
         updateIdentifiable(
           this.props.apiContextPath,
-          this.state.identifiable,
+          identifiable,
           this.props.type
         );
       } else {
         saveIdentifiable(
           this.props.apiContextPath,
-          this.state.identifiable,
+          identifiable,
           this.props.parentType,
           this.props.parentUuid,
           this.props.type
