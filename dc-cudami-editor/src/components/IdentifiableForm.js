@@ -130,10 +130,7 @@ class IdentifiableForm extends Component {
   }
 
   isEmptyContent = (content) => {
-    if (content.length === 1 && !content[0].content) {
-      return true;
-    }
-    return false;
+    return content.length === 1 && !content[0].content;
   }
 
   isFormValid = () => {
