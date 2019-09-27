@@ -95,9 +95,8 @@ class IdentifiableForm extends Component {
    * Removes languages with empty content from the json
    */
   cleanUpJson = (editorJson) => {
-    const initialEditorDocString = '{"type":"doc","content":[{"type":"paragraph"}]}';
     return Object.entries(editorJson).reduce((json, [language, doc]) => {
-      if (JSON.stringify(doc) === initialEditorDocString) {
+      if (this.isEmptyContent(doc.content)) {
         return json;
       }
       return {
@@ -128,6 +127,13 @@ class IdentifiableForm extends Component {
       onUpdate={this.updateIdentifiable}
       type={this.props.type}
     />;
+  }
+
+  isEmptyContent = (content) => {
+    if (content.length === 1 && !content[0].content) {
+      return true;
+    }
+    return false;
   }
 
   isFormValid = () => {
