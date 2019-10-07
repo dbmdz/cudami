@@ -32,7 +32,7 @@ public class LocaleController {
   }
 
   @ApiMethod(description = "get all supported languages")
-  @GetMapping(value = {"/latest/languages", "/v2/laguages"})
+  @GetMapping(value = {"/latest/languages", "/v2/languages"})
   @ApiResponseObject
   public List<String> getSupportedLanguages() {
     return service.getSupportedLanguages();
