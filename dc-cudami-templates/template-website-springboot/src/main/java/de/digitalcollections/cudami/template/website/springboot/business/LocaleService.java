@@ -4,5 +4,5 @@ import java.util.Locale;
 
 public interface LocaleService {
 
-  public Locale getDefaultLocale();
+  public Locale getDefaultLanguage();
 }
