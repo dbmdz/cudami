@@ -2,7 +2,7 @@ cudami:
   # FIXME nested Optional
   # environment: local
   server:
-    address: http://localhost:9000/
+    url: http://localhost:9000/
 
 info:
   app:

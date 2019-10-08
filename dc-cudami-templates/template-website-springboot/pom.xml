@@ -16,11 +16,7 @@
   <dependencies>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
-      <artifactId>dc-cudami-client-openfeign</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>de.digitalcollections.cudami</groupId>
-      <artifactId>dc-cudami-client-spring</artifactId>
+      <artifactId>dc-cudami-client</artifactId>
     </dependency>
     <dependency>
       <groupId>nz.net.ultraq.thymeleaf</groupId>

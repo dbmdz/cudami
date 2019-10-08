@@ -27,7 +27,7 @@
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
-      <artifactId>dc-cudami-client-spring</artifactId>
+      <artifactId>dc-cudami-client</artifactId>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
@@ -37,7 +37,6 @@
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-server-backend-inmemory</artifactId>
-      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>

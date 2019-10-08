@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.template.website.springboot;
 
-import de.digitalcollections.cudami.client.spring.backend.CudamiRepository;
 import de.digitalcollections.cudami.template.website.springboot.repository.LocaleRepository;
 import java.util.Locale;
 import org.mockito.Mockito;
@@ -19,11 +18,5 @@ public class TestConfig {
 
     Mockito.when(dummy.getDefault()).thenReturn(defaultLocale);
     return dummy;
-  }
-
-  @Bean
-  @Primary
-  public CudamiRepository cudamiRepository() {
-    return Mockito.mock(CudamiRepository.class);
   }
 }
