@@ -34,12 +34,12 @@ import org.thymeleaf.dialect.springdata.SpringDataDialect;
 import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect;
 
 @Configuration
-@ComponentScan(basePackages = {
-  //  "de.digitalcollections.cudami.admin.webapp.aop",
-  //  "de.digitalcollections.cudami.admin.webapp.controller",
-  //  "de.digitalcollections.cudami.admin.webapp.propertyeditor",
-  "de.digitalcollections.commons.springmvc.controller"}, excludeFilters = {
-  @ComponentScan.Filter(value = ErrorController.class, type = FilterType.ASSIGNABLE_TYPE)}
+@ComponentScan(
+    basePackages = {
+      "de.digitalcollections.commons.springmvc.controller"
+    }, excludeFilters = {
+      @ComponentScan.Filter(value = ErrorController.class, type = FilterType.ASSIGNABLE_TYPE)
+    }
 )
 @EnableAspectJAutoProxy
 @EnableSpringDataWebSupport // for getting support for sorting and paging params
