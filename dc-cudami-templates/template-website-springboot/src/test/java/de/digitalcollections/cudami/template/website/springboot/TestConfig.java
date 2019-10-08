@@ -14,7 +14,7 @@ public class TestConfig {
   @Primary
   public LocaleRepository localeRepository() {
     final LocaleRepository dummy = Mockito.mock(LocaleRepository.class);
-    Locale defaultLanguage = new Locale("en");
+    Locale defaultLanguage = Locale.ENGLISH;
 
     Mockito.when(dummy.getDefault()).thenReturn(defaultLanguage);
     return dummy;
