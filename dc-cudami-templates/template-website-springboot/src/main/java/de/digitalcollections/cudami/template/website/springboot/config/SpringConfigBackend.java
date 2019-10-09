@@ -22,7 +22,6 @@ public class SpringConfigBackend {
   }
 
   @Bean
-  @Primary
   public CudamiClient cudamiClient() {
     CudamiClientBuilder builder = new CudamiClientBuilder(serverUrl);
     return builder.build();
