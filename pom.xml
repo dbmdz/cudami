@@ -94,7 +94,7 @@
     <version.postgresql>42.2.8</version.postgresql>
     <version.querydsl>4.2.1</version.querydsl>
     <version.slf4j>1.7.28</version.slf4j>
-    <version.snakeyaml>1.24</version.snakeyaml>
+    <version.snakeyaml>1.25</version.snakeyaml>
     <version.spotbugs>3.1.12</version.spotbugs>
     <version.unbescape>1.1.6.RELEASE</version.unbescape>
 
