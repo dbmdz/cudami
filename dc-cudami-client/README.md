@@ -83,13 +83,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class CudamiWebpageController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(CudamiWebpageController.class);
+  private final CudamiClient cudamiClient;
+  private final UUID uuid;
 
-  @Autowired
-  private CudamiClient cudamiClient;
-
-  @Value(value = "${cudami.webpages.foobar}")
-  private UUID uuid;
+  public CudamiWebpageController(
+    @Autowired CudamiClient cudamiClient,
+    @Value("${cudami.webpages.foobar}") UUID uuid
+  ) {
+    this.cudamiClient = cudamiClient;
+    this.uuid = uuid;
+  }
 
   private Locale getLanguage(Webpage webpage) {
     if (webpage == null) {
