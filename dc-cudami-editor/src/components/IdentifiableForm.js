@@ -107,7 +107,6 @@ class IdentifiableForm extends Component {
     if (Object.keys(cleanedJson).length > 0) {
       return cleanedJson;
     }
-    return undefined;
   }
 
   getFormComponent = () => {
