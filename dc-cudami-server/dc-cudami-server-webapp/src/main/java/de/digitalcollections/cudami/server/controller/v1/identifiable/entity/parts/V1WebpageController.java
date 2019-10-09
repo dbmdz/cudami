@@ -45,7 +45,7 @@ public class V1WebpageController {
   @Autowired
   private WebpageService webpageService;
 
-  @ApiMethod(description = "get a webpage as JSON (Version 1), depending on extension or <tt>format</tt> request parameter or accept header")
+  @ApiMethod(description = "get a webpage as JSON (Version 1)")
   @RequestMapping(value = {"/v1/webpages/{uuid}.json", "/v1/webpages/{uuid}"}, produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
   @ApiResponseObject
   public ResponseEntity<String> getWebpageV1Json(
@@ -55,17 +55,21 @@ public class V1WebpageController {
   ) throws IdentifiableServiceException, JsonProcessingException {
     Webpage webpage = loadWebpage(pLocale, uuid);
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(webpage));
-    JSONObject description = new JSONObject();
-    description.put("documents", result.getJSONObject("description"));
-    result.put("description", convertLocalizedStructuredContentJson(result.getJSONObject("description")));
-    result.put("label", convertLocalizedTextJson(result.getJSONObject("label")));
-    result.put("text", convertLocalizedStructuredContentJson(result.getJSONObject("text")));
+    if (result.has("description")) {
+      result.put("description", convertLocalizedStructuredContentJson(result.getJSONObject("description")));
+    }
+    if (result.has("label")) {
+      result.put("label", convertLocalizedTextJson(result.getJSONObject("label")));
+    }
+    if (result.has("text")) {
+      result.put("text", convertLocalizedStructuredContentJson(result.getJSONObject("text")));
+    }
     result.put("type", "RESOURCE");
     return new ResponseEntity<>(result.toString(), HttpStatus.OK);
   }
 
-  @ApiMethod(description = "get a webpage as JSON or XML (Version 1), depending on extension or <tt>format</tt> request parameter or accept header")
-  @RequestMapping(value = {"/v1/webpages/{uuid}.xml"}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, method = RequestMethod.GET)
+  @ApiMethod(description = "get a webpage as XML (Version 1)")
+  @RequestMapping(value = {"/v1/webpages/{uuid}.xml"}, produces = {MediaType.APPLICATION_XML_VALUE}, method = RequestMethod.GET)
   @ApiResponseObject
   public ResponseEntity<String> getWebpageV1Xml(
       @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
@@ -135,9 +139,18 @@ public class V1WebpageController {
     try {
       SAXBuilder saxBuilder = new SAXBuilder();
       Document doc = saxBuilder.build(new StringReader(xml));
-      convertLocalizedStructuredContentXml(doc.getRootElement().getChild("description"));
-      convertLocalizedStructuredContentXml(doc.getRootElement().getChild("text"));
-      convertLocalizedTextXml(doc.getRootElement().getChild("label"));
+      Element description = doc.getRootElement().getChild("description");
+      if (description != null) {
+        convertLocalizedStructuredContentXml(description);
+      }
+      Element text = doc.getRootElement().getChild("text");
+      if (text != null) {
+        convertLocalizedStructuredContentXml(text);
+      }
+      Element label = doc.getRootElement().getChild("label");
+      if (label != null) {
+        convertLocalizedTextXml(label);
+      }
       return new XMLOutputter().outputString(doc);
     } catch (IOException | JDOMException ex) {
       return xml;
