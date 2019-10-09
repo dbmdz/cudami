@@ -15,7 +15,7 @@ public class LocalizedTextEditor extends PropertyEditorSupport {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LocalizedTextEditor.class);
 
-  private ObjectMapper objectMapper;
+  private final ObjectMapper objectMapper;
 
   @Autowired
   public LocalizedTextEditor(ObjectMapper objectMapper) {

@@ -15,7 +15,7 @@ public class LocalizedStructuredContentEditor extends PropertyEditorSupport {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LocalizedStructuredContentEditor.class);
 
-  private ObjectMapper objectMapper;
+  private final ObjectMapper objectMapper;
 
   @Autowired
   public LocalizedStructuredContentEditor(ObjectMapper objectMapper) {

@@ -12,7 +12,7 @@ cudami is an editorial backoffice for managing cultural digital assets like webs
 Technologies used:
 
 * Overall: Java, Spring Boot, Spring Security
-* Frontend: Spring MVC, Thymeleaf
+* Frontend: Spring MVC, Thymeleaf, React
 * Business: Java
 * Backend: JDBI/PostgreSql, Flyway
 

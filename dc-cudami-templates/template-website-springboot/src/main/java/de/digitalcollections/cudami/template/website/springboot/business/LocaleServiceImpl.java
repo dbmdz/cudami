@@ -12,7 +12,7 @@ public class LocaleServiceImpl implements LocaleService {
   private LocaleRepository repository;
 
   @Override
-  public Locale getDefaultLocale() {
+  public Locale getDefaultLanguage() {
     return repository.getDefault();
   }
 

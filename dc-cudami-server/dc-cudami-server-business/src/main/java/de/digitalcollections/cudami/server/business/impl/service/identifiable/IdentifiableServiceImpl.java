@@ -64,7 +64,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     LocalizedText label = identifiable.getLabel();
     if (!label.containsKey(locale) || locale == null) {
       // identifiable does not exist in requested language, so try with default locale
-      locale = localeService.getDefaultLocale();
+      locale = new Locale(localeService.getDefaultLanguage());
       if (!label.containsKey(locale)) {
         locale = label.getLocales().iterator().next();
       }

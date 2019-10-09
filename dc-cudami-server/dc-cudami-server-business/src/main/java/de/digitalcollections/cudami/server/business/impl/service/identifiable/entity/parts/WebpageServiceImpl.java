@@ -38,9 +38,11 @@ public class WebpageServiceImpl<E extends Entity> extends EntityPartServiceImpl<
       return null;
     }
 
+    // get the already filtered language to compare with
+    Locale fLocale = webpage.getLabel().entrySet().iterator().next().getKey();
     // filter out not requested translations of fields not already filtered
     if (webpage.getText() != null) {
-      webpage.getText().entrySet().removeIf((Map.Entry entry) -> !entry.getKey().equals(locale));
+      webpage.getText().entrySet().removeIf((Map.Entry entry) -> !entry.getKey().equals(fLocale));
     }
     return webpage;
   }
