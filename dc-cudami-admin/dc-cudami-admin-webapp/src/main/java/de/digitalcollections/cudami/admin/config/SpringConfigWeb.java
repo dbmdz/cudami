@@ -9,6 +9,9 @@ import de.digitalcollections.commons.springmvc.thymeleaf.SpacesDialect;
 import de.digitalcollections.cudami.admin.converter.GrantedAuthorityJsonFilter;
 import de.digitalcollections.cudami.admin.interceptors.CreateAdminUserInterceptor;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +35,7 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.thymeleaf.dialect.AbstractProcessorDialect;
 import org.thymeleaf.dialect.springdata.SpringDataDialect;
 import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect;
+import org.yaml.snakeyaml.Yaml;
 
 @Configuration
 @ComponentScan(
@@ -127,5 +131,17 @@ public class SpringConfigWeb implements WebMvcConfigurer {
     // In case you want the filter to apply to specific URL patterns only (defaults to "/*")
     registration.addUrlPatterns("/*");
     return registration;
+  }
+
+  @Bean
+  public Map<String, String> webjarVersions() {
+    Map<String, String> versions;
+    Yaml yaml = new Yaml();
+    try (InputStream in = this.getClass().getResourceAsStream("/webjar-versions.yml")) {
+      versions = (Map<String, String>) yaml.load(in);
+    } catch (IOException exception) {
+      throw new IllegalStateException(exception);
+    }
+    return versions;
   }
 }

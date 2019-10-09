@@ -14,12 +14,12 @@
     <title layout:title-pattern="$LAYOUT_TITLE: $CONTENT_TITLE">cudami</title>
 
     <!-- Bootstrap core CSS -->
-    <link th:href="@{/webjars/bootswatch/4.2.1/yeti/bootstrap.min.css}" rel="stylesheet" />
+    <link th:href="@{|/webjars/bootswatch/${webjarVersions.bootswatch}/yeti/bootstrap.min.css|}" rel="stylesheet" />
 
     <!-- Font awesome CSS -->
-    <link th:href="@{/webjars/font-awesome/5.9.0/css/all.css}" rel="stylesheet" />
+    <link th:href="@{|/webjars/font-awesome/${webjarVersions['font-awesome']}/css/all.css|}" rel="stylesheet" />
 
-    <link th:href="@{/webjars/jquery-ui-dist/1.12.1/jquery-ui.min.css}" rel="stylesheet" />
+    <link th:href="@{|/webjars/jquery-ui-dist/${webjarVersions['jquery-ui']}/jquery-ui.min.css|}" rel="stylesheet" />
 
     <!-- Custom styles for this template -->
     <link th:href="@{/css/main.css}" rel="stylesheet" />
@@ -28,8 +28,8 @@
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-      <script th:src="@{/webjars/html5shiv/3.7.3/html5shiv.min.js}"></script>
-      <script th:src="@{/webjars/respond/1.4.2/dest/respond.min.js}"></script>
+      <script th:src="@{|/webjars/html5shiv/${webjarVersions.html5shiv}/html5shiv.min.js|}"></script>
+      <script th:src="@{|/webjars/respond/${webjarVersions.respond}/dest/respond.min.js|}"></script>
     <![endif]-->
 
     <script>
@@ -89,11 +89,11 @@
 
     </div>
 
-    <script th:src="@{/webjars/jquery/3.4.1/dist/jquery.min.js}"></script>
-    <script th:src="@{/webjars/jquery-ui-dist/1.12.1/jquery-ui.min.js}"></script>
-    <script th:src="@{/webjars/bootstrap/4.3.1/dist/js/bootstrap.min.js}"></script>
+    <script th:src="@{|/webjars/jquery/${webjarVersions.jquery}/dist/jquery.min.js|}"></script>
+    <script th:src="@{|/webjars/jquery-ui-dist/${webjarVersions['jquery-ui']}/jquery-ui.min.js|}"></script>
+    <script th:src="@{|/webjars/bootstrap/${webjarVersions.bootstrap}/dist/js/bootstrap.min.js|}"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script th:src="@{/webjars/ie10-viewport-bug-workaround/1.0.3/dist/ie10-viewport-bug-workaround.min.js}"></script>
+    <script th:src="@{|/webjars/ie10-viewport-bug-workaround/${webjarVersions['ie10-viewport-bug-workaround']}/dist/ie10-viewport-bug-workaround.min.js|}"></script>
     <div th:replace="fragments/modals-confirmation :: confirmYesNoDialog-bootstrap4"></div>
 
   <th:block layout:fragment="beforeBodyEnds"></th:block>
