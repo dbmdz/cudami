@@ -47,8 +47,7 @@ public class SpringConfig {
   ...
   @Bean
   public CudamiClient cudamiClient() {
-    CudamiClientBuilder builder = new CudamiClientBuilder(serverUrl);
-    return builder.build();
+    return CudamiClient.build(serverUrl);
   }
   ...
 }
