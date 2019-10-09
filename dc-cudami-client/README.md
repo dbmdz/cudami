@@ -38,13 +38,16 @@ Example `SpringConfig.java`:
 
 ```java
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiClientBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SpringConfig {
   ...
+  @Value("${cudami.server.url}")
+  String serverUrl;
+
   @Bean
   public CudamiClient cudamiClient() {
     return CudamiClient.build(serverUrl);
