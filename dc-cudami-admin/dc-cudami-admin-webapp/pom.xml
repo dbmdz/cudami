@@ -14,8 +14,14 @@
   <packaging>jar</packaging>
 
   <properties>
+    <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <timestamp>${maven.build.timestamp}</timestamp>
+    <versionName>${project.version} manually built by ${user.name} at ${maven.build.timestamp}</versionName>
+
     <version.dc-commons-server>4.0.3</version.dc-commons-server>
     <version.dc-commons-springaop>4.0.3</version.dc-commons-springaop>
+    <version.dc-commons-springboot>4.0.3</version.dc-commons-springboot>
     <version.dc-commons-springdata>4.0.3</version.dc-commons-springdata>
     <version.dc-commons-springmvc>4.1.1-SNAPSHOT</version.dc-commons-springmvc>
     <version.snakeyaml>1.25</version.snakeyaml>
@@ -44,6 +50,11 @@
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-springaop</artifactId>
       <version>${version.dc-commons-springaop}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.commons</groupId>
+      <artifactId>dc-commons-springboot</artifactId>
+      <version>${version.dc-commons-springboot}</version>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
@@ -85,6 +96,14 @@
       <groupId>io.github.jpenren</groupId>
       <artifactId>thymeleaf-spring-data-dialect</artifactId>
       <version>${version.thymeleaf-spring-data-dialect}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-registry-prometheus</artifactId>
     </dependency>
     <dependency>
       <groupId>net.logstash.logback</groupId>

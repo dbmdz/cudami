@@ -19,9 +19,10 @@ info:
       source: "@maven.compiler.source@"
       target: "@maven.compiler.target@"
     project:
-      name: "@project.name@"
-      groupId: "@project.groupId@"
       artifactId: "@project.artifactId@"
+      buildDetails: "@versionName@"
+      groupId: "@project.groupId@"
+      name: "@project.name@"
       version: "@project.version@"
 
 jsondoc:

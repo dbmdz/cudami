@@ -10,10 +10,11 @@ info:
       source: @maven.compiler.source@
       target: @maven.compiler.target@
     project:
+      artifactId: '@project.artifactId@'
+      buildDetails: '@versionName@'
+      groupId: '@project.groupId@'
       name: '@project.name@'
-      groupId: @project.groupId@
-      artifactId: @project.artifactId@
-      version: @project.version@
+      version: '@project.version@'
 
 management:
   endpoints:
@@ -63,9 +64,5 @@ spring:
 
 spring:
   profiles: PROD
-  security:
-    user:
-      name: admin
-      password: secret
   thymeleaf:
     cache: true
