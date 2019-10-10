@@ -21,8 +21,9 @@ import org.springframework.stereotype.Service;
  * @param <E> entity type
  */
 @Service
-//@Transactional(readOnly = true)
-public class WebpageServiceImpl<E extends Entity> extends EntityPartServiceImpl<Webpage, E> implements WebpageService<E> {
+// @Transactional(readOnly = true)
+public class WebpageServiceImpl<E extends Entity> extends EntityPartServiceImpl<Webpage, E>
+    implements WebpageService<E> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpageServiceImpl.class);
 
@@ -69,7 +70,8 @@ public class WebpageServiceImpl<E extends Entity> extends EntityPartServiceImpl<
 
   @Override
   //  @Transactional(readOnly = false)
-  public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid) throws IdentifiableServiceException {
+  public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid)
+      throws IdentifiableServiceException {
     try {
       return ((WebpageRepository) repository).saveWithParentWebsite(webpage, parentWebsiteUuid);
     } catch (Exception e) {
@@ -80,7 +82,8 @@ public class WebpageServiceImpl<E extends Entity> extends EntityPartServiceImpl<
 
   @Override
   //  @Transactional(readOnly = false)
-  public Webpage saveWithParentWebpage(Webpage webpage, UUID parentWebpageUuid) throws IdentifiableServiceException {
+  public Webpage saveWithParentWebpage(Webpage webpage, UUID parentWebpageUuid)
+      throws IdentifiableServiceException {
     try {
       return ((WebpageRepository) repository).saveWithParentWebpage(webpage, parentWebpageUuid);
     } catch (Exception e) {

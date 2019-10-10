@@ -25,9 +25,10 @@ import org.thymeleaf.dialect.AbstractProcessorDialect;
 
 @Configuration
 @EnableAspectJAutoProxy
-//@PropertySource(value = {
-//  "classpath:de/digitalcollections/cudami/server/config/SpringConfigWeb-${spring.profiles.active:PROD}.properties"
-//})
+// @PropertySource(value = {
+//
+// "classpath:de/digitalcollections/cudami/server/config/SpringConfigWeb-${spring.profiles.active:PROD}.properties"
+// })
 public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfigWeb.class);
@@ -66,30 +67,32 @@ public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
   }
 
   //  @Bean
-//  public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-//    return new PropertySourcesPlaceholderConfigurer();
-//  }
-//  @Primary // needed to replace default spring boot created object mapper
-//  @Bean
-//  public ObjectMapper objectMapper() {
-//    ObjectMapper objectMapper = new JacksonModelObjectMapper();
-//    return objectMapper;
-//  }
+  //  public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+  //    return new PropertySourcesPlaceholderConfigurer();
+  //  }
+  //  @Primary // needed to replace default spring boot created object mapper
+  //  @Bean
+  //  public ObjectMapper objectMapper() {
+  //    ObjectMapper objectMapper = new JacksonModelObjectMapper();
+  //    return objectMapper;
+  //  }
   @Override
   public void configurePathMatch(PathMatchConfigurer configurer) {
-    // "This is generally recommended to reduce ambiguity and to avoid issues such as when a "." appears in the path for other reasons."
+    // "This is generally recommended to reduce ambiguity and to avoid issues such as when a "."
+    // appears in the path for other reasons."
     configurer.setUseRegisteredSuffixPatternMatch(Boolean.TRUE);
   }
 
   @Override
   public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
     configurer
-            .favorParameter(true)
-            .favorPathExtension(true)
-            //            .ignoreAcceptHeader(false)
-            .ignoreUnknownPathExtensions(true)
-            .useRegisteredExtensionsOnly(false)
-            .defaultContentType(MediaType.APPLICATION_JSON); // we are are REST-Server (no HTML/Webapp!) !
+        .favorParameter(true)
+        .favorPathExtension(true)
+        //            .ignoreAcceptHeader(false)
+        .ignoreUnknownPathExtensions(true)
+        .useRegisteredExtensionsOnly(false)
+        .defaultContentType(
+            MediaType.APPLICATION_JSON); // we are are REST-Server (no HTML/Webapp!) !
     configurer.mediaType("html", MediaType.TEXT_HTML);
     configurer.mediaType("json", MediaType.APPLICATION_JSON);
     configurer.mediaType("xml", MediaType.APPLICATION_XML);
@@ -102,7 +105,8 @@ public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
 
   private HttpMessageConverter<Object> createXmlHttpMessageConverter() {
     MarshallingHttpMessageConverter xmlConverter = new MarshallingHttpMessageConverter();
-    DigitalCollectionsXStreamMarshaller xstreamMarshaller = new DigitalCollectionsXStreamMarshaller();
+    DigitalCollectionsXStreamMarshaller xstreamMarshaller =
+        new DigitalCollectionsXStreamMarshaller();
     xmlConverter.setMarshaller(xstreamMarshaller);
     xmlConverter.setUnmarshaller(xstreamMarshaller);
     return xmlConverter;
@@ -117,5 +121,4 @@ public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
   public AbstractProcessorDialect whiteSpaceNormalizedDialect() {
     return new SpacesDialect();
   }
-
 }

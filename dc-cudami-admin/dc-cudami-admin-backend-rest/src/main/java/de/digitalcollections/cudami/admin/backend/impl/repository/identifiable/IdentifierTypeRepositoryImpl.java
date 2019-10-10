@@ -21,8 +21,7 @@ public class IdentifierTypeRepositoryImpl implements IdentifierTypeRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifierTypeRepositoryImpl.class);
 
-  @Autowired
-  private IdentifierTypeRepositoryEndpoint endpoint;
+  @Autowired private IdentifierTypeRepositoryEndpoint endpoint;
 
   @Override
   public IdentifierType create() {
@@ -32,7 +31,13 @@ public class IdentifierTypeRepositoryImpl implements IdentifierTypeRepository {
   @Override
   public PageResponse<IdentifierType> find(PageRequest pageRequest) {
     FindParams f = getFindParams(pageRequest);
-    PageResponse<IdentifierType> pageResponse = endpoint.find(f.getPageNumber(), f.getPageSize(), f.getSortField(), f.getSortDirection(), f.getNullHandling());
+    PageResponse<IdentifierType> pageResponse =
+        endpoint.find(
+            f.getPageNumber(),
+            f.getPageSize(),
+            f.getSortField(),
+            f.getSortDirection(),
+            f.getNullHandling());
     return getGenericPageResponse(pageResponse);
   }
 
@@ -65,7 +70,8 @@ public class IdentifierTypeRepositoryImpl implements IdentifierTypeRepository {
 
   private static class FindParams {
 
-    public FindParams(int pageNumber, int pageSize, String sortField, String sortDirection, String nullHandling) {
+    public FindParams(
+        int pageNumber, int pageSize, String sortField, String sortDirection, String nullHandling) {
       this.pageNumber = pageNumber;
       this.pageSize = pageSize;
       this.sortField = sortField;
@@ -117,7 +123,8 @@ public class IdentifierTypeRepositoryImpl implements IdentifierTypeRepository {
     if (identifierTypes == null) {
       return null;
     }
-    List<IdentifierType> genericContent = identifierTypes.stream().map(s -> (IdentifierType) s).collect(Collectors.toList());
+    List<IdentifierType> genericContent =
+        identifierTypes.stream().map(s -> (IdentifierType) s).collect(Collectors.toList());
     return genericContent;
   }
 

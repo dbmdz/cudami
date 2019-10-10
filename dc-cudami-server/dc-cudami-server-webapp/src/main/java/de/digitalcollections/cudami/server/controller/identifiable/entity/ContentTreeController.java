@@ -31,20 +31,22 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The content tree controller", name = "ContentTree controller")
 public class ContentTreeController {
 
-  @Autowired
-  private ContentTreeService service;
+  @Autowired private ContentTreeService service;
 
   @ApiMethod(description = "Get all content trees")
-  @RequestMapping(value = {"/latest/contenttrees", "/v2/contenttrees"},
-    produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(
+      value = {"/latest/contenttrees", "/v2/contenttrees"},
+      produces = "application/json",
+      method = RequestMethod.GET)
   @ApiResponseObject
   public PageResponse<ContentTree> findAll(
-    @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-    @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-    @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
-    @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC") Direction sortDirection,
-    @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE") NullHandling nullHandling
-  ) {
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
+          Direction sortDirection,
+      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
+          NullHandling nullHandling) {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
@@ -52,36 +54,54 @@ public class ContentTreeController {
   }
 
   @ApiMethod(description = "Get content tree by uuid")
-  @RequestMapping(value = {"/latest/contenttrees/{uuid}", "/v2/contenttrees/{uuid}"}, produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(
+      value = {"/latest/contenttrees/{uuid}", "/v2/contenttrees/{uuid}"},
+      produces = "application/json",
+      method = RequestMethod.GET)
   @ApiResponseObject
   public ContentTree findById(@PathVariable UUID uuid) {
     return (ContentTree) service.get(uuid);
   }
 
   @ApiMethod(description = "Save a newly created ContentTree")
-  @RequestMapping(value = {"/latest/contenttrees", "/v2/contenttrees"}, produces = "application/json", method = RequestMethod.POST)
+  @RequestMapping(
+      value = {"/latest/contenttrees", "/v2/contenttrees"},
+      produces = "application/json",
+      method = RequestMethod.POST)
   @ApiResponseObject
-  public ContentTree save(@RequestBody ContentTree contentTree, BindingResult errors) throws IdentifiableServiceException {
+  public ContentTree save(@RequestBody ContentTree contentTree, BindingResult errors)
+      throws IdentifiableServiceException {
     return (ContentTree) service.save(contentTree);
   }
 
   @ApiMethod(description = "Update a content tree")
-  @RequestMapping(value = {"/latest/contenttrees/{uuid}", "/v2/contenttrees/{uuid}"}, produces = "application/json", method = RequestMethod.PUT)
+  @RequestMapping(
+      value = {"/latest/contenttrees/{uuid}", "/v2/contenttrees/{uuid}"},
+      produces = "application/json",
+      method = RequestMethod.PUT)
   @ApiResponseObject
-  public ContentTree update(@PathVariable UUID uuid, @RequestBody ContentTree contentTree, BindingResult errors) throws IdentifiableServiceException {
+  public ContentTree update(
+      @PathVariable UUID uuid, @RequestBody ContentTree contentTree, BindingResult errors)
+      throws IdentifiableServiceException {
     assert Objects.equals(uuid, contentTree.getUuid());
     return (ContentTree) service.update(contentTree);
   }
 
   @ApiMethod(description = "Get count of content trees")
-  @RequestMapping(value = {"/latest/contenttrees/count", "/v2/contenttrees/count"}, produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(
+      value = {"/latest/contenttrees/count", "/v2/contenttrees/count"},
+      produces = "application/json",
+      method = RequestMethod.GET)
   @ApiResponseObject
   public long count() {
     return service.count();
   }
 
   @ApiMethod(description = "Get root nodes of content tree")
-  @RequestMapping(value = {"/latest/contenttrees/{uuid}/rootNodes", "/v2/contenttrees/{uuid}/rootNodes"}, produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(
+      value = {"/latest/contenttrees/{uuid}/rootNodes", "/v2/contenttrees/{uuid}/rootNodes"},
+      produces = "application/json",
+      method = RequestMethod.GET)
   @ApiResponseObject
   List<ContentNode> getRootNodes(@PathVariable UUID uuid) {
     return service.getRootNodes(uuid);

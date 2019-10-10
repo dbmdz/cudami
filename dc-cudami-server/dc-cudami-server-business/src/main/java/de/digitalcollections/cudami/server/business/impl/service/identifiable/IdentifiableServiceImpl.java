@@ -18,18 +18,18 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
-//@Transactional(readOnly = true)
+// @Transactional(readOnly = true)
 public class IdentifiableServiceImpl<I extends Identifiable> implements IdentifiableService<I> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableServiceImpl.class);
 
-  @Autowired
-  private LocaleService localeService;
+  @Autowired private LocaleService localeService;
 
   protected IdentifiableRepository<I> repository;
 
   @Autowired
-  public IdentifiableServiceImpl(@Qualifier("identifiableRepositoryImpl") IdentifiableRepository<I> repository) {
+  public IdentifiableServiceImpl(
+      @Qualifier("identifiableRepositoryImpl") IdentifiableRepository<I> repository) {
     this.repository = repository;
   }
 
@@ -77,7 +77,8 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     final Locale fLocale = locale; // needed final for following lambda expressions
 
     // filter out all translations not in requested locale
-    // TODO maybe a better solution to just get locale specific fields directly from database/repository instead of removing it here?
+    // TODO maybe a better solution to just get locale specific fields directly from
+    // database/repository instead of removing it here?
     // filter label
     label.entrySet().removeIf(entry -> !entry.getKey().equals(fLocale));
 

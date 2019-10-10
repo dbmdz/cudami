@@ -22,17 +22,24 @@ public class SpringConfigSecurityMonitoring extends WebSecurityConfigurerAdapter
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    auth
-            .inMemoryAuthentication().passwordEncoder(passwordEncoderDummy()).withUser(User.withUsername(actuatorUsername).password(actuatorPassword).roles("ACTUATOR"));
+    auth.inMemoryAuthentication()
+        .passwordEncoder(passwordEncoderDummy())
+        .withUser(User.withUsername(actuatorUsername).password(actuatorPassword).roles("ACTUATOR"));
   }
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     // Monitoring:
-    // see https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#production-ready-endpoints
-    http.antMatcher("/monitoring/**").authorizeRequests()
-            .requestMatchers(EndpointRequest.to("info", "health")).permitAll()
-            .requestMatchers(EndpointRequest.toAnyEndpoint()).hasRole("ACTUATOR").and().httpBasic();
+    // see
+    // https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#production-ready-endpoints
+    http.antMatcher("/monitoring/**")
+        .authorizeRequests()
+        .requestMatchers(EndpointRequest.to("info", "health"))
+        .permitAll()
+        .requestMatchers(EndpointRequest.toAnyEndpoint())
+        .hasRole("ACTUATOR")
+        .and()
+        .httpBasic();
   }
 
   private PasswordEncoder passwordEncoderDummy() {

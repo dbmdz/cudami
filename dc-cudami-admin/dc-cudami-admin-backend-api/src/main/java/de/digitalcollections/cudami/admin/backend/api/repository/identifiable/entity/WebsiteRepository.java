@@ -5,9 +5,7 @@ import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Repository for Website persistence handling.
- */
+/** Repository for Website persistence handling. */
 public interface WebsiteRepository extends EntityRepository<Website> {
 
   List<Webpage> getRootPages(Website website);

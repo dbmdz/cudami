@@ -38,19 +38,36 @@ public class SpringConfigSecurityWebapp extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     // Webapp:
     http.authorizeRequests()
-        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-        .antMatchers("/api/**", "/setup/**").permitAll().and().csrf().disable();
+        .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+        .permitAll()
+        .antMatchers("/api/**", "/setup/**")
+        .permitAll()
+        .and()
+        .csrf()
+        .disable();
 
     // FIXME: replace with serverside token repository?
-    final InMemoryTokenRepositoryImpl inMemoryTokenRepositoryImpl = new InMemoryTokenRepositoryImpl();
+    final InMemoryTokenRepositoryImpl inMemoryTokenRepositoryImpl =
+        new InMemoryTokenRepositoryImpl();
 
     http.authorizeRequests()
-            .antMatchers("/users/**").hasAnyAuthority(Role.ADMIN.getAuthority())
-            .anyRequest().authenticated().and()
-            // enable form based log in
-            .formLogin().loginPage("/login").permitAll().and()
-            .logout().logoutUrl("/logout").permitAll().and()
-            .rememberMe().tokenRepository(inMemoryTokenRepositoryImpl).tokenValiditySeconds(14 * 24 * 3600);
+        .antMatchers("/users/**")
+        .hasAnyAuthority(Role.ADMIN.getAuthority())
+        .anyRequest()
+        .authenticated()
+        .and()
+        // enable form based log in
+        .formLogin()
+        .loginPage("/login")
+        .permitAll()
+        .and()
+        .logout()
+        .logoutUrl("/logout")
+        .permitAll()
+        .and()
+        .rememberMe()
+        .tokenRepository(inMemoryTokenRepositoryImpl)
+        .tokenValiditySeconds(14 * 24 * 3600);
   }
 
   @Bean

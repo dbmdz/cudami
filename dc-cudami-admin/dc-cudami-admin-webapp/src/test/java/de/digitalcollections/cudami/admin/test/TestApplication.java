@@ -8,7 +8,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
-@Import({SpringConfigSecurityMonitoring.class, SpringConfigSecurityWebapp.class, SpringConfigWeb.class})
+@Import({
+  SpringConfigSecurityMonitoring.class,
+  SpringConfigSecurityWebapp.class,
+  SpringConfigWeb.class
+})
 public class TestApplication {
 
   public static void main(String[] args) throws Exception {

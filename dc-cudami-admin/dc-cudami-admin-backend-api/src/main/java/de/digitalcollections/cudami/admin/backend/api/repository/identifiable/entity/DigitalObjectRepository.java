@@ -6,9 +6,7 @@ import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import java.util.LinkedHashSet;
 import java.util.UUID;
 
-/**
- * Repository for Digital Object persistence handling.
- */
+/** Repository for Digital Object persistence handling. */
 public interface DigitalObjectRepository extends EntityRepository<DigitalObject> {
 
   LinkedHashSet<FileResource> getFileResources(DigitalObject digitalObject);
@@ -21,7 +19,9 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
 
   LinkedHashSet<ImageFileResource> getImageFileResources(UUID digitalObjectUuid);
 
-  LinkedHashSet<FileResource> saveFileResources(DigitalObject digitalObject, LinkedHashSet<FileResource> fileResources);
+  LinkedHashSet<FileResource> saveFileResources(
+      DigitalObject digitalObject, LinkedHashSet<FileResource> fileResources);
 
-  LinkedHashSet<FileResource> saveFileResources(UUID digitalObjectUuid, LinkedHashSet<FileResource> fileResources);
+  LinkedHashSet<FileResource> saveFileResources(
+      UUID digitalObjectUuid, LinkedHashSet<FileResource> fileResources);
 }

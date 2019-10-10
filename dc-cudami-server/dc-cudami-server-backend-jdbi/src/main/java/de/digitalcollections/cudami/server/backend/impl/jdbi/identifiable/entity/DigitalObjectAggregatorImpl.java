@@ -9,15 +9,13 @@ import java.util.UUID;
 public class DigitalObjectAggregatorImpl /* implements BiFunction<T, U, R> */ {
 
   Map<UUID, DigitalObjectImpl> digitalObjects = new LinkedHashMap<>();
-  //Map<UUID, Map<UUID, FileResource>> digitalObjectFileResources = new LinkedHashMap<>();
-  //Map<UUID, Map<UUID, Identifier>> fileResourceIdentifiers = new LinkedHashMap<>();
+  // Map<UUID, Map<UUID, FileResource>> digitalObjectFileResources = new LinkedHashMap<>();
+  // Map<UUID, Map<UUID, Identifier>> fileResourceIdentifiers = new LinkedHashMap<>();
   Map<UUID, Identifier> identifiers = new LinkedHashMap<>();
 
   UUID dfFileresourceUuid;
 
-  public DigitalObjectAggregatorImpl() {
-
-  }
+  public DigitalObjectAggregatorImpl() {}
 
   public Map<UUID, DigitalObjectImpl> getDigitalObjects() {
     return digitalObjects;

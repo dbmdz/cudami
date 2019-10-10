@@ -16,11 +16,14 @@ public interface DigitalObjectRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine("GET /latest/digitalobjects/count")
   long count();
 
-  @RequestLine("GET /latest/digitalobjects?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
+  @RequestLine(
+      "GET /latest/digitalobjects?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<DigitalObject> find(
-    @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
-    @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
-  );
+      @Param("pageNumber") int pageNumber,
+      @Param("pageSize") int pageSize,
+      @Param("sortField") String sortField,
+      @Param("sortDirection") String sortDirection,
+      @Param("nullHandling") String nullHandling);
 
   @RequestLine("GET /latest/digitalobjects/{uuid}")
   DigitalObject findOne(@Param("uuid") UUID uuid);
@@ -40,7 +43,8 @@ public interface DigitalObjectRepositoryEndpoint extends RepositoryEndpoint {
   DigitalObject save(DigitalObject digitalObject);
 
   @RequestLine("POST /latest/digitalobjects/{uuid}/fileresources")
-  LinkedHashSet<FileResource> saveFileResources(@Param("uuid") UUID uuid, LinkedHashSet<FileResource> fileResources);
+  LinkedHashSet<FileResource> saveFileResources(
+      @Param("uuid") UUID uuid, LinkedHashSet<FileResource> fileResources);
 
   @RequestLine("PUT /latest/digitalobjects/{uuid}")
   @Headers("Content-Type: application/json")

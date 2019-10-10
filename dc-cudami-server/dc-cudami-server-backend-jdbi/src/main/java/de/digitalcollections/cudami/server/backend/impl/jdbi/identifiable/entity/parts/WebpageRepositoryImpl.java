@@ -19,7 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositoryImpl<Webpage, E> implements WebpageRepository<E> {
+public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositoryImpl<Webpage, E>
+    implements WebpageRepository<E> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpageRepositoryImpl.class);
 
@@ -37,15 +38,15 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
 
   @Override
   public PageResponse<Webpage> find(PageRequest pageRequest) {
-    StringBuilder query = new StringBuilder()
-      .append("SELECT " + IDENTIFIABLE_COLUMNS + ", text")
-      .append(" FROM webpages");
+    StringBuilder query =
+        new StringBuilder()
+            .append("SELECT " + IDENTIFIABLE_COLUMNS + ", text")
+            .append(" FROM webpages");
 
     addPageRequestParams(pageRequest, query);
 
-    List<WebpageImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
-      .mapToBean(WebpageImpl.class)
-      .list());
+    List<WebpageImpl> result =
+        dbi.withHandle(h -> h.createQuery(query.toString()).mapToBean(WebpageImpl.class).list());
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -53,38 +54,49 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
 
   @Override
   public Webpage findOne(UUID uuid) {
-    StringBuilder query = new StringBuilder()
-      .append("SELECT " + IDENTIFIABLE_COLUMNS + ", text")
-      .append(" FROM webpages")
-      .append(" WHERE uuid = :uuid");
+    StringBuilder query =
+        new StringBuilder()
+            .append("SELECT " + IDENTIFIABLE_COLUMNS + ", text")
+            .append(" FROM webpages")
+            .append(" WHERE uuid = :uuid");
 
-    Webpage webpage = dbi.withHandle(h -> h.createQuery(query.toString())
-      .bind("uuid", uuid)
-      .mapToBean(WebpageImpl.class)
-      .findOne().orElse(null));
+    Webpage webpage =
+        dbi.withHandle(
+            h ->
+                h.createQuery(query.toString())
+                    .bind("uuid", uuid)
+                    .mapToBean(WebpageImpl.class)
+                    .findOne()
+                    .orElse(null));
     if (webpage != null) {
       webpage.setChildren(getChildren(webpage));
-//      webpage.setIdentifiables(getIdentifiables(webpage));
+      //      webpage.setIdentifiables(getIdentifiables(webpage));
     }
     return webpage;
   }
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[]{"uuid"};
+    return new String[] {"uuid"};
   }
 
   @Override
   public Webpage getParent(UUID uuid) {
-    StringBuilder query = new StringBuilder()
-      .append("SELECT " + IDENTIFIABLE_COLUMNS)
-      .append(" FROM webpages INNER JOIN webpage_webpages ww ON uuid = ww.parent_webpage_uuid")
-      .append(" WHERE ww.child_webpage_uuid = :uuid");
+    StringBuilder query =
+        new StringBuilder()
+            .append("SELECT " + IDENTIFIABLE_COLUMNS)
+            .append(
+                " FROM webpages INNER JOIN webpage_webpages ww ON uuid = ww.parent_webpage_uuid")
+            .append(" WHERE ww.child_webpage_uuid = :uuid");
 
-    Webpage webpage = dbi.withHandle(h -> h.createQuery(query.toString())
-      .bind("uuid", uuid)
-      .mapToBean(WebpageImpl.class)
-      .findOne().orElse(null));
+    Webpage webpage =
+        dbi.withHandle(
+            h ->
+                h.createQuery(query.toString())
+                    .bind("uuid", uuid)
+                    .mapToBean(WebpageImpl.class)
+                    .findOne()
+                    .orElse(null));
     return webpage;
   }
 
@@ -94,11 +106,15 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
     webpage.setCreated(LocalDateTime.now());
     webpage.setLastModified(LocalDateTime.now());
 
-    Webpage result = dbi.withHandle(h -> h
-      .createQuery("INSERT INTO webpages(uuid, created, description, identifiable_type, label, last_modified, text) VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :text::JSONB) RETURNING *")
-      .bindBean(webpage)
-      .mapToBean(WebpageImpl.class)
-      .findOne().orElse(null));
+    Webpage result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(
+                        "INSERT INTO webpages(uuid, created, description, identifiable_type, label, last_modified, text) VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :text::JSONB) RETURNING *")
+                    .bindBean(webpage)
+                    .mapToBean(WebpageImpl.class)
+                    .findOne()
+                    .orElse(null));
     return result;
   }
 
@@ -106,14 +122,18 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
   public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid) {
     Webpage savedWebpage = save(webpage);
 
-    Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "website_webpages", "website_uuid", parentWebsiteUuid);
-    dbi.withHandle(h -> h.createUpdate(
-      "INSERT INTO website_webpages(website_uuid, webpage_uuid, sortIndex)"
-      + " VALUES (:parent_website_uuid, :uuid, :sortIndex)")
-      .bind("parent_website_uuid", parentWebsiteUuid)
-      .bind("sortIndex", sortIndex)
-      .bindBean(savedWebpage)
-      .execute());
+    Integer sortIndex =
+        selectNextSortIndexForParentChildren(
+            dbi, "website_webpages", "website_uuid", parentWebsiteUuid);
+    dbi.withHandle(
+        h ->
+            h.createUpdate(
+                    "INSERT INTO website_webpages(website_uuid, webpage_uuid, sortIndex)"
+                        + " VALUES (:parent_website_uuid, :uuid, :sortIndex)")
+                .bind("parent_website_uuid", parentWebsiteUuid)
+                .bind("sortIndex", sortIndex)
+                .bindBean(savedWebpage)
+                .execute());
 
     return findOne(savedWebpage.getUuid());
   }
@@ -122,14 +142,18 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
   public Webpage saveWithParentWebpage(Webpage webpage, UUID parentWebpageUuid) {
     Webpage savedWebpage = save(webpage);
 
-    Integer sortIndex = selectNextSortIndexForParentChildren(dbi, "webpage_webpages", "parent_webpage_uuid", parentWebpageUuid);
-    dbi.withHandle(h -> h.createUpdate(
-      "INSERT INTO webpage_webpages(parent_webpage_uuid, child_webpage_uuid, sortIndex)"
-      + " VALUES (:parent_webpage_uuid, :uuid, :sortIndex)")
-      .bind("parent_webpage_uuid", parentWebpageUuid)
-      .bind("sortIndex", sortIndex)
-      .bindBean(savedWebpage)
-      .execute());
+    Integer sortIndex =
+        selectNextSortIndexForParentChildren(
+            dbi, "webpage_webpages", "parent_webpage_uuid", parentWebpageUuid);
+    dbi.withHandle(
+        h ->
+            h.createUpdate(
+                    "INSERT INTO webpage_webpages(parent_webpage_uuid, child_webpage_uuid, sortIndex)"
+                        + " VALUES (:parent_webpage_uuid, :uuid, :sortIndex)")
+                .bind("parent_webpage_uuid", parentWebpageUuid)
+                .bind("sortIndex", sortIndex)
+                .bindBean(savedWebpage)
+                .execute());
 
     return findOne(savedWebpage.getUuid());
   }
@@ -138,12 +162,17 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
   public Webpage update(Webpage webpage) {
     webpage.setLastModified(LocalDateTime.now());
 
-    // do not update/left out from statement (not changed since insert): uuid, created, identifiable_type, entity_type
-    Webpage result = dbi.withHandle(h -> h
-      .createQuery("UPDATE webpages SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, text=:text::JSONB WHERE uuid=:uuid RETURNING *")
-      .bindBean(webpage)
-      .mapToBean(WebpageImpl.class)
-      .findOne().orElse(null));
+    // do not update/left out from statement (not changed since insert): uuid, created,
+    // identifiable_type, entity_type
+    Webpage result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(
+                        "UPDATE webpages SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, text=:text::JSONB WHERE uuid=:uuid RETURNING *")
+                    .bindBean(webpage)
+                    .mapToBean(WebpageImpl.class)
+                    .findOne()
+                    .orElse(null));
     return result;
   }
 
@@ -155,15 +184,16 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
   @Override
   public List<Webpage> getChildren(UUID uuid) {
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
-    String sql = "SELECT " + IDENTIFIABLE_COLUMNS
-                 + " FROM webpages INNER JOIN webpage_webpages ww ON uuid = ww.child_webpage_uuid"
-                 + " WHERE ww.parent_webpage_uuid = :uuid"
-                 + " ORDER BY ww.sortIndex ASC";
+    String sql =
+        "SELECT "
+            + IDENTIFIABLE_COLUMNS
+            + " FROM webpages INNER JOIN webpage_webpages ww ON uuid = ww.child_webpage_uuid"
+            + " WHERE ww.parent_webpage_uuid = :uuid"
+            + " ORDER BY ww.sortIndex ASC";
 
-    List<WebpageImpl> list = dbi.withHandle(h -> h.createQuery(sql)
-      .bind("uuid", uuid)
-      .mapToBean(WebpageImpl.class)
-      .list());
+    List<WebpageImpl> list =
+        dbi.withHandle(
+            h -> h.createQuery(sql).bind("uuid", uuid).mapToBean(WebpageImpl.class).list());
 
     if (list.isEmpty()) {
       return new ArrayList<>();

@@ -5,9 +5,7 @@ import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Repository for ContentTree persistence handling.
- */
+/** Repository for ContentTree persistence handling. */
 public interface ContentTreeRepository extends EntityRepository<ContentTree> {
 
   List<ContentNode> getRootNodes(ContentTree contentTree);

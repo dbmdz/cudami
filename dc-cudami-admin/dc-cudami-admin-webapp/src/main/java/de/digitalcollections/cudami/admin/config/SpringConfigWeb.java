@@ -39,12 +39,10 @@ import org.yaml.snakeyaml.Yaml;
 
 @Configuration
 @ComponentScan(
-    basePackages = {
-      "de.digitalcollections.commons.springmvc.controller"
-    }, excludeFilters = {
+    basePackages = {"de.digitalcollections.commons.springmvc.controller"},
+    excludeFilters = {
       @ComponentScan.Filter(value = ErrorController.class, type = FilterType.ASSIGNABLE_TYPE)
-    }
-)
+    })
 @EnableAspectJAutoProxy
 @EnableSpringDataWebSupport // for getting support for sorting and paging params
 @Import(SpringConfigCommonsMvc.class)
@@ -56,9 +54,12 @@ public class SpringConfigWeb implements WebMvcConfigurer {
 
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
-//    registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
-    registry.addResourceHandler("/favicon.ico").addResourceLocations("classpath:/static/images/favicon.png");
-//    registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+    //    registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
+    registry
+        .addResourceHandler("/favicon.ico")
+        .addResourceLocations("classpath:/static/images/favicon.png");
+    //
+    // registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
   }
 
   @Bean
@@ -105,7 +106,8 @@ public class SpringConfigWeb implements WebMvcConfigurer {
   public void addInterceptors(InterceptorRegistry registry) {
     registry.addInterceptor(localeChangeInterceptor());
 
-    InterceptorRegistration createAdminUserInterceptorRegistration = registry.addInterceptor(createAdminUserInterceptor());
+    InterceptorRegistration createAdminUserInterceptorRegistration =
+        registry.addInterceptor(createAdminUserInterceptor());
     createAdminUserInterceptorRegistration.addPathPatterns("/login");
   }
 

@@ -17,10 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class EntityRepositoryImpl<E extends Entity> extends IdentifiableRepositoryImpl<E> implements EntityRepository<E> {
+public class EntityRepositoryImpl<E extends Entity> extends IdentifiableRepositoryImpl<E>
+    implements EntityRepository<E> {
 
-  @Autowired
-  private EntityRepositoryEndpoint endpoint;
+  @Autowired private EntityRepositoryEndpoint endpoint;
 
   @Override
   public void addRelatedFileresource(E entity, FileResource fileResource) {
@@ -34,7 +34,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public void addRelation(EntityRelation<E> relation) {
-    addRelation(relation.getSubject().getUuid(), relation.getPredicate(), relation.getObject().getUuid());
+    addRelation(
+        relation.getSubject().getUuid(), relation.getPredicate(), relation.getObject().getUuid());
   }
 
   @Override
@@ -55,7 +56,13 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   @Override
   public PageResponse<E> find(PageRequest pageRequest) {
     FindParams f = getFindParams(pageRequest);
-    PageResponse<Entity> pageResponse = endpoint.find(f.getPageNumber(), f.getPageSize(), f.getSortField(), f.getSortDirection(), f.getNullHandling());
+    PageResponse<Entity> pageResponse =
+        endpoint.find(
+            f.getPageNumber(),
+            f.getPageSize(),
+            f.getSortField(),
+            f.getSortDirection(),
+            f.getNullHandling());
     return getGenericPageResponse(pageResponse);
   }
 
@@ -95,12 +102,14 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveRelatedFileResources(E entity, LinkedHashSet<FileResource> fileResources) {
+  public LinkedHashSet<FileResource> saveRelatedFileResources(
+      E entity, LinkedHashSet<FileResource> fileResources) {
     return saveRelatedFileResources(entity.getUuid(), fileResources);
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveRelatedFileResources(UUID entityUuid, LinkedHashSet<FileResource> fileResources) {
+  public LinkedHashSet<FileResource> saveRelatedFileResources(
+      UUID entityUuid, LinkedHashSet<FileResource> fileResources) {
     return endpoint.saveRelatedFileResources(entityUuid, fileResources);
   }
 

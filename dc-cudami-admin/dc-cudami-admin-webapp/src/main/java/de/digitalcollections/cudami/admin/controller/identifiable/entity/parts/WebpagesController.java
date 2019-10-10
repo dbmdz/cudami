@@ -34,9 +34,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-/**
- * Controller for webpage management pages.
- */
+/** Controller for webpage management pages. */
 @Controller
 public class WebpagesController extends AbstractController {
 
@@ -57,7 +55,10 @@ public class WebpagesController extends AbstractController {
   }
 
   @GetMapping("/webpages/new")
-  public String create(Model model, @RequestParam("parentType") String parentType, @RequestParam("parentUuid") String parentUuid) {
+  public String create(
+      Model model,
+      @RequestParam("parentType") String parentType,
+      @RequestParam("parentUuid") String parentUuid) {
     model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
@@ -85,7 +86,12 @@ public class WebpagesController extends AbstractController {
   }
 
   @GetMapping("/webpages")
-  public String list(Model model, @PageableDefault(sort = {"email"}, size = 25) Pageable pageable) {
+  public String list(
+      Model model,
+      @PageableDefault(
+              sort = {"email"},
+              size = 25)
+          Pageable pageable) {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
@@ -97,8 +103,8 @@ public class WebpagesController extends AbstractController {
   public ResponseEntity save(
       @RequestBody Webpage webpage,
       @RequestParam("parentType") String parentType,
-      @RequestParam("parentUuid") UUID parentUuid
-  ) throws IdentifiableServiceException {
+      @RequestParam("parentUuid") UUID parentUuid)
+      throws IdentifiableServiceException {
     Webpage webpageDb = null;
     HttpHeaders headers = new HttpHeaders();
     try {
@@ -121,7 +127,8 @@ public class WebpagesController extends AbstractController {
   }
 
   @PutMapping("/api/webpages/{uuid}")
-  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Webpage webpage) throws IdentifiableServiceException {
+  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Webpage webpage)
+      throws IdentifiableServiceException {
     HttpHeaders headers = new HttpHeaders();
     try {
       service.update(webpage);

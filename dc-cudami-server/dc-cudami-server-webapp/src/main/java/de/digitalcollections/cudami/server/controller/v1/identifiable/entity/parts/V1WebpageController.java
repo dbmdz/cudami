@@ -40,23 +40,36 @@ import org.springframework.web.bind.annotation.RestController;
 public class V1WebpageController {
 
   private final DigitalCollectionsObjectMapper objectMapper = new DigitalCollectionsObjectMapper();
-  private final V1DigitalCollectionsXStreamMarshaller v1XStreamMarshaller = new V1DigitalCollectionsXStreamMarshaller();
+  private final V1DigitalCollectionsXStreamMarshaller v1XStreamMarshaller =
+      new V1DigitalCollectionsXStreamMarshaller();
 
-  @Autowired
-  private WebpageService webpageService;
+  @Autowired private WebpageService webpageService;
 
   @ApiMethod(description = "Get a webpage as JSON (Version 1)")
-  @RequestMapping(value = {"/v1/webpages/{uuid}.json", "/v1/webpages/{uuid}"}, produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
+  @RequestMapping(
+      value = {"/v1/webpages/{uuid}.json", "/v1/webpages/{uuid}"},
+      produces = {MediaType.APPLICATION_JSON_VALUE},
+      method = RequestMethod.GET)
   @ApiResponseObject
   public ResponseEntity<String> getWebpageV1Json(
-      @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
-      @ApiQueryParam(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
-      @RequestParam(name = "pLocale", required = false) Locale pLocale
-  ) throws IdentifiableServiceException, JsonProcessingException {
+      @ApiPathParam(
+              description =
+                  "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @ApiQueryParam(
+              name = "pLocale",
+              description =
+                  "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+          @RequestParam(name = "pLocale", required = false)
+          Locale pLocale)
+      throws IdentifiableServiceException, JsonProcessingException {
     Webpage webpage = loadWebpage(pLocale, uuid);
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(webpage));
     if (result.has("description")) {
-      result.put("description", convertLocalizedStructuredContentJson(result.getJSONObject("description")));
+      result.put(
+          "description",
+          convertLocalizedStructuredContentJson(result.getJSONObject("description")));
     }
     if (result.has("label")) {
       result.put("label", convertLocalizedTextJson(result.getJSONObject("label")));
@@ -69,13 +82,25 @@ public class V1WebpageController {
   }
 
   @ApiMethod(description = "Get a webpage as XML (Version 1)")
-  @RequestMapping(value = {"/v1/webpages/{uuid}.xml"}, produces = {MediaType.APPLICATION_XML_VALUE}, method = RequestMethod.GET)
+  @RequestMapping(
+      value = {"/v1/webpages/{uuid}.xml"},
+      produces = {MediaType.APPLICATION_XML_VALUE},
+      method = RequestMethod.GET)
   @ApiResponseObject
   public ResponseEntity<String> getWebpageV1Xml(
-      @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
-      @ApiQueryParam(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
-      @RequestParam(name = "pLocale", required = false) Locale pLocale
-  ) throws IdentifiableServiceException, JsonProcessingException, XmlMappingException, IOException {
+      @ApiPathParam(
+              description =
+                  "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @ApiQueryParam(
+              name = "pLocale",
+              description =
+                  "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+          @RequestParam(name = "pLocale", required = false)
+          Locale pLocale)
+      throws IdentifiableServiceException, JsonProcessingException, XmlMappingException,
+          IOException {
     Webpage webpage = loadWebpage(pLocale, uuid);
     StringWriter sw = new StringWriter();
     v1XStreamMarshaller.marshalWriter(webpage, sw);
@@ -97,12 +122,14 @@ public class V1WebpageController {
   private JSONObject convertLocalizedTextJson(JSONObject json) {
     JSONObject result = new JSONObject();
     JSONArray translations = new JSONArray();
-    json.keySet().forEach((locale) -> {
-      JSONObject translation = new JSONObject();
-      translation.put("locale", locale);
-      translation.put("text", json.get(locale));
-      translations.put(translation);
-    });
+    json.keySet()
+        .forEach(
+            (locale) -> {
+              JSONObject translation = new JSONObject();
+              translation.put("locale", locale);
+              translation.put("text", json.get(locale));
+              translations.put(translation);
+            });
     result.put("translations", translations);
     return result;
   }
@@ -110,12 +137,13 @@ public class V1WebpageController {
   private void convertLocalizedTextXml(Element xml) {
     List<Element> contents = xml.getChildren("entry");
     Element translations = new Element("translations");
-    contents.forEach((entry) -> {
-      Element translation = new Element("translation");
-      translation.addContent(entry.getChild("locale").clone());
-      translation.addContent(entry.getChild("string").clone());
-      translations.addContent(translation);
-    });
+    contents.forEach(
+        (entry) -> {
+          Element translation = new Element("translation");
+          translation.addContent(entry.getChild("locale").clone());
+          translation.addContent(entry.getChild("string").clone());
+          translations.addContent(translation);
+        });
     xml.setContent(translations);
   }
 

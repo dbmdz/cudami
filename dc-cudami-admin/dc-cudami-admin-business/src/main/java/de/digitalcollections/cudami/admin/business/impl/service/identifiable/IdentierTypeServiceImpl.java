@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-//@Transactional(readOnly = true)
+// @Transactional(readOnly = true)
 public class IdentierTypeServiceImpl implements IdentifierTypeService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentierTypeServiceImpl.class);
@@ -22,7 +22,8 @@ public class IdentierTypeServiceImpl implements IdentifierTypeService {
   protected IdentifierTypeRepository repository;
 
   @Autowired
-  public IdentierTypeServiceImpl(@Qualifier("identifierTypeRepositoryImpl") IdentifierTypeRepository repository) {
+  public IdentierTypeServiceImpl(
+      @Qualifier("identifierTypeRepositoryImpl") IdentifierTypeRepository repository) {
     this.repository = repository;
   }
 

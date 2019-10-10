@@ -33,9 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-/**
- * Controller for content trees management pages.
- */
+/** Controller for content trees management pages. */
 @Controller
 public class ContentTreesController extends AbstractController {
 
@@ -82,7 +80,12 @@ public class ContentTreesController extends AbstractController {
   }
 
   @GetMapping("/contenttrees")
-  public String list(Model model, @PageableDefault(sort = {"lastModified"}, size = 25) Pageable pageable) {
+  public String list(
+      Model model,
+      @PageableDefault(
+              sort = {"lastModified"},
+              size = 25)
+          Pageable pageable) {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
@@ -91,7 +94,8 @@ public class ContentTreesController extends AbstractController {
   }
 
   @PostMapping("/api/contenttrees/new")
-  public ResponseEntity save(@RequestBody ContentTree contentTree) throws IdentifiableServiceException {
+  public ResponseEntity save(@RequestBody ContentTree contentTree)
+      throws IdentifiableServiceException {
     ContentTree contentTreeDb = null;
     HttpHeaders headers = new HttpHeaders();
     try {
@@ -105,7 +109,8 @@ public class ContentTreesController extends AbstractController {
   }
 
   @PutMapping("/api/contenttrees/{uuid}")
-  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody ContentTree contentTree) throws IdentifiableServiceException {
+  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody ContentTree contentTree)
+      throws IdentifiableServiceException {
     HttpHeaders headers = new HttpHeaders();
     try {
       service.update(contentTree);

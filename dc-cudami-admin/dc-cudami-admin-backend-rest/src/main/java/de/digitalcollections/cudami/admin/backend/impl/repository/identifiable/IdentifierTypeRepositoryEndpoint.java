@@ -11,14 +11,18 @@ import java.util.UUID;
 
 public interface IdentifierTypeRepositoryEndpoint extends RepositoryEndpoint {
 
-  @RequestLine("GET /latest/identifiertypes?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
+  @RequestLine(
+      "GET /latest/identifiertypes?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<IdentifierType> find(
-      @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
-      @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
-  );
+      @Param("pageNumber") int pageNumber,
+      @Param("pageSize") int pageSize,
+      @Param("sortField") String sortField,
+      @Param("sortDirection") String sortDirection,
+      @Param("nullHandling") String nullHandling);
 
   @RequestLine("GET /latest/identifiertypes?searchTerm={searchTerm}&maxResults={maxResults}")
-  List<IdentifierType> find(@Param("searchTerm") String searchTerm, @Param("maxResults") int maxResults);
+  List<IdentifierType> find(
+      @Param("searchTerm") String searchTerm, @Param("maxResults") int maxResults);
 
   @RequestLine("GET /latest/identifiertypes/{uuid}")
   IdentifierType findOne(@Param("uuid") UUID uuid);

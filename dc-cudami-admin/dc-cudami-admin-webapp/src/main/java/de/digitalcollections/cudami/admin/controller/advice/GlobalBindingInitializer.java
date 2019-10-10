@@ -16,14 +16,11 @@ import org.springframework.web.context.request.WebRequest;
 @ControllerAdvice
 public class GlobalBindingInitializer {
 
-  @Autowired
-  LocalizedStructuredContentEditor localizedStructuredContentEditor;
+  @Autowired LocalizedStructuredContentEditor localizedStructuredContentEditor;
 
-  @Autowired
-  LocalizedTextEditor localizedTextContentEditor;
+  @Autowired LocalizedTextEditor localizedTextContentEditor;
 
-  @Autowired
-  RoleEditor roleEditor;
+  @Autowired RoleEditor roleEditor;
 
   @InitBinder
   public void registerCustomEditors(WebDataBinder binder, WebRequest request) {

@@ -8,5 +8,4 @@ public class HttpServerException extends HttpException {
   public HttpServerException(String methodKey, Response response) {
     super(methodKey, response);
   }
-
 }

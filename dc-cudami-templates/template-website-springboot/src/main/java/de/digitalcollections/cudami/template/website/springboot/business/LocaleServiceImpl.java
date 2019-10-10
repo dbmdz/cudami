@@ -8,12 +8,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class LocaleServiceImpl implements LocaleService {
 
-  @Autowired
-  private LocaleRepository repository;
+  @Autowired private LocaleRepository repository;
 
   @Override
   public Locale getDefaultLanguage() {
     return repository.getDefault();
   }
-
 }

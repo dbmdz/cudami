@@ -28,9 +28,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/**
- * Controller for digital objects management pages.
- */
+/** Controller for digital objects management pages. */
 @Controller
 @SessionAttributes(value = {"digitalobject"})
 public class DigitalObjectsController extends AbstractController {
@@ -55,7 +53,12 @@ public class DigitalObjectsController extends AbstractController {
   }
 
   @RequestMapping(value = "/digitalobjects/new", method = RequestMethod.POST)
-  public String create(@ModelAttribute @Valid DigitalObjectImpl digitalObject, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  public String create(
+      @ModelAttribute @Valid DigitalObjectImpl digitalObject,
+      BindingResult results,
+      Model model,
+      SessionStatus status,
+      RedirectAttributes redirectAttributes) {
     throw new UnsupportedOperationException();
   }
 
@@ -65,12 +68,23 @@ public class DigitalObjectsController extends AbstractController {
   }
 
   @RequestMapping(value = "/digitalobjects/{pathUuid}/edit", method = RequestMethod.POST)
-  public String edit(@PathVariable UUID pathUuid, @ModelAttribute @Valid DigitalObjectImpl digitalObject, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  public String edit(
+      @PathVariable UUID pathUuid,
+      @ModelAttribute @Valid DigitalObjectImpl digitalObject,
+      BindingResult results,
+      Model model,
+      SessionStatus status,
+      RedirectAttributes redirectAttributes) {
     throw new UnsupportedOperationException();
   }
 
   @RequestMapping(value = "/digitalobjects", method = RequestMethod.GET)
-  public String list(Model model, @PageableDefault(sort = {"lastModified"}, size = 25) Pageable pageable) {
+  public String list(
+      Model model,
+      @PageableDefault(
+              sort = {"lastModified"},
+              size = 25)
+          Pageable pageable) {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);

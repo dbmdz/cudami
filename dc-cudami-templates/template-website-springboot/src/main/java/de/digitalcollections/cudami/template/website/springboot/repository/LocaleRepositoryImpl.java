@@ -14,8 +14,7 @@ public class LocaleRepositoryImpl implements LocaleRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LocaleRepositoryImpl.class);
 
-  @Autowired
-  private CudamiClient cudamiClient;
+  @Autowired private CudamiClient cudamiClient;
 
   @Override
   public Locale getDefault() {
@@ -30,7 +29,9 @@ public class LocaleRepositoryImpl implements LocaleRepository {
   @Override
   public List<Locale> getAll() {
     try {
-      return cudamiClient.getSupportedLanguages().stream().map(language -> new Locale(language)).collect(Collectors.toList());
+      return cudamiClient.getSupportedLanguages().stream()
+          .map(language -> new Locale(language))
+          .collect(Collectors.toList());
     } catch (Exception e) {
       LOGGER.error("Cannot get all locales: " + e, e);
       return null;

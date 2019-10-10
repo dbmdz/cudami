@@ -35,9 +35,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/**
- * Controller for all "Users" pages.
- */
+/** Controller for all "Users" pages. */
 @Controller
 @SessionAttributes(value = {"user"})
 public class UserController extends AbstractController {
@@ -64,22 +62,30 @@ public class UserController extends AbstractController {
 
   @InitBinder("user")
   protected void initBinder(WebDataBinder binder) {
-//        binder.setDisallowedFields("password");
-//        binder.addValidators(mySpecialUserValidator);
+    //        binder.setDisallowedFields("password");
+    //        binder.addValidators(mySpecialUserValidator);
   }
 
   @RequestMapping(value = "/users/{uuid}/activate", method = RequestMethod.GET)
-  public String activate(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
+  public String activate(
+      @PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
     User user = service.activate(uuid);
-    String message = messageSource.getMessage("msg.user_activated", new Object[]{user.getEmail()}, LocaleContextHolder.getLocale());
+    String message =
+        messageSource.getMessage(
+            "msg.user_activated", new Object[] {user.getEmail()}, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
     return "redirect:/users";
   }
 
   @RequestMapping(value = "/users/{uuid}/deactivate", method = RequestMethod.GET)
-  public String deactivate(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
+  public String deactivate(
+      @PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
     User user = service.deactivate(uuid);
-    String message = messageSource.getMessage("msg.user_deactivated", new Object[]{user.getEmail()}, LocaleContextHolder.getLocale());
+    String message =
+        messageSource.getMessage(
+            "msg.user_deactivated",
+            new Object[] {user.getEmail()},
+            LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("warning_message", message);
     return "redirect:/users";
   }
@@ -91,7 +97,14 @@ public class UserController extends AbstractController {
   }
 
   @RequestMapping(value = "/users/new", method = RequestMethod.POST)
-  public String create(@RequestParam("pwd1") String password1, @RequestParam("pwd2") String password2, @ModelAttribute(name = "user") @Valid UserImpl user, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  public String create(
+      @RequestParam("pwd1") String password1,
+      @RequestParam("pwd2") String password2,
+      @ModelAttribute(name = "user") @Valid UserImpl user,
+      BindingResult results,
+      Model model,
+      SessionStatus status,
+      RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "users/create";
@@ -101,7 +114,8 @@ public class UserController extends AbstractController {
       return "users/create";
     }
     status.setComplete();
-    String message = messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
+    String message =
+        messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
     return "redirect:/users/" + userDb.getUuid().toString();
   }
@@ -113,8 +127,15 @@ public class UserController extends AbstractController {
   }
 
   @RequestMapping(value = "/users/{uuid}/edit", method = RequestMethod.POST)
-  public String edit(@PathVariable UUID uuid, @RequestParam("pwd1") String password1, @RequestParam("pwd2") String password2, @ModelAttribute(name = "user") @Valid UserImpl user, BindingResult results,
-                     Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  public String edit(
+      @PathVariable UUID uuid,
+      @RequestParam("pwd1") String password1,
+      @RequestParam("pwd2") String password2,
+      @ModelAttribute(name = "user") @Valid UserImpl user,
+      BindingResult results,
+      Model model,
+      SessionStatus status,
+      RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "users/edit";
@@ -124,15 +145,22 @@ public class UserController extends AbstractController {
       return "users/edit";
     }
     status.setComplete();
-    String message = messageSource.getMessage("msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
+    String message =
+        messageSource.getMessage(
+            "msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
     return "redirect:/users/" + uuid;
   }
 
   @RequestMapping(value = "/users", method = RequestMethod.GET)
-  public String list(Model model, @PageableDefault(sort = {"email"}, size = 25) Pageable pageable) {
-//    List<User> users = userService.getAll();
-//    model.addAttribute("users", users);
+  public String list(
+      Model model,
+      @PageableDefault(
+              sort = {"email"},
+              size = 25)
+          Pageable pageable) {
+    //    List<User> users = userService.getAll();
+    //    model.addAttribute("users", users);
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);

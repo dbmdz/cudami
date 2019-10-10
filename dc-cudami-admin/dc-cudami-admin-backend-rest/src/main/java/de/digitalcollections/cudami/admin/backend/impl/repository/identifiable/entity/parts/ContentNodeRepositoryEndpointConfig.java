@@ -16,16 +16,16 @@ public class ContentNodeRepositoryEndpointConfig {
   @Value(value = "${cudami.server.address}")
   private String cudamiServerAddress;
 
-  @Autowired
-  ObjectMapper objectMapper;
+  @Autowired ObjectMapper objectMapper;
 
   @Bean
   public ContentNodeRepositoryEndpoint contentNodeRepositoryEndpoint() {
-    ContentNodeRepositoryEndpoint endpoint = Feign.builder()
-        .decoder(new JacksonDecoder(objectMapper))
-        .encoder(new JacksonEncoder(objectMapper))
-        .errorDecoder(new EndpointErrorDecoder())
-        .target(ContentNodeRepositoryEndpoint.class, cudamiServerAddress);
+    ContentNodeRepositoryEndpoint endpoint =
+        Feign.builder()
+            .decoder(new JacksonDecoder(objectMapper))
+            .encoder(new JacksonEncoder(objectMapper))
+            .errorDecoder(new EndpointErrorDecoder())
+            .target(ContentNodeRepositoryEndpoint.class, cudamiServerAddress);
     return endpoint;
   }
 }

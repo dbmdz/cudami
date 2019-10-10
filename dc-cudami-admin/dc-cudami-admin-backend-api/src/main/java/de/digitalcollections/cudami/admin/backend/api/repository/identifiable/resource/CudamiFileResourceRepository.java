@@ -9,7 +9,9 @@ public interface CudamiFileResourceRepository extends IdentifiableRepository<Fil
 
   public FileResource save(FileResource fileResource, byte[] bytes);
 
-  public FileResource upload(InputStream inputStream, String filename, String contentType) throws ResourceIOException;
+  public FileResource upload(InputStream inputStream, String filename, String contentType)
+      throws ResourceIOException;
 
-  public FileResource upload(byte[] bytes, String filename, String contentType) throws ResourceIOException;
+  public FileResource upload(byte[] bytes, String filename, String contentType)
+      throws ResourceIOException;
 }

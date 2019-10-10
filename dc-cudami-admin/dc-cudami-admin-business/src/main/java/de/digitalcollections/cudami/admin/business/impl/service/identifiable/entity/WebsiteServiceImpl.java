@@ -10,11 +10,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/**
- * Service for Website handling.
- */
+/** Service for Website handling. */
 @Service
-//@Transactional(readOnly = true)
+// @Transactional(readOnly = true)
 public class WebsiteServiceImpl extends EntityServiceImpl<Website> implements WebsiteService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsiteServiceImpl.class);

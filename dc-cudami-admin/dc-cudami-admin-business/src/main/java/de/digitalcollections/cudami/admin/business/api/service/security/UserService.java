@@ -31,14 +31,13 @@ public interface UserService<U extends User> extends UserDetailsService {
 
   PageResponse<U> find(PageRequest pageRequest);
 
-//  List<U> findActiveAdminUsers();
+  //  List<U> findActiveAdminUsers();
   List<U> findAll();
 
-//  U findByEmail(String email);
+  //  U findByEmail(String email);
   U findOne(UUID uuid);
 
-//  U save(U user);
-//  U update(U user);
+  //  U save(U user);
+  //  U update(U user);
   U update(U user, String password1, String password2, Errors results);
-
 }

@@ -9,17 +9,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/**
- * Service for Locale handling.
- */
+/** Service for Locale handling. */
 @Service
-//@Transactional(readOnly = true)
+// @Transactional(readOnly = true)
 public class LocaleServiceImpl implements LocaleService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LocaleServiceImpl.class);
 
-  @Autowired
-  private LocaleRepository repository;
+  @Autowired private LocaleRepository repository;
 
   @Override
   public String getDefaultLanguage() {

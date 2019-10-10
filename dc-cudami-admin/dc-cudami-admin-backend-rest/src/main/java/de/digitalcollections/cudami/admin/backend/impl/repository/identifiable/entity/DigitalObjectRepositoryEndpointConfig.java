@@ -16,16 +16,16 @@ public class DigitalObjectRepositoryEndpointConfig {
   @Value(value = "${cudami.server.address}")
   private String cudamiServerAddress;
 
-  @Autowired
-  ObjectMapper objectMapper;
+  @Autowired ObjectMapper objectMapper;
 
   @Bean
   public DigitalObjectRepositoryEndpoint digitalObjectRepositoryEndpoint() {
-    DigitalObjectRepositoryEndpoint endpoint = Feign.builder()
-        .decoder(new JacksonDecoder(objectMapper))
-        .encoder(new JacksonEncoder(objectMapper))
-        .errorDecoder(new EndpointErrorDecoder())
-        .target(DigitalObjectRepositoryEndpoint.class, cudamiServerAddress);
+    DigitalObjectRepositoryEndpoint endpoint =
+        Feign.builder()
+            .decoder(new JacksonDecoder(objectMapper))
+            .encoder(new JacksonEncoder(objectMapper))
+            .errorDecoder(new EndpointErrorDecoder())
+            .target(DigitalObjectRepositoryEndpoint.class, cudamiServerAddress);
     return endpoint;
   }
 }

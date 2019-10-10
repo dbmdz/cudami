@@ -9,17 +9,21 @@ import org.w3c.dom.Document;
 
 public interface FileResourceBinaryRepository {
 
-  void assertReadability(FileResource resource) throws ResourceIOException, ResourceNotFoundException;
+  void assertReadability(FileResource resource)
+      throws ResourceIOException, ResourceNotFoundException;
 
   FileResource find(String uuid) throws ResourceIOException, ResourceNotFoundException;
 
   byte[] getAsBytes(FileResource resource) throws ResourceIOException, ResourceNotFoundException;
 
-  Document getAsDocument(FileResource resource) throws ResourceIOException, ResourceNotFoundException;
+  Document getAsDocument(FileResource resource)
+      throws ResourceIOException, ResourceNotFoundException;
 
-  InputStream getInputStream(FileResource resource) throws ResourceIOException, ResourceNotFoundException;
+  InputStream getInputStream(FileResource resource)
+      throws ResourceIOException, ResourceNotFoundException;
 
   FileResource save(FileResource fileResource, InputStream binaryData) throws ResourceIOException;
 
-  FileResource save(FileResource fileResource, String input, Charset charset) throws ResourceIOException;
+  FileResource save(FileResource fileResource, String input, Charset charset)
+      throws ResourceIOException;
 }

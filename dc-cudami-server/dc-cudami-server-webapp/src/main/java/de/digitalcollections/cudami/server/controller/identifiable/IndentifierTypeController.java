@@ -28,19 +28,22 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The identifier types controller", name = "Identifier types controller")
 public class IndentifierTypeController {
 
-  @Autowired
-  private IdentifierTypeService service;
+  @Autowired private IdentifierTypeService service;
 
   @ApiMethod(description = "Get all identifier types")
-  @RequestMapping(value = {"/latest/identifiertypes", "/v2/identifiertypes"}, produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(
+      value = {"/latest/identifiertypes", "/v2/identifiertypes"},
+      produces = "application/json",
+      method = RequestMethod.GET)
   @ApiResponseObject
   public PageResponse<IdentifierType> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
-      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC") Direction sortDirection,
-      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE") NullHandling nullHandling
-  ) {
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
+          Direction sortDirection,
+      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
+          NullHandling nullHandling) {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
@@ -48,23 +51,33 @@ public class IndentifierTypeController {
   }
 
   @ApiMethod(description = "get identifier type by uuid")
-  @RequestMapping(value = {"/latest/identifiertypes/{uuid}", "/v2/identifiertypes/{uuid}"}, produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(
+      value = {"/latest/identifiertypes/{uuid}", "/v2/identifiertypes/{uuid}"},
+      produces = "application/json",
+      method = RequestMethod.GET)
   @ApiResponseObject
   public IdentifierType findById(@PathVariable UUID uuid) {
     return (IdentifierType) service.get(uuid);
   }
 
   @ApiMethod(description = "save a newly created identifier type")
-  @RequestMapping(value = {"/latest/identifiertypes", "/v2/identifiertypes"}, produces = "application/json", method = RequestMethod.POST)
+  @RequestMapping(
+      value = {"/latest/identifiertypes", "/v2/identifiertypes"},
+      produces = "application/json",
+      method = RequestMethod.POST)
   @ApiResponseObject
   public IdentifierType save(@RequestBody IdentifierType identifierType, BindingResult errors) {
     return service.save(identifierType);
   }
 
   @ApiMethod(description = "update an identifier type")
-  @RequestMapping(value = {"/latest/identifiertypes/{uuid}", "/v2/identifiertypes/{uuid}"}, produces = "application/json", method = RequestMethod.PUT)
+  @RequestMapping(
+      value = {"/latest/identifiertypes/{uuid}", "/v2/identifiertypes/{uuid}"},
+      produces = "application/json",
+      method = RequestMethod.PUT)
   @ApiResponseObject
-  public IdentifierType update(@PathVariable UUID uuid, @RequestBody IdentifierType identifierType, BindingResult errors) {
+  public IdentifierType update(
+      @PathVariable UUID uuid, @RequestBody IdentifierType identifierType, BindingResult errors) {
     assert Objects.equals(uuid, identifierType.getUuid());
     return (IdentifierType) service.update(identifierType);
   }

@@ -20,8 +20,9 @@ import org.springframework.stereotype.Service;
  * @param <E> entity type
  */
 @Service
-//@Transactional(readOnly = true)
-public class ContentNodeServiceImpl<E extends Entity> extends EntityPartServiceImpl<ContentNode, E> implements ContentNodeService<E> {
+// @Transactional(readOnly = true)
+public class ContentNodeServiceImpl<E extends Entity> extends EntityPartServiceImpl<ContentNode, E>
+    implements ContentNodeService<E> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentNodeServiceImpl.class);
 
@@ -72,9 +73,11 @@ public class ContentNodeServiceImpl<E extends Entity> extends EntityPartServiceI
 
   @Override
   //  @Transactional(readOnly = false)
-  public ContentNode saveWithParentContentTree(ContentNode contentNode, UUID parentContentTreeUuid) throws IdentifiableServiceException {
+  public ContentNode saveWithParentContentTree(ContentNode contentNode, UUID parentContentTreeUuid)
+      throws IdentifiableServiceException {
     try {
-      return ((ContentNodeRepository) repository).saveWithParentContentTree(contentNode, parentContentTreeUuid);
+      return ((ContentNodeRepository) repository)
+          .saveWithParentContentTree(contentNode, parentContentTreeUuid);
     } catch (Exception e) {
       LOGGER.error("Cannot save top-level content node " + contentNode + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
@@ -83,9 +86,11 @@ public class ContentNodeServiceImpl<E extends Entity> extends EntityPartServiceI
 
   @Override
   //  @Transactional(readOnly = false)
-  public ContentNode saveWithParentContentNode(ContentNode contentNode, UUID parentContentNodeUuid) throws IdentifiableServiceException {
+  public ContentNode saveWithParentContentNode(ContentNode contentNode, UUID parentContentNodeUuid)
+      throws IdentifiableServiceException {
     try {
-      return ((ContentNodeRepository) repository).saveWithParentContentNode(contentNode, parentContentNodeUuid);
+      return ((ContentNodeRepository) repository)
+          .saveWithParentContentNode(contentNode, parentContentNodeUuid);
     } catch (Exception e) {
       LOGGER.error("Cannot save content node " + contentNode + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
@@ -103,12 +108,14 @@ public class ContentNodeServiceImpl<E extends Entity> extends EntityPartServiceI
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveFileResources(ContentNode contentNode, LinkedHashSet<FileResource> fileResources) {
+  public LinkedHashSet<FileResource> saveFileResources(
+      ContentNode contentNode, LinkedHashSet<FileResource> fileResources) {
     return saveFileResources(contentNode.getUuid(), fileResources);
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveFileResources(UUID contentNodeUuid, LinkedHashSet<FileResource> fileResources) {
+  public LinkedHashSet<FileResource> saveFileResources(
+      UUID contentNodeUuid, LinkedHashSet<FileResource> fileResources) {
     return ((ContentNodeRepository) repository).saveFileResources(contentNodeUuid, fileResources);
   }
 }

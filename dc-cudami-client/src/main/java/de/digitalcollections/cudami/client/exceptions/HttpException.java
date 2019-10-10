@@ -13,15 +13,19 @@ public class HttpException extends Exception {
   int statuscode;
   String errorMessage;
 
-  @SuppressFBWarnings(value = "OS_OPEN_STREAM", justification = "Opened stream will be closed via try-with-resources statement")
+  @SuppressFBWarnings(
+      value = "OS_OPEN_STREAM",
+      justification = "Opened stream will be closed via try-with-resources statement")
   public HttpException(String methodKey, Response response) {
-    super(String.format("Got %d for backend call %s.%n⤷ %s",
-                        response.status(), methodKey, response.request()));
+    super(
+        String.format(
+            "Got %d for backend call %s.%n⤷ %s", response.status(), methodKey, response.request()));
 
     if (response.body() != null) {
 
       try {
-        try (InputStreamReader ir = new InputStreamReader(response.body().asInputStream(), StandardCharsets.UTF_8)) {
+        try (InputStreamReader ir =
+            new InputStreamReader(response.body().asInputStream(), StandardCharsets.UTF_8)) {
           errorMessage = new BufferedReader(ir).lines().parallel().collect(Collectors.joining(" "));
           errorMessage = errorMessage.replaceFirst("^\"", "").replaceFirst("\"$", "");
         }
@@ -40,5 +44,4 @@ public class HttpException extends Exception {
   public String getErrorMessage() {
     return errorMessage;
   }
-
 }

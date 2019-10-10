@@ -17,12 +17,12 @@ public class CudamiFileResourceRepositoryEndpointConfig {
   @Value(value = "${cudami.server.address}")
   private String cudamiServerAddress;
 
-  @Autowired
-  ObjectMapper objectMapper;
+  @Autowired ObjectMapper objectMapper;
 
   @Bean
   public CudamiFileResourceRepositoryEndpoint fileResourceRepositoryEndpoint() {
-    CudamiFileResourceRepositoryEndpoint endpoint = Feign.builder()
+    CudamiFileResourceRepositoryEndpoint endpoint =
+        Feign.builder()
             .decoder(new JacksonDecoder(objectMapper))
             .encoder(new SpringFormEncoder(new JacksonEncoder(objectMapper)))
             .errorDecoder(new EndpointErrorDecoder())

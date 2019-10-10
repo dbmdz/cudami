@@ -15,13 +15,14 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 @SuppressWarnings("checkstyle:typename")
 public class V1_4_0__DML_Refactor_localized_content extends BaseJavaMigration {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(V1_4_0__DML_Refactor_localized_content.class);
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(V1_4_0__DML_Refactor_localized_content.class);
 
   @Override
   public void migrate(Context context) throws Exception {
-    JdbcTemplate jdbcTemplate = new JdbcTemplate(
-      new SingleConnectionDataSource(context.getConnection(), true).getConnection()
-    );
+    JdbcTemplate jdbcTemplate =
+        new JdbcTemplate(
+            new SingleConnectionDataSource(context.getConnection(), true).getConnection());
     migrateLocalizedStructuredContent(jdbcTemplate, "description", "identifiables");
     migrateLocalizedStructuredContent(jdbcTemplate, "text", "articles");
     migrateLocalizedStructuredContent(jdbcTemplate, "text", "webpages");
@@ -29,17 +30,23 @@ public class V1_4_0__DML_Refactor_localized_content extends BaseJavaMigration {
   }
 
   private String convertLocalizedStructuredContent(String currentJson) {
-    JSONObject localizedStructuredContent = new JSONObject(currentJson).getJSONObject("localizedStructuredContent");
+    JSONObject localizedStructuredContent =
+        new JSONObject(currentJson).getJSONObject("localizedStructuredContent");
     JSONObject result = new JSONObject();
-    localizedStructuredContent.keySet().forEach((locale) -> {
-      result.put(locale, localizedStructuredContent.get(locale));
-    });
+    localizedStructuredContent
+        .keySet()
+        .forEach(
+            (locale) -> {
+              result.put(locale, localizedStructuredContent.get(locale));
+            });
     return result.toString();
   }
 
-  private void migrateLocalizedStructuredContent(JdbcTemplate jdbcTemplate, String tableField, String tableName) throws SQLException {
+  private void migrateLocalizedStructuredContent(
+      JdbcTemplate jdbcTemplate, String tableField, String tableName) throws SQLException {
     String selectQuery = String.format("SELECT uuid,%s FROM %s", tableField, tableName);
-    String updateQuery = String.format("UPDATE %s SET %s=?::JSONB WHERE uuid=?::uuid", tableName, tableField);
+    String updateQuery =
+        String.format("UPDATE %s SET %s=?::JSONB WHERE uuid=?::uuid", tableName, tableField);
 
     LOGGER.info("Migrating from select: " + selectQuery + " to update: " + updateQuery);
 
@@ -48,10 +55,8 @@ public class V1_4_0__DML_Refactor_localized_content extends BaseJavaMigration {
       LOGGER.info("Migrating " + tableField + " of identifiable: " + identifiable.get("uuid"));
       final String currentJson = identifiable.get(tableField);
       if (currentJson != null) {
-        jdbcTemplate.update(updateQuery,
-                            convertLocalizedStructuredContent(currentJson),
-                            identifiable.get("uuid")
-        );
+        jdbcTemplate.update(
+            updateQuery, convertLocalizedStructuredContent(currentJson), identifiable.get("uuid"));
       }
     }
   }
@@ -59,12 +64,13 @@ public class V1_4_0__DML_Refactor_localized_content extends BaseJavaMigration {
   private String convertLocalizedText(String currentJson) {
     JSONArray labelTranslations = new JSONObject(currentJson).getJSONArray("translations");
     JSONObject result = new JSONObject();
-    labelTranslations.forEach((translation) -> {
-      JSONObject currentTranslation = (JSONObject) translation;
-      if (currentTranslation.has("text")) {
-        result.put((String) currentTranslation.get("locale"), currentTranslation.get("text"));
-      }
-    });
+    labelTranslations.forEach(
+        (translation) -> {
+          JSONObject currentTranslation = (JSONObject) translation;
+          if (currentTranslation.has("text")) {
+            result.put((String) currentTranslation.get("locale"), currentTranslation.get("text"));
+          }
+        });
     return result.toString();
   }
 
@@ -78,10 +84,7 @@ public class V1_4_0__DML_Refactor_localized_content extends BaseJavaMigration {
       final String currentJson = identifiable.get("label");
       if (currentJson != null) {
         jdbcTemplate.update(
-          updateQuery,
-          convertLocalizedText(currentJson),
-          identifiable.get("uuid")
-        );
+            updateQuery, convertLocalizedText(currentJson), identifiable.get("uuid"));
       }
     }
   }

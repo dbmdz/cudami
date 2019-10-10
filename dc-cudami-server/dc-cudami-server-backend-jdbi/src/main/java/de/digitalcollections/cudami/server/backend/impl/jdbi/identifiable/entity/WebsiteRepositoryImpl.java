@@ -20,7 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website> implements WebsiteRepository {
+public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
+    implements WebsiteRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsiteRepositoryImpl.class);
 
@@ -38,14 +39,14 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website> impleme
 
   @Override
   public PageResponse<Website> find(PageRequest pageRequest) {
-    StringBuilder query = new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS + ", url, registration_date")
-      .append(" FROM websites");
+    StringBuilder query =
+        new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS + ", url, registration_date")
+            .append(" FROM websites");
 
     addPageRequestParams(pageRequest, query);
 
-    List<WebsiteImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
-      .mapToBean(WebsiteImpl.class)
-      .list());
+    List<WebsiteImpl> result =
+        dbi.withHandle(h -> h.createQuery(query.toString()).mapToBean(WebsiteImpl.class).list());
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -53,14 +54,21 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website> impleme
 
   @Override
   public Website findOne(UUID uuid) {
-    String query = "SELECT " + IDENTIFIABLE_COLUMNS + ", url, registration_date"
-                   + " FROM websites"
-                   + " WHERE uuid = :uuid";
+    String query =
+        "SELECT "
+            + IDENTIFIABLE_COLUMNS
+            + ", url, registration_date"
+            + " FROM websites"
+            + " WHERE uuid = :uuid";
 
-    Website website = dbi.withHandle(h -> h.createQuery(query)
-      .bind("uuid", uuid)
-      .mapToBean(WebsiteImpl.class)
-      .findOne().orElse(null));
+    Website website =
+        dbi.withHandle(
+            h ->
+                h.createQuery(query)
+                    .bind("uuid", uuid)
+                    .mapToBean(WebsiteImpl.class)
+                    .findOne()
+                    .orElse(null));
     if (website != null) {
       website.setRootPages(getRootPages(website));
     }
@@ -69,7 +77,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website> impleme
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[]{"url"};
+    return new String[] {"url"};
   }
 
   @Override
@@ -78,12 +86,16 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website> impleme
     website.setCreated(LocalDateTime.now());
     website.setLastModified(LocalDateTime.now());
 
-    Website result = dbi.withHandle(h -> h
-      .createQuery("INSERT INTO websites(uuid, created, description, identifiable_type, label, last_modified, entity_type, url, registration_date)"
-                   + " VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :entityType, :url, :registrationDate) RETURNING *")
-      .bindBean(website)
-      .mapToBean(WebsiteImpl.class)
-      .findOne().orElse(null));
+    Website result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(
+                        "INSERT INTO websites(uuid, created, description, identifiable_type, label, last_modified, entity_type, url, registration_date)"
+                            + " VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :entityType, :url, :registrationDate) RETURNING *")
+                    .bindBean(website)
+                    .mapToBean(WebsiteImpl.class)
+                    .findOne()
+                    .orElse(null));
     return result;
   }
 
@@ -91,12 +103,17 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website> impleme
   public Website update(Website website) {
     website.setLastModified(LocalDateTime.now());
 
-    // do not update/left out from statement (not changed since insert): uuid, created, identifiable_type, entity_type
-    Website result = dbi.withHandle(h -> h
-      .createQuery("UPDATE websites SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, url=:url, registration_date=:registrationDate WHERE uuid=:uuid RETURNING *")
-      .bindBean(website)
-      .mapToBean(WebsiteImpl.class)
-      .findOne().orElse(null));
+    // do not update/left out from statement (not changed since insert): uuid, created,
+    // identifiable_type, entity_type
+    Website result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(
+                        "UPDATE websites SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, url=:url, registration_date=:registrationDate WHERE uuid=:uuid RETURNING *")
+                    .bindBean(website)
+                    .mapToBean(WebsiteImpl.class)
+                    .findOne()
+                    .orElse(null));
     return result;
   }
 
@@ -109,19 +126,21 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website> impleme
   @Override
   public List<Webpage> getRootPages(UUID uuid) {
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
-    String sql = "SELECT " + IDENTIFIABLE_COLUMNS
-                 + " FROM webpages INNER JOIN website_webpages ww ON uuid = ww.webpage_uuid"
-                 + " WHERE ww.website_uuid = :uuid"
-                 + " ORDER BY ww.sortIndex ASC";
+    String sql =
+        "SELECT "
+            + IDENTIFIABLE_COLUMNS
+            + " FROM webpages INNER JOIN website_webpages ww ON uuid = ww.webpage_uuid"
+            + " WHERE ww.website_uuid = :uuid"
+            + " ORDER BY ww.sortIndex ASC";
 
-//    String query = "SELECT ww.webpage_uuid as uuid, i.label as label"
-//                   + " FROM websites ws INNER JOIN website_webpage ww ON ws.uuid=ww.website_uuid INNER JOIN identifiables i ON ww.webpage_uuid=i.uuid"
-//                   + " WHERE ws.uuid = :uuid"
-//                   + " ORDER BY ww.sortIndex ASC";
-    List<WebpageImpl> list = dbi.withHandle(h -> h.createQuery(sql)
-      .bind("uuid", uuid)
-      .mapToBean(WebpageImpl.class)
-      .list());
+    //    String query = "SELECT ww.webpage_uuid as uuid, i.label as label"
+    //                   + " FROM websites ws INNER JOIN website_webpage ww ON
+    // ws.uuid=ww.website_uuid INNER JOIN identifiables i ON ww.webpage_uuid=i.uuid"
+    //                   + " WHERE ws.uuid = :uuid"
+    //                   + " ORDER BY ww.sortIndex ASC";
+    List<WebpageImpl> list =
+        dbi.withHandle(
+            h -> h.createQuery(sql).bind("uuid", uuid).mapToBean(WebpageImpl.class).list());
 
     if (list.isEmpty()) {
       return new ArrayList<>();

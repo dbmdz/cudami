@@ -14,8 +14,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
-//@Transactional(readOnly = true)
-public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl<E> implements EntityService<E> {
+// @Transactional(readOnly = true)
+public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl<E>
+    implements EntityService<E> {
 
   @Autowired
   public EntityServiceImpl(@Qualifier("entityRepositoryImpl") EntityRepository<E> repository) {
@@ -63,12 +64,14 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveRelatedFileResources(E entity, LinkedHashSet<FileResource> fileResources) {
+  public LinkedHashSet<FileResource> saveRelatedFileResources(
+      E entity, LinkedHashSet<FileResource> fileResources) {
     return ((EntityRepository) repository).saveRelatedFileResources(entity, fileResources);
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveRelatedFileResources(UUID entityUuid, LinkedHashSet<FileResource> fileResources) {
+  public LinkedHashSet<FileResource> saveRelatedFileResources(
+      UUID entityUuid, LinkedHashSet<FileResource> fileResources) {
     return ((EntityRepository) repository).saveRelatedFileResources(entityUuid, fileResources);
   }
 

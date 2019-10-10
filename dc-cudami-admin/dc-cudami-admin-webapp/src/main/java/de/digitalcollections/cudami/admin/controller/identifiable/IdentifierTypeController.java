@@ -59,7 +59,12 @@ public class IdentifierTypeController extends AbstractController {
   }
 
   @RequestMapping(value = "/identifiertypes/new", method = RequestMethod.POST)
-  public String create(@ModelAttribute @Valid IdentifierTypeImpl identifierType, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  public String create(
+      @ModelAttribute @Valid IdentifierTypeImpl identifierType,
+      BindingResult results,
+      Model model,
+      SessionStatus status,
+      RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "identifiertypes/create";
@@ -77,7 +82,8 @@ public class IdentifierTypeController extends AbstractController {
       return "identifiertypes/create";
     }
     status.setComplete();
-    String message = messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
+    String message =
+        messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
     return "redirect:/identifiertypes";
   }
@@ -89,7 +95,13 @@ public class IdentifierTypeController extends AbstractController {
   }
 
   @RequestMapping(value = "/identifiertypes/{pathUuid}/edit", method = RequestMethod.POST)
-  public String edit(@PathVariable UUID pathUuid, @ModelAttribute @Valid IdentifierTypeImpl identifierType, BindingResult results, Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  public String edit(
+      @PathVariable UUID pathUuid,
+      @ModelAttribute @Valid IdentifierTypeImpl identifierType,
+      BindingResult results,
+      Model model,
+      SessionStatus status,
+      RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "identifiertypes/" + pathUuid + "/edit";
@@ -115,13 +127,20 @@ public class IdentifierTypeController extends AbstractController {
       return "identifiertypes/" + pathUuid + "/edit";
     }
     status.setComplete();
-    String message = messageSource.getMessage("msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
+    String message =
+        messageSource.getMessage(
+            "msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
     return "redirect:/identifiertypes";
   }
 
   @GetMapping(value = "/identifiertypes")
-  public String list(Model model, @PageableDefault(sort = {"lastModified"}, size = 25) Pageable pageable) {
+  public String list(
+      Model model,
+      @PageableDefault(
+              sort = {"lastModified"},
+              size = 25)
+          Pageable pageable) {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);

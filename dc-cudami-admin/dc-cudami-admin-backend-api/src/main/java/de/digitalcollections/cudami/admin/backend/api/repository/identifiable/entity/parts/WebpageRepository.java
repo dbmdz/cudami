@@ -10,7 +10,8 @@ import java.util.UUID;
  *
  * @param <E> entity type
  */
-public interface WebpageRepository<E extends Entity> extends NodeRepository<Webpage>, EntityPartRepository<Webpage, E> {
+public interface WebpageRepository<E extends Entity>
+    extends NodeRepository<Webpage>, EntityPartRepository<Webpage, E> {
 
   Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUUID);
 

@@ -11,14 +11,18 @@ import java.util.UUID;
 
 public interface IdentifiableRepositoryEndpoint extends RepositoryEndpoint {
 
-  @RequestLine("GET /latest/identifiables?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
+  @RequestLine(
+      "GET /latest/identifiables?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<Identifiable> find(
-          @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
-          @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
-  );
+      @Param("pageNumber") int pageNumber,
+      @Param("pageSize") int pageSize,
+      @Param("sortField") String sortField,
+      @Param("sortDirection") String sortDirection,
+      @Param("nullHandling") String nullHandling);
 
   @RequestLine("GET /latest/identifiables?searchTerm={searchTerm}&maxResults={maxResults}")
-  List<Identifiable> find(@Param("searchTerm") String searchTerm, @Param("maxResults") int maxResults);
+  List<Identifiable> find(
+      @Param("searchTerm") String searchTerm, @Param("maxResults") int maxResults);
 
   @RequestLine("GET /latest/identifiables/{uuid}")
   Identifiable findOne(@Param("uuid") UUID uuid);

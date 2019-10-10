@@ -12,11 +12,14 @@ import java.util.UUID;
  *
  * @param <E> entity type
  */
-public interface WebpageService<E extends Entity> extends NodeService<Webpage>, EntityPartService<Webpage, E> {
+public interface WebpageService<E extends Entity>
+    extends NodeService<Webpage>, EntityPartService<Webpage, E> {
 
   Webpage get(UUID uuid, Locale locale) throws IdentifiableServiceException;
 
-  Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid) throws IdentifiableServiceException;
+  Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid)
+      throws IdentifiableServiceException;
 
-  Webpage saveWithParentWebpage(Webpage webpage, UUID parentWebpageUuid) throws IdentifiableServiceException;
+  Webpage saveWithParentWebpage(Webpage webpage, UUID parentWebpageUuid)
+      throws IdentifiableServiceException;
 }

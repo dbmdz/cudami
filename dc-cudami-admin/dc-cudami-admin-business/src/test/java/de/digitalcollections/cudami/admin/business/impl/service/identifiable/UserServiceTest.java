@@ -1,5 +1,7 @@
 package de.digitalcollections.cudami.admin.business.impl.service.identifiable;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import de.digitalcollections.cudami.admin.backend.api.repository.security.UserRepository;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import de.digitalcollections.cudami.config.SpringConfigBackendForTest;
@@ -19,19 +21,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {SpringConfigBusiness.class, SpringConfigBackendForTest.class})
 public class UserServiceTest {
 
   private User user;
 
-  @Autowired
-  UserRepository userRepository;
+  @Autowired UserRepository userRepository;
 
-  @Autowired
-  UserService service;
+  @Autowired UserService service;
 
   @BeforeEach
   public void setup() {

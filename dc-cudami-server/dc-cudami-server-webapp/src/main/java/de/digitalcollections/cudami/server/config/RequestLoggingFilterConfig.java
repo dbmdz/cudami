@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.server.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
-//@Configuration
+// @Configuration
 public class RequestLoggingFilterConfig {
 
   @Bean
@@ -12,7 +12,7 @@ public class RequestLoggingFilterConfig {
     filter.setIncludeHeaders(true);
     filter.setIncludeQueryString(true);
     filter.setIncludePayload(true);
-//    filter.setMaxPayloadLength(10000);
+    //    filter.setMaxPayloadLength(10000);
     filter.setAfterMessagePrefix("REQUEST DATA : ");
     return filter;
   }

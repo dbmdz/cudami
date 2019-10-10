@@ -23,7 +23,8 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
     }
   }
 
-  private void addOrderBy(PageRequest pageRequest, StringBuilder query, String[] allowedOrderByFields) {
+  private void addOrderBy(
+      PageRequest pageRequest, StringBuilder query, String[] allowedOrderByFields) {
     // Sorting
     String sortDirection = null;
     String sortField = null;
@@ -45,7 +46,9 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
       sortField = "id";
     }
 
-    if ("id".equals(sortField) || (allowedOrderByFields != null && Arrays.asList(allowedOrderByFields).contains(sortField))) {
+    if ("id".equals(sortField)
+        || (allowedOrderByFields != null
+            && Arrays.asList(allowedOrderByFields).contains(sortField))) {
       // Do not just append sortFiels value (check if is in allowed fields or equals "id")
       // binding of jdbi/database does not work for order by!!!
       query.append(" ORDER BY ").append(sortField);

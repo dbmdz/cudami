@@ -10,14 +10,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class MainController {
 
-  @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
+  @RequestMapping(
+      value = {"", "/"},
+      method = RequestMethod.GET)
   public String printWelcome(Model model) {
     model.addAttribute("time", new Date());
     return "main";
   }
 
-  @RequestMapping(value = {"/login"}, method = RequestMethod.GET)
-  public String login(@RequestParam(value = "error", defaultValue = "false") boolean error, Model model) {
+  @RequestMapping(
+      value = {"/login"},
+      method = RequestMethod.GET)
+  public String login(
+      @RequestParam(value = "error", defaultValue = "false") boolean error, Model model) {
     model.addAttribute("error", error);
     model.addAttribute("login", true);
     return "login";

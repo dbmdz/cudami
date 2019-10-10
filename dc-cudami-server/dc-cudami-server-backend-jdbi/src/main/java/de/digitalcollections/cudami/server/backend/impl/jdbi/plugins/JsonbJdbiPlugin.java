@@ -20,7 +20,8 @@ public class JsonbJdbiPlugin implements JdbiPlugin {
   public void customizeJdbi(Jdbi db) {
     db.registerArgument(new JsonbArgumentFactory<>(LocalizedStructuredContent.class, objectMapper));
     db.registerArgument(new JsonbArgumentFactory<>(LocalizedText.class, objectMapper));
-    db.registerColumnMapper(new JsonbColumnMapperFactory(LocalizedStructuredContent.class, objectMapper));
+    db.registerColumnMapper(
+        new JsonbColumnMapperFactory(LocalizedStructuredContent.class, objectMapper));
     db.registerColumnMapper(new JsonbColumnMapperFactory(LocalizedText.class, objectMapper));
   }
 }

@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article> implements ArticleRepository {
+public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
+    implements ArticleRepository {
 
-  @Autowired
-  private ArticleRepositoryEndpoint endpoint;
+  @Autowired private ArticleRepositoryEndpoint endpoint;
 
   @Override
   public long count() {
@@ -29,7 +29,13 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article> impleme
   @Override
   public PageResponse<Article> find(PageRequest pageRequest) {
     FindParams f = getFindParams(pageRequest);
-    PageResponse<Article> pageResponse = endpoint.find(f.getPageNumber(), f.getPageSize(), f.getSortField(), f.getSortDirection(), f.getNullHandling());
+    PageResponse<Article> pageResponse =
+        endpoint.find(
+            f.getPageNumber(),
+            f.getPageSize(),
+            f.getSortField(),
+            f.getSortDirection(),
+            f.getNullHandling());
     return getGenericPageResponse(pageResponse);
   }
 

@@ -15,9 +15,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-/**
- * Validates that given passwords are equals.
- */
+/** Validates that given passwords are equals. */
 @Component
 public class PasswordsValidator implements Validator {
 
@@ -54,25 +52,32 @@ public class PasswordsValidator implements Validator {
     }
 
     if (!StringUtils.isEmpty(password1) && password1.length() < PASSWORD_MIN_LENGTH) {
-      errors.reject("error.password_min_length", new Object[]{PASSWORD_MIN_LENGTH}, String.format("Password's minimum length is %d.", PASSWORD_MIN_LENGTH));
+      errors.reject(
+          "error.password_min_length",
+          new Object[] {PASSWORD_MIN_LENGTH},
+          String.format("Password's minimum length is %d.", PASSWORD_MIN_LENGTH));
       return;
     }
 
     if (!StringUtils.isEmpty(password1) && password1.length() > PASSWORD_MAX_LENGTH) {
-      errors.reject("error.password_max_length", new Object[]{PASSWORD_MAX_LENGTH}, String.format("Password's maximum length is %d.", PASSWORD_MAX_LENGTH));
+      errors.reject(
+          "error.password_max_length",
+          new Object[] {PASSWORD_MAX_LENGTH},
+          String.format("Password's maximum length is %d.", PASSWORD_MAX_LENGTH));
       return;
     }
 
-
-    final PasswordValidator validator = new PasswordValidator(Arrays.asList(
-            // Password minimum and maximum length range:
-            new LengthRule(PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH),
-            // at least one upper case letter:
-            new CharacterRule(EnglishCharacterData.UpperCase, 1),
-            // at least one lower case letter:
-            new CharacterRule(EnglishCharacterData.LowerCase, 1),
-            // at least one digit character:
-            new CharacterRule(EnglishCharacterData.Digit, 1)));
+    final PasswordValidator validator =
+        new PasswordValidator(
+            Arrays.asList(
+                // Password minimum and maximum length range:
+                new LengthRule(PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH),
+                // at least one upper case letter:
+                new CharacterRule(EnglishCharacterData.UpperCase, 1),
+                // at least one lower case letter:
+                new CharacterRule(EnglishCharacterData.LowerCase, 1),
+                // at least one digit character:
+                new CharacterRule(EnglishCharacterData.Digit, 1)));
     // at least one symbol (special character):
     //            new CharacterRule(EnglishCharacterData.Special, 1);
     // rejects passwords that contain a sequence of 3 digits (e.g. 123):

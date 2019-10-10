@@ -18,20 +18,26 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The version controller", name = "Version controller")
 public class VersionController {
 
-  @Autowired
-  VersionService versionService;
+  @Autowired VersionService versionService;
 
   @ApiMethod(description = "Get version by uuid")
-  @RequestMapping(value = {"/latest/versions/{uuid}", "/v2/versions/{uuid}"}, produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(
+      value = {"/latest/versions/{uuid}", "/v2/versions/{uuid}"},
+      produces = "application/json",
+      method = RequestMethod.GET)
   @ApiResponseObject
   public Version findById(@PathVariable UUID uuid) {
     return (Version) versionService.get(uuid);
   }
 
   @ApiMethod(description = "Update the version status")
-  @RequestMapping(value = {"/latest/versions/{uuid}", "/v2/versions/{uuid}"}, produces = "application/json", method = RequestMethod.PUT)
+  @RequestMapping(
+      value = {"/latest/versions/{uuid}", "/v2/versions/{uuid}"},
+      produces = "application/json",
+      method = RequestMethod.PUT)
   @ApiResponseObject
-  public Version update(@PathVariable UUID uuid, @RequestBody Version version, BindingResult errors) throws Exception {
+  public Version update(@PathVariable UUID uuid, @RequestBody Version version, BindingResult errors)
+      throws Exception {
     return (Version) versionService.update(version);
   }
 }

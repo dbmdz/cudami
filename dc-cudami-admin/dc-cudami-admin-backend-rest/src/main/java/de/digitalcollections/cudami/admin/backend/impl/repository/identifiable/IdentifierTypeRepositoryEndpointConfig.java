@@ -16,16 +16,16 @@ public class IdentifierTypeRepositoryEndpointConfig {
   @Value(value = "${cudami.server.address}")
   private String cudamiServerAddress;
 
-  @Autowired
-  ObjectMapper objectMapper;
+  @Autowired ObjectMapper objectMapper;
 
   @Bean
   public IdentifierTypeRepositoryEndpoint identifierTypeRepositoryEndpoint() {
-    IdentifierTypeRepositoryEndpoint endpoint = Feign.builder()
-        .decoder(new JacksonDecoder(objectMapper))
-        .encoder(new JacksonEncoder(objectMapper))
-        .errorDecoder(new EndpointErrorDecoder())
-        .target(IdentifierTypeRepositoryEndpoint.class, cudamiServerAddress);
+    IdentifierTypeRepositoryEndpoint endpoint =
+        Feign.builder()
+            .decoder(new JacksonDecoder(objectMapper))
+            .encoder(new JacksonEncoder(objectMapper))
+            .errorDecoder(new EndpointErrorDecoder())
+            .target(IdentifierTypeRepositoryEndpoint.class, cudamiServerAddress);
     return endpoint;
   }
 }

@@ -18,14 +18,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class FileResourceServiceImpl extends IdentifiableServiceImpl<FileResource> implements FileResourceService {
+public class FileResourceServiceImpl extends IdentifiableServiceImpl<FileResource>
+    implements FileResourceService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FileResourceServiceImpl.class);
 
   private final FileResourceBinaryRepository binaryRepository;
 
   @Autowired
-  public FileResourceServiceImpl(FileResourceMetadataRepository metadataRepository, FileResourceBinaryRepository binaryRepository) {
+  public FileResourceServiceImpl(
+      FileResourceMetadataRepository metadataRepository,
+      FileResourceBinaryRepository binaryRepository) {
     super(metadataRepository);
     this.binaryRepository = binaryRepository;
   }
@@ -41,13 +44,15 @@ public class FileResourceServiceImpl extends IdentifiableServiceImpl<FileResourc
   }
 
   @Override
-  public FileResource getByIdentifier(String namespace, String id) throws IdentifiableServiceException {
+  public FileResource getByIdentifier(String namespace, String id)
+      throws IdentifiableServiceException {
     Identifier identifier = new IdentifierImpl(null, namespace, id);
     return repository.findOne(identifier);
   }
 
   @Override
-  public FileResource save(FileResource fileResource, InputStream binaryData) throws IdentifiableServiceException {
+  public FileResource save(FileResource fileResource, InputStream binaryData)
+      throws IdentifiableServiceException {
     try {
       fileResource = binaryRepository.save(fileResource, binaryData);
       fileResource = repository.save(fileResource);

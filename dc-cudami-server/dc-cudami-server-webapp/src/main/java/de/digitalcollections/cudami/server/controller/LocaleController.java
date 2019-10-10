@@ -14,8 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The locale/language controller", name = "Locale and language controller")
 public class LocaleController {
 
-  @Autowired
-  private LocaleService service;
+  @Autowired private LocaleService service;
 
   @ApiMethod(description = "Get default language")
   @GetMapping(value = {"/latest/languages/default", "/v2/languages/default"})

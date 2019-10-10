@@ -11,12 +11,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/**
- * Service for ContentTree handling.
- */
+/** Service for ContentTree handling. */
 @Service
-//@Transactional(readOnly = true)
-public class ContentTreeServiceImpl extends EntityServiceImpl<ContentTree> implements ContentTreeService {
+// @Transactional(readOnly = true)
+public class ContentTreeServiceImpl extends EntityServiceImpl<ContentTree>
+    implements ContentTreeService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentTreeServiceImpl.class);
 

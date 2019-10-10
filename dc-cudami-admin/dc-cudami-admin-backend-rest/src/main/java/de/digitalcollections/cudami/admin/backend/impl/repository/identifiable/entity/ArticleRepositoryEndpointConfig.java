@@ -16,12 +16,12 @@ public class ArticleRepositoryEndpointConfig {
   @Value(value = "${cudami.server.address}")
   private String cudamiServerAddress;
 
-  @Autowired
-  ObjectMapper objectMapper;
+  @Autowired ObjectMapper objectMapper;
 
   @Bean
   public ArticleRepositoryEndpoint articleRepositoryEndpoint() {
-    ArticleRepositoryEndpoint endpoint = Feign.builder()
+    ArticleRepositoryEndpoint endpoint =
+        Feign.builder()
             .decoder(new JacksonDecoder(objectMapper))
             .encoder(new JacksonEncoder(objectMapper))
             .errorDecoder(new EndpointErrorDecoder())

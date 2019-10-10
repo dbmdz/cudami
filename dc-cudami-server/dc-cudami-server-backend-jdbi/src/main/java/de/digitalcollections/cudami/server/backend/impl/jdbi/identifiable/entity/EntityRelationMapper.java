@@ -29,8 +29,14 @@ public class EntityRelationMapper<E extends Entity> implements RowMapper<EntityR
   public EntityRelation map(ResultSet rs, StatementContext ctx) throws SQLException {
     ConfigRegistry config = ctx.getConfig();
     ColumnMappers columnMappers = config.get(ColumnMappers.class);
-    ColumnMapper<LocalizedStructuredContent> lscMapper = columnMappers.findFor(LocalizedStructuredContent.class).orElseThrow(() -> new NoSuchMapperException("LocalizedStructuredContent"));
-    ColumnMapper<LocalizedText> ltMapper = columnMappers.findFor(LocalizedText.class).orElseThrow(() -> new NoSuchMapperException("LocalizedText"));
+    ColumnMapper<LocalizedStructuredContent> lscMapper =
+        columnMappers
+            .findFor(LocalizedStructuredContent.class)
+            .orElseThrow(() -> new NoSuchMapperException("LocalizedStructuredContent"));
+    ColumnMapper<LocalizedText> ltMapper =
+        columnMappers
+            .findFor(LocalizedText.class)
+            .orElseThrow(() -> new NoSuchMapperException("LocalizedText"));
 
     EntityRelation result = new EntityRelationImpl();
 
@@ -43,7 +49,8 @@ public class EntityRelationMapper<E extends Entity> implements RowMapper<EntityR
     objectEntity.setEntityType(EntityType.valueOf(rs.getString("entity_type")));
     objectEntity.setLabel(ltMapper.map(rs, "label", ctx));
     objectEntity.setLastModified(rs.getTimestamp("last_modified").toLocalDateTime());
-//    objectEntity.setType(IdentifiableType.valueOf(rs.getString("identifiable_type"))); // set in constructor
+    //    objectEntity.setType(IdentifiableType.valueOf(rs.getString("identifiable_type"))); // set
+    // in constructor
     objectEntity.setUuid(rs.getObject("uuid", UUID.class));
 
     result.setObject(objectEntity);
