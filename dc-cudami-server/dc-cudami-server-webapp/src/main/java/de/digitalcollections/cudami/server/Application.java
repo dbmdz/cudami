@@ -18,12 +18,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 public class Application {
 
-//  private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
   public static void main(String[] args) throws Exception {
-
-//    if (System.getProperty("spring.profiles.active") == null) {
-//      System.setProperty("spring.profiles.active", "local");
-//    }
     SpringApplication.run(Application.class, args);
   }
 }
