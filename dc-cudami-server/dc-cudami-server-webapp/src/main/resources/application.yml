@@ -26,12 +26,12 @@ info:
 
 jsondoc:
   basePath: "http://localhost:9000"
-  version: "@project.version@"
+  displayMethodAs: URI
   packages:
     - de.digitalcollections.cudami.server.controller
   # optional configuration
   playgroundEnabled: true
-  displayMethodAs: URI
+  version: "@project.version@"
 
 management:
   endpoints:
