@@ -2,6 +2,8 @@ package de.digitalcollections.cudami.admin.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
+import org.springframework.boot.actuate.health.HealthEndpoint;
+import org.springframework.boot.actuate.info.InfoEndpoint;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -14,11 +16,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Order(1)
 public class SpringConfigSecurityMonitoring extends WebSecurityConfigurerAdapter {
 
-  @Value("${spring.security.user.name}")
-  private String actuatorUsername;
+  @Value("${management.endpoints.web.base-path}")
+  private String actuatorBasePath;
 
   @Value("${spring.security.user.password}")
   private String actuatorPassword;
+
+  @Value("${spring.security.user.name}")
+  private String actuatorUsername;
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -32,9 +37,11 @@ public class SpringConfigSecurityMonitoring extends WebSecurityConfigurerAdapter
     // Monitoring:
     // see
     // https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#production-ready-endpoints
-    http.antMatcher("/monitoring/**")
+    http.antMatcher(actuatorBasePath + "/**")
         .authorizeRequests()
-        .requestMatchers(EndpointRequest.to("info", "health"))
+        .requestMatchers(EndpointRequest.to(HealthEndpoint.class, InfoEndpoint.class))
+        .permitAll()
+        .requestMatchers(EndpointRequest.to("prometheus", "version"))
         .permitAll()
         .requestMatchers(EndpointRequest.toAnyEndpoint())
         .hasRole("ACTUATOR")
