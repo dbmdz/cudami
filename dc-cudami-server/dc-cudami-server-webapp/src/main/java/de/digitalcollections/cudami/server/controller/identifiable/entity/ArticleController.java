@@ -32,13 +32,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Api(description = "The article controller", name = "article controller")
+@Api(description = "The article controller", name = "Article controller")
 public class ArticleController {
 
   @Autowired
   private ArticleService articleService;
 
-  @ApiMethod(description = "get all articles")
+  @ApiMethod(description = "Get all articles")
   @RequestMapping(value = {"/latest/articles", "/v2/articles"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public PageResponse<Article> findAll(
@@ -55,7 +55,7 @@ public class ArticleController {
   }
 
   // Test-URL: http://localhost:9000/latest/articles/599a120c-2dd5-11e8-b467-0ed5f89f718b
-  @ApiMethod(description = "get an article as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @ApiMethod(description = "Get an article as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @RequestMapping(value = {"/latest/articles/{uuid}", "/v2/articles/{uuid}"}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, method = RequestMethod.GET)
   @ApiResponseObject
   public ResponseEntity<Article> getWebpage(
@@ -73,14 +73,14 @@ public class ArticleController {
     return new ResponseEntity<>(article, HttpStatus.OK);
   }
 
-  @ApiMethod(description = "save a newly created article")
+  @ApiMethod(description = "Save a newly created article")
   @RequestMapping(value = {"/latest/articles", "/v2/articles"}, produces = "application/json", method = RequestMethod.POST)
   @ApiResponseObject
   public Article save(@RequestBody Article article, BindingResult errors) throws IdentifiableServiceException {
     return articleService.save(article);
   }
 
-  @ApiMethod(description = "update an article")
+  @ApiMethod(description = "Update an article")
   @RequestMapping(value = {"/latest/articles/{uuid}", "/v2/articles/{uuid}"}, produces = "application/json", method = RequestMethod.PUT)
   @ApiResponseObject
   public Article update(@PathVariable UUID uuid, @RequestBody Article article, BindingResult errors) throws IdentifiableServiceException {

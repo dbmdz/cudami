@@ -25,13 +25,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Api(description = "The identifier types controller", name = "identifier types controller")
+@Api(description = "The identifier types controller", name = "Identifier types controller")
 public class IndentifierTypeController {
 
   @Autowired
   private IdentifierTypeService service;
 
-  @ApiMethod(description = "get all identifier types")
+  @ApiMethod(description = "Get all identifier types")
   @RequestMapping(value = {"/latest/identifiertypes", "/v2/identifiertypes"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public PageResponse<IdentifierType> findAll(
