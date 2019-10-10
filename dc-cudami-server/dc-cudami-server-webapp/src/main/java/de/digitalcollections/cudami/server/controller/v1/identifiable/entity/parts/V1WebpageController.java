@@ -45,7 +45,7 @@ public class V1WebpageController {
   @Autowired
   private WebpageService webpageService;
 
-  @ApiMethod(description = "get a webpage as JSON (Version 1)")
+  @ApiMethod(description = "Get a webpage as JSON (Version 1)")
   @RequestMapping(value = {"/v1/webpages/{uuid}.json", "/v1/webpages/{uuid}"}, produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
   @ApiResponseObject
   public ResponseEntity<String> getWebpageV1Json(
@@ -68,7 +68,7 @@ public class V1WebpageController {
     return new ResponseEntity<>(result.toString(), HttpStatus.OK);
   }
 
-  @ApiMethod(description = "get a webpage as XML (Version 1)")
+  @ApiMethod(description = "Get a webpage as XML (Version 1)")
   @RequestMapping(value = {"/v1/webpages/{uuid}.xml"}, produces = {MediaType.APPLICATION_XML_VALUE}, method = RequestMethod.GET)
   @ApiResponseObject
   public ResponseEntity<String> getWebpageV1Xml(

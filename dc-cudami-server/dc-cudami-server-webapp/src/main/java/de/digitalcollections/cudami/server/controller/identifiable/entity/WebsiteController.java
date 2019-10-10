@@ -34,7 +34,7 @@ public class WebsiteController {
   @Autowired
   private WebsiteService service;
 
-  @ApiMethod(description = "get all websites")
+  @ApiMethod(description = "Get all websites")
   @RequestMapping(value = {"/latest/websites", "/v2/websites"},
     produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
@@ -51,21 +51,21 @@ public class WebsiteController {
     return service.find(pageRequest);
   }
 
-  @ApiMethod(description = "get website by uuid")
+  @ApiMethod(description = "Get website by uuid")
   @RequestMapping(value = {"/latest/websites/{uuid}", "/v2/websites/{uuid}"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public Website findById(@PathVariable UUID uuid) {
     return (Website) service.get(uuid);
   }
 
-  @ApiMethod(description = "save a newly created website")
+  @ApiMethod(description = "Save a newly created website")
   @RequestMapping(value = {"/latest/websites", "/v2/websites"}, produces = "application/json", method = RequestMethod.POST)
   @ApiResponseObject
   public Website save(@RequestBody Website website, BindingResult errors) throws IdentifiableServiceException {
     return (Website) service.save(website);
   }
 
-  @ApiMethod(description = "update a website")
+  @ApiMethod(description = "Update a website")
   @RequestMapping(value = {"/latest/websites/{uuid}", "/v2/websites/{uuid}"}, produces = "application/json", method = RequestMethod.PUT)
   @ApiResponseObject
   public Website update(@PathVariable UUID uuid, @RequestBody Website website, BindingResult errors) throws IdentifiableServiceException {
@@ -73,14 +73,14 @@ public class WebsiteController {
     return (Website) service.update(website);
   }
 
-  @ApiMethod(description = "get count of content trees")
+  @ApiMethod(description = "Get count of content trees")
   @RequestMapping(value = {"/latest/websites/count", "/v2/websites/count"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public long count() {
     return service.count();
   }
 
-  @ApiMethod(description = "get root pages of website")
+  @ApiMethod(description = "Get root pages of website")
   @RequestMapping(value = {"/latest/websites/{uuid}/rootPages", "/v2/websites/{uuid}/rootPages"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   List<Webpage> getRootPages(@PathVariable UUID uuid) {

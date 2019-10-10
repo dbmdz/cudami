@@ -66,7 +66,7 @@ public class FileResourceController {
   @Autowired
   private ObjectMapper objectMapper;
 
-  @ApiMethod(description = "get all fileresources")
+  @ApiMethod(description = "Get all fileresources")
   @GetMapping(value = {"/latest/fileresources", "/v2/fileresources"}, produces = "application/json")
   @ApiResponseObject
   public PageResponse<FileResource> findAll(
@@ -81,7 +81,7 @@ public class FileResourceController {
     return fileResourceService.find(pageRequest);
   }
 
-  @ApiMethod(description = "get a fileresource as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @ApiMethod(description = "Get a fileresource as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(value = {"/latest/fileresources/{uuid}", "/v2/fileresources/{uuid}"}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   @ApiResponseObject
   public ResponseEntity<FileResource> get(
@@ -98,7 +98,7 @@ public class FileResourceController {
     return new ResponseEntity<>(fileResource, HttpStatus.OK);
   }
 
-  @ApiMethod(description = "get a fileresource as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @ApiMethod(description = "Get a fileresource as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(value = {"/latest/fileresources/identifier/{namespace}:{id}", "/v2/fileresources/identifier/{namespace}:{id}"}, produces = {MediaType.APPLICATION_JSON_VALUE,
     MediaType.APPLICATION_XML_VALUE})
   @ApiResponseObject
@@ -108,7 +108,7 @@ public class FileResourceController {
     return new ResponseEntity<>(fileResource, HttpStatus.OK);
   }
 
-  @ApiMethod(description = "save a newly created fileresource")
+  @ApiMethod(description = "Save a newly created fileresource")
   @PostMapping(value = {"/latest/fileresources", "/v2/fileresources"}, produces = "application/json")
   @ApiResponseObject
   public ResponseEntity<FileResource> save(@RequestParam("fileresource") String resourceJson,
@@ -144,7 +144,7 @@ public class FileResourceController {
     return new ResponseEntity<>(fileResource, HttpStatus.OK);
   }
 
-  @ApiMethod(description = "update a fileresource")
+  @ApiMethod(description = "Update a fileresource")
   @PutMapping(value = {"/latest/fileresources/{uuid}", "/v2/fileresources/{uuid}"}, produces = "application/json")
   @ApiResponseObject
   public FileResource update(@PathVariable UUID uuid, @RequestBody FileResource fileResource, BindingResult errors) throws IdentifiableServiceException {

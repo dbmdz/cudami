@@ -34,7 +34,7 @@ public class DigitalObjectController {
   @Autowired
   private DigitalObjectService service;
 
-  @ApiMethod(description = "get all digital objects")
+  @ApiMethod(description = "Get all digital objects")
   @RequestMapping(value = {"/latest/digitalobjects", "/v2/digitalobjects"},
                   produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
@@ -50,14 +50,14 @@ public class DigitalObjectController {
     return service.find(pageRequest);
   }
 
-  @ApiMethod(description = "get digital object by uuid")
+  @ApiMethod(description = "Get digital object by uuid")
   @RequestMapping(value = {"/latest/digitalobjects/{uuid}", "/v2/digitalobjects/{uuid}"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public DigitalObject findById(@PathVariable UUID uuid) {
     return service.get(uuid);
   }
 
-  @ApiMethod(description = "get digital object by namespace and id")
+  @ApiMethod(description = "Get digital object by namespace and id")
   @RequestMapping(value = {"/latest/digitalobjects/identifier/{namespace}:{id}", "/v2/digitalobjects/identifier/{namespace}:{id}"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public DigitalObject findByIdIdentifier(@PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
@@ -69,14 +69,14 @@ public class DigitalObjectController {
     return digitalObject;
   }
 
-  @ApiMethod(description = "save a newly created digital object")
+  @ApiMethod(description = "Save a newly created digital object")
   @RequestMapping(value = {"/latest/digitalobjects", "/v2/digitalobjects"}, produces = "application/json", method = RequestMethod.POST)
   @ApiResponseObject
   public DigitalObject save(@RequestBody DigitalObject digitalObject, BindingResult errors) throws IdentifiableServiceException {
     return service.save(digitalObject);
   }
 
-  @ApiMethod(description = "update a digital object")
+  @ApiMethod(description = "Update a digital object")
   @RequestMapping(value = {"/latest/digitalobjects/{uuid}", "/v2/digitalobjects/{uuid}"}, produces = "application/json", method = RequestMethod.PUT)
   @ApiResponseObject
   public DigitalObject update(@PathVariable UUID uuid, @RequestBody DigitalObject digitalObject, BindingResult errors) throws IdentifiableServiceException {
@@ -84,14 +84,14 @@ public class DigitalObjectController {
     return service.update(digitalObject);
   }
 
-  @ApiMethod(description = "get image file resources of a digital object")
+  @ApiMethod(description = "Get image file resources of a digital object")
   @RequestMapping(value = {"/latest/digitalobjects/{uuid}/fileresources/images", "/v2/digitalobjects/{uuid}/fileresources/images"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public LinkedHashSet<ImageFileResource> getImageFileResources(@PathVariable UUID uuid) {
     return service.getImageFileResources(uuid);
   }
 
-  @ApiMethod(description = "get count of digital objects")
+  @ApiMethod(description = "Get count of digital objects")
   @RequestMapping(value = {"/latest/digitalobjects/count", "/v2/digitalobjects/count"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public long count() {

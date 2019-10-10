@@ -43,7 +43,7 @@ public class ContentNodeController {
   @Autowired
   private ContentNodeService<Entity> service;
 
-  @ApiMethod(description = "get all content nodes")
+  @ApiMethod(description = "Get all content nodes")
   @RequestMapping(value = {"/latest/contentnodes", "/v2/contentnodes"},
                   produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
@@ -61,7 +61,7 @@ public class ContentNodeController {
   }
 
   // Test-URL: http://localhost:9000/latest/contentnodes/599a120c-2dd5-11e8-b467-0ed5f89f718b
-  @ApiMethod(description = "get a content node as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @ApiMethod(description = "Get a content node as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @RequestMapping(value = {"/latest/contentnodes/{uuid}", "/v2/contentnodes/{uuid}"}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, method = RequestMethod.GET)
   @ApiResponseObject
   public ResponseEntity<ContentNode> getContentNode(
@@ -79,7 +79,7 @@ public class ContentNodeController {
     return new ResponseEntity<>(contentNode, HttpStatus.OK);
   }
 
-  @ApiMethod(description = "save a newly created top-level content node")
+  @ApiMethod(description = "Save a newly created top-level content node")
   @RequestMapping(value = {"/latest/contenttrees/{parentContentTreeUuid}/contentnode", "/v2/contenttrees/{parentContentTreeUuid}/contentnode"}, produces = "application/json",
                   method = RequestMethod.POST)
   @ApiResponseObject
@@ -87,7 +87,7 @@ public class ContentNodeController {
     return service.saveWithParentContentTree(contentNode, parentContentTreeUuid);
   }
 
-  @ApiMethod(description = "save a newly created content node")
+  @ApiMethod(description = "Save a newly created content node")
   @RequestMapping(value = {"/latest/contentnodes/{parentContentNodeUuid}/contentnode", "/v2/contentnodes/{parentContentNodeUuid}/contentnode"}, produces = "application/json",
                   method = RequestMethod.POST)
   @ApiResponseObject
@@ -95,7 +95,7 @@ public class ContentNodeController {
     return service.saveWithParentContentNode(contentNode, parentContentNodeUuid);
   }
 
-  @ApiMethod(description = "update a content node")
+  @ApiMethod(description = "Update a content node")
   @RequestMapping(value = {"/latest/contentnodes/{uuid}", "/v2/contentnodes/{uuid}"}, produces = "application/json", method = RequestMethod.PUT)
   @ApiResponseObject
   public ContentNode update(@PathVariable UUID uuid, @RequestBody ContentNode contentNode, BindingResult errors) throws IdentifiableServiceException {
@@ -103,21 +103,21 @@ public class ContentNodeController {
     return service.update(contentNode);
   }
 
-  @ApiMethod(description = "get count of content nodes")
+  @ApiMethod(description = "Get count of content nodes")
   @RequestMapping(value = {"/latest/contentnodes/count", "/v2/contentnodes/count"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public long count() {
     return service.count();
   }
 
-  @ApiMethod(description = "get child content nodes of content node")
+  @ApiMethod(description = "Get child content nodes of content node")
   @RequestMapping(value = {"/latest/contentnodes/{uuid}/children", "/v2/contentnodes/{uuid}/children"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   List<ContentNode> getChildren(@PathVariable UUID uuid) {
     return service.getChildren(uuid);
   }
 
-  @ApiMethod(description = "get entities of content node")
+  @ApiMethod(description = "Get entities of content node")
   @RequestMapping(value = {"/latest/contentnodes/{uuid}/entities", "/v2/contentnodes/{uuid}/entities"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public LinkedHashSet<Entity> getEntities(@PathVariable UUID uuid) {
@@ -125,14 +125,14 @@ public class ContentNodeController {
   }
 
   // FIXME
-  @ApiMethod(description = "save entities of content node")
+  @ApiMethod(description = "Save entities of content node")
   @PostMapping(value = {"/latest/contentnodes/{uuid}/entities", "/v2/contentnodes/{uuid}/entities"}, produces = "application/json")
   @ApiResponseObject
   public LinkedHashSet<Entity> saveEntities(@PathVariable UUID uuid, @RequestBody LinkedHashSet<Entity> entities) {
     return service.saveEntities(uuid, entities);
   }
 
-  @ApiMethod(description = "get file resources of content node")
+  @ApiMethod(description = "Get file resources of content node")
   @RequestMapping(value = {"/latest/contentnodes/{uuid}/fileresources", "/v2/contentnodes/{uuid}/fileresources"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   public LinkedHashSet<FileResource> getFileResources(@PathVariable UUID uuid) {
@@ -140,20 +140,20 @@ public class ContentNodeController {
   }
 
   // FIXME
-  @ApiMethod(description = "save fileresources of content node")
+  @ApiMethod(description = "Save fileresources of content node")
   @PostMapping(value = {"/latest/contentnodes/{uuid}/fileresources", "/v2/contentnodes/{uuid}/fileresources"}, produces = "application/json")
   @ApiResponseObject
   public LinkedHashSet<FileResource> saveFileresources(@PathVariable UUID uuid, @RequestBody LinkedHashSet<FileResource> fileResources) {
     return service.saveFileResources(uuid, fileResources);
   }
 
-  @ApiMethod(description = "get parent content node of content node")
+  @ApiMethod(description = "Get parent content node of content node")
   @RequestMapping(value = {"/latest/contentnodes/{uuid}/parent", "/v2/contentnodes/{uuid}/parent"}, produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
   ContentNode getParent(@PathVariable UUID uuid) {
     return service.getParent(uuid);
   }
-  
+
 //  @ApiMethod(description = "add identifiable to content node")
 //  @PostMapping(value = {"/latest/contentnodes/{uuid}/identifiables/{identifiableUuid}", "/v2/contentnodes/{uuid}/identifiables/{identifiableUuid}"})
 //  @ResponseStatus(value = HttpStatus.OK)

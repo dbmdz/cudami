@@ -44,7 +44,7 @@ public class WebpageController {
   @Autowired
   private WebpageService<Entity> webpageService;
 
-  @ApiMethod(description = "get all webpages")
+  @ApiMethod(description = "Get all webpages")
   @RequestMapping(value = {"/latest/webpages", "/v2/webpages"},
                   produces = "application/json", method = RequestMethod.GET)
   @ApiResponseObject
@@ -62,7 +62,7 @@ public class WebpageController {
   }
 
   // Test-URL: http://localhost:9000/latest/webpages/599a120c-2dd5-11e8-b467-0ed5f89f718b
-  @ApiMethod(description = "get a webpage as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @ApiMethod(description = "Get a webpage as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @RequestMapping(value = {"/latest/webpages/{uuid}", "/v2/webpages/{uuid}"}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, method = RequestMethod.GET)
   @ApiResponseObject
   public ResponseEntity<Webpage> getWebpage(
@@ -80,21 +80,21 @@ public class WebpageController {
     return new ResponseEntity<>(webpage, HttpStatus.OK);
   }
 
-  @ApiMethod(description = "save a newly created top-level webpage")
+  @ApiMethod(description = "Save a newly created top-level webpage")
   @RequestMapping(value = {"/latest/websites/{parentWebsiteUuid}/webpage", "/v2/websites/{parentWebsiteUuid}/webpage"}, produces = "application/json", method = RequestMethod.POST)
   @ApiResponseObject
   public Webpage saveWithParentWebsite(@PathVariable UUID parentWebsiteUuid, @RequestBody Webpage webpage, BindingResult errors) throws IdentifiableServiceException {
     return webpageService.saveWithParentWebsite(webpage, parentWebsiteUuid);
   }
 
-  @ApiMethod(description = "save a newly created webpage")
+  @ApiMethod(description = "Save a newly created webpage")
   @RequestMapping(value = {"/latest/webpages/{parentWebpageUuid}/webpage", "/v2/webpages/{parentWebpageUuid}/webpage"}, produces = "application/json", method = RequestMethod.POST)
   @ApiResponseObject
   public Webpage saveWithParentWebpage(@PathVariable UUID parentWebpageUuid, @RequestBody Webpage webpage, BindingResult errors) throws IdentifiableServiceException {
     return webpageService.saveWithParentWebpage(webpage, parentWebpageUuid);
   }
 
-  @ApiMethod(description = "update a webpage")
+  @ApiMethod(description = "Update a webpage")
   @RequestMapping(value = {"/latest/webpages/{uuid}", "/v2/webpages/{uuid}"}, produces = "application/json", method = RequestMethod.PUT)
   @ApiResponseObject
   public Webpage update(@PathVariable UUID uuid, @RequestBody Webpage webpage, BindingResult errors) throws IdentifiableServiceException {
@@ -102,7 +102,7 @@ public class WebpageController {
     return webpageService.update(webpage);
   }
 
-  @ApiMethod(description = "get file resources related to webpage")
+  @ApiMethod(description = "Get file resources related to webpage")
   @GetMapping(value = {
     "/latest/webpages/{uuid}/related/fileresources",
     "/v2/webpages/{uuid}/related/fileresources"}, produces = "application/json")
@@ -111,7 +111,7 @@ public class WebpageController {
     return webpageService.getRelatedFileResources(uuid);
   }
 
-  @ApiMethod(description = "add file resource related to webpage")
+  @ApiMethod(description = "Add file resource related to webpage")
   @PostMapping(value = {
     "/latest/webpages/{uuid}/related/fileresources/{fileResourceUuid}",
     "/v2/webpages/{uuid}/related/fileresources/{fileResourceUuid}"})
