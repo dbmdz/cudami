@@ -21,14 +21,15 @@ public interface CudamiClient {
 
   public static CudamiClient build(String serverUrl) {
     ObjectMapper mapper = new DigitalCollectionsObjectMapper();
-    CudamiClient backend = ReflectiveFeign.builder()
-        .decoder(new JacksonDecoder(mapper))
-        .encoder(new JacksonEncoder(mapper))
-        .errorDecoder(new CudamiRestErrorDecoder())
-        .logger(new Slf4jLogger())
-        .logLevel(Logger.Level.BASIC)
-        .retryer(new Retryer.Default())
-        .target(CudamiClient.class, serverUrl);
+    CudamiClient backend =
+        ReflectiveFeign.builder()
+            .decoder(new JacksonDecoder(mapper))
+            .encoder(new JacksonEncoder(mapper))
+            .errorDecoder(new CudamiRestErrorDecoder())
+            .logger(new Slf4jLogger())
+            .logLevel(Logger.Level.BASIC)
+            .retryer(new Retryer.Default())
+            .target(CudamiClient.class, serverUrl);
     return backend;
   }
 
@@ -48,7 +49,8 @@ public interface CudamiClient {
   Webpage getWebpage(@Param("uuid") String uuid) throws HttpException;
 
   @RequestLine("GET /v2/webpages/{uuid}?pLocale={locale}")
-  Webpage getWebpage(@Param("locale") Locale locale, @Param("uuid") String uuid) throws HttpException;
+  Webpage getWebpage(@Param("locale") Locale locale, @Param("uuid") String uuid)
+      throws HttpException;
 
   @RequestLine("GET /V2/websites/{uuid}")
   Website getWebsite(@Param("uuid") String uuid) throws HttpException;

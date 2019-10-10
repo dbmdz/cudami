@@ -15,13 +15,15 @@ public class Application {
 
   /**
    * Create a resource bundle for your messages ("messages_en.properties").<br>
-   * This file goes in src/main/resources because you want it to appear at the root of the classpath on deployment.
+   * This file goes in src/main/resources because you want it to appear at the root of the classpath
+   * on deployment.
    *
    * @return message source
    */
   @Bean(name = "messageSource")
   public MessageSource configureMessageSource() {
-    ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+    ReloadableResourceBundleMessageSource messageSource =
+        new ReloadableResourceBundleMessageSource();
     messageSource.setBasename("classpath:messages");
     messageSource.setCacheSeconds(5);
     messageSource.setDefaultEncoding("UTF-8");

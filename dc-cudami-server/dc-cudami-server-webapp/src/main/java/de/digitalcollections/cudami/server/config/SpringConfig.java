@@ -11,22 +11,24 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.core.env.Environment;
 
 @Configuration
-//@ComponentScan(basePackages = {
+// @ComponentScan(basePackages = {
 //  "de.digitalcollections.cudami.server.config"
-//}) // scans all frontend, business and backend configs
+// }) // scans all frontend, business and backend configs
 public class SpringConfig implements EnvironmentAware {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfig.class);
 
   /**
    * Create a resource bundle for your messages ("messages.properties").<br>
-   * This file goes in src/main/resources because you want it to appear at the root of the classpath on deployment.
+   * This file goes in src/main/resources because you want it to appear at the root of the classpath
+   * on deployment.
    *
    * @return message source
    */
   @Bean(name = "messageSource")
   public MessageSource configureMessageSource() {
-    ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+    ReloadableResourceBundleMessageSource messageSource =
+        new ReloadableResourceBundleMessageSource();
     messageSource.setBasename("classpath:messages");
     messageSource.setCacheSeconds(5);
     messageSource.setDefaultEncoding("UTF-8");

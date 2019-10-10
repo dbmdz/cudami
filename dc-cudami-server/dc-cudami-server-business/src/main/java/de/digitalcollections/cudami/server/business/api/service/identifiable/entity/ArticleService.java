@@ -5,9 +5,7 @@ import de.digitalcollections.model.api.identifiable.entity.Article;
 import java.util.Locale;
 import java.util.UUID;
 
-/**
- * Service for Article.
- */
+/** Service for Article. */
 public interface ArticleService extends EntityService<Article> {
 
   Article get(UUID uuid, Locale locale) throws IdentifiableServiceException;

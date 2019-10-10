@@ -14,7 +14,8 @@ public interface EntityPartRepositoryEndpoint extends RepositoryEndpoint {
   void addRelatedEntity(@Param("uuid") UUID uuid, @Param("entityUuid") UUID entityUuid);
 
   @RequestLine("POST /latest/entityparts/{uuid}/related/fileresources/{fileResourceUuid}")
-  void addRelatedFileresource(@Param("uuid") UUID uuid, @Param("fileResourceUuid") UUID fileResourceUuid);
+  void addRelatedFileresource(
+      @Param("uuid") UUID uuid, @Param("fileResourceUuid") UUID fileResourceUuid);
 
   @RequestLine("GET /latest/entityparts/{uuid}/related/entities")
   LinkedHashSet<Entity> getRelatedEntities(@Param("uuid") UUID uuid);
@@ -23,8 +24,10 @@ public interface EntityPartRepositoryEndpoint extends RepositoryEndpoint {
   LinkedHashSet<FileResource> getRelatedFileResources(@Param("uuid") UUID uuid);
 
   @RequestLine("POST /latest/entityparts/{uuid}/related/entities")
-  LinkedHashSet<Entity> saveRelatedEntities(@Param("uuid") UUID uuid, LinkedHashSet<Entity> convertFromGenericLinkedHashSet);
+  LinkedHashSet<Entity> saveRelatedEntities(
+      @Param("uuid") UUID uuid, LinkedHashSet<Entity> convertFromGenericLinkedHashSet);
 
   @RequestLine("POST /latest/entityparts/{uuid}/related/fileresources")
-  LinkedHashSet<FileResource> saveRelatedFileResources(@Param("uuid") UUID uuid, LinkedHashSet<FileResource> fileResources);
+  LinkedHashSet<FileResource> saveRelatedFileResources(
+      @Param("uuid") UUID uuid, LinkedHashSet<FileResource> fileResources);
 }

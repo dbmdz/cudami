@@ -7,5 +7,4 @@ public class ForbiddenException extends HttpClientException {
   public ForbiddenException(String methodKey, Response response) {
     super(methodKey, response);
   }
-
 }

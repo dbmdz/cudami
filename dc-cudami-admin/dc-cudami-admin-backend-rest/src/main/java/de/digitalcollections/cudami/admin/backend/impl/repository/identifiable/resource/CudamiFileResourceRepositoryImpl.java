@@ -30,18 +30,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<FileResource> implements CudamiFileResourceRepository {
+public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<FileResource>
+    implements CudamiFileResourceRepository {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(CudamiFileResourceRepositoryImpl.class);
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(CudamiFileResourceRepositoryImpl.class);
 
   @Value(value = "${cudami.server.address}")
   private String cudamiServerAddress;
 
-  @Autowired
-  private CudamiFileResourceRepositoryEndpoint endpoint;
+  @Autowired private CudamiFileResourceRepositoryEndpoint endpoint;
 
-  @Autowired
-  ObjectMapper objectMapper;
+  @Autowired ObjectMapper objectMapper;
 
   @Override
   public long count() {
@@ -56,7 +56,13 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
   @Override
   public PageResponse<FileResource> find(PageRequest pageRequest) {
     FindParams f = getFindParams(pageRequest);
-    PageResponse<FileResource> pageResponse = endpoint.find(f.getPageNumber(), f.getPageSize(), f.getSortField(), f.getSortDirection(), f.getNullHandling());
+    PageResponse<FileResource> pageResponse =
+        endpoint.find(
+            f.getPageNumber(),
+            f.getPageSize(),
+            f.getSortField(),
+            f.getSortDirection(),
+            f.getNullHandling());
     return getGenericPageResponse(pageResponse);
   }
 
@@ -84,12 +90,17 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
   }
 
   @Override
-  public FileResource upload(InputStream inputStream, String filename, String contentType) throws ResourceIOException {
+  public FileResource upload(InputStream inputStream, String filename, String contentType)
+      throws ResourceIOException {
     try {
-      filename = URLEncoder.encode(filename, StandardCharsets.UTF_8.toString()); // filenames with umlauts caused exception...
-      HttpEntity entity = MultipartEntityBuilder.create()
-          .addBinaryBody(contentType, inputStream, ContentType.create(contentType), filename)
-          .build();
+      filename =
+          URLEncoder.encode(
+              filename,
+              StandardCharsets.UTF_8.toString()); // filenames with umlauts caused exception...
+      HttpEntity entity =
+          MultipartEntityBuilder.create()
+              .addBinaryBody(contentType, inputStream, ContentType.create(contentType), filename)
+              .build();
       return doPost(entity);
     } catch (Exception ex) {
       throw new ResourceIOException("Error saving uploaded file data", ex);
@@ -97,26 +108,33 @@ public class CudamiFileResourceRepositoryImpl extends IdentifiableRepositoryImpl
   }
 
   @Override
-  public FileResource upload(byte[] bytes, String filename, String contentType) throws ResourceIOException {
+  public FileResource upload(byte[] bytes, String filename, String contentType)
+      throws ResourceIOException {
     try {
-      filename = URLEncoder.encode(filename, StandardCharsets.UTF_8.toString()); // filenames with umlauts caused exception...
-      HttpEntity entity = MultipartEntityBuilder.create()
-          .addBinaryBody(contentType, bytes, ContentType.create(contentType), filename)
-          .build();
+      filename =
+          URLEncoder.encode(
+              filename,
+              StandardCharsets.UTF_8.toString()); // filenames with umlauts caused exception...
+      HttpEntity entity =
+          MultipartEntityBuilder.create()
+              .addBinaryBody(contentType, bytes, ContentType.create(contentType), filename)
+              .build();
       return doPost(entity);
     } catch (Exception ex) {
       throw new ResourceIOException("Error saving uploaded file data", ex);
     }
   }
 
-  private FileResource doPost(HttpEntity entity) throws UnsupportedOperationException, IOException, ResourceIOException {
+  private FileResource doPost(HttpEntity entity)
+      throws UnsupportedOperationException, IOException, ResourceIOException {
     HttpPost post = new HttpPost(cudamiServerAddress + "/latest/fileresources/new/upload");
     post.setEntity(entity);
     HttpClient client = HttpClientBuilder.create().build();
     HttpResponse response = client.execute(post);
 
     if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
-      FileResource fileResource = objectMapper.readValue(response.getEntity().getContent(), FileResource.class);
+      FileResource fileResource =
+          objectMapper.readValue(response.getEntity().getContent(), FileResource.class);
       return fileResource;
     }
     throw new ResourceIOException("Error saving uploaded file data");

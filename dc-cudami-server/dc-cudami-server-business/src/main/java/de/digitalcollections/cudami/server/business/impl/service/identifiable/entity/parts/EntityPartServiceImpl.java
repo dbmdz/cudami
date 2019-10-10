@@ -13,10 +13,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EntityPartServiceImpl<P extends EntityPart, E extends Entity> extends IdentifiableServiceImpl<P> implements EntityPartService<P, E> {
+public class EntityPartServiceImpl<P extends EntityPart, E extends Entity>
+    extends IdentifiableServiceImpl<P> implements EntityPartService<P, E> {
 
   @Autowired
-  public EntityPartServiceImpl(@Qualifier("entityPartRepositoryImpl") EntityPartRepository<P, E> repository) {
+  public EntityPartServiceImpl(
+      @Qualifier("entityPartRepositoryImpl") EntityPartRepository<P, E> repository) {
     super(repository);
   }
 
@@ -71,13 +73,15 @@ public class EntityPartServiceImpl<P extends EntityPart, E extends Entity> exten
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveRelatedFileResources(P entityPart, LinkedHashSet<FileResource> fileResources) {
+  public LinkedHashSet<FileResource> saveRelatedFileResources(
+      P entityPart, LinkedHashSet<FileResource> fileResources) {
     return ((EntityPartRepository) repository).saveRelatedFileResources(entityPart, fileResources);
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveRelatedFileResources(UUID entityPartUuid, LinkedHashSet<FileResource> fileResources) {
-    return ((EntityPartRepository) repository).saveRelatedFileResources(entityPartUuid, fileResources);
+  public LinkedHashSet<FileResource> saveRelatedFileResources(
+      UUID entityPartUuid, LinkedHashSet<FileResource> fileResources) {
+    return ((EntityPartRepository) repository)
+        .saveRelatedFileResources(entityPartUuid, fileResources);
   }
-
 }

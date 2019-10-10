@@ -12,7 +12,8 @@ import java.util.UUID;
  *
  * @param <E> entity type
  */
-public interface ContentNodeRepository<E extends Entity> extends NodeRepository<ContentNode>, EntityPartRepository<ContentNode, E> {
+public interface ContentNodeRepository<E extends Entity>
+    extends NodeRepository<ContentNode>, EntityPartRepository<ContentNode, E> {
 
   LinkedHashSet<E> getEntities(ContentNode contentNode);
 
@@ -26,9 +27,11 @@ public interface ContentNodeRepository<E extends Entity> extends NodeRepository<
 
   LinkedHashSet<FileResource> getFileResources(UUID contentNodeUuid);
 
-  LinkedHashSet<FileResource> saveFileResources(ContentNode contentNode, LinkedHashSet<FileResource> fileResources);
+  LinkedHashSet<FileResource> saveFileResources(
+      ContentNode contentNode, LinkedHashSet<FileResource> fileResources);
 
-  LinkedHashSet<FileResource> saveFileResources(UUID contentNodeUuid, LinkedHashSet<FileResource> fileResources);
+  LinkedHashSet<FileResource> saveFileResources(
+      UUID contentNodeUuid, LinkedHashSet<FileResource> fileResources);
 
   ContentNode saveWithParentContentTree(ContentNode contentNode, UUID parentContentTreeUuid);
 

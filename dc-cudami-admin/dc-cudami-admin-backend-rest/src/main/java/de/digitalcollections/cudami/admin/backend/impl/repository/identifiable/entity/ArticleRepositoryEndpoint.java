@@ -14,11 +14,14 @@ public interface ArticleRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine("GET /latest/articles/count")
   long count();
 
-  @RequestLine("GET /latest/articles?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
+  @RequestLine(
+      "GET /latest/articles?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<Article> find(
-      @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
-      @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
-  );
+      @Param("pageNumber") int pageNumber,
+      @Param("pageSize") int pageSize,
+      @Param("sortField") String sortField,
+      @Param("sortDirection") String sortDirection,
+      @Param("nullHandling") String nullHandling);
 
   @RequestLine("GET /latest/articles/{uuid}")
   Article findOne(@Param("uuid") UUID uuid);

@@ -13,8 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-//@Transactional(readOnly = true)
-public class CudamiFileResourceServiceImpl extends IdentifiableServiceImpl<FileResource> implements CudamiFileResourceService {
+// @Transactional(readOnly = true)
+public class CudamiFileResourceServiceImpl extends IdentifiableServiceImpl<FileResource>
+    implements CudamiFileResourceService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CudamiFileResourceServiceImpl.class);
 
@@ -24,11 +25,13 @@ public class CudamiFileResourceServiceImpl extends IdentifiableServiceImpl<FileR
   }
 
   @Override
-  public FileResource save(FileResource fileResource, byte[] bytes) throws IdentifiableServiceException {
+  public FileResource save(FileResource fileResource, byte[] bytes)
+      throws IdentifiableServiceException {
     try {
       // FIXME save/upload over feign endpoint does not work (anymore?)
-//      fileResource = ((CudamiFileResourceRepository) repository).save(fileResource, bytes);
-      fileResource = upload(bytes, fileResource.getFilename(), fileResource.getMimeType().getTypeName());
+      //      fileResource = ((CudamiFileResourceRepository) repository).save(fileResource, bytes);
+      fileResource =
+          upload(bytes, fileResource.getFilename(), fileResource.getMimeType().getTypeName());
     } catch (Exception e) {
       LOGGER.error("Cannot save fileResource " + fileResource + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
@@ -37,12 +40,14 @@ public class CudamiFileResourceServiceImpl extends IdentifiableServiceImpl<FileR
   }
 
   @Override
-  public FileResource upload(InputStream inputStream, String filename, String contentType) throws ResourceIOException {
+  public FileResource upload(InputStream inputStream, String filename, String contentType)
+      throws ResourceIOException {
     return ((CudamiFileResourceRepository) repository).upload(inputStream, filename, contentType);
   }
 
   @Override
-  public FileResource upload(byte[] bytes, String filename, String contentType) throws ResourceIOException {
+  public FileResource upload(byte[] bytes, String filename, String contentType)
+      throws ResourceIOException {
     return ((CudamiFileResourceRepository) repository).upload(bytes, filename, contentType);
   }
 }

@@ -9,9 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
 @Configuration
-@ComponentScan(basePackages = {
-  "de.digitalcollections.cudami.config"
-})
+@ComponentScan(basePackages = {"de.digitalcollections.cudami.config"})
 public class SpringConfig implements EnvironmentAware {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfig.class);

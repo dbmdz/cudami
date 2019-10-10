@@ -21,11 +21,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class IdentifiableRepositoryImpl<I extends Identifiable> extends AbstractPagingAndSortingRepositoryImpl implements IdentifiableRepository<I> {
+public class IdentifiableRepositoryImpl<I extends Identifiable>
+    extends AbstractPagingAndSortingRepositoryImpl implements IdentifiableRepository<I> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableRepositoryImpl.class);
 
-  protected static final String IDENTIFIABLE_COLUMNS = "uuid, created, description, label, last_modified";
+  protected static final String IDENTIFIABLE_COLUMNS =
+      "uuid, created, description, label, last_modified";
 
   protected Jdbi dbi;
 
@@ -46,9 +48,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
     StringBuilder query = new StringBuilder("SELECT * FROM identifiables");
 
     addPageRequestParams(pageRequest, query);
-    List<IdentifiableImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
-      .mapToBean(IdentifiableImpl.class)
-      .list());
+    List<IdentifiableImpl> result =
+        dbi.withHandle(
+            h -> h.createQuery(query.toString()).mapToBean(IdentifiableImpl.class).list());
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -59,74 +61,99 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
     // TODO: think about using GIN
     // see: https://bitnine.net/blog-postgresql/postgresql-internals-jsonb-type-and-its-indexes/
     // see: https://www.postgresql.org/docs/10/datatype-json.html
-    StringBuilder query = new StringBuilder("WITH flattened AS (SELECT uuid, label, description, identifiable_type, jsonb_array_elements(label#>'{translations}')->>'text' AS text FROM identifiables)");
-    query.append(" SELECT uuid, label, description, identifiable_type FROM flattened WHERE text ILIKE '%' || :searchTerm || '%'");
+    StringBuilder query =
+        new StringBuilder(
+            "WITH flattened AS (SELECT uuid, label, description, identifiable_type, jsonb_array_elements(label#>'{translations}')->>'text' AS text FROM identifiables)");
+    query.append(
+        " SELECT uuid, label, description, identifiable_type FROM flattened WHERE text ILIKE '%' || :searchTerm || '%'");
     query.append(" LIMIT :maxResults");
 
-    List<I> result = dbi.withHandle(h -> h.createQuery(query.toString())
-        .bind("searchTerm", searchTerm)
-        .bind("maxResults", maxResults)
-        .mapToBean(IdentifiableImpl.class)
-        .stream().map(s -> (I) s).collect(Collectors.toList()));
+    List<I> result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(query.toString()).bind("searchTerm", searchTerm)
+                    .bind("maxResults", maxResults).mapToBean(IdentifiableImpl.class).stream()
+                    .map(s -> (I) s)
+                    .collect(Collectors.toList()));
     return result;
   }
 
   @Override
   public I findOne(UUID uuid) {
-    I identifiable = (I) dbi.withHandle(h -> h.createQuery(
-      "SELECT * FROM identifiables WHERE uuid = :uuid")
-      .bind("uuid", uuid)
-      .mapToBean(IdentifiableImpl.class)
-      .findOne().orElse(null));
+    I identifiable =
+        (I)
+            dbi.withHandle(
+                h ->
+                    h.createQuery("SELECT * FROM identifiables WHERE uuid = :uuid")
+                        .bind("uuid", uuid)
+                        .mapToBean(IdentifiableImpl.class)
+                        .findOne()
+                        .orElse(null));
     return identifiable;
   }
 
   @Override
   public I findOne(Identifier identifier) {
-    throw new UnsupportedOperationException("Not supported. Use findOne of specific/inherited identifiable repository.");
+    throw new UnsupportedOperationException(
+        "Not supported. Use findOne of specific/inherited identifiable repository.");
   }
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[]{"created", "type", "last_modified"};
+    return new String[] {"created", "type", "last_modified"};
   }
 
   @Override
   public I save(I identifiable) {
-    throw new UnsupportedOperationException("use save of specific/inherited identifiable repository");
-//    identifiable.setUuid(UUID.randomUUID());
-//    identifiable.setCreated(LocalDateTime.now());
-//    identifiable.setLastModified(LocalDateTime.now());
-//
-//    IdentifiableImpl result = dbi.withHandle(h -> h
-//        .createQuery("INSERT INTO identifiables(created, description, identifiable_type, label, last_modified, uuid) VALUES (:created, :description::JSONB, :type, :label::JSONB, :lastModified, :uuid) RETURNING *")
-//        .bindBean(identifiable)
-//        .mapToBean(IdentifiableImpl.class)
-//        .findOne().orElse(null));
-//    return (I) result;
+    throw new UnsupportedOperationException(
+        "use save of specific/inherited identifiable repository");
+    //    identifiable.setUuid(UUID.randomUUID());
+    //    identifiable.setCreated(LocalDateTime.now());
+    //    identifiable.setLastModified(LocalDateTime.now());
+    //
+    //    IdentifiableImpl result = dbi.withHandle(h -> h
+    //        .createQuery("INSERT INTO identifiables(created, description, identifiable_type,
+    // label, last_modified, uuid) VALUES (:created, :description::JSONB, :type, :label::JSONB,
+    // :lastModified, :uuid) RETURNING *")
+    //        .bindBean(identifiable)
+    //        .mapToBean(IdentifiableImpl.class)
+    //        .findOne().orElse(null));
+    //    return (I) result;
   }
 
   @Override
   public I update(I identifiable) {
-    throw new UnsupportedOperationException("use update of specific/inherited identifiable repository");
-//    identifiable.setLastModified(LocalDateTime.now());
-//
-//    // do not update/left out from statement: created, uuid
-//    IdentifiableImpl result = dbi.withHandle(h -> h
-//        .createQuery("UPDATE identifiables SET description=:description::JSONB, identifiable_type=:type, label=:label::JSONB, last_modified=:lastModified WHERE uuid=:uuid RETURNING *")
-//        .bindBean(identifiable)
-//        .mapToBean(IdentifiableImpl.class)
-//        .findOne().orElse(null));
-//    return (I) result;
+    throw new UnsupportedOperationException(
+        "use update of specific/inherited identifiable repository");
+    //    identifiable.setLastModified(LocalDateTime.now());
+    //
+    //    // do not update/left out from statement: created, uuid
+    //    IdentifiableImpl result = dbi.withHandle(h -> h
+    //        .createQuery("UPDATE identifiables SET description=:description::JSONB,
+    // identifiable_type=:type, label=:label::JSONB, last_modified=:lastModified WHERE uuid=:uuid
+    // RETURNING *")
+    //        .bindBean(identifiable)
+    //        .mapToBean(IdentifiableImpl.class)
+    //        .findOne().orElse(null));
+    //    return (I) result;
   }
 
-  protected Integer selectNextSortIndexForParentChildren(Jdbi dbi, String tableName, String columNameParentUuid, UUID parentUuid) {
+  protected Integer selectNextSortIndexForParentChildren(
+      Jdbi dbi, String tableName, String columNameParentUuid, UUID parentUuid) {
     // first child: max gets no results (= null)):
-    Integer sortIndex = dbi.withHandle((Handle h) -> h
-      .createQuery("SELECT MAX(sortIndex) + 1 FROM " + tableName + " WHERE " + columNameParentUuid + " = :parent_uuid")
-      .bind("parent_uuid", parentUuid)
-      .mapTo(Integer.class)
-      .findOne().orElse(null));
+    Integer sortIndex =
+        dbi.withHandle(
+            (Handle h) ->
+                h.createQuery(
+                        "SELECT MAX(sortIndex) + 1 FROM "
+                            + tableName
+                            + " WHERE "
+                            + columNameParentUuid
+                            + " = :parent_uuid")
+                    .bind("parent_uuid", parentUuid)
+                    .mapTo(Integer.class)
+                    .findOne()
+                    .orElse(null));
     if (sortIndex == null) {
       sortIndex = 0;
     }
@@ -137,7 +164,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends Abstract
   protected int getIndex(LinkedHashSet<? extends Identifiable> list, Identifiable identifiable) {
     boolean found = false;
     int pos = -1;
-    for (Iterator iterator = list.iterator(); iterator.hasNext();) {
+    for (Iterator iterator = list.iterator(); iterator.hasNext(); ) {
       pos = pos + 1;
       Identifiable idf = (Identifiable) iterator.next();
       if (idf.getUuid().equals(identifiable.getUuid())) {

@@ -7,5 +7,4 @@ public class UnauthorizedException extends HttpClientException {
   public UnauthorizedException(String methodKey, Response response) {
     super(methodKey, response);
   }
-
 }

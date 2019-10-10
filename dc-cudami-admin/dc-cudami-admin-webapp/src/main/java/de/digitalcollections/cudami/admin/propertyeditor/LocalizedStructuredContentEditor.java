@@ -13,7 +13,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class LocalizedStructuredContentEditor extends PropertyEditorSupport {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(LocalizedStructuredContentEditor.class);
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(LocalizedStructuredContentEditor.class);
 
   private final ObjectMapper objectMapper;
 

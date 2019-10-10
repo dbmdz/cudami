@@ -16,12 +16,12 @@ public class ContentTreeRepositoryEndpointConfig {
   @Value(value = "${cudami.server.address}")
   private String cudamiServerAddress;
 
-  @Autowired
-  ObjectMapper objectMapper;
+  @Autowired ObjectMapper objectMapper;
 
   @Bean
   public ContentTreeRepositoryEndpoint contentTreeRepositoryEndpoint() {
-    ContentTreeRepositoryEndpoint endpoint = Feign.builder()
+    ContentTreeRepositoryEndpoint endpoint =
+        Feign.builder()
             .decoder(new JacksonDecoder(objectMapper))
             .encoder(new JacksonEncoder(objectMapper))
             .errorDecoder(new EndpointErrorDecoder())

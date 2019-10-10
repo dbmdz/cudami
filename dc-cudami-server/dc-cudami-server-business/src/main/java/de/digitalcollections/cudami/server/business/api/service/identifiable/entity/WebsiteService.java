@@ -5,9 +5,7 @@ import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Service for Website.
- */
+/** Service for Website. */
 public interface WebsiteService extends EntityService<Website> {
 
   List<Webpage> getRootPages(Website website);

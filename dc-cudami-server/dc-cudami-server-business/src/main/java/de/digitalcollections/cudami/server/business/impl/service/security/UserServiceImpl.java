@@ -16,19 +16,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-/**
- * Service for User handling.
- */
+/** Service for User handling. */
 @Service
-//@Transactional(readOnly = true)
+// @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService<User> {
 
   @Autowired
   @Qualifier("uniqueUsernameValidator")
   private Validator uniqueUsernameValidator;
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
   @Override
   //  @Transactional(readOnly = false)
@@ -85,12 +82,12 @@ public class UserServiceImpl implements UserService<User> {
   }
 
   /*
-     see: http://stackoverflow.com/questions/19302196/transaction-marked-as-rollback-only-how-do-i-find-the-cause
-     When you mark your method as @Transactional, occurrence of any exception inside your method will mark the surrounding TX as roll-back only (even if you catch them). You can use other attributes of
-     @Transactional annotation to prevent it of rolling back like:
+    see: http://stackoverflow.com/questions/19302196/transaction-marked-as-rollback-only-how-do-i-find-the-cause
+    When you mark your method as @Transactional, occurrence of any exception inside your method will mark the surrounding TX as roll-back only (even if you catch them). You can use other attributes of
+    @Transactional annotation to prevent it of rolling back like:
 
-     @Transactional(rollbackFor=MyException.class, noRollbackFor=MyException2.class)
-   */
+    @Transactional(rollbackFor=MyException.class, noRollbackFor=MyException2.class)
+  */
   @Override
   //  @Transactional(readOnly = true, noRollbackFor = UsernameNotFoundException.class)
   public User loadUserByUsername(String username) throws UsernameNotFoundException {

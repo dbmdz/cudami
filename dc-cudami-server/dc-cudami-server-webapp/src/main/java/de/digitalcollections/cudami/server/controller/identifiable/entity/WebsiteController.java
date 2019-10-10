@@ -31,20 +31,22 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The website controller", name = "Website controller")
 public class WebsiteController {
 
-  @Autowired
-  private WebsiteService service;
+  @Autowired private WebsiteService service;
 
   @ApiMethod(description = "Get all websites")
-  @RequestMapping(value = {"/latest/websites", "/v2/websites"},
-    produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(
+      value = {"/latest/websites", "/v2/websites"},
+      produces = "application/json",
+      method = RequestMethod.GET)
   @ApiResponseObject
   public PageResponse<Website> findAll(
-    @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-    @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-    @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
-    @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC") Direction sortDirection,
-    @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE") NullHandling nullHandling
-  ) {
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
+          Direction sortDirection,
+      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
+          NullHandling nullHandling) {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
@@ -52,36 +54,53 @@ public class WebsiteController {
   }
 
   @ApiMethod(description = "Get website by uuid")
-  @RequestMapping(value = {"/latest/websites/{uuid}", "/v2/websites/{uuid}"}, produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(
+      value = {"/latest/websites/{uuid}", "/v2/websites/{uuid}"},
+      produces = "application/json",
+      method = RequestMethod.GET)
   @ApiResponseObject
   public Website findById(@PathVariable UUID uuid) {
     return (Website) service.get(uuid);
   }
 
   @ApiMethod(description = "Save a newly created website")
-  @RequestMapping(value = {"/latest/websites", "/v2/websites"}, produces = "application/json", method = RequestMethod.POST)
+  @RequestMapping(
+      value = {"/latest/websites", "/v2/websites"},
+      produces = "application/json",
+      method = RequestMethod.POST)
   @ApiResponseObject
-  public Website save(@RequestBody Website website, BindingResult errors) throws IdentifiableServiceException {
+  public Website save(@RequestBody Website website, BindingResult errors)
+      throws IdentifiableServiceException {
     return (Website) service.save(website);
   }
 
   @ApiMethod(description = "Update a website")
-  @RequestMapping(value = {"/latest/websites/{uuid}", "/v2/websites/{uuid}"}, produces = "application/json", method = RequestMethod.PUT)
+  @RequestMapping(
+      value = {"/latest/websites/{uuid}", "/v2/websites/{uuid}"},
+      produces = "application/json",
+      method = RequestMethod.PUT)
   @ApiResponseObject
-  public Website update(@PathVariable UUID uuid, @RequestBody Website website, BindingResult errors) throws IdentifiableServiceException {
+  public Website update(@PathVariable UUID uuid, @RequestBody Website website, BindingResult errors)
+      throws IdentifiableServiceException {
     assert Objects.equals(uuid, website.getUuid());
     return (Website) service.update(website);
   }
 
   @ApiMethod(description = "Get count of content trees")
-  @RequestMapping(value = {"/latest/websites/count", "/v2/websites/count"}, produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(
+      value = {"/latest/websites/count", "/v2/websites/count"},
+      produces = "application/json",
+      method = RequestMethod.GET)
   @ApiResponseObject
   public long count() {
     return service.count();
   }
 
   @ApiMethod(description = "Get root pages of website")
-  @RequestMapping(value = {"/latest/websites/{uuid}/rootPages", "/v2/websites/{uuid}/rootPages"}, produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(
+      value = {"/latest/websites/{uuid}/rootPages", "/v2/websites/{uuid}/rootPages"},
+      produces = "application/json",
+      method = RequestMethod.GET)
   @ApiResponseObject
   List<Webpage> getRootPages(@PathVariable UUID uuid) {
     return service.getRootPages(uuid);

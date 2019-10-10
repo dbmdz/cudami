@@ -8,6 +8,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.ContentNodeService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.WebpageService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.security.UserService;
 import java.util.Locale;
 import org.flywaydb.core.Flyway;
@@ -15,7 +16,6 @@ import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceService;
 
 @Configuration
 public class SpringConfigBusinessForTest {
@@ -89,5 +89,4 @@ public class SpringConfigBusinessForTest {
   public WebsiteService websiteService() {
     return Mockito.mock(WebsiteService.class);
   }
-
 }

@@ -18,12 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class IdentifiableRepositoryImpl<I extends Identifiable> implements IdentifiableRepository<I> {
+public class IdentifiableRepositoryImpl<I extends Identifiable>
+    implements IdentifiableRepository<I> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableRepositoryImpl.class);
 
-  @Autowired
-  private IdentifiableRepositoryEndpoint endpoint;
+  @Autowired private IdentifiableRepositoryEndpoint endpoint;
 
   @Override
   public long count() {
@@ -38,7 +38,13 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> implements Ident
   @Override
   public PageResponse<I> find(PageRequest pageRequest) {
     FindParams f = getFindParams(pageRequest);
-    PageResponse<Identifiable> pageResponse = endpoint.find(f.getPageNumber(), f.getPageSize(), f.getSortField(), f.getSortDirection(), f.getNullHandling());
+    PageResponse<Identifiable> pageResponse =
+        endpoint.find(
+            f.getPageNumber(),
+            f.getPageSize(),
+            f.getSortField(),
+            f.getSortDirection(),
+            f.getNullHandling());
     return getGenericPageResponse(pageResponse);
   }
 
@@ -76,7 +82,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> implements Ident
 
   public class FindParams {
 
-    public FindParams(int pageNumber, int pageSize, String sortField, String sortDirection, String nullHandling) {
+    public FindParams(
+        int pageNumber, int pageSize, String sortField, String sortDirection, String nullHandling) {
       this.pageNumber = pageNumber;
       this.pageSize = pageSize;
       this.sortField = sortField;
@@ -151,5 +158,4 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> implements Ident
   public I update(I identifiable) {
     return (I) endpoint.update(identifiable.getUuid(), identifiable);
   }
-
 }

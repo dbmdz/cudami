@@ -21,8 +21,7 @@ public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
   }
 
   @Override
-  public void afterPropertiesSet() throws Exception {
-  }
+  public void afterPropertiesSet() throws Exception {}
 
   @Bean(name = "localeResolver")
   public LocaleResolver sessionLocaleResolver() {

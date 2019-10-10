@@ -15,11 +15,14 @@ public interface ContentTreeRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine("GET /latest/contenttrees/count")
   long count();
 
-  @RequestLine("GET /latest/contenttrees?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
+  @RequestLine(
+      "GET /latest/contenttrees?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<ContentTree> find(
-      @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
-      @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
-  );
+      @Param("pageNumber") int pageNumber,
+      @Param("pageSize") int pageSize,
+      @Param("sortField") String sortField,
+      @Param("sortDirection") String sortDirection,
+      @Param("nullHandling") String nullHandling);
 
   @RequestLine("GET /latest/contenttrees/{uuid}")
   ContentTree findOne(@Param("uuid") UUID uuid);

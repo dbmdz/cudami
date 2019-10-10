@@ -17,11 +17,14 @@ public interface ContentNodeRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine("GET /latest/contentnodes/count")
   long count();
 
-  @RequestLine("GET /latest/contentnodes?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
+  @RequestLine(
+      "GET /latest/contentnodes?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<ContentNode> find(
-          @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
-          @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
-  );
+      @Param("pageNumber") int pageNumber,
+      @Param("pageSize") int pageSize,
+      @Param("sortField") String sortField,
+      @Param("sortDirection") String sortDirection,
+      @Param("nullHandling") String nullHandling);
 
   @RequestLine("GET /latest/contentnodes/{uuid}")
   ContentNode findOne(@Param("uuid") UUID uuid);
@@ -51,15 +54,18 @@ public interface ContentNodeRepositoryEndpoint extends RepositoryEndpoint {
 
   @RequestLine("POST /latest/contentnodes/{uuid}/fileresources")
   @Headers("Content-Type: application/json")
-  LinkedHashSet<FileResource> saveFileResources(@Param("uuid") UUID uuid, LinkedHashSet<FileResource> fileResources);
+  LinkedHashSet<FileResource> saveFileResources(
+      @Param("uuid") UUID uuid, LinkedHashSet<FileResource> fileResources);
 
   @RequestLine("POST /latest/contenttrees/{parentContentTreeUuid}/contentnode")
   @Headers("Content-Type: application/json")
-  ContentNode saveWithParentContentTree(ContentNode contentNode, @Param("parentContentTreeUuid") UUID parentContentTreeUuid);
+  ContentNode saveWithParentContentTree(
+      ContentNode contentNode, @Param("parentContentTreeUuid") UUID parentContentTreeUuid);
 
   @RequestLine("POST /latest/contentnodes/{parentContentNodeUuid}/contentnode")
   @Headers("Content-Type: application/json")
-  ContentNode saveWithParentContentNode(ContentNode contentNode, @Param("parentContentNodeUuid") UUID parentContentNodeUuid);
+  ContentNode saveWithParentContentNode(
+      ContentNode contentNode, @Param("parentContentNodeUuid") UUID parentContentNodeUuid);
 
   @RequestLine("PUT /latest/contentnodes/{uuid}")
   @Headers("Content-Type: application/json")

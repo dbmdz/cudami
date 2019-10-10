@@ -16,17 +16,15 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.servlet.view.RedirectView;
 
-/**
- * Check if admin user exists before login (call to "/login") dialog.
- */
-public class CreateAdminUserInterceptor extends HandlerInterceptorAdapter implements MessageSourceAware {
+/** Check if admin user exists before login (call to "/login") dialog. */
+public class CreateAdminUserInterceptor extends HandlerInterceptorAdapter
+    implements MessageSourceAware {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CreateAdminUserInterceptor.class);
 
   private MessageSource messageSource;
 
-  @Autowired
-  private UserService service;
+  @Autowired private UserService service;
 
   @Override
   public void setMessageSource(MessageSource messageSource) {
@@ -34,7 +32,8 @@ public class CreateAdminUserInterceptor extends HandlerInterceptorAdapter implem
   }
 
   @Override
-  public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+  public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+      throws Exception {
     LOGGER.info("checking if admin user exists...");
     boolean activeAdminUserExists = service.doesActiveAdminUserExist();
     if (!activeAdminUserExists) {
@@ -44,24 +43,31 @@ public class CreateAdminUserInterceptor extends HandlerInterceptorAdapter implem
   }
 
   @Override
-  public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView)
+  public void postHandle(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      Object handler,
+      ModelAndView modelAndView)
       throws Exception {
     final Object doCreateAdminUser = request.getAttribute("createAdminUser");
     if (doCreateAdminUser != null) {
       boolean createAdminUser = (boolean) doCreateAdminUser;
       if (createAdminUser) {
         modelAndView.setView(new RedirectView("/setup/adminUser", true));
-        String message = messageSource.getMessage("msg.create_a_new_admin_user", null, LocaleContextHolder.getLocale());
+        String message =
+            messageSource.getMessage(
+                "msg.create_a_new_admin_user", null, LocaleContextHolder.getLocale());
 
         FlashMap flashMap = new FlashMap();
         flashMap.put("info_message", message);
         FlashMapManager flashMapManager = RequestContextUtils.getFlashMapManager(request);
         if (flashMapManager == null) {
-          throw new IllegalStateException("FlashMapManager not found despite output FlashMap having been set");
+          throw new IllegalStateException(
+              "FlashMapManager not found despite output FlashMap having been set");
         }
         flashMapManager.saveOutputFlashMap(flashMap, request, response);
 
-//        modelAndView.addObject("info_message", message);
+        //        modelAndView.addObject("info_message", message);
         LOGGER.info("Admin user does not exist. Create a new administrator user.");
       }
     }

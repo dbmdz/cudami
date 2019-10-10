@@ -7,5 +7,4 @@ public class ResourceNotFoundException extends HttpClientException {
   public ResourceNotFoundException(String methodKey, Response response) {
     super(methodKey, response);
   }
-
 }

@@ -15,8 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class VersionServiceImpl implements VersionService {
 
-  @Autowired
-  private VersionRepository repository;
+  @Autowired private VersionRepository repository;
 
   @Override
   public Version get(UUID uuid) {
@@ -59,6 +58,6 @@ public class VersionServiceImpl implements VersionService {
       }
     }
     return null;
-    //return "dummy_instance_version_key_7";
+    // return "dummy_instance_version_key_7";
   }
 }

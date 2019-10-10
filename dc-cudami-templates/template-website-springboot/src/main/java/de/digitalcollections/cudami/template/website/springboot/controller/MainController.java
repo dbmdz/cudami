@@ -18,8 +18,7 @@ public class MainController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MainController.class);
 
-  @Autowired
-  private LocaleService localeService;
+  @Autowired private LocaleService localeService;
 
   @RequestMapping(method = RequestMethod.GET)
   public String printWelcome(Model model) {

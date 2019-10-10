@@ -12,12 +12,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/**
- * Service for Digital Object handling.
- */
+/** Service for Digital Object handling. */
 @Service
-//@Transactional(readOnly = true)
-public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject> implements DigitalObjectService {
+// @Transactional(readOnly = true)
+public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
+    implements DigitalObjectService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectServiceImpl.class);
 
@@ -47,12 +46,15 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject> i
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveFileResources(DigitalObject digitalObject, LinkedHashSet<FileResource> fileResources) {
+  public LinkedHashSet<FileResource> saveFileResources(
+      DigitalObject digitalObject, LinkedHashSet<FileResource> fileResources) {
     return saveFileResources(digitalObject.getUuid(), fileResources);
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveFileResources(UUID digitalObjectUuid, LinkedHashSet<FileResource> fileResources) {
-    return ((DigitalObjectRepository) repository).saveFileResources(digitalObjectUuid, fileResources);
+  public LinkedHashSet<FileResource> saveFileResources(
+      UUID digitalObjectUuid, LinkedHashSet<FileResource> fileResources) {
+    return ((DigitalObjectRepository) repository)
+        .saveFileResources(digitalObjectUuid, fileResources);
   }
 }

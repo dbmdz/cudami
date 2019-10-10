@@ -17,7 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class IdentifierRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl implements IdentifierRepository {
+public class IdentifierRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl
+    implements IdentifierRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifierRepositoryImpl.class);
 
@@ -40,9 +41,8 @@ public class IdentifierRepositoryImpl extends AbstractPagingAndSortingRepository
     StringBuilder query = new StringBuilder("SELECT * FROM identifiers");
 
     addPageRequestParams(pageRequest, query);
-    List<IdentifierImpl> result = dbi.withHandle(h -> h.createQuery(query.toString())
-      .mapToBean(IdentifierImpl.class)
-      .list());
+    List<IdentifierImpl> result =
+        dbi.withHandle(h -> h.createQuery(query.toString()).mapToBean(IdentifierImpl.class).list());
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -50,58 +50,74 @@ public class IdentifierRepositoryImpl extends AbstractPagingAndSortingRepository
 
   @Override
   public List<Identifier> find(String searchTerm, int maxResults) {
-    StringBuilder query = new StringBuilder("SELECT uuid, identifiable, namespace, identifier FROM identifiers WHERE namespace ILIKE '%' || :searchTerm || '%'");
+    StringBuilder query =
+        new StringBuilder(
+            "SELECT uuid, identifiable, namespace, identifier FROM identifiers WHERE namespace ILIKE '%' || :searchTerm || '%'");
     query.append(" LIMIT :maxResults");
 
-    List<Identifier> result = dbi.withHandle(h -> h.createQuery(query.toString())
-      .bind("searchTerm", searchTerm)
-      .bind("maxResults", maxResults)
-      .mapToBean(IdentifierImpl.class)
-      .stream().map(Identifier.class::cast).collect(Collectors.toList()));
+    List<Identifier> result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(query.toString()).bind("searchTerm", searchTerm)
+                    .bind("maxResults", maxResults).mapToBean(IdentifierImpl.class).stream()
+                    .map(Identifier.class::cast)
+                    .collect(Collectors.toList()));
     return result;
   }
 
   @Override
   public List<Identifier> findByIdentifiable(UUID identifiable) {
-    List<Identifier> result = dbi.withHandle(h -> h.createQuery(
-      "SELECT * FROM identifiers WHERE identifiable = :identifiable")
-      .bind("identifiable", identifiable)
-      .mapToBean(IdentifierImpl.class)
-      .stream().map(Identifier.class::cast).collect(Collectors.toList()));
+    List<Identifier> result =
+        dbi.withHandle(
+            h ->
+                h.createQuery("SELECT * FROM identifiers WHERE identifiable = :identifiable")
+                    .bind("identifiable", identifiable).mapToBean(IdentifierImpl.class).stream()
+                    .map(Identifier.class::cast)
+                    .collect(Collectors.toList()));
     return result;
   }
 
   @Override
   public Identifier findOne(String namespace, String id) {
-    Identifier identifier = (Identifier) dbi.withHandle(h -> h.createQuery(
-      "SELECT * FROM identifiers WHERE namespace = :namespace, identifier = :identifier")
-      .bind("namespace", namespace)
-      .bind("identifier", id)
-      .mapToBean(IdentifierImpl.class)
-      .findOne().orElse(null));
+    Identifier identifier =
+        (Identifier)
+            dbi.withHandle(
+                h ->
+                    h.createQuery(
+                            "SELECT * FROM identifiers WHERE namespace = :namespace, identifier = :identifier")
+                        .bind("namespace", namespace)
+                        .bind("identifier", id)
+                        .mapToBean(IdentifierImpl.class)
+                        .findOne()
+                        .orElse(null));
     return identifier;
   }
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[]{"identifiable", "namespace", "id"};
+    return new String[] {"identifiable", "namespace", "id"};
   }
 
   @Override
   public Identifier save(Identifier identifier) {
     identifier.setUuid(UUID.randomUUID());
 
-    Identifier result = dbi.withHandle(h -> h
-      .createQuery("INSERT INTO identifiers(uuid, identifiable, namespace, identifier)"
-                   + " VALUES (:uuid, :identifiable, :namespace, :id) RETURNING *")
-      .bindBean(identifier)
-      .mapToBean(IdentifierImpl.class)
-      .findOne().orElse(null));
+    Identifier result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(
+                        "INSERT INTO identifiers(uuid, identifiable, namespace, identifier)"
+                            + " VALUES (:uuid, :identifiable, :namespace, :id) RETURNING *")
+                    .bindBean(identifier)
+                    .mapToBean(IdentifierImpl.class)
+                    .findOne()
+                    .orElse(null));
     return result;
   }
 
   @Override
   public Identifier update(Identifier identifier) {
-    throw new UnsupportedOperationException("An update on identifiable, namespace and identifier has no use case.");
+    throw new UnsupportedOperationException(
+        "An update on identifiable, namespace and identifier has no use case.");
   }
 }

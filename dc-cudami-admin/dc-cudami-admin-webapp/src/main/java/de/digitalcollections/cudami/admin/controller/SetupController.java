@@ -19,9 +19,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/**
- * Controller for system setup tasks.
- */
+/** Controller for system setup tasks. */
 @Controller
 @SessionAttributes(value = {"user"})
 public class SetupController extends AbstractController {
@@ -48,8 +46,14 @@ public class SetupController extends AbstractController {
   }
 
   @RequestMapping(value = "/setup/adminUser", method = RequestMethod.POST)
-  public String adminUser(@RequestParam("pwd1") String password1, @RequestParam("pwd2") String password2, @ModelAttribute(name = "user") @Valid UserImpl user, BindingResult results,
-          Model model, SessionStatus status, RedirectAttributes redirectAttributes) {
+  public String adminUser(
+      @RequestParam("pwd1") String password1,
+      @RequestParam("pwd2") String password2,
+      @ModelAttribute(name = "user") @Valid UserImpl user,
+      BindingResult results,
+      Model model,
+      SessionStatus status,
+      RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "users/create";
@@ -59,7 +63,8 @@ public class SetupController extends AbstractController {
       return "users/create";
     }
     status.setComplete();
-    String message = messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
+    String message =
+        messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
     return "redirect:/";
   }

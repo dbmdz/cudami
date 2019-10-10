@@ -6,9 +6,7 @@ import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import java.util.LinkedHashSet;
 import java.util.UUID;
 
-/**
- * Service for Digital Object.
- */
+/** Service for Digital Object. */
 public interface DigitalObjectService extends EntityService<DigitalObject> {
 
   LinkedHashSet<FileResource> getFileResources(DigitalObject digitalObject);
@@ -19,9 +17,11 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
 
   LinkedHashSet<ImageFileResource> getImageFileResources(UUID digitalObjectUuid);
 
-  LinkedHashSet<FileResource> saveFileResources(DigitalObject digitalObject, LinkedHashSet<FileResource> fileResources);
+  LinkedHashSet<FileResource> saveFileResources(
+      DigitalObject digitalObject, LinkedHashSet<FileResource> fileResources);
 
-  LinkedHashSet<FileResource> saveFileResources(UUID digitalObjectUuid, LinkedHashSet<FileResource> fileResources);
+  LinkedHashSet<FileResource> saveFileResources(
+      UUID digitalObjectUuid, LinkedHashSet<FileResource> fileResources);
 
   DigitalObject getByIdentifier(String nameSpace, String id);
 }

@@ -7,9 +7,7 @@ import javax.servlet.http.HttpSessionListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Session configuration.
- */
+/** Session configuration. */
 @WebListener
 public class HttpSessionListenerImpl implements HttpSessionListener {
 
@@ -17,7 +15,8 @@ public class HttpSessionListenerImpl implements HttpSessionListener {
 
   private void setSessionTimeout(HttpSession session) {
     session.setMaxInactiveInterval(10 * 60 * 60); // seconds: 36000s = 10h
-    // replaces web.xml config: <session-config> <session-timeout>600</session-timeout> <!-- minutes: 60 * 10 h --> </session-config>
+    // replaces web.xml config: <session-config> <session-timeout>600</session-timeout> <!--
+    // minutes: 60 * 10 h --> </session-config>
   }
 
   @Override

@@ -71,5 +71,4 @@ public class CudamiRestErrorDecoder implements ErrorDecoder {
         return new HttpServerException(methodKey, response);
     }
   }
-
 }

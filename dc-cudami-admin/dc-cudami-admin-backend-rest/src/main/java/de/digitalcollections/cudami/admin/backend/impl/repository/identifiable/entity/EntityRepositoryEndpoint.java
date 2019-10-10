@@ -15,16 +15,23 @@ import java.util.UUID;
 public interface EntityRepositoryEndpoint extends RepositoryEndpoint {
 
   @RequestLine("POST /latest/entities/{uuid}/related/fileresources/{fileResourceUuid}")
-  void addRelatedFileresource(@Param("uuid") UUID uuid, @Param("fileResourceUuid") UUID fileResourceUuid);
+  void addRelatedFileresource(
+      @Param("uuid") UUID uuid, @Param("fileResourceUuid") UUID fileResourceUuid);
 
   @RequestLine("POST /latest/entities/relations/{subjectEntityUuid}/{predicate}/{objectEntityUuid}")
-  public void addRelation(@Param("subjectEntityUuid") UUID subjectEntityUuid, @Param("predicate") String predicate, @Param("objectEntityUuid") UUID objectEntityUuid);
+  public void addRelation(
+      @Param("subjectEntityUuid") UUID subjectEntityUuid,
+      @Param("predicate") String predicate,
+      @Param("objectEntityUuid") UUID objectEntityUuid);
 
-  @RequestLine("GET /latest/entities?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
+  @RequestLine(
+      "GET /latest/entities?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<Entity> find(
-          @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
-          @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
-  );
+      @Param("pageNumber") int pageNumber,
+      @Param("pageSize") int pageSize,
+      @Param("sortField") String sortField,
+      @Param("sortDirection") String sortDirection,
+      @Param("nullHandling") String nullHandling);
 
   @RequestLine("GET /latest/entities/{uuid}")
   Entity findOne(@Param("uuid") UUID uuid);
@@ -43,7 +50,8 @@ public interface EntityRepositoryEndpoint extends RepositoryEndpoint {
   Entity save(Entity entity);
 
   @RequestLine("POST /latest/entities/{uuid}/related/fileresources")
-  LinkedHashSet<FileResource> saveRelatedFileResources(@Param("uuid") UUID uuid, LinkedHashSet<FileResource> fileResources);
+  LinkedHashSet<FileResource> saveRelatedFileResources(
+      @Param("uuid") UUID uuid, LinkedHashSet<FileResource> fileResources);
 
   @RequestLine("POST /latest/entities/relations")
   List<EntityRelation> saveRelations(List<EntityRelation> relations);

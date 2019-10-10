@@ -15,10 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepositoryImpl<ContentNode, E> implements ContentNodeRepository<E> {
+public class ContentNodeRepositoryImpl<E extends Entity>
+    extends EntityPartRepositoryImpl<ContentNode, E> implements ContentNodeRepository<E> {
 
-  @Autowired
-  private ContentNodeRepositoryEndpoint endpoint;
+  @Autowired private ContentNodeRepositoryEndpoint endpoint;
 
   @Override
   public long count() {
@@ -33,7 +33,13 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
   @Override
   public PageResponse<ContentNode> find(PageRequest pageRequest) {
     FindParams f = getFindParams(pageRequest);
-    PageResponse<ContentNode> pageResponse = endpoint.find(f.getPageNumber(), f.getPageSize(), f.getSortField(), f.getSortDirection(), f.getNullHandling());
+    PageResponse<ContentNode> pageResponse =
+        endpoint.find(
+            f.getPageNumber(),
+            f.getPageSize(),
+            f.getSortField(),
+            f.getSortDirection(),
+            f.getNullHandling());
     return getGenericPageResponse(pageResponse);
   }
 
@@ -84,16 +90,19 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
 
   @Override
   public LinkedHashSet<E> saveEntities(UUID contentNodeUuid, LinkedHashSet<E> entities) {
-    return convertToGenericLinkedHashSet(endpoint.saveEntities(contentNodeUuid, convertFromGenericLinkedHashSet(entities)));
+    return convertToGenericLinkedHashSet(
+        endpoint.saveEntities(contentNodeUuid, convertFromGenericLinkedHashSet(entities)));
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveFileResources(ContentNode contentNode, LinkedHashSet<FileResource> fileResources) {
+  public LinkedHashSet<FileResource> saveFileResources(
+      ContentNode contentNode, LinkedHashSet<FileResource> fileResources) {
     return saveFileResources(contentNode.getUuid(), fileResources);
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveFileResources(UUID contentNodeUuid, LinkedHashSet<FileResource> fileResources) {
+  public LinkedHashSet<FileResource> saveFileResources(
+      UUID contentNodeUuid, LinkedHashSet<FileResource> fileResources) {
     return endpoint.saveFileResources(contentNodeUuid, fileResources);
   }
 
@@ -113,12 +122,14 @@ public class ContentNodeRepositoryImpl<E extends Entity> extends EntityPartRepos
   }
 
   @Override
-  public ContentNode saveWithParentContentTree(ContentNode contentNode, UUID parentContentTreeUUID) {
+  public ContentNode saveWithParentContentTree(
+      ContentNode contentNode, UUID parentContentTreeUUID) {
     return endpoint.saveWithParentContentTree(contentNode, parentContentTreeUUID);
   }
 
   @Override
-  public ContentNode saveWithParentContentNode(ContentNode contentNode, UUID parentContentNodeUUID) {
+  public ContentNode saveWithParentContentNode(
+      ContentNode contentNode, UUID parentContentNodeUUID) {
     return endpoint.saveWithParentContentNode(contentNode, parentContentNodeUUID);
   }
 }

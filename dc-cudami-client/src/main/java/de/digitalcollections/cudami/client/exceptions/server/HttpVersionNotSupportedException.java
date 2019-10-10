@@ -7,5 +7,4 @@ public class HttpVersionNotSupportedException extends HttpServerException {
   public HttpVersionNotSupportedException(String methodKey, Response response) {
     super(methodKey, response);
   }
-
 }

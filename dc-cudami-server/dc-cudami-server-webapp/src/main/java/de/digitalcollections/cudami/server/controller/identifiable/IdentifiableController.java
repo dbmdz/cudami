@@ -21,11 +21,13 @@ public class IdentifiableController {
   private IdentifiableService service;
 
   @ApiMethod(description = "Find limited amount of identifiables containing searchTerm in label")
-  @GetMapping(value = {"/latest/identifiables", "/v2/identifiables"}, produces = "application/json")
+  @GetMapping(
+      value = {"/latest/identifiables", "/v2/identifiables"},
+      produces = "application/json")
   @ApiResponseObject
   public List<Identifiable> find(
-          @RequestParam(name = "searchTerm") String searchTerm,
-          @RequestParam(name = "maxResults", required = false, defaultValue = "25") int maxResults) {
+      @RequestParam(name = "searchTerm") String searchTerm,
+      @RequestParam(name = "maxResults", required = false, defaultValue = "25") int maxResults) {
     List<Identifiable> identifiables = service.find(searchTerm, maxResults);
     return identifiables;
   }

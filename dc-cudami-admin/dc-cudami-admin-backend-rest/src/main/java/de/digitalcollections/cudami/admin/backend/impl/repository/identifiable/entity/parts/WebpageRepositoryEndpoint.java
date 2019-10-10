@@ -11,11 +11,14 @@ import java.util.UUID;
 
 public interface WebpageRepositoryEndpoint extends RepositoryEndpoint {
 
-  @RequestLine("GET /latest/webpages?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
+  @RequestLine(
+      "GET /latest/webpages?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<Webpage> find(
-    @Param("pageNumber") int pageNumber, @Param("pageSize") int pageSize,
-    @Param("sortField") String sortField, @Param("sortDirection") String sortDirection, @Param("nullHandling") String nullHandling
-  );
+      @Param("pageNumber") int pageNumber,
+      @Param("pageSize") int pageSize,
+      @Param("sortField") String sortField,
+      @Param("sortDirection") String sortDirection,
+      @Param("nullHandling") String nullHandling);
 
   @RequestLine("GET /latest/webpages/{uuid}")
   Webpage findOne(@Param("uuid") UUID uuid);
@@ -42,9 +45,11 @@ public interface WebpageRepositoryEndpoint extends RepositoryEndpoint {
 
   @RequestLine("POST /latest/websites/{parentWebsiteUuid}/webpage")
   @Headers("Content-Type: application/json")
-  Webpage saveWithParentWebsite(Webpage webpage, @Param("parentWebsiteUuid") UUID parentWebsiteUuid);
+  Webpage saveWithParentWebsite(
+      Webpage webpage, @Param("parentWebsiteUuid") UUID parentWebsiteUuid);
 
   @RequestLine("POST /latest/webpages/{parentWebpageUuid}/webpage")
   @Headers("Content-Type: application/json")
-  Webpage saveWithParentWebpage(Webpage webpage, @Param("parentWebpageUuid") UUID parentWebpageUuid);
+  Webpage saveWithParentWebpage(
+      Webpage webpage, @Param("parentWebpageUuid") UUID parentWebpageUuid);
 }

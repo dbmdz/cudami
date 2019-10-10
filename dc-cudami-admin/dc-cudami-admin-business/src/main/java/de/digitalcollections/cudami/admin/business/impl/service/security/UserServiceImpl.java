@@ -23,9 +23,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-/**
- * Service for User handling.
- */
+/** Service for User handling. */
 @Service
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService<User> {
@@ -38,8 +36,7 @@ public class UserServiceImpl implements UserService<User> {
   @Qualifier("uniqueUsernameValidator")
   private Validator uniqueUsernameValidator;
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
   @Override
   @Transactional(readOnly = false)
@@ -131,9 +128,10 @@ public class UserServiceImpl implements UserService<User> {
     return buildUserForAuthentication(user, authorities);
   }
 
-  private org.springframework.security.core.userdetails.User buildUserForAuthentication(User user, List<? extends GrantedAuthority> authorities) {
-    return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPasswordHash(),
-            user.isEnabled(), true, true, true, authorities);
+  private org.springframework.security.core.userdetails.User buildUserForAuthentication(
+      User user, List<? extends GrantedAuthority> authorities) {
+    return new org.springframework.security.core.userdetails.User(
+        user.getEmail(), user.getPasswordHash(), user.isEnabled(), true, true, true, authorities);
   }
 
   @Override
@@ -142,8 +140,10 @@ public class UserServiceImpl implements UserService<User> {
     return save(password1, password2, user, results, true);
   }
 
-  private User save(String password1, String password2, User user, Errors results, boolean isUpdate) {
-    final PasswordsValidatorParams passwordsValidatorParams = new PasswordsValidatorParams(password1, password2, user.getPasswordHash());
+  private User save(
+      String password1, String password2, User user, Errors results, boolean isUpdate) {
+    final PasswordsValidatorParams passwordsValidatorParams =
+        new PasswordsValidatorParams(password1, password2, user.getPasswordHash());
     String password = passwordsValidatorParams.getPassword1();
     if (!StringUtils.isEmpty(password)) {
       passwordsValidator.validate(passwordsValidatorParams, results);

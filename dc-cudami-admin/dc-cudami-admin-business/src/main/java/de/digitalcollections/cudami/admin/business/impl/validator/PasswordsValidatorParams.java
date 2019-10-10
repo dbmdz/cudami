@@ -1,8 +1,6 @@
 package de.digitalcollections.cudami.admin.business.impl.validator;
 
-/**
- * Container for params of PasswordsValidator.
- */
+/** Container for params of PasswordsValidator. */
 public class PasswordsValidatorParams {
 
   private final String password1;

@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
-//@Transactional(readOnly = true)
+// @Transactional(readOnly = true)
 public class IdentifierTypeServiceImpl implements IdentifierTypeService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifierTypeServiceImpl.class);
@@ -21,7 +21,8 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
   protected IdentifierTypeRepository repository;
 
   @Autowired
-  public IdentifierTypeServiceImpl(@Qualifier("identifierTypeRepositoryImpl") IdentifierTypeRepository repository) {
+  public IdentifierTypeServiceImpl(
+      @Qualifier("identifierTypeRepositoryImpl") IdentifierTypeRepository repository) {
     this.repository = repository;
   }
 

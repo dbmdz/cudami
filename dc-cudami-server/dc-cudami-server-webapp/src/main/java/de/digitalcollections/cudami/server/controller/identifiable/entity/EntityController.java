@@ -24,7 +24,13 @@ public class EntityController<E extends Entity> {
   private EntityService<E> service;
 
   @ApiMethod(description = "Get related file resources of entity")
-  @RequestMapping(value = {"/latest/entities/{uuid}/related/fileresources", "/v2/entities/{uuid}/related/fileresources"}, produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(
+      value = {
+        "/latest/entities/{uuid}/related/fileresources",
+        "/v2/entities/{uuid}/related/fileresources"
+      },
+      produces = "application/json",
+      method = RequestMethod.GET)
   @ApiResponseObject
   LinkedHashSet<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
     return service.getRelatedFileResources(uuid);

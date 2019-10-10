@@ -31,14 +31,10 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
-/**
- * Database configuration.
- */
+/** Database configuration. */
 @Configuration
-//@EnableTransactionManagement
-@ComponentScan(basePackages = {
-  "de.digitalcollections.cudami.server.backend.impl.jdbi"
-})
+// @EnableTransactionManagement
+@ComponentScan(basePackages = {"de.digitalcollections.cudami.server.backend.impl.jdbi"})
 public class SpringConfigBackendDatabase {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfigBackendDatabase.class);
@@ -58,14 +54,19 @@ public class SpringConfigBackendDatabase {
   @Value("${cudami.database.username}")
   private String databaseUsername;
 
-  @Autowired
-  ObjectMapper objectMapper;
+  @Autowired ObjectMapper objectMapper;
 
   @Bean(initMethod = "migrate")
   @Autowired
   @Qualifier(value = "pds")
   public Flyway flyway(DataSource pds) {
-    Flyway flyway = Flyway.configure().dataSource(pds).locations("classpath:/de/digitalcollections/cudami/server/backend/impl/database/migration").baselineOnMigrate(true).load();
+    Flyway flyway =
+        Flyway.configure()
+            .dataSource(pds)
+            .locations(
+                "classpath:/de/digitalcollections/cudami/server/backend/impl/database/migration")
+            .baselineOnMigrate(true)
+            .load();
     return flyway;
   }
 
@@ -93,10 +94,10 @@ public class SpringConfigBackendDatabase {
     return jdbiFactoryBean;
   }
 
-//  @Bean
-//  public DataSourceTransactionManager transactionManager() {
-//    return new DataSourceTransactionManager(dataSource());
-//  }
+  //  @Bean
+  //  public DataSourceTransactionManager transactionManager() {
+  //    return new DataSourceTransactionManager(dataSource());
+  //  }
 
   /*
    * Unpooled datasource.
@@ -119,14 +120,18 @@ public class SpringConfigBackendDatabase {
     // Enable or disable TCP keep-alive probe. The default is false.
 
     props.put("testOnBorrow", "true");
-    // default: true. The indication of whether objects will be validated before being borrowed from the pool.
-    // If the object fails to validate, it will be dropped from the pool, and we will attempt to borrow another.
+    // default: true. The indication of whether objects will be validated before being borrowed from
+    // the pool.
+    // If the object fails to validate, it will be dropped from the pool, and we will attempt to
+    // borrow another.
     props.put("testOnReturn", "true");
     props.put("testWhileIdle", "true");
 
     props.put("validationQuery", "SELECT 1");
-    // validationQuery - The SQL query that will be used to validate connections from this pool before returning
-    // them to the caller. If specified, this query MUST be an SQL SELECT statement that returns at least one row.
+    // validationQuery - The SQL query that will be used to validate connections from this pool
+    // before returning
+    // them to the caller. If specified, this query MUST be an SQL SELECT statement that returns at
+    // least one row.
     // If not specified, connections will be validation by calling the isValid() method.
 
     props.put("timeBetweenEvictionRunsMillis", "60000"); // default is disabled
@@ -140,14 +145,15 @@ public class SpringConfigBackendDatabase {
     // sb.append(";socketTimeout=30");
     // The timeout value used for socket read operations.
     // If reading from the server takes longer than this value, the connection is closed.
-    // This can be used as both a brute force global query timeout and a method of detecting network problems.
+    // This can be used as both a brute force global query timeout and a method of detecting network
+    // problems.
     // The timeout is specified in seconds and a value of zero means that it is disabled.
     return props;
   }
 
   /*
-     * Pooled datasource.
-     * We create the PoolingDataSource, passing in the object pool created.
+   * Pooled datasource.
+   * We create the PoolingDataSource, passing in the object pool created.
    */
   @Bean(name = "pds")
   @Autowired
@@ -159,24 +165,26 @@ public class SpringConfigBackendDatabase {
   }
 
   /*
-     * We need a ObjectPool that serves as the actual pool of connections.
-     * We'll use a GenericObjectPool instance, although any ObjectPool implementation will suffice.
+   * We need a ObjectPool that serves as the actual pool of connections.
+   * We'll use a GenericObjectPool instance, although any ObjectPool implementation will suffice.
    */
   private ObjectPool<PoolableConnection> getObjectPool(DataSource ds) {
     PoolableConnectionFactory poolableConnectionFactory = getPoolableConnectionFactory(ds);
-    ObjectPool<PoolableConnection> connectionPool = new GenericObjectPool<>(poolableConnectionFactory);
+    ObjectPool<PoolableConnection> connectionPool =
+        new GenericObjectPool<>(poolableConnectionFactory);
     // Set the factory's pool property to the owning pool
     poolableConnectionFactory.setPool(connectionPool);
     return connectionPool;
   }
 
   /*
-     * We create the PoolableConnectionFactory, which wraps the "real" Connections
-     * created by the ConnectionFactory with the classes that implement the pooling functionality.
+   * We create the PoolableConnectionFactory, which wraps the "real" Connections
+   * created by the ConnectionFactory with the classes that implement the pooling functionality.
    */
   private PoolableConnectionFactory getPoolableConnectionFactory(DataSource ds) {
     DataSourceConnectionFactory dataSourceConnectionFactory = getDataSourceConnectionFactory(ds);
-    PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(dataSourceConnectionFactory, null);
+    PoolableConnectionFactory poolableConnectionFactory =
+        new PoolableConnectionFactory(dataSourceConnectionFactory, null);
     poolableConnectionFactory.setValidationQuery("SELECT 1");
     long maxConnLifetimeMillis = 600000; // ten minutes
     poolableConnectionFactory.setMaxConnLifetimeMillis(maxConnLifetimeMillis);
@@ -184,12 +192,11 @@ public class SpringConfigBackendDatabase {
   }
 
   /*
-     * We create a ConnectionFactory that the pool will use to create Connections.
-     * It is using the unppoled datasource we had before.
+   * We create a ConnectionFactory that the pool will use to create Connections.
+   * It is using the unppoled datasource we had before.
    */
   private DataSourceConnectionFactory getDataSourceConnectionFactory(DataSource ds) {
     DataSourceConnectionFactory dscf = new DataSourceConnectionFactory(ds);
     return dscf;
   }
-
 }

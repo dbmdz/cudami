@@ -13,10 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree> implements ContentTreeRepository {
+public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
+    implements ContentTreeRepository {
 
-  @Autowired
-  private ContentTreeRepositoryEndpoint endpoint;
+  @Autowired private ContentTreeRepositoryEndpoint endpoint;
 
   @Override
   public long count() {
@@ -31,7 +31,13 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
   @Override
   public PageResponse<ContentTree> find(PageRequest pageRequest) {
     FindParams f = getFindParams(pageRequest);
-    PageResponse<ContentTree> pageResponse = endpoint.find(f.getPageNumber(), f.getPageSize(), f.getSortField(), f.getSortDirection(), f.getNullHandling());
+    PageResponse<ContentTree> pageResponse =
+        endpoint.find(
+            f.getPageNumber(),
+            f.getPageSize(),
+            f.getSortField(),
+            f.getSortDirection(),
+            f.getNullHandling());
     return getGenericPageResponse(pageResponse);
   }
 

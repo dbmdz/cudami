@@ -16,8 +16,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class UserRepositoryImpl implements UserRepository<UserImpl> {
 
-  @Autowired
-  private UserRepositoryEndpoint endpoint;
+  @Autowired private UserRepositoryEndpoint endpoint;
 
   @Override
   public long count() {
@@ -41,7 +40,7 @@ public class UserRepositoryImpl implements UserRepository<UserImpl> {
     String sortField = "";
     String sortDirection = "";
     String nullHandling = "";
-//    while (iterator.hasNext()) {
+    //    while (iterator.hasNext()) {
     if (iterator.hasNext()) {
       Order order = iterator.next();
       sortField = order.getProperty() == null ? "" : order.getProperty();
@@ -64,7 +63,8 @@ public class UserRepositoryImpl implements UserRepository<UserImpl> {
     try {
       user = endpoint.findByEmail(email);
     } catch (ResourceNotFoundException e) {
-      // TODO may be throw a business exception instead returning null to make more clear what happened?
+      // TODO may be throw a business exception instead returning null to make more clear what
+      // happened?
       user = null;
     }
     return user;

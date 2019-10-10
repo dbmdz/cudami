@@ -10,7 +10,9 @@ public interface CudamiFileResourceService extends IdentifiableService<FileResou
 
   FileResource save(FileResource fileResource, byte[] bytes) throws IdentifiableServiceException;
 
-  public FileResource upload(InputStream inputStream, String filename, String contentType) throws ResourceIOException;
+  public FileResource upload(InputStream inputStream, String filename, String contentType)
+      throws ResourceIOException;
 
-  public FileResource upload(byte[] bytes, String filename, String contentType) throws ResourceIOException;
+  public FileResource upload(byte[] bytes, String filename, String contentType)
+      throws ResourceIOException;
 }

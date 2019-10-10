@@ -8,12 +8,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/**
- * Service for ContentTree handling.
- */
+/** Service for ContentTree handling. */
 @Service
-//@Transactional(readOnly = true)
-public class ContentTreeServiceImpl extends EntityServiceImpl<ContentTree> implements ContentTreeService {
+// @Transactional(readOnly = true)
+public class ContentTreeServiceImpl extends EntityServiceImpl<ContentTree>
+    implements ContentTreeService {
 
   @Autowired
   public ContentTreeServiceImpl(ContentTreeRepository repository) {

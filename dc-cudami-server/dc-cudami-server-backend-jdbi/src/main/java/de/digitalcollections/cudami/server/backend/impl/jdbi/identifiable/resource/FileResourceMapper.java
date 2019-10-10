@@ -27,8 +27,14 @@ public class FileResourceMapper implements RowMapper<FileResource> {
   public FileResource map(ResultSet rs, StatementContext ctx) throws SQLException {
     ConfigRegistry config = ctx.getConfig();
     ColumnMappers columnMappers = config.get(ColumnMappers.class);
-    ColumnMapper<LocalizedStructuredContent> lscMapper = columnMappers.findFor(LocalizedStructuredContent.class).orElseThrow(() -> new NoSuchMapperException("LocalizedStructuredContent"));
-    ColumnMapper<LocalizedText> ltMapper = columnMappers.findFor(LocalizedText.class).orElseThrow(() -> new NoSuchMapperException("LocalizedText"));
+    ColumnMapper<LocalizedStructuredContent> lscMapper =
+        columnMappers
+            .findFor(LocalizedStructuredContent.class)
+            .orElseThrow(() -> new NoSuchMapperException("LocalizedStructuredContent"));
+    ColumnMapper<LocalizedText> ltMapper =
+        columnMappers
+            .findFor(LocalizedText.class)
+            .orElseThrow(() -> new NoSuchMapperException("LocalizedText"));
 
     FileResource result;
     String mimeType = rs.getString("mimetype");

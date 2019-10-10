@@ -34,9 +34,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-/**
- * Controller for content node management pages.
- */
+/** Controller for content node management pages. */
 @Controller
 public class ContentNodesController extends AbstractController {
 
@@ -57,7 +55,10 @@ public class ContentNodesController extends AbstractController {
   }
 
   @GetMapping("/contentnodes/new")
-  public String create(Model model, @RequestParam("parentType") String parentType, @RequestParam("parentUuid") String parentUuid) {
+  public String create(
+      Model model,
+      @RequestParam("parentType") String parentType,
+      @RequestParam("parentUuid") String parentUuid) {
     model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
@@ -97,8 +98,8 @@ public class ContentNodesController extends AbstractController {
   public ResponseEntity save(
       @RequestBody ContentNode contentNode,
       @RequestParam("parentType") String parentType,
-      @RequestParam("parentUuid") UUID parentUuid
-  ) throws IdentifiableServiceException {
+      @RequestParam("parentUuid") UUID parentUuid)
+      throws IdentifiableServiceException {
     ContentNode contentNodeDb = null;
     HttpHeaders headers = new HttpHeaders();
     try {
@@ -121,7 +122,8 @@ public class ContentNodesController extends AbstractController {
   }
 
   @PutMapping("/api/contentnodes/{uuid}")
-  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody ContentNode contentNode) throws IdentifiableServiceException {
+  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody ContentNode contentNode)
+      throws IdentifiableServiceException {
     HttpHeaders headers = new HttpHeaders();
     try {
       service.update(contentNode);

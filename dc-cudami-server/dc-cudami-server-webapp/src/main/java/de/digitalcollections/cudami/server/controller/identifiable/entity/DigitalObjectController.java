@@ -31,19 +31,22 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The digital object controller", name = "Digital object controller")
 public class DigitalObjectController {
 
-  @Autowired
-  private DigitalObjectService service;
+  @Autowired private DigitalObjectService service;
 
   @ApiMethod(description = "Get all digital objects")
-  @RequestMapping(value = {"/latest/digitalobjects", "/v2/digitalobjects"},
-                  produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(
+      value = {"/latest/digitalobjects", "/v2/digitalobjects"},
+      produces = "application/json",
+      method = RequestMethod.GET)
   @ApiResponseObject
   public PageResponse<DigitalObject> findAll(
-    @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-    @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-    @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
-    @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC") Direction sortDirection,
-    @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE") NullHandling nullHandling) {
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
+          Direction sortDirection,
+      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
+          NullHandling nullHandling) {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
@@ -51,48 +54,77 @@ public class DigitalObjectController {
   }
 
   @ApiMethod(description = "Get digital object by uuid")
-  @RequestMapping(value = {"/latest/digitalobjects/{uuid}", "/v2/digitalobjects/{uuid}"}, produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(
+      value = {"/latest/digitalobjects/{uuid}", "/v2/digitalobjects/{uuid}"},
+      produces = "application/json",
+      method = RequestMethod.GET)
   @ApiResponseObject
   public DigitalObject findById(@PathVariable UUID uuid) {
     return service.get(uuid);
   }
 
   @ApiMethod(description = "Get digital object by namespace and id")
-  @RequestMapping(value = {"/latest/digitalobjects/identifier/{namespace}:{id}", "/v2/digitalobjects/identifier/{namespace}:{id}"}, produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(
+      value = {
+        "/latest/digitalobjects/identifier/{namespace}:{id}",
+        "/v2/digitalobjects/identifier/{namespace}:{id}"
+      },
+      produces = "application/json",
+      method = RequestMethod.GET)
   @ApiResponseObject
-  public DigitalObject findByIdIdentifier(@PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
+  public DigitalObject findByIdIdentifier(@PathVariable String namespace, @PathVariable String id)
+      throws IdentifiableServiceException {
     DigitalObject digitalObject = service.getByIdentifier(namespace, id);
     if (digitalObject == null) {
       // FIXME throw resource not found http exception
-      throw new IdentifiableServiceException("DigitalObject " + namespace + ":" + id + " not found");
+      throw new IdentifiableServiceException(
+          "DigitalObject " + namespace + ":" + id + " not found");
     }
     return digitalObject;
   }
 
   @ApiMethod(description = "Save a newly created digital object")
-  @RequestMapping(value = {"/latest/digitalobjects", "/v2/digitalobjects"}, produces = "application/json", method = RequestMethod.POST)
+  @RequestMapping(
+      value = {"/latest/digitalobjects", "/v2/digitalobjects"},
+      produces = "application/json",
+      method = RequestMethod.POST)
   @ApiResponseObject
-  public DigitalObject save(@RequestBody DigitalObject digitalObject, BindingResult errors) throws IdentifiableServiceException {
+  public DigitalObject save(@RequestBody DigitalObject digitalObject, BindingResult errors)
+      throws IdentifiableServiceException {
     return service.save(digitalObject);
   }
 
   @ApiMethod(description = "Update a digital object")
-  @RequestMapping(value = {"/latest/digitalobjects/{uuid}", "/v2/digitalobjects/{uuid}"}, produces = "application/json", method = RequestMethod.PUT)
+  @RequestMapping(
+      value = {"/latest/digitalobjects/{uuid}", "/v2/digitalobjects/{uuid}"},
+      produces = "application/json",
+      method = RequestMethod.PUT)
   @ApiResponseObject
-  public DigitalObject update(@PathVariable UUID uuid, @RequestBody DigitalObject digitalObject, BindingResult errors) throws IdentifiableServiceException {
+  public DigitalObject update(
+      @PathVariable UUID uuid, @RequestBody DigitalObject digitalObject, BindingResult errors)
+      throws IdentifiableServiceException {
     assert Objects.equals(uuid, digitalObject.getUuid());
     return service.update(digitalObject);
   }
 
   @ApiMethod(description = "Get image file resources of a digital object")
-  @RequestMapping(value = {"/latest/digitalobjects/{uuid}/fileresources/images", "/v2/digitalobjects/{uuid}/fileresources/images"}, produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(
+      value = {
+        "/latest/digitalobjects/{uuid}/fileresources/images",
+        "/v2/digitalobjects/{uuid}/fileresources/images"
+      },
+      produces = "application/json",
+      method = RequestMethod.GET)
   @ApiResponseObject
   public LinkedHashSet<ImageFileResource> getImageFileResources(@PathVariable UUID uuid) {
     return service.getImageFileResources(uuid);
   }
 
   @ApiMethod(description = "Get count of digital objects")
-  @RequestMapping(value = {"/latest/digitalobjects/count", "/v2/digitalobjects/count"}, produces = "application/json", method = RequestMethod.GET)
+  @RequestMapping(
+      value = {"/latest/digitalobjects/count", "/v2/digitalobjects/count"},
+      produces = "application/json",
+      method = RequestMethod.GET)
   @ApiResponseObject
   public long count() {
     return service.count();

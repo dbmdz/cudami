@@ -14,10 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObject> implements DigitalObjectRepository {
+public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObject>
+    implements DigitalObjectRepository {
 
-  @Autowired
-  private DigitalObjectRepositoryEndpoint endpoint;
+  @Autowired private DigitalObjectRepositoryEndpoint endpoint;
 
   @Override
   public long count() {
@@ -32,7 +32,13 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   @Override
   public PageResponse<DigitalObject> find(PageRequest pageRequest) {
     FindParams f = getFindParams(pageRequest);
-    PageResponse<DigitalObject> pageResponse = endpoint.find(f.getPageNumber(), f.getPageSize(), f.getSortField(), f.getSortDirection(), f.getNullHandling());
+    PageResponse<DigitalObject> pageResponse =
+        endpoint.find(
+            f.getPageNumber(),
+            f.getPageSize(),
+            f.getSortField(),
+            f.getSortDirection(),
+            f.getNullHandling());
     return getGenericPageResponse(pageResponse);
   }
 
@@ -67,12 +73,14 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveFileResources(DigitalObject digitalObject, LinkedHashSet<FileResource> fileResources) {
+  public LinkedHashSet<FileResource> saveFileResources(
+      DigitalObject digitalObject, LinkedHashSet<FileResource> fileResources) {
     return saveFileResources(digitalObject.getUuid(), fileResources);
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveFileResources(UUID digitalObjectUuid, LinkedHashSet<FileResource> fileResources) {
+  public LinkedHashSet<FileResource> saveFileResources(
+      UUID digitalObjectUuid, LinkedHashSet<FileResource> fileResources) {
     return endpoint.saveFileResources(digitalObjectUuid, fileResources);
   }
 

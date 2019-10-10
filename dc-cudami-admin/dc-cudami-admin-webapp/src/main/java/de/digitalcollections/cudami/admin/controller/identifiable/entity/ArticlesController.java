@@ -33,9 +33,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-/**
- * Controller for content trees management pages.
- */
+/** Controller for content trees management pages. */
 @Controller
 public class ArticlesController extends AbstractController {
 
@@ -82,7 +80,12 @@ public class ArticlesController extends AbstractController {
   }
 
   @GetMapping("/articles")
-  public String list(Model model, @PageableDefault(sort = {"lastModified"}, size = 25) Pageable pageable) {
+  public String list(
+      Model model,
+      @PageableDefault(
+              sort = {"lastModified"},
+              size = 25)
+          Pageable pageable) {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
@@ -105,7 +108,8 @@ public class ArticlesController extends AbstractController {
   }
 
   @PutMapping("/api/articles/{uuid}")
-  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Article article) throws IdentifiableServiceException {
+  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Article article)
+      throws IdentifiableServiceException {
     HttpHeaders headers = new HttpHeaders();
     try {
       service.update(article);

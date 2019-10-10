@@ -1,10 +1,10 @@
 package de.digitalcollections.cudami.admin.business.impl.validator;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class PasswordsValidatorTest {
 

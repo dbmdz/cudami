@@ -14,7 +14,8 @@ import java.util.UUID;
  *
  * @param <E> entity type
  */
-public interface ContentNodeService<E extends Entity> extends NodeService<ContentNode>, EntityPartService<ContentNode, E> {
+public interface ContentNodeService<E extends Entity>
+    extends NodeService<ContentNode>, EntityPartService<ContentNode, E> {
 
   @Override
   ContentNode get(UUID uuid, Locale locale) throws IdentifiableServiceException;
@@ -31,11 +32,15 @@ public interface ContentNodeService<E extends Entity> extends NodeService<Conten
 
   LinkedHashSet<FileResource> getFileResources(UUID contentNodeUuid);
 
-  LinkedHashSet<FileResource> saveFileResources(ContentNode contentNode, LinkedHashSet<FileResource> fileResources);
+  LinkedHashSet<FileResource> saveFileResources(
+      ContentNode contentNode, LinkedHashSet<FileResource> fileResources);
 
-  LinkedHashSet<FileResource> saveFileResources(UUID contentNodeUuid, LinkedHashSet<FileResource> fileResources);
+  LinkedHashSet<FileResource> saveFileResources(
+      UUID contentNodeUuid, LinkedHashSet<FileResource> fileResources);
 
-  ContentNode saveWithParentContentTree(ContentNode contentNode, UUID parentContentTreeUuid) throws IdentifiableServiceException;
+  ContentNode saveWithParentContentTree(ContentNode contentNode, UUID parentContentTreeUuid)
+      throws IdentifiableServiceException;
 
-  ContentNode saveWithParentContentNode(ContentNode contentNode, UUID parentContentNodeUuid) throws IdentifiableServiceException;
+  ContentNode saveWithParentContentNode(ContentNode contentNode, UUID parentContentNodeUuid)
+      throws IdentifiableServiceException;
 }

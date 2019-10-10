@@ -9,14 +9,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-/**
- * Validates that username does not exist, yet.
- */
+/** Validates that username does not exist, yet. */
 @Component
 public class UniqueUsernameValidator implements Validator {
 
-  @Autowired
-  UserService userService;
+  @Autowired UserService userService;
 
   @Override
   public boolean supports(Class<?> clazz) {
@@ -35,5 +32,4 @@ public class UniqueUsernameValidator implements Validator {
       // ok, username not used, yet.
     }
   }
-
 }

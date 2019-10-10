@@ -5,9 +5,7 @@ import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Service for ContentTree.
- */
+/** Service for ContentTree. */
 public interface ContentTreeService extends EntityService<ContentTree> {
 
   List<ContentNode> getRootNodes(ContentTree contentTree);

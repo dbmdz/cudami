@@ -14,17 +14,20 @@ public class SpringConfigSecurity extends WebSecurityConfigurerAdapter {
     http.headers().frameOptions().disable();
 
     // CSRF handling is 'on' by default with Spring Security
-    // see https://stackoverflow.com/questions/38108357/how-to-enable-post-put-and-delete-methods-in-spring-security
+    // see
+    // https://stackoverflow.com/questions/38108357/how-to-enable-post-put-and-delete-methods-in-spring-security
     // https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-security.html#boot-features-security-csrf
     // https://docs.spring.io/spring-security/site/docs/5.0.4.RELEASE/reference/htmlsingle/#csrf
     http.csrf().ignoringAntMatchers("/latest/**", "/v1/**");
 
     http.authorizeRequests()
-            .antMatchers("/latest/**", "/v1/**").permitAll()
-            .requestMatchers(EndpointRequest.to("info", "health")).permitAll()
-            .requestMatchers(EndpointRequest.toAnyEndpoint()).hasRole("ACTUATOR")
-            .and()
-            .httpBasic();
+        .antMatchers("/latest/**", "/v1/**")
+        .permitAll()
+        .requestMatchers(EndpointRequest.to("info", "health"))
+        .permitAll()
+        .requestMatchers(EndpointRequest.toAnyEndpoint())
+        .hasRole("ACTUATOR")
+        .and()
+        .httpBasic();
   }
-
 }

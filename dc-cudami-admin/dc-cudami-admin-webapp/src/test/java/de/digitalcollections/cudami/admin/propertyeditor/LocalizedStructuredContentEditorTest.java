@@ -1,5 +1,7 @@
 package de.digitalcollections.cudami.admin.propertyeditor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.admin.test.TestApplication;
 import de.digitalcollections.cudami.admin.test.config.SpringConfigBusinessForTest;
@@ -16,14 +18,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {TestApplication.class, SpringConfigBusinessForTest.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+    classes = {TestApplication.class, SpringConfigBusinessForTest.class},
+    webEnvironment = WebEnvironment.RANDOM_PORT)
 public class LocalizedStructuredContentEditorTest implements InitializingBean {
 
-  @Autowired
-  private ObjectMapper objectMapper;
+  @Autowired private ObjectMapper objectMapper;
 
   private LocalizedStructuredContentEditor documentEditor;
 
@@ -35,7 +36,8 @@ public class LocalizedStructuredContentEditorTest implements InitializingBean {
   private LocalizedStructuredContent createLocalizedStructuredContent(String filename) {
     try {
       String json = createJson(filename);
-      LocalizedStructuredContent lsc = objectMapper.readValue(json, LocalizedStructuredContent.class);
+      LocalizedStructuredContent lsc =
+          objectMapper.readValue(json, LocalizedStructuredContent.class);
       return lsc;
     } catch (IOException ex) {
       return null;
@@ -44,37 +46,38 @@ public class LocalizedStructuredContentEditorTest implements InitializingBean {
 
   private String createJson(String filename) {
     try {
-      String json = IOUtils.toString(this.getClass().getClassLoader().getResourceAsStream(filename), StandardCharsets.UTF_8);
+      String json =
+          IOUtils.toString(
+              this.getClass().getClassLoader().getResourceAsStream(filename),
+              StandardCharsets.UTF_8);
       return json;
     } catch (IOException ex) {
       return null;
     }
   }
 
-  /**
-   * Test of getAsText method, of class LocalizedStructuredContentEditor.
-   */
+  /** Test of getAsText method, of class LocalizedStructuredContentEditor. */
   @Test
   public void testGetAsText() {
     String expResult = createJson("localizedStructuredContent.json").replaceAll("\\s", "");
-    LocalizedStructuredContent lsc = createLocalizedStructuredContent("localizedStructuredContent.json");
+    LocalizedStructuredContent lsc =
+        createLocalizedStructuredContent("localizedStructuredContent.json");
     documentEditor.setValue(lsc);
 
     String result = documentEditor.getAsText().replaceAll("\\s", "");
     assertThat(result).isEqualTo(expResult);
   }
 
-  /**
-   * Test of setAsText method, of class LocalizedStructuredContentEditor.
-   */
+  /** Test of setAsText method, of class LocalizedStructuredContentEditor. */
   @Test
   public void testSetAsText() {
-    LocalizedStructuredContent expResult = createLocalizedStructuredContent("localizedStructuredContent.json");
+    LocalizedStructuredContent expResult =
+        createLocalizedStructuredContent("localizedStructuredContent.json");
     String json = createJson("localizedStructuredContent.json");
     documentEditor.setAsText(json);
 
-    LocalizedStructuredContentImpl result = (LocalizedStructuredContentImpl) documentEditor.getValue();
+    LocalizedStructuredContentImpl result =
+        (LocalizedStructuredContentImpl) documentEditor.getValue();
     assertThat(result.size()).isEqualTo(expResult.size());
   }
-
 }

@@ -12,11 +12,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/**
- * Service for Article handling.
- */
+/** Service for Article handling. */
 @Service
-//@Transactional(readOnly = true)
+// @Transactional(readOnly = true)
 public class ArticleServiceImpl extends EntityServiceImpl<Article> implements ArticleService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticleServiceImpl.class);

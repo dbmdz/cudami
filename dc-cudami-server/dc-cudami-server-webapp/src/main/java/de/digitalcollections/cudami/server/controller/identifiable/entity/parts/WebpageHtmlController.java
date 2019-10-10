@@ -22,17 +22,31 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Api(description = "The webpage controller", name = "Webpage controller")
 public class WebpageHtmlController {
 
-  @Autowired
-  private WebpageService webpageService;
+  @Autowired private WebpageService webpageService;
 
   @ApiMethod(description = "Get a webpage as HTML")
-  @RequestMapping(value = {"/latest/webpages/{uuid}.html", "/v2/webpages/{uuid}.html", "/v1/webpages/{uuid}.html"}, produces = {MediaType.TEXT_HTML_VALUE}, method = RequestMethod.GET)
+  @RequestMapping(
+      value = {
+        "/latest/webpages/{uuid}.html",
+        "/v2/webpages/{uuid}.html",
+        "/v1/webpages/{uuid}.html"
+      },
+      produces = {MediaType.TEXT_HTML_VALUE},
+      method = RequestMethod.GET)
   public String getWebpageAsHtml(
-      @ApiPathParam(description = "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>") @PathVariable("uuid") UUID uuid,
-      @ApiQueryParam(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
-      @RequestParam(name = "pLocale", required = false) Locale pLocale,
-      Model model
-  ) throws IdentifiableServiceException {
+      @ApiPathParam(
+              description =
+                  "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @ApiQueryParam(
+              name = "pLocale",
+              description =
+                  "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+          @RequestParam(name = "pLocale", required = false)
+          Locale pLocale,
+      Model model)
+      throws IdentifiableServiceException {
     Webpage webpage;
     if (pLocale == null) {
       webpage = (Webpage) webpageService.get(uuid);

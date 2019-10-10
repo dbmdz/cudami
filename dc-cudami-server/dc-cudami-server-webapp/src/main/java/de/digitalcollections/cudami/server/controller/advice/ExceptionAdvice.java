@@ -16,13 +16,11 @@ public class ExceptionAdvice {
 
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ExceptionHandler(UsernameNotFoundException.class)
-  public void handleNotFound() {
-  }
+  public void handleNotFound() {}
 
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
-  public void handleHttpMediaTypeNotAcceptableException() {
-  }
+  public void handleHttpMediaTypeNotAcceptableException() {}
 
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   @ExceptionHandler(Exception.class)

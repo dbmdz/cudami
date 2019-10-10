@@ -52,7 +52,8 @@ import org.xml.sax.SAXException;
 @Repository
 public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepository {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(FileResourceBinaryRepositoryImpl.class);
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(FileResourceBinaryRepositoryImpl.class);
   private String repositoryFolderPath;
   private final ResourceLoader resourceLoader;
 
@@ -62,7 +63,8 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
   }
 
   @Override
-  public void assertReadability(FileResource resource) throws ResourceIOException, ResourceNotFoundException {
+  public void assertReadability(FileResource resource)
+      throws ResourceIOException, ResourceNotFoundException {
     try (InputStream is = getInputStream(resource)) {
       if (is.available() <= 0) {
         throw new ResourceIOException("Cannot read " + resource.getFilename() + ": Empty file");
@@ -72,7 +74,8 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
     } catch (ResourceNotFoundException e) {
       throw e;
     } catch (Exception e) {
-      throw new ResourceIOException("Cannot read " + resource.getFilename() + ": " + e.getMessage());
+      throw new ResourceIOException(
+          "Cannot read " + resource.getFilename() + ": " + e.getMessage());
     }
   }
 
@@ -86,7 +89,8 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
 
     if (mimeType != null && !mimeType.getExtensions().isEmpty()) {
       location = location + "." + mimeType.getExtensions().get(0);
-      // example location = file:///local/cudami/resourceRepository/a30c/f362/5992/4f5a/8de0/6193/8134/e721/a30cf362-5992-4f5a-8de0-61938134e721.xml
+      // example location =
+      // file:///local/cudami/resourceRepository/a30c/f362/5992/4f5a/8de0/6193/8134/e721/a30cf362-5992-4f5a-8de0-61938134e721.xml
     }
     return URI.create(location);
   }
@@ -113,8 +117,10 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
 
     long lastModified = getLastModified(springResource);
     if (lastModified != 0) {
-      // lastmodified by code in java.io.File#lastModified (is also used in Spring's core.io.Resource) is in milliseconds!
-      resource.setLastModified(Instant.ofEpochMilli(lastModified).atOffset(ZoneOffset.UTC).toLocalDateTime());
+      // lastmodified by code in java.io.File#lastModified (is also used in Spring's
+      // core.io.Resource) is in milliseconds!
+      resource.setLastModified(
+          Instant.ofEpochMilli(lastModified).atOffset(ZoneOffset.UTC).toLocalDateTime());
     } else {
       resource.setLastModified(LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC));
     }
@@ -127,7 +133,8 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
   }
 
   @Override
-  public byte[] getAsBytes(FileResource resource) throws ResourceIOException, ResourceNotFoundException {
+  public byte[] getAsBytes(FileResource resource)
+      throws ResourceIOException, ResourceNotFoundException {
     try {
       assertReadability(resource);
       return IOUtils.toByteArray(this.getInputStream(resource));
@@ -139,7 +146,8 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
   }
 
   @Override
-  public Document getAsDocument(FileResource resource) throws ResourceIOException, ResourceNotFoundException {
+  public Document getAsDocument(FileResource resource)
+      throws ResourceIOException, ResourceNotFoundException {
     Document doc = null;
     try {
       // get InputStream on resource
@@ -155,7 +163,8 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
         LOGGER.debug("Got document: " + doc);
       }
     } catch (IOException | ParserConfigurationException | SAXException ex) {
-      throw new ResourceIOException("Cannot read document from resolved resource '" + resource.getUri().toString() + "'", ex);
+      throw new ResourceIOException(
+          "Cannot read document from resolved resource '" + resource.getUri().toString() + "'", ex);
     }
     return doc;
   }
@@ -181,7 +190,8 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
     }
   }
 
-  public InputStream getInputStream(URI resourceUri) throws ResourceIOException, ResourceNotFoundException {
+  public InputStream getInputStream(URI resourceUri)
+      throws ResourceIOException, ResourceNotFoundException {
     try {
       String location = resourceUri.toString();
       if (LOGGER.isDebugEnabled()) {
@@ -198,7 +208,8 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
   }
 
   @Override
-  public InputStream getInputStream(FileResource resource) throws ResourceIOException, ResourceNotFoundException {
+  public InputStream getInputStream(FileResource resource)
+      throws ResourceIOException, ResourceNotFoundException {
     return getInputStream(resource.getUri());
   }
 
@@ -213,7 +224,8 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
     return -1;
   }
 
-  public Reader getReader(FileResource resource, Charset charset) throws ResourceIOException, ResourceNotFoundException {
+  public Reader getReader(FileResource resource, Charset charset)
+      throws ResourceIOException, ResourceNotFoundException {
     return new InputStreamReader(this.getInputStream(resource), charset);
   }
 
@@ -228,7 +240,8 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
   }
 
   protected String getSplittedUuidPath(String uuid) {
-    // regex '^([0-9a-f]{4})([0-9a-f]{4})-([0-9a-f]{4})-([1-5][0-9a-f]{3})-([89ab][0-9a-f]{3})-([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{4})$' could be used, too...
+    // regex
+    // '^([0-9a-f]{4})([0-9a-f]{4})-([0-9a-f]{4})-([1-5][0-9a-f]{3})-([89ab][0-9a-f]{3})-([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{4})$' could be used, too...
     String uuidWithoutDashes = uuid.replaceAll("-", "");
     String[] pathParts = splitEqually(uuidWithoutDashes, 4);
     String splittedUuidPath = String.join(File.separator, pathParts);
@@ -248,9 +261,10 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
       throw new ResourceNotFoundException(path.toString() + " does not exist");
     }
     // create new filename filter
-    FilenameFilter fileNameFilter = (File dir, String name) -> {
-      return name.startsWith(uuidStr);
-    };
+    FilenameFilter fileNameFilter =
+        (File dir, String name) -> {
+          return name.startsWith(uuidStr);
+        };
 
     File[] matchingFiles = directory.listFiles(fileNameFilter);
     if (matchingFiles != null && matchingFiles.length > 0) {
@@ -263,22 +277,25 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
   }
 
   @Override
-  public FileResource save(FileResource fileResource, InputStream binaryData) throws ResourceIOException {
+  public FileResource save(FileResource fileResource, InputStream binaryData)
+      throws ResourceIOException {
     Assert.notNull(fileResource, "fileResource must not be null");
     Assert.notNull(binaryData, "binaryData must not be null");
 
     try {
       if (fileResource.isReadonly()) {
-        throw new ResourceIOException("fileResource is read only, does not support write-operations.");
+        throw new ResourceIOException(
+            "fileResource is read only, does not support write-operations.");
       }
 
       URI uri = createUri(fileResource.getUuid(), fileResource.getMimeType());
       fileResource.setUri(uri);
 
-//      final String scheme = uri.getScheme();
-//      if ("http".equals(scheme) || "https".equals(scheme)) {
-//        throw new ResourceIOException("Scheme not supported for write-operations: " + scheme + " (" + uri + ")");
-//      }
+      //      final String scheme = uri.getScheme();
+      //      if ("http".equals(scheme) || "https".equals(scheme)) {
+      //        throw new ResourceIOException("Scheme not supported for write-operations: " + scheme
+      // + " (" + uri + ")");
+      //      }
       final Path parentDirectory = Paths.get(uri).getParent();
       if (parentDirectory == null) {
         throw new ResourceIOException("No parent directory defined for uri: " + uri);
@@ -302,7 +319,8 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
   }
 
   @Override
-  public FileResource save(FileResource resource, String input, Charset charset) throws ResourceIOException {
+  public FileResource save(FileResource resource, String input, Charset charset)
+      throws ResourceIOException {
     try (InputStream in = new ReaderInputStream(new StringReader(input), charset)) {
       return save(resource, in);
     } catch (IOException ex) {
@@ -321,7 +339,7 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
    */
   private String[] splitEqually(String text, int partLength) {
     if (StringUtils.isEmpty(text) || partLength == 0) {
-      return new String[]{text};
+      return new String[] {text};
     }
 
     int textLength = text.length();

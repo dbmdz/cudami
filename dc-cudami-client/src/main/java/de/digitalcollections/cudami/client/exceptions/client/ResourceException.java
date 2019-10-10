@@ -7,5 +7,4 @@ public class ResourceException extends HttpClientException {
   public ResourceException(String methodKey, Response response) {
     super(methodKey, response);
   }
-
 }

@@ -31,9 +31,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-/**
- * Controller for website management pages.
- */
+/** Controller for website management pages. */
 @Controller
 public class WebsitesController extends AbstractController {
 
@@ -81,7 +79,12 @@ public class WebsitesController extends AbstractController {
   }
 
   @GetMapping("/websites")
-  public String list(Model model, @PageableDefault(sort = {"email"}, size = 25) Pageable pageable) {
+  public String list(
+      Model model,
+      @PageableDefault(
+              sort = {"email"},
+              size = 25)
+          Pageable pageable) {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
@@ -104,7 +107,8 @@ public class WebsitesController extends AbstractController {
   }
 
   @PutMapping("/api/websites/{uuid}")
-  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Website website) throws IdentifiableServiceException {
+  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Website website)
+      throws IdentifiableServiceException {
     HttpHeaders headers = new HttpHeaders();
     try {
       service.update(website);

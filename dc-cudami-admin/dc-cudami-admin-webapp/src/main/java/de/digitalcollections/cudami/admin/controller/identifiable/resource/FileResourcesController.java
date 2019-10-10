@@ -39,9 +39,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/**
- * Controller for resource management pages.
- */
+/** Controller for resource management pages. */
 @Controller
 public class FileResourcesController extends AbstractController {
 
@@ -51,7 +49,8 @@ public class FileResourcesController extends AbstractController {
   CudamiFileResourceService service;
 
   @Autowired
-  public FileResourcesController(LocaleRepository localeRepository, CudamiFileResourceService service) {
+  public FileResourcesController(
+      LocaleRepository localeRepository, CudamiFileResourceService service) {
     this.localeRepository = localeRepository;
     this.service = service;
   }
@@ -89,7 +88,12 @@ public class FileResourcesController extends AbstractController {
   }
 
   @GetMapping("/fileresources")
-  public String list(Model model, @PageableDefault(sort = {"label"}, size = 25) Pageable pageable) {
+  public String list(
+      Model model,
+      @PageableDefault(
+              sort = {"label"},
+              size = 25)
+          Pageable pageable) {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
@@ -98,7 +102,8 @@ public class FileResourcesController extends AbstractController {
   }
 
   @PostMapping("/api/fileresources/new")
-  public ResponseEntity save(@RequestBody FileResource fileResource) throws IdentifiableServiceException {
+  public ResponseEntity save(@RequestBody FileResource fileResource)
+      throws IdentifiableServiceException {
     FileResource fileResourceDb = null;
     HttpHeaders headers = new HttpHeaders();
     try {
@@ -112,7 +117,8 @@ public class FileResourcesController extends AbstractController {
   }
 
   @PutMapping("/api/fileresources/{uuid}")
-  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody FileResource fileResource) throws IdentifiableServiceException {
+  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody FileResource fileResource)
+      throws IdentifiableServiceException {
     HttpHeaders headers = new HttpHeaders();
     try {
       // get object from db
@@ -132,7 +138,8 @@ public class FileResourcesController extends AbstractController {
 
   @PostMapping("/api/fileresources/new/upload")
   @ResponseBody
-  public FileResource upload(HttpServletRequest request, RedirectAttributes redirectAttributes) throws InterruptedException, IOException {
+  public FileResource upload(HttpServletRequest request, RedirectAttributes redirectAttributes)
+      throws InterruptedException, IOException {
     boolean isMultipart = ServletFileUpload.isMultipartContent(request);
     if (!isMultipart) {
       // Inform user about invalid request
