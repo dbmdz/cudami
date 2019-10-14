@@ -23,7 +23,7 @@
     <version.dc-commons-springaop>4.0.3</version.dc-commons-springaop>
     <version.dc-commons-springboot>4.0.3</version.dc-commons-springboot>
     <version.dc-commons-springdata>4.0.3</version.dc-commons-springdata>
-    <version.dc-commons-springmvc>4.1.1-SNAPSHOT</version.dc-commons-springmvc>
+    <version.dc-commons-springmvc>4.1.1</version.dc-commons-springmvc>
     <version.snakeyaml>1.25</version.snakeyaml>
     <version.thymeleaf-spring-data-dialect>3.4.1</version.thymeleaf-spring-data-dialect>
     <version.webjar-bootstrap>4.3.1</version.webjar-bootstrap>
