@@ -96,7 +96,7 @@
     <version.unbescape>1.1.6.RELEASE</version.unbescape>
 
     <!-- plugins -->
-    <version.jacoco-maven-plugin>0.8.4</version.jacoco-maven-plugin>
+    <version.jacoco-maven-plugin>0.8.5</version.jacoco-maven-plugin>
     <version.maven-fmt-plugin>2.9</version.maven-fmt-plugin>
     <version.maven-gpg-plugin>1.6</version.maven-gpg-plugin>
     <version.maven-surefire-plugin>3.0.0-M3</version.maven-surefire-plugin>
