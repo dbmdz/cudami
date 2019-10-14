@@ -2,6 +2,7 @@ cudami:
   defaultLocale-gui: en
   server:
     address: http://localhost:9000
+    url: http://localhost:9000
 
 info:
   app:
