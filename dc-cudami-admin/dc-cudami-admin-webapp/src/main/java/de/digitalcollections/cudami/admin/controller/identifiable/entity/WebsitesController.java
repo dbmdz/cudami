@@ -10,7 +10,6 @@ import de.digitalcollections.cudami.admin.business.api.service.identifiable.enti
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import java.net.URI;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -94,31 +92,25 @@ public class WebsitesController extends AbstractController {
 
   @PostMapping("/api/websites/new")
   public ResponseEntity save(@RequestBody Website website) throws IdentifiableServiceException {
-    Website websiteDb = null;
-    HttpHeaders headers = new HttpHeaders();
     try {
-      websiteDb = service.save(website);
-      headers.setLocation(URI.create("/websites/" + websiteDb.getUuid().toString()));
+      Website websiteDb = service.save(website);
+      return ResponseEntity.ok(websiteDb);
     } catch (Exception e) {
       LOGGER.error("Cannot save website: ", e);
-      headers.setLocation(URI.create("/websites/new"));
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
-    return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }
 
   @PutMapping("/api/websites/{uuid}")
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Website website)
       throws IdentifiableServiceException {
-    HttpHeaders headers = new HttpHeaders();
     try {
-      service.update(website);
-      headers.setLocation(URI.create("/websites/" + uuid));
+      Website websiteDb = service.update(website);
+      return ResponseEntity.ok(websiteDb);
     } catch (Exception e) {
-      String message = "Cannot save website with uuid=" + uuid + ": " + e;
-      LOGGER.error(message, e);
-      headers.setLocation(URI.create("/websites/" + uuid + "/edit"));
+      LOGGER.error("Cannot save website with uuid={}", uuid, e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
-    return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }
 
   @GetMapping("/websites/{uuid}")
