@@ -34,11 +34,11 @@ export async function saveIdentifiable (contextPath, identifiable, parentType, p
         'Content-Type': 'application/json',
         credentials: 'same-origin'
       },
-      method: 'POST',
+      method: 'POST'
     });
-    if (response.redirected) {
-      window.location.href = response.url;
-    }
+    const json = await response.json();
+    const viewUrl = `${contextPath}${type.toLowerCase()}s/${json.uuid}`;
+    window.location.href = viewUrl;
   } catch(err) {
     console.log('An error occured');
   }
@@ -53,11 +53,11 @@ export async function updateIdentifiable (contextPath, identifiable, type) {
         'Content-Type': 'application/json',
         credentials: 'same-origin'
       },
-      method: 'PUT',
+      method: 'PUT'
     });
-    if (response.redirected) {
-      window.location.href = response.url;
-    }
+    const json = await response.json();
+    const viewUrl = `${contextPath}${type.toLowerCase()}s/${json.uuid}`;
+    window.location.href = viewUrl;
   } catch(err) {
     console.log('An error occured');
   }
