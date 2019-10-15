@@ -21,7 +21,7 @@ public interface CudamiClient {
 
   public static CudamiClient build(String serverUrl) {
     ObjectMapper mapper = new DigitalCollectionsObjectMapper();
-    CudamiClient backend =
+    CudamiClient client =
         ReflectiveFeign.builder()
             .decoder(new JacksonDecoder(mapper))
             .encoder(new JacksonEncoder(mapper))
@@ -30,7 +30,7 @@ public interface CudamiClient {
             .logLevel(Logger.Level.BASIC)
             .retryer(new Retryer.Default())
             .target(CudamiClient.class, serverUrl);
-    return backend;
+    return client;
   }
 
   @RequestLine("GET /v2/languages/default")
