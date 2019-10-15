@@ -96,7 +96,7 @@ public class ContentTreesController extends AbstractController {
       throws IdentifiableServiceException {
     try {
       ContentTree contentTreeDb = service.save(contentTree);
-      return ResponseEntity.ok(contentTreeDb);
+      return ResponseEntity.status(HttpStatus.CREATED).body(contentTreeDb);
     } catch (Exception e) {
       LOGGER.error("Cannot save content tree: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);

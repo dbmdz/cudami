@@ -94,7 +94,7 @@ public class WebsitesController extends AbstractController {
   public ResponseEntity save(@RequestBody Website website) throws IdentifiableServiceException {
     try {
       Website websiteDb = service.save(website);
-      return ResponseEntity.ok(websiteDb);
+      return ResponseEntity.status(HttpStatus.CREATED).body(websiteDb);
     } catch (Exception e) {
       LOGGER.error("Cannot save website: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);

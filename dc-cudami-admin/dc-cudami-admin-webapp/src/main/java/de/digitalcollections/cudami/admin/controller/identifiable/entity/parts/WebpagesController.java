@@ -110,7 +110,7 @@ public class WebpagesController extends AbstractController {
       } else {
         webpageDb = service.saveWithParentWebpage(webpage, parentUuid);
       }
-      return ResponseEntity.ok(webpageDb);
+      return ResponseEntity.status(HttpStatus.CREATED).body(webpageDb);
     } catch (Exception e) {
       if (parentType.equals("website")) {
         LOGGER.error("Cannot save top-level webpage: ", e);

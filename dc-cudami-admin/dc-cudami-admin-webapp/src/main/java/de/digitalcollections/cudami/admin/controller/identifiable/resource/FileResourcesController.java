@@ -104,7 +104,7 @@ public class FileResourcesController extends AbstractController {
       throws IdentifiableServiceException {
     try {
       FileResource fileResourceDb = service.save(fileResource);
-      return ResponseEntity.ok(fileResourceDb);
+      return ResponseEntity.status(HttpStatus.CREATED).body(fileResourceDb);
     } catch (Exception e) {
       LOGGER.error("Cannot save fileresource: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);

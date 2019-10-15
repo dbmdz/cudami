@@ -105,7 +105,7 @@ public class ContentNodesController extends AbstractController {
       } else {
         contentNodeDb = service.saveWithParentContentNode(contentNode, parentUuid);
       }
-      return ResponseEntity.ok(contentNodeDb);
+      return ResponseEntity.status(HttpStatus.CREATED).body(contentNodeDb);
     } catch (Exception e) {
       if (parentType.equals("contentTree")) {
         LOGGER.error("Cannot save top-level content node: ", e);

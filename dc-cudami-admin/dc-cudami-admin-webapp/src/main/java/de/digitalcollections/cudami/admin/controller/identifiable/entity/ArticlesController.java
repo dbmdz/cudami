@@ -95,7 +95,7 @@ public class ArticlesController extends AbstractController {
   public ResponseEntity save(@RequestBody Article article) throws IdentifiableServiceException {
     try {
       Article articleDb = service.save(article);
-      return ResponseEntity.ok(articleDb);
+      return ResponseEntity.status(HttpStatus.CREATED).body(articleDb);
     } catch (Exception e) {
       LOGGER.error("Cannot save article: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
