@@ -6,7 +6,7 @@ import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
-import de.digitalcollections.cudami.client.CudamiAdminClient;
+import de.digitalcollections.cudami.client.CudamiCollectionsClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -40,12 +40,12 @@ public class CollectionsController extends AbstractController {
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionsController.class);
 
   LocaleRepository localeRepository;
-  CudamiAdminClient cudamiAdminClient;
+  CudamiCollectionsClient cudamiCollectionsClient;
 
   @Autowired
-  public CollectionsController(LocaleRepository localeRepository, CudamiAdminClient cudamiAdminClient) {
+  public CollectionsController(LocaleRepository localeRepository, CudamiCollectionsClient cudamiCollectionsClient) {
     this.localeRepository = localeRepository;
-    this.cudamiAdminClient = cudamiAdminClient;
+    this.cudamiCollectionsClient = cudamiCollectionsClient;
   }
 
   @ModelAttribute("menu")
@@ -56,27 +56,25 @@ public class CollectionsController extends AbstractController {
   @GetMapping("/api/collections/new")
   @ResponseBody
   public Collection create() {
-    return cudamiAdminClient.createCollection();
+    return cudamiCollectionsClient.createCollection();
   }
 
   @PostMapping("/api/collections/new")
   public ResponseEntity save(@RequestBody Collection collection, @RequestParam("parentUuid") UUID parentUuid) throws IdentifiableServiceException {
     Collection collectionDb;
-    HttpHeaders headers = new HttpHeaders();
     try {
-      collectionDb = cudamiAdminClient.saveCollectionWithParentCollection(collection, parentUuid);
-      headers.setLocation(URI.create("/collections/" + collectionDb.getUuid().toString()));
+      collectionDb = cudamiCollectionsClient.saveCollectionWithParentCollection(collection, parentUuid);
+      return ResponseEntity.ok(collectionDb);
     } catch (Exception e) {
       LOGGER.error("Cannot save collection: ", e);
-      headers.setLocation(URI.create("/collections/new"));
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
-    return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }
 
   @GetMapping("/api/collections/{uuid}")
   @ResponseBody
   public Collection get(@PathVariable UUID uuid) throws HttpException {
-    return cudamiAdminClient.getCollection(uuid);
+    return cudamiCollectionsClient.getCollection(uuid);
   }
 
   @PutMapping("/api/collections/{uuid}")
@@ -84,7 +82,7 @@ public class CollectionsController extends AbstractController {
     throws IdentifiableServiceException {
     HttpHeaders headers = new HttpHeaders();
     try {
-      cudamiAdminClient.updateCollection(collection);
+      cudamiCollectionsClient.updateCollection(collection);
       headers.setLocation(URI.create("/collections/" + uuid));
     } catch (Exception e) {
       String message = "Cannot save collection with uuid=" + uuid + ": " + e;
@@ -97,7 +95,7 @@ public class CollectionsController extends AbstractController {
   @GetMapping("/collections")
   public String list(Model model, @PageableDefault(sort = {"label"}, size = 25) Pageable pageable) {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
-    final PageResponse pageResponse = cudamiAdminClient.findCollections(pageRequest);
+    final PageResponse pageResponse = cudamiCollectionsClient.findCollections(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
     model.addAttribute("page", new PageWrapper(page, "/collections"));
     return "collections/list";
@@ -105,7 +103,7 @@ public class CollectionsController extends AbstractController {
 
   @GetMapping("/collections/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) throws HttpException {
-    Collection collection = cudamiAdminClient.getCollection(uuid);
+    Collection collection = cudamiCollectionsClient.getCollection(uuid);
     model.addAttribute("availableLanguages", collection.getLabel().getLocales());
     model.addAttribute("collection", collection);
     return "collections/view";
@@ -120,7 +118,7 @@ public class CollectionsController extends AbstractController {
 
   @GetMapping("/collections/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
-    Collection collection = cudamiAdminClient.getCollection(uuid);
+    Collection collection = cudamiCollectionsClient.getCollection(uuid);
     model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     model.addAttribute("uuid", collection.getUuid());
     return "collections/edit";

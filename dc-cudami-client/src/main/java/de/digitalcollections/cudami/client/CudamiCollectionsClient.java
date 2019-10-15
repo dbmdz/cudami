@@ -21,11 +21,11 @@ import feign.jackson.JacksonEncoder;
 import feign.slf4j.Slf4jLogger;
 import java.util.UUID;
 
-public interface CudamiAdminClient {
+public interface CudamiCollectionsClient {
 
-  public static CudamiAdminClient build(String serverUrl) {
+  public static CudamiCollectionsClient build(String serverUrl) {
     ObjectMapper mapper = new DigitalCollectionsObjectMapper();
-    CudamiAdminClient backend
+    CudamiCollectionsClient backend
       = ReflectiveFeign.builder()
         .decoder(new JacksonDecoder(mapper))
         .encoder(new JacksonEncoder(mapper))
@@ -33,7 +33,7 @@ public interface CudamiAdminClient {
         .logger(new Slf4jLogger())
         .logLevel(Logger.Level.BASIC)
         .retryer(new Retryer.Default())
-        .target(CudamiAdminClient.class, serverUrl);
+        .target(CudamiCollectionsClient.class, serverUrl);
     return backend;
   }
 
