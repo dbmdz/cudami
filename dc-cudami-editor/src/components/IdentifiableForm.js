@@ -26,7 +26,7 @@ import initI18n from '../i18n'
 class IdentifiableForm extends Component {
   constructor(props) {
     super(props)
-    this.identifiablesWithLongText = ['article', 'webpage']
+    this.identifiablesWithLongText = ['article', 'collection', 'webpage']
     this.state = {
       activeLanguage: props.activeLanguage,
       availableLanguages: [],
