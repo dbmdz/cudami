@@ -11,7 +11,6 @@ import de.digitalcollections.model.api.identifiable.entity.Article;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import java.net.URI;
 import java.util.LinkedHashSet;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -20,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -95,31 +93,25 @@ public class ArticlesController extends AbstractController {
 
   @PostMapping("/api/articles/new")
   public ResponseEntity save(@RequestBody Article article) throws IdentifiableServiceException {
-    Article articleDb = null;
-    HttpHeaders headers = new HttpHeaders();
     try {
-      articleDb = service.save(article);
-      headers.setLocation(URI.create("/articles/" + articleDb.getUuid().toString()));
+      Article articleDb = service.save(article);
+      return ResponseEntity.status(HttpStatus.CREATED).body(articleDb);
     } catch (Exception e) {
       LOGGER.error("Cannot save article: ", e);
-      headers.setLocation(URI.create("/articles/new"));
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
-    return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }
 
   @PutMapping("/api/articles/{uuid}")
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Article article)
       throws IdentifiableServiceException {
-    HttpHeaders headers = new HttpHeaders();
     try {
-      service.update(article);
-      headers.setLocation(URI.create("/articles/" + uuid));
+      Article articleDb = service.update(article);
+      return ResponseEntity.ok(articleDb);
     } catch (Exception e) {
-      String message = "Cannot save article with uuid=" + uuid + ": " + e;
-      LOGGER.error(message, e);
-      headers.setLocation(URI.create("/articles/" + uuid + "/edit"));
+      LOGGER.error("Cannot save article with uuid={}", uuid, e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
-    return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }
 
   @GetMapping("/articles/{uuid}")

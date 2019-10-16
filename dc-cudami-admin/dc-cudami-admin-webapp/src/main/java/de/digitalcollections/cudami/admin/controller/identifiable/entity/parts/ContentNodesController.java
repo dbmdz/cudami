@@ -11,7 +11,6 @@ import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import java.net.URI;
 import java.util.LinkedHashSet;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -20,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -100,40 +98,34 @@ public class ContentNodesController extends AbstractController {
       @RequestParam("parentType") String parentType,
       @RequestParam("parentUuid") UUID parentUuid)
       throws IdentifiableServiceException {
-    ContentNode contentNodeDb = null;
-    HttpHeaders headers = new HttpHeaders();
     try {
+      ContentNode contentNodeDb = null;
       if (parentType.equals("contentTree")) {
         contentNodeDb = service.saveWithParentContentTree(contentNode, parentUuid);
-        headers.setLocation(URI.create("/contentnodes/" + contentNodeDb.getUuid().toString()));
-      } else if (parentType.equals("contentNode")) {
+      } else {
         contentNodeDb = service.saveWithParentContentNode(contentNode, parentUuid);
-        headers.setLocation(URI.create("/contentnodes/" + contentNodeDb.getUuid().toString()));
       }
+      return ResponseEntity.status(HttpStatus.CREATED).body(contentNodeDb);
     } catch (Exception e) {
       if (parentType.equals("contentTree")) {
         LOGGER.error("Cannot save top-level content node: ", e);
       } else if (parentType.equals("contentNode")) {
         LOGGER.error("Cannot save content node: ", e);
       }
-      headers.setLocation(URI.create("/contentnodes/new"));
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
-    return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }
 
   @PutMapping("/api/contentnodes/{uuid}")
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody ContentNode contentNode)
       throws IdentifiableServiceException {
-    HttpHeaders headers = new HttpHeaders();
     try {
-      service.update(contentNode);
-      headers.setLocation(URI.create("/contentnodes/" + uuid));
+      ContentNode contentNodeDb = (ContentNode) service.update(contentNode);
+      return ResponseEntity.ok(contentNodeDb);
     } catch (Exception e) {
-      String message = "Cannot save content node with uuid=" + uuid + ": " + e;
-      LOGGER.error(message, e);
-      headers.setLocation(URI.create("/contentnodes/" + uuid + "/edit"));
+      LOGGER.error("Cannot save content node with uuid={}", uuid, e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
-    return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }
 
   @GetMapping("/contentnodes/{uuid}")

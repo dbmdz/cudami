@@ -10,7 +10,6 @@ import de.digitalcollections.cudami.admin.business.api.service.identifiable.enti
 import de.digitalcollections.model.api.identifiable.entity.ContentTree;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import java.net.URI;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -96,31 +94,25 @@ public class ContentTreesController extends AbstractController {
   @PostMapping("/api/contenttrees/new")
   public ResponseEntity save(@RequestBody ContentTree contentTree)
       throws IdentifiableServiceException {
-    ContentTree contentTreeDb = null;
-    HttpHeaders headers = new HttpHeaders();
     try {
-      contentTreeDb = service.save(contentTree);
-      headers.setLocation(URI.create("/contenttrees/" + contentTreeDb.getUuid().toString()));
+      ContentTree contentTreeDb = service.save(contentTree);
+      return ResponseEntity.status(HttpStatus.CREATED).body(contentTreeDb);
     } catch (Exception e) {
       LOGGER.error("Cannot save content tree: ", e);
-      headers.setLocation(URI.create("/contenttrees/new"));
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
-    return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }
 
   @PutMapping("/api/contenttrees/{uuid}")
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody ContentTree contentTree)
       throws IdentifiableServiceException {
-    HttpHeaders headers = new HttpHeaders();
     try {
-      service.update(contentTree);
-      headers.setLocation(URI.create("/contenttrees/" + uuid));
+      ContentTree contentTreeDb = service.update(contentTree);
+      return ResponseEntity.ok(contentTreeDb);
     } catch (Exception e) {
-      String message = "Cannot save content tree with uuid=" + uuid + ": " + e;
-      LOGGER.error(message, e);
-      headers.setLocation(URI.create("/contenttrees/" + uuid + "/edit"));
+      LOGGER.error("Cannot save content tree with uuid={}", uuid, e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
-    return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }
 
   @GetMapping("/contenttrees/{uuid}")

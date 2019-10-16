@@ -12,7 +12,6 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.tomcat.util.http.fileupload.FileItemIterator;
@@ -25,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -104,36 +102,25 @@ public class FileResourcesController extends AbstractController {
   @PostMapping("/api/fileresources/new")
   public ResponseEntity save(@RequestBody FileResource fileResource)
       throws IdentifiableServiceException {
-    FileResource fileResourceDb = null;
-    HttpHeaders headers = new HttpHeaders();
     try {
-      fileResourceDb = service.save(fileResource);
-      headers.setLocation(URI.create("/fileresources/" + fileResourceDb.getUuid().toString()));
+      FileResource fileResourceDb = service.save(fileResource);
+      return ResponseEntity.status(HttpStatus.CREATED).body(fileResourceDb);
     } catch (Exception e) {
       LOGGER.error("Cannot save fileresource: ", e);
-      headers.setLocation(URI.create("/fileresources/new"));
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
-    return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }
 
   @PutMapping("/api/fileresources/{uuid}")
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody FileResource fileResource)
       throws IdentifiableServiceException {
-    HttpHeaders headers = new HttpHeaders();
     try {
-      // get object from db
-      FileResource fileResourceDb = service.get(uuid);
-      // just update the fields, that were editable
-      fileResourceDb.setLabel(fileResource.getLabel());
-      fileResourceDb.setDescription(fileResource.getDescription());
-      service.update(fileResourceDb);
-      headers.setLocation(URI.create("/fileresources/" + uuid));
+      FileResource fileResourceDb = service.update(fileResource);
+      return ResponseEntity.ok(fileResourceDb);
     } catch (Exception e) {
-      String message = "Cannot save fileresource with uuid=" + uuid + ": " + e;
-      LOGGER.error(message, e);
-      headers.setLocation(URI.create("/fileresources/" + uuid + "/edit"));
+      LOGGER.error("Cannot save fileresource with uuid={}", uuid, e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
-    return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }
 
   @PostMapping("/api/fileresources/new/upload")
