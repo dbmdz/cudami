@@ -5,14 +5,14 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:text="|#{articles}: #{article}|">Articles: Article</title>
+    <title th:text="|#{collections}: #{collection}|">Collections: Collection</title>
   </head>
   <body>
-    <section layout:fragment="content" th:object="${article}">
+    <section layout:fragment="content" th:object="${collection}">
 
       <div class="row">
         <div class="col-sm-6">
-          <h1 th:text="#{article}">Article</h1>
+          <h1 th:text="#{collection}">Collection</h1>
         </div>
         <div class="col-sm-6">
           <div class="float-right">
@@ -49,9 +49,9 @@
             <div th:each="language,iter : ${availableLanguages}" th:id="${language}" class="tab-pane" th:classappend="${iter.index} == 0 ? active">
               <div class="card">
                 <div class="card-body bg-light">
-                  <div th:replace="fragments/identifiable::renderTeaser(${article}, ${language})"></div>
+                  <div th:replace="fragments/identifiable::renderTeaser(${collection}, ${language})"></div>
                 </div>
-                <th:block th:if="*{text} and ${article.text.containsKey(language)}">
+                <th:block th:if="*{text} and ${collection.text.containsKey(language)}">
                   <div class="card-body">
                     <div th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(*{text}, ${language})"></div>
                   </div>
