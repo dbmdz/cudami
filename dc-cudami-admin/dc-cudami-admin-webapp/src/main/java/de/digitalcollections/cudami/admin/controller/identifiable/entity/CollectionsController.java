@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /** Controller for collection management pages. */
@@ -61,13 +60,11 @@ public class CollectionsController extends AbstractController {
   }
 
   @PostMapping("/api/collections/new")
-  public ResponseEntity save(
-      @RequestBody Collection collection, @RequestParam("parentUuid") UUID parentUuid)
+  public ResponseEntity save(@RequestBody Collection collection)
       throws IdentifiableServiceException {
     Collection collectionDb;
     try {
-      collectionDb =
-          cudamiCollectionsClient.saveCollectionWithParentCollection(collection, parentUuid);
+      collectionDb = cudamiCollectionsClient.saveCollection(collection);
       return ResponseEntity.ok(collectionDb);
     } catch (Exception e) {
       LOGGER.error("Cannot save collection: ", e);

@@ -70,6 +70,10 @@ public interface CudamiCollectionsClient {
   Collection saveCollectionWithParentCollection(
       Collection collection, @Param("parentCollectionUuid") UUID parentCollectionUuid);
 
+  @RequestLine("POST /latest/collections")
+  @Headers("Content-Type: application/json")
+  Collection saveCollection(Collection collection);
+
   default Collection updateCollection(Collection collection) {
     return updateCollection(collection.getUuid(), collection);
   }
