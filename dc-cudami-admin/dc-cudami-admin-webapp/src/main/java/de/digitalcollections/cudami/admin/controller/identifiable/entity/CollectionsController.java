@@ -43,7 +43,8 @@ public class CollectionsController extends AbstractController {
   CudamiCollectionsClient cudamiCollectionsClient;
 
   @Autowired
-  public CollectionsController(LocaleRepository localeRepository, CudamiCollectionsClient cudamiCollectionsClient) {
+  public CollectionsController(
+      LocaleRepository localeRepository, CudamiCollectionsClient cudamiCollectionsClient) {
     this.localeRepository = localeRepository;
     this.cudamiCollectionsClient = cudamiCollectionsClient;
   }
@@ -60,10 +61,13 @@ public class CollectionsController extends AbstractController {
   }
 
   @PostMapping("/api/collections/new")
-  public ResponseEntity save(@RequestBody Collection collection, @RequestParam("parentUuid") UUID parentUuid) throws IdentifiableServiceException {
+  public ResponseEntity save(
+      @RequestBody Collection collection, @RequestParam("parentUuid") UUID parentUuid)
+      throws IdentifiableServiceException {
     Collection collectionDb;
     try {
-      collectionDb = cudamiCollectionsClient.saveCollectionWithParentCollection(collection, parentUuid);
+      collectionDb =
+          cudamiCollectionsClient.saveCollectionWithParentCollection(collection, parentUuid);
       return ResponseEntity.ok(collectionDb);
     } catch (Exception e) {
       LOGGER.error("Cannot save collection: ", e);
@@ -79,7 +83,7 @@ public class CollectionsController extends AbstractController {
 
   @PutMapping("/api/collections/{uuid}")
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Collection collection)
-    throws IdentifiableServiceException {
+      throws IdentifiableServiceException {
     HttpHeaders headers = new HttpHeaders();
     try {
       cudamiCollectionsClient.updateCollection(collection);
@@ -93,7 +97,12 @@ public class CollectionsController extends AbstractController {
   }
 
   @GetMapping("/collections")
-  public String list(Model model, @PageableDefault(sort = {"label"}, size = 25) Pageable pageable) {
+  public String list(
+      Model model,
+      @PageableDefault(
+              sort = {"label"},
+              size = 25)
+          Pageable pageable) {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = cudamiCollectionsClient.findCollections(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
@@ -110,9 +119,9 @@ public class CollectionsController extends AbstractController {
   }
 
   @GetMapping("/collections/new")
-  public String create(Model model, @RequestParam("parentUuid") String parentUuid) {
+  public String create(Model model) {
     model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
-    model.addAttribute("parentUuid", parentUuid);
+    // model.addAttribute("parentUuid", parentUuid);
     return "collections/create";
   }
 
