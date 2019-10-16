@@ -11,7 +11,6 @@ import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import java.net.URI;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -53,44 +51,31 @@ public class CollectionsController extends AbstractController {
     return "collections";
   }
 
+  @GetMapping("/collections/new")
+  public String create(Model model) {
+    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
+    // model.addAttribute("parentUuid", parentUuid);
+    return "collections/create";
+  }
+
   @GetMapping("/api/collections/new")
   @ResponseBody
   public Collection create() {
     return cudamiCollectionsClient.createCollection();
   }
 
-  @PostMapping("/api/collections/new")
-  public ResponseEntity save(@RequestBody Collection collection)
-      throws IdentifiableServiceException {
-    Collection collectionDb;
-    try {
-      collectionDb = cudamiCollectionsClient.saveCollection(collection);
-      return ResponseEntity.ok(collectionDb);
-    } catch (Exception e) {
-      LOGGER.error("Cannot save collection: ", e);
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-    }
+  @GetMapping("/collections/{uuid}/edit")
+  public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
+    Collection collection = cudamiCollectionsClient.getCollection(uuid);
+    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
+    model.addAttribute("uuid", collection.getUuid());
+    return "collections/edit";
   }
 
   @GetMapping("/api/collections/{uuid}")
   @ResponseBody
   public Collection get(@PathVariable UUID uuid) throws HttpException {
     return cudamiCollectionsClient.getCollection(uuid);
-  }
-
-  @PutMapping("/api/collections/{uuid}")
-  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Collection collection)
-      throws IdentifiableServiceException {
-    HttpHeaders headers = new HttpHeaders();
-    try {
-      cudamiCollectionsClient.updateCollection(collection);
-      headers.setLocation(URI.create("/collections/" + uuid));
-    } catch (Exception e) {
-      String message = "Cannot save collection with uuid=" + uuid + ": " + e;
-      LOGGER.error(message, e);
-      headers.setLocation(URI.create("/collections/" + uuid + "/edit"));
-    }
-    return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
   }
 
   @GetMapping("/collections")
@@ -107,26 +92,35 @@ public class CollectionsController extends AbstractController {
     return "collections/list";
   }
 
+  @PostMapping("/api/collections/new")
+  public ResponseEntity save(@RequestBody Collection collection)
+      throws IdentifiableServiceException {
+    try {
+      Collection collectionDb = cudamiCollectionsClient.saveCollection(collection);
+      return ResponseEntity.status(HttpStatus.CREATED).body(collectionDb);
+    } catch (Exception e) {
+      LOGGER.error("Cannot save collection: ", e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    }
+  }
+
+  @PutMapping("/api/collections/{uuid}")
+  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Collection collection)
+      throws IdentifiableServiceException {
+    try {
+      Collection collectionDb = cudamiCollectionsClient.updateCollection(collection);
+      return ResponseEntity.ok(collectionDb);
+    } catch (Exception e) {
+      LOGGER.error("Cannot save collection with uuid={}", uuid, e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    }
+  }
+
   @GetMapping("/collections/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) throws HttpException {
     Collection collection = cudamiCollectionsClient.getCollection(uuid);
     model.addAttribute("availableLanguages", collection.getLabel().getLocales());
     model.addAttribute("collection", collection);
     return "collections/view";
-  }
-
-  @GetMapping("/collections/new")
-  public String create(Model model) {
-    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
-    // model.addAttribute("parentUuid", parentUuid);
-    return "collections/create";
-  }
-
-  @GetMapping("/collections/{uuid}/edit")
-  public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
-    Collection collection = cudamiCollectionsClient.getCollection(uuid);
-    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
-    model.addAttribute("uuid", collection.getUuid());
-    return "collections/edit";
   }
 }
