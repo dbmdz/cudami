@@ -6,6 +6,7 @@ import ArticleForm from './ArticleForm'
 import ContentNodeForm from './ContentNodeForm'
 import ContentTreeForm from './ContentTreeForm'
 import CollectionForm from './CollectionForm'
+import CorporationForm from './CorporationForm'
 import FileResourceForm from './FileResourceForm'
 import FormErrors from './FormErrors'
 import WebpageForm from './WebpageForm'
@@ -124,6 +125,7 @@ class IdentifiableForm extends Component {
       contentNode: ContentNodeForm,
       contentTree: ContentTreeForm,
       collection: CollectionForm,
+      corporation: CorporationForm,
       fileResource: FileResourceForm,
       webpage: WebpageForm,
       website: WebsiteForm,

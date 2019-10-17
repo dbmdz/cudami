@@ -5,7 +5,7 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:text="|#{collections}: #{collection_create}|">Articles: Create a new collection</title>
+    <title th:text="|#{corporations}: #{corporation_edit}|">Articles: Edit corporation</title>
   </head>
   <body>
     <section layout:fragment="content">
@@ -16,8 +16,9 @@
           activeLanguage: /*[[${activeLanguage}]]*/,
           apiContextPath: /*[[@{/}]]*/ '',
           id: "editor",
-          type: "collection",
-          uiLocale: /*[[${#locale.language}]]*/
+          type: "corporation",
+          uiLocale: /*[[${#locale.language}]]*/,
+          uuid: /*[[${uuid}]]*/
         });
       </script>
     </section>
