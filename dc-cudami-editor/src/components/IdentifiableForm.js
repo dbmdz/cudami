@@ -28,6 +28,7 @@ import initI18n from '../i18n';
 class IdentifiableForm extends Component {
   constructor(props){
     super(props);
+    this.identifiablesWithLongText = ['article', 'webpage'];
     this.state = {
       activeLanguage: props.activeLanguage,
       availableLanguages: [],
@@ -54,7 +55,7 @@ class IdentifiableForm extends Component {
       label: {
         [this.state.activeLanguage]: ''
       },
-      text: ['article', 'webpage'].includes(this.props.type) ? {} : undefined,
+      text: this.identifiablesWithLongText.includes(this.props.type) ? {} : undefined,
       ...identifiable
     };
     this.setState({
