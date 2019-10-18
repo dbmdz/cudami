@@ -1,12 +1,9 @@
-import React from 'react';
-import {
-  NavItem,
-  NavLink
-} from 'reactstrap';
-import { useTranslation } from 'react-i18next';
+import React from 'react'
+import {NavItem, NavLink} from 'reactstrap'
+import {useTranslation} from 'react-i18next'
 
-const LanguageTab = (props) => {
-  const { t } = useTranslation();
+const LanguageTab = props => {
+  const {t} = useTranslation()
   return (
     <NavItem>
       <NavLink
@@ -16,7 +13,7 @@ const LanguageTab = (props) => {
         {t(`languageNames:${props.language}`)}
       </NavLink>
     </NavItem>
-  );
+  )
 }
 
-export default LanguageTab;
+export default LanguageTab

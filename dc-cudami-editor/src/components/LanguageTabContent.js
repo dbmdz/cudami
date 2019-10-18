@@ -1,18 +1,14 @@
-import React from 'react';
-import {
-  Card,
-  CardBody,
-  TabPane
-} from 'reactstrap';
+import React from 'react'
+import {Card, CardBody, TabPane} from 'reactstrap'
 
-import FormEditor from './FormEditor';
-import FormLabelInput from './FormLabelInput';
+import FormEditor from './FormEditor'
+import FormLabelInput from './FormLabelInput'
 
-const LanguageTabContent = (props) => {
+const LanguageTabContent = props => {
   return (
     <TabPane tabId={props.language}>
       <Card>
-        <CardBody className='bg-light'>
+        <CardBody className="bg-light">
           <FormLabelInput
             label={props.label}
             language={props.language}
@@ -22,18 +18,16 @@ const LanguageTabContent = (props) => {
           />
           <FormEditor
             document={props.description}
-            type='description'
+            type="description"
             onUpdate={document => {
               props.onUpdate('description', document)
             }}
           />
         </CardBody>
-        {props.children && <CardBody>
-          {props.children}
-        </CardBody>}
+        {props.children && <CardBody>{props.children}</CardBody>}
       </Card>
     </TabPane>
-  );
+  )
 }
 
-export default LanguageTabContent;
+export default LanguageTabContent

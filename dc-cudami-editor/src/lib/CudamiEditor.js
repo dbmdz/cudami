@@ -1,10 +1,10 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import 'babel-polyfill';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import 'babel-polyfill'
 
-import IdentifiableForm from '../components/IdentifiableForm';
+import IdentifiableForm from '../components/IdentifiableForm'
 
-export default function (config) {
+export default function(config) {
   ReactDOM.render(
     <IdentifiableForm
       activeLanguage={config.activeLanguage}
@@ -17,5 +17,5 @@ export default function (config) {
       uuid={config.uuid}
     />,
     document.getElementById(config.id)
-  );
-};
+  )
+}

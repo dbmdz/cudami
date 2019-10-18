@@ -1,7 +1,7 @@
-import React from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React from 'react'
+import 'bootstrap/dist/css/bootstrap.min.css'
 
-import IdentifiableForm from './components/IdentifiableForm';
+import IdentifiableForm from './components/IdentifiableForm'
 
 const App = () => {
   return (
@@ -13,7 +13,7 @@ const App = () => {
       uiLocale="en"
       uuid="mock"
     />
-  );
-};
+  )
+}
 
-export default App;
+export default App

@@ -1,48 +1,41 @@
-import React, { Component } from 'react';
-import {
-  Editor,
-  Floater,
-  MenuBar
-} from '@aeaton/react-prosemirror';
-import {
-  Label
-} from 'reactstrap';
-import { withTranslation } from 'react-i18next';
+import React, {Component} from 'react'
+import {Editor, Floater, MenuBar} from '@aeaton/react-prosemirror'
+import {Label} from 'reactstrap'
+import {withTranslation} from 'react-i18next'
 
-import './FormEditor.css';
-import FormEditorMenu from './FormEditorMenu';
-import {
-  menu,
-  options
-} from '../config';
+import './FormEditor.css'
+import FormEditorMenu from './FormEditorMenu'
+import {menu, options} from '../config'
 
 class FormEditor extends Component {
-  constructor(props){
-    super(props);
+  constructor(props) {
+    super(props)
     this.editorOptions = {
       ...options,
-      doc: props.document ? options.schema.nodeFromJSON(props.document) : undefined
-    };
+      doc: props.document
+        ? options.schema.nodeFromJSON(props.document)
+        : undefined,
+    }
   }
 
-  render(){
-    const { t } = this.props;
-    const translatedMenu = menu(t);
+  render() {
+    const {t} = this.props
+    const translatedMenu = menu(t)
     return (
       <>
-        <Label className='font-weight-bold'>{t(this.props.type)}</Label>
-        <div className='text-editor'>
+        <Label className="font-weight-bold">{t(this.props.type)}</Label>
+        <div className="text-editor">
           <Editor
             options={this.editorOptions}
             onChange={doc => {
-              this.props.onUpdate(JSON.parse(JSON.stringify(doc)));
+              this.props.onUpdate(JSON.parse(JSON.stringify(doc)))
             }}
-            render={({ editor, view }) => (
+            render={({editor, view}) => (
               <>
                 <FormEditorMenu menu={translatedMenu} view={view} />
 
                 <Floater view={view}>
-                  <MenuBar menu={{ marks: translatedMenu.marks }} view={view} />
+                  <MenuBar menu={{marks: translatedMenu.marks}} view={view} />
                 </Floater>
 
                 {editor}
@@ -51,8 +44,8 @@ class FormEditor extends Component {
           />
         </div>
       </>
-    );
+    )
   }
 }
 
-export default withTranslation()(FormEditor);
+export default withTranslation()(FormEditor)

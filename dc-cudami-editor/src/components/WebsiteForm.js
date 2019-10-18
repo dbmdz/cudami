@@ -1,77 +1,89 @@
-import React from 'react';
-import {
-  Col,
-  Form,
-  Nav,
-  Row,
-  TabContent
-} from 'reactstrap';
-import { useTranslation } from 'react-i18next';
+import React from 'react'
+import {Col, Form, Nav, Row, TabContent} from 'reactstrap'
+import {useTranslation} from 'react-i18next'
 
-import FormIdInput from './FormIdInput';
-import FormUrlInput from './FormUrlInput';
-import FormButtons from './FormButtons';
-import LanguageAdder from './LanguageAdder';
-import LanguageTab from './LanguageTab';
-import LanguageTabContent from './LanguageTabContent';
+import FormIdInput from './FormIdInput'
+import FormUrlInput from './FormUrlInput'
+import FormButtons from './FormButtons'
+import LanguageAdder from './LanguageAdder'
+import LanguageTab from './LanguageTab'
+import LanguageTabContent from './LanguageTabContent'
 
-const WebsiteForm = (props) => {
-  const { t } = useTranslation();
+const WebsiteForm = props => {
+  const {t} = useTranslation()
   return (
-    <Form onSubmit={evt => {
-      evt.preventDefault();
-      props.onSubmit();
-    }}>
+    <Form
+      onSubmit={evt => {
+        evt.preventDefault()
+        props.onSubmit()
+      }}
+    >
       <Row>
-        <Col xs='6' sm='9'>
+        <Col xs="6" sm="9">
           <h1>
-            {props.identifiable.uuid ? t('editWebsite', {url: props.identifiable.url}) : t('createWebsite')}
+            {props.identifiable.uuid
+              ? t('editWebsite', {url: props.identifiable.url})
+              : t('createWebsite')}
           </h1>
         </Col>
-        <Col xs='6' sm='3'>
+        <Col xs="6" sm="3">
           <FormButtons />
         </Col>
       </Row>
       <Row>
-        <Col sm='12'>
+        <Col sm="12">
           <hr />
         </Col>
       </Row>
       <Row>
-        <Col sm='12'>
-          {props.identifiable.uuid && <FormIdInput id={props.identifiable.uuid} />}
+        <Col sm="12">
+          {props.identifiable.uuid && (
+            <FormIdInput id={props.identifiable.uuid} />
+          )}
           <FormUrlInput
-            onChange={evt => props.onUpdate({...props.identifiable, url: evt.target.value})}
+            onChange={evt =>
+              props.onUpdate({...props.identifiable, url: evt.target.value})
+            }
             url={props.identifiable.url}
           />
           <Nav tabs>
-            {Object.entries(props.identifiable.label).map(([language]) => <LanguageTab
-              activeLanguage={props.activeLanguage}
-              key={language}
-              language={language}
-              onClick={(language => props.onToggleLanguage(language))}
-            />)}
-            {props.canAddLanguage && <LanguageAdder onClick={props.onAddLanguage} />}
+            {Object.entries(props.identifiable.label).map(([language]) => (
+              <LanguageTab
+                activeLanguage={props.activeLanguage}
+                key={language}
+                language={language}
+                onClick={language => props.onToggleLanguage(language)}
+              />
+            ))}
+            {props.canAddLanguage && (
+              <LanguageAdder onClick={props.onAddLanguage} />
+            )}
           </Nav>
           <TabContent activeTab={props.activeLanguage}>
-            {Object.entries(props.identifiable.label).map(([language, text]) => <LanguageTabContent
-              description={props.identifiable.description[language]}
-              key={language}
-              label={text}
-              language={language}
-              onUpdate={(updateKey, updateValue) => props.onUpdate({
-                ...props.identifiable,
-                [updateKey]: {
-                  ...props.identifiable[updateKey],
-                  [language]: updateValue
-                }
-              })}
-            />)}
+            {Object.entries(props.identifiable.label).map(
+              ([language, text]) => (
+                <LanguageTabContent
+                  description={props.identifiable.description[language]}
+                  key={language}
+                  label={text}
+                  language={language}
+                  onUpdate={(updateKey, updateValue) =>
+                    props.onUpdate({
+                      ...props.identifiable,
+                      [updateKey]: {
+                        ...props.identifiable[updateKey],
+                        [language]: updateValue,
+                      },
+                    })
+                  }
+                />
+              )
+            )}
           </TabContent>
         </Col>
       </Row>
     </Form>
   )
-};
+}
 
-export default WebsiteForm;
+export default WebsiteForm
