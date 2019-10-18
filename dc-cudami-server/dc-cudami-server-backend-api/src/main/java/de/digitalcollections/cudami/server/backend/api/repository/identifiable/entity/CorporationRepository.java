@@ -2,5 +2,5 @@ package de.digitalcollections.cudami.server.backend.api.repository.identifiable.
 
 import de.digitalcollections.model.api.identifiable.entity.Corporation;
 
-/** Repository for Article persistence handling. */
+/** Repository for Corporation persistence handling. */
 public interface CorporationRepository extends EntityRepository<Corporation> {}

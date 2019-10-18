@@ -1,0 +1,112 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+
+  <head>
+    <title th:text="|#{projects}: #{project}|">Collections: Collection</title>
+  </head>
+  <body>
+    <section layout:fragment="content" th:object="${project}">
+
+      <div class="row">
+        <div class="col-sm-6">
+          <h1 th:text="#{project}">Collection</h1>
+        </div>
+        <div class="col-sm-6">
+          <div class="float-right">
+            <a class="btn btn-secondary" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12">
+          <hr/>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="container-fluid rows-striped">
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{id}">ID</label></div>
+              <div class="col-md-9"><span th:text="*{uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row main-content">
+        <div class="col-sm-12">
+          <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item" th:each="language,iter : ${availableLanguages}">
+              <a class="nav-link" th:classappend="${iter.index} == 0 ? active" th:href="${'#' + language}" data-toggle="tab" th:text="${language.getDisplayName(#locale)}" role="tab">language</a>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div th:each="language,iter : ${availableLanguages}" th:id="${language}" class="tab-pane" th:classappend="${iter.index} == 0 ? active">
+              <div class="card">
+                <div class="card-body bg-light">
+                  <div th:replace="fragments/identifiable::renderTeaser(${project}, ${language})"></div>
+                </div>
+                <th:block th:if="*{text} and ${project.text.containsKey(language)}">
+                  <div class="card-body">
+                    <div th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(*{text}, ${language})"></div>
+                  </div>
+                </th:block>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row main-content">
+        <div class="col-sm-6">
+          <h2 th:text="#{linked_data}">Linked Data</h2>
+        </div>
+        <div class="col-sm-6">
+          <div class="float-right">
+            <button type="button" class="btn btn-secondary new-button" data-toggle="modal" data-target="#select-item-dialog" th:text="#{add}">Add</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12">
+          <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
+            <thead>
+              <tr>
+                <th class="center" th:text="#{label}">Label</th>
+                <!-- TODO
+                <th class="center" th:text="#{actions}">Actions</th>
+                -->
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="relatedFileResource: ${relatedFileResources}">
+                <td>
+                  <!-- TODO
+                  <a th:href="@{'/fileresources/' + ${relatedFileResource.uuid}}" th:text="${relatedFileResource.label.text}">Label</a>
+                  -->
+                  <span th:text="${relatedFileResource.label.text}">Label</span>
+                </td>
+                <!-- TODO
+                <td class="center">
+                  <a th:href="@{'/fileresources/' + ${relatedFileResource.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
+                  <a th:href="@{'/fileresources/' + ${relatedFileResource.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
+                </td>
+                -->
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  <th:block layout:fragment="beforeBodyEnds">
+    <div th:replace="fragments/modals :: selectItemDialog"></div>
+  </th:block>
+</body>
+</html>

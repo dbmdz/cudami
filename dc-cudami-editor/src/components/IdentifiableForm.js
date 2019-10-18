@@ -9,6 +9,7 @@ import CollectionForm from './CollectionForm'
 import CorporationForm from './CorporationForm'
 import FileResourceForm from './FileResourceForm'
 import FormErrors from './FormErrors'
+import ProjectForm from './ProjectForm'
 import WebpageForm from './WebpageForm'
 import WebsiteForm from './WebsiteForm'
 import {
@@ -27,7 +28,7 @@ import initI18n from '../i18n'
 class IdentifiableForm extends Component {
   constructor(props) {
     super(props)
-    this.identifiablesWithLongText = ['article', 'collection', 'webpage']
+    this.identifiablesWithLongText = ['article', 'collection', 'corporation', 'project', 'webpage']
     this.state = {
       activeLanguage: props.activeLanguage,
       availableLanguages: [],
@@ -127,6 +128,7 @@ class IdentifiableForm extends Component {
       collection: CollectionForm,
       corporation: CorporationForm,
       fileResource: FileResourceForm,
+      project: ProjectForm,
       webpage: WebpageForm,
       website: WebsiteForm,
     }

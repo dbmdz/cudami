@@ -1,0 +1,26 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+
+  <head>
+    <title th:text="|#{projects}: #{project_edit}|">Articles: Edit project</title>
+  </head>
+  <body>
+    <section layout:fragment="content">
+      <div id="editor"></div>
+      <script th:src="@{/js/cudami-editor.bundle.js}"></script>
+      <script th:inline="javascript">
+        CudamiEditor({
+          activeLanguage: /*[[${activeLanguage}]]*/,
+          apiContextPath: /*[[@{/}]]*/ '',
+          id: "editor",
+          type: "project",
+          uiLocale: /*[[${#locale.language}]]*/,
+          uuid: /*[[${uuid}]]*/
+        });
+      </script>
+    </section>
+  </body>
+</html>
