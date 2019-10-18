@@ -1,30 +1,24 @@
-import React from 'react';
-import classNames from 'classnames';
-import {
-  DropdownItem,
-  DropdownMenu,
-  UncontrolledDropdown
-} from 'reactstrap';
+import React from 'react'
+import classNames from 'classnames'
+import {DropdownItem, DropdownMenu, UncontrolledDropdown} from 'reactstrap'
 
-import './FormEditorMenu.css';
+import './FormEditorMenu.css'
 
-const Button = ({ dispatch, fullWidth, item, state }) => {
-  const disabled = item.enable && !item.enable(state);
+const Button = ({dispatch, fullWidth, item, state}) => {
+  const disabled = item.enable && !item.enable(state)
   return (
     <button
-      className={
-        classNames({
-          active: item.active && item.active(state),
-          disabled: disabled,
-          "full-width": fullWidth,
-          "menu-button": true,
-          "text-left": fullWidth
-        })
-      }
+      className={classNames({
+        active: item.active && item.active(state),
+        disabled: disabled,
+        'full-width': fullWidth,
+        'menu-button': true,
+        'text-left': fullWidth,
+      })}
       onClick={evt => {
-        evt.preventDefault();
+        evt.preventDefault()
         if (!disabled && item.run) {
-          item.run(state, dispatch);
+          item.run(state, dispatch)
         }
       }}
       title={item.title}
@@ -32,23 +26,37 @@ const Button = ({ dispatch, fullWidth, item, state }) => {
     >
       {item.content}
     </button>
-  );
-};
+  )
+}
 
-const ButtonGroup = ({ items, view }) => {
+const ButtonGroup = ({items, view}) => {
   return (
     <span className="menu-group">
       {Object.entries(items).map(([key, item]) => {
         if (item.children) {
-          return <DropDown dispatch={view.dispatch} item={item} key={key} state={view.state} />;
+          return (
+            <DropDown
+              dispatch={view.dispatch}
+              item={item}
+              key={key}
+              state={view.state}
+            />
+          )
         }
-        return <Button dispatch={view.dispatch} item={item} key={key} state={view.state} />;
+        return (
+          <Button
+            dispatch={view.dispatch}
+            item={item}
+            key={key}
+            state={view.state}
+          />
+        )
       })}
     </span>
-  );
-};
+  )
+}
 
-const DropDown = ({ dispatch, item, state }) => {
+const DropDown = ({dispatch, item, state}) => {
   return (
     <UncontrolledDropdown>
       <Button dispatch={dispatch} item={item} state={state} />
@@ -56,19 +64,26 @@ const DropDown = ({ dispatch, item, state }) => {
         {item.children.map((child, index) => {
           return (
             <DropdownItem className="p-0" key={index} tag="div">
-              <Button fullWidth={true} dispatch={dispatch} item={child} state={state} />
+              <Button
+                fullWidth={true}
+                dispatch={dispatch}
+                item={child}
+                state={state}
+              />
             </DropdownItem>
-          );
+          )
         })}
       </DropdownMenu>
     </UncontrolledDropdown>
-  );
-};
+  )
+}
 
-const FormEditorMenu = ({ menu, view }) => (
+const FormEditorMenu = ({menu, view}) => (
   <div className="menu-bar">
-    {Object.entries(menu).map(([key, value]) => <ButtonGroup items={value} key={key} view={view} />)}
+    {Object.entries(menu).map(([key, value]) => (
+      <ButtonGroup items={value} key={key} view={view} />
+    ))}
   </div>
-);
+)
 
-export default FormEditorMenu;
+export default FormEditorMenu

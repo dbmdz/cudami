@@ -1,39 +1,39 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react'
 import {
   Button,
   Input,
   Modal,
   ModalBody,
   ModalFooter,
-  ModalHeader
-} from 'reactstrap';
-import { withTranslation } from 'react-i18next';
+  ModalHeader,
+} from 'reactstrap'
+import {withTranslation} from 'react-i18next'
 
 class LanguageAdderModal extends Component {
-  constructor(props){
-    super(props);
-    this.state = {};
+  constructor(props) {
+    super(props)
+    this.state = {}
   }
 
   add = () => {
     const selectedLanguage = this.props.availableLanguages.filter(
       language => language.name === this.state.selectedLanguage
-    )[0];
-    this.props.onClick(selectedLanguage);
+    )[0]
+    this.props.onClick(selectedLanguage)
   }
 
-  setLanguage = (selectedLanguage) => {
+  setLanguage = selectedLanguage => {
     this.setState({
-      selectedLanguage
-    });
+      selectedLanguage,
+    })
   }
 
   toggle = () => {
-    this.props.onToggle();
+    this.props.onToggle()
   }
 
-  render(){
-    const { t } = this.props;
+  render() {
+    const {t} = this.props
     return (
       <Modal
         isOpen={this.props.isOpen}
@@ -43,18 +43,24 @@ class LanguageAdderModal extends Component {
         <ModalHeader toggle={this.toggle}>{t('chooseLanguage')}</ModalHeader>
         <ModalBody>
           <Input
-            onChange={(evt) => this.setLanguage(evt.target.value)}
-            type='select'
+            onChange={evt => this.setLanguage(evt.target.value)}
+            type="select"
           >
-            {this.props.availableLanguages.map(language => <option key={language.name} value={language.name}>{language.displayName}</option>)}
+            {this.props.availableLanguages.map(language => (
+              <option key={language.name} value={language.name}>
+                {language.displayName}
+              </option>
+            ))}
           </Input>
         </ModalBody>
         <ModalFooter>
-          <Button color='primary' onClick={this.add}>{t('add')}</Button>
+          <Button color="primary" onClick={this.add}>
+            {t('add')}
+          </Button>
         </ModalFooter>
       </Modal>
-    );
+    )
   }
-};
+}
 
-export default withTranslation()(LanguageAdderModal);
+export default withTranslation()(LanguageAdderModal)

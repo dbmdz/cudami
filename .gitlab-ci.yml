@@ -1,11 +1,31 @@
 include: "https://raw.githubusercontent.com/dbmdz/development/master/ci/.gitlab-ci-base.yml"
 
 stages:
+  - check
   - build
   - test
   - publish
   - deploy
   - release
+
+###################
+### Stage check ###
+###################
+
+check_java_codestyle:
+  script:
+    - mvn com.coveo:fmt-maven-plugin:check
+  stage: check
+
+check_javascript_codestyle:
+  before_script:
+    - pushd dc-cudami-editor
+    - npm install --only=dev
+  image: "$BUILD_IMAGE_ANSIBLE_MAVEN_JDK11"
+  script:
+    - ./node_modules/.bin/prettier --check "src/**/*.js"
+    - popd
+  stage: check
 
 ####################
 ### Stage deploy ###

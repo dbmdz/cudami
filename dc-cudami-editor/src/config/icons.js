@@ -1,5 +1,5 @@
-import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import React from 'react'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {
   faAngleUp,
   faAsterisk,
@@ -22,8 +22,8 @@ import {
   faTable,
   faUnderline,
   faUndo,
-  faWindowMaximize
-} from '@fortawesome/free-solid-svg-icons';
+  faWindowMaximize,
+} from '@fortawesome/free-solid-svg-icons'
 
 export default {
   blockquote: <FontAwesomeIcon icon={faQuoteLeft} />,
@@ -50,5 +50,5 @@ export default {
   superscript: <FontAwesomeIcon icon={faSuperscript} />,
   table: <FontAwesomeIcon icon={faTable} />,
   underline: <FontAwesomeIcon icon={faUnderline} />,
-  undo: <FontAwesomeIcon icon={faUndo} />
-};
+  undo: <FontAwesomeIcon icon={faUndo} />,
+}

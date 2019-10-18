@@ -42,6 +42,8 @@
     "reactstrap": "^8.0.0"
   },
   "devDependencies": {
+    "@fisker/prettier-config": "^1.0.21",
+    "prettier": "1.18.2",
     "webpack-cli": "^3.3.6"
   },
   "browserslist": {
@@ -55,5 +57,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "prettier": "@fisker/prettier-config"
 }
