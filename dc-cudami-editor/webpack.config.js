@@ -3,7 +3,7 @@ const path = require('path');
 const config = {
   cache: true,
   devtool: 'sourcemaps',
-  entry: './src/lib/CudamiEditor.js',
+  entry: './src/lib/CudamiEditor.jsx',
   mode: 'production',
   module: {
     rules: [
@@ -13,7 +13,7 @@ const config = {
       },
       {
         exclude: /(node_modules)/,
-        test: /\.js?$/,
+        test: /\.jsx?$/,
         use: ['babel-loader']
       },
       {
@@ -39,7 +39,7 @@ const config = {
     path: null
   },
   resolve: {
-    extensions: ['.js'],
+    extensions: ['.js', '.jsx'],
   }
 }
 
