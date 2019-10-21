@@ -54,7 +54,6 @@ public class CorporationsController extends AbstractController {
   @GetMapping("/corporations/new")
   public String create(Model model) {
     model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
-    // model.addAttribute("parentUuid", parentUuid);
     return "corporations/create";
   }
 

@@ -54,7 +54,6 @@ public class CollectionsController extends AbstractController {
   @GetMapping("/collections/new")
   public String create(Model model) {
     model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
-    // model.addAttribute("parentUuid", parentUuid);
     return "collections/create";
   }
 
