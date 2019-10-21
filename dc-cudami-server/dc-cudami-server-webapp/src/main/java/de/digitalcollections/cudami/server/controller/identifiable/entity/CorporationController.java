@@ -35,7 +35,12 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The corporation controller", name = "Corporation controller")
 public class CorporationController {
 
-  @Autowired private CorporationService corporationService;
+  private CorporationService corporationService;
+
+  @Autowired
+  public CorporationController(CorporationService corporationService) {
+    this.corporationService = corporationService;
+  }
 
   @ApiMethod(description = "Get all corporations")
   @RequestMapping(

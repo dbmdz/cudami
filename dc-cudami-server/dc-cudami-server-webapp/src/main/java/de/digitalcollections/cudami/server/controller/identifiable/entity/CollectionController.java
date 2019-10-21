@@ -35,7 +35,12 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The collection controller", name = "Collection controller")
 public class CollectionController {
 
-  @Autowired private CollectionService collectionService;
+  private CollectionService collectionService;
+
+  @Autowired
+  public CollectionController(CollectionService collectionService) {
+    this.collectionService = collectionService;
+  }
 
   @ApiMethod(description = "Get all collections")
   @RequestMapping(

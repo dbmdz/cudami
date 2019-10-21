@@ -35,7 +35,12 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The project controller", name = "Project controller")
 public class ProjectController {
 
-  @Autowired private ProjectService projectService;
+  private ProjectService projectService;
+
+  @Autowired
+  public ProjectController(ProjectService projectService) {
+    this.projectService = projectService;
+  }
 
   @ApiMethod(description = "Get all projects")
   @RequestMapping(
