@@ -1,0 +1,72 @@
+{
+  "created": "2019-08-05T16:54:29.71132",
+  "description": {
+    "de": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Das ist meine erste Institution."
+            }
+          ]
+        }
+      ]
+    },
+    "en": {
+      "type": "doc",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "This is my first corporation."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "entityType": "CORPORATION",
+  "identifiers": [],
+  "label": {
+    "de": "Meine erste Institution",
+    "en": "My first corporation"
+  },
+  "lastModified": "2019-08-05T16:54:29.711332",
+  "text": {
+    "de": {
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Das ist meine erste Institution."
+            }
+          ]
+        }
+      ],
+      "type": "doc"
+    },
+    "en": {
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "This is my first corporation."
+            }
+          ]
+        }
+      ],
+      "type": "doc"
+    }
+  },
+  "type": "ENTITY",
+  "uuid": "3a32c394-8080-4f78-8145-47441902c7f8"
+}
