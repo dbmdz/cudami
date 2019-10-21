@@ -5,4 +5,4 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan(basePackages = {"de.digitalcollections.cudami.admin.backend.impl.repository"})
-public class SpringConfigBackend {}
+public class SpringConfigBackendRest {}

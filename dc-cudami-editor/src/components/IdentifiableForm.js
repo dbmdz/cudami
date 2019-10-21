@@ -3,10 +3,13 @@ import {Container, Label} from 'reactstrap'
 
 import './IdentifiableForm.css'
 import ArticleForm from './ArticleForm'
+import CollectionForm from './CollectionForm'
 import ContentNodeForm from './ContentNodeForm'
 import ContentTreeForm from './ContentTreeForm'
+import CorporationForm from './CorporationForm'
 import FileResourceForm from './FileResourceForm'
 import FormErrors from './FormErrors'
+import ProjectForm from './ProjectForm'
 import WebpageForm from './WebpageForm'
 import WebsiteForm from './WebsiteForm'
 import {
@@ -25,7 +28,13 @@ import initI18n from '../i18n'
 class IdentifiableForm extends Component {
   constructor(props) {
     super(props)
-    this.identifiablesWithLongText = ['article', 'webpage']
+    this.identifiablesWithLongText = [
+      'article',
+      'collection',
+      'corporation',
+      'project',
+      'webpage',
+    ]
     this.state = {
       activeLanguage: props.activeLanguage,
       availableLanguages: [],
@@ -120,9 +129,12 @@ class IdentifiableForm extends Component {
   getFormComponent = () => {
     const FORM_COMPONENT_MAPPING = {
       article: ArticleForm,
+      collection: CollectionForm,
       contentNode: ContentNodeForm,
       contentTree: ContentTreeForm,
+      corporation: CorporationForm,
       fileResource: FileResourceForm,
+      project: ProjectForm,
       webpage: WebpageForm,
       website: WebsiteForm,
     }

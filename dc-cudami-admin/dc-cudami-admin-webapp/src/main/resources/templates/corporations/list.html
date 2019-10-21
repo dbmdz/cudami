@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+
+  <head>
+    <title th:text="#{corporations}">Corporations</title>
+  </head>
+  <body>
+    <section layout:fragment="content">
+
+      <div class="row">
+        <div class="col-sm-6">
+          <h1 th:text="#{corporations}">Corporations</h1>
+        </div>
+        <div class="col-sm-6">
+          <div class="float-right">
+            <a class="btn btn-secondary" th:href="@{/corporations/new}" th:text="#{btn_new}">New</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12">
+          <hr/>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12" >
+          <div th:replace="fragments/pagination-navigation :: pagination-bootstrap4"></div>
+
+          <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
+            <thead>
+              <tr sd:page-object="${page.page}">
+                <th class="center" th:text="#{label}">Label</th>
+                <th class="center" th:text="#{actions}">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="corporation: ${page.content}">
+                <td>
+                  <a th:href="@{'/corporations/' + ${corporation.uuid}}" th:if="${corporation.label}" th:text="${corporation.label.text}">bavarikon</a>
+                </td>
+                <td class="center">
+                  <a th:href="@{'/corporations/' + ${corporation.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
+                  <a th:href="@{'/corporations/' + ${corporation.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div th:replace="fragments/pagination-navigation :: pagination-bootstrap4"></div>
+        </div>
+      </div>
+    </section>
+
+  <th:block layout:fragment="beforeBodyEnds">
+    <div th:replace="fragments/modals-confirmation :: confirmYesNoDialog-bootstrap4"></div>
+  </th:block>
+</body>
+</html>
+
+
