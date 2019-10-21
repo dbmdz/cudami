@@ -3,9 +3,9 @@ import {Container, Label} from 'reactstrap'
 
 import './IdentifiableForm.css'
 import ArticleForm from './ArticleForm'
+import CollectionForm from './CollectionForm'
 import ContentNodeForm from './ContentNodeForm'
 import ContentTreeForm from './ContentTreeForm'
-import CollectionForm from './CollectionForm'
 import CorporationForm from './CorporationForm'
 import FileResourceForm from './FileResourceForm'
 import FormErrors from './FormErrors'
@@ -28,7 +28,13 @@ import initI18n from '../i18n'
 class IdentifiableForm extends Component {
   constructor(props) {
     super(props)
-    this.identifiablesWithLongText = ['article', 'collection', 'corporation', 'project', 'webpage']
+    this.identifiablesWithLongText = [
+      'article',
+      'collection',
+      'corporation',
+      'project',
+      'webpage',
+    ]
     this.state = {
       activeLanguage: props.activeLanguage,
       availableLanguages: [],
