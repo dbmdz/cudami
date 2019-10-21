@@ -5,14 +5,14 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:text="|#{corporations}: #{corporation}|">Collections: Collection</title>
+    <title th:text="|#{corporations}: #{corporation}|">Corporations: Corporation</title>
   </head>
   <body>
     <section layout:fragment="content" th:object="${corporation}">
 
       <div class="row">
         <div class="col-sm-6">
-          <h1 th:text="#{corporation}">Collection</h1>
+          <h1 th:text="#{corporation}">Corporation</h1>
         </div>
         <div class="col-sm-6">
           <div class="float-right">
