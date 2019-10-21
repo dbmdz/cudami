@@ -129,9 +129,9 @@ class IdentifiableForm extends Component {
   getFormComponent = () => {
     const FORM_COMPONENT_MAPPING = {
       article: ArticleForm,
+      collection: CollectionForm,
       contentNode: ContentNodeForm,
       contentTree: ContentTreeForm,
-      collection: CollectionForm,
       corporation: CorporationForm,
       fileResource: FileResourceForm,
       project: ProjectForm,
