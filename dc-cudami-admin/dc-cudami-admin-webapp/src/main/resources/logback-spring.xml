@@ -1,49 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+  <!-- Stack Trace filters for better hashing and logging, see
+        https://github.com/logstash/logstash-logback-encoder/blob/master/stack-hash.md -->
+  <property name="STE_EXCLUSIONS" value=".*FastClassBy(Spring)?CGLIB.*,.*EnhancerBySpringCGLIB.*,^sun\.reflect\..*\.invoke,^com\.sun\.,^sun\.net\.,^net\.sf\.cglib\.proxy\.MethodProxy\.invoke,^org\.springframework\.cglib\.,^org\.springframework\.transaction\.,^org\.springframework\.validation\.,^org\.springframework\.app\.,^org\.springframework\.aop\.,^java\.lang\.reflect\.Method\.invoke,^org\.springframework\.ws\..*\.invoke,^org\.springframework\.ws\.transport\.,^org\.springframework\.ws\.soap\.saaj\.SaajSoapMessage\.,^org\.springframework\.ws\.client\.core\.WebServiceTemplate\.,^org\.springframework\.web\.filter\.,^org\.apache\.tomcat\.,^org\.apache\.catalina\.,^org\.apache\.coyote\.,^java\.util\.concurrent\.ThreadPoolExecutor\.runWorker,^java\.lang\.Thread\.run$,^jdk\.internal\.reflect\.,^java\.lang\.reflect\.,^net\.bull\.javamelody\.,^org\.springframework\.web\..*([iI]nvoke|[hH]andle|doDispatch|doService)"/>
 
   <!-- see https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-logging.html#_profile_specific_configuration -->
-  <springProfile name="DEV, STG, PROD">
-    <appender name="default" class="ch.qos.logback.core.rolling.RollingFileAppender">
-      <!-- create directory /var/log/digitalcollections with proper permissions... -->
-      <file>/var/log/cudami/cudami-admin.log</file>
-      <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-        <fileNamePattern>/var/log/cudami/cudami-admin.%d{yyyy-MM-dd}.log</fileNamePattern>
-      </rollingPolicy>
-      <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-        <fileNamePattern>/var/log/cudami/cudami-admin.%d{yyyy-MM}.%i.log.gz</fileNamePattern>
-        <maxFileSize>100MB</maxFileSize>
-        <maxHistory>90</maxHistory>
-        <totalSizeCap>5GB</totalSizeCap>
-      </rollingPolicy>
-      <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-        <customFields>{"service":"cudami-admin", "group":"rest", "instance":"${instance.name:-default}"}</customFields>
-      </encoder>
-    </appender>
-  </springProfile>
+  <appender name="default" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+      <providers>
+        <timestamp />
+        <message />
+        <loggerName>
+          <shortenedLoggerNameLength>16</shortenedLoggerNameLength>
+        </loggerName>
+        <logLevel />
 
-  <springProfile name="local">
-    <appender name="default" class="ch.qos.logback.core.ConsoleAppender">
-      <encoder>
-        <!-- contains example for logging sessionID from MDC context -->
-        <pattern>[%d{ISO8601} %5p] %40.40c:%4L [%-8t / %X{sessionID}] - %m%n</pattern>
-      </encoder>
-    </appender>
-  </springProfile>
+        <!-- Custom logging fields -->
+        <logstashMarkers />
+        <arguments />
+        <tags />
+        <mdc />
 
-  <!-- if no environment of above is set add console log as fallback -->
-  <!-- documented feature, but working with OR, so can not be used this way! -->
-  <!-- see: https://github.com/spring-projects/spring-boot/issues/5851 -->
-  <!--
-  <springProfile name="!local, !DEV, !STG, !PROD">
-    <appender name="default" class="ch.qos.logback.core.ConsoleAppender">
-      <encoder>
-        <pattern>[%d{ISO8601} %5p] %40.40c:%4L [%-8t] - %m%n</pattern>
-      </encoder>
-    </appender>
-  </springProfile>
-  -->
-
-  <logger name="de.digitalcollections.cudami" level="info" />
+        <!-- Stack Trace handling -->
+        <stackTrace>
+          <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+            <maxDepthPerThrowable>8</maxDepthPerThrowable>
+            <maxLength>4096</maxLength>
+            <shortenedClassNameLength>16</shortenedClassNameLength>
+            <exclusions>${STE_EXCLUSIONS}</exclusions>
+            <rootCauseFirst>true</rootCauseFirst>
+          </throwableConverter>
+        </stackTrace>
+        <stackHash>
+          <exclusions>${STE_EXCLUSIONS}</exclusions>
+        </stackHash>
+      </providers>
+    </encoder>
+  </appender>
 
   <root level="info">
     <appender-ref ref="default" />
