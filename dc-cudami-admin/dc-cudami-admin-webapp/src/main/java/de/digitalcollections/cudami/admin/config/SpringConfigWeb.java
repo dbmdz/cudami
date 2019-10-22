@@ -54,12 +54,9 @@ public class SpringConfigWeb implements WebMvcConfigurer {
 
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    //    registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
     registry
         .addResourceHandler("/favicon.ico")
         .addResourceLocations("classpath:/static/images/favicon.png");
-    //
-    // registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
   }
 
   @Bean
