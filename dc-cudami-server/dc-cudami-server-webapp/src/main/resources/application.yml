@@ -49,7 +49,7 @@ server:
 
 spring:
   main:
-    banner-mode: off
+    banner-mode: 'off'
   profiles:
     active: local
   security:
