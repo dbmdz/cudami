@@ -1,15 +1,10 @@
 package de.digitalcollections.cudami.server.config;
 
-import java.util.Arrays;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.EnvironmentAware;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.core.env.Environment;
 
 @Configuration
 @ComponentScan(
@@ -18,9 +13,7 @@ import org.springframework.core.env.Environment;
       "de.digitalcollections.commons.springboot.contributor",
       "de.digitalcollections.commons.springboot.monitoring"
     })
-public class SpringConfig implements EnvironmentAware {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfig.class);
+public class SpringConfig {
 
   /**
    * Create a resource bundle for your messages ("messages.properties").<br>
@@ -37,12 +30,5 @@ public class SpringConfig implements EnvironmentAware {
     messageSource.setCacheSeconds(5);
     messageSource.setDefaultEncoding("UTF-8");
     return messageSource;
-  }
-
-  @Override
-  public void setEnvironment(Environment environment) {
-    String[] activeProfiles = environment.getActiveProfiles();
-    String activeProfilesStr = Arrays.toString(activeProfiles);
-    LOGGER.info("##### Active Profiles: " + activeProfilesStr);
   }
 }
