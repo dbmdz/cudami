@@ -48,6 +48,8 @@ server:
   server-header: "@project.name@ v@project.version@"
 
 spring:
+  main:
+    banner-mode: off
   profiles:
     active: local
   security:
