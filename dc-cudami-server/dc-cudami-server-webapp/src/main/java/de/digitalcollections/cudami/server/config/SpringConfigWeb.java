@@ -7,8 +7,6 @@ import de.digitalcollections.model.xml.xstream.DigitalCollectionsXStreamMarshall
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -25,13 +23,7 @@ import org.thymeleaf.dialect.AbstractProcessorDialect;
 
 @Configuration
 @EnableAspectJAutoProxy
-// @PropertySource(value = {
-//
-// "classpath:de/digitalcollections/cudami/server/config/SpringConfigWeb-${spring.profiles.active:PROD}.properties"
-// })
 public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfigWeb.class);
 
   @Value("${server.port:80}")
   Integer port;
@@ -66,16 +58,6 @@ public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
     System.setProperty("jsondoc.version", projectVersion);
   }
 
-  //  @Bean
-  //  public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-  //    return new PropertySourcesPlaceholderConfigurer();
-  //  }
-  //  @Primary // needed to replace default spring boot created object mapper
-  //  @Bean
-  //  public ObjectMapper objectMapper() {
-  //    ObjectMapper objectMapper = new JacksonModelObjectMapper();
-  //    return objectMapper;
-  //  }
   @Override
   public void configurePathMatch(PathMatchConfigurer configurer) {
     // "This is generally recommended to reduce ambiguity and to avoid issues such as when a "."
