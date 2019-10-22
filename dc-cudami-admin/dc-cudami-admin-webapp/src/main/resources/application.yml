@@ -32,6 +32,8 @@ server:
 
 # upload config: see org.springframework.boot.autoconfigure.web.MultipartProperties
 spring:
+  main:
+    banner-mode: off
   messages:
     basename: messages, messages-commons
     fallback-to-system-locale: false
