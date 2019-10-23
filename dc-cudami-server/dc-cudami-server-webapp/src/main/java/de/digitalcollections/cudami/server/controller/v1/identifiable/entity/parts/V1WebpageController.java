@@ -141,7 +141,9 @@ public class V1WebpageController {
         (entry) -> {
           Element translation = new Element("translation");
           translation.addContent(entry.getChild("locale").clone());
-          translation.addContent(entry.getChild("string").clone());
+          Element text = new Element("text");
+          text.addContent(entry.getChild("string").getText());
+          translation.addContent(text);
           translations.addContent(translation);
         });
     xml.setContent(translations);
