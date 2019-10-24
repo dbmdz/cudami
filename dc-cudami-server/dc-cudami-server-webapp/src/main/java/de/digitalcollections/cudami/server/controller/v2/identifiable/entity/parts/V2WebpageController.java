@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Api(description = "The V1 webpage controller", name = "V1 Webpage controller")
+@Api(description = "The V2 webpage controller", name = "V2 Webpage controller")
 public class V2WebpageController {
 
   private final DigitalCollectionsObjectMapper objectMapper = new DigitalCollectionsObjectMapper();
@@ -45,13 +45,13 @@ public class V2WebpageController {
 
   @Autowired private WebpageService webpageService;
 
-  @ApiMethod(description = "Get a webpage as JSON (Version 1)")
+  @ApiMethod(description = "Get a webpage as JSON (Version 2)")
   @RequestMapping(
       value = {"/v2/webpages/{uuid}.json", "/v2/webpages/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE},
       method = RequestMethod.GET)
   @ApiResponseObject
-  public ResponseEntity<String> getWebpageV1Json(
+  public ResponseEntity<String> getWebpageV2Json(
       @ApiPathParam(
               description =
                   "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
@@ -83,13 +83,13 @@ public class V2WebpageController {
     return new ResponseEntity<>(result.toString(), HttpStatus.OK);
   }
 
-  @ApiMethod(description = "Get a webpage as XML (Version 1)")
+  @ApiMethod(description = "Get a webpage as XML (Version 2)")
   @RequestMapping(
       value = {"/v2/webpages/{uuid}.xml"},
       produces = {MediaType.APPLICATION_XML_VALUE},
       method = RequestMethod.GET)
   @ApiResponseObject
-  public ResponseEntity<String> getWebpageV1Xml(
+  public ResponseEntity<String> getWebpageV2Xml(
       @ApiPathParam(
               description =
                   "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
