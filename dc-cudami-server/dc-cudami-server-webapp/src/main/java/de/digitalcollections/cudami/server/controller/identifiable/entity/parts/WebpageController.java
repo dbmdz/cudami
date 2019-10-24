@@ -68,7 +68,7 @@ public class WebpageController {
       description =
           "Get a webpage as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @RequestMapping(
-      value = {"/latest/webpages/{uuid}", "/v2/webpages/{uuid}"},
+      value = {"/latest/webpages/{uuid}", "/v3/webpages/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
       method = RequestMethod.GET)
   @ApiResponseObject
