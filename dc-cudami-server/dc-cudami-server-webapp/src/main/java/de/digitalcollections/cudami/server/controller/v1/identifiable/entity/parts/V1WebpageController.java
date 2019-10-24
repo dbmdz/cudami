@@ -65,6 +65,8 @@ public class V1WebpageController {
           Locale pLocale)
       throws IdentifiableServiceException, JsonProcessingException {
     Webpage webpage = loadWebpage(pLocale, uuid);
+    webpage.setCreated(null);
+    webpage.setLastModified(null);
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(webpage));
     if (result.has("description")) {
       result.put(
