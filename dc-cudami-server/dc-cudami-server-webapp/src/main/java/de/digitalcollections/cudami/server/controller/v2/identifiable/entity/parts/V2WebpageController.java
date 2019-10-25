@@ -1,11 +1,11 @@
-package de.digitalcollections.cudami.server.controller.v1.identifiable.entity.parts;
+package de.digitalcollections.cudami.server.controller.v2.identifiable.entity.parts;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.WebpageService;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
-import de.digitalcollections.model.xml.xstream.v1.V1DigitalCollectionsXStreamMarshaller;
+import de.digitalcollections.model.xml.xstream.DigitalCollectionsXStreamMarshaller;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -36,22 +36,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Api(description = "The V1 webpage controller", name = "V1 Webpage controller")
-public class V1WebpageController {
+@Api(description = "The V2 webpage controller", name = "V2 Webpage controller")
+public class V2WebpageController {
 
   private final DigitalCollectionsObjectMapper objectMapper = new DigitalCollectionsObjectMapper();
-  private final V1DigitalCollectionsXStreamMarshaller v1XStreamMarshaller =
-      new V1DigitalCollectionsXStreamMarshaller();
+  private final DigitalCollectionsXStreamMarshaller xStreamMarshaller =
+      new DigitalCollectionsXStreamMarshaller();
 
   @Autowired private WebpageService webpageService;
 
-  @ApiMethod(description = "Get a webpage as JSON (Version 1)")
+  @ApiMethod(description = "Get a webpage as JSON (Version 2)")
   @RequestMapping(
-      value = {"/v1/webpages/{uuid}.json", "/v1/webpages/{uuid}"},
+      value = {"/v2/webpages/{uuid}.json", "/v2/webpages/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE},
       method = RequestMethod.GET)
   @ApiResponseObject
-  public ResponseEntity<String> getWebpageV1Json(
+  public ResponseEntity<String> getWebpageV2Json(
       @ApiPathParam(
               description =
                   "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
@@ -83,13 +83,13 @@ public class V1WebpageController {
     return new ResponseEntity<>(result.toString(), HttpStatus.OK);
   }
 
-  @ApiMethod(description = "Get a webpage as XML (Version 1)")
+  @ApiMethod(description = "Get a webpage as XML (Version 2)")
   @RequestMapping(
-      value = {"/v1/webpages/{uuid}.xml"},
+      value = {"/v2/webpages/{uuid}.xml"},
       produces = {MediaType.APPLICATION_XML_VALUE},
       method = RequestMethod.GET)
   @ApiResponseObject
-  public ResponseEntity<String> getWebpageV1Xml(
+  public ResponseEntity<String> getWebpageV2Xml(
       @ApiPathParam(
               description =
                   "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
@@ -105,20 +105,20 @@ public class V1WebpageController {
           IOException {
     Webpage webpage = loadWebpage(pLocale, uuid);
     StringWriter sw = new StringWriter();
-    v1XStreamMarshaller.marshalWriter(webpage, sw);
+    xStreamMarshaller.marshalWriter(webpage, sw);
     String result = sw.toString();
     return new ResponseEntity<>(migrateWebpageXml(result), HttpStatus.OK);
   }
 
   private JSONObject convertLocalizedStructuredContentJson(JSONObject json) {
     JSONObject localizedStructuredContent = new JSONObject();
-    localizedStructuredContent.put("documents", json);
+    localizedStructuredContent.put("localizedStructuredContent", json);
     return localizedStructuredContent;
   }
 
   private void convertLocalizedStructuredContentXml(Element xml) {
     Element content = xml.getChild("entry");
-    xml.setContent(createDocumentsElement(content));
+    xml.setContent(createLSCElement(content));
   }
 
   private JSONObject convertLocalizedTextJson(JSONObject json) {
@@ -151,10 +151,10 @@ public class V1WebpageController {
     xml.setContent(translations);
   }
 
-  private Element createDocumentsElement(Element content) {
-    Element documents = new Element("documents");
-    documents.setContent(content.clone());
-    return documents;
+  private Element createLSCElement(Element content) {
+    Element localizedStructuredContent = new Element("localizedStructuredContent");
+    localizedStructuredContent.setContent(content.clone());
+    return localizedStructuredContent;
   }
 
   private Webpage loadWebpage(Locale pLocale, UUID uuid) throws IdentifiableServiceException {

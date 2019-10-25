@@ -45,7 +45,7 @@ public interface CudamiClient {
   @RequestLine("GET /v2/locales")
   List<Locale> getSupportedLocales() throws HttpException;
 
-  @RequestLine("GET /v2/webpages/{uuid}")
+  @RequestLine("GET /v3/webpages/{uuid}")
   Webpage getWebpage(@Param("uuid") String uuid) throws HttpException;
 
   @RequestLine("GET /v2/webpages/{uuid}?pLocale={locale}")
