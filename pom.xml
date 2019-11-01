@@ -90,7 +90,7 @@
     <version.mockito-core>3.1.0</version.mockito-core>
     <version.passay>1.5.0</version.passay>
     <version.postgresql>42.2.8</version.postgresql>
-    <version.slf4j>1.7.28</version.slf4j>
+    <version.slf4j>1.7.29</version.slf4j>
     <version.snakeyaml>1.24</version.snakeyaml>
     <version.spotbugs>3.1.12</version.spotbugs>
     <version.unbescape>1.1.6.RELEASE</version.unbescape>
