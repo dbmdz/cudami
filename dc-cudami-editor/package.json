@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@aeaton/prosemirror-footnotes": "^0.1.0",
-    "@aeaton/prosemirror-placeholder": "^0.1.0",
     "@aeaton/react-prosemirror": "^0.22.1",
     "@fortawesome/fontawesome-svg-core": "^1.2.19",
     "@fortawesome/free-brands-svg-icons": "^5.9.0",
