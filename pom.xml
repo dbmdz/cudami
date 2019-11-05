@@ -80,7 +80,7 @@
     <version.commons-dbcp2>2.7.0</version.commons-dbcp2>
     <version.commons-lang3>3.9</version.commons-lang3>
     <version.dc-model>4.0.0</version.dc-model>
-    <version.feign>10.5.1</version.feign>
+    <version.feign>10.6.0</version.feign>
     <version.feign-form-spring>3.5.0</version.feign-form-spring>
     <version.flyway>6.0.8</version.flyway>
     <version.javax.servlet-api>4.0.1</version.javax.servlet-api>
