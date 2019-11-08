@@ -7,15 +7,19 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.ArticleService;
+import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.model.api.identifiable.entity.Article;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -37,11 +41,16 @@ public class ArticlesController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticlesController.class);
 
+  LanguageSortingHelper languageSortingHelper;
   LocaleRepository localeRepository;
   ArticleService service;
 
   @Autowired
-  public ArticlesController(LocaleRepository localeRepository, ArticleService service) {
+  public ArticlesController(
+      LanguageSortingHelper languageSortingHelper,
+      LocaleRepository localeRepository,
+      ArticleService service) {
+    this.languageSortingHelper = languageSortingHelper;
     this.localeRepository = localeRepository;
     this.service = service;
   }
@@ -116,9 +125,13 @@ public class ArticlesController extends AbstractController {
 
   @GetMapping("/articles/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
     Article article = (Article) service.get(uuid);
+    List<Locale> availableLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, article.getLabel().getLocales());
+
     model.addAttribute("article", article);
-    model.addAttribute("availableLanguages", article.getLabel().getLocales());
+    model.addAttribute("availableLanguages", availableLanguages);
 
     LinkedHashSet<FileResource> relatedFileResources = service.getRelatedFileResources(article);
     model.addAttribute("relatedFileResources", relatedFileResources);

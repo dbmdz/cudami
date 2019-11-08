@@ -7,15 +7,19 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.WebpageService;
+import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -38,11 +42,16 @@ public class WebpagesController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpagesController.class);
 
+  LanguageSortingHelper languageSortingHelper;
   LocaleRepository localeRepository;
   WebpageService service;
 
   @Autowired
-  public WebpagesController(LocaleRepository localeRepository, WebpageService service) {
+  public WebpagesController(
+      LanguageSortingHelper languageSortingHelper,
+      LocaleRepository localeRepository,
+      WebpageService service) {
+    this.languageSortingHelper = languageSortingHelper;
     this.localeRepository = localeRepository;
     this.service = service;
   }
@@ -135,8 +144,12 @@ public class WebpagesController extends AbstractController {
 
   @GetMapping("/webpages/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
     Webpage webpage = (Webpage) service.get(uuid);
-    model.addAttribute("availableLanguages", webpage.getLabel().getLocales());
+    List<Locale> availableLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, webpage.getLabel().getLocales());
+
+    model.addAttribute("availableLanguages", availableLanguages);
     model.addAttribute("webpage", webpage);
 
     LinkedHashSet<FileResource> relatedFileResources = service.getRelatedFileResources(webpage);

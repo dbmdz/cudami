@@ -6,15 +6,19 @@ import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiProjectsClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Project;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -36,12 +40,16 @@ public class ProjectsController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProjectsController.class);
 
+  LanguageSortingHelper languageSortingHelper;
   LocaleRepository localeRepository;
   CudamiProjectsClient cudamiProjectsClient;
 
   @Autowired
   public ProjectsController(
-      LocaleRepository localeRepository, CudamiProjectsClient cudamiProjectsClient) {
+      LanguageSortingHelper languageSortingHelper,
+      LocaleRepository localeRepository,
+      CudamiProjectsClient cudamiProjectsClient) {
+    this.languageSortingHelper = languageSortingHelper;
     this.localeRepository = localeRepository;
     this.cudamiProjectsClient = cudamiProjectsClient;
   }
@@ -116,9 +124,14 @@ public class ProjectsController extends AbstractController {
 
   @GetMapping("/projects/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) throws HttpException {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
     Project project = cudamiProjectsClient.getProject(uuid);
-    model.addAttribute("availableLanguages", project.getLabel().getLocales());
+    List<Locale> availableLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, project.getLabel().getLocales());
+
+    model.addAttribute("availableLanguages", availableLanguages);
     model.addAttribute("project", project);
+
     return "projects/view";
   }
 }
