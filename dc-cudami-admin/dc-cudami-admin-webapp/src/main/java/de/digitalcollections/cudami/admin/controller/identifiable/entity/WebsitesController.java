@@ -126,10 +126,10 @@ public class WebsitesController extends AbstractController {
   public String view(@PathVariable UUID uuid, Model model) {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Website website = (Website) service.get(uuid);
-    List<Locale> availableLanguages =
+    List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, website.getLabel().getLocales());
 
-    model.addAttribute("availableLanguages", availableLanguages);
+    model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("website", website);
 
     return "websites/view";

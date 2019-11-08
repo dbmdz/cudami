@@ -128,10 +128,10 @@ public class ContentTreesController extends AbstractController {
   public String view(@PathVariable UUID uuid, Model model) {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     ContentTree contentTree = (ContentTree) service.get(uuid);
-    List<Locale> availableLanguages =
+    List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, contentTree.getLabel().getLocales());
 
-    model.addAttribute("availableLanguages", availableLanguages);
+    model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("contentTree", contentTree);
 
     return "contenttrees/view";

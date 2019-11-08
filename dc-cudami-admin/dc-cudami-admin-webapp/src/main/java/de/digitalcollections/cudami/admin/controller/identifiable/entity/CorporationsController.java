@@ -127,10 +127,10 @@ public class CorporationsController extends AbstractController {
   public String view(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Corporation corporation = cudamiCorporationsClient.getCorporation(uuid);
-    List<Locale> availableLanguages =
+    List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, corporation.getLabel().getLocales());
 
-    model.addAttribute("availableLanguages", availableLanguages);
+    model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("corporation", corporation);
 
     return "corporations/view";

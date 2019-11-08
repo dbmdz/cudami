@@ -127,10 +127,10 @@ public class CollectionsController extends AbstractController {
   public String view(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Collection collection = cudamiCollectionsClient.getCollection(uuid);
-    List<Locale> availableLanguages =
+    List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, collection.getLabel().getLocales());
 
-    model.addAttribute("availableLanguages", availableLanguages);
+    model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("collection", collection);
 
     return "collections/view";

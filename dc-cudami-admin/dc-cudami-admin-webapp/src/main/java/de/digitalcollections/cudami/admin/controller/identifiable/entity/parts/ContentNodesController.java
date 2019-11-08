@@ -141,10 +141,10 @@ public class ContentNodesController extends AbstractController {
   public String view(@PathVariable UUID uuid, Model model) {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     ContentNode contentNode = (ContentNode) service.get(uuid);
-    List<Locale> availableLanguages =
+    List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, contentNode.getLabel().getLocales());
 
-    model.addAttribute("availableLanguages", availableLanguages);
+    model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("contentNode", contentNode);
 
     LinkedHashSet<FileResource> relatedFileResources = service.getRelatedFileResources(contentNode);

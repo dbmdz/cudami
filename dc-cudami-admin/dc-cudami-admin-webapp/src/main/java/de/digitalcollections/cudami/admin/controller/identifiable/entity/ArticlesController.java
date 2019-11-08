@@ -127,11 +127,11 @@ public class ArticlesController extends AbstractController {
   public String view(@PathVariable UUID uuid, Model model) {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Article article = (Article) service.get(uuid);
-    List<Locale> availableLanguages =
+    List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, article.getLabel().getLocales());
 
     model.addAttribute("article", article);
-    model.addAttribute("availableLanguages", availableLanguages);
+    model.addAttribute("existingLanguages", existingLanguages);
 
     LinkedHashSet<FileResource> relatedFileResources = service.getRelatedFileResources(article);
     model.addAttribute("relatedFileResources", relatedFileResources);
