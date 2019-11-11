@@ -80,9 +80,15 @@ public class ContentNodesController extends AbstractController {
 
   @GetMapping("/contentnodes/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
     ContentNode contentNode = (ContentNode) service.get(uuid);
-    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, contentNode.getLabel().getLocales());
+
+    model.addAttribute("activeLanguage", existingLanguages.get(0));
+    model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("uuid", contentNode.getUuid());
+
     return "contentnodes/edit";
   }
 

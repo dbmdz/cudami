@@ -80,10 +80,16 @@ public class FileResourcesController extends AbstractController {
 
   @GetMapping("/fileresources/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
     FileResource fileResource = service.get(uuid);
-    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, fileResource.getLabel().getLocales());
+
+    model.addAttribute("activeLanguage", existingLanguages.get(0));
+    model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("filename", fileResource.getFilename());
     model.addAttribute("uuid", fileResource.getUuid());
+
     return "fileresources/edit";
   }
 

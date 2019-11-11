@@ -73,9 +73,15 @@ public class ProjectsController extends AbstractController {
 
   @GetMapping("/projects/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
     Project project = cudamiProjectsClient.getProject(uuid);
-    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, project.getLabel().getLocales());
+
+    model.addAttribute("activeLanguage", existingLanguages.get(0));
+    model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("uuid", project.getUuid());
+
     return "projects/edit";
   }
 

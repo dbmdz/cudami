@@ -73,9 +73,15 @@ public class CollectionsController extends AbstractController {
 
   @GetMapping("/collections/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
     Collection collection = cudamiCollectionsClient.getCollection(uuid);
-    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, collection.getLabel().getLocales());
+
+    model.addAttribute("activeLanguage", existingLanguages.get(0));
+    model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("uuid", collection.getUuid());
+
     return "collections/edit";
   }
 

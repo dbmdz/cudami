@@ -72,10 +72,16 @@ public class WebsitesController extends AbstractController {
 
   @GetMapping("/websites/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
     Website website = service.get(uuid);
-    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, website.getLabel().getLocales());
+
+    model.addAttribute("activeLanguage", existingLanguages.get(0));
+    model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("url", website.getUrl());
     model.addAttribute("uuid", website.getUuid());
+
     return "websites/edit";
   }
 

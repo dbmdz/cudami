@@ -73,9 +73,15 @@ public class CorporationsController extends AbstractController {
 
   @GetMapping("/corporations/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
     Corporation corporation = cudamiCorporationsClient.getCorporation(uuid);
-    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, corporation.getLabel().getLocales());
+
+    model.addAttribute("activeLanguage", existingLanguages.get(0));
+    model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("uuid", corporation.getUuid());
+
     return "corporations/edit";
   }
 

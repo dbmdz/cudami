@@ -74,9 +74,15 @@ public class ContentTreesController extends AbstractController {
 
   @RequestMapping(value = "/contenttrees/{uuid}/edit", method = RequestMethod.GET)
   public String edit(@PathVariable UUID uuid, Model model) {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
     ContentTree contentTree = service.get(uuid);
-    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, contentTree.getLabel().getLocales());
+
+    model.addAttribute("activeLanguage", existingLanguages.get(0));
+    model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("uuid", contentTree.getUuid());
+
     return "contenttrees/edit";
   }
 
