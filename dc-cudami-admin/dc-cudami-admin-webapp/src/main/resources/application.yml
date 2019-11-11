@@ -1,5 +1,6 @@
 cudami:
   defaultLocale-gui: en
+  prioritisedSortedLanguages: ''
   server:
     address: http://localhost:9000
     url: http://localhost:9000

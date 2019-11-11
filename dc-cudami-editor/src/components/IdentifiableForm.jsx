@@ -38,6 +38,7 @@ class IdentifiableForm extends Component {
     this.state = {
       activeLanguage: props.activeLanguage,
       availableLanguages: [],
+      existingLanguages: props.existingLanguages || [props.activeLanguage],
       identifiable: null,
       invalidLanguages: [],
       modalsOpen: {
@@ -91,6 +92,7 @@ class IdentifiableForm extends Component {
       availableLanguages: this.state.availableLanguages.filter(
         language => language.name !== selectedLanguage.name
       ),
+      existingLanguages: [...this.state.existingLanguages, selectedLanguage.name],
       identifiable: {
         ...this.state.identifiable,
         label: {
@@ -144,6 +146,7 @@ class IdentifiableForm extends Component {
         activeLanguage={this.state.activeLanguage}
         apiContextPath={this.props.apiContextPath}
         canAddLanguage={this.state.availableLanguages.length > 0}
+        existingLanguages={this.state.existingLanguages}
         identifiable={this.state.identifiable}
         onAddLanguage={this.toggleModal}
         onSubmit={this.submitIdentifiable}

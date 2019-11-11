@@ -6,15 +6,19 @@ import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiCorporationsClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Corporation;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -36,12 +40,16 @@ public class CorporationsController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CorporationsController.class);
 
+  LanguageSortingHelper languageSortingHelper;
   LocaleRepository localeRepository;
   CudamiCorporationsClient cudamiCorporationsClient;
 
   @Autowired
   public CorporationsController(
-      LocaleRepository localeRepository, CudamiCorporationsClient cudamiCorporationsClient) {
+      LanguageSortingHelper languageSortingHelper,
+      LocaleRepository localeRepository,
+      CudamiCorporationsClient cudamiCorporationsClient) {
+    this.languageSortingHelper = languageSortingHelper;
     this.localeRepository = localeRepository;
     this.cudamiCorporationsClient = cudamiCorporationsClient;
   }
@@ -65,9 +73,15 @@ public class CorporationsController extends AbstractController {
 
   @GetMapping("/corporations/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
     Corporation corporation = cudamiCorporationsClient.getCorporation(uuid);
-    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, corporation.getLabel().getLocales());
+
+    model.addAttribute("activeLanguage", existingLanguages.get(0));
+    model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("uuid", corporation.getUuid());
+
     return "corporations/edit";
   }
 
@@ -117,9 +131,14 @@ public class CorporationsController extends AbstractController {
 
   @GetMapping("/corporations/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) throws HttpException {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
     Corporation corporation = cudamiCorporationsClient.getCorporation(uuid);
-    model.addAttribute("availableLanguages", corporation.getLabel().getLocales());
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, corporation.getLabel().getLocales());
+
+    model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("corporation", corporation);
+
     return "corporations/view";
   }
 }

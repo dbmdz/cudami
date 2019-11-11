@@ -40,7 +40,7 @@ const ContentTreeForm = props => {
             <FormIdInput id={props.identifiable.uuid} />
           )}
           <Nav tabs>
-            {Object.entries(props.identifiable.label).map(([language]) => (
+            {props.existingLanguages.map((language) => (
               <LanguageTab
                 activeLanguage={props.activeLanguage}
                 key={language}
@@ -53,12 +53,12 @@ const ContentTreeForm = props => {
             )}
           </Nav>
           <TabContent activeTab={props.activeLanguage}>
-            {Object.entries(props.identifiable.label).map(
-              ([language, text]) => (
+            {props.existingLanguages.map(
+              (language) => (
                 <LanguageTabContent
                   description={props.identifiable.description[language]}
                   key={language}
-                  label={text}
+                  label={props.identifiable.label[language]}
                   language={language}
                   onUpdate={(updateKey, updateValue) =>
                     props.onUpdate({

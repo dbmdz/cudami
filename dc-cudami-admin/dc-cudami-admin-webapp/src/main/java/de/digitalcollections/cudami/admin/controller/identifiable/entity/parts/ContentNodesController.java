@@ -7,15 +7,19 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.ContentNodeService;
+import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -38,11 +42,16 @@ public class ContentNodesController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentNodesController.class);
 
+  LanguageSortingHelper languageSortingHelper;
   LocaleRepository localeRepository;
   ContentNodeService service;
 
   @Autowired
-  public ContentNodesController(LocaleRepository localeRepository, ContentNodeService service) {
+  public ContentNodesController(
+      LanguageSortingHelper languageSortingHelper,
+      LocaleRepository localeRepository,
+      ContentNodeService service) {
+    this.languageSortingHelper = languageSortingHelper;
     this.localeRepository = localeRepository;
     this.service = service;
   }
@@ -71,9 +80,15 @@ public class ContentNodesController extends AbstractController {
 
   @GetMapping("/contentnodes/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
     ContentNode contentNode = (ContentNode) service.get(uuid);
-    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, contentNode.getLabel().getLocales());
+
+    model.addAttribute("activeLanguage", existingLanguages.get(0));
+    model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("uuid", contentNode.getUuid());
+
     return "contentnodes/edit";
   }
 
@@ -130,8 +145,12 @@ public class ContentNodesController extends AbstractController {
 
   @GetMapping("/contentnodes/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
     ContentNode contentNode = (ContentNode) service.get(uuid);
-    model.addAttribute("availableLanguages", contentNode.getLabel().getLocales());
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, contentNode.getLabel().getLocales());
+
+    model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("contentNode", contentNode);
 
     LinkedHashSet<FileResource> relatedFileResources = service.getRelatedFileResources(contentNode);
