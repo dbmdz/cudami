@@ -53,7 +53,9 @@ public class FileResourcesController extends AbstractController {
 
   @Autowired
   public FileResourcesController(
-      LanguageSortingHelper languageSortingHelper, LocaleRepository localeRepository, CudamiFileResourceService service) {
+      LanguageSortingHelper languageSortingHelper,
+      LocaleRepository localeRepository,
+      CudamiFileResourceService service) {
     this.languageSortingHelper = languageSortingHelper;
     this.localeRepository = localeRepository;
     this.service = service;
