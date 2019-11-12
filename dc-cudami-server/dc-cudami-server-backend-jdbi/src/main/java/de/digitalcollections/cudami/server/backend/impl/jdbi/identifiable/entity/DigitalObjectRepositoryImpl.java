@@ -5,7 +5,6 @@ import static java.util.stream.Collectors.toList;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMapper;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
@@ -16,6 +15,7 @@ import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ApplicationFileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.AudioFileResourceImpl;
+import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.TextFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
@@ -89,7 +89,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   @Override
   public PageResponse<DigitalObject> find(PageRequest pageRequest) {
     StringBuilder query =
-        new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS).append(" FROM digitalobjects");
+        new StringBuilder("SELECT " + "uuid, created, description, label, last_modified")
+            .append(" FROM digitalobjects");
 
     addPageRequestParams(pageRequest, query);
 
@@ -188,12 +189,12 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             + " WHERE df.digitalobject_uuid = :uuid"
             + " ORDER BY df.sortIndex ASC";
 
-    List<FileResource> result =
+    List<FileResourceImpl> result =
         dbi.withHandle(
             h ->
                 h.createQuery(query)
                     .bind("uuid", digitalObjectUuid)
-                    .map(new FileResourceMapper())
+                    .mapToBean(FileResourceImpl.class)
                     .list());
     return new LinkedHashSet<>(result);
   }

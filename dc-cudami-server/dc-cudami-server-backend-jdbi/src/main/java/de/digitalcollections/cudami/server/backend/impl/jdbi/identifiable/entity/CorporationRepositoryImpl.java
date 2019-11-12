@@ -37,7 +37,8 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
   @Override
   public PageResponse<Corporation> find(PageRequest pageRequest) {
     StringBuilder query =
-        new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS + ", text").append(" FROM corporations");
+        new StringBuilder("SELECT " + "uuid, created, description, label, last_modified" + ", text")
+            .append(" FROM corporations");
 
     addPageRequestParams(pageRequest, query);
 
@@ -52,7 +53,11 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
   @Override
   public Corporation findOne(UUID uuid) {
     String query =
-        "SELECT " + IDENTIFIABLE_COLUMNS + ", text" + " FROM corporations" + " WHERE uuid = :uuid";
+        "SELECT "
+            + "uuid, created, description, label, last_modified"
+            + ", text"
+            + " FROM corporations"
+            + " WHERE uuid = :uuid";
 
     Corporation corporation =
         dbi.withHandle(

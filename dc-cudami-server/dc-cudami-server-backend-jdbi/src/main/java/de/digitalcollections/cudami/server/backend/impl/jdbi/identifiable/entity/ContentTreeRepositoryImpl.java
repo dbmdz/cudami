@@ -41,7 +41,8 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
   @Override
   public PageResponse<ContentTree> find(PageRequest pageRequest) {
     StringBuilder query =
-        new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS).append(" FROM contenttrees");
+        new StringBuilder("SELECT " + "uuid, created, description, label, last_modified")
+            .append(" FROM contenttrees");
 
     addPageRequestParams(pageRequest, query);
 
@@ -55,7 +56,11 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
 
   @Override
   public ContentTree findOne(UUID uuid) {
-    String query = "SELECT " + IDENTIFIABLE_COLUMNS + " FROM contenttrees" + " WHERE uuid = :uuid";
+    String query =
+        "SELECT "
+            + "uuid, created, description, label, last_modified"
+            + " FROM contenttrees"
+            + " WHERE uuid = :uuid";
 
     ContentTree contentTree =
         dbi.withHandle(
@@ -128,7 +133,7 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
     String sql =
         "SELECT "
-            + IDENTIFIABLE_COLUMNS
+            + "uuid, created, description, label, last_modified"
             + " FROM contentnodes INNER JOIN contenttree_contentnodes cc ON uuid = cc.contentnode_uuid"
             + " WHERE cc.contenttree_uuid = :uuid"
             + " ORDER BY cc.sortIndex ASC";

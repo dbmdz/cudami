@@ -40,7 +40,7 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
   public PageResponse<Webpage> find(PageRequest pageRequest) {
     StringBuilder query =
         new StringBuilder()
-            .append("SELECT " + IDENTIFIABLE_COLUMNS + ", text")
+            .append("SELECT " + "uuid, created, description, label, last_modified" + ", text")
             .append(" FROM webpages");
 
     addPageRequestParams(pageRequest, query);
@@ -56,7 +56,7 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
   public Webpage findOne(UUID uuid) {
     StringBuilder query =
         new StringBuilder()
-            .append("SELECT " + IDENTIFIABLE_COLUMNS + ", text")
+            .append("SELECT " + "uuid, created, description, label, last_modified" + ", text")
             .append(" FROM webpages")
             .append(" WHERE uuid = :uuid");
 
@@ -84,7 +84,7 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
   public Webpage getParent(UUID uuid) {
     StringBuilder query =
         new StringBuilder()
-            .append("SELECT " + IDENTIFIABLE_COLUMNS)
+            .append("SELECT " + "uuid, created, description, label, last_modified")
             .append(
                 " FROM webpages INNER JOIN webpage_webpages ww ON uuid = ww.parent_webpage_uuid")
             .append(" WHERE ww.child_webpage_uuid = :uuid");
@@ -186,7 +186,7 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
     String sql =
         "SELECT "
-            + IDENTIFIABLE_COLUMNS
+            + "uuid, created, description, label, last_modified"
             + " FROM webpages INNER JOIN webpage_webpages ww ON uuid = ww.child_webpage_uuid"
             + " WHERE ww.parent_webpage_uuid = :uuid"
             + " ORDER BY ww.sortIndex ASC";

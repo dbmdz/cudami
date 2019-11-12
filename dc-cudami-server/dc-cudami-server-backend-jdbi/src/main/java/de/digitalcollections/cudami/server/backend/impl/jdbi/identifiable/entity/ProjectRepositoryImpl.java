@@ -37,7 +37,8 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   @Override
   public PageResponse<Project> find(PageRequest pageRequest) {
     StringBuilder query =
-        new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS + ", text").append(" FROM projects");
+        new StringBuilder("SELECT " + "uuid, created, description, label, last_modified" + ", text")
+            .append(" FROM projects");
 
     addPageRequestParams(pageRequest, query);
 
@@ -51,7 +52,11 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   @Override
   public Project findOne(UUID uuid) {
     String query =
-        "SELECT " + IDENTIFIABLE_COLUMNS + ", text" + " FROM projects" + " WHERE uuid = :uuid";
+        "SELECT "
+            + "uuid, created, description, label, last_modified"
+            + ", text"
+            + " FROM projects"
+            + " WHERE uuid = :uuid";
 
     Project project =
         dbi.withHandle(

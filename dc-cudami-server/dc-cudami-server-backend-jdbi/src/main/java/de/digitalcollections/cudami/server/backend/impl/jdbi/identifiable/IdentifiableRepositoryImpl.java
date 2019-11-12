@@ -26,9 +26,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableRepositoryImpl.class);
 
-  protected static final String IDENTIFIABLE_COLUMNS =
-      "uuid, created, description, label, last_modified";
-
   protected Jdbi dbi;
 
   @Autowired

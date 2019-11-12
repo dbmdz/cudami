@@ -37,7 +37,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   @Override
   public PageResponse<Collection> find(PageRequest pageRequest) {
     StringBuilder query =
-        new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS + ", text").append(" FROM collections");
+        new StringBuilder("SELECT " + "uuid, created, description, label, last_modified" + ", text")
+            .append(" FROM collections");
 
     addPageRequestParams(pageRequest, query);
 
@@ -51,7 +52,11 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   @Override
   public Collection findOne(UUID uuid) {
     String query =
-        "SELECT " + IDENTIFIABLE_COLUMNS + ", text" + " FROM collections" + " WHERE uuid = :uuid";
+        "SELECT "
+            + "uuid, created, description, label, last_modified"
+            + ", text"
+            + " FROM collections"
+            + " WHERE uuid = :uuid";
 
     Collection collection =
         dbi.withHandle(

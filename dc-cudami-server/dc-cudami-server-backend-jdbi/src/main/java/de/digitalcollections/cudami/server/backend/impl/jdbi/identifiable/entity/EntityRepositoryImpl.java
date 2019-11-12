@@ -77,7 +77,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   @Override
   public PageResponse<E> find(PageRequest pageRequest) {
     StringBuilder query =
-        new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS + ", entityType")
+        new StringBuilder(
+                "SELECT " + "uuid, created, description, label, last_modified" + ", entityType")
             .append(" FROM entities");
 
     addPageRequestParams(pageRequest, query);
@@ -92,7 +93,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   public E findOne(UUID uuid) {
     String query =
         "SELECT "
-            + IDENTIFIABLE_COLUMNS
+            + "uuid, created, description, label, last_modified"
             + ", entityType"
             + " FROM entities"
             + " WHERE uuid = :uuid";

@@ -37,7 +37,8 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   @Override
   public PageResponse<Article> find(PageRequest pageRequest) {
     StringBuilder query =
-        new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS + ", text").append(" FROM articles");
+        new StringBuilder("SELECT " + "uuid, created, description, label, last_modified" + ", text")
+            .append(" FROM articles");
 
     addPageRequestParams(pageRequest, query);
 
@@ -51,7 +52,11 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   @Override
   public Article findOne(UUID uuid) {
     String query =
-        "SELECT " + IDENTIFIABLE_COLUMNS + ", text" + " FROM articles" + " WHERE uuid = :uuid";
+        "SELECT "
+            + "uuid, created, description, label, last_modified"
+            + ", text"
+            + " FROM articles"
+            + " WHERE uuid = :uuid";
 
     Article article =
         dbi.withHandle(

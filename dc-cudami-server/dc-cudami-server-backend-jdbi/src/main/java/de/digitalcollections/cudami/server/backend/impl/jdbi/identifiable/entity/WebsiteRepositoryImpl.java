@@ -40,7 +40,10 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   @Override
   public PageResponse<Website> find(PageRequest pageRequest) {
     StringBuilder query =
-        new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS + ", url, registration_date")
+        new StringBuilder(
+                "SELECT "
+                    + "uuid, created, description, label, last_modified"
+                    + ", url, registration_date")
             .append(" FROM websites");
 
     addPageRequestParams(pageRequest, query);
@@ -56,7 +59,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   public Website findOne(UUID uuid) {
     String query =
         "SELECT "
-            + IDENTIFIABLE_COLUMNS
+            + "uuid, created, description, label, last_modified"
             + ", url, registration_date"
             + " FROM websites"
             + " WHERE uuid = :uuid";
@@ -128,7 +131,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
     String sql =
         "SELECT "
-            + IDENTIFIABLE_COLUMNS
+            + "uuid, created, description, label, last_modified"
             + " FROM webpages INNER JOIN website_webpages ww ON uuid = ww.webpage_uuid"
             + " WHERE ww.website_uuid = :uuid"
             + " ORDER BY ww.sortIndex ASC";

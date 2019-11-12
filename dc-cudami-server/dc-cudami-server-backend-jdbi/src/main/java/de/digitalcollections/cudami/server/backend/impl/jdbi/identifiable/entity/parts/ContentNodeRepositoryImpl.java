@@ -44,7 +44,9 @@ public class ContentNodeRepositoryImpl<E extends Entity>
   @Override
   public PageResponse<ContentNode> find(PageRequest pageRequest) {
     StringBuilder query =
-        new StringBuilder().append("SELECT " + IDENTIFIABLE_COLUMNS).append(" FROM contentnodes");
+        new StringBuilder()
+            .append("SELECT " + "uuid, created, description, label, last_modified")
+            .append(" FROM contentnodes");
 
     addPageRequestParams(pageRequest, query);
 
@@ -60,7 +62,7 @@ public class ContentNodeRepositoryImpl<E extends Entity>
   public ContentNode findOne(UUID uuid) {
     StringBuilder query =
         new StringBuilder()
-            .append("SELECT " + IDENTIFIABLE_COLUMNS)
+            .append("SELECT " + "uuid, created, description, label, last_modified")
             .append(" FROM contentnodes")
             .append(" WHERE uuid = :uuid");
 
@@ -87,7 +89,7 @@ public class ContentNodeRepositoryImpl<E extends Entity>
   public ContentNode getParent(UUID uuid) {
     StringBuilder query =
         new StringBuilder()
-            .append("SELECT " + IDENTIFIABLE_COLUMNS)
+            .append("SELECT " + "uuid, created, description, label, last_modified")
             .append(
                 " FROM contentnodes INNER JOIN contentnode_contentnodes cc ON uuid = cc.parent_contentnode_uuid")
             .append(" WHERE cc.child_contentnode_uuid = :uuid");
@@ -113,7 +115,7 @@ public class ContentNodeRepositoryImpl<E extends Entity>
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
     String sql =
         "SELECT "
-            + IDENTIFIABLE_COLUMNS
+            + "uuid, created, description, label, last_modified"
             + " FROM contentnodes INNER JOIN contentnode_contentnodes cc ON uuid = cc.child_contentnode_uuid"
             + " WHERE cc.parent_contentnode_uuid = :uuid"
             + " ORDER BY cc.sortIndex ASC";
@@ -145,7 +147,7 @@ public class ContentNodeRepositoryImpl<E extends Entity>
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
     String sql =
         "SELECT "
-            + IDENTIFIABLE_COLUMNS
+            + "uuid, created, description, label, last_modified"
             + ", entity_type"
             + " FROM entities INNER JOIN contentnode_entities ce ON uuid = ce.entity_uuid"
             + " WHERE ce.contentnode_uuid = :uuid"
@@ -179,7 +181,7 @@ public class ContentNodeRepositoryImpl<E extends Entity>
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
     String sql =
         "SELECT "
-            + IDENTIFIABLE_COLUMNS
+            + "uuid, created, description, label, last_modified"
             + ", filename, mimetype, size_in_bytes, uri"
             + " FROM fileresources INNER JOIN contentnode_fileresources cf ON uuid = cf.fileresource_uuid"
             + " WHERE cf.contentnode_uuid = :uuid"
