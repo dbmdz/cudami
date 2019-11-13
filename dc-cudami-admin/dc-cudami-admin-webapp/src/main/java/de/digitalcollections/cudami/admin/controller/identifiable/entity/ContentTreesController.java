@@ -31,8 +31,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /** Controller for content trees management pages. */
@@ -72,7 +70,7 @@ public class ContentTreesController extends AbstractController {
     return service.create();
   }
 
-  @RequestMapping(value = "/contenttrees/{uuid}/edit", method = RequestMethod.GET)
+  @GetMapping("/contenttrees/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     ContentTree contentTree = service.get(uuid);
