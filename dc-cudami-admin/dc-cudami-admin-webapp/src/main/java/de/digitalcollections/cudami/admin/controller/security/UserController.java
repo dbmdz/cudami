@@ -25,11 +25,11 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
@@ -66,7 +66,7 @@ public class UserController extends AbstractController {
     //        binder.addValidators(mySpecialUserValidator);
   }
 
-  @RequestMapping(value = "/users/{uuid}/activate", method = RequestMethod.GET)
+  @GetMapping("/users/{uuid}/activate")
   public String activate(
       @PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
     User user = service.activate(uuid);
@@ -77,7 +77,7 @@ public class UserController extends AbstractController {
     return "redirect:/users";
   }
 
-  @RequestMapping(value = "/users/{uuid}/deactivate", method = RequestMethod.GET)
+  @GetMapping("/users/{uuid}/deactivate")
   public String deactivate(
       @PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
     User user = service.deactivate(uuid);
@@ -90,13 +90,13 @@ public class UserController extends AbstractController {
     return "redirect:/users";
   }
 
-  @RequestMapping(value = "/users/new", method = RequestMethod.GET)
+  @GetMapping("/users/new")
   public String create(Model model) {
     model.addAttribute("user", service.create());
     return "users/create";
   }
 
-  @RequestMapping(value = "/users/new", method = RequestMethod.POST)
+  @PostMapping("/users/new")
   public String create(
       @RequestParam("pwd1") String password1,
       @RequestParam("pwd2") String password2,
@@ -120,13 +120,13 @@ public class UserController extends AbstractController {
     return "redirect:/users/" + userDb.getUuid().toString();
   }
 
-  @RequestMapping(value = "/users/{uuid}/edit", method = RequestMethod.GET)
+  @GetMapping("/users/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) {
     model.addAttribute("user", service.findOne(uuid));
     return "users/edit";
   }
 
-  @RequestMapping(value = "/users/{uuid}/edit", method = RequestMethod.POST)
+  @PostMapping("/users/{uuid}/edit")
   public String edit(
       @PathVariable UUID uuid,
       @RequestParam("pwd1") String password1,
@@ -152,7 +152,7 @@ public class UserController extends AbstractController {
     return "redirect:/users/" + uuid;
   }
 
-  @RequestMapping(value = "/users", method = RequestMethod.GET)
+  @GetMapping("/users")
   public String list(
       Model model,
       @PageableDefault(
@@ -168,7 +168,7 @@ public class UserController extends AbstractController {
     return "users/list";
   }
 
-  @RequestMapping(value = "/users/{uuid}", method = RequestMethod.GET)
+  @GetMapping("/users/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) {
     model.addAttribute("user", service.findOne(uuid));
     return "users/view";
