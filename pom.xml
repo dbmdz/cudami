@@ -99,7 +99,7 @@
     <version.jacoco-maven-plugin>0.8.5</version.jacoco-maven-plugin>
     <version.maven-fmt-plugin>2.9</version.maven-fmt-plugin>
     <version.maven-gpg-plugin>1.6</version.maven-gpg-plugin>
-    <version.maven-surefire-plugin>3.0.0-M3</version.maven-surefire-plugin>
+    <version.maven-surefire-plugin>3.0.0-M4</version.maven-surefire-plugin>
     <version.nexus-staging-maven-plugin>1.6.8</version.nexus-staging-maven-plugin>
     <version.spotbugs-maven-plugin>3.1.12.2</version.spotbugs-maven-plugin>
   </properties>
