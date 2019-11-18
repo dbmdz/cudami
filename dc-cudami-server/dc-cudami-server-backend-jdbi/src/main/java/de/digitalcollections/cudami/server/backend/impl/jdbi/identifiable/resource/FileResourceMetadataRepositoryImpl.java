@@ -241,7 +241,9 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
                     .map(new FileResourceMapper())
                     .findOne()
                     .orElse(null));
-
+    if (fileResource == null) {
+      return null;
+    }
     addSpecificMetadata(fileResource, fileResource.getUuid());
 
     return fileResource;
