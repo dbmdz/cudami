@@ -66,6 +66,7 @@ public class SpringConfigBackendDatabase {
             .locations(
                 "classpath:/de/digitalcollections/cudami/server/backend/impl/database/migration")
             .baselineOnMigrate(true)
+            .outOfOrder(true)
             .load();
     return flyway;
   }
