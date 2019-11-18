@@ -117,8 +117,8 @@ public class V1WebpageController {
   }
 
   private void convertLocalizedStructuredContentXml(Element xml) {
-    Element content = xml.getChild("entry");
-    xml.setContent(createDocumentsElement(content));
+    List<Element> contents = xml.getChildren("entry");
+    xml.setContent(createDocumentsElement(contents));
   }
 
   private JSONObject convertLocalizedTextJson(JSONObject json) {
@@ -151,9 +151,12 @@ public class V1WebpageController {
     xml.setContent(translations);
   }
 
-  private Element createDocumentsElement(Element content) {
+  private Element createDocumentsElement(List<Element> contents) {
     Element documents = new Element("documents");
-    documents.setContent(content.clone());
+    contents.forEach(
+        (content) -> {
+          documents.addContent(content.clone());
+        });
     return documents;
   }
 
