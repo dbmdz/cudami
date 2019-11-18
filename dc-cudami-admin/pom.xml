@@ -6,7 +6,7 @@
   <parent>
     <groupId>de.digitalcollections.cudami</groupId>
     <artifactId>dc-cudami</artifactId>
-    <version>3.2.1-SNAPSHOT</version>
+    <version>3.2.2-SNAPSHOT</version>
   </parent>
 
   <name>DigitalCollections: cudami Admin</name>

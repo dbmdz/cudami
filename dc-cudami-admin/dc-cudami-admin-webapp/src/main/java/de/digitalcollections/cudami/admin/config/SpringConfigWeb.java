@@ -8,13 +8,17 @@ import de.digitalcollections.commons.springmvc.controller.ErrorController;
 import de.digitalcollections.commons.springmvc.thymeleaf.SpacesDialect;
 import de.digitalcollections.cudami.admin.converter.GrantedAuthorityJsonFilter;
 import de.digitalcollections.cudami.admin.interceptors.CreateAdminUserInterceptor;
+import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -130,6 +134,12 @@ public class SpringConfigWeb implements WebMvcConfigurer {
     // In case you want the filter to apply to specific URL patterns only (defaults to "/*")
     registration.addUrlPatterns("/*");
     return registration;
+  }
+
+  @Bean
+  public LanguageSortingHelper languageSortingHelper(
+      @Value("${cudami.prioritisedSortedLanguages}") List<Locale> prioritisedSortedLanguages) {
+    return new LanguageSortingHelper(prioritisedSortedLanguages);
   }
 
   @Bean

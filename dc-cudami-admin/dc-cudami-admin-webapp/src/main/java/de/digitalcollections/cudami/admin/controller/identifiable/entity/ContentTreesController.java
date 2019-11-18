@@ -7,13 +7,17 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.ContentTreeService;
+import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.model.api.identifiable.entity.ContentTree;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -37,11 +41,16 @@ public class ContentTreesController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentTreesController.class);
 
+  LanguageSortingHelper languageSortingHelper;
   LocaleRepository localeRepository;
   ContentTreeService service;
 
   @Autowired
-  public ContentTreesController(LocaleRepository localeRepository, ContentTreeService service) {
+  public ContentTreesController(
+      LanguageSortingHelper languageSortingHelper,
+      LocaleRepository localeRepository,
+      ContentTreeService service) {
+    this.languageSortingHelper = languageSortingHelper;
     this.localeRepository = localeRepository;
     this.service = service;
   }
@@ -65,9 +74,15 @@ public class ContentTreesController extends AbstractController {
 
   @RequestMapping(value = "/contenttrees/{uuid}/edit", method = RequestMethod.GET)
   public String edit(@PathVariable UUID uuid, Model model) {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
     ContentTree contentTree = service.get(uuid);
-    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, contentTree.getLabel().getLocales());
+
+    model.addAttribute("activeLanguage", existingLanguages.get(0));
+    model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("uuid", contentTree.getUuid());
+
     return "contenttrees/edit";
   }
 
@@ -117,8 +132,12 @@ public class ContentTreesController extends AbstractController {
 
   @GetMapping("/contenttrees/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
     ContentTree contentTree = (ContentTree) service.get(uuid);
-    model.addAttribute("availableLanguages", contentTree.getLabel().getLocales());
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, contentTree.getLabel().getLocales());
+
+    model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("contentTree", contentTree);
 
     return "contenttrees/view";

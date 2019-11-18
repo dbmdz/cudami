@@ -8,6 +8,7 @@ const App = () => {
     <IdentifiableForm
       activeLanguage="en"
       debug={true}
+      existingLanguages={["de", "en"]}
       mockApi={true}
       type="webpage"
       uiLocale="en"

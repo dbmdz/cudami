@@ -5,7 +5,7 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:text="|#{fileresources}: #{fileresources_edit(${filename})}|">Files: Edit file "abc"</title>
+    <title th:text="|#{fileresources}: #{fileresource_edit(${filename})}|">Files: Edit file "abc"</title>
   </head>
   <body>
     <section layout:fragment="content">
@@ -15,6 +15,7 @@
         CudamiEditor({
           activeLanguage: /*[[${activeLanguage}]]*/,
           apiContextPath: /*[[@{/}]]*/ '',
+          existingLanguages: /*[[${existingLanguages}]]*/,
           id: "editor",
           type: "fileResource",
           uiLocale: /*[[${#locale.language}]]*/,

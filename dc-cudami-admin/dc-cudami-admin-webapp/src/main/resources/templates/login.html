@@ -24,12 +24,11 @@
                   <input type="password" class="form-control" id="j_password" name="password" />
                 </div>
                 <div class="form-group">
-                  <div class="offset-3 col-sm-9">
-                    <div class="form-check">
-                      <label>
-                        <input type="checkbox" id="checkSave" name="remember-me" /> <span th:text="#{lbl_stay_logged_in}">stay logged in</span>
-                      </label>
-                    </div>
+                  <div class="form-check">
+                    <input class="form-check-input" id="remember-me" name="remember-me" type="checkbox">
+                    <label class="form-check-label" for="remember-me" th:text="#{lbl_stay_logged_in}">
+                      Stay logged in
+                    </label>
                   </div>
                 </div>
                 <button type="submit" class="btn btn-primary float-right" th:text="#{btn_login}">Login</button>

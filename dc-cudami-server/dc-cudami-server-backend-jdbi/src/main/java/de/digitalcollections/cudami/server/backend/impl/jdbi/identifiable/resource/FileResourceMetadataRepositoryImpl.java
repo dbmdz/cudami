@@ -170,7 +170,6 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
                     .mapToBean(FileResourceImpl.class)
                     .findOne()
                     .orElse(null));
-
     if (fileResource == null) {
       return null;
     }

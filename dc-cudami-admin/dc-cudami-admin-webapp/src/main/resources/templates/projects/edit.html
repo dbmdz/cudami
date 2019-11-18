@@ -5,7 +5,7 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:text="|#{projects}: #{project_edit}|">Projects: Edit project</title>
+    <title th:text="|#{digitization_projects}: #{project_edit}|">Projects: Edit project</title>
   </head>
   <body>
     <section layout:fragment="content">
@@ -15,6 +15,7 @@
         CudamiEditor({
           activeLanguage: /*[[${activeLanguage}]]*/,
           apiContextPath: /*[[@{/}]]*/ '',
+          existingLanguages: /*[[${existingLanguages}]]*/,
           id: "editor",
           type: "project",
           uiLocale: /*[[${#locale.language}]]*/,
