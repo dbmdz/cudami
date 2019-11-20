@@ -63,17 +63,17 @@ public class SpringConfigBackendDatabase {
   @Autowired
   @Qualifier(value = "pds")
   public Flyway flyway(DataSource pds) {
-    if (flywayEnabled) {
-      Flyway flyway =
-          Flyway.configure()
-              .dataSource(pds)
-              .locations(
-                  "classpath:/de/digitalcollections/cudami/server/backend/impl/database/migration")
-              .baselineOnMigrate(true)
-              .load();
-      return flyway;
+    if (!flywayEnabled) {
+      return null;
     }
-    return null;
+    Flyway flyway =
+        Flyway.configure()
+            .dataSource(pds)
+            .locations(
+                "classpath:/de/digitalcollections/cudami/server/backend/impl/database/migration")
+            .baselineOnMigrate(true)
+            .load();
+    return flyway;
   }
 
   @Bean
