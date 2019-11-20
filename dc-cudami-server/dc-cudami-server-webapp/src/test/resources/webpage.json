@@ -1,0 +1,37 @@
+{
+  "children": [],
+  "created": "2019-08-05T16:54:29.71132",
+  "entityPartType": "WEBPAGE",
+  "identifiers": [],
+  "label": {
+    "en": "My first webpage"
+  },
+  "lastModified": "2019-08-05T16:54:29.711332",
+  "text": {
+    "en": {
+      "content": [
+        {
+          "content": [
+            {
+              "marks": [
+                {
+                  "attrs": {
+                    "href": "http://foobar.com",
+                    "title": "Foo Bar"
+                  },
+                  "type": "link"
+                }
+              ],
+              "text": "Foo Bar",
+              "type": "text"
+            }
+          ],
+          "type": "paragraph"
+        }
+      ],
+      "type": "doc"
+    }
+  },
+  "type": "ENTITY_PART",
+  "uuid": "3a32c394-8080-4f78-8145-47441902c7f8"
+}
