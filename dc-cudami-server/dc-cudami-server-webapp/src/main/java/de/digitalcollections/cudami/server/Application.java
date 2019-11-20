@@ -1,7 +1,5 @@
 package de.digitalcollections.cudami.server;
 
-// import org.slf4j.Logger;
-// import org.slf4j.LoggerFactory;
 import org.jsondoc.spring.boot.starter.EnableJSONDoc;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
