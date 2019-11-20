@@ -8,6 +8,7 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 public class ApplicationTest {
 
+  /* This method tests, if the application comes up, not more */
   @Test
   public void contextLoads() throws Exception {}
 }
