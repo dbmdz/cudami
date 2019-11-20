@@ -78,17 +78,16 @@ public class EntityPartRepositoryImpl<P extends EntityPart, E extends Entity>
 
   @Override
   public LinkedHashSet<E> getRelatedEntities(UUID entityPartUuid) {
-    StringBuilder query =
-        new StringBuilder("SELECT *")
-            .append(
-                " FROM entities e INNER JOIN rel_entitypart_entities ref ON e.uuid=ref.entity_uuid")
-            .append(" WHERE ref.entitypart_uuid = :entityPartUuid")
-            .append(" ORDER BY ref.sortindex");
+    String query =
+        "SELECT * FROM entities e"
+            + " INNER JOIN rel_entitypart_entities ref ON e.uuid=ref.entity_uuid"
+            + " WHERE ref.entitypart_uuid = :entityPartUuid"
+            + " ORDER BY ref.sortindex";
 
     List<EntityImpl> list =
         dbi.withHandle(
             h ->
-                h.createQuery(query.toString())
+                h.createQuery(query)
                     .bind("entityPartUuid", entityPartUuid)
                     .mapToBean(EntityImpl.class)
                     .list());
@@ -110,17 +109,16 @@ public class EntityPartRepositoryImpl<P extends EntityPart, E extends Entity>
 
   @Override
   public LinkedHashSet<FileResource> getRelatedFileResources(UUID entityPartUuid) {
-    StringBuilder query =
-        new StringBuilder("SELECT *")
-            .append(
-                " FROM fileresources f INNER JOIN rel_entitypart_fileresources ref ON f.uuid=ref.fileresource_uuid")
-            .append(" WHERE ref.entitypart_uuid = :entityPartUuid")
-            .append(" ORDER BY ref.sortindex");
+    String query =
+        "SELECT * FROM fileresources f"
+            + " INNER JOIN rel_entitypart_fileresources ref ON f.uuid=ref.fileresource_uuid"
+            + " WHERE ref.entitypart_uuid = :entityPartUuid"
+            + " ORDER BY ref.sortindex";
 
     List<FileResourceImpl> result =
         dbi.withHandle(
             h ->
-                h.createQuery(query.toString())
+                h.createQuery(query)
                     .bind("entityPartUuid", entityPartUuid)
                     .mapToBean(FileResourceImpl.class)
                     .list());

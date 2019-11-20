@@ -41,11 +41,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   public PageResponse<Website> find(PageRequest pageRequest) {
     StringBuilder query =
         new StringBuilder(
-                "SELECT "
-                    + "uuid, created, description, label, last_modified"
-                    + ", url, registration_date")
-            .append(" FROM websites");
-
+            "SELECT uuid, label, description, created, last_modified, url, registration_date FROM websites");
     addPageRequestParams(pageRequest, query);
 
     List<WebsiteImpl> result =
@@ -58,12 +54,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   @Override
   public Website findOne(UUID uuid) {
     String query =
-        "SELECT "
-            + "uuid, created, description, label, last_modified"
-            + ", url, registration_date"
-            + " FROM websites"
-            + " WHERE uuid = :uuid";
-
+        "SELECT uuid, label, description, created, last_modified, url, registration_date FROM websites WHERE uuid = :uuid";
     Website website =
         dbi.withHandle(
             h ->
@@ -89,12 +80,16 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     website.setCreated(LocalDateTime.now());
     website.setLastModified(LocalDateTime.now());
 
+    String query =
+        "INSERT INTO websites("
+            + "uuid, label, description, identifiable_type, entity_type, created, last_modified, url, registration_date"
+            + ") VALUES ("
+            + ":uuid, :label::JSONB, :description::JSONB, :type, :entityType, :created, :lastModified, :url, :registrationDate"
+            + ") RETURNING *";
     Website result =
         dbi.withHandle(
             h ->
-                h.createQuery(
-                        "INSERT INTO websites(uuid, created, description, identifiable_type, label, last_modified, entity_type, url, registration_date)"
-                            + " VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :entityType, :url, :registrationDate) RETURNING *")
+                h.createQuery(query)
                     .bindBean(website)
                     .mapToBean(WebsiteImpl.class)
                     .findOne()
@@ -108,11 +103,15 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
 
     // do not update/left out from statement (not changed since insert): uuid, created,
     // identifiable_type, entity_type
+    String query =
+        "UPDATE websites SET"
+            + " label=:label::JSONB, description=:description::JSONB, last_modified=:lastModified, url=:url, registration_date=:registrationDate"
+            + " WHERE uuid=:uuid"
+            + " RETURNING *";
     Website result =
         dbi.withHandle(
             h ->
-                h.createQuery(
-                        "UPDATE websites SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, url=:url, registration_date=:registrationDate WHERE uuid=:uuid RETURNING *")
+                h.createQuery(query)
                     .bindBean(website)
                     .mapToBean(WebsiteImpl.class)
                     .findOne()

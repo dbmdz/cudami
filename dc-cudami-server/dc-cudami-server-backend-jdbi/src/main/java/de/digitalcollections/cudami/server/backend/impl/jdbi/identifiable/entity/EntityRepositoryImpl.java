@@ -78,8 +78,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   public PageResponse<E> find(PageRequest pageRequest) {
     StringBuilder query =
         new StringBuilder(
-                "SELECT " + "uuid, created, description, label, last_modified" + ", entityType")
-            .append(" FROM entities");
+            "SELECT uuid, label, description, entityType, created, last_modified FROM entities");
 
     addPageRequestParams(pageRequest, query);
     List<EntityImpl> result =
@@ -92,11 +91,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   @Override
   public E findOne(UUID uuid) {
     String query =
-        "SELECT "
-            + "uuid, created, description, label, last_modified"
-            + ", entityType"
-            + " FROM entities"
-            + " WHERE uuid = :uuid";
+        "SELECT uuid, label, description, entityType, created, last_modified FROM entities WHERE uuid = :uuid";
 
     E entity =
         (E)
@@ -144,17 +139,16 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public LinkedHashSet<FileResource> getRelatedFileResources(UUID entityUuid) {
-    StringBuilder query =
-        new StringBuilder("SELECT *")
-            .append(
-                " FROM fileresources f INNER JOIN rel_entity_fileresources ref ON f.uuid=ref.fileresource_uuid")
-            .append(" WHERE ref.entity_uuid = :entityUuid")
-            .append(" ORDER BY ref.sortindex");
+    String query =
+        "SELECT * FROM fileresources f"
+            + " INNER JOIN rel_entity_fileresources ref ON f.uuid=ref.fileresource_uuid"
+            + " WHERE ref.entity_uuid = :entityUuid"
+            + " ORDER BY ref.sortindex";
 
     List<FileResourceImpl> result =
         dbi.withHandle(
             h ->
-                h.createQuery(query.toString())
+                h.createQuery(query)
                     .bind("entityUuid", entityUuid)
                     .mapToBean(FileResourceImpl.class)
                     .list());
@@ -164,17 +158,16 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   @Override
   public List<EntityRelation> getRelations(E subjectEntity) {
     // query predicate and object entity (subject entity is given)
-    StringBuilder query =
-        new StringBuilder("SELECT rel.predicate as predicate,")
-            .append(
-                " e.uuid as uuid, e.created as created, e.description as description, e.identifiable_type as identifiable_type, e.label as label, e.last_modified as last_modified, e.entity_type as entity_type")
-            .append(" FROM rel_entity_entities rel INNER JOIN entities e ON rel.object_uuid=e.uuid")
-            .append(" WHERE rel.subject_uuid = :uuid");
+    String query =
+        "SELECT rel.predicate as predicate, e.uuid as uuid, e.created as created, e.description as description, e.identifiable_type as identifiable_type, e.label as label, e.last_modified as last_modified, e.entity_type as entity_type"
+            + " FROM rel_entity_entities rel"
+            + " INNER JOIN entities e ON rel.object_uuid=e.uuid"
+            + " WHERE rel.subject_uuid = :uuid";
 
     List<EntityRelation> result =
         dbi.withHandle(
             h ->
-                h.createQuery(query.toString())
+                h.createQuery(query)
                     .bind("uuid", subjectEntity.getUuid())
                     .map(new EntityRelationMapper(subjectEntity))
                     .list());

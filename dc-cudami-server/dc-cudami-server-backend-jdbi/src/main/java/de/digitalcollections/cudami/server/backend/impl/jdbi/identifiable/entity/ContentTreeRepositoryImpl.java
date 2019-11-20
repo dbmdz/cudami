@@ -41,9 +41,8 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
   @Override
   public PageResponse<ContentTree> find(PageRequest pageRequest) {
     StringBuilder query =
-        new StringBuilder("SELECT " + "uuid, created, description, label, last_modified")
-            .append(" FROM contenttrees");
-
+        new StringBuilder(
+            "SELECT uuid, label, description, created, last_modified FROM contenttrees");
     addPageRequestParams(pageRequest, query);
 
     List<ContentTreeImpl> result =
@@ -57,11 +56,7 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
   @Override
   public ContentTree findOne(UUID uuid) {
     String query =
-        "SELECT "
-            + "uuid, created, description, label, last_modified"
-            + " FROM contenttrees"
-            + " WHERE uuid = :uuid";
-
+        "SELECT uuid, label, description, created, last_modified FROM contenttrees WHERE uuid = :uuid";
     ContentTree contentTree =
         dbi.withHandle(
             h ->
@@ -87,16 +82,46 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
   }
 
   @Override
+  public List<ContentNode> getRootNodes(ContentTree contentTree) {
+    UUID uuid = contentTree.getUuid();
+    return getRootNodes(uuid);
+  }
+
+  @Override
+  public List<ContentNode> getRootNodes(UUID uuid) {
+    // minimal data required (= identifiable fields) for creating text links/teasers in a list
+    String query =
+        "SELECT "
+            + "uuid, label, description, created, last_modified"
+            + " FROM contentnodes INNER JOIN contenttree_contentnodes cc ON uuid = cc.contentnode_uuid"
+            + " WHERE cc.contenttree_uuid = :uuid"
+            + " ORDER BY cc.sortIndex ASC";
+    List<ContentNodeImpl> list =
+        dbi.withHandle(
+            h -> h.createQuery(query).bind("uuid", uuid).mapToBean(ContentNodeImpl.class).list());
+
+    if (list.isEmpty()) {
+      return new ArrayList<>();
+    }
+    return list.stream().map(ContentNode.class::cast).collect(Collectors.toList());
+  }
+
+  @Override
   public ContentTree save(ContentTree contentTree) {
     contentTree.setUuid(UUID.randomUUID());
     contentTree.setCreated(LocalDateTime.now());
     contentTree.setLastModified(LocalDateTime.now());
 
+    String query =
+        "INSERT INTO contenttrees("
+            + "uuid, label, description, identifiable_type, entity_type, created, last_modified"
+            + ") VALUES ("
+            + ":uuid, :label::JSONB, :description::JSONB, :type, :entityType, :created, :lastModified"
+            + ") RETURNING *";
     ContentTree result =
         dbi.withHandle(
             h ->
-                h.createQuery(
-                        "INSERT INTO contenttrees(uuid, created, description, identifiable_type, label, last_modified, entity_type) VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :entityType) RETURNING *")
+                h.createQuery(query)
                     .bindBean(contentTree)
                     .mapToBean(ContentTreeImpl.class)
                     .findOne()
@@ -110,46 +135,19 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
 
     // do not update/left out from statement (not changed since insert): uuid, created,
     // identifiable_type, entity_type
+    String query =
+        "UPDATE contenttrees SET"
+            + " label=:label::JSONB, description=:description::JSONB, last_modified=:lastModified"
+            + " WHERE uuid=:uuid"
+            + " RETURNING *";
     ContentTree result =
         dbi.withHandle(
             h ->
-                h.createQuery(
-                        "UPDATE contenttrees SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified WHERE uuid=:uuid RETURNING *")
+                h.createQuery(query)
                     .bindBean(contentTree)
                     .mapToBean(ContentTreeImpl.class)
                     .findOne()
                     .orElse(null));
     return result;
-  }
-
-  @Override
-  public List<ContentNode> getRootNodes(ContentTree contentTree) {
-    UUID uuid = contentTree.getUuid();
-    return getRootNodes(uuid);
-  }
-
-  @Override
-  public List<ContentNode> getRootNodes(UUID uuid) {
-    // minimal data required (= identifiable fields) for creating text links/teasers in a list
-    String sql =
-        "SELECT "
-            + "uuid, created, description, label, last_modified"
-            + " FROM contentnodes INNER JOIN contenttree_contentnodes cc ON uuid = cc.contentnode_uuid"
-            + " WHERE cc.contenttree_uuid = :uuid"
-            + " ORDER BY cc.sortIndex ASC";
-
-    //    String query = "SELECT cc.contentnode_uuid as uuid, i.label as label"
-    //                   + " FROM contenttrees ct INNER JOIN contenttree_contentnode cc ON
-    // ct.uuid=cc.contenttree_uuid INNER JOIN identifiables i ON cc.contentnode_uuid=i.uuid"
-    //                   + " WHERE ct.uuid = :uuid"
-    //                   + " ORDER BY cc.sortIndex ASC";
-    List<ContentNodeImpl> list =
-        dbi.withHandle(
-            h -> h.createQuery(sql).bind("uuid", uuid).mapToBean(ContentNodeImpl.class).list());
-
-    if (list.isEmpty()) {
-      return new ArrayList<>();
-    }
-    return list.stream().map(ContentNode.class::cast).collect(Collectors.toList());
   }
 }

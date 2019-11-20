@@ -37,9 +37,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   @Override
   public PageResponse<Collection> find(PageRequest pageRequest) {
     StringBuilder query =
-        new StringBuilder("SELECT " + "uuid, created, description, label, last_modified" + ", text")
-            .append(" FROM collections");
-
+        new StringBuilder(
+            "SELECT uuid, label, description, created, last_modified, text FROM collections");
     addPageRequestParams(pageRequest, query);
 
     List<CollectionImpl> result =
@@ -52,12 +51,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   @Override
   public Collection findOne(UUID uuid) {
     String query =
-        "SELECT "
-            + "uuid, created, description, label, last_modified"
-            + ", text"
-            + " FROM collections"
-            + " WHERE uuid = :uuid";
-
+        "SELECT uuid, label, description, created, last_modified, text FROM collections WHERE uuid = :uuid";
     Collection collection =
         dbi.withHandle(
             h ->
@@ -85,16 +79,20 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     collection.setCreated(LocalDateTime.now());
     collection.setLastModified(LocalDateTime.now());
 
+    String query =
+        "INSERT INTO collections("
+            + "uuid, label, description, identifiable_type, entity_type, created, last_modified, text"
+            + ") VALUES ("
+            + ":uuid, :label::JSONB, :description::JSONB, :type, :entityType, :created, :lastModified, :text::JSONB"
+            + ") RETURNING *";
     Collection result =
         dbi.withHandle(
             h ->
-                h.createQuery(
-                        "INSERT INTO collections(uuid, created, description, identifiable_type, label, last_modified, entity_type, text) VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :entityType, :text::JSONB) RETURNING *")
+                h.createQuery(query)
                     .bindBean(collection)
                     .mapToBean(CollectionImpl.class)
                     .findOne()
                     .orElse(null));
-
     return result;
   }
 
@@ -103,11 +101,16 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     collection.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert): uuid, created,
     // identifiable_type, entity_type
+
+    String query =
+        "UPDATE collections SET"
+            + " label=:label::JSONB, description=:description::JSONB, last_modified=:lastModified, text=:text::JSONB"
+            + " WHERE uuid=:uuid"
+            + " RETURNING *";
     Collection result =
         dbi.withHandle(
             h ->
-                h.createQuery(
-                        "UPDATE collections SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, text=:text::JSONB WHERE uuid=:uuid RETURNING *")
+                h.createQuery(query)
                     .bindBean(collection)
                     .mapToBean(CollectionImpl.class)
                     .findOne()
