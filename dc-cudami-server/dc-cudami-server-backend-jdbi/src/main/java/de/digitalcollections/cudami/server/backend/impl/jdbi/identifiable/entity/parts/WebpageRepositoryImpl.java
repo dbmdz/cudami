@@ -8,7 +8,6 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -92,10 +91,6 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
     List<WebpageImpl> list =
         dbi.withHandle(
             h -> h.createQuery(sql).bind("uuid", uuid).mapToBean(WebpageImpl.class).list());
-
-    if (list.isEmpty()) {
-      return new ArrayList<>();
-    }
     return list.stream().map(s -> (Webpage) s).collect(Collectors.toList());
   }
 

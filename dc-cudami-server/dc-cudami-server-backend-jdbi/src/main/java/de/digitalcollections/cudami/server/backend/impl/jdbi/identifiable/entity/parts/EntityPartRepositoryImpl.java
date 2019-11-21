@@ -91,11 +91,6 @@ public class EntityPartRepositoryImpl<P extends EntityPart, E extends Entity>
                     .bind("entityPartUuid", entityPartUuid)
                     .mapToBean(EntityImpl.class)
                     .list());
-
-    if (list.isEmpty()) {
-      return new LinkedHashSet<>();
-    }
-
     // TODO maybe does not work, then we have to refactor to LinkedHashSet<Entity>...
     LinkedHashSet<E> result =
         list.stream().map(s -> (E) s).collect(Collectors.toCollection(LinkedHashSet::new));

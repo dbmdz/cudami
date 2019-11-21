@@ -116,18 +116,13 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   private int getIndex(LinkedHashSet<FileResource> fileResources, FileResource fileResource) {
-    boolean found = false;
     int pos = -1;
     for (Iterator<FileResource> iterator = fileResources.iterator(); iterator.hasNext(); ) {
       pos = pos + 1;
       FileResource fr = iterator.next();
       if (fr.getUuid().equals(fileResource.getUuid())) {
-        found = true;
-        break;
+        return pos;
       }
-    }
-    if (found) {
-      return pos;
     }
     return -1;
   }

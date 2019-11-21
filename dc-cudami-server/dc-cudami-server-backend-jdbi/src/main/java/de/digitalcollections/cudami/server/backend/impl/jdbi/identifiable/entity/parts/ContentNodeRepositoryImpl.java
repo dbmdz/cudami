@@ -11,7 +11,6 @@ import de.digitalcollections.model.impl.identifiable.entity.parts.ContentNodeImp
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
@@ -97,10 +96,6 @@ public class ContentNodeRepositoryImpl<E extends Entity>
     List<ContentNodeImpl> list =
         dbi.withHandle(
             h -> h.createQuery(query).bind("uuid", uuid).mapToBean(ContentNodeImpl.class).list());
-
-    if (list.isEmpty()) {
-      return new ArrayList<>();
-    }
     return list.stream().map(s -> (ContentNode) s).collect(Collectors.toList());
   }
 
@@ -126,11 +121,6 @@ public class ContentNodeRepositoryImpl<E extends Entity>
                     .bind("uuid", contentNodeUuid)
                     .mapToBean(EntityImpl.class)
                     .list());
-
-    if (list.isEmpty()) {
-      return new LinkedHashSet<>();
-    }
-
     // TODO maybe does not work, then we have to refactor to LinkedHashSet<Entity>...
     LinkedHashSet<E> result =
         list.stream().map(s -> (E) s).collect(Collectors.toCollection(LinkedHashSet::new));
@@ -160,11 +150,6 @@ public class ContentNodeRepositoryImpl<E extends Entity>
                     .bind("uuid", contentNodeUuid)
                     .mapToBean(FileResourceImpl.class)
                     .list());
-
-    if (list.isEmpty()) {
-      return new LinkedHashSet<>();
-    }
-
     LinkedHashSet<FileResource> result =
         list.stream()
             .map(s -> (FileResource) s)

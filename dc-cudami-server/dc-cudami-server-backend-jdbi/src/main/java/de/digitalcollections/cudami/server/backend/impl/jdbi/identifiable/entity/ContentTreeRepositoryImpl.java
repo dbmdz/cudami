@@ -10,7 +10,6 @@ import de.digitalcollections.model.impl.identifiable.entity.ContentTreeImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.ContentNodeImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -99,10 +98,6 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
     List<ContentNodeImpl> list =
         dbi.withHandle(
             h -> h.createQuery(query).bind("uuid", uuid).mapToBean(ContentNodeImpl.class).list());
-
-    if (list.isEmpty()) {
-      return new ArrayList<>();
-    }
     return list.stream().map(ContentNode.class::cast).collect(Collectors.toList());
   }
 
