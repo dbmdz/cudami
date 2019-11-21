@@ -136,3 +136,8 @@ li.locale-switcher.invalid > a {
 li > p {
   margin: 0;
 }
+
+blockquote {
+  border-left: 3px solid #ccc;
+  padding-left: 1em;
+}
