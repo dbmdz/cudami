@@ -77,19 +77,6 @@ public class UserController extends AbstractController {
     return "redirect:/users";
   }
 
-  @GetMapping("/users/{uuid}/deactivate")
-  public String deactivate(
-      @PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
-    User user = service.deactivate(uuid);
-    String message =
-        messageSource.getMessage(
-            "msg.user_deactivated",
-            new Object[] {user.getEmail()},
-            LocaleContextHolder.getLocale());
-    redirectAttributes.addFlashAttribute("warning_message", message);
-    return "redirect:/users";
-  }
-
   @GetMapping("/users/new")
   public String create(Model model) {
     model.addAttribute("user", service.create());
@@ -118,6 +105,19 @@ public class UserController extends AbstractController {
         messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
     return "redirect:/users/" + userDb.getUuid().toString();
+  }
+
+  @GetMapping("/users/{uuid}/deactivate")
+  public String deactivate(
+      @PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
+    User user = service.deactivate(uuid);
+    String message =
+        messageSource.getMessage(
+            "msg.user_deactivated",
+            new Object[] {user.getEmail()},
+            LocaleContextHolder.getLocale());
+    redirectAttributes.addFlashAttribute("warning_message", message);
+    return "redirect:/users";
   }
 
   @GetMapping("/users/{uuid}/edit")
