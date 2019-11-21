@@ -228,7 +228,7 @@ export default function(t) {
       },
     },
     insert: {
-      image: {
+      /*image: {
         title: t('insert.image'),
         content: icons.image,
         enable: canInsert(schema.nodes.image),
@@ -248,7 +248,7 @@ export default function(t) {
           const footnote = schema.nodes.footnote.create()
           dispatch(state.tr.replaceSelectionWith(footnote))
         },
-      },
+      },*/
       hr: {
         title: t('insert.hr'),
         content: icons.hr,
