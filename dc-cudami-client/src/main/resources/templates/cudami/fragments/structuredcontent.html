@@ -127,7 +127,15 @@
             <th:block th:text="' ' + ${attribute.key} + '='"></th:block>"<th:block th:text="${attribute.value}"></th:block>"</th:block>
           <th:block th:utext="'>'"></th:block>
         </th:block>
-        <th:block th:unless="${mark.type} == 'link'" th:utext="'<' + ${mark.type} + '>'"></th:block>
+        <th:block th:unless="${mark.type} == 'link'">
+          <th:block th:switch="${mark.type}">
+            <th:block th:case="'strikethrough'" th:utext="'<s>'"></th:block>
+            <th:block th:case="'subscript'" th:utext="'<sub>'"></th:block>
+            <th:block th:case="'superscript'" th:utext="'<sup>'"></th:block>
+            <th:block th:case="'underline'" th:utext="'<u>'"></th:block>
+            <th:block th:case="*" th:utext="'<' + ${mark.type} + '>'"></th:block>
+          </th:block>
+        </th:block>
       </th:block>
     </th:block>
     <th:block th:utext="${block.text}">...</th:block>
@@ -137,12 +145,17 @@
           <th:block th:utext="'</a>'"></th:block>
         </th:block>
         <th:block th:unless="${mark.type} == 'link'">
-          <th:block th:utext="'</' + ${mark.type} + '>'"></th:block>
+          <th:block th:switch="${mark.type}">
+            <th:block th:case="'strikethrough'" th:utext="'</s>'"></th:block>
+            <th:block th:case="'subscript'" th:utext="'</sub>'"></th:block>
+            <th:block th:case="'superscript'" th:utext="'</sup>'"></th:block>
+            <th:block th:case="'underline'" th:utext="'</u>'"></th:block>
+            <th:block th:case="*" th:utext="'</' + ${mark.type} + '>'"></th:block>
+          </th:block>
         </th:block>
       </th:block>
     </th:block>
   </th:block>
 </th:block>
-
 </body>
 </html>
