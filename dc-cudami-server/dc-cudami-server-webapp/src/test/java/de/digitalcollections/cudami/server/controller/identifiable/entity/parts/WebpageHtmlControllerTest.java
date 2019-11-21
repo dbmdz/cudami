@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.parts
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,7 +46,6 @@ public class WebpageHtmlControllerTest {
     MvcResult result =
         mockMvc
             .perform(get("/latest/webpages/{uuid}.html", "00000000-0000-0000-0000-000000000000"))
-            .andDo(print())
             .andExpect(status().isOk())
             .andReturn();
     String content = result.getResponse().getContentAsString();
