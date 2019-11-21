@@ -37,8 +37,8 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
   @Override
   public PageResponse<Corporation> find(PageRequest pageRequest) {
     StringBuilder query =
-        new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS + ", text").append(" FROM corporations");
-
+        new StringBuilder(
+            "SELECT uuid, label, description, created, last_modified, text FROM corporations");
     addPageRequestParams(pageRequest, query);
 
     List<CorporationImpl> result =
@@ -52,8 +52,7 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
   @Override
   public Corporation findOne(UUID uuid) {
     String query =
-        "SELECT " + IDENTIFIABLE_COLUMNS + ", text" + " FROM corporations" + " WHERE uuid = :uuid";
-
+        "SELECT uuid, label, description, created, last_modified, text FROM corporations WHERE uuid = :uuid";
     Corporation corporation =
         dbi.withHandle(
             h ->
@@ -81,16 +80,20 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
     corporation.setCreated(LocalDateTime.now());
     corporation.setLastModified(LocalDateTime.now());
 
+    String query =
+        "INSERT INTO corporations("
+            + "uuid, label, description, identifiable_type, entity_type, created, last_modified, text"
+            + ") VALUES ("
+            + ":uuid, :label::JSONB, :description::JSONB, :type, :entityType, :created, :lastModified, :text::JSONB"
+            + ") RETURNING *";
     Corporation result =
         dbi.withHandle(
             h ->
-                h.createQuery(
-                        "INSERT INTO corporations(uuid, created, description, identifiable_type, label, last_modified, entity_type, text) VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :entityType, :text::JSONB) RETURNING *")
+                h.createQuery(query)
                     .bindBean(corporation)
                     .mapToBean(CorporationImpl.class)
                     .findOne()
                     .orElse(null));
-
     return result;
   }
 
@@ -99,11 +102,15 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
     corporation.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert): uuid, created,
     // identifiable_type, entity_type
+    String query =
+        "UPDATE corporations SET"
+            + " label=:label::JSONB, description=:description::JSONB, last_modified=:lastModified, text=:text::JSONB"
+            + " WHERE uuid=:uuid"
+            + " RETURNING *";
     Corporation result =
         dbi.withHandle(
             h ->
-                h.createQuery(
-                        "UPDATE corporations SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, text=:text::JSONB WHERE uuid=:uuid RETURNING *")
+                h.createQuery(query)
                     .bindBean(corporation)
                     .mapToBean(CorporationImpl.class)
                     .findOne()

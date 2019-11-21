@@ -37,8 +37,8 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   @Override
   public PageResponse<Article> find(PageRequest pageRequest) {
     StringBuilder query =
-        new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS + ", text").append(" FROM articles");
-
+        new StringBuilder(
+            "SELECT uuid, label, description, created, last_modified, text FROM articles");
     addPageRequestParams(pageRequest, query);
 
     List<ArticleImpl> result =
@@ -51,8 +51,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   @Override
   public Article findOne(UUID uuid) {
     String query =
-        "SELECT " + IDENTIFIABLE_COLUMNS + ", text" + " FROM articles" + " WHERE uuid = :uuid";
-
+        "SELECT uuid, label, description, created, last_modified, text FROM articles WHERE uuid = :uuid";
     Article article =
         dbi.withHandle(
             h ->
@@ -80,16 +79,20 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
     article.setCreated(LocalDateTime.now());
     article.setLastModified(LocalDateTime.now());
 
+    String query =
+        "INSERT INTO articles("
+            + "uuid, label, description, identifiable_type, entity_type, created, last_modified, text"
+            + ") VALUES ("
+            + ":uuid, :label::JSONB, :description::JSONB, :type, :entityType, :created, :lastModified, :text::JSONB"
+            + ") RETURNING *";
     Article result =
         dbi.withHandle(
             h ->
-                h.createQuery(
-                        "INSERT INTO articles(uuid, created, description, identifiable_type, label, last_modified, entity_type, text) VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :entityType, :text::JSONB) RETURNING *")
+                h.createQuery(query)
                     .bindBean(article)
                     .mapToBean(ArticleImpl.class)
                     .findOne()
                     .orElse(null));
-
     return result;
   }
 
@@ -98,11 +101,16 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
     article.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert): uuid, created,
     // identifiable_type, entity_type
+
+    String query =
+        "UPDATE articles SET"
+            + " label=:label::JSONB, description=:description::JSONB, last_modified=:lastModified, text=:text::JSONB"
+            + " WHERE uuid=:uuid"
+            + " RETURNING *";
     Article result =
         dbi.withHandle(
             h ->
-                h.createQuery(
-                        "UPDATE articles SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, text=:text::JSONB WHERE uuid=:uuid RETURNING *")
+                h.createQuery(query)
                     .bindBean(article)
                     .mapToBean(ArticleImpl.class)
                     .findOne()

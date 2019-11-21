@@ -37,8 +37,8 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   @Override
   public PageResponse<Project> find(PageRequest pageRequest) {
     StringBuilder query =
-        new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS + ", text").append(" FROM projects");
-
+        new StringBuilder(
+            "SELECT uuid, label, description, created, last_modified, text FROM projects");
     addPageRequestParams(pageRequest, query);
 
     List<ProjectImpl> result =
@@ -51,8 +51,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   @Override
   public Project findOne(UUID uuid) {
     String query =
-        "SELECT " + IDENTIFIABLE_COLUMNS + ", text" + " FROM projects" + " WHERE uuid = :uuid";
-
+        "SELECT uuid, label, description, created, last_modified, text FROM projects WHERE uuid = :uuid";
     Project project =
         dbi.withHandle(
             h ->
@@ -80,16 +79,20 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
     project.setCreated(LocalDateTime.now());
     project.setLastModified(LocalDateTime.now());
 
+    String query =
+        "INSERT INTO projects("
+            + "uuid, label, description, identifiable_type, entity_type, created, last_modified, text"
+            + ") VALUES ("
+            + ":uuid, :label::JSONB, :description::JSONB, :type, :entityType, :created, :lastModified, :text::JSONB"
+            + ") RETURNING *";
     Project result =
         dbi.withHandle(
             h ->
-                h.createQuery(
-                        "INSERT INTO projects(uuid, created, description, identifiable_type, label, last_modified, entity_type, text) VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :entityType, :text::JSONB) RETURNING *")
+                h.createQuery(query)
                     .bindBean(project)
                     .mapToBean(ProjectImpl.class)
                     .findOne()
                     .orElse(null));
-
     return result;
   }
 
@@ -98,11 +101,16 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
     project.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert): uuid, created,
     // identifiable_type, entity_type
+
+    String query =
+        "UPDATE projects SET"
+            + " label=:label::JSONB, description=:description::JSONB, last_modified=:lastModified, text=:text::JSONB"
+            + " WHERE uuid=:uuid"
+            + " RETURNING *";
     Project result =
         dbi.withHandle(
             h ->
-                h.createQuery(
-                        "UPDATE projects SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, text=:text::JSONB WHERE uuid=:uuid RETURNING *")
+                h.createQuery(query)
                     .bindBean(project)
                     .mapToBean(ProjectImpl.class)
                     .findOne()

@@ -11,7 +11,6 @@ import de.digitalcollections.model.impl.identifiable.entity.parts.ContentNodeImp
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
@@ -44,8 +43,8 @@ public class ContentNodeRepositoryImpl<E extends Entity>
   @Override
   public PageResponse<ContentNode> find(PageRequest pageRequest) {
     StringBuilder query =
-        new StringBuilder().append("SELECT " + IDENTIFIABLE_COLUMNS).append(" FROM contentnodes");
-
+        new StringBuilder(
+            "SELECT uuid, label, description, created, last_modified FROM contentnodes");
     addPageRequestParams(pageRequest, query);
 
     List<ContentNodeImpl> result =
@@ -58,16 +57,12 @@ public class ContentNodeRepositoryImpl<E extends Entity>
 
   @Override
   public ContentNode findOne(UUID uuid) {
-    StringBuilder query =
-        new StringBuilder()
-            .append("SELECT " + IDENTIFIABLE_COLUMNS)
-            .append(" FROM contentnodes")
-            .append(" WHERE uuid = :uuid");
-
+    String query =
+        "SELECT uuid, label, description, created, last_modified FROM contentnodes WHERE uuid = :uuid";
     ContentNode contentNode =
         dbi.withHandle(
             h ->
-                h.createQuery(query.toString())
+                h.createQuery(query)
                     .bind("uuid", uuid)
                     .mapToBean(ContentNodeImpl.class)
                     .findOne()
@@ -84,26 +79,6 @@ public class ContentNodeRepositoryImpl<E extends Entity>
   }
 
   @Override
-  public ContentNode getParent(UUID uuid) {
-    StringBuilder query =
-        new StringBuilder()
-            .append("SELECT " + IDENTIFIABLE_COLUMNS)
-            .append(
-                " FROM contentnodes INNER JOIN contentnode_contentnodes cc ON uuid = cc.parent_contentnode_uuid")
-            .append(" WHERE cc.child_contentnode_uuid = :uuid");
-
-    ContentNode contentNode =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query.toString())
-                    .bind("uuid", uuid)
-                    .mapToBean(ContentNodeImpl.class)
-                    .findOne()
-                    .orElse(null));
-    return contentNode;
-  }
-
-  @Override
   public List<ContentNode> getChildren(ContentNode contentNode) {
     return getChildren(contentNode.getUuid());
   }
@@ -111,27 +86,16 @@ public class ContentNodeRepositoryImpl<E extends Entity>
   @Override
   public List<ContentNode> getChildren(UUID uuid) {
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
-    String sql =
+    String query =
         "SELECT "
-            + IDENTIFIABLE_COLUMNS
+            + "uuid, label, description, created, last_modified"
             + " FROM contentnodes INNER JOIN contentnode_contentnodes cc ON uuid = cc.child_contentnode_uuid"
             + " WHERE cc.parent_contentnode_uuid = :uuid"
             + " ORDER BY cc.sortIndex ASC";
 
-    //    StringBuilder query = new StringBuilder()
-    //        .append("SELECT i.uuid as uuid, i.label as label")
-    //        .append(" FROM contentnodes cn INNER JOIN contentnode_contentnode cc ON
-    // cn.uuid=cc.parent_contentnode_uuid INNER JOIN identifiables i ON
-    // cc.child_contentnode_uuid=i.uuid")
-    //        .append(" WHERE cn.uuid = :uuid")
-    //        .append(" ORDER BY cc.sortindex ASC");
     List<ContentNodeImpl> list =
         dbi.withHandle(
-            h -> h.createQuery(sql).bind("uuid", uuid).mapToBean(ContentNodeImpl.class).list());
-
-    if (list.isEmpty()) {
-      return new ArrayList<>();
-    }
+            h -> h.createQuery(query).bind("uuid", uuid).mapToBean(ContentNodeImpl.class).list());
     return list.stream().map(s -> (ContentNode) s).collect(Collectors.toList());
   }
 
@@ -143,10 +107,9 @@ public class ContentNodeRepositoryImpl<E extends Entity>
   @Override
   public LinkedHashSet<E> getEntities(UUID contentNodeUuid) {
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
-    String sql =
-        "SELECT "
-            + IDENTIFIABLE_COLUMNS
-            + ", entity_type"
+    String query =
+        "SELECT"
+            + " uuid, label, description, entity_type, created, last_modified"
             + " FROM entities INNER JOIN contentnode_entities ce ON uuid = ce.entity_uuid"
             + " WHERE ce.contentnode_uuid = :uuid"
             + " ORDER BY ce.sortIndex ASC";
@@ -154,15 +117,10 @@ public class ContentNodeRepositoryImpl<E extends Entity>
     List<EntityImpl> list =
         dbi.withHandle(
             h ->
-                h.createQuery(sql)
+                h.createQuery(query)
                     .bind("uuid", contentNodeUuid)
                     .mapToBean(EntityImpl.class)
                     .list());
-
-    if (list.isEmpty()) {
-      return new LinkedHashSet<>();
-    }
-
     // TODO maybe does not work, then we have to refactor to LinkedHashSet<Entity>...
     LinkedHashSet<E> result =
         list.stream().map(s -> (E) s).collect(Collectors.toCollection(LinkedHashSet::new));
@@ -177,10 +135,10 @@ public class ContentNodeRepositoryImpl<E extends Entity>
   @Override
   public LinkedHashSet<FileResource> getFileResources(UUID contentNodeUuid) {
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
-    String sql =
-        "SELECT "
-            + IDENTIFIABLE_COLUMNS
-            + ", filename, mimetype, size_in_bytes, uri"
+    String query =
+        "SELECT"
+            + " uuid, label, description, created, last_modified,"
+            + " filename, mimetype, size_in_bytes, uri"
             + " FROM fileresources INNER JOIN contentnode_fileresources cf ON uuid = cf.fileresource_uuid"
             + " WHERE cf.contentnode_uuid = :uuid"
             + " ORDER BY cf.sortIndex ASC";
@@ -188,15 +146,10 @@ public class ContentNodeRepositoryImpl<E extends Entity>
     List<FileResourceImpl> list =
         dbi.withHandle(
             h ->
-                h.createQuery(sql)
+                h.createQuery(query)
                     .bind("uuid", contentNodeUuid)
                     .mapToBean(FileResourceImpl.class)
                     .list());
-
-    if (list.isEmpty()) {
-      return new LinkedHashSet<>();
-    }
-
     LinkedHashSet<FileResource> result =
         list.stream()
             .map(s -> (FileResource) s)
@@ -205,16 +158,41 @@ public class ContentNodeRepositoryImpl<E extends Entity>
   }
 
   @Override
+  public ContentNode getParent(UUID uuid) {
+    String query =
+        "SELECT"
+            + " uuid, label, description, created, last_modified,"
+            + " FROM contentnodes"
+            + " INNER JOIN contentnode_contentnodes cc ON uuid = cc.parent_contentnode_uuid"
+            + " WHERE cc.child_contentnode_uuid = :uuid";
+
+    ContentNode contentNode =
+        dbi.withHandle(
+            h ->
+                h.createQuery(query)
+                    .bind("uuid", uuid)
+                    .mapToBean(ContentNodeImpl.class)
+                    .findOne()
+                    .orElse(null));
+    return contentNode;
+  }
+
+  @Override
   public ContentNode save(ContentNode contentNode) {
     contentNode.setUuid(UUID.randomUUID());
     contentNode.setCreated(LocalDateTime.now());
     contentNode.setLastModified(LocalDateTime.now());
 
+    String query =
+        "INSERT INTO contentnodes("
+            + "uuid, label, description, identifiable_type, created, last_modified"
+            + ") VALUES ("
+            + ":uuid, :label::JSONB, :description::JSONB, :type, :created, :lastModified"
+            + ") RETURNING *";
     ContentNode result =
         dbi.withHandle(
             h ->
-                h.createQuery(
-                        "INSERT INTO contentnodes(uuid, created, description, identifiable_type, label, last_modified) VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified) RETURNING *")
+                h.createQuery(query)
                     .bindBean(contentNode)
                     .mapToBean(ContentNodeImpl.class)
                     .findOne()

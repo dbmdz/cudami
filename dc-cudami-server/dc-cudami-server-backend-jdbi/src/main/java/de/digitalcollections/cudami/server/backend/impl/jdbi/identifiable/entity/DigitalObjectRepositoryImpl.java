@@ -5,7 +5,6 @@ import static java.util.stream.Collectors.toList;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMapper;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
@@ -16,6 +15,7 @@ import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ApplicationFileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.AudioFileResourceImpl;
+import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.TextFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
@@ -43,32 +43,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   private final FileResourceMetadataRepository fileResourceMetadataRepository;
   private final IdentifierRepository identifierRepository;
 
-  static final String SELECT_ALL_FR =
-      "select d.uuid d_uuid, d.created d_created, d.description d_description, d.identifiable_type d_identifiable_type, d.label d_label, d.last_modified d_last_modified,"
-          + " d.entity_type d_entity_type,"
-          + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          // + " idfi.uuid idfi_uuid, idfi.identifiable idfi_identifiable, idfi.namespace
-          // idfi_namespace, idfi.identifier idfi_id,"
-          + " df.fileresource_uuid df_fileresource_uuid,"
-          + " fi.uuid fi_uuid, fi.created fi_created, fi.description fi_description, fi.identifiable_type fi_identifiable_type,"
-          + " fi.label fi_label, fi.last_modified fi_last_modified, fi.filename fi_filename, fi.mimetype fi_mimetype, fi.size_in_bytes fi_size_in_bytes, fi.uri fi_uri,"
-          + " fi.height fi_height, fi.width fi_width,"
-          + " fa.uuid fa_uuid, fa.created fa_created, fa.description fa_description, fa.identifiable_type fa_identifiable_type,"
-          + " fa.label fa_label, fa.last_modified fa_last_modified, fa.filename fa_filename, fa.mimetype fa_mimetype, fa.size_in_bytes fa_size_in_bytes, fa.uri fa_uri,"
-          + " fa.duration fa_duration,"
-          + " ft.uuid ft_uuid, ft.created ft_created, ft.description ft_description, ft.identifiable_type ft_identifiable_type,"
-          + " ft.label ft_label, ft.last_modified ft_last_modified, ft.filename ft_filename, ft.mimetype ft_mimetype, ft.size_in_bytes ft_size_in_bytes, ft.uri ft_uri,"
-          + " fp.uuid fp_uuid, fp.created fp_created, fp.description fp_description, fp.identifiable_type fp_identifiable_type,"
-          + " fp.label fp_label, fp.last_modified fp_last_modified, fp.filename fp_filename, fp.mimetype fp_mimetype, fp.size_in_bytes fp_size_in_bytes, fp.uri fp_uri"
-          + " from digitalobjects as d"
-          + " left join identifiers as id on d.uuid = id.identifiable"
-          + " left join digitalobject_fileresources as df on d.uuid = df.digitalobject_uuid"
-          + " left join fileresources_image as fi on df.fileresource_uuid = fi.uuid"
-          // + " left join identifiers as idfi on fi.uuid = idfi.identifiable"
-          + " left join fileresources_audio as fa on df.fileresource_uuid = fa.uuid"
-          + " left join fileresources_text as ft on df.fileresource_uuid = ft.uuid"
-          + " left join fileresources_application as fp on df.fileresource_uuid = fp.uuid";
-
   @Autowired
   public DigitalObjectRepositoryImpl(
       Jdbi dbi,
@@ -89,8 +63,10 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   @Override
   public PageResponse<DigitalObject> find(PageRequest pageRequest) {
     StringBuilder query =
-        new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS).append(" FROM digitalobjects");
-
+        new StringBuilder(
+            "SELECT uuid, label, description,"
+                + " created, last_modified"
+                + " FROM digitalobjects");
     addPageRequestParams(pageRequest, query);
 
     List<DigitalObjectImpl> result =
@@ -102,8 +78,50 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
+  public DigitalObject findByIdentifier(String namespace, String id) {
+    return findOne(new IdentifierImpl(null, namespace, id));
+  }
+
+  @Override
   public DigitalObject findOne(UUID uuid) {
-    String query = SELECT_ALL_FR + " WHERE d.uuid = :uuid order by df.sortindex";
+    String query =
+        "SELECT d.uuid d_uuid, d.label d_label, d.description d_description,"
+            + " d.identifiable_type d_identifiable_type, d.entity_type d_entity_type,"
+            + " d.created d_created, d.last_modified d_last_modified,"
+            + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
+            + " df.fileresource_uuid df_fileresource_uuid,"
+            + ""
+            + " fi.uuid fi_uuid, fi.label fi_label, fi.description fi_description,"
+            + " fi.identifiable_type fi_identifiable_type,"
+            + " fi.created fi_created, fi.last_modified fi_last_modified,"
+            + " fi.filename fi_filename, fi.mimetype fi_mimetype, fi.size_in_bytes fi_size_in_bytes, fi.uri fi_uri,"
+            + " fi.height fi_height, fi.width fi_width,"
+            + ""
+            + " fa.uuid fa_uuid, fa.label fa_label, fa.description fa_description,"
+            + " fa.identifiable_type fa_identifiable_type,"
+            + " fa.created fa_created, fa.last_modified fa_last_modified,"
+            + " fa.filename fa_filename, fa.mimetype fa_mimetype, fa.size_in_bytes fa_size_in_bytes, fa.uri fa_uri,"
+            + " fa.duration fa_duration,"
+            + ""
+            + " ft.uuid ft_uuid, ft.label ft_label, ft.description ft_description,"
+            + " ft.identifiable_type ft_identifiable_type,"
+            + " ft.created ft_created, ft.last_modified ft_last_modified,"
+            + " ft.filename ft_filename, ft.mimetype ft_mimetype, ft.size_in_bytes ft_size_in_bytes, ft.uri ft_uri,"
+            + ""
+            + " fp.uuid fp_uuid, fp.label fp_label, fp.description fp_description,"
+            + " fp.identifiable_type fp_identifiable_type,"
+            + " fp.created fp_created, fp.last_modified fp_last_modified,"
+            + " fp.filename fp_filename, fp.mimetype fp_mimetype, fp.size_in_bytes fp_size_in_bytes, fp.uri fp_uri"
+            + ""
+            + " FROM digitalobjects as d"
+            + " LEFT JOIN identifiers as id on d.uuid = id.identifiable"
+            + " LEFT JOIN digitalobject_fileresources as df on d.uuid = df.digitalobject_uuid"
+            + " LEFT JOIN fileresources_image as fi on df.fileresource_uuid = fi.uuid"
+            + " LEFT JOIN fileresources_audio as fa on df.fileresource_uuid = fa.uuid"
+            + " LEFT JOIN fileresources_text as ft on df.fileresource_uuid = ft.uuid"
+            + " LEFT JOIN fileresources_application as fp on df.fileresource_uuid = fp.uuid"
+            + " WHERE d.uuid = :uuid"
+            + " ORDER BY df.sortindex";
 
     Optional<DigitalObjectImpl> digitalObjectOpt =
         dbi.withHandle(
@@ -171,7 +189,33 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   @Override
   public DigitalObject findOne(Identifier identifier) {
-    throw new UnsupportedOperationException("Not supported yet.");
+    if (identifier.getIdentifiable() != null) {
+      return findOne(identifier.getIdentifiable());
+    }
+
+    String namespace = identifier.getNamespace();
+    String id = identifier.getId();
+
+    String query =
+        "SELECT d.uuid"
+            + " FROM digitalobjects as d"
+            + " LEFT JOIN identifiers as id on d.uuid = id.identifiable"
+            + " LEFT JOIN versions as v on v.uuid = d.version"
+            + " WHERE id.identifier = :id AND id.namespace = :namespace AND v.status = 'ACTIVE'";
+
+    UUID uuid =
+        dbi.withHandle(
+            h ->
+                h.createQuery(query)
+                    .bind("id", id)
+                    .bind("namespace", namespace)
+                    .mapTo(UUID.class)
+                    .findOne()
+                    .orElse(null));
+    if (uuid == null) {
+      return null;
+    }
+    return findOne(uuid);
   }
 
   @Override
@@ -182,18 +226,18 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   @Override
   public LinkedHashSet<FileResource> getFileResources(UUID digitalObjectUuid) {
     String query =
-        "select f.*"
-            + " from fileresources as f"
-            + " left join digitalobject_fileresources as df on f.uuid=df.fileresource_uuid"
+        "SELECT f.*"
+            + " FROM fileresources as f"
+            + " LEFT JOIN digitalobject_fileresources as df on f.uuid = df.fileresource_uuid"
             + " WHERE df.digitalobject_uuid = :uuid"
             + " ORDER BY df.sortIndex ASC";
 
-    List<FileResource> result =
+    List<FileResourceImpl> result =
         dbi.withHandle(
             h ->
                 h.createQuery(query)
                     .bind("uuid", digitalObjectUuid)
-                    .map(new FileResourceMapper())
+                    .mapToBean(FileResourceImpl.class)
                     .list());
     return new LinkedHashSet<>(result);
   }
@@ -201,14 +245,16 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   @Override
   public LinkedHashSet<ImageFileResource> getImageFileResources(UUID digitalObjectUuid) {
     String query =
-        "select"
-            + " fi.uuid fi_uuid, fi.created fi_created, fi.description fi_description, fi.identifiable_type fi_identifiable_type,"
-            + " fi.label fi_label, fi.last_modified fi_last_modified, fi.filename fi_filename, fi.mimetype fi_mimetype, fi.size_in_bytes fi_size_in_bytes, fi.uri fi_uri,"
+        "SELECT"
+            + " fi.uuid fi_uuid, fi.label fi_label, fi.description fi_description,"
+            + " fi.identifiable_type fi_identifiable_type,"
+            + " fi.created fi_created, fi.last_modified fi_last_modified,"
+            + " fi.filename fi_filename, fi.mimetype fi_mimetype, fi.size_in_bytes fi_size_in_bytes, fi.uri fi_uri,"
             + " fi.height fi_height, fi.width fi_width,"
-            + " idfi.uuid idfi_uuid, idfi.identifiable idfi_identifiable, idfi.namespace idfi_namespace, idfi.identifier idfi_id"
-            + " from fileresources_image as fi"
-            + " left join digitalobject_fileresources as df on fi.uuid=df.fileresource_uuid"
-            + " left join identifiers as idfi on fi.uuid = idfi.identifiable"
+            + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
+            + " FROM fileresources_image as fi"
+            + " LEFT JOIN digitalobject_fileresources as df on fi.uuid = df.fileresource_uuid"
+            + " LEFT JOIN identifiers as id on fi.uuid = id.identifiable"
             + " WHERE df.digitalobject_uuid = :uuid"
             + " ORDER BY df.sortIndex ASC";
 
@@ -216,7 +262,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         dbi.withHandle(
             h ->
                 h.createQuery(query).bind("uuid", digitalObjectUuid)
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "idfi"))
+                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "fi"))
                     .reduceRows(
                         new LinkedHashMap<UUID, ImageFileResourceImpl>(),
@@ -225,7 +271,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                               map.computeIfAbsent(
                                   rowView.getColumn("fi_uuid", UUID.class),
                                   id -> rowView.getRow(ImageFileResourceImpl.class));
-                          if (rowView.getColumn("idfi_uuid", UUID.class) != null) {
+                          if (rowView.getColumn("id_uuid", UUID.class) != null) {
                             imageFileResource.addIdentifier(rowView.getRow(IdentifierImpl.class));
                           }
                           return map;
@@ -234,6 +280,18 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                     .collect(toList()));
 
     return new LinkedHashSet<>(result);
+  }
+
+  private int getIndex(LinkedHashSet<FileResource> fileResources, FileResource fileResource) {
+    int pos = -1;
+    for (Iterator<FileResource> iterator = fileResources.iterator(); iterator.hasNext(); ) {
+      pos = pos + 1;
+      FileResource fr = iterator.next();
+      if (fr.getUuid().equals(fileResource.getUuid())) {
+        return pos;
+      }
+    }
+    return -1;
   }
 
   @Override
@@ -245,8 +303,11 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     dbi.withHandle(
         h ->
             h.createUpdate(
-                    "INSERT INTO digitalobjects(uuid, created, description, identifiable_type, label, last_modified, entity_type, version) "
-                        + "VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :entityType, :version.uuid)")
+                    "INSERT INTO digitalobjects("
+                        + "uuid, label, description, identifiable_type, entity_type, created, last_modified, version"
+                        + ") VALUES ("
+                        + ":uuid, :label::JSONB, :description::JSONB, :type, :entityType, :created, :lastModified, :version.uuid"
+                        + ")")
                 .bindBean(digitalObject)
                 .execute());
 
@@ -310,50 +371,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
           });
     }
     return getFileResources(digitalObjectUuid);
-  }
-
-  @Override
-  public DigitalObject findByIdentifier(String namespace, String id) {
-    Optional<DigitalObjectImpl> digitalObjectOpt =
-        (Optional<DigitalObjectImpl>)
-            dbi.withHandle(
-                h ->
-                    h.createQuery(
-                            "select di.uuid, di.created, di.description, di.label, di.last_modified"
-                                + " from digitalobjects as di"
-                                + " left join identifiers as id on di.uuid = id.identifiable"
-                                + " left join versions as v on v.uuid = di.version"
-                                + " where id.namespace = :namespace"
-                                + " and id.identifier = :id"
-                                + " and v.status = 'ACTIVE'")
-                        .bind("namespace", namespace)
-                        .bind("id", id)
-                        .mapToBean(DigitalObjectImpl.class)
-                        .findFirst());
-
-    if (!digitalObjectOpt.isPresent()) {
-      return null;
-    }
-    DigitalObject digitalObject = digitalObjectOpt.get();
-    digitalObject.setFileResources(getFileResources(digitalObject.getUuid()));
-    return digitalObject;
-  }
-
-  private int getIndex(LinkedHashSet<FileResource> fileResources, FileResource fileResource) {
-    boolean found = false;
-    int pos = -1;
-    for (Iterator<FileResource> iterator = fileResources.iterator(); iterator.hasNext(); ) {
-      pos = pos + 1;
-      FileResource fr = iterator.next();
-      if (fr.getUuid().equals(fileResource.getUuid())) {
-        found = true;
-        break;
-      }
-    }
-    if (found) {
-      return pos;
-    }
-    return -1;
   }
 
   @Override

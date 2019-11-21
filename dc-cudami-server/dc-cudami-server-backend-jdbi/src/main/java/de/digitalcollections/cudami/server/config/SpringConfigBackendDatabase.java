@@ -70,6 +70,7 @@ public class SpringConfigBackendDatabase {
         .dataSource(pds)
         .locations("classpath:/de/digitalcollections/cudami/server/backend/impl/database/migration")
         .baselineOnMigrate(true)
+        .outOfOrder(true)
         .load();
   }
 

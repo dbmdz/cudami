@@ -9,7 +9,6 @@ import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -40,9 +39,8 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   @Override
   public PageResponse<Website> find(PageRequest pageRequest) {
     StringBuilder query =
-        new StringBuilder("SELECT " + IDENTIFIABLE_COLUMNS + ", url, registration_date")
-            .append(" FROM websites");
-
+        new StringBuilder(
+            "SELECT uuid, label, description, created, last_modified, url, registration_date FROM websites");
     addPageRequestParams(pageRequest, query);
 
     List<WebsiteImpl> result =
@@ -55,12 +53,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   @Override
   public Website findOne(UUID uuid) {
     String query =
-        "SELECT "
-            + IDENTIFIABLE_COLUMNS
-            + ", url, registration_date"
-            + " FROM websites"
-            + " WHERE uuid = :uuid";
-
+        "SELECT uuid, label, description, created, last_modified, url, registration_date FROM websites WHERE uuid = :uuid";
     Website website =
         dbi.withHandle(
             h ->
@@ -86,12 +79,16 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     website.setCreated(LocalDateTime.now());
     website.setLastModified(LocalDateTime.now());
 
+    String query =
+        "INSERT INTO websites("
+            + "uuid, label, description, identifiable_type, entity_type, created, last_modified, url, registration_date"
+            + ") VALUES ("
+            + ":uuid, :label::JSONB, :description::JSONB, :type, :entityType, :created, :lastModified, :url, :registrationDate"
+            + ") RETURNING *";
     Website result =
         dbi.withHandle(
             h ->
-                h.createQuery(
-                        "INSERT INTO websites(uuid, created, description, identifiable_type, label, last_modified, entity_type, url, registration_date)"
-                            + " VALUES (:uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :entityType, :url, :registrationDate) RETURNING *")
+                h.createQuery(query)
                     .bindBean(website)
                     .mapToBean(WebsiteImpl.class)
                     .findOne()
@@ -105,11 +102,15 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
 
     // do not update/left out from statement (not changed since insert): uuid, created,
     // identifiable_type, entity_type
+    String query =
+        "UPDATE websites SET"
+            + " label=:label::JSONB, description=:description::JSONB, last_modified=:lastModified, url=:url, registration_date=:registrationDate"
+            + " WHERE uuid=:uuid"
+            + " RETURNING *";
     Website result =
         dbi.withHandle(
             h ->
-                h.createQuery(
-                        "UPDATE websites SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, url=:url, registration_date=:registrationDate WHERE uuid=:uuid RETURNING *")
+                h.createQuery(query)
                     .bindBean(website)
                     .mapToBean(WebsiteImpl.class)
                     .findOne()
@@ -128,7 +129,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
     String sql =
         "SELECT "
-            + IDENTIFIABLE_COLUMNS
+            + "uuid, created, description, label, last_modified"
             + " FROM webpages INNER JOIN website_webpages ww ON uuid = ww.webpage_uuid"
             + " WHERE ww.website_uuid = :uuid"
             + " ORDER BY ww.sortIndex ASC";
@@ -141,10 +142,6 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     List<WebpageImpl> list =
         dbi.withHandle(
             h -> h.createQuery(sql).bind("uuid", uuid).mapToBean(WebpageImpl.class).list());
-
-    if (list.isEmpty()) {
-      return new ArrayList<>();
-    }
     return list.stream().map(WebpageImpl.class::cast).collect(Collectors.toList());
   }
 }

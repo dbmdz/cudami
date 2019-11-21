@@ -26,9 +26,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableRepositoryImpl.class);
 
-  protected static final String IDENTIFIABLE_COLUMNS =
-      "uuid, created, description, label, last_modified";
-
   protected Jdbi dbi;
 
   @Autowired
@@ -162,18 +159,13 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   protected int getIndex(LinkedHashSet<? extends Identifiable> list, Identifiable identifiable) {
-    boolean found = false;
     int pos = -1;
     for (Iterator iterator = list.iterator(); iterator.hasNext(); ) {
       pos = pos + 1;
       Identifiable idf = (Identifiable) iterator.next();
       if (idf.getUuid().equals(identifiable.getUuid())) {
-        found = true;
-        break;
+        return pos;
       }
-    }
-    if (found) {
-      return pos;
     }
     return -1;
   }
