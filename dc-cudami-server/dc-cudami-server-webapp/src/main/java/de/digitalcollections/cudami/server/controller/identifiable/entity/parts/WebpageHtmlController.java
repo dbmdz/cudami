@@ -36,19 +36,22 @@ public class WebpageHtmlController {
       method = RequestMethod.GET)
   public String getWebpageAsHtml(
       @ApiPathParam(
-          description =
-          "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
-      @PathVariable("uuid") UUID uuid,
+              description =
+                  "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
       @ApiQueryParam(
-          name = "pLocale",
-          description =
-          "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
-      @RequestParam(name = "pLocale", required = false) Locale pLocale,
+              name = "pLocale",
+              description =
+                  "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+          @RequestParam(name = "pLocale", required = false)
+          Locale pLocale,
       @ApiQueryParam(
-          name = "renderLabel",
-          description =
-          "Switch for (de)activating rendering of webpage label. If 'false', label rendering will be skipped")
-      @RequestParam(name = "renderLabel", required = false, defaultValue = "true") String renderLabel,
+              name = "renderLabel",
+              description =
+                  "Switch for (de)activating rendering of webpage label. If 'false', label rendering will be skipped")
+          @RequestParam(name = "renderLabel", required = false, defaultValue = "true")
+          String renderLabel,
       Model model)
       throws IdentifiableServiceException {
     Webpage webpage;
