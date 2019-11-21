@@ -54,21 +54,24 @@ public class SpringConfigBackendDatabase {
   @Value("${cudami.database.username}")
   private String databaseUsername;
 
+  @Value("${spring.flyway.enabled:true}")
+  private boolean flywayEnabled;
+
   @Autowired ObjectMapper objectMapper;
 
   @Bean(initMethod = "migrate")
   @Autowired
   @Qualifier(value = "pds")
   public Flyway flyway(DataSource pds) {
-    Flyway flyway =
-        Flyway.configure()
-            .dataSource(pds)
-            .locations(
-                "classpath:/de/digitalcollections/cudami/server/backend/impl/database/migration")
-            .baselineOnMigrate(true)
-            .outOfOrder(true)
-            .load();
-    return flyway;
+    if (!flywayEnabled) {
+      return null;
+    }
+    return Flyway.configure()
+        .dataSource(pds)
+        .locations("classpath:/de/digitalcollections/cudami/server/backend/impl/database/migration")
+        .baselineOnMigrate(true)
+        .outOfOrder(true)
+        .load();
   }
 
   @Bean

@@ -46,6 +46,12 @@ public class WebpageHtmlController {
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale,
+      @ApiQueryParam(
+              name = "renderLabel",
+              description =
+                  "Switch for (de)activating rendering of webpage label. If 'false', label rendering will be skipped")
+          @RequestParam(name = "renderLabel", required = false, defaultValue = "true")
+          String renderLabel,
       Model model)
       throws IdentifiableServiceException {
     Webpage webpage;
@@ -56,6 +62,7 @@ public class WebpageHtmlController {
       Locale returnedLocale = getLocale(webpage);
       model.addAttribute("locale", returnedLocale);
     }
+    model.addAttribute("renderLabel", Boolean.parseBoolean(renderLabel));
     model.addAttribute("webpage", webpage);
     return "webpage";
   }

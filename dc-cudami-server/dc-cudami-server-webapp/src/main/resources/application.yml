@@ -81,3 +81,11 @@ spring:
   profiles: PROD
   thymeleaf:
     cache: true
+
+---
+
+# TEST
+spring:
+  flyway:
+    enabled: false
+  profiles: TEST

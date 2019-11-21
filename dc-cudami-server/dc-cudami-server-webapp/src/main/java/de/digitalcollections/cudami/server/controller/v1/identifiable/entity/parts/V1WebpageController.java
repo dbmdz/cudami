@@ -112,26 +112,42 @@ public class V1WebpageController {
 
   private JSONObject convertLocalizedStructuredContentJson(JSONObject json) {
     JSONObject localizedStructuredContent = new JSONObject();
-    localizedStructuredContent.put("documents", json);
+    JSONObject documents = new JSONObject();
+    for (String locale : json.keySet()) {
+      if (locale.equals("de")) {
+        documents.put("de_DE", json.get(locale));
+      } else {
+        documents.put(locale, json.get(locale));
+      }
+    }
+    localizedStructuredContent.put("documents", documents);
     return localizedStructuredContent;
   }
 
   private void convertLocalizedStructuredContentXml(Element xml) {
-    Element content = xml.getChild("entry");
-    xml.setContent(createDocumentsElement(content));
+    List<Element> contents = xml.getChildren("entry");
+    for (Element entry : contents) {
+      Element locale = entry.getChild("locale");
+      if (locale.getText().equals("de")) {
+        locale.setText("de_DE");
+      }
+    }
+    xml.setContent(createDocumentsElement(contents));
   }
 
   private JSONObject convertLocalizedTextJson(JSONObject json) {
     JSONObject result = new JSONObject();
     JSONArray translations = new JSONArray();
-    json.keySet()
-        .forEach(
-            (locale) -> {
-              JSONObject translation = new JSONObject();
-              translation.put("locale", locale);
-              translation.put("text", json.get(locale));
-              translations.put(translation);
-            });
+    for (String locale : json.keySet()) {
+      JSONObject translation = new JSONObject();
+      if (locale.equals("de")) {
+        translation.put("locale", "de_DE");
+      } else {
+        translation.put("locale", locale);
+      }
+      translation.put("text", json.get(locale));
+      translations.put(translation);
+    }
     result.put("translations", translations);
     return result;
   }
@@ -139,21 +155,27 @@ public class V1WebpageController {
   private void convertLocalizedTextXml(Element xml) {
     List<Element> contents = xml.getChildren("entry");
     Element translations = new Element("translations");
-    contents.forEach(
-        (entry) -> {
-          Element translation = new Element("translation");
-          translation.addContent(entry.getChild("locale").clone());
-          Element text = new Element("text");
-          text.addContent(entry.getChild("string").getText());
-          translation.addContent(text);
-          translations.addContent(translation);
-        });
+    for (Element entry : contents) {
+      Element translation = new Element("translation");
+      Element locale = entry.getChild("locale");
+      if (locale.getText().equals("de")) {
+        translation.addContent(locale.clone().setText("de_DE"));
+      } else {
+        translation.addContent(locale.clone());
+      }
+      Element text = new Element("text");
+      text.addContent(entry.getChild("string").getText());
+      translation.addContent(text);
+      translations.addContent(translation);
+    }
     xml.setContent(translations);
   }
 
-  private Element createDocumentsElement(Element content) {
+  private Element createDocumentsElement(List<Element> contents) {
     Element documents = new Element("documents");
-    documents.setContent(content.clone());
+    for (Element entry : contents) {
+      documents.addContent(entry.clone());
+    }
     return documents;
   }
 
