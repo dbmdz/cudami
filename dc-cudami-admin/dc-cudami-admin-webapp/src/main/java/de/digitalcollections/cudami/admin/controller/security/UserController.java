@@ -20,6 +20,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -166,6 +167,39 @@ public class UserController extends AbstractController {
     Page page = PageConverter.convert(pageResponse, pageRequest);
     model.addAttribute("page", new PageWrapper(page, "/users"));
     return "users/list";
+  }
+
+  @GetMapping("/users/updatePassword")
+  public String updatePassword(Model model) {
+    User currentUser =
+        service.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+    model.addAttribute("user", currentUser);
+    return "users/edit-password";
+  }
+
+  @PostMapping("/users/updatePassword")
+  public String updatePassword(
+      @RequestParam("pwd1") String password1,
+      @RequestParam("pwd2") String password2,
+      @ModelAttribute(name = "user") @Valid UserImpl user,
+      BindingResult results,
+      Model model,
+      SessionStatus status,
+      RedirectAttributes redirectAttributes) {
+    verifyBinding(results);
+    if (results.hasErrors()) {
+      return "users/updatePassword";
+    }
+    service.update(user, password1, password2, (Errors) results);
+    if (results.hasErrors()) {
+      return "users/updatePassword";
+    }
+    status.setComplete();
+    String message =
+        messageSource.getMessage(
+            "msg.changed_password_successfully", null, LocaleContextHolder.getLocale());
+    redirectAttributes.addFlashAttribute("success_message", message);
+    return "redirect:/";
   }
 
   @GetMapping("/users/{uuid}")
