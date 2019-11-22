@@ -139,12 +139,14 @@ public class UserServiceImpl implements UserService<User> {
         user.getEmail(), user.getPasswordHash(), user.isEnabled(), true, true, true, authorities);
   }
 
+  // TODO: Simplify user management
   @Override
   @Transactional(readOnly = false)
   public User update(User user, String password1, String password2, Errors results) {
     return save(password1, password2, user, results, true);
   }
 
+  // TODO: Simplify user management
   private User save(
       String password1, String password2, User user, Errors results, boolean isUpdate) {
     final PasswordsValidatorParams passwordsValidatorParams =

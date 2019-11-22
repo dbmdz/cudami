@@ -127,6 +127,7 @@ public class UserController extends AbstractController {
     return "users/edit";
   }
 
+  // TODO: Simplify user management
   @PostMapping("/users/{uuid}/edit")
   public String edit(
       @PathVariable UUID uuid,
@@ -177,6 +178,7 @@ public class UserController extends AbstractController {
     return "users/edit-password";
   }
 
+  // TODO: Simplify user management
   @PostMapping("/users/updatePassword")
   public String updatePassword(
       @RequestParam("pwd1") String password1,

@@ -75,11 +75,13 @@ public class UserRepositoryImpl implements UserRepository<UserImpl> {
     return endpoint.findActiveAdminUsers();
   }
 
+  // TODO: Simplify user management
   @Override
   public UserImpl save(UserImpl user) {
     return (UserImpl) endpoint.save(user);
   }
 
+  // TODO: Simplify user management
   @Override
   public UserImpl update(UserImpl user) {
     return (UserImpl) endpoint.update(user.getUuid(), user);
