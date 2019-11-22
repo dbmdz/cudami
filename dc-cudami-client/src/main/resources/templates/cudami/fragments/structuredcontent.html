@@ -79,14 +79,13 @@
 
   <th:block th:if="${block.class.simpleName == 'IFrameImpl'}" th:with="attr=${block.attributes}">
     <iframe th:attr="src=${attr.get('src') != null}?${attr.get('src')}, width=${attr.get('width') != null}?${attr.get('width')}, height=${attr.get('height') != null}?${attr.get('height')}">
-      [Your user agent does not support frames or is currently configured not to display frames. However, you may visit <a th:attr="href=${attr.get('src') != null}?${attr.get('src')}">the related
-        document.</a>]
+      [Your user agent does not support frames or is currently configured not to display frames. However, you may visit <a th:attr="href=${attr.get('src') != null}?${attr.get('src')}">the related document.</a>]
     </iframe>
   </th:block>
 
   <th:block th:if="${block.class.simpleName == 'ListItemImpl'}">
     <li>
-    <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
+      <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
     </li>
   </th:block>
 
@@ -98,19 +97,19 @@
 
   <th:block th:if="${block.class.simpleName == 'ParagraphImpl'}">
     <p>
-    <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
+      <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
     </p>
   </th:block>
 
   <th:block th:if="${block.class.simpleName == 'TableCellImpl'}" th:with="attr=${block.attributes}">
     <td th:attr="colspan=${attr.get('colspan') != null}?${attr.get('colspan')}, rowspan=${attr.get('rowspan') != null}?${attr.get('rowspan')}, data-colwidth=${attr.get('colwidth') != null}?${attr.get('colwidth')}">
-    <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
+      <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
     </td>
   </th:block>
 
   <th:block th:if="${block.class.simpleName == 'TableHeaderImpl'}" th:with="attr=${block.attributes}">
     <th th:attr="colspan=${attr.get('colspan') != null}?${attr.get('colspan')}, rowspan=${attr.get('rowspan') != null}?${attr.get('rowspan')}, data-colwidth=${attr.get('colwidth') != null}?${attr.get('colwidth')}">
-    <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
+      <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
     </th>
   </th:block>
 
@@ -122,7 +121,7 @@
 
   <th:block th:if="${block.class.simpleName == 'TableRowImpl'}">
     <tr>
-    <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
+      <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
     </tr>
   </th:block>
 
