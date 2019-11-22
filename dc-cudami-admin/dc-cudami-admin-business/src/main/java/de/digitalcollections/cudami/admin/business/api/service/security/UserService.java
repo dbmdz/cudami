@@ -34,7 +34,8 @@ public interface UserService<U extends User> extends UserDetailsService {
   //  List<U> findActiveAdminUsers();
   List<U> findAll();
 
-  //  U findByEmail(String email);
+  U findByEmail(String email);
+
   U findOne(UUID uuid);
 
   //  U save(U user);
