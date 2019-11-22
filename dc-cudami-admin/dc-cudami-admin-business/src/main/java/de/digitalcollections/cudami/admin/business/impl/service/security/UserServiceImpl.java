@@ -100,13 +100,18 @@ public class UserServiceImpl implements UserService<User> {
   }
 
   @Override
-  public User findOne(UUID uuid) {
-    return (User) userRepository.findOne(uuid);
+  public List<User> findAll() {
+    return userRepository.findAll();
   }
 
   @Override
-  public List<User> findAll() {
-    return userRepository.findAll();
+  public User findByEmail(String email) {
+    return userRepository.findByEmail(email);
+  }
+
+  @Override
+  public User findOne(UUID uuid) {
+    return (User) userRepository.findOne(uuid);
   }
 
   /*
