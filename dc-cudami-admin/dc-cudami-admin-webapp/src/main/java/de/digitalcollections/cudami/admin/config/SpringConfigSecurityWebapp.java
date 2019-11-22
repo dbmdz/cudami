@@ -51,6 +51,8 @@ public class SpringConfigSecurityWebapp extends WebSecurityConfigurerAdapter {
         new InMemoryTokenRepositoryImpl();
 
     http.authorizeRequests()
+        .antMatchers("/users/updatePassword")
+        .permitAll()
         .antMatchers("/users/**")
         .hasAnyAuthority(Role.ADMIN.getAuthority())
         .anyRequest()
