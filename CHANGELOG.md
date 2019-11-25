@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.2](https://github.com/dbmdz/cudami/releases/tag/3.2.2) - 2019-11-25
+
+### Added
+
+- Added param for disabling rendering of webpage label in HTML output
+- Added rendering of horizontal rule
+- Added styling for blockquotes
+- Added possibility for the user for updating his/her own password
+
+### Changed
+
+- Fixed possible NPE if fileresource is null
+- Fixed conversion of multiple languages in localized structured content for xml in v1
+- Refactored v1 controller to return `de_DE` instead of `de`
+- Made database migrations more flexible by setting out of order migrations to `true`
+- Reformated SQL to make it more readable
+- Fixed rendering of html attributes
+- Fixed rendering of the mark types `strikethrough`, `subscript`, `superscript` and `underline`
+
+### Removed
+
+- Disabled insert of footnotes and images for the moment
+
 ## [3.2.1](https://github.com/dbmdz/cudami/releases/tag/3.2.1) - 2019-11-13
 
 ### Changed
