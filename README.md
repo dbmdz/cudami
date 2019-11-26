@@ -214,7 +214,7 @@ $ cd dc-cudami-server
 $ docker-compose down
 ```
 
-### Migrations from 3.1.1 to 3.2.0
+### Migrations from 3.1.1 to 3.2.2
 
 - Stop 3.1.1 cudami backend server webapp, manually rename table "schema_version" to "flyway_schema_history":
 
@@ -222,5 +222,5 @@ $ docker-compose down
 alter table schema_version rename to flyway_schema_history;
 ```
 
-- Deploy cudami 3.2.0
-- Start 3.2.0
+- Deploy cudami 3.2.2
+- Start 3.2.2
