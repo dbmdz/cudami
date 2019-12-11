@@ -161,7 +161,7 @@ public class ContentNodeRepositoryImpl<E extends Entity>
   public ContentNode getParent(UUID uuid) {
     String query =
         "SELECT"
-            + " uuid, label, description, created, last_modified,"
+            + " uuid, label, description, created, last_modified"
             + " FROM contentnodes"
             + " INNER JOIN contentnode_contentnodes cc ON uuid = cc.parent_contentnode_uuid"
             + " WHERE cc.child_contentnode_uuid = :uuid";
