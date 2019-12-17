@@ -20,10 +20,11 @@ import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,11 +34,19 @@ public class DigitalObjectController {
 
   @Autowired private DigitalObjectService service;
 
+  @ApiMethod(description = "Get count of digital objects")
+  @GetMapping(
+      value = {"/latest/digitalobjects/count", "/v2/digitalobjects/count"},
+      produces = "application/json")
+  @ApiResponseObject
+  public long count() {
+    return service.count();
+  }
+
   @ApiMethod(description = "Get all digital objects")
-  @RequestMapping(
+  @GetMapping(
       value = {"/latest/digitalobjects", "/v2/digitalobjects"},
-      produces = "application/json",
-      method = RequestMethod.GET)
+      produces = "application/json")
   @ApiResponseObject
   public PageResponse<DigitalObject> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -54,23 +63,21 @@ public class DigitalObjectController {
   }
 
   @ApiMethod(description = "Get digital object by uuid")
-  @RequestMapping(
+  @GetMapping(
       value = {"/latest/digitalobjects/{uuid}", "/v2/digitalobjects/{uuid}"},
-      produces = "application/json",
-      method = RequestMethod.GET)
+      produces = "application/json")
   @ApiResponseObject
   public DigitalObject findById(@PathVariable UUID uuid) {
     return service.get(uuid);
   }
 
   @ApiMethod(description = "Get digital object by namespace and id")
-  @RequestMapping(
+  @GetMapping(
       value = {
         "/latest/digitalobjects/identifier/{namespace}:{id}",
         "/v2/digitalobjects/identifier/{namespace}:{id}"
       },
-      produces = "application/json",
-      method = RequestMethod.GET)
+      produces = "application/json")
   @ApiResponseObject
   public DigitalObject findByIdIdentifier(@PathVariable String namespace, @PathVariable String id)
       throws IdentifiableServiceException {
@@ -83,11 +90,22 @@ public class DigitalObjectController {
     return digitalObject;
   }
 
+  @ApiMethod(description = "Get image file resources of a digital object")
+  @GetMapping(
+      value = {
+        "/latest/digitalobjects/{uuid}/fileresources/images",
+        "/v2/digitalobjects/{uuid}/fileresources/images"
+      },
+      produces = "application/json")
+  @ApiResponseObject
+  public LinkedHashSet<ImageFileResource> getImageFileResources(@PathVariable UUID uuid) {
+    return service.getImageFileResources(uuid);
+  }
+
   @ApiMethod(description = "Save a newly created digital object")
-  @RequestMapping(
+  @PostMapping(
       value = {"/latest/digitalobjects", "/v2/digitalobjects"},
-      produces = "application/json",
-      method = RequestMethod.POST)
+      produces = "application/json")
   @ApiResponseObject
   public DigitalObject save(@RequestBody DigitalObject digitalObject, BindingResult errors)
       throws IdentifiableServiceException {
@@ -95,38 +113,14 @@ public class DigitalObjectController {
   }
 
   @ApiMethod(description = "Update a digital object")
-  @RequestMapping(
+  @PutMapping(
       value = {"/latest/digitalobjects/{uuid}", "/v2/digitalobjects/{uuid}"},
-      produces = "application/json",
-      method = RequestMethod.PUT)
+      produces = "application/json")
   @ApiResponseObject
   public DigitalObject update(
       @PathVariable UUID uuid, @RequestBody DigitalObject digitalObject, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, digitalObject.getUuid());
     return service.update(digitalObject);
-  }
-
-  @ApiMethod(description = "Get image file resources of a digital object")
-  @RequestMapping(
-      value = {
-        "/latest/digitalobjects/{uuid}/fileresources/images",
-        "/v2/digitalobjects/{uuid}/fileresources/images"
-      },
-      produces = "application/json",
-      method = RequestMethod.GET)
-  @ApiResponseObject
-  public LinkedHashSet<ImageFileResource> getImageFileResources(@PathVariable UUID uuid) {
-    return service.getImageFileResources(uuid);
-  }
-
-  @ApiMethod(description = "Get count of digital objects")
-  @RequestMapping(
-      value = {"/latest/digitalobjects/count", "/v2/digitalobjects/count"},
-      produces = "application/json",
-      method = RequestMethod.GET)
-  @ApiResponseObject
-  public long count() {
-    return service.count();
   }
 }

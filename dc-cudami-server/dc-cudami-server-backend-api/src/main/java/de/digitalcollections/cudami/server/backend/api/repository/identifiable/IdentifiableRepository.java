@@ -15,6 +15,8 @@ public interface IdentifiableRepository<I extends Identifiable> {
 
   List<I> find(String searchTerm, int maxResults);
 
+  I findOneByIdentifier(String namespace, String id);
+
   I findOne(Identifier identifier);
 
   I findOne(UUID uuid);

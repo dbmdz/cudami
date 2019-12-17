@@ -31,6 +31,10 @@ public interface DigitalObjectRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine("GET /latest/digitalobjects/{uuid}?locale={locale}")
   DigitalObject findOne(@Param("uuid") UUID uuid, @Param("locale") String locale);
 
+  @RequestLine("GET /latest/digitalobjects/identifier/{namespace}:{id}.json")
+  @Headers("Accept: application/json")
+  DigitalObject findOneByIdentifier(@Param("namespace") String namespace, @Param("id") String id);
+
   @RequestLine("GET /latest/digitalobjects/{uuid}/fileresources")
   LinkedHashSet<FileResource> getFileResources(@Param("uuid") UUID uuid);
 

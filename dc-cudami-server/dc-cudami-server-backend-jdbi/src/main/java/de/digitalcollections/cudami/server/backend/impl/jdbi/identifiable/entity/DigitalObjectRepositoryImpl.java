@@ -26,6 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.jdbi.v3.core.statement.PreparedBatch;
@@ -64,14 +65,34 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   public PageResponse<DigitalObject> find(PageRequest pageRequest) {
     StringBuilder query =
         new StringBuilder(
-            "SELECT uuid, label, description,"
-                + " created, last_modified"
-                + " FROM digitalobjects");
+            "SELECT d.uuid d_uuid, d.label d_label, d.description d_description,"
+                + " d.created d_created, d.last_modified d_lastModified,"
+                + " file.uri f_uri"
+                + " FROM digitalobjects as d"
+                + " LEFT JOIN fileresources_image as file on d.previewfileresource = file.uuid");
     addPageRequestParams(pageRequest, query);
 
-    List<DigitalObjectImpl> result =
+    List<DigitalObject> result =
         dbi.withHandle(
-            h -> h.createQuery(query.toString()).mapToBean(DigitalObjectImpl.class).list());
+            h ->
+                h.createQuery(query.toString())
+                    .registerRowMapper(BeanMapper.factory(DigitalObjectImpl.class, "d"))
+                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                    .reduceRows(
+                        new LinkedHashMap<UUID, DigitalObject>(),
+                        (map, rowView) -> {
+                          DigitalObject digitalObject =
+                              map.computeIfAbsent(
+                                  rowView.getColumn("d_uuid", UUID.class),
+                                  uuid -> rowView.getRow(DigitalObjectImpl.class));
+                          if (rowView.getColumn("f_uri", String.class) != null) {
+                            digitalObject.setPreviewImage(
+                                rowView.getRow(ImageFileResourceImpl.class));
+                          }
+                          return map;
+                        })
+                    .values().stream()
+                    .collect(Collectors.toList()));
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -89,6 +110,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             + " d.identifiable_type d_identifiable_type, d.entity_type d_entity_type,"
             + " d.created d_created, d.last_modified d_last_modified,"
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
+            + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri,"
             + " df.fileresource_uuid df_fileresource_uuid,"
             + ""
             + " fi.uuid fi_uuid, fi.label fi_label, fi.description fi_description,"
@@ -115,6 +137,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             + ""
             + " FROM digitalobjects as d"
             + " LEFT JOIN identifiers as id on d.uuid = id.identifiable"
+            + " LEFT JOIN fileresources_image as file on d.previewfileresource = file.uuid"
             + " LEFT JOIN digitalobject_fileresources as df on d.uuid = df.digitalobject_uuid"
             + " LEFT JOIN fileresources_image as fi on df.fileresource_uuid = fi.uuid"
             + " LEFT JOIN fileresources_audio as fa on df.fileresource_uuid = fa.uuid"
@@ -128,6 +151,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             h ->
                 h.createQuery(query).bind("uuid", uuid)
                     .registerRowMapper(BeanMapper.factory(DigitalObjectImpl.class, "d"))
+                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "fi"))
                     .registerRowMapper(BeanMapper.factory(AudioFileResourceImpl.class, "fa"))
                     .registerRowMapper(BeanMapper.factory(TextFileResourceImpl.class, "ft"))
@@ -141,6 +165,11 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                               map.getDigitalObjects()
                                   .computeIfAbsent(
                                       dUUID, id -> rowView.getRow(DigitalObjectImpl.class));
+
+                          if (rowView.getColumn("f_uri", String.class) != null) {
+                            digitalObject.setPreviewImage(
+                                rowView.getRow(ImageFileResourceImpl.class));
+                          }
 
                           UUID idUUID = rowView.getColumn("id_uuid", UUID.class);
                           if (idUUID != null && !map.getIdentifiers().containsKey(idUUID)) {
@@ -196,12 +225,19 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     String namespace = identifier.getNamespace();
     String id = identifier.getId();
 
+    // TODO review versioning
+    //    String query =
+    //        "SELECT d.uuid"
+    //            + " FROM digitalobjects as d"
+    //            + " LEFT JOIN identifiers as id on d.uuid = id.identifiable"
+    //            + " LEFT JOIN versions as v on v.uuid = d.version"
+    //            + " WHERE id.identifier = :id AND id.namespace = :namespace AND v.status =
+    // 'ACTIVE'";
     String query =
         "SELECT d.uuid"
             + " FROM digitalobjects as d"
             + " LEFT JOIN identifiers as id on d.uuid = id.identifiable"
-            + " LEFT JOIN versions as v on v.uuid = d.version"
-            + " WHERE id.identifier = :id AND id.namespace = :namespace AND v.status = 'ACTIVE'";
+            + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
     UUID uuid =
         dbi.withHandle(
@@ -300,14 +336,18 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     digitalObject.setCreated(LocalDateTime.now());
     digitalObject.setLastModified(LocalDateTime.now());
 
+    final UUID previewImageUuid =
+        digitalObject.getPreviewImage() == null ? null : digitalObject.getPreviewImage().getUuid();
+
     dbi.withHandle(
         h ->
             h.createUpdate(
                     "INSERT INTO digitalobjects("
-                        + "uuid, label, description, identifiable_type, entity_type, created, last_modified, version"
+                        + "uuid, previewFileResource, label, description, identifiable_type, entity_type, created, last_modified"
                         + ") VALUES ("
-                        + ":uuid, :label::JSONB, :description::JSONB, :type, :entityType, :created, :lastModified, :version.uuid"
+                        + ":uuid, :previewFileResource, :label::JSONB, :description::JSONB, :type, :entityType, :created, :lastModified"
                         + ")")
+                .bind("previewFileResource", previewImageUuid)
                 .bindBean(digitalObject)
                 .execute());
 
@@ -317,11 +357,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
     // save digital object identifiers
     List<Identifier> identifiers = digitalObject.getIdentifiers();
-    for (Identifier identifier : identifiers) {
-      identifier.setIdentifiable(digitalObject.getUuid());
-      // newly created digital object, no pre existing identifiers, so just save
-      identifierRepository.save(identifier);
-    }
+    saveIdentifiers(identifiers, digitalObject);
 
     DigitalObject dbDigitalObject = findOne(digitalObject.getUuid());
     return dbDigitalObject;
@@ -373,21 +409,45 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     return getFileResources(digitalObjectUuid);
   }
 
+  private void saveIdentifiers(List<Identifier> identifiers, DigitalObject digitalObject) {
+    // we assume that identifiers (unique to object) are new (existing ones were deleted before
+    // (e.g. see update))
+    if (identifiers != null) {
+      for (Identifier identifier : identifiers) {
+        identifier.setIdentifiable(digitalObject.getUuid());
+        identifierRepository.save(identifier);
+      }
+    }
+  }
+
   @Override
   public DigitalObject update(DigitalObject digitalObject) {
     digitalObject.setLastModified(LocalDateTime.now());
-
+    final UUID previewImageUuid =
+        digitalObject.getPreviewImage() == null ? null : digitalObject.getPreviewImage().getUuid();
     // do not update/left out from statement (not changed since insert): uuid, created,
+
+    String query =
+        "UPDATE digitalobjects SET previewFileResource=:previewFileResource, label=:label::JSONB, description=:description::JSONB, last_modified=:lastModified WHERE uuid=:uuid RETURNING *";
     // identifiable_type, entity_type
-    DigitalObject result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(
-                        "UPDATE digitalobjects SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified WHERE uuid=:uuid RETURNING *")
-                    .bindBean(digitalObject)
-                    .mapToBean(DigitalObjectImpl.class)
-                    .findOne()
-                    .orElse(null));
+    dbi.withHandle(
+        h ->
+            h.createUpdate(query)
+                .bind("previewFileResource", previewImageUuid)
+                .bindBean(digitalObject)
+                .execute());
+
+    // save identifiers
+    List<Identifier> identifiers = digitalObject.getIdentifiers();
+    // as we store the whole list new: delete old entries
+    dbi.withHandle(
+        h ->
+            h.createUpdate("DELETE FROM identifiers WHERE identifiable = :uuid")
+                .bind("uuid", digitalObject.getUuid())
+                .execute());
+    saveIdentifiers(identifiers, digitalObject);
+
+    DigitalObject result = findOne(digitalObject.getUuid());
     return result;
   }
 }

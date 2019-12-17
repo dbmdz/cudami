@@ -30,6 +30,10 @@ public interface ContentTreeRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine("GET /latest/contenttrees/{uuid}?locale={locale}")
   ContentTree findOne(@Param("uuid") UUID uuid, @Param("locale") String locale);
 
+  @RequestLine("GET /latest/contenttrees/identifier/{namespace}:{id}.json")
+  @Headers("Accept: application/json")
+  ContentTree findOneByIdentifier(@Param("namespace") String namespace, @Param("id") String id);
+
   @RequestLine("GET /latest/contenttrees/{uuid}/rootNodes")
   List<ContentNode> getRootNodes(@Param("uuid") UUID uuid);
 

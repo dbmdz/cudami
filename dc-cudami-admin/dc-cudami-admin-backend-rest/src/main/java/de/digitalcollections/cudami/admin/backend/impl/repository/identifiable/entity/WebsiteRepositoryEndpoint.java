@@ -30,6 +30,10 @@ public interface WebsiteRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine("GET /latest/websites/{uuid}?locale={locale}")
   Website findOne(@Param("uuid") UUID uuid, @Param("locale") String locale);
 
+  @RequestLine("GET /latest/websites/identifier/{namespace}:{id}.json")
+  @Headers("Accept: application/json")
+  Website findOneByIdentifier(@Param("namespace") String namespace, @Param("id") String id);
+
   @RequestLine("GET /latest/websites/{uuid}/rootPages")
   List<Webpage> getRootPages(@Param("uuid") UUID uuid);
 

@@ -5,11 +5,9 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.r
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
-import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.MimeType;
 import de.digitalcollections.model.api.identifiable.resource.exceptions.ResourceIOException;
-import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import java.io.InputStream;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -41,13 +39,6 @@ public class FileResourceServiceImpl extends IdentifiableServiceImpl<FileResourc
   @Override
   public FileResource get(UUID uuid) {
     return repository.findOne(uuid);
-  }
-
-  @Override
-  public FileResource getByIdentifier(String namespace, String id)
-      throws IdentifiableServiceException {
-    Identifier identifier = new IdentifierImpl(null, namespace, id);
-    return repository.findOne(identifier);
   }
 
   @Override

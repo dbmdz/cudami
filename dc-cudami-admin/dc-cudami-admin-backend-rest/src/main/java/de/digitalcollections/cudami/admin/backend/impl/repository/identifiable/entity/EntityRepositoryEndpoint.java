@@ -39,6 +39,10 @@ public interface EntityRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine("GET /latest/entities/{uuid}?locale={locale}")
   Entity findOne(@Param("uuid") UUID uuid, @Param("locale") String locale);
 
+  @RequestLine("GET /latest/entities/identifier/{namespace}:{id}.json")
+  @Headers("Accept: application/json")
+  Entity findOneByIdentifier(@Param("namespace") String namespace, @Param("id") String id);
+
   @RequestLine("GET /latest/entities/{uuid}/related/fileresources")
   LinkedHashSet<FileResource> getRelatedFileResources(@Param("uuid") UUID uuid);
 

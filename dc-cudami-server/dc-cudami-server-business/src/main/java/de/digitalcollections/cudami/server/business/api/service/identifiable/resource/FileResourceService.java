@@ -35,6 +35,4 @@ public interface FileResourceService extends IdentifiableService<FileResource> {
 
   FileResource save(FileResource fileResource, InputStream binaryData)
       throws IdentifiableServiceException;
-
-  FileResource getByIdentifier(String namespace, String id) throws IdentifiableServiceException;
 }
