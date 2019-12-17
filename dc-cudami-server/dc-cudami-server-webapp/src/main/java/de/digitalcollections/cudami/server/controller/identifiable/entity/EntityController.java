@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
@@ -10,6 +11,7 @@ import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,6 +24,17 @@ public class EntityController<E extends Entity> {
   @Autowired
   @Qualifier("entityServiceImpl")
   private EntityService<E> service;
+
+  @ApiMethod(description = "Get entity by namespace and id")
+  @GetMapping(
+      value = {"/latest/entities/identifier/{namespace}:{id}"},
+      produces = "application/json")
+  @ApiResponseObject
+  public Entity findByIdIdentifier(@PathVariable String namespace, @PathVariable String id)
+      throws IdentifiableServiceException {
+    Entity entity = service.getByIdentifier(namespace, id);
+    return entity;
+  }
 
   @ApiMethod(description = "Get related file resources of entity")
   @RequestMapping(

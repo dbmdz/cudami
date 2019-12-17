@@ -1,7 +1,9 @@
 package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable;
 
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.IdentifiableRepository;
+import de.digitalcollections.model.api.http.exceptions.client.ResourceNotFoundException;
 import de.digitalcollections.model.api.identifiable.Identifiable;
+import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.paging.Order;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -80,41 +82,22 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     return new FindParams(pageNumber, pageSize, sortField, sortDirection, nullHandling);
   }
 
-  public class FindParams {
-
-    public FindParams(
-        int pageNumber, int pageSize, String sortField, String sortDirection, String nullHandling) {
-      this.pageNumber = pageNumber;
-      this.pageSize = pageSize;
-      this.sortField = sortField;
-      this.sortDirection = sortDirection;
-      this.nullHandling = nullHandling;
+  @Override
+  public I findOne(Identifier identifier) {
+    if (identifier == null) {
+      return null;
     }
+    String namespace = identifier.getNamespace();
+    String id = identifier.getId();
+    return findOneByIdentifier(namespace, id);
+  }
 
-    final int pageNumber;
-    final int pageSize;
-    final String sortField;
-    final String sortDirection;
-    final String nullHandling;
-
-    public int getPageNumber() {
-      return pageNumber;
-    }
-
-    public int getPageSize() {
-      return pageSize;
-    }
-
-    public String getSortField() {
-      return sortField;
-    }
-
-    public String getSortDirection() {
-      return sortDirection;
-    }
-
-    public String getNullHandling() {
-      return nullHandling;
+  @Override
+  public I findOneByIdentifier(String namespace, String id) {
+    try {
+      return (I) endpoint.findOneByIdentifier(namespace, id);
+    } catch (ResourceNotFoundException e) {
+      return null;
     }
   }
 
@@ -157,5 +140,43 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   @Override
   public I update(I identifiable) {
     return (I) endpoint.update(identifiable.getUuid(), identifiable);
+  }
+
+  public class FindParams {
+
+    public FindParams(
+        int pageNumber, int pageSize, String sortField, String sortDirection, String nullHandling) {
+      this.pageNumber = pageNumber;
+      this.pageSize = pageSize;
+      this.sortField = sortField;
+      this.sortDirection = sortDirection;
+      this.nullHandling = nullHandling;
+    }
+
+    final int pageNumber;
+    final int pageSize;
+    final String sortField;
+    final String sortDirection;
+    final String nullHandling;
+
+    public int getPageNumber() {
+      return pageNumber;
+    }
+
+    public int getPageSize() {
+      return pageSize;
+    }
+
+    public String getSortField() {
+      return sortField;
+    }
+
+    public String getSortDirection() {
+      return sortDirection;
+    }
+
+    public String getNullHandling() {
+      return nullHandling;
+    }
   }
 }

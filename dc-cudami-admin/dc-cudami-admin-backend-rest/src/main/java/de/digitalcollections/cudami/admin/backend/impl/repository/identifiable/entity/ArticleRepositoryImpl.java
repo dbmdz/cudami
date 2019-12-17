@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.ArticleRepository;
+import de.digitalcollections.model.api.http.exceptions.client.ResourceNotFoundException;
 import de.digitalcollections.model.api.identifiable.entity.Article;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -37,6 +38,15 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
             f.getSortDirection(),
             f.getNullHandling());
     return getGenericPageResponse(pageResponse);
+  }
+
+  @Override
+  public Article findOneByIdentifier(String namespace, String id) {
+    try {
+      return endpoint.findOneByIdentifier(namespace, id);
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
   }
 
   @Override

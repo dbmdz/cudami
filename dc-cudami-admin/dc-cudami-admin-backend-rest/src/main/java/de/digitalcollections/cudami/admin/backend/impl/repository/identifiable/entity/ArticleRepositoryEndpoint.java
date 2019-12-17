@@ -29,6 +29,10 @@ public interface ArticleRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine("GET /latest/articles/{uuid}?locale={locale}")
   Article findOne(@Param("uuid") UUID uuid, @Param("locale") String locale);
 
+  @RequestLine("GET /latest/articles/identifier/{namespace}:{id}.json")
+  @Headers("Accept: application/json")
+  Article findOneByIdentifier(@Param("namespace") String namespace, @Param("id") String id);
+
   @RequestLine("GET /latest/articles/{uuid}/children")
   List<Article> getChildren(@Param("uuid") UUID uuid);
 

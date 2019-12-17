@@ -8,6 +8,7 @@ import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
@@ -107,7 +108,35 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public E findOne(Identifier identifier) {
-    throw new UnsupportedOperationException("Not supported yet.");
+    if (identifier.getIdentifiable() != null) {
+      return findOne(identifier.getIdentifiable());
+    }
+
+    String namespace = identifier.getNamespace();
+    String id = identifier.getId();
+
+    String query =
+        "SELECT e.uuid, e.label, e.description, e.entity_type, e.created, e.last_modified"
+            + " FROM entities as e"
+            + " LEFT JOIN identifiers as id on e.uuid = id.identifiable"
+            + " WHERE id.identifier = :id AND id.namespace = :namespace";
+
+    E entity =
+        (E)
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("id", id)
+                        .bind("namespace", namespace)
+                        .mapToBean(EntityImpl.class)
+                        .findOne()
+                        .orElse(null));
+    return entity;
+  }
+
+  @Override
+  public E findOneByIdentifier(String namespace, String id) {
+    return findOne(new IdentifierImpl(null, namespace, id));
   }
 
   @Override

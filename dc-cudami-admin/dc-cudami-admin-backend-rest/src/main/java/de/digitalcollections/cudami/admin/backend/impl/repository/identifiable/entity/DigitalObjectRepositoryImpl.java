@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.DigitalObjectRepository;
+import de.digitalcollections.model.api.http.exceptions.client.ResourceNotFoundException;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
@@ -40,6 +41,15 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             f.getSortDirection(),
             f.getNullHandling());
     return getGenericPageResponse(pageResponse);
+  }
+
+  @Override
+  public DigitalObject findOneByIdentifier(String namespace, String id) {
+    try {
+      return endpoint.findOneByIdentifier(namespace, id);
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
   }
 
   @Override

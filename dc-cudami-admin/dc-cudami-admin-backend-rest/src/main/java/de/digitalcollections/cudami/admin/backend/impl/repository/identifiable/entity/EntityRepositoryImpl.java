@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.IdentifiableRepositoryImpl.FindParams;
+import de.digitalcollections.model.api.http.exceptions.client.ResourceNotFoundException;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
@@ -64,6 +65,15 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
             f.getSortDirection(),
             f.getNullHandling());
     return getGenericPageResponse(pageResponse);
+  }
+
+  @Override
+  public E findOneByIdentifier(String namespace, String id) {
+    try {
+      return (E) endpoint.findOneByIdentifier(namespace, id);
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
   }
 
   @Override

@@ -26,6 +26,10 @@ public interface WebpageRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine("GET /latest/webpages/{uuid}?locale={locale}")
   Webpage findOne(@Param("uuid") UUID uuid, @Param("locale") String locale);
 
+  @RequestLine("GET /latest/webpages/identifier/{namespace}:{id}.json")
+  @Headers("Accept: application/json")
+  Webpage findOneByIdentifier(@Param("namespace") String namespace, @Param("id") String id);
+
   @RequestLine("POST /latest/webpages")
   @Headers("Content-Type: application/json")
   Webpage save(Webpage webpage);

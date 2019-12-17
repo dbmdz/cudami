@@ -26,6 +26,10 @@ public interface CudamiFileResourceRepositoryEndpoint extends RepositoryEndpoint
   @RequestLine("GET /latest/fileresources/{uuid}")
   FileResource findOne(@Param("uuid") UUID uuid);
 
+  @RequestLine("GET /latest/fileresources/identifier/{namespace}:{id}.json")
+  @Headers("Accept: application/json")
+  FileResource findOneByIdentifier(@Param("namespace") String namespace, @Param("id") String id);
+
   /**
    * only saving non binary parts of resource
    *

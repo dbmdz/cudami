@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.model.api.identifiable.Identifiable;
+import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.parts.LocalizedText;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -49,6 +50,11 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
+  public I get(Identifier identifier) {
+    return repository.findOne(identifier);
+  }
+
+  @Override
   public I get(UUID uuid) {
     return (I) repository.findOne(uuid);
   }
@@ -88,6 +94,11 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     }
 
     return identifiable;
+  }
+
+  @Override
+  public I getByIdentifier(String namespace, String id) {
+    return repository.findOneByIdentifier(namespace, id);
   }
 
   @Override

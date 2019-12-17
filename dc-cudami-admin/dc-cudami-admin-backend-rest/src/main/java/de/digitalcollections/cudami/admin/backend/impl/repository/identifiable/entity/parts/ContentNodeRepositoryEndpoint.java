@@ -32,6 +32,10 @@ public interface ContentNodeRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine("GET /latest/contentnodes/{uuid}?locale={locale}")
   ContentNode findOne(@Param("uuid") UUID uuid, @Param("locale") String locale);
 
+  @RequestLine("GET /latest/contentnodes/identifier/{namespace}:{id}.json")
+  @Headers("Accept: application/json")
+  ContentNode findOneByIdentifier(@Param("namespace") String namespace, @Param("id") String id);
+
   @RequestLine("GET /latest/contentnodes/{uuid}/children")
   List<ContentNode> getChildren(@Param("uuid") UUID uuid);
 
