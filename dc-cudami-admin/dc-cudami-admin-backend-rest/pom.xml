@@ -14,7 +14,7 @@
   <packaging>jar</packaging>
   
   <properties>
-    <version.dc-commons-feign>4.0.3</version.dc-commons-feign>
+    <version.dc-commons-feign>4.1.1-SNAPSHOT</version.dc-commons-feign>
   </properties>
 
   <dependencies>
