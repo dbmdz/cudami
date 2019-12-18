@@ -77,6 +77,17 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
+  public E findOneByRefId(long refId) {
+    E result = null;
+    try {
+      result = (E) endpoint.findOneByRefId(refId);
+    } catch (ResourceNotFoundException e) {
+
+    }
+    return result;
+  }
+
+  @Override
   public E findOne(UUID uuid) {
     return (E) endpoint.findOne(uuid);
   }

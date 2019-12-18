@@ -44,6 +44,11 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
   }
 
   @Override
+  public E getByRefId(long refId) {
+    return (E) ((EntityRepository) repository).findOneByRefId(refId);
+  }
+
+  @Override
   public LinkedHashSet<FileResource> getRelatedFileResources(E entity) {
     return ((EntityRepository) repository).getRelatedFileResources(entity);
   }

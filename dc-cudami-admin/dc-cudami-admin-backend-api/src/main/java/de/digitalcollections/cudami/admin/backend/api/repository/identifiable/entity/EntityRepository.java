@@ -15,6 +15,8 @@ public interface EntityRepository<E extends Entity> extends IdentifiableReposito
 
   void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid);
 
+  E findOneByRefId(long refId);
+
   List<EntityRelation> getRelations(E subjectEntity);
 
   List<EntityRelation> getRelations(UUID subjectEntityUuid);

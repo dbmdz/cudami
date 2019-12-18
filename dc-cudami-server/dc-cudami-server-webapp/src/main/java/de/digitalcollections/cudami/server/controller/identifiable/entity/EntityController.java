@@ -36,6 +36,26 @@ public class EntityController<E extends Entity> {
     return entity;
   }
 
+  @ApiMethod(description = "Get entity by reference id")
+  @GetMapping(
+      value = {"/latest/entities/{refId}"},
+      produces = "application/json")
+  @ApiResponseObject
+  public Entity findByRefId(@PathVariable long refId) {
+    Entity entity = service.getByRefId(refId);
+    if (entity == null) {
+      return null;
+    }
+    // routing should be done in frontend webapp (second call will be sent on entity type)
+    //    EntityType entityType = entity.getEntityType();
+    //    UUID uuid = entity.getUuid();
+    //    switch (entityType) {
+    //      case PERSON:
+    //        return personService.get(uuid);
+    //    }
+    return entity;
+  }
+
   @ApiMethod(description = "Get related file resources of entity")
   @RequestMapping(
       value = {
