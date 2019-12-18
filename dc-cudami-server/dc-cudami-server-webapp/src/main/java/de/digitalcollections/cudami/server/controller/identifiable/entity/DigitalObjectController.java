@@ -81,13 +81,13 @@ public class DigitalObjectController {
   @ApiResponseObject
   public DigitalObject findByIdentifier(@PathVariable String namespace, @PathVariable String id)
       throws IdentifiableServiceException {
-    DigitalObject digitalObject = service.getByIdentifier(namespace, id);
-    if (digitalObject == null) {
-      // FIXME throw resource not found http exception
-      throw new IdentifiableServiceException(
-          "DigitalObject " + namespace + ":" + id + " not found");
-    }
-    return digitalObject;
+    return service.getByIdentifier(namespace, id);
+    //    if (digitalObject == null) {
+    //      // FIXME throw resource not found http exception
+    //      throw new IdentifiableServiceException(
+    //          "DigitalObject " + namespace + ":" + id + " not found");
+    //    }
+    //    return digitalObject;
   }
 
   @ApiMethod(description = "Get image file resources of a digital object")
