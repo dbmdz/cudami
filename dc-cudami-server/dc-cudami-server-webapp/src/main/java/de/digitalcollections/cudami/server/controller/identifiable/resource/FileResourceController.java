@@ -130,6 +130,17 @@ public class FileResourceController {
     return new ResponseEntity<>(fileResource, HttpStatus.OK);
   }
 
+  // FIXME solve conflict of similar post with upload or pure metadata
+  @ApiMethod(description = "Save a newly created fileresource")
+  @PostMapping(
+      value = {"/latest/fileresources2", "/v2/fileresources2"},
+      produces = "application/json")
+  @ApiResponseObject
+  public FileResource save(@RequestBody FileResource fileResource)
+      throws IdentifiableServiceException {
+    return fileResourceService.save(fileResource);
+  }
+
   @ApiMethod(description = "Save a newly created fileresource")
   @PostMapping(
       value = {"/latest/fileresources", "/v2/fileresources"},

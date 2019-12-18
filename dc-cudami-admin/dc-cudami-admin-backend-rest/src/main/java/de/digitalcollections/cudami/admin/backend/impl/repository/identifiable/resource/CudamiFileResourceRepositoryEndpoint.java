@@ -36,7 +36,7 @@ public interface CudamiFileResourceRepositoryEndpoint extends RepositoryEndpoint
    * @param fileresource metadata object
    * @return saved object
    */
-  @RequestLine("POST /latest/fileresources")
+  @RequestLine("POST /latest/fileresources2") // FIXME conflict of two post methods with same url...
   @Headers("Content-Type: application/json")
   FileResource save(FileResource fileresource);
 

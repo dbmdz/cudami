@@ -51,7 +51,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
 
   @Override
   public I get(Identifier identifier) {
-    return repository.findOne(identifier);
+    return (I) repository.findOne(identifier);
   }
 
   @Override
@@ -98,7 +98,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
 
   @Override
   public I getByIdentifier(String namespace, String id) {
-    return repository.findOneByIdentifier(namespace, id);
+    return (I) repository.findOneByIdentifier(namespace, id);
   }
 
   @Override
