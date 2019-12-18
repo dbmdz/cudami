@@ -79,7 +79,7 @@ public class DigitalObjectController {
       },
       produces = "application/json")
   @ApiResponseObject
-  public DigitalObject findByIdIdentifier(@PathVariable String namespace, @PathVariable String id)
+  public DigitalObject findByIdentifier(@PathVariable String namespace, @PathVariable String id)
       throws IdentifiableServiceException {
     DigitalObject digitalObject = service.getByIdentifier(namespace, id);
     if (digitalObject == null) {
