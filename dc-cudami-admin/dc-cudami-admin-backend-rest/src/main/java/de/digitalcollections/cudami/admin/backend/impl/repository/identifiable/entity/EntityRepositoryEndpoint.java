@@ -43,6 +43,10 @@ public interface EntityRepositoryEndpoint extends RepositoryEndpoint {
   @Headers("Accept: application/json")
   Entity findOneByIdentifier(@Param("namespace") String namespace, @Param("id") String id);
 
+  @RequestLine("GET /latest/entities/{refId}")
+  @Headers("Accept: application/json")
+  Entity findOneByRefId(@Param("refId") long refId);
+
   @RequestLine("GET /latest/entities/{uuid}/related/fileresources")
   LinkedHashSet<FileResource> getRelatedFileResources(@Param("uuid") UUID uuid);
 

@@ -14,6 +14,8 @@ public interface EntityService<E extends Entity> extends IdentifiableService<E> 
 
   void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid);
 
+  E getByRefId(long refId);
+
   List<EntityRelation> getRelations(E subjectEntity);
 
   List<EntityRelation> getRelations(UUID subjectEntityUuid);

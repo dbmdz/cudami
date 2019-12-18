@@ -134,6 +134,25 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
+  public E findOneByRefId(long refId) {
+    String query =
+        "SELECT e.refid, e.uuid, e.label, e.description, e.entity_type, e.created, e.last_modified"
+            + " FROM entities as e"
+            + " WHERE e.refid = :refId";
+
+    E entity =
+        (E)
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("refId", refId)
+                        .mapToBean(EntityImpl.class)
+                        .findOne()
+                        .orElse(null));
+    return entity;
+  }
+
+  @Override
   protected String[] getAllowedOrderByFields() {
     return new String[] {"created", "entity_type", "last_modified"};
   }
