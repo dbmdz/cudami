@@ -30,7 +30,7 @@ public class EntityController<E extends Entity> {
       value = {"/latest/entities/identifier/{namespace}:{id}"},
       produces = "application/json")
   @ApiResponseObject
-  public Entity findByIdIdentifier(@PathVariable String namespace, @PathVariable String id)
+  public Entity findByIdentifier(@PathVariable String namespace, @PathVariable String id)
       throws IdentifiableServiceException {
     Entity entity = service.getByIdentifier(namespace, id);
     return entity;
