@@ -7,6 +7,7 @@ import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
+import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -96,6 +97,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   @Override
+  public I findOneByIdentifier(String namespace, String id) {
+    return findOne(new IdentifierImpl(null, namespace, id));
+  }
+
+  @Override
   protected String[] getAllowedOrderByFields() {
     return new String[] {"created", "type", "last_modified"};
   }
@@ -168,11 +174,5 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
       }
     }
     return -1;
-  }
-
-  @Override
-  public I findOneByIdentifier(String namespace, String id) {
-    throw new UnsupportedOperationException(
-        "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
   }
 }

@@ -8,7 +8,6 @@ import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
@@ -132,11 +131,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
                         .findOne()
                         .orElse(null));
     return entity;
-  }
-
-  @Override
-  public E findOneByIdentifier(String namespace, String id) {
-    return findOne(new IdentifierImpl(null, namespace, id));
   }
 
   @Override
