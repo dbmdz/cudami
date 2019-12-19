@@ -181,7 +181,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                           UUID fiUUID = rowView.getColumn("fi_uuid", UUID.class);
                           UUID dfFileresourceUuid =
                               rowView.getColumn("df_fileresource_uuid", UUID.class);
-                          if (!dfFileresourceUuid.equals(map.getDfFileresourceUuid())) {
+                          if (dfFileresourceUuid != null
+                              && !dfFileresourceUuid.equals(map.getDfFileresourceUuid())) {
                             if (fiUUID != null) {
                               ImageFileResource imageFileResource =
                                   rowView.getRow(ImageFileResourceImpl.class);
@@ -387,7 +388,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     if (fileResources != null) {
       // first save fileresources
       for (FileResource fileResource : fileResources) {
-        fileResource = fileResourceMetadataRepository.save(fileResource);
+        if (fileResource.getUuid() == null) {
+          fileResource = fileResourceMetadataRepository.save(fileResource);
+        }
       }
 
       // second: save relations to digital object
