@@ -18,10 +18,11 @@ const LanguageTabContent = props => {
           />
           <FormEditor
             document={props.description}
-            type="description"
             onUpdate={document => {
               props.onUpdate('description', document)
             }}
+            restrictedMenu={true}
+            type="description"
           />
         </CardBody>
         {props.children && <CardBody>{props.children}</CardBody>}
