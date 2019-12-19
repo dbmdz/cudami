@@ -19,16 +19,21 @@ class FormEditor extends Component {
   }
 
   render() {
-    const {t} = this.props
-    const translatedMenu = menu(t)
+    const { onUpdate, restrictedMenu, t, type} = this.props
+    let translatedMenu = menu(t)
+    if (restrictedMenu) {
+      translatedMenu = {
+        marks: translatedMenu.marks
+      }
+    }
     return (
       <>
-        <Label className="font-weight-bold">{t(this.props.type)}</Label>
+        <Label className="font-weight-bold">{t(type)}</Label>
         <div className="text-editor">
           <Editor
             options={this.editorOptions}
             onChange={doc => {
-              this.props.onUpdate(JSON.parse(JSON.stringify(doc)))
+              onUpdate(JSON.parse(JSON.stringify(doc)))
             }}
             render={({editor, view}) => (
               <>
