@@ -4,6 +4,7 @@ import {tableNodes} from 'prosemirror-tables'
 import {footnoteNodes} from '@aeaton/prosemirror-footnotes'
 
 import iframeNode from './custom/IframeNode'
+import imageNode from './custom/ImageNode'
 
 const listNodes = {
   ordered_list: {
@@ -31,4 +32,5 @@ export default {
   }),
   ...footnoteNodes,
   ...iframeNode,
+  ...imageNode,
 }

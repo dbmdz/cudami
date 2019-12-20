@@ -3,6 +3,7 @@
     "abort": "Abort",
     "add": "Add",
     "addLanguage": "Add language",
+    "altText": "Alternative text",
     "blocks": {
       "blockquote": "Add block quote",
       "bulletList": "Change to bulleted list",

@@ -20,6 +20,7 @@ import {
   updateIdentifiable,
 } from '../api'
 import IframeAdderModal from './modals/IframeAdderModal'
+import ImageAdderModal from './modals/ImageAdderModal'
 import LanguageAdderModal from './modals/LanguageAdderModal'
 import LinkAdderModal from './modals/LinkAdderModal'
 import TableAdderModal from './modals/TableAdderModal'
@@ -43,6 +44,7 @@ class IdentifiableForm extends Component {
       invalidLanguages: [],
       modalsOpen: {
         iframeAdder: false,
+        imageAdder: false,
         languageAdder: false,
         linkAdder: false,
         tableAdder: false,
@@ -247,6 +249,10 @@ class IdentifiableForm extends Component {
         <IframeAdderModal
           isOpen={this.state.modalsOpen.iframeAdder}
           onToggle={() => this.toggleModal('iframeAdder')}
+        />
+        <ImageAdderModal
+          isOpen={this.state.modalsOpen.imageAdder}
+          onToggle={() => this.toggleModal('imageAdder')}
         />
         <LanguageAdderModal
           availableLanguages={this.state.availableLanguages}

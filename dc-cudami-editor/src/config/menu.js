@@ -228,19 +228,15 @@ export default function(t) {
       },
     },
     insert: {
-      /*image: {
+      image: {
         title: t('insert.image'),
         content: icons.image,
         enable: canInsert(schema.nodes.image),
         run: (state, dispatch) => {
-          const src = promptForURL()
-          if (!src) return false
-
-          const img = schema.nodes.image.createAndFill({src})
-          dispatch(state.tr.replaceSelectionWith(img))
+          publish('editor.show-image-modal')
         },
       },
-      footnote: {
+      /*footnote: {
         title: t('insert.footnote'),
         content: icons.footnote,
         enable: canInsert(schema.nodes.footnote),
