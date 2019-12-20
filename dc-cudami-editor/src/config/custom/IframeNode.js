@@ -21,14 +21,15 @@ export default {
       },
     ],
     toDOM: function(node) {
+      const {height, src, width} = node.attrs
       return [
         'iframe',
         {
           class: 'editable',
-          height: node.attrs.height,
+          height,
           sandbox: '',
-          src: node.attrs.src,
-          width: node.attrs.width,
+          src,
+          width,
         },
       ]
     },
