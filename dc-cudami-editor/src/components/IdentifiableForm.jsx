@@ -19,7 +19,7 @@ import {
   saveIdentifiable,
   updateIdentifiable,
 } from '../api'
-import IFrameAdderModal from './modals/IFrameAdderModal'
+import IframeAdderModal from './modals/IframeAdderModal'
 import LanguageAdderModal from './modals/LanguageAdderModal'
 import LinkAdderModal from './modals/LinkAdderModal'
 import TableAdderModal from './modals/TableAdderModal'
@@ -241,7 +241,7 @@ class IdentifiableForm extends Component {
             </pre>
           </>
         )}
-        <IFrameAdderModal
+        <IframeAdderModal
           isOpen={this.state.modalsOpen.iframeAdder}
           onToggle={() => this.toggleModal('iframeAdder')}
         />

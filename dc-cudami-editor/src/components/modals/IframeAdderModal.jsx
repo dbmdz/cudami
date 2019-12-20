@@ -11,7 +11,7 @@ import {
 } from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
-class IFrameAdderModal extends Component {
+class IframeAdderModal extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -77,4 +77,4 @@ class IFrameAdderModal extends Component {
   }
 }
 
-export default withTranslation()(IFrameAdderModal)
+export default withTranslation()(IframeAdderModal)
