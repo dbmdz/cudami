@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable;
 import de.digitalcollections.cudami.admin.backend.impl.repository.RepositoryEndpoint;
 import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -25,7 +26,7 @@ public interface IdentifiableRepositoryEndpoint extends RepositoryEndpoint {
       @Param("searchTerm") String searchTerm, @Param("maxResults") int maxResults);
 
   @RequestLine("GET /latest/identifiables/{uuid}")
-  Identifiable findOne(@Param("uuid") UUID uuid);
+  IdentifiableImpl findOne(@Param("uuid") UUID uuid);
 
   @RequestLine("GET /latest/identifiables/{uuid}?locale={locale}")
   Identifiable findOne(@Param("uuid") UUID uuid, @Param("locale") String locale);
