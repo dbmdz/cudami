@@ -25,6 +25,15 @@ public class EntityController<E extends Entity> {
   @Qualifier("entityServiceImpl")
   private EntityService<E> service;
 
+  @ApiMethod(description = "Get entity by uuid")
+  @GetMapping(
+      value = {"/latest/entities/{uuid}", "/v2/entities/{uuid}"},
+      produces = "application/json")
+  @ApiResponseObject
+  public Entity findById(@PathVariable UUID uuid) {
+    return service.get(uuid);
+  }
+
   @ApiMethod(description = "Get entity by namespace and id")
   @GetMapping(
       value = {"/latest/entities/identifier/{namespace}:{id}"},
@@ -38,7 +47,7 @@ public class EntityController<E extends Entity> {
 
   @ApiMethod(description = "Get entity by reference id")
   @GetMapping(
-      value = {"/latest/entities/{refId}"},
+      value = {"/latest/entities/{refId:[0-9]+}"},
       produces = "application/json")
   @ApiResponseObject
   public Entity findByRefId(@PathVariable long refId) {

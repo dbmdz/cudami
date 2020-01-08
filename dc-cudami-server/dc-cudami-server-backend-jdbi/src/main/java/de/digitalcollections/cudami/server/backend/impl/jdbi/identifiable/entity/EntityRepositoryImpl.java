@@ -91,7 +91,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   @Override
   public E findOne(UUID uuid) {
     String query =
-        "SELECT uuid, label, description, entityType, created, last_modified FROM entities WHERE uuid = :uuid";
+        "SELECT uuid, label, description, entity_type, created, last_modified FROM entities WHERE uuid = :uuid";
 
     E entity =
         (E)
