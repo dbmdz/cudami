@@ -82,7 +82,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
         (I)
             dbi.withHandle(
                 h ->
-                    h.createQuery("SELECT uuid, created, description, identifiable_type as type, label, last_modified FROM identifiables WHERE uuid = :uuid")
+                    h.createQuery(
+                            "SELECT uuid, created, description, identifiable_type as type, label, last_modified FROM identifiables WHERE uuid = :uuid")
                         .bind("uuid", uuid)
                         .mapToBean(IdentifiableImpl.class)
                         .findOne()
