@@ -28,7 +28,7 @@ export default {
           alt,
           src,
           title,
-        }
+        },
       ]
     },
   },
