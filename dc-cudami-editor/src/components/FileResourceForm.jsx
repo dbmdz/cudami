@@ -45,7 +45,7 @@ const FileResourceForm = props => {
         <Col sm="12">
           <FormIdInput id={props.identifiable.uuid} />
           <Nav tabs>
-            {props.existingLanguages.map((language) => (
+            {props.existingLanguages.map(language => (
               <LanguageTab
                 activeLanguage={props.activeLanguage}
                 key={language}
@@ -58,25 +58,23 @@ const FileResourceForm = props => {
             )}
           </Nav>
           <TabContent activeTab={props.activeLanguage}>
-            {props.existingLanguages.map(
-              (language) => (
-                <LanguageTabContent
-                  description={props.identifiable.description[language]}
-                  key={language}
-                  label={props.identifiable.label[language]}
-                  language={language}
-                  onUpdate={(updateKey, updateValue) =>
-                    props.onUpdate({
-                      ...props.identifiable,
-                      [updateKey]: {
-                        ...props.identifiable[updateKey],
-                        [language]: updateValue,
-                      },
-                    })
-                  }
-                />
-              )
-            )}
+            {props.existingLanguages.map(language => (
+              <LanguageTabContent
+                description={props.identifiable.description[language]}
+                key={language}
+                label={props.identifiable.label[language]}
+                language={language}
+                onUpdate={(updateKey, updateValue) =>
+                  props.onUpdate({
+                    ...props.identifiable,
+                    [updateKey]: {
+                      ...props.identifiable[updateKey],
+                      [language]: updateValue,
+                    },
+                  })
+                }
+              />
+            ))}
           </TabContent>
         </Col>
       </Row>
