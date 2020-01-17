@@ -23,7 +23,7 @@ check_javascript_codestyle:
     - npm install --only=dev
   image: "$BUILD_IMAGE_ANSIBLE_MAVEN_JDK11"
   script:
-    - ./node_modules/.bin/prettier --check "src/**/*.js"
+    - npm run format-check
     - popd
   stage: check
 
