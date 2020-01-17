@@ -19,11 +19,11 @@ class FormEditor extends Component {
   }
 
   render() {
-    const { onUpdate, restrictedMenu, t, type} = this.props
+    const {onUpdate, restrictedMenu, t, type} = this.props
     let translatedMenu = menu(t)
     if (restrictedMenu) {
       translatedMenu = {
-        marks: translatedMenu.marks
+        marks: translatedMenu.marks,
       }
     }
     return (

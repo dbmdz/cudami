@@ -92,7 +92,10 @@ class IdentifiableForm extends Component {
       availableLanguages: this.state.availableLanguages.filter(
         language => language.name !== selectedLanguage.name
       ),
-      existingLanguages: [...this.state.existingLanguages, selectedLanguage.name],
+      existingLanguages: [
+        ...this.state.existingLanguages,
+        selectedLanguage.name,
+      ],
       identifiable: {
         ...this.state.identifiable,
         label: {
