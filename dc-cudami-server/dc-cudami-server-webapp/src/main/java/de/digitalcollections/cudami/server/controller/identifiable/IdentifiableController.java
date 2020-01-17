@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.model.api.identifiable.Identifiable;
 import java.util.List;
@@ -9,6 +10,9 @@ import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,5 +45,25 @@ public class IdentifiableController {
   @ApiResponseObject
   public Identifiable findById(@PathVariable UUID uuid) {
     return service.get(uuid);
+  }
+
+  @ApiMethod(
+      description =
+          "get an identifiable as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @GetMapping(
+      value = {
+        "/latest/identifiables/identifier/{namespace}:{id}",
+        "/v2/identifiables/identifier/{namespace}:{id}"
+      },
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  @ApiResponseObject
+  public ResponseEntity<Identifiable> getByIdentifier(
+      @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
+
+    Identifiable result = service.getByIdentifier(namespace, id);
+    if (result == null) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    return new ResponseEntity<>(result, HttpStatus.OK);
   }
 }
