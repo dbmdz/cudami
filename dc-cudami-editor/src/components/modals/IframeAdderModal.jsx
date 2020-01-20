@@ -2,11 +2,11 @@ import {publish, subscribe} from 'pubsub-js'
 import React, {Component} from 'react'
 import {
   Button,
+  Form,
   FormGroup,
   Input,
   Modal,
   ModalBody,
-  ModalFooter,
   ModalHeader,
 } from 'reactstrap'
 import {withTranslation} from 'react-i18next'
@@ -42,36 +42,42 @@ class IframeAdderModal extends Component {
           {t('insert.iframe')}
         </ModalHeader>
         <ModalBody>
-          <FormGroup>
-            <Input
-              onChange={evt => this.setState({src: evt.target.value})}
-              placeholder="URL"
-              type="text"
-              value={this.state.src}
-            />
-          </FormGroup>
-          <FormGroup>
-            <Input
-              onChange={evt => this.setState({width: evt.target.value})}
-              placeholder={t('width')}
-              type="text"
-              value={this.state.width}
-            />
-          </FormGroup>
-          <FormGroup className="mb-0">
-            <Input
-              onChange={evt => this.setState({height: evt.target.value})}
-              placeholder={t('height')}
-              type="text"
-              value={this.state.height}
-            />
-          </FormGroup>
+          <Form
+            onSubmit={evt => {
+              evt.preventDefault()
+              this.addIframeToEditor()
+            }}
+          >
+            <FormGroup>
+              <Input
+                onChange={evt => this.setState({src: evt.target.value})}
+                placeholder="URL"
+                required
+                type="url"
+                value={this.state.src}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Input
+                onChange={evt => this.setState({width: evt.target.value})}
+                placeholder={t('width')}
+                type="text"
+                value={this.state.width}
+              />
+            </FormGroup>
+            <FormGroup className="mb-0">
+              <Input
+                onChange={evt => this.setState({height: evt.target.value})}
+                placeholder={t('height')}
+                type="text"
+                value={this.state.height}
+              />
+            </FormGroup>
+            <Button className="float-right mt-3" color="primary" type="submit">
+              {t('add')}
+            </Button>
+          </Form>
         </ModalBody>
-        <ModalFooter>
-          <Button color="primary" onClick={this.addIframeToEditor}>
-            {t('add')}
-          </Button>
-        </ModalFooter>
       </Modal>
     )
   }
