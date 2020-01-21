@@ -54,7 +54,9 @@ class TableAdderModal extends Component {
               <Input
                 id="table-rows"
                 min="1"
-                onChange={evt => this.setState({rows: evt.target.value})}
+                onChange={evt =>
+                  this.setState({rows: parseInt(evt.target.value)})
+                }
                 required
                 type="number"
                 value={this.state.rows}
@@ -67,7 +69,9 @@ class TableAdderModal extends Component {
               <Input
                 id="table-columns"
                 min="1"
-                onChange={evt => this.setState({columns: evt.target.value})}
+                onChange={evt =>
+                  this.setState({columns: parseInt(evt.target.value)})
+                }
                 required
                 type="number"
                 value={this.state.columns}
