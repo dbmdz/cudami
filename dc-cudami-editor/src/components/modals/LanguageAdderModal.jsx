@@ -1,12 +1,5 @@
 import React, {Component} from 'react'
-import {
-  Button,
-  Input,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-} from 'reactstrap'
+import {Button, Form, Input, Modal, ModalBody, ModalHeader} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
 class LanguageAdderModal extends Component {
@@ -15,7 +8,7 @@ class LanguageAdderModal extends Component {
     this.state = {}
   }
 
-  add = () => {
+  addLanguage = () => {
     const selectedLanguage = this.props.availableLanguages.filter(
       language => language.name === this.state.selectedLanguage
     )[0]
@@ -42,22 +35,27 @@ class LanguageAdderModal extends Component {
       >
         <ModalHeader toggle={this.toggle}>{t('chooseLanguage')}</ModalHeader>
         <ModalBody>
-          <Input
-            onChange={evt => this.setLanguage(evt.target.value)}
-            type="select"
+          <Form
+            onSubmit={evt => {
+              evt.preventDefault()
+              this.addLanguage()
+            }}
           >
-            {this.props.availableLanguages.map(language => (
-              <option key={language.name} value={language.name}>
-                {language.displayName}
-              </option>
-            ))}
-          </Input>
+            <Input
+              onChange={evt => this.setLanguage(evt.target.value)}
+              type="select"
+            >
+              {this.props.availableLanguages.map(language => (
+                <option key={language.name} value={language.name}>
+                  {language.displayName}
+                </option>
+              ))}
+            </Input>
+            <Button className="float-right mt-3" color="primary" type="submit">
+              {t('add')}
+            </Button>
+          </Form>
         </ModalBody>
-        <ModalFooter>
-          <Button color="primary" onClick={this.add}>
-            {t('add')}
-          </Button>
-        </ModalFooter>
       </Modal>
     )
   }

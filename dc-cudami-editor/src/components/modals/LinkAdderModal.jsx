@@ -2,11 +2,11 @@ import {publish, subscribe} from 'pubsub-js'
 import React, {Component} from 'react'
 import {
   Button,
+  Form,
   FormGroup,
   Input,
   Modal,
   ModalBody,
-  ModalFooter,
   ModalHeader,
 } from 'reactstrap'
 import {withTranslation} from 'react-i18next'
@@ -40,28 +40,34 @@ class LinkAdderModal extends Component {
           {t('insertLink')}
         </ModalHeader>
         <ModalBody>
-          <FormGroup>
-            <Input
-              onChange={evt => this.setState({href: evt.target.value})}
-              placeholder="URL"
-              type="url"
-              value={this.state.href}
-            />
-          </FormGroup>
-          <FormGroup className="mb-0">
-            <Input
-              onChange={evt => this.setState({title: evt.target.value})}
-              placeholder={t('label')}
-              type="text"
-              value={this.state.height}
-            />
-          </FormGroup>
+          <Form
+            onSubmit={evt => {
+              evt.preventDefault()
+              this.addLinkToEditor()
+            }}
+          >
+            <FormGroup>
+              <Input
+                onChange={evt => this.setState({href: evt.target.value})}
+                placeholder="URL"
+                required
+                type="url"
+                value={this.state.href}
+              />
+            </FormGroup>
+            <FormGroup className="mb-0">
+              <Input
+                onChange={evt => this.setState({title: evt.target.value})}
+                placeholder={t('label')}
+                type="text"
+                value={this.state.height}
+              />
+            </FormGroup>
+            <Button className="float-right mt-3" color="primary" type="submit">
+              {t('add')}
+            </Button>
+          </Form>
         </ModalBody>
-        <ModalFooter>
-          <Button color="primary" onClick={this.addLinkToEditor}>
-            {t('add')}
-          </Button>
-        </ModalFooter>
       </Modal>
     )
   }

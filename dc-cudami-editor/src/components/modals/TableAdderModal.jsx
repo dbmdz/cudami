@@ -2,12 +2,12 @@ import {publish, subscribe} from 'pubsub-js'
 import React, {Component} from 'react'
 import {
   Button,
+  Form,
   FormGroup,
   Input,
   Label,
   Modal,
   ModalBody,
-  ModalFooter,
   ModalHeader,
 } from 'reactstrap'
 import {withTranslation} from 'react-i18next'
@@ -41,34 +41,47 @@ class TableAdderModal extends Component {
           {t('insert.table')}
         </ModalHeader>
         <ModalBody>
-          <FormGroup>
-            <Label className="font-weight-bold" for="rows">
-              {t('numberOfRows')}
-            </Label>
-            <Input
-              id="rows"
-              onChange={evt => this.setState({rows: evt.target.value})}
-              type="text"
-              value={this.state.rows}
-            />
-          </FormGroup>
-          <FormGroup className="mb-0">
-            <Label className="font-weight-bold" for="columns">
-              {t('numberOfColumns')}
-            </Label>
-            <Input
-              id="columns"
-              onChange={evt => this.setState({columns: evt.target.value})}
-              type="text"
-              value={this.state.columns}
-            />
-          </FormGroup>
+          <Form
+            onSubmit={evt => {
+              evt.preventDefault()
+              this.addTableToEditor()
+            }}
+          >
+            <FormGroup>
+              <Label className="font-weight-bold" for="table-rows">
+                {t('numberOfRows')}
+              </Label>
+              <Input
+                id="table-rows"
+                min="1"
+                onChange={evt =>
+                  this.setState({rows: parseInt(evt.target.value)})
+                }
+                required
+                type="number"
+                value={this.state.rows}
+              />
+            </FormGroup>
+            <FormGroup className="mb-0">
+              <Label className="font-weight-bold" for="table-columns">
+                {t('numberOfColumns')}
+              </Label>
+              <Input
+                id="table-columns"
+                min="1"
+                onChange={evt =>
+                  this.setState({columns: parseInt(evt.target.value)})
+                }
+                required
+                type="number"
+                value={this.state.columns}
+              />
+            </FormGroup>
+            <Button className="float-right mt-3" color="primary" type="submit">
+              {t('add')}
+            </Button>
+          </Form>
         </ModalBody>
-        <ModalFooter>
-          <Button color="primary" onClick={this.addTableToEditor}>
-            {t('add')}
-          </Button>
-        </ModalFooter>
       </Modal>
     )
   }
