@@ -8,6 +8,7 @@ import {
   Modal,
   ModalBody,
   ModalHeader,
+  FormText,
 } from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
@@ -64,6 +65,11 @@ class IframeAdderModal extends Component {
                 type="text"
                 value={this.state.width}
               />
+              <FormText className="ml-1">
+                {t('forExample')}
+                <code className="ml-1">500</code>, <code>300px</code> or
+                <code className="ml-1">50%</code>
+              </FormText>
             </FormGroup>
             <FormGroup className="mb-0">
               <Input
@@ -72,6 +78,11 @@ class IframeAdderModal extends Component {
                 type="text"
                 value={this.state.height}
               />
+              <FormText className="ml-1">
+                {t('forExample')}
+                <code className="ml-1">500</code>, <code>300px</code> or
+                <code className="ml-1">50%</code>
+              </FormText>
             </FormGroup>
             <Button className="float-right mt-3" color="primary" type="submit">
               {t('add')}
