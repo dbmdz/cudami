@@ -1,5 +1,13 @@
 import React, {Component} from 'react'
-import {Button, Form, Input, Modal, ModalBody, ModalHeader} from 'reactstrap'
+import {
+  Button,
+  Form,
+  FormGroup,
+  Input,
+  Modal,
+  ModalBody,
+  ModalHeader,
+} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
 class LanguageAdderModal extends Component {
@@ -41,17 +49,19 @@ class LanguageAdderModal extends Component {
               this.addLanguage()
             }}
           >
-            <Input
-              onChange={evt => this.setLanguage(evt.target.value)}
-              type="select"
-            >
-              {this.props.availableLanguages.map(language => (
-                <option key={language.name} value={language.name}>
-                  {language.displayName}
-                </option>
-              ))}
-            </Input>
-            <Button className="float-right mt-3" color="primary" type="submit">
+            <FormGroup>
+              <Input
+                onChange={evt => this.setLanguage(evt.target.value)}
+                type="select"
+              >
+                {this.props.availableLanguages.map(language => (
+                  <option key={language.name} value={language.name}>
+                    {language.displayName}
+                  </option>
+                ))}
+              </Input>
+            </FormGroup>
+            <Button className="float-right" color="primary" type="submit">
               {t('add')}
             </Button>
           </Form>

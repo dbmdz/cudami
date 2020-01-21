@@ -62,7 +62,7 @@ class TableAdderModal extends Component {
                 value={this.state.rows}
               />
             </FormGroup>
-            <FormGroup className="mb-0">
+            <FormGroup>
               <Label className="font-weight-bold" for="table-columns">
                 {t('numberOfColumns')}
               </Label>
@@ -77,7 +77,7 @@ class TableAdderModal extends Component {
                 value={this.state.columns}
               />
             </FormGroup>
-            <Button className="float-right mt-3" color="primary" type="submit">
+            <Button className="float-right" color="primary" type="submit">
               {t('add')}
             </Button>
           </Form>

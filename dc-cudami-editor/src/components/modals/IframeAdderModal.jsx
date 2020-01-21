@@ -71,7 +71,7 @@ class IframeAdderModal extends Component {
                 <code className="ml-1">50%</code>
               </FormText>
             </FormGroup>
-            <FormGroup className="mb-0">
+            <FormGroup>
               <Input
                 onChange={evt => this.setState({height: evt.target.value})}
                 placeholder={t('height')}
@@ -84,7 +84,7 @@ class IframeAdderModal extends Component {
                 <code className="ml-1">50%</code>
               </FormText>
             </FormGroup>
-            <Button className="float-right mt-3" color="primary" type="submit">
+            <Button className="float-right" color="primary" type="submit">
               {t('add')}
             </Button>
           </Form>

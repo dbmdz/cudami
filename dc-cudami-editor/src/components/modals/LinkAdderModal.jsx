@@ -55,7 +55,7 @@ class LinkAdderModal extends Component {
                 value={this.state.href}
               />
             </FormGroup>
-            <FormGroup className="mb-0">
+            <FormGroup>
               <Input
                 onChange={evt => this.setState({title: evt.target.value})}
                 placeholder={t('label')}
@@ -63,7 +63,7 @@ class LinkAdderModal extends Component {
                 value={this.state.height}
               />
             </FormGroup>
-            <Button className="float-right mt-3" color="primary" type="submit">
+            <Button className="float-right" color="primary" type="submit">
               {t('add')}
             </Button>
           </Form>
