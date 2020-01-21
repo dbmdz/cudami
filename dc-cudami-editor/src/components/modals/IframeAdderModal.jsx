@@ -4,11 +4,11 @@ import {
   Button,
   Form,
   FormGroup,
+  FormText,
   Input,
   Modal,
   ModalBody,
   ModalHeader,
-  FormText,
 } from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
