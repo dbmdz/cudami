@@ -65,8 +65,6 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
 
   @Override
   public PageResponse<Article> find(PageRequest pageRequest) {
-    // select only what is shown/needed in paged list (commented some additional available fields
-    // not needed in overview list to avoid unnecessary payload/traffic):
     StringBuilder query = new StringBuilder(REDUCED_FIND_ONE_BASE_SQL);
     addPageRequestParams(pageRequest, query);
 
