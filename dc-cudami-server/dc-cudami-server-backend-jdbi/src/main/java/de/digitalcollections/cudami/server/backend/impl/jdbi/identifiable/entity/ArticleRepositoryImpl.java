@@ -74,24 +74,16 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
     StringBuilder query = new StringBuilder(REDUCED_FIND_ONE_BASE_SQL);
     addPageRequestParams(pageRequest, query);
 
-    List<Article> result =
+    List<ArticleImpl> result =
         dbi.withHandle(
             h ->
                 h.createQuery(query.toString())
                     .registerRowMapper(BeanMapper.factory(ArticleImpl.class, "a"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, Article>(),
-                        (map, rowView) -> {
-                          Article article =
-                              map.computeIfAbsent(
-                                  rowView.getColumn("a_uuid", UUID.class),
-                                  uuid -> rowView.getRow(ArticleImpl.class));
-                          if (rowView.getColumn("f_uri", String.class) != null) {
-                            article.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
-                          }
-                          return map;
-                        })
+                        new LinkedHashMap<UUID, ArticleImpl>(),
+                        (map, rowView) ->
+                            addPreviewImage(map, rowView, ArticleImpl.class, "a_uuid"))
                     .values().stream()
                     .collect(Collectors.toList()));
     long total = count();
@@ -103,7 +95,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   public Article findOne(UUID uuid) {
     String query = FIND_ONE_BASE_SQL + " WHERE a.uuid = :uuid";
 
-    Optional<Article> resultOpt =
+    Optional<ArticleImpl> resultOpt =
         dbi.withHandle(
             h ->
                 h.createQuery(query).bind("uuid", uuid)
@@ -111,20 +103,10 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, Article>(),
-                        (map, rowView) -> {
-                          Article article =
-                              map.computeIfAbsent(
-                                  rowView.getColumn("a_uuid", UUID.class),
-                                  id -> rowView.getRow(ArticleImpl.class));
-                          if (rowView.getColumn("id_uuid", UUID.class) != null) {
-                            article.addIdentifier(rowView.getRow(IdentifierImpl.class));
-                          }
-                          if (rowView.getColumn("f_uri", String.class) != null) {
-                            article.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
-                          }
-                          return map;
-                        })
+                        new LinkedHashMap<UUID, ArticleImpl>(),
+                        (map, rowView) ->
+                            addPreviewImageAndIdentifiers(
+                                map, rowView, ArticleImpl.class, "a_uuid"))
                     .values().stream()
                     .findFirst());
     if (!resultOpt.isPresent()) {
@@ -144,7 +126,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
 
     String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
-    Optional<Article> resultOpt =
+    Optional<ArticleImpl> resultOpt =
         dbi.withHandle(
             h ->
                 h.createQuery(query).bind("id", identifierId).bind("namespace", namespace)
@@ -152,20 +134,10 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, Article>(),
-                        (map, rowView) -> {
-                          Article article =
-                              map.computeIfAbsent(
-                                  rowView.getColumn("a_uuid", UUID.class),
-                                  id -> rowView.getRow(ArticleImpl.class));
-                          if (rowView.getColumn("id_uuid", UUID.class) != null) {
-                            article.addIdentifier(rowView.getRow(IdentifierImpl.class));
-                          }
-                          if (rowView.getColumn("f_uri", String.class) != null) {
-                            article.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
-                          }
-                          return map;
-                        })
+                        new LinkedHashMap<UUID, ArticleImpl>(),
+                        (map, rowView) ->
+                            addPreviewImageAndIdentifiers(
+                                map, rowView, ArticleImpl.class, "a_uuid"))
                     .values().stream()
                     .findFirst());
     if (!resultOpt.isPresent()) {
