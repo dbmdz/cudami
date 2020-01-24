@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CorporationRepository;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Corporation;
@@ -23,8 +24,8 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
   private static final Logger LOGGER = LoggerFactory.getLogger(CorporationRepositoryImpl.class);
 
   @Autowired
-  public CorporationRepositoryImpl(Jdbi dbi) {
-    super(dbi);
+  public CorporationRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
+    super(dbi, identifierRepository);
   }
 
   @Override

@@ -42,12 +42,9 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
   private static final Logger LOGGER =
       LoggerFactory.getLogger(FileResourceMetadataRepositoryImpl.class);
 
-  private final IdentifierRepository identifierRepository;
-
   @Autowired
   public FileResourceMetadataRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(dbi);
-    this.identifierRepository = identifierRepository;
+    super(dbi, identifierRepository);
   }
 
   @Override

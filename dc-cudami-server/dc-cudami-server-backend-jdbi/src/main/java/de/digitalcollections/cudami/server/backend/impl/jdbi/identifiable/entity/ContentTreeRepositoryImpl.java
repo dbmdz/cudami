@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ContentTreeRepository;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.ContentTree;
@@ -26,8 +27,8 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
   private static final Logger LOGGER = LoggerFactory.getLogger(ContentTreeRepositoryImpl.class);
 
   @Autowired
-  public ContentTreeRepositoryImpl(Jdbi dbi) {
-    super(dbi);
+  public ContentTreeRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
+    super(dbi, identifierRepository);
   }
 
   @Override

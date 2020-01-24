@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSortingRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.Identifier;
@@ -31,11 +32,37 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableRepositoryImpl.class);
 
+  // select all details shown/needed in single object details page
+  private static final String FIND_ONE_BASE_SQL =
+      "SELECT i.uuid i_uuid, i.label i_label, i.description i_description,"
+          + " i.identifiable_type i_type,"
+          + " i.created i_created, i.last_modified i_last_modified,"
+          + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
+          + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
+          + " FROM identifiables as i"
+          + " LEFT JOIN identifiers as id on i.uuid = id.identifiable"
+          + " LEFT JOIN fileresources_image as file on i.previewfileresource = file.uuid";
+
+  // select only what is shown/needed in paged list (commented some additional available fields
+  // not needed in overview list to avoid unnecessary payload/traffic):
+  private static final String REDUCED_FIND_ONE_BASE_SQL =
+      "SELECT i.uuid i_uuid, i.label i_label, i.description i_description,"
+          + " i.identifiable_type i_type,"
+          + " i.created i_created, i.last_modified i_lastModified,"
+          //      + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace
+          // id_namespace, id.identifier id_id,"
+          + " file.uri f_uri, file.filename f_filename"
+          + " FROM identifiables as i"
+          //      + " LEFT JOIN identifiers as id on i.uuid = id.identifiable"
+          + " LEFT JOIN fileresources_image as file on i.previewfileresource = file.uuid";
+
   protected Jdbi dbi;
+  protected final IdentifierRepository identifierRepository;
 
   @Autowired
-  public IdentifiableRepositoryImpl(Jdbi dbi) {
+  public IdentifiableRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     this.dbi = dbi;
+    this.identifierRepository = identifierRepository;
   }
 
   @Override
@@ -45,20 +72,17 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     return count;
   }
 
+  protected void deleteIdentifiers(Identifiable identifiable) {
+    dbi.withHandle(
+        h ->
+            h.createUpdate("DELETE FROM identifiers WHERE identifiable = :uuid")
+                .bind("uuid", identifiable.getUuid())
+                .execute());
+  }
+
   @Override
   public PageResponse<I> find(PageRequest pageRequest) {
-    // select only what is shown/needed in paged list (commented some additional prepared fields):
-    StringBuilder query =
-        new StringBuilder(
-            "SELECT i.uuid i_uuid, i.label i_label, i.description i_description,"
-                + " i.identifiable_type i_type,"
-                + " i.created i_created, i.last_modified i_lastModified,"
-                //      + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace
-                // id_namespace, id.identifier id_id,"
-                + " file.uri f_uri, file.filename f_filename"
-                + " FROM identifiables as i"
-                //      + " LEFT JOIN identifiers as id on i.uuid = id.identifiable"
-                + " LEFT JOIN fileresources_image as file on i.previewfileresource = file.uuid");
+    StringBuilder query = new StringBuilder(REDUCED_FIND_ONE_BASE_SQL);
     addPageRequestParams(pageRequest, query);
 
     List<Identifiable> result =
@@ -111,16 +135,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
   @Override
   public I findOne(UUID uuid) {
-    String query =
-        "SELECT i.uuid i_uuid, i.label i_label, i.description i_description,"
-            + " i.identifiable_type i_type,"
-            + " i.created i_created, i.last_modified i_last_modified,"
-            + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-            + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
-            + " FROM identifiables as i"
-            + " LEFT JOIN identifiers as id on i.uuid = id.identifiable"
-            + " LEFT JOIN fileresources_image as file on i.previewfileresource = file.uuid"
-            + " WHERE i.uuid = :uuid";
+    String query = FIND_ONE_BASE_SQL + " WHERE i.uuid = :uuid";
 
     Optional<Identifiable> resultOpt =
         dbi.withHandle(
@@ -162,16 +177,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     String namespace = identifier.getNamespace();
     String identifierId = identifier.getId();
 
-    String query =
-        "SELECT i.uuid i_uuid, i.label i_label, i.description i_description,"
-            + " i.identifiable_type i_type,"
-            + " i.created i_created, i.last_modified i_last_modified,"
-            + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-            + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
-            + " FROM identifiables as i"
-            + " LEFT JOIN identifiers as id on i.uuid = id.identifiable"
-            + " LEFT JOIN fileresources_image as file on i.previewfileresource = file.uuid"
-            + " WHERE id.identifier = :id AND id.namespace = :namespace";
+    String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
     Optional<Identifiable> resultOpt =
         dbi.withHandle(
@@ -211,42 +217,30 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[] {"created", "type", "last_modified"};
+    return new String[] {"i.created", "i.last_modified", "i.identifiable_type"};
   }
 
   @Override
   public I save(I identifiable) {
     throw new UnsupportedOperationException(
         "use save of specific/inherited identifiable repository");
-    //    identifiable.setUuid(UUID.randomUUID());
-    //    identifiable.setCreated(LocalDateTime.now());
-    //    identifiable.setLastModified(LocalDateTime.now());
-    //
-    //    IdentifiableImpl result = dbi.withHandle(h -> h
-    //        .createQuery("INSERT INTO identifiables(created, description, identifiable_type,
-    // label, last_modified, uuid) VALUES (:created, :description::JSONB, :type, :label::JSONB,
-    // :lastModified, :uuid) RETURNING *")
-    //        .bindBean(identifiable)
-    //        .mapToBean(IdentifiableImpl.class)
-    //        .findOne().orElse(null));
-    //    return (I) result;
+  }
+
+  protected void saveIdentifiers(List<Identifier> identifiers, Identifiable identifiable) {
+    // we assume that identifiers (unique to object) are new (existing ones were deleted before
+    // (e.g. see update))
+    if (identifiers != null) {
+      for (Identifier identifier : identifiers) {
+        identifier.setIdentifiable(identifiable.getUuid());
+        identifierRepository.save(identifier);
+      }
+    }
   }
 
   @Override
   public I update(I identifiable) {
     throw new UnsupportedOperationException(
         "use update of specific/inherited identifiable repository");
-    //    identifiable.setLastModified(LocalDateTime.now());
-    //
-    //    // do not update/left out from statement: created, uuid
-    //    IdentifiableImpl result = dbi.withHandle(h -> h
-    //        .createQuery("UPDATE identifiables SET description=:description::JSONB,
-    // identifiable_type=:type, label=:label::JSONB, last_modified=:lastModified WHERE uuid=:uuid
-    // RETURNING *")
-    //        .bindBean(identifiable)
-    //        .mapToBean(IdentifiableImpl.class)
-    //        .findOne().orElse(null));
-    //    return (I) result;
   }
 
   protected Integer selectNextSortIndexForParentChildren(

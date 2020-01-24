@@ -42,16 +42,14 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectRepositoryImpl.class);
 
   private final FileResourceMetadataRepository fileResourceMetadataRepository;
-  private final IdentifierRepository identifierRepository;
 
   @Autowired
   public DigitalObjectRepositoryImpl(
       Jdbi dbi,
       IdentifierRepository identifierRepository,
       FileResourceMetadataRepository fileResourceMetadataRepository) {
-    super(dbi);
+    super(dbi, identifierRepository);
     this.fileResourceMetadataRepository = fileResourceMetadataRepository;
-    this.identifierRepository = identifierRepository;
   }
 
   @Override
@@ -412,17 +410,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     return getFileResources(digitalObjectUuid);
   }
 
-  private void saveIdentifiers(List<Identifier> identifiers, DigitalObject digitalObject) {
-    // we assume that identifiers (unique to object) are new (existing ones were deleted before
-    // (e.g. see update))
-    if (identifiers != null) {
-      for (Identifier identifier : identifiers) {
-        identifier.setIdentifiable(digitalObject.getUuid());
-        identifierRepository.save(identifier);
-      }
-    }
-  }
-
   @Override
   public DigitalObject update(DigitalObject digitalObject) {
     digitalObject.setLastModified(LocalDateTime.now());
@@ -441,13 +428,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                 .execute());
 
     // save identifiers
-    List<Identifier> identifiers = digitalObject.getIdentifiers();
     // as we store the whole list new: delete old entries
-    dbi.withHandle(
-        h ->
-            h.createUpdate("DELETE FROM identifiers WHERE identifiable = :uuid")
-                .bind("uuid", digitalObject.getUuid())
-                .execute());
+    deleteIdentifiers(digitalObject);
+    List<Identifier> identifiers = digitalObject.getIdentifiers();
     saveIdentifiers(identifiers, digitalObject);
 
     DigitalObject result = findOne(digitalObject.getUuid());
