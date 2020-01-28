@@ -1,19 +1,8 @@
 import React, {Component} from 'react'
-import {
-  Button,
-  ButtonGroup,
-  Col,
-  Form,
-  FormGroup,
-  Input,
-  InputGroup,
-  InputGroupAddon,
-  Label,
-  Progress,
-  Row,
-} from 'reactstrap'
+import {Button, ButtonGroup, Col, Form, Row} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
+import FileUploadForm from './FileUploadForm'
 import {uploadFile} from '../api'
 
 class FileResourceUploadForm extends Component {
@@ -73,42 +62,16 @@ class FileResourceUploadForm extends Component {
         </Row>
         <Row>
           <Col sm="12">
-            <FormGroup>
-              <Label className="font-weight-bold" for={'filename'}>
-                {t('file')}
-              </Label>
-              <InputGroup>
-                <Input
-                  id="filename"
-                  readOnly="readonly"
-                  type="text"
-                  value={this.state.file.name || ''}
-                />
-                <InputGroupAddon addonType="append" className="ml-1">
-                  <Label
-                    className="btn btn-info"
-                    for={'file-upload'}
-                    id="file-upload-button"
-                  >
-                    {t('chooseFile')}
-                  </Label>
-                  <Input
-                    className="d-none"
-                    id="file-upload"
-                    onChange={evt =>
-                      this.setState({
-                        file: evt.target.files[0],
-                        submitEnabled: true,
-                      })
-                    }
-                    type="file"
-                  />
-                </InputGroupAddon>
-              </InputGroup>
-            </FormGroup>
-            <Progress animated color="info" value={this.state.progress}>
-              {this.state.progress > 0 && `${this.state.progress}%`}
-            </Progress>
+            <FileUploadForm
+              filename={this.state.file.name}
+              onChange={file =>
+                this.setState({
+                  file: file,
+                  submitEnabled: true,
+                })
+              }
+              progress={this.state.progress}
+            />
           </Col>
         </Row>
       </Form>
