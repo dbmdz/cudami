@@ -7,7 +7,7 @@ const FormIdInput = props => {
       <Label className="font-weight-bold" for="id">
         ID
       </Label>
-      <Input id="id" readOnly="readonly" type="text" value={props.id} />
+      <Input id="id" readOnly type="text" value={props.id} />
     </FormGroup>
   )
 }
