@@ -233,6 +233,11 @@ export default function(t) {
         content: icons.image,
         enable: canInsert(schema.nodes.image),
         run: (state, dispatch) => {
+          const token = subscribe('editor.add-image', (_msg, data) => {
+            const image = schema.nodes.image.createAndFill(data)
+            dispatch(state.tr.replaceSelectionWith(image))
+            unsubscribe(token)
+          })
           publish('editor.show-image-modal')
         },
       },

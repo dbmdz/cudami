@@ -3,7 +3,7 @@
     "abort": "Abort",
     "add": "Add",
     "addLanguage": "Add language",
-    "altText": "Alternative text",
+    "altText": "Alt text",
     "blocks": {
       "blockquote": "Add block quote",
       "bulletList": "Change to bulleted list",
@@ -15,6 +15,7 @@
       "orderedList": "Change to numbered list",
       "paragraph": "Change to paragraph"
     },
+    "caption": "Caption",
     "chooseFile": "Choose file",
     "chooseLanguage": "Choose a language",
     "createArticle": "Create a new article",
@@ -67,6 +68,7 @@
     "numberOfRows": "Number of rows",
     "save": "Save",
     "text": "Long text",
+    "title": "Title",
     "uploadFileResource": "Upload a new file",
     "width": "Width"
   }
