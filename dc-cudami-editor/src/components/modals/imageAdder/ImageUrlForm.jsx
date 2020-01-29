@@ -2,7 +2,7 @@ import React from 'react'
 import {Button, Form, FormGroup, Input} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-const ImageMetadataForm = props => {
+const ImageUrlForm = props => {
   const {t} = useTranslation()
   const {label, url} = props.attributes
   return (
@@ -39,4 +39,4 @@ const ImageMetadataForm = props => {
   )
 }
 
-export default ImageMetadataForm
+export default ImageUrlForm
