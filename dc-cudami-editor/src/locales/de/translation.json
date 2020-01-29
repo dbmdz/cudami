@@ -3,7 +3,7 @@
     "abort": "Abbrechen",
     "add": "Hinzufügen",
     "addLanguage": "Sprache hinzufügen",
-    "altText": "Alternativtext",
+    "altText": "Alt-Text",
     "blocks": {
       "blockquote": "Zitat einfügen",
       "bulletList": "In Aufzählungsliste umwandeln",
@@ -15,6 +15,7 @@
       "orderedList": "In geordnete Liste umwandeln",
       "paragraph": "In Paragraph umwandeln"
     },
+    "caption": "Beschriftung",
     "chooseFile": "Datei auswählen",
     "chooseLanguage": "Sprache auswählen",
     "createArticle": "Neuen Artikel anlegen",
@@ -67,6 +68,7 @@
     "numberOfRows": "Anzahl an Zeilen",
     "save": "Speichern",
     "text": "Langtext",
+    "title": "Titel",
     "uploadFileResource": "Neue Datei hochladen",
     "width": "Breite"
   }
