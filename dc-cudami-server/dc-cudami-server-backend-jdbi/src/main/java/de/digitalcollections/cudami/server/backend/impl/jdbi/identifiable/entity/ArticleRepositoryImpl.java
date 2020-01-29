@@ -41,8 +41,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
           + " LEFT JOIN identifiers as id on a.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on a.previewfileresource = file.uuid";
 
-  // select only what is shown/needed in paged list (commented some additional available fields
-  // not needed in overview list to avoid unnecessary payload/traffic):
+  // select only what is shown/needed in paged list (to avoid unnecessary payload/traffic):
   private static final String REDUCED_FIND_ONE_BASE_SQL =
       "SELECT a.uuid a_uuid, a.refid a_refId, a.label a_label, a.description a_description,"
           + " a.identifiable_type a_type, a.entity_type a_entityType,"

@@ -44,8 +44,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
           + " LEFT JOIN identifiers as id on i.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on i.previewfileresource = file.uuid";
 
-  // select only what is shown/needed in paged list (commented some additional available fields
-  // not needed in overview list to avoid unnecessary payload/traffic):
+  // select only what is shown/needed in paged list (to avoid unnecessary payload/traffic):
   private static final String REDUCED_FIND_ONE_BASE_SQL =
       "SELECT i.uuid i_uuid, i.label i_label, i.description i_description,"
           + " i.identifiable_type i_type,"
