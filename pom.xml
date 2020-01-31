@@ -82,7 +82,7 @@
     <version.dc-model>4.0.3-SNAPSHOT</version.dc-model>
     <version.feign>10.7.0</version.feign>
     <version.feign-form-spring>3.5.0</version.feign-form-spring>
-    <version.flyway>6.1.2</version.flyway>
+    <version.flyway>6.2.1</version.flyway>
     <version.javax.servlet-api>4.0.1</version.javax.servlet-api>
     <version.json>20190722</version.json>
     <version.junit>5.6.0</version.junit>
