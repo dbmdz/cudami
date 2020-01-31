@@ -34,7 +34,7 @@ class ImageUploadForm extends Component {
             this.updateProgress
           )
           const responseJson = JSON.parse(response)
-          const label = Object.entries(responseJson.label)[0][1]
+          const label = Object.values(responseJson.label)[0]
           this.props.onChange({
             label: label,
             title: label,
