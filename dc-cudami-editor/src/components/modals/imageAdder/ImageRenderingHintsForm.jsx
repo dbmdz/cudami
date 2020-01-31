@@ -13,13 +13,13 @@ const ImageRenderingHintsForm = props => {
       }}
     >
       <FormGroup>
-        <Label for="rendering-hints-alignment">Ausrichtung</Label>
+        <Label for="rendering-hints-alignment">{t('alignment')}</Label>
         <div id="rendering-hints-alignment">
           <CustomInput
             checked={alignment === 'left'}
             id="rendering-hits-alignment-left"
             inline
-            label="links"
+            label={t('left')}
             onChange={evt => props.onChange('alignment', evt.target.value)}
             type="radio"
             value="left"
@@ -28,7 +28,7 @@ const ImageRenderingHintsForm = props => {
             checked={alignment === 'right'}
             id="rendering-hits-alignment-right"
             inline
-            label="rechts"
+            label={t('right')}
             onChange={evt => props.onChange('alignment', evt.target.value)}
             type="radio"
             value="right"
@@ -36,7 +36,7 @@ const ImageRenderingHintsForm = props => {
         </div>
       </FormGroup>
       <FormGroup>
-        <Label for="rendering-hints-width">Breite</Label>
+        <Label for="rendering-hints-width">{t('width')}</Label>
         <div id="rendering-hints-width">
           <CustomInput
             checked={width === '25%'}
@@ -77,7 +77,7 @@ const ImageRenderingHintsForm = props => {
         </div>
       </FormGroup>
       <FormGroup>
-        <Label for="rendering-hints-image-link">Bild-Link</Label>
+        <Label for="rendering-hints-image-link">{t('imageLink')}</Label>
         <Input
           id="rendering-hints-image-link"
           onChange={evt => props.onChange('linkUrl', evt.target.value)}
@@ -89,14 +89,14 @@ const ImageRenderingHintsForm = props => {
           checked={linkNewTab}
           className="mt-1"
           id="rendering-hits-image-link-blank"
-          label="in neuem Fenster"
+          label={t('openLinkNewTab')}
           onChange={() => props.onChange('linkNewTab', true)}
           type="radio"
         />
         <CustomInput
           checked={!linkNewTab}
           id="rendering-hits-image-link-no-blank"
-          label="in gleichem Fenster"
+          label={t('openLinkSameTab')}
           onChange={() => props.onChange('linkNewTab', false)}
           type="radio"
         />

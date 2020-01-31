@@ -3,6 +3,7 @@
     "abort": "Abort",
     "add": "Add",
     "addLanguage": "Add language",
+    "alignment": "Alignment",
     "altText": "Alt text",
     "blocks": {
       "blockquote": "Add block quote",
@@ -43,6 +44,7 @@
       "redo": "Redo last undone change",
       "undo": "Undo last change"
     },
+    "imageLink": "Image link",
     "insert": {
       "footnote": "Insert footnote",
       "hr": "Insert horizontal rule",
@@ -53,6 +55,7 @@
     "insertLink": "Insert hyperlink",
     "invalidLabels": "Please fill in the field \"$t(label)\" in the following languages:",
     "label": "Label",
+    "left": "left",
     "marks": {
       "code": "Code style",
       "em": "Italic",
@@ -66,6 +69,9 @@
     "next": "Next",
     "numberOfColumns": "Number of columns",
     "numberOfRows": "Number of rows",
+    "openLinkNewTab": "open in a new tab",
+    "openLinkSameTab": "open in the same tab",
+    "right": "right",
     "save": "Save",
     "text": "Long text",
     "title": "Title",

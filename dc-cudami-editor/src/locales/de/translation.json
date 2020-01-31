@@ -3,6 +3,7 @@
     "abort": "Abbrechen",
     "add": "Hinzufügen",
     "addLanguage": "Sprache hinzufügen",
+    "alignment": "Ausrichtung",
     "altText": "Alt-Text",
     "blocks": {
       "blockquote": "Zitat einfügen",
@@ -43,6 +44,7 @@
       "redo": "Letzte rückgängig gemachte Änderung wiederholen",
       "undo": "Letzte Änderung rückgängig machen"
     },
+    "imageLink": "Bild-Link",
     "insert": {
       "footnote": "Fußnote einfügen",
       "hr": "Horizontale Linie einfügen",
@@ -53,6 +55,7 @@
     "insertLink": "Verlinkung einfügen",
     "invalidLabels": "Bitte füllen Sie in den folgenden Sprachen das Feld \"$t(label)\" noch aus):",
     "label": "Titel",
+    "left": "links",
     "marks": {
       "code": "Code-Stil",
       "em": "Kursiv",
@@ -63,9 +66,14 @@
       "superscript": "Hochgestellt",
       "underline": "Unterstrichen"
     },
+    "newTab": "in neuem Tab",
     "next": "Weiter",
     "numberOfColumns": "Anzahl an Spalten",
     "numberOfRows": "Anzahl an Zeilen",
+    "openLinkNewTab": "in einem neuen Tab öffnen",
+    "openLinkSameTab": "im selben Tab öffnen",
+    "right": "rechts",
+    "sameTab": "in gleichem Tab",
     "save": "Speichern",
     "text": "Langtext",
     "title": "Titel",
