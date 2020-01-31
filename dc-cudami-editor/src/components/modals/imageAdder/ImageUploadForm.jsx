@@ -56,7 +56,7 @@ class ImageUploadForm extends Component {
         <Button
           className="float-right"
           color="primary"
-          disabled={!this.state.submitEnabled && true}
+          disabled={!this.state.submitEnabled}
           type="submit"
         >
           {t('next')}
