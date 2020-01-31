@@ -42,14 +42,8 @@ class ImageAdderModal extends Component {
 
   addImageToEditor = () => {
     this.toggle()
-    const filteredAttributes = Object.entries(this.state.attributes).reduce(
-      (filteredAttributes, attribute) => {
-        if (attribute[1]) {
-          filteredAttributes[attribute[0]] = attribute[1]
-        }
-        return filteredAttributes
-      },
-      {}
+    const filteredAttributes = Object.fromEntries(
+      Object.entries(this.state.attributes).filter(([_, value]) => value)
     )
     publish('editor.add-image', filteredAttributes)
   }
