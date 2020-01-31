@@ -47,7 +47,7 @@ class FileResourceUploadForm extends Component {
               </Button>
               <Button
                 color="primary"
-                disabled={!this.state.submitEnabled && true}
+                disabled={!this.state.submitEnabled}
                 type="submit"
               >
                 {t('next')}
