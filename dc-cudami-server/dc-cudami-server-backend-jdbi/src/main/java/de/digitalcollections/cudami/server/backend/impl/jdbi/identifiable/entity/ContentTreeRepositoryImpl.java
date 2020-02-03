@@ -107,7 +107,12 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
     if (!resultOpt.isPresent()) {
       return null;
     }
-    return resultOpt.get();
+    ContentTree contentTree = resultOpt.get();
+    if (contentTree != null) {
+      // TODO could be replaced with another join in above query...
+      contentTree.setRootNodes(getRootNodes(contentTree));
+    }
+    return contentTree;
   }
 
   @Override
@@ -138,7 +143,12 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
     if (!resultOpt.isPresent()) {
       return null;
     }
-    return resultOpt.get();
+    ContentTree contentTree = resultOpt.get();
+    if (contentTree != null) {
+      // TODO could be replaced with another join in above query...
+      contentTree.setRootNodes(getRootNodes(contentTree));
+    }
+    return contentTree;
   }
 
   @Override
