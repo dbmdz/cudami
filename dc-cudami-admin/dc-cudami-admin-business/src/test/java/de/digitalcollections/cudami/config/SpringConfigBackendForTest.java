@@ -10,7 +10,8 @@ import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.en
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.ContentNodeRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.EntityPartRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.WebpageRepository;
-import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.CudamiFileResourceRepository;
+import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.FileResourceBinaryRepository;
+import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.security.UserRepository;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -70,9 +71,13 @@ public class SpringConfigBackendForTest {
   }
 
   @Bean
-  @Qualifier("resourceRepositoryImpl")
-  public CudamiFileResourceRepository resourceRepositoryImpl() {
-    return Mockito.mock(CudamiFileResourceRepository.class);
+  public FileResourceBinaryRepository fileResourceBinaryRepository() {
+    return Mockito.mock(FileResourceBinaryRepository.class);
+  }
+
+  @Bean
+  public FileResourceMetadataRepository fileResourceMetadataRepository() {
+    return Mockito.mock(FileResourceMetadataRepository.class);
   }
 
   @Bean
