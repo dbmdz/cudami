@@ -6,21 +6,14 @@ import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
-import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.CudamiFileResourceService;
+import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
-import org.apache.tomcat.util.http.fileupload.FileItemIterator;
-import org.apache.tomcat.util.http.fileupload.FileItemStream;
-import org.apache.tomcat.util.http.fileupload.FileUploadException;
-import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,23 +32,23 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /** Controller for resource management pages. */
 @Controller
-public class FileResourcesController extends AbstractController {
+public class FileResourcesMetadataController extends AbstractController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(FileResourcesController.class);
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(FileResourcesMetadataController.class);
 
   LanguageSortingHelper languageSortingHelper;
   LocaleRepository localeRepository;
-  CudamiFileResourceService service;
+  FileResourceMetadataService service;
 
   @Autowired
-  public FileResourcesController(
+  public FileResourcesMetadataController(
       LanguageSortingHelper languageSortingHelper,
       LocaleRepository localeRepository,
-      CudamiFileResourceService service) {
+      FileResourceMetadataService service) {
     this.languageSortingHelper = languageSortingHelper;
     this.localeRepository = localeRepository;
     this.service = service;
@@ -135,44 +128,6 @@ public class FileResourcesController extends AbstractController {
       LOGGER.error("Cannot save fileresource with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
-  }
-
-  @PostMapping("/api/fileresources/new/upload")
-  @ResponseBody
-  public FileResource upload(HttpServletRequest request, RedirectAttributes redirectAttributes)
-      throws InterruptedException, IOException {
-    boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-    if (!isMultipart) {
-      // Inform user about invalid request
-      redirectAttributes.addFlashAttribute("message", "Invalid file resource!");
-      return null;
-    }
-    InputStream stream = null;
-    try {
-      ServletFileUpload upload = new ServletFileUpload();
-      FileItemIterator iter = upload.getItemIterator(request);
-      while (iter.hasNext()) {
-        FileItemStream item = iter.next();
-        if (!item.isFormField()) {
-          String contentType = item.getContentType();
-          String filename = item.getName();
-          stream = item.openStream();
-
-          FileResource fileResource = service.upload(stream, filename, contentType);
-          return fileResource;
-        }
-      }
-    } catch (IOException | FileUploadException e) {
-      LOGGER.error("Error saving uploaded file data", e);
-      redirectAttributes.addFlashAttribute("message", "Error saving file resource!");
-      return null;
-    } finally {
-      if (stream != null) {
-        stream.close();
-      }
-    }
-    LOGGER.warn("Invalid file resource!");
-    return null;
   }
 
   @GetMapping(value = "/fileresources/{uuid}")

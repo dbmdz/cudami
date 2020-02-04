@@ -1,12 +1,10 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.resource;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.MimeType;
-import java.io.InputStream;
 
-public interface FileResourceService extends IdentifiableService<FileResource> {
+public interface FileResourceMetadataService extends IdentifiableService<FileResource> {
 
   default FileResource createByContentTypeAndFilename(String contentType, String filename) {
     return createByMimeTypeAndFilename(MimeType.fromTypename(contentType), filename);
@@ -32,7 +30,4 @@ public interface FileResourceService extends IdentifiableService<FileResource> {
     result.setFilename(filename);
     return result;
   }
-
-  FileResource save(FileResource fileResource, InputStream binaryData)
-      throws IdentifiableServiceException;
 }

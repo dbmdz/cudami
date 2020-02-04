@@ -88,11 +88,7 @@ export async function uploadFile(contextPath, file, type, updateProgress) {
         updateProgress(Math.round((evt.loaded / evt.total) * 100))
       }
     })
-    request.open(
-      'POST',
-      `${contextPath}api/${type.toLowerCase()}s/new/upload`,
-      true
-    )
+    request.open('POST', `${contextPath}api/files`, true)
     const formData = new FormData()
     formData.append('userfile', file, file.name)
     request.send(formData)
