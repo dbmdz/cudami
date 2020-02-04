@@ -36,7 +36,6 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
       "SELECT c.uuid c_uuid, c.refid c_refId, c.label c_label, c.description c_description,"
           + " c.identifiable_type c_type, c.entity_type c_entityType,"
           + " c.created c_created, c.last_modified c_lastModified,"
-          + " c.text c_text,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
           + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
           + " FROM contenttrees as c"
@@ -166,7 +165,7 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
   public List<ContentNode> getRootNodes(UUID uuid) {
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
     String query =
-        "SELECT cn.uuid cn_uuid, cn.refid cn_refId, cn.label cn_label, cn.description cn_description,"
+        "SELECT cn.uuid cn_uuid, cn.label cn_label, cn.description cn_description,"
             + " cn.identifiable_type cn_type,"
             + " cn.created cn_created, cn.last_modified cn_lastModified,"
             + " file.uri f_uri, file.filename f_filename"
