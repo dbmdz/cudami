@@ -62,23 +62,45 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     this.identifierRepository = identifierRepository;
   }
 
+  // this method can be used, if sql prefix of main object columns is not "f"
   protected <T extends Identifiable> LinkedHashMap<UUID, T> addPreviewImage(
       LinkedHashMap<UUID, T> map, RowView rowView, Class<T> clz, String idColumnName) {
+    return addPreviewImage(map, rowView, clz, idColumnName, "f_uri");
+  }
+
+  // this method must be used, if sql prefix of main object columns is equals "f"
+  protected <T extends Identifiable> LinkedHashMap<UUID, T> addPreviewImage(
+      LinkedHashMap<UUID, T> map,
+      RowView rowView,
+      Class<T> clz,
+      String idColumnName,
+      String previewFileColumnName) {
     T obj =
         map.computeIfAbsent(
             rowView.getColumn(idColumnName, UUID.class), uuid -> rowView.getRow(clz));
-    if (rowView.getColumn("f_uri", String.class) != null) {
+    if (rowView.getColumn(previewFileColumnName, String.class) != null) {
       obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
     }
     return map;
   }
 
+  // this method can be used, if sql prefix of main object columns is not "f"
   protected <T extends Identifiable> LinkedHashMap<UUID, T> addPreviewImageAndIdentifiers(
       LinkedHashMap<UUID, T> map, RowView rowView, Class<T> clz, String idColumnName) {
+    return addPreviewImageAndIdentifiers(map, rowView, clz, idColumnName, "f_uri");
+  }
+
+  // this method must be used, if sql prefix of main object columns is equals "f"
+  protected <T extends Identifiable> LinkedHashMap<UUID, T> addPreviewImageAndIdentifiers(
+      LinkedHashMap<UUID, T> map,
+      RowView rowView,
+      Class<T> clz,
+      String idColumnName,
+      String previewFileColumnName) {
     T obj =
         map.computeIfAbsent(
             rowView.getColumn(idColumnName, UUID.class), uuid -> rowView.getRow(clz));
-    if (rowView.getColumn("f_uri", String.class) != null) {
+    if (rowView.getColumn(previewFileColumnName, String.class) != null) {
       obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
     }
     if (rowView.getColumn("id_uuid", UUID.class) != null) {

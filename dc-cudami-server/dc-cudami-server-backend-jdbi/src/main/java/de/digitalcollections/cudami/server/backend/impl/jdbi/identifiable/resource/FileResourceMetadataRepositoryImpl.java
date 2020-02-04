@@ -220,7 +220,11 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
                         new LinkedHashMap<UUID, ApplicationFileResourceImpl>(),
                         (map, rowView) ->
                             addPreviewImageAndIdentifiers(
-                                map, rowView, ApplicationFileResourceImpl.class, "f_uuid"))
+                                map,
+                                rowView,
+                                ApplicationFileResourceImpl.class,
+                                "f_uuid",
+                                "pf_uri"))
                     .values().stream()
                     .findFirst());
     if (!resultOpt.isPresent()) {
@@ -253,7 +257,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
                         new LinkedHashMap<UUID, AudioFileResourceImpl>(),
                         (map, rowView) ->
                             addPreviewImageAndIdentifiers(
-                                map, rowView, AudioFileResourceImpl.class, "f_uuid"))
+                                map, rowView, AudioFileResourceImpl.class, "f_uuid", "pf_uri"))
                     .values().stream()
                     .findFirst());
     if (!resultOpt.isPresent()) {
@@ -281,12 +285,15 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
                 h.createQuery(query).bind("uuid", uuid)
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
+                    .registerRowMapper(BeanMapper.factory(FileResourceImpl.class, "pf"))
+                    // FIXME: FileResourceImpl.class is a workaround, because using
+                    // ImageFileResoureImpl leads to empty result bean... maybe clash of jdbi being
+                    // not able to map to two identical classes
                     .reduceRows(
                         new LinkedHashMap<UUID, ImageFileResourceImpl>(),
                         (map, rowView) ->
                             addPreviewImageAndIdentifiers(
-                                map, rowView, ImageFileResourceImpl.class, "f_uuid"))
+                                map, rowView, ImageFileResourceImpl.class, "f_uuid", "pf_uri"))
                     .values().stream()
                     .findFirst());
     if (!resultOpt.isPresent()) {
@@ -320,7 +327,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
                         new LinkedHashMap<UUID, LinkedDataFileResourceImpl>(),
                         (map, rowView) ->
                             addPreviewImageAndIdentifiers(
-                                map, rowView, LinkedDataFileResourceImpl.class, "f_uuid"))
+                                map, rowView, LinkedDataFileResourceImpl.class, "f_uuid", "pf_uri"))
                     .values().stream()
                     .findFirst());
     if (!resultOpt.isPresent()) {
@@ -352,7 +359,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
                         new LinkedHashMap<UUID, TextFileResourceImpl>(),
                         (map, rowView) ->
                             addPreviewImageAndIdentifiers(
-                                map, rowView, TextFileResourceImpl.class, "f_uuid"))
+                                map, rowView, TextFileResourceImpl.class, "f_uuid", "pf_uri"))
                     .values().stream()
                     .findFirst());
     if (!resultOpt.isPresent()) {
@@ -385,7 +392,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
                         new LinkedHashMap<UUID, VideoFileResourceImpl>(),
                         (map, rowView) ->
                             addPreviewImageAndIdentifiers(
-                                map, rowView, VideoFileResourceImpl.class, "f_uuid"))
+                                map, rowView, VideoFileResourceImpl.class, "f_uuid", "pf_uri"))
                     .values().stream()
                     .findFirst());
     if (!resultOpt.isPresent()) {
