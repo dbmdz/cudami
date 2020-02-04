@@ -302,7 +302,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
             + " f.created f_created, f.last_modified f_lastModified,"
             + " f.filename f_filename, f.mimetype f_mimetype, f.size_in_bytes f_sizeInBytes, f.uri f_uri,"
             + " f.context f_context, f.object_type f_objectType," // file resource type specific
-                                                                  // fields
+            // fields
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
             + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimetype, file.size_in_bytes pf_size_in_bytes, file.uri pf_uri"
             + " FROM fileresources_linkeddata as f"
