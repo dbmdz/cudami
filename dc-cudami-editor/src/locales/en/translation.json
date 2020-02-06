@@ -28,6 +28,7 @@
     "createProject": "Create a new project",
     "createWebsite": "Create a new website",
     "description": "Abstract",
+    "dragAndDropImage": "Drag and drop file to upload here",
     "editArticle": "Edit article",
     "editCollection": "Edit collection",
     "editContentNode": "Edit content node",

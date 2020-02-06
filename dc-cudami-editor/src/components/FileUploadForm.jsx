@@ -5,16 +5,22 @@ import {Card, Input, Label, Progress} from 'reactstrap'
 import FileDrop from 'react-file-drop'
 import {useTranslation} from 'react-i18next'
 
+import './FileUploadForm.css'
+
 const FileUploadForm = props => {
   const {t} = useTranslation()
   const {onChange, progress} = props
   return (
     <>
-      <FileDrop onDrop={files => onChange(files[0])}>
+      <FileDrop
+        onDrop={files => onChange(files[0])}
+        draggingOverTargetClassName="file-drop-dragging-over-target"
+        targetClassName="file-drop-target p-1"
+      >
         <div className="mb-3">
-          <FontAwesomeIcon icon={faUpload} size="3x" />
+          <FontAwesomeIcon icon={faUpload} size="2x" />
         </div>
-        <div className="mb-3">Drop some files here!</div>
+        <div className="mb-3">{t('dragAndDropImage')}</div>
         <Label
           className="btn btn-success m-0 rounded"
           for="file-upload"
