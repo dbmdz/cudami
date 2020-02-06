@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Button, ButtonGroup, Col, Form, Row} from 'reactstrap'
+import {Button, ButtonGroup, Card, Col, Form, Input, Row} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
 import FileUploadForm from './FileUploadForm'
@@ -61,16 +61,24 @@ class FileResourceUploadForm extends Component {
         </Row>
         <Row>
           <Col sm="12">
-            <FileUploadForm
-              filename={this.state.file.name}
-              onChange={file =>
-                this.setState({
-                  file: file,
-                  submitEnabled: true,
-                })
-              }
-              progress={this.state.progress}
-            />
+            <Card body className="text-center">
+              <FileUploadForm
+                onChange={file =>
+                  this.setState({
+                    file: file,
+                    submitEnabled: true,
+                  })
+                }
+                progress={this.state.progress}
+              />
+              <Input
+                className="mt-3 rounded"
+                id="filename"
+                readOnly
+                type="text"
+                value={this.state.file.name || ''}
+              />
+            </Card>
           </Col>
         </Row>
       </Form>
