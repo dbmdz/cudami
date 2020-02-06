@@ -57,16 +57,6 @@ const markActive = type => state => {
     : state.doc.rangeHasMark(from, to, type)
 }
 
-const promptForURL = () => {
-  let url = window && window.prompt('Enter the URL', 'https://')
-
-  if (url && !/^https?:\/\//i.test(url)) {
-    url = 'http://' + url
-  }
-
-  return url
-}
-
 export default function(t) {
   return {
     marks: {
