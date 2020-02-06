@@ -1,53 +1,40 @@
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {faCopy, faUpload} from '@fortawesome/free-solid-svg-icons'
 import React from 'react'
-import {
-  FormGroup,
-  Input,
-  InputGroup,
-  InputGroupAddon,
-  Label,
-  Progress,
-} from 'reactstrap'
+import {Card, Input, Label, Progress} from 'reactstrap'
+import FileDrop from 'react-file-drop'
 import {useTranslation} from 'react-i18next'
 
 const FileUploadForm = props => {
   const {t} = useTranslation()
-  const {filename, onChange, progress} = props
+  const {onChange, progress} = props
   return (
     <>
-      <FormGroup>
-        <Label className="font-weight-bold" for={'filename'}>
-          {t('file')}
+      <FileDrop onDrop={files => onChange(files[0])}>
+        <div className="mb-3">
+          <FontAwesomeIcon icon={faUpload} size="3x" />
+        </div>
+        <div className="mb-3">Drop some files here!</div>
+        <Label
+          className="btn btn-success m-0 rounded"
+          for="file-upload"
+          id="file-upload-button"
+        >
+          <FontAwesomeIcon className="mr-1" icon={faCopy} />
+          {t('chooseFile')}
         </Label>
-        <InputGroup>
-          <Input
-            className="rounded"
-            id="filename"
-            readOnly
-            type="text"
-            value={filename || ''}
-          />
-          <InputGroupAddon addonType="append" className="ml-1">
-            <Label
-              className="btn btn-info rounded"
-              for={'file-upload'}
-              id="file-upload-button"
-            >
-              {t('chooseFile')}
-            </Label>
-            <Input
-              className="d-none"
-              id="file-upload"
-              onChange={evt => onChange(evt.target.files[0])}
-              type="file"
-            />
-          </InputGroupAddon>
-        </InputGroup>
-      </FormGroup>
-      <FormGroup>
-        <Progress animated color="info" value={progress}>
-          {progress > 0 && `${progress}%`}
+        <Input
+          className="d-none"
+          id="file-upload"
+          onChange={evt => onChange(evt.target.files[0])}
+          type="file"
+        />
+      </FileDrop>
+      {progress > 0 && progress < 100 && (
+        <Progress animated className="mt-3" color="info" value={progress}>
+          {`${progress}%`}
         </Progress>
-      </FormGroup>
+      )}
     </>
   )
 }
