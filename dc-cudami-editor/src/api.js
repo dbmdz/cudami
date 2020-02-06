@@ -72,7 +72,7 @@ export async function updateIdentifiable(contextPath, identifiable, type) {
   }
 }
 
-export async function uploadFile(contextPath, file, type, updateProgress) {
+export async function uploadFile(contextPath, file, updateProgress) {
   return new Promise((resolve, reject) => {
     const request = new XMLHttpRequest()
     request.onerror = () => reject(request.statusText)

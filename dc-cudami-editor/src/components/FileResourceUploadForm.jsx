@@ -30,7 +30,6 @@ class FileResourceUploadForm extends Component {
           const responseJson = await uploadFile(
             this.props.apiContextPath,
             this.state.file,
-            this.props.type,
             this.updateProgress
           )
           this.props.onUpdate(JSON.parse(responseJson))

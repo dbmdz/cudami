@@ -16,7 +16,6 @@ const FileResourceForm = props => {
     return (
       <FileResourceUploadForm
         apiContextPath={props.apiContextPath}
-        type={props.type}
         onUpdate={props.onUpdate}
       />
     )
