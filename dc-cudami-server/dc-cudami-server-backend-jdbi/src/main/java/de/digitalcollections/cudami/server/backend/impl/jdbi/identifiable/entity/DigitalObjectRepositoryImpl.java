@@ -49,7 +49,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       "SELECT d.uuid d_uuid, d.refid d_refId, d.label d_label, d.description d_description,"
           + " d.identifiable_type d_type, d.entity_type d_entityType,"
           + " d.created d_created, d.last_modified d_lastModified,"
-          //          + " d.license d_license, d.version d_version,"
+          // TODO: add d.license d_license, d.version d_version, when features added
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
           + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
           + " FROM digitalobjects as d"
@@ -116,7 +116,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         "SELECT d.uuid d_uuid, d.label d_label, d.description d_description,"
             + " d.identifiable_type d_identifiable_type, d.entity_type d_entity_type,"
             + " d.created d_created, d.last_modified d_last_modified,"
-            //          + " d.license d_license, d.version d_version,"
+            // TODO: add d.license d_license, d.version d_version, when available
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
             + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri,"
             + " df.fileresource_uuid df_fileresource_uuid,"
@@ -218,7 +218,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     String namespace = identifier.getNamespace();
     String id = identifier.getId();
 
-    // TODO review versioning
+    // TODO review versioning, prototype was:
     //    String query =
     //        "SELECT d.uuid"
     //            + " FROM digitalobjects as d"
