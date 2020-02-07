@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifier;
@@ -8,15 +9,22 @@ import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
+import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.jdbi.v3.core.statement.PreparedBatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -24,9 +32,31 @@ import org.springframework.stereotype.Repository;
 public class EntityRepositoryImpl<E extends Entity> extends IdentifiableRepositoryImpl<E>
     implements EntityRepository<E> {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(EntityRepositoryImpl.class);
+
+  // select all details shown/needed in single object details page
+  private static final String FIND_ONE_BASE_SQL =
+      "SELECT e.uuid e_uuid, e.refid e_refId, e.label e_label, e.description e_description,"
+          + " e.identifiable_type e_type, e.entity_type e_entityType,"
+          + " e.created e_created, e.last_modified e_last_modified,"
+          + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
+          + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
+          + " FROM entities as e"
+          + " LEFT JOIN identifiers as id on e.uuid = id.identifiable"
+          + " LEFT JOIN fileresources_image as file on e.previewfileresource = file.uuid";
+
+  // select only what is shown/needed in paged list (to avoid unnecessary payload/traffic):
+  private static final String REDUCED_FIND_ONE_BASE_SQL =
+      "SELECT e.uuid e_uuid, e.refid e_refId, e.label e_label, e.description e_description,"
+          + " e.identifiable_type e_type, , e.entity_type e_entityType,"
+          + " e.created e_created, e.last_modified e_lastModified,"
+          + " file.uri f_uri, file.filename f_filename"
+          + " FROM entities as e"
+          + " LEFT JOIN fileresources_image as file on e.previewfileresource = file.uuid";
+
   @Autowired
-  public EntityRepositoryImpl(Jdbi dbi) {
-    super(dbi);
+  public EntityRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
+    super(dbi, identifierRepository);
   }
 
   @Override
@@ -76,13 +106,20 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public PageResponse<E> find(PageRequest pageRequest) {
-    StringBuilder query =
-        new StringBuilder(
-            "SELECT uuid, label, description, entityType, created, last_modified FROM entities");
-
+    StringBuilder query = new StringBuilder(REDUCED_FIND_ONE_BASE_SQL);
     addPageRequestParams(pageRequest, query);
+
     List<EntityImpl> result =
-        dbi.withHandle(h -> h.createQuery(query.toString()).mapToBean(EntityImpl.class).list());
+        dbi.withHandle(
+            h ->
+                h.createQuery(query.toString())
+                    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "i"))
+                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                    .reduceRows(
+                        new LinkedHashMap<UUID, EntityImpl>(),
+                        (map, rowView) -> addPreviewImage(map, rowView, EntityImpl.class, "i_uuid"))
+                    .values().stream()
+                    .collect(Collectors.toList()));
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -90,19 +127,25 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public E findOne(UUID uuid) {
-    String query =
-        "SELECT uuid, label, description, entity_type, created, last_modified FROM entities WHERE uuid = :uuid";
+    String query = FIND_ONE_BASE_SQL + " WHERE e.uuid = :uuid";
 
-    E entity =
-        (E)
-            dbi.withHandle(
-                h ->
-                    h.createQuery(query)
-                        .bind("uuid", uuid)
-                        .mapToBean(EntityImpl.class)
-                        .findOne()
-                        .orElse(null));
-    return entity;
+    Optional<EntityImpl> resultOpt =
+        dbi.withHandle(
+            h ->
+                h.createQuery(query).bind("uuid", uuid)
+                    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "i"))
+                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                    .reduceRows(
+                        new LinkedHashMap<UUID, EntityImpl>(),
+                        (map, rowView) ->
+                            addPreviewImageAndIdentifiers(map, rowView, EntityImpl.class, "e_uuid"))
+                    .values().stream()
+                    .findFirst());
+    if (!resultOpt.isPresent()) {
+      return null;
+    }
+    return (E) resultOpt.get();
   }
 
   @Override
@@ -112,61 +155,55 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     }
 
     String namespace = identifier.getNamespace();
-    String id = identifier.getId();
+    String identifierId = identifier.getId();
 
-    String query =
-        "SELECT e.uuid, e.label, e.description, e.entity_type, e.created, e.last_modified"
-            + " FROM entities as e"
-            + " LEFT JOIN identifiers as id on e.uuid = id.identifiable"
-            + " WHERE id.identifier = :id AND id.namespace = :namespace";
+    String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
-    E entity =
-        (E)
-            dbi.withHandle(
-                h ->
-                    h.createQuery(query)
-                        .bind("id", id)
-                        .bind("namespace", namespace)
-                        .mapToBean(EntityImpl.class)
-                        .findOne()
-                        .orElse(null));
-    return entity;
+    Optional<EntityImpl> resultOpt =
+        dbi.withHandle(
+            h ->
+                h.createQuery(query).bind("id", identifierId).bind("namespace", namespace)
+                    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "i"))
+                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                    .reduceRows(
+                        new LinkedHashMap<UUID, EntityImpl>(),
+                        (map, rowView) ->
+                            addPreviewImageAndIdentifiers(map, rowView, EntityImpl.class, "e_uuid"))
+                    .values().stream()
+                    .findFirst());
+    if (!resultOpt.isPresent()) {
+      return null;
+    }
+    return (E) resultOpt.get();
   }
 
   @Override
   public E findOneByRefId(long refId) {
-    String query =
-        "SELECT e.refid, e.uuid, e.label, e.description, e.entity_type, e.created, e.last_modified"
-            + " FROM entities as e"
-            + " WHERE e.refid = :refId";
+    String query = FIND_ONE_BASE_SQL + " WHERE e.refid = :refId";
 
-    E entity =
-        (E)
-            dbi.withHandle(
-                h ->
-                    h.createQuery(query)
-                        .bind("refId", refId)
-                        .mapToBean(EntityImpl.class)
-                        .findOne()
-                        .orElse(null));
-    return entity;
+    Optional<EntityImpl> resultOpt =
+        dbi.withHandle(
+            h ->
+                h.createQuery(query).bind("refId", refId)
+                    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "i"))
+                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                    .reduceRows(
+                        new LinkedHashMap<UUID, EntityImpl>(),
+                        (map, rowView) ->
+                            addPreviewImageAndIdentifiers(map, rowView, EntityImpl.class, "e_uuid"))
+                    .values().stream()
+                    .findFirst());
+    if (!resultOpt.isPresent()) {
+      return null;
+    }
+    return (E) resultOpt.get();
   }
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[] {"created", "entity_type", "last_modified"};
-  }
-
-  private int getIndex(LinkedHashSet<FileResource> fileResources, FileResource fileResource) {
-    int pos = -1;
-    for (Iterator<FileResource> iterator = fileResources.iterator(); iterator.hasNext(); ) {
-      pos = pos + 1;
-      FileResource fr = iterator.next();
-      if (fr.getUuid().equals(fileResource.getUuid())) {
-        return pos;
-      }
-    }
-    return -1;
+    return new String[] {"e.created", "e.last_modified", "e.identifiable_type", "e.entity_type"};
   }
 
   @Override

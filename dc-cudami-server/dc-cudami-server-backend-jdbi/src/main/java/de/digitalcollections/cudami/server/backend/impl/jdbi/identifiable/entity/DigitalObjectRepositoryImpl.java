@@ -7,8 +7,11 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.api.identifiable.resource.ApplicationFileResource;
+import de.digitalcollections.model.api.identifiable.resource.AudioFileResource;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
+import de.digitalcollections.model.api.identifiable.resource.TextFileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
@@ -41,17 +44,36 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectRepositoryImpl.class);
 
+  // select all details shown/needed in single object details page
+  private static final String FIND_ONE_BASE_SQL =
+      "SELECT d.uuid d_uuid, d.refid d_refId, d.label d_label, d.description d_description,"
+          + " d.identifiable_type d_type, d.entity_type d_entityType,"
+          + " d.created d_created, d.last_modified d_lastModified,"
+          // TODO: add d.license d_license, d.version d_version, when features added
+          + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
+          + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
+          + " FROM digitalobjects as d"
+          + " LEFT JOIN identifiers as id on d.uuid = id.identifiable"
+          + " LEFT JOIN fileresources_image as file on d.previewfileresource = file.uuid";
+
+  // select only what is shown/needed in paged list (to avoid unnecessary payload/traffic):
+  private static final String REDUCED_FIND_ONE_BASE_SQL =
+      "SELECT d.uuid d_uuid, d.refid d_refId, d.label d_label, d.description d_description,"
+          + " d.identifiable_type d_type, d.entity_type d_entityType,"
+          + " d.created d_created, d.last_modified d_lastModified,"
+          + " file.uri f_uri, file.filename f_filename"
+          + " FROM digitalobjects as d"
+          + " LEFT JOIN fileresources_image as file on d.previewfileresource = file.uuid";
+
   private final FileResourceMetadataRepository fileResourceMetadataRepository;
-  private final IdentifierRepository identifierRepository;
 
   @Autowired
   public DigitalObjectRepositoryImpl(
       Jdbi dbi,
       IdentifierRepository identifierRepository,
       FileResourceMetadataRepository fileResourceMetadataRepository) {
-    super(dbi);
+    super(dbi, identifierRepository);
     this.fileResourceMetadataRepository = fileResourceMetadataRepository;
-    this.identifierRepository = identifierRepository;
   }
 
   @Override
@@ -63,34 +85,19 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   @Override
   public PageResponse<DigitalObject> find(PageRequest pageRequest) {
-    StringBuilder query =
-        new StringBuilder(
-            "SELECT d.uuid d_uuid, d.label d_label, d.description d_description,"
-                + " d.created d_created, d.last_modified d_lastModified,"
-                + " file.uri f_uri"
-                + " FROM digitalobjects as d"
-                + " LEFT JOIN fileresources_image as file on d.previewfileresource = file.uuid");
+    StringBuilder query = new StringBuilder(REDUCED_FIND_ONE_BASE_SQL);
     addPageRequestParams(pageRequest, query);
 
-    List<DigitalObject> result =
+    List<DigitalObjectImpl> result =
         dbi.withHandle(
             h ->
                 h.createQuery(query.toString())
                     .registerRowMapper(BeanMapper.factory(DigitalObjectImpl.class, "d"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, DigitalObject>(),
-                        (map, rowView) -> {
-                          DigitalObject digitalObject =
-                              map.computeIfAbsent(
-                                  rowView.getColumn("d_uuid", UUID.class),
-                                  uuid -> rowView.getRow(DigitalObjectImpl.class));
-                          if (rowView.getColumn("f_uri", String.class) != null) {
-                            digitalObject.setPreviewImage(
-                                rowView.getRow(ImageFileResourceImpl.class));
-                          }
-                          return map;
-                        })
+                        new LinkedHashMap<UUID, DigitalObjectImpl>(),
+                        (map, rowView) ->
+                            addPreviewImage(map, rowView, DigitalObjectImpl.class, "d_uuid"))
                     .values().stream()
                     .collect(Collectors.toList()));
     long total = count();
@@ -109,6 +116,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         "SELECT d.uuid d_uuid, d.label d_label, d.description d_description,"
             + " d.identifiable_type d_identifiable_type, d.entity_type d_entity_type,"
             + " d.created d_created, d.last_modified d_last_modified,"
+            // TODO: add d.license d_license, d.version d_version, when available
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
             + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri,"
             + " df.fileresource_uuid df_fileresource_uuid,"
@@ -158,58 +166,42 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                     .registerRowMapper(BeanMapper.factory(ApplicationFileResourceImpl.class, "fp"))
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .reduceRows(
-                        new DigitalObjectAggregatorImpl(),
+                        new LinkedHashMap<UUID, DigitalObjectImpl>(),
                         (map, rowView) -> {
-                          UUID dUUID = rowView.getColumn("d_uuid", UUID.class);
-                          DigitalObjectImpl digitalObject =
-                              map.getDigitalObjects()
-                                  .computeIfAbsent(
-                                      dUUID, id -> rowView.getRow(DigitalObjectImpl.class));
+                          addPreviewImageAndIdentifiers(
+                              map, rowView, DigitalObjectImpl.class, "d_uuid");
+                          DigitalObject obj = map.get(uuid);
 
-                          if (rowView.getColumn("f_uri", String.class) != null) {
-                            digitalObject.setPreviewImage(
-                                rowView.getRow(ImageFileResourceImpl.class));
-                          }
-
-                          UUID idUUID = rowView.getColumn("id_uuid", UUID.class);
-                          if (idUUID != null && !map.getIdentifiers().containsKey(idUUID)) {
-                            Identifier identifier = rowView.getRow(IdentifierImpl.class);
-                            digitalObject.getIdentifiers().add(identifier);
-                            map.getIdentifiers().put(idUUID, identifier);
-                          }
-
-                          UUID fiUUID = rowView.getColumn("fi_uuid", UUID.class);
-                          UUID dfFileresourceUuid =
-                              rowView.getColumn("df_fileresource_uuid", UUID.class);
-                          if (dfFileresourceUuid != null
-                              && !dfFileresourceUuid.equals(map.getDfFileresourceUuid())) {
-                            if (fiUUID != null) {
+                          // FIXME: not using DigitalObjectAggregatorImpl anymore: check if this
+                          // leads to duplicate fileresources....
+                          if (rowView.getColumn("df_fileresource_uuid", UUID.class) != null) {
+                            if (rowView.getColumn("fi_uuid", UUID.class) != null) {
+                              // add image fileresource
                               ImageFileResource imageFileResource =
                                   rowView.getRow(ImageFileResourceImpl.class);
-                              digitalObject.addFileResource(imageFileResource);
-                              map.setDfFileresourceUuid(dfFileresourceUuid);
+                              obj.addFileResource(imageFileResource);
                             } else if (rowView.getColumn("fa_uuid", UUID.class) != null) {
-                              FileResource fileResource =
+                              // add audio fileresource
+                              AudioFileResource audioFileResource =
                                   rowView.getRow(AudioFileResourceImpl.class);
-                              digitalObject.addFileResource(fileResource);
-                              map.setDfFileresourceUuid(dfFileresourceUuid);
+                              obj.addFileResource(audioFileResource);
                             } else if (rowView.getColumn("ft_uuid", UUID.class) != null) {
-                              FileResource fileResource =
+                              // add text fileresource
+                              TextFileResource textFileResource =
                                   rowView.getRow(TextFileResourceImpl.class);
-                              digitalObject.addFileResource(fileResource);
-                              map.setDfFileresourceUuid(dfFileresourceUuid);
+                              obj.addFileResource(textFileResource);
                             } else if (rowView.getColumn("fp_uuid", UUID.class) != null) {
-                              FileResource fileResource =
+                              // add application fileresource
+                              ApplicationFileResource applicationFileResource =
                                   rowView.getRow(ApplicationFileResourceImpl.class);
-                              digitalObject.addFileResource(fileResource);
-                              map.setDfFileresourceUuid(dfFileresourceUuid);
+                              obj.addFileResource(applicationFileResource);
                             }
                           }
+
                           return map;
                         })
-                    .getDigitalObjects().values().stream()
+                    .values().stream() // TODO: maybe shorter: .get(uuid)?
                     .findFirst());
-
     if (digitalObjectOpt.isPresent()) {
       return digitalObjectOpt.get();
     } else {
@@ -226,7 +218,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     String namespace = identifier.getNamespace();
     String id = identifier.getId();
 
-    // TODO review versioning
+    // TODO review versioning, prototype was:
     //    String query =
     //        "SELECT d.uuid"
     //            + " FROM digitalobjects as d"
@@ -336,18 +328,24 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     digitalObject.setUuid(UUID.randomUUID());
     digitalObject.setCreated(LocalDateTime.now());
     digitalObject.setLastModified(LocalDateTime.now());
-
+    // refid is generated as serial, DO NOT SET!
     final UUID previewImageUuid =
         digitalObject.getPreviewImage() == null ? null : digitalObject.getPreviewImage().getUuid();
 
+    String query =
+        "INSERT INTO digitalobjects("
+            + "uuid, label, description, previewFileResource,"
+            + " identifiable_type, entity_type,"
+            + " created, last_modified"
+            + ") VALUES ("
+            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource,"
+            + " :type, :entityType,"
+            + " :created, :lastModified"
+            + ")";
+
     dbi.withHandle(
         h ->
-            h.createUpdate(
-                    "INSERT INTO digitalobjects("
-                        + "uuid, previewFileResource, label, description, identifiable_type, entity_type, created, last_modified"
-                        + ") VALUES ("
-                        + ":uuid, :previewFileResource, :label::JSONB, :description::JSONB, :type, :entityType, :created, :lastModified"
-                        + ")")
+            h.createUpdate(query)
                 .bind("previewFileResource", previewImageUuid)
                 .bindBean(digitalObject)
                 .execute());
@@ -356,12 +354,12 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     final LinkedHashSet<FileResource> fileResources = digitalObject.getFileResources();
     saveFileResources(digitalObject, fileResources);
 
-    // save digital object identifiers
+    // save identifiers
     List<Identifier> identifiers = digitalObject.getIdentifiers();
     saveIdentifiers(identifiers, digitalObject);
 
-    DigitalObject dbDigitalObject = findOne(digitalObject.getUuid());
-    return dbDigitalObject;
+    DigitalObject result = findOne(digitalObject.getUuid());
+    return result;
   }
 
   @Override
@@ -412,27 +410,21 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     return getFileResources(digitalObjectUuid);
   }
 
-  private void saveIdentifiers(List<Identifier> identifiers, DigitalObject digitalObject) {
-    // we assume that identifiers (unique to object) are new (existing ones were deleted before
-    // (e.g. see update))
-    if (identifiers != null) {
-      for (Identifier identifier : identifiers) {
-        identifier.setIdentifiable(digitalObject.getUuid());
-        identifierRepository.save(identifier);
-      }
-    }
-  }
-
   @Override
   public DigitalObject update(DigitalObject digitalObject) {
     digitalObject.setLastModified(LocalDateTime.now());
+
+    // do not update/left out from statement (not changed since insert):
+    // uuid, created, identifiable_type, entity_type, refid
     final UUID previewImageUuid =
         digitalObject.getPreviewImage() == null ? null : digitalObject.getPreviewImage().getUuid();
-    // do not update/left out from statement (not changed since insert): uuid, created,
 
     String query =
-        "UPDATE digitalobjects SET previewFileResource=:previewFileResource, label=:label::JSONB, description=:description::JSONB, last_modified=:lastModified WHERE uuid=:uuid RETURNING *";
-    // identifiable_type, entity_type
+        "UPDATE digitalobjects SET"
+            + " label=:label::JSONB, description=:description::JSONB, previewFileResource=:previewFileResource,"
+            + " last_modified=:lastModified"
+            + " WHERE uuid=:uuid";
+
     dbi.withHandle(
         h ->
             h.createUpdate(query)
@@ -441,13 +433,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                 .execute());
 
     // save identifiers
-    List<Identifier> identifiers = digitalObject.getIdentifiers();
     // as we store the whole list new: delete old entries
-    dbi.withHandle(
-        h ->
-            h.createUpdate("DELETE FROM identifiers WHERE identifiable = :uuid")
-                .bind("uuid", digitalObject.getUuid())
-                .execute());
+    deleteIdentifiers(digitalObject);
+    List<Identifier> identifiers = digitalObject.getIdentifiers();
     saveIdentifiers(identifiers, digitalObject);
 
     DigitalObject result = findOne(digitalObject.getUuid());

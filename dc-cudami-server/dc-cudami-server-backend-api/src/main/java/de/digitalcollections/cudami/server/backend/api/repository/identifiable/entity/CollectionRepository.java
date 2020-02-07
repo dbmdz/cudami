@@ -2,5 +2,5 @@ package de.digitalcollections.cudami.server.backend.api.repository.identifiable.
 
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 
-/** Repository for Article persistence handling. */
+/** Repository for Collection persistence handling. */
 public interface CollectionRepository extends EntityRepository<Collection> {}

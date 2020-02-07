@@ -1,17 +1,24 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.parts;
 
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.WebpageRepository;
+import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
+import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +30,30 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpageRepositoryImpl.class);
 
+  // select all details shown/needed in single object details page
+  private static final String FIND_ONE_BASE_SQL =
+      "SELECT w.uuid w_uuid, w.label w_label, w.description w_description,"
+          + " w.identifiable_type w_type,"
+          + " w.created w_created, w.last_modified w_lastModified,"
+          + " w.text w_text,"
+          + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
+          + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
+          + " FROM webpages as w"
+          + " LEFT JOIN identifiers as id on w.uuid = id.identifiable"
+          + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid";
+
+  // select only what is shown/needed in paged list (to avoid unnecessary payload/traffic):
+  private static final String REDUCED_FIND_ONE_BASE_SQL =
+      "SELECT w.uuid w_uuid, w.refid w_refId, w.label w_label, w.description w_description,"
+          + " w.identifiable_type w_type,"
+          + " w.created w_created, w.last_modified w_lastModified,"
+          + " file.uri f_uri, file.filename f_filename"
+          + " FROM webpages as w"
+          + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid";
+
   @Autowired
-  public WebpageRepositoryImpl(Jdbi dbi) {
-    super(dbi);
+  public WebpageRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
+    super(dbi, identifierRepository);
   }
 
   @Override
@@ -37,13 +65,21 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
 
   @Override
   public PageResponse<Webpage> find(PageRequest pageRequest) {
-    StringBuilder query =
-        new StringBuilder(
-            "SELECT uuid, label, description, created, last_modified, text FROM webpages");
+    StringBuilder query = new StringBuilder(REDUCED_FIND_ONE_BASE_SQL);
     addPageRequestParams(pageRequest, query);
 
     List<WebpageImpl> result =
-        dbi.withHandle(h -> h.createQuery(query.toString()).mapToBean(WebpageImpl.class).list());
+        dbi.withHandle(
+            h ->
+                h.createQuery(query.toString())
+                    .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
+                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                    .reduceRows(
+                        new LinkedHashMap<UUID, WebpageImpl>(),
+                        (map, rowView) ->
+                            addPreviewImage(map, rowView, WebpageImpl.class, "w_uuid"))
+                    .values().stream()
+                    .collect(Collectors.toList()));
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -51,26 +87,72 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
 
   @Override
   public Webpage findOne(UUID uuid) {
-    String query =
-        "SELECT uuid, label, description, created, last_modified, text FROM webpages WHERE uuid = :uuid";
-    Webpage webpage =
+    String query = FIND_ONE_BASE_SQL + " WHERE w.uuid = :uuid";
+
+    Optional<WebpageImpl> resultOpt =
         dbi.withHandle(
             h ->
-                h.createQuery(query)
-                    .bind("uuid", uuid)
-                    .mapToBean(WebpageImpl.class)
-                    .findOne()
-                    .orElse(null));
+                h.createQuery(query).bind("uuid", uuid)
+                    .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
+                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                    .reduceRows(
+                        new LinkedHashMap<UUID, WebpageImpl>(),
+                        (map, rowView) ->
+                            addPreviewImageAndIdentifiers(
+                                map, rowView, WebpageImpl.class, "w_uuid"))
+                    .values().stream()
+                    .findFirst());
+    if (!resultOpt.isPresent()) {
+      return null;
+    }
+    Webpage webpage = resultOpt.get();
     if (webpage != null) {
+      // TODO could be replaced with another join in above query...
       webpage.setChildren(getChildren(webpage));
-      //      webpage.setIdentifiables(getIdentifiables(webpage));
+    }
+    return webpage;
+  }
+
+  @Override
+  public Webpage findOne(Identifier identifier) {
+    if (identifier.getIdentifiable() != null) {
+      return findOne(identifier.getIdentifiable());
+    }
+
+    String namespace = identifier.getNamespace();
+    String identifierId = identifier.getId();
+
+    String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
+
+    Optional<WebpageImpl> resultOpt =
+        dbi.withHandle(
+            h ->
+                h.createQuery(query).bind("id", identifierId).bind("namespace", namespace)
+                    .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
+                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                    .reduceRows(
+                        new LinkedHashMap<UUID, WebpageImpl>(),
+                        (map, rowView) ->
+                            addPreviewImageAndIdentifiers(
+                                map, rowView, WebpageImpl.class, "w_uuid"))
+                    .values().stream()
+                    .findFirst());
+    if (!resultOpt.isPresent()) {
+      return null;
+    }
+    Webpage webpage = resultOpt.get();
+    if (webpage != null) {
+      // TODO could be replaced with another join in above query...
+      webpage.setChildren(getChildren(webpage));
     }
     return webpage;
   }
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[] {"uuid"};
+    return new String[] {"w.created", "w.last_modified"};
   }
 
   @Override
@@ -81,34 +163,54 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
   @Override
   public List<Webpage> getChildren(UUID uuid) {
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
-    String sql =
-        "SELECT "
-            + "uuid, created, description, label, last_modified"
-            + " FROM webpages INNER JOIN webpage_webpages ww ON uuid = ww.child_webpage_uuid"
+    String query =
+        "SELECT w.uuid w_uuid, w.label w_label, w.description w_description,"
+            + " w.identifiable_type w_type,"
+            + " w.created w_created, w.last_modified w_lastModified,"
+            + " file.uri f_uri, file.filename f_filename"
+            + " FROM webpages as w INNER JOIN webpage_webpages ww ON w.uuid = ww.child_webpage_uuid"
+            + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid"
             + " WHERE ww.parent_webpage_uuid = :uuid"
             + " ORDER BY ww.sortIndex ASC";
 
-    List<WebpageImpl> list =
+    List<WebpageImpl> result =
         dbi.withHandle(
-            h -> h.createQuery(sql).bind("uuid", uuid).mapToBean(WebpageImpl.class).list());
-    return list.stream().map(s -> (Webpage) s).collect(Collectors.toList());
+            h ->
+                h.createQuery(query).bind("uuid", uuid)
+                    .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
+                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                    .reduceRows(
+                        new LinkedHashMap<UUID, WebpageImpl>(),
+                        (map, rowView) ->
+                            addPreviewImage(map, rowView, WebpageImpl.class, "w_uuid"))
+                    .values().stream()
+                    .collect(Collectors.toList()));
+    return result.stream().map(Webpage.class::cast).collect(Collectors.toList());
   }
 
   @Override
   public Webpage getParent(UUID uuid) {
     String query =
-        "SELECT uuid, label, description, created, last_modified"
-            + " FROM webpages"
-            + " INNER JOIN webpage_webpages ww ON uuid = ww.parent_webpage_uuid"
+        REDUCED_FIND_ONE_BASE_SQL
+            + " INNER JOIN webpage_webpages ww ON w.uuid = ww.parent_webpage_uuid"
             + " WHERE ww.child_webpage_uuid = :uuid";
-    Webpage webpage =
+
+    Optional<WebpageImpl> resultOpt =
         dbi.withHandle(
             h ->
-                h.createQuery(query)
-                    .bind("uuid", uuid)
-                    .mapToBean(WebpageImpl.class)
-                    .findOne()
-                    .orElse(null));
+                h.createQuery(query).bind("uuid", uuid)
+                    .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
+                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                    .reduceRows(
+                        new LinkedHashMap<UUID, WebpageImpl>(),
+                        (map, rowView) ->
+                            addPreviewImage(map, rowView, WebpageImpl.class, "w_uuid"))
+                    .values().stream()
+                    .findFirst());
+    if (!resultOpt.isPresent()) {
+      return null;
+    }
+    Webpage webpage = resultOpt.get();
     return webpage;
   }
 
@@ -117,21 +219,34 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
     webpage.setUuid(UUID.randomUUID());
     webpage.setCreated(LocalDateTime.now());
     webpage.setLastModified(LocalDateTime.now());
+    final UUID previewImageUuid =
+        webpage.getPreviewImage() == null ? null : webpage.getPreviewImage().getUuid();
 
     String query =
         "INSERT INTO webpages("
-            + "uuid, label, description, identifiable_type, created, last_modified, text"
+            + "uuid, label, description, previewfileresource,"
+            + " identifiable_type,"
+            + " created, last_modified,"
+            + " text"
             + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :type, :created, :lastModified, :text::JSONB"
-            + ") RETURNING *";
-    Webpage result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query)
-                    .bindBean(webpage)
-                    .mapToBean(WebpageImpl.class)
-                    .findOne()
-                    .orElse(null));
+            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource,"
+            + " :type,"
+            + " :created, :lastModified,"
+            + " :text::JSONB"
+            + ")";
+
+    dbi.withHandle(
+        h ->
+            h.createUpdate(query)
+                .bind("previewFileResource", previewImageUuid)
+                .bindBean(webpage)
+                .execute());
+
+    // save identifiers
+    List<Identifier> identifiers = webpage.getIdentifiers();
+    saveIdentifiers(identifiers, webpage);
+
+    Webpage result = findOne(webpage.getUuid());
     return result;
   }
 
@@ -181,21 +296,33 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
   @Override
   public Webpage update(Webpage webpage) {
     webpage.setLastModified(LocalDateTime.now());
-    // do not update/left out from statement (not changed since insert): uuid, created,
-    // identifiable_type, entity_type
+
+    // do not update/left out from statement (not changed since insert):
+    // uuid, created, identifiable_type
+    final UUID previewImageUuid =
+        webpage.getPreviewImage() == null ? null : webpage.getPreviewImage().getUuid();
+
     String query =
         "UPDATE webpages SET"
-            + " label=:label::JSONB, description=:description::JSONB, last_modified=:lastModified, text=:text::JSONB"
-            + " WHERE uuid=:uuid"
-            + " RETURNING *";
-    Webpage result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query)
-                    .bindBean(webpage)
-                    .mapToBean(WebpageImpl.class)
-                    .findOne()
-                    .orElse(null));
+            + " label=:label::JSONB, description=:description::JSONB, previewfileresource=:previewFileResource,"
+            + " last_modified=:lastModified,"
+            + " text=:text::JSONB"
+            + " WHERE uuid=:uuid";
+
+    dbi.withHandle(
+        h ->
+            h.createUpdate(query)
+                .bind("previewFileResource", previewImageUuid)
+                .bindBean(webpage)
+                .execute());
+
+    // save identifiers
+    // as we store the whole list new: delete old entries
+    deleteIdentifiers(webpage);
+    List<Identifier> identifiers = webpage.getIdentifiers();
+    saveIdentifiers(identifiers, webpage);
+
+    Webpage result = findOne(webpage.getUuid());
     return result;
   }
 }

@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.parts;
 
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.EntityPartRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifier;
@@ -22,8 +23,8 @@ public class EntityPartRepositoryImpl<P extends EntityPart, E extends Entity>
     extends IdentifiableRepositoryImpl<P> implements EntityPartRepository<P, E> {
 
   @Autowired
-  public EntityPartRepositoryImpl(Jdbi dbi) {
-    super(dbi);
+  public EntityPartRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
+    super(dbi, identifierRepository);
   }
 
   @Override
