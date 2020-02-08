@@ -249,7 +249,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[] {"last_modified"};
+    return new String[] {"d.last_modified"};
   }
 
   @Override

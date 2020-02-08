@@ -113,11 +113,11 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         dbi.withHandle(
             h ->
                 h.createQuery(query.toString())
-                    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "i"))
+                    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
                         new LinkedHashMap<UUID, EntityImpl>(),
-                        (map, rowView) -> addPreviewImage(map, rowView, EntityImpl.class, "i_uuid"))
+                        (map, rowView) -> addPreviewImage(map, rowView, EntityImpl.class, "e_uuid"))
                     .values().stream()
                     .collect(Collectors.toList()));
     long total = count();
@@ -133,7 +133,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         dbi.withHandle(
             h ->
                 h.createQuery(query).bind("uuid", uuid)
-                    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "i"))
+                    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
@@ -163,7 +163,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         dbi.withHandle(
             h ->
                 h.createQuery(query).bind("id", identifierId).bind("namespace", namespace)
-                    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "i"))
+                    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
@@ -186,7 +186,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         dbi.withHandle(
             h ->
                 h.createQuery(query).bind("refId", refId)
-                    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "i"))
+                    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
