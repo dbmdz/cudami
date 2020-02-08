@@ -48,7 +48,7 @@ public class ContentNodeRepositoryImpl<E extends Entity>
 
   // select only what is shown/needed in paged list (to avoid unnecessary payload/traffic):
   private static final String REDUCED_FIND_ONE_BASE_SQL =
-      "SELECT c.uuid c_uuid, c.refid c_refId, c.label c_label, c.description c_description,"
+      "SELECT c.uuid c_uuid, c.label c_label, c.description c_description,"
           + " c.identifiable_type c_type,"
           + " c.created c_created, c.last_modified c_lastModified,"
           + " file.uri f_uri, file.filename f_filename"
@@ -247,12 +247,13 @@ public class ContentNodeRepositoryImpl<E extends Entity>
         dbi.withHandle(
             h ->
                 h.createQuery(query).bind("uuid", contentNodeUuid)
-                    .registerRowMapper(BeanMapper.factory(FileResourceImpl.class, "cn"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                    .registerRowMapper(BeanMapper.factory(FileResourceImpl.class, "f"))
+                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
                     .reduceRows(
                         new LinkedHashMap<UUID, FileResourceImpl>(),
                         (map, rowView) ->
-                            addPreviewImage(map, rowView, FileResourceImpl.class, "cn_uuid"))
+                            addPreviewImage(
+                                map, rowView, FileResourceImpl.class, "f_uuid", "pf_uri"))
                     .values().stream()
                     .collect(Collectors.toList()));
     // TODO it is an implementation: better return List? (LinkedHashSet was used because of getting
