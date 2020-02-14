@@ -27,7 +27,6 @@ import java.time.ZoneOffset;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.UUID;
-import javax.annotation.Nonnull;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
@@ -43,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -79,7 +79,7 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
     }
   }
 
-  protected URI createUri(@Nonnull UUID uuid, MimeType mimeType) {
+  protected URI createUri(@NonNull UUID uuid, MimeType mimeType) {
     Objects.requireNonNull(uuid, "uuid must not be null");
 
     final String uuidStr = uuid.toString();
@@ -248,7 +248,7 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
     return splittedUuidPath;
   }
 
-  protected URI getUri(@Nonnull UUID uuid) throws ResourceNotFoundException {
+  protected URI getUri(@NonNull UUID uuid) throws ResourceNotFoundException {
     Objects.requireNonNull(uuid, "uuid must not be null");
 
     final String uuidStr = uuid.toString();
