@@ -518,9 +518,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
 
     final String baseColumnsSql =
         "label=:label::JSONB, description=:description::JSONB, previewfileresource=:previewFileResource,"
-            + " identifiable_type=:type,"
-            + " created=:created, last_modified=:lastModified,"
-            + " filename=:filename, mimetype=:mimeType, size_in_bytes=:sizeInBytes, uri=:uri";
+            + " last_modified=:lastModified";
 
     if (fileResource instanceof ApplicationFileResource) {
       // no special columns
