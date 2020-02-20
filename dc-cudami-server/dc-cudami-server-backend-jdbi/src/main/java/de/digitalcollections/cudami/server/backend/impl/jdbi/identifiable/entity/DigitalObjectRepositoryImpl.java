@@ -113,46 +113,56 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   @Override
   public DigitalObject findOne(UUID uuid) {
     String query =
-        "SELECT d.uuid d_uuid, d.label d_label, d.description d_description,"
-            + " d.identifiable_type d_identifiable_type, d.entity_type d_entity_type,"
-            + " d.created d_created, d.last_modified d_last_modified,"
-            // TODO: add d.license d_license, d.version d_version, when available
-            + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-            + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri,"
-            + " df.fileresource_uuid df_fileresource_uuid,"
-            + ""
-            + " fi.uuid fi_uuid, fi.label fi_label, fi.description fi_description,"
-            + " fi.identifiable_type fi_identifiable_type,"
-            + " fi.created fi_created, fi.last_modified fi_last_modified,"
-            + " fi.filename fi_filename, fi.mimetype fi_mimetype, fi.size_in_bytes fi_size_in_bytes, fi.uri fi_uri,"
-            + " fi.height fi_height, fi.width fi_width,"
-            + ""
-            + " fa.uuid fa_uuid, fa.label fa_label, fa.description fa_description,"
-            + " fa.identifiable_type fa_identifiable_type,"
-            + " fa.created fa_created, fa.last_modified fa_last_modified,"
-            + " fa.filename fa_filename, fa.mimetype fa_mimetype, fa.size_in_bytes fa_size_in_bytes, fa.uri fa_uri,"
-            + " fa.duration fa_duration,"
-            + ""
-            + " ft.uuid ft_uuid, ft.label ft_label, ft.description ft_description,"
-            + " ft.identifiable_type ft_identifiable_type,"
-            + " ft.created ft_created, ft.last_modified ft_last_modified,"
-            + " ft.filename ft_filename, ft.mimetype ft_mimetype, ft.size_in_bytes ft_size_in_bytes, ft.uri ft_uri,"
-            + ""
-            + " fp.uuid fp_uuid, fp.label fp_label, fp.description fp_description,"
-            + " fp.identifiable_type fp_identifiable_type,"
-            + " fp.created fp_created, fp.last_modified fp_last_modified,"
-            + " fp.filename fp_filename, fp.mimetype fp_mimetype, fp.size_in_bytes fp_size_in_bytes, fp.uri fp_uri"
-            + ""
-            + " FROM digitalobjects as d"
-            + " LEFT JOIN identifiers as id on d.uuid = id.identifiable"
-            + " LEFT JOIN fileresources_image as file on d.previewfileresource = file.uuid"
-            + " LEFT JOIN digitalobject_fileresources as df on d.uuid = df.digitalobject_uuid"
-            + " LEFT JOIN fileresources_image as fi on df.fileresource_uuid = fi.uuid"
-            + " LEFT JOIN fileresources_audio as fa on df.fileresource_uuid = fa.uuid"
-            + " LEFT JOIN fileresources_text as ft on df.fileresource_uuid = ft.uuid"
-            + " LEFT JOIN fileresources_application as fp on df.fileresource_uuid = fp.uuid"
-            + " WHERE d.uuid = :uuid"
-            + " ORDER BY df.sortindex";
+        FIND_ONE_BASE_SQL
+            //        "SELECT d.uuid d_uuid, d.label d_label, d.description d_description,"
+            //            + " d.identifiable_type d_identifiable_type, d.entity_type d_entity_type,"
+            //            + " d.created d_created, d.last_modified d_last_modified,"
+            //            // TODO: add d.license d_license, d.version d_version, when available
+            //            + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace
+            // id_namespace, id.identifier id_id,"
+            //            + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes
+            // f_size_in_bytes, file.uri f_uri,"
+            //            + " df.fileresource_uuid df_fileresource_uuid,"
+            //            + ""
+            //            + " fi.uuid fi_uuid, fi.label fi_label, fi.description fi_description,"
+            //            + " fi.identifiable_type fi_identifiable_type,"
+            //            + " fi.created fi_created, fi.last_modified fi_last_modified,"
+            //            + " fi.filename fi_filename, fi.mimetype fi_mimetype, fi.size_in_bytes
+            // fi_size_in_bytes, fi.uri fi_uri,"
+            //            + " fi.height fi_height, fi.width fi_width,"
+            //            + ""
+            //            + " fa.uuid fa_uuid, fa.label fa_label, fa.description fa_description,"
+            //            + " fa.identifiable_type fa_identifiable_type,"
+            //            + " fa.created fa_created, fa.last_modified fa_last_modified,"
+            //            + " fa.filename fa_filename, fa.mimetype fa_mimetype, fa.size_in_bytes
+            // fa_size_in_bytes, fa.uri fa_uri,"
+            //            + " fa.duration fa_duration,"
+            //            + ""
+            //            + " ft.uuid ft_uuid, ft.label ft_label, ft.description ft_description,"
+            //            + " ft.identifiable_type ft_identifiable_type,"
+            //            + " ft.created ft_created, ft.last_modified ft_last_modified,"
+            //            + " ft.filename ft_filename, ft.mimetype ft_mimetype, ft.size_in_bytes
+            // ft_size_in_bytes, ft.uri ft_uri,"
+            //            + ""
+            //            + " fp.uuid fp_uuid, fp.label fp_label, fp.description fp_description,"
+            //            + " fp.identifiable_type fp_identifiable_type,"
+            //            + " fp.created fp_created, fp.last_modified fp_last_modified,"
+            //            + " fp.filename fp_filename, fp.mimetype fp_mimetype, fp.size_in_bytes
+            // fp_size_in_bytes, fp.uri fp_uri"
+            //            + ""
+            //            + " FROM digitalobjects as d"
+            //            + " LEFT JOIN identifiers as id on d.uuid = id.identifiable"
+            //            + " LEFT JOIN fileresources_image as file on d.previewfileresource =
+            // file.uuid"
+            //            + " LEFT JOIN digitalobject_fileresources as df on d.uuid =
+            // df.digitalobject_uuid"
+            //            + " LEFT JOIN fileresources_image as fi on df.fileresource_uuid = fi.uuid"
+            //            + " LEFT JOIN fileresources_audio as fa on df.fileresource_uuid = fa.uuid"
+            //            + " LEFT JOIN fileresources_text as ft on df.fileresource_uuid = ft.uuid"
+            //            + " LEFT JOIN fileresources_application as fp on df.fileresource_uuid =
+            // fp.uuid"
+            + " WHERE d.uuid = :uuid";
+    //            + " ORDER BY df.sortindex";
 
     Optional<DigitalObjectImpl> digitalObjectOpt =
         dbi.withHandle(
@@ -160,10 +170,15 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                 h.createQuery(query).bind("uuid", uuid)
                     .registerRowMapper(BeanMapper.factory(DigitalObjectImpl.class, "d"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "fi"))
-                    .registerRowMapper(BeanMapper.factory(AudioFileResourceImpl.class, "fa"))
-                    .registerRowMapper(BeanMapper.factory(TextFileResourceImpl.class, "ft"))
-                    .registerRowMapper(BeanMapper.factory(ApplicationFileResourceImpl.class, "fp"))
+                    //
+                    // .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "fi"))
+                    //
+                    // .registerRowMapper(BeanMapper.factory(AudioFileResourceImpl.class, "fa"))
+                    //
+                    // .registerRowMapper(BeanMapper.factory(TextFileResourceImpl.class, "ft"))
+                    //
+                    // .registerRowMapper(BeanMapper.factory(ApplicationFileResourceImpl.class,
+                    // "fp"))
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .reduceRows(
                         new LinkedHashMap<UUID, DigitalObjectImpl>(),
@@ -174,29 +189,29 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
                           // FIXME: not using DigitalObjectAggregatorImpl anymore: check if this
                           // leads to duplicate fileresources....
-                          if (rowView.getColumn("df_fileresource_uuid", UUID.class) != null) {
-                            if (rowView.getColumn("fi_uuid", UUID.class) != null) {
-                              // add image fileresource
-                              ImageFileResource imageFileResource =
-                                  rowView.getRow(ImageFileResourceImpl.class);
-                              obj.addFileResource(imageFileResource);
-                            } else if (rowView.getColumn("fa_uuid", UUID.class) != null) {
-                              // add audio fileresource
-                              AudioFileResource audioFileResource =
-                                  rowView.getRow(AudioFileResourceImpl.class);
-                              obj.addFileResource(audioFileResource);
-                            } else if (rowView.getColumn("ft_uuid", UUID.class) != null) {
-                              // add text fileresource
-                              TextFileResource textFileResource =
-                                  rowView.getRow(TextFileResourceImpl.class);
-                              obj.addFileResource(textFileResource);
-                            } else if (rowView.getColumn("fp_uuid", UUID.class) != null) {
-                              // add application fileresource
-                              ApplicationFileResource applicationFileResource =
-                                  rowView.getRow(ApplicationFileResourceImpl.class);
-                              obj.addFileResource(applicationFileResource);
-                            }
-                          }
+//                          if (rowView.getColumn("df_fileresource_uuid", UUID.class) != null) {
+//                            if (rowView.getColumn("fi_uuid", UUID.class) != null) {
+//                              // add image fileresource
+//                              ImageFileResource imageFileResource =
+//                                  rowView.getRow(ImageFileResourceImpl.class);
+//                              obj.addFileResource(imageFileResource);
+//                            } else if (rowView.getColumn("fa_uuid", UUID.class) != null) {
+//                              // add audio fileresource
+//                              AudioFileResource audioFileResource =
+//                                  rowView.getRow(AudioFileResourceImpl.class);
+//                              obj.addFileResource(audioFileResource);
+//                            } else if (rowView.getColumn("ft_uuid", UUID.class) != null) {
+//                              // add text fileresource
+//                              TextFileResource textFileResource =
+//                                  rowView.getRow(TextFileResourceImpl.class);
+//                              obj.addFileResource(textFileResource);
+//                            } else if (rowView.getColumn("fp_uuid", UUID.class) != null) {
+//                              // add application fileresource
+//                              ApplicationFileResource applicationFileResource =
+//                                  rowView.getRow(ApplicationFileResourceImpl.class);
+//                              obj.addFileResource(applicationFileResource);
+//                            }
+//                          }
 
                           return map;
                         })
