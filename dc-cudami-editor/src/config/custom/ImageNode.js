@@ -1,12 +1,15 @@
 export default {
   image: {
     attrs: {
+      alignment: {default: 'left'},
       altText: {default: null},
       caption: {default: null},
-      linkNewTab: {default: false},
+      linkNewTab: {default: true},
       linkUrl: {default: null},
+      resourceId: {default: null},
       title: {default: null},
       url: {default: null},
+      width: {default: '33%'},
     },
     draggable: true,
     group: 'inline',
@@ -34,8 +37,20 @@ export default {
       },
     ],
     toDOM(node) {
-      const {altText, caption, linkNewTab, linkUrl, title, url} = node.attrs
-      const tags = ['figure']
+      const {
+        alignment,
+        altText,
+        caption,
+        linkNewTab,
+        linkUrl,
+        title,
+        url,
+        width,
+      } = node.attrs
+      const tags = [
+        'figure',
+        {class: `alignment-${alignment} width-${parseInt(width)}`},
+      ]
       const imageTag = ['img', {alt: altText, src: url, title}]
       if (linkUrl) {
         tags.push([

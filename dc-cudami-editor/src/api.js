@@ -25,12 +25,25 @@ export async function loadIdentifiable(contextPath, type, uuid) {
   }
 }
 
+export async function saveFileResource(contextPath, fileResource) {
+  const savedFileResource = await saveIdentifiable(
+    contextPath,
+    fileResource,
+    null,
+    null,
+    'fileResource',
+    false
+  )
+  return savedFileResource
+}
+
 export async function saveIdentifiable(
   contextPath,
   identifiable,
   parentType,
   parentUuid,
-  type
+  type,
+  redirect = true
 ) {
   let url = `${contextPath}api/${type.toLowerCase()}s/new`
   if (parentType && parentUuid) {
@@ -46,14 +59,33 @@ export async function saveIdentifiable(
       method: 'POST',
     })
     const json = await response.json()
-    const viewUrl = `${contextPath}${type.toLowerCase()}s/${json.uuid}`
-    window.location.href = viewUrl
+    if (redirect) {
+      const viewUrl = `${contextPath}${type.toLowerCase()}s/${json.uuid}`
+      window.location.href = viewUrl
+    } else {
+      return json
+    }
   } catch (err) {
     console.log('An error occured')
   }
 }
 
-export async function updateIdentifiable(contextPath, identifiable, type) {
+export async function updateFileResource(contextPath, fileResource) {
+  const updatedFileResource = await updateIdentifiable(
+    contextPath,
+    fileResource,
+    'fileResource',
+    false
+  )
+  return updatedFileResource
+}
+
+export async function updateIdentifiable(
+  contextPath,
+  identifiable,
+  type,
+  redirect = true
+) {
   const url = `${contextPath}api/${type.toLowerCase()}s/${identifiable.uuid}`
   try {
     const response = await fetch(url, {
@@ -65,8 +97,12 @@ export async function updateIdentifiable(contextPath, identifiable, type) {
       method: 'PUT',
     })
     const json = await response.json()
-    const viewUrl = `${contextPath}${type.toLowerCase()}s/${json.uuid}`
-    window.location.href = viewUrl
+    if (redirect) {
+      const viewUrl = `${contextPath}${type.toLowerCase()}s/${json.uuid}`
+      window.location.href = viewUrl
+    } else {
+      return json
+    }
   } catch (err) {
     console.log('An error occured')
   }

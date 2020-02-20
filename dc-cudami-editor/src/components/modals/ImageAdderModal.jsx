@@ -1,117 +1,79 @@
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faCode, faUpload} from '@fortawesome/free-solid-svg-icons'
 import {publish, subscribe} from 'pubsub-js'
 import React, {Component} from 'react'
-import {
-  ListGroup,
-  ListGroupItem,
-  Modal,
-  ModalBody,
-  ModalHeader,
-} from 'reactstrap'
+import {Button, Form, Modal, ModalBody, ModalHeader} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
 import ImageMetadataForm from './imageAdder/ImageMetadataForm'
 import ImageRenderingHintsForm from './imageAdder/ImageRenderingHintsForm'
-import ImageUploadForm from './imageAdder/ImageUploadForm'
-import ImageUrlForm from './imageAdder/ImageUrlForm'
+import ImageSelector from './imageAdder/ImageSelector'
+import {loadIdentifiable, saveFileResource, updateFileResource} from '../../api'
 
 class ImageAdderModal extends Component {
+  initialAttributes = {
+    alignment: 'left',
+    altText: '',
+    caption: '',
+    linkNewTab: true,
+    linkUrl: '',
+    title: '',
+    width: '33%',
+  }
+
   constructor(props) {
     super(props)
-    this.initialAttributes = {
-      alignment: 'left',
-      altText: '',
-      caption: '',
-      label: '',
-      linkNewTab: true,
-      linkUrl: '',
-      title: '',
-      url: '',
-      width: '33%',
-    }
     this.state = {
       attributes: this.initialAttributes,
-      readOnly: false,
-      step: 'initial',
+      fileResource: {},
+      metadataOpen: false,
+      renderingHintsOpen: false,
+      toggleEnabled: false,
     }
     subscribe('editor.show-image-modal', () => {
       this.props.onToggle()
     })
   }
 
-  addImageToEditor = () => {
-    this.toggle()
+  async componentDidMount() {
+    const newFileResource = await loadIdentifiable(
+      this.props.apiContextPath,
+      'fileResource',
+      'new'
+    )
+    const initialFileResource = {
+      ...newFileResource,
+      fileresourceType: 'image_fileresource',
+      label: {[this.props.activeLanguage]: ''},
+      mimeType: 'image/png',
+      uri: '',
+    }
+    this.setState({
+      fileResource: initialFileResource,
+      initialFileResource,
+    })
+  }
+
+  addImageToEditor = resourceId => {
     const filteredAttributes = Object.fromEntries(
       Object.entries(this.state.attributes).filter(([_, value]) => value)
     )
-    publish('editor.add-image', filteredAttributes)
+    const data = {
+      ...filteredAttributes,
+      resourceId,
+      url: this.state.fileResource.uri,
+    }
+    publish('editor.add-image', data)
+    this.destroy()
   }
 
-  getStepComponent = t => {
-    const STEP_COMPONENT_MAPPING = {
-      initial: (
-        <ListGroup>
-          <ListGroupItem
-            className="text-decoration-none"
-            href="#"
-            onClick={() => this.setState({step: 'url'})}
-            tag="a"
-          >
-            <FontAwesomeIcon icon={faCode} /> URL
-          </ListGroupItem>
-          <ListGroupItem
-            className="text-decoration-none"
-            href="#"
-            onClick={() => this.setState({step: 'upload'})}
-            tag="a"
-          >
-            <FontAwesomeIcon icon={faUpload} /> Upload
-          </ListGroupItem>
-        </ListGroup>
-      ),
-      metadata: (
-        <ImageMetadataForm
-          attributes={this.state.attributes}
-          onChange={(name, value) => this.setAttribute(name, value)}
-          onSubmit={() => this.setState({step: 'renderingHints'})}
-        />
-      ),
-      renderingHints: (
-        <ImageRenderingHintsForm
-          attributes={this.state.attributes}
-          onChange={(name, value) => this.setAttribute(name, value)}
-          onSubmit={() => this.addImageToEditor()}
-        />
-      ),
-      upload: (
-        <ImageUploadForm
-          apiContextPath={this.props.apiContextPath}
-          onChange={attributes => this.setAttributes(attributes)}
-          onSubmit={() => this.setState({readOnly: true, step: 'url'})}
-        />
-      ),
-      url: (
-        <ImageUrlForm
-          attributes={this.state.attributes}
-          onChange={(name, value) => this.setAttribute(name, value)}
-          onSubmit={() => this.setState({step: 'metadata'})}
-          readOnly={this.state.readOnly}
-        />
-      ),
-    }
-    return STEP_COMPONENT_MAPPING[this.state.step]
-  }
-
-  getStepTitle = t => {
-    const STEP_TITLE_MAPPING = {
-      initial: 'Bild einfügen über',
-      renderingHints: 'Darstellung',
-      upload: 'Hochladen',
-      url: 'URL eingeben',
-      metadata: 'Metadaten eingeben',
-    }
-    return STEP_TITLE_MAPPING[this.state.step]
+  destroy = () => {
+    this.props.onToggle()
+    this.setState({
+      attributes: this.initialAttributes,
+      fileResource: this.state.initialFileResource,
+      metadataOpen: false,
+      renderingHintsOpen: false,
+      toggleEnabled: false,
+    })
   }
 
   setAttribute = (name, value) => {
@@ -132,21 +94,75 @@ class ImageAdderModal extends Component {
     })
   }
 
-  toggle = () => {
-    this.props.onToggle()
+  submitFileResource = async () => {
+    let resourceId = this.state.fileResource.uuid
+    if (resourceId) {
+      updateFileResource(this.props.apiContextPath, this.state.fileResource)
+    } else {
+      const {uuid} = await saveFileResource(
+        this.props.apiContextPath,
+        this.state.fileResource
+      )
+      resourceId = uuid
+    }
+    return resourceId
+  }
+
+  updateFileResource = (updateFields, additionalFields = {}) => {
     this.setState({
-      attributes: this.initialAttributes,
-      readOnly: false,
-      step: 'initial',
+      fileResource: {
+        ...this.state.fileResource,
+        ...updateFields,
+      },
+      ...additionalFields,
     })
   }
 
   render() {
     const {t} = this.props
     return (
-      <Modal isOpen={this.props.isOpen} size="xl" toggle={this.toggle}>
-        <ModalHeader toggle={this.toggle}>{this.getStepTitle(t)}</ModalHeader>
-        <ModalBody>{this.getStepComponent(t)}</ModalBody>
+      <Modal isOpen={this.props.isOpen} size="lg" toggle={this.destroy}>
+        <ModalHeader toggle={this.destroy}>{t('insert.image')}</ModalHeader>
+        <ModalBody>
+          <Form
+            onSubmit={async evt => {
+              evt.preventDefault()
+              const resourceId = await this.submitFileResource()
+              this.addImageToEditor(resourceId)
+            }}
+          >
+            <ImageSelector
+              apiContextPath={this.props.apiContextPath}
+              fileResource={this.state.fileResource}
+              onChange={(updateFields, additionalFields) =>
+                this.updateFileResource(updateFields, additionalFields)
+              }
+            />
+            <ImageMetadataForm
+              attributes={this.state.attributes}
+              isOpen={this.state.metadataOpen}
+              onChange={(name, value) => this.setAttribute(name, value)}
+              toggle={() =>
+                this.setState({metadataOpen: !this.state.metadataOpen})
+              }
+              toggleEnabled={this.state.toggleEnabled}
+            />
+            <ImageRenderingHintsForm
+              attributes={this.state.attributes}
+              isOpen={this.state.renderingHintsOpen}
+              onChange={(name, value) => this.setAttribute(name, value)}
+              toggle={() =>
+                this.setState({
+                  renderingHintsOpen: !this.state.renderingHintsOpen,
+                })
+              }
+              toggleEnabled={this.state.toggleEnabled}
+            />
+            <Button className="float-right mt-2" color="primary" type="submit">
+              {t('save')}
+            </Button>
+          </Form>
+        </ModalBody>
       </Modal>
     )
   }
