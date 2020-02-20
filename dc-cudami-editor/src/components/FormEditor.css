@@ -5,3 +5,31 @@
 .cudami-editor .text-editor {
   border: 1px solid #ccc;
 }
+
+.cudami-editor .text-editor figure.alignment-left {
+  float: left;
+}
+
+.cudami-editor .text-editor figure.alignment-right {
+  float: right;
+}
+
+.cudami-editor .text-editor figure.width-25 {
+  width: 25%;
+}
+
+.cudami-editor .text-editor figure.width-33 {
+  width: 33%;
+}
+
+.cudami-editor .text-editor figure.width-50 {
+  width: 50%;
+}
+
+.cudami-editor .text-editor figure.width-100 {
+  width: 100%;
+}
+
+.cudami-editor .text-editor figure > img {
+  width: 100%;
+}

@@ -250,6 +250,7 @@ class IdentifiableForm extends Component {
           onToggle={() => this.toggleModal('iframeAdder')}
         />
         <ImageAdderModal
+          activeLanguage={this.state.activeLanguage}
           apiContextPath={this.props.apiContextPath}
           isOpen={this.state.modalsOpen.imageAdder}
           onToggle={() => this.toggleModal('imageAdder')}

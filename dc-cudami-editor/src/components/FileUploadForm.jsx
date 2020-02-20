@@ -1,7 +1,7 @@
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faCopy, faUpload} from '@fortawesome/free-solid-svg-icons'
 import React from 'react'
-import {Card, Input, Label, Progress} from 'reactstrap'
+import {Input, Label, Progress} from 'reactstrap'
 import FileDrop from 'react-file-drop'
 import {useTranslation} from 'react-i18next'
 
@@ -22,7 +22,7 @@ const FileUploadForm = props => {
         </div>
         <div className="mb-3">{t('dragAndDropImage')}</div>
         <Label
-          className="btn btn-success m-0 rounded"
+          className="btn btn-primary m-0 rounded"
           for="file-upload"
           id="file-upload-button"
         >
