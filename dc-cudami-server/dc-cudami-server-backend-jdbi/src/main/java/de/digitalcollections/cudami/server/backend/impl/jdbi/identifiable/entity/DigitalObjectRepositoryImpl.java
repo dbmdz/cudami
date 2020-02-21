@@ -7,26 +7,21 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.api.identifiable.resource.ApplicationFileResource;
-import de.digitalcollections.model.api.identifiable.resource.AudioFileResource;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
-import de.digitalcollections.model.api.identifiable.resource.TextFileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
-import de.digitalcollections.model.impl.identifiable.resource.ApplicationFileResourceImpl;
-import de.digitalcollections.model.impl.identifiable.resource.AudioFileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
-import de.digitalcollections.model.impl.identifiable.resource.TextFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -51,10 +46,14 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
           + " d.created d_created, d.last_modified d_lastModified,"
           // TODO: add d.license d_license, d.version d_version, when features added
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_sizeInBytes, file.uri f_uri,"
+          // related file resources
+          + " fr.uuid fr_uuid, fr.filename fr_filename, fr.mimetype fr_mimetype, fr.size_in_bytes fr_sizeInBytes, fr.uri fr_uri"
           + " FROM digitalobjects as d"
           + " LEFT JOIN identifiers as id on d.uuid = id.identifiable"
-          + " LEFT JOIN fileresources_image as file on d.previewfileresource = file.uuid";
+          + " LEFT JOIN fileresources_image as file on d.previewfileresource = file.uuid"
+          + " LEFT JOIN digitalobject_fileresources as df on d.uuid = df.digitalobject_uuid"
+          + " LEFT JOIN fileresources as fr on fr.uuid = df.fileresource_uuid";
 
   // select only what is shown/needed in paged list (to avoid unnecessary payload/traffic):
   private static final String REDUCED_FIND_ONE_BASE_SQL =
@@ -112,57 +111,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   @Override
   public DigitalObject findOne(UUID uuid) {
-    String query =
-        FIND_ONE_BASE_SQL
-            //        "SELECT d.uuid d_uuid, d.label d_label, d.description d_description,"
-            //            + " d.identifiable_type d_identifiable_type, d.entity_type d_entity_type,"
-            //            + " d.created d_created, d.last_modified d_last_modified,"
-            //            // TODO: add d.license d_license, d.version d_version, when available
-            //            + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace
-            // id_namespace, id.identifier id_id,"
-            //            + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes
-            // f_size_in_bytes, file.uri f_uri,"
-            //            + " df.fileresource_uuid df_fileresource_uuid,"
-            //            + ""
-            //            + " fi.uuid fi_uuid, fi.label fi_label, fi.description fi_description,"
-            //            + " fi.identifiable_type fi_identifiable_type,"
-            //            + " fi.created fi_created, fi.last_modified fi_last_modified,"
-            //            + " fi.filename fi_filename, fi.mimetype fi_mimetype, fi.size_in_bytes
-            // fi_size_in_bytes, fi.uri fi_uri,"
-            //            + " fi.height fi_height, fi.width fi_width,"
-            //            + ""
-            //            + " fa.uuid fa_uuid, fa.label fa_label, fa.description fa_description,"
-            //            + " fa.identifiable_type fa_identifiable_type,"
-            //            + " fa.created fa_created, fa.last_modified fa_last_modified,"
-            //            + " fa.filename fa_filename, fa.mimetype fa_mimetype, fa.size_in_bytes
-            // fa_size_in_bytes, fa.uri fa_uri,"
-            //            + " fa.duration fa_duration,"
-            //            + ""
-            //            + " ft.uuid ft_uuid, ft.label ft_label, ft.description ft_description,"
-            //            + " ft.identifiable_type ft_identifiable_type,"
-            //            + " ft.created ft_created, ft.last_modified ft_last_modified,"
-            //            + " ft.filename ft_filename, ft.mimetype ft_mimetype, ft.size_in_bytes
-            // ft_size_in_bytes, ft.uri ft_uri,"
-            //            + ""
-            //            + " fp.uuid fp_uuid, fp.label fp_label, fp.description fp_description,"
-            //            + " fp.identifiable_type fp_identifiable_type,"
-            //            + " fp.created fp_created, fp.last_modified fp_last_modified,"
-            //            + " fp.filename fp_filename, fp.mimetype fp_mimetype, fp.size_in_bytes
-            // fp_size_in_bytes, fp.uri fp_uri"
-            //            + ""
-            //            + " FROM digitalobjects as d"
-            //            + " LEFT JOIN identifiers as id on d.uuid = id.identifiable"
-            //            + " LEFT JOIN fileresources_image as file on d.previewfileresource =
-            // file.uuid"
-            //            + " LEFT JOIN digitalobject_fileresources as df on d.uuid =
-            // df.digitalobject_uuid"
-            //            + " LEFT JOIN fileresources_image as fi on df.fileresource_uuid = fi.uuid"
-            //            + " LEFT JOIN fileresources_audio as fa on df.fileresource_uuid = fa.uuid"
-            //            + " LEFT JOIN fileresources_text as ft on df.fileresource_uuid = ft.uuid"
-            //            + " LEFT JOIN fileresources_application as fp on df.fileresource_uuid =
-            // fp.uuid"
-            + " WHERE d.uuid = :uuid";
-    //            + " ORDER BY df.sortindex";
+    String query = FIND_ONE_BASE_SQL + " WHERE d.uuid = :uuid";
 
     Optional<DigitalObjectImpl> digitalObjectOpt =
         dbi.withHandle(
@@ -170,52 +119,37 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                 h.createQuery(query).bind("uuid", uuid)
                     .registerRowMapper(BeanMapper.factory(DigitalObjectImpl.class, "d"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    //
-                    // .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "fi"))
-                    //
-                    // .registerRowMapper(BeanMapper.factory(AudioFileResourceImpl.class, "fa"))
-                    //
-                    // .registerRowMapper(BeanMapper.factory(TextFileResourceImpl.class, "ft"))
-                    //
-                    // .registerRowMapper(BeanMapper.factory(ApplicationFileResourceImpl.class,
-                    // "fp"))
+                    .registerRowMapper(BeanMapper.factory(FileResourceImpl.class, "fr"))
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, DigitalObjectImpl>(),
-                        (map, rowView) -> {
-                          addPreviewImageAndIdentifiers(
-                              map, rowView, DigitalObjectImpl.class, "d_uuid");
-                          DigitalObject obj = map.get(uuid);
+                        new DigitalObjectAggregator(),
+                        (aggregator, rowView) -> {
+                          DigitalObjectImpl digitalObject =
+                              aggregator.digitalObjects.computeIfAbsent(
+                                  rowView.getColumn("d_uuid", UUID.class),
+                                  dUuid -> rowView.getRow(DigitalObjectImpl.class));
 
-                          // FIXME: not using DigitalObjectAggregatorImpl anymore: check if this
-                          // leads to duplicate fileresources....
-//                          if (rowView.getColumn("df_fileresource_uuid", UUID.class) != null) {
-//                            if (rowView.getColumn("fi_uuid", UUID.class) != null) {
-//                              // add image fileresource
-//                              ImageFileResource imageFileResource =
-//                                  rowView.getRow(ImageFileResourceImpl.class);
-//                              obj.addFileResource(imageFileResource);
-//                            } else if (rowView.getColumn("fa_uuid", UUID.class) != null) {
-//                              // add audio fileresource
-//                              AudioFileResource audioFileResource =
-//                                  rowView.getRow(AudioFileResourceImpl.class);
-//                              obj.addFileResource(audioFileResource);
-//                            } else if (rowView.getColumn("ft_uuid", UUID.class) != null) {
-//                              // add text fileresource
-//                              TextFileResource textFileResource =
-//                                  rowView.getRow(TextFileResourceImpl.class);
-//                              obj.addFileResource(textFileResource);
-//                            } else if (rowView.getColumn("fp_uuid", UUID.class) != null) {
-//                              // add application fileresource
-//                              ApplicationFileResource applicationFileResource =
-//                                  rowView.getRow(ApplicationFileResourceImpl.class);
-//                              obj.addFileResource(applicationFileResource);
-//                            }
-//                          }
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            digitalObject.setPreviewImage(
+                                rowView.getRow(ImageFileResourceImpl.class));
+                          }
 
-                          return map;
+                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
+                          if (idUuid != null && !aggregator.identifiers.containsKey(idUuid)) {
+                            IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                            digitalObject.addIdentifier(identifier);
+                            aggregator.identifiers.put(idUuid, identifier);
+                          }
+
+                          final UUID frUuid = rowView.getColumn("fr_uuid", UUID.class);
+                          if (frUuid != null && !aggregator.fileResources.containsKey(frUuid)) {
+                            FileResourceImpl fileResource = rowView.getRow(FileResourceImpl.class);
+                            digitalObject.addFileResource(fileResource);
+                            aggregator.fileResources.put(frUuid, fileResource);
+                          }
+                          return aggregator;
                         })
-                    .values().stream() // TODO: maybe shorter: .get(uuid)?
+                    .digitalObjects.values().stream() // TODO: maybe shorter: .get(uuid)?
                     .findFirst());
     if (digitalObjectOpt.isPresent()) {
       return digitalObjectOpt.get();
@@ -455,5 +389,12 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
     DigitalObject result = findOne(digitalObject.getUuid());
     return result;
+  }
+
+  static class DigitalObjectAggregator {
+
+    Map<UUID, DigitalObjectImpl> digitalObjects = new LinkedHashMap<>();
+    Map<UUID, IdentifierImpl> identifiers = new LinkedHashMap<>();
+    Map<UUID, FileResourceImpl> fileResources = new LinkedHashMap<>();
   }
 }
