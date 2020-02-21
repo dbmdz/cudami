@@ -46,7 +46,7 @@
   "devDependencies": {
     "@fisker/prettier-config": "^1.0.21",
     "prettier": "1.18.2",
-    "webpack-cli": "^3.3.10"
+    "webpack-cli": "^3.3.11"
   },
   "browserslist": {
     "production": [
