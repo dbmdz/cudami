@@ -256,6 +256,7 @@ class IdentifiableForm extends Component {
         <ImageAdderModal
           activeLanguage={this.state.activeLanguage}
           apiContextPath={this.props.apiContextPath}
+          debug={this.props.debug}
           isOpen={this.state.modalsOpen.imageAdder}
           onToggle={() => this.toggleModal('imageAdder')}
         />

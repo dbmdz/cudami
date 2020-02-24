@@ -1,6 +1,6 @@
 import {publish, subscribe} from 'pubsub-js'
 import React, {Component} from 'react'
-import {Button, Form, Modal, ModalBody, ModalHeader} from 'reactstrap'
+import {Button, Form, Label, Modal, ModalBody, ModalHeader} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
 import ImageMetadataForm from './imageAdder/ImageMetadataForm'
@@ -119,9 +119,9 @@ class ImageAdderModal extends Component {
   }
 
   render() {
-    const {t} = this.props
+    const {apiContextPath, debug, isOpen, t} = this.props
     return (
-      <Modal isOpen={this.props.isOpen} size="lg" toggle={this.destroy}>
+      <Modal isOpen={isOpen} size="lg" toggle={this.destroy}>
         <ModalHeader toggle={this.destroy}>{t('insert.image')}</ModalHeader>
         <ModalBody>
           <Form
@@ -132,7 +132,7 @@ class ImageAdderModal extends Component {
             }}
           >
             <ImageSelector
-              apiContextPath={this.props.apiContextPath}
+              apiContextPath={apiContextPath}
               fileResource={this.state.fileResource}
               onChange={(updateFields, additionalFields) =>
                 this.updateFileResource(updateFields, additionalFields)
@@ -158,6 +158,14 @@ class ImageAdderModal extends Component {
               }
               toggleEnabled={this.state.toggleEnabled}
             />
+            {debug && (
+              <>
+                <Label className="font-weight-bold mt-3">JSON (debug)</Label>
+                <pre className="border">
+                  <code>{JSON.stringify(this.state, null, 4)}</code>
+                </pre>
+              </>
+            )}
             <Button className="float-right mt-2" color="primary" type="submit">
               {t('save')}
             </Button>
