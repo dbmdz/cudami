@@ -12,8 +12,8 @@ export default {
       width: {default: '33%'},
     },
     draggable: true,
-    group: 'inline',
-    inline: true,
+    group: 'block',
+    inline: false,
     parseDOM: [
       {
         tag: 'figure',
