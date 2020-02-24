@@ -162,7 +162,11 @@ class IdentifiableForm extends Component {
   }
 
   isEmptyContent = content => {
-    return content.length === 1 && !content[0].content
+    return (
+      content.length === 1 &&
+      content[0].type === 'paragraph' &&
+      !content[0].content
+    )
   }
 
   isFormValid = () => {
