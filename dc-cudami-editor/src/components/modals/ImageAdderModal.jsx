@@ -54,7 +54,7 @@ class ImageAdderModal extends Component {
 
   addImageToEditor = resourceId => {
     const filteredAttributes = Object.fromEntries(
-      Object.entries(this.state.attributes).filter(([_, value]) => value)
+      Object.entries(this.state.attributes).filter(([_, value]) => value !== '')
     )
     const data = {
       ...filteredAttributes,
