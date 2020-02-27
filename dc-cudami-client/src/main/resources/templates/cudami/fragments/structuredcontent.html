@@ -83,6 +83,22 @@
     </iframe>
   </th:block>
 
+  <th:block th:if="${block.class.simpleName == 'ImageImpl'}" th:with="attr=${block.attributes}">
+    <figure th:classappend="${'alignment-' + attr.get('alignment') + ' width-' + #strings.substringBefore(attr.get('width'),'%')}">
+      <th:block th:if="${attr.get('linkUrl')}">
+        <a th:attr="href=${attr.get('linkUrl')}, target=${attr.get('linkNewTab') ? '_blank' : ''}">
+          <img th:attr="alt=${attr.get('altText')}, src=${attr.get('url')}, title=${attr.get('title')}" />
+        </a>
+      </th:block>
+      <th:block th:unless="${attr.get('linkUrl')}">
+        <img th:attr="alt=${attr.get('altText')}, src=${attr.get('url')}, title=${attr.get('title')}" />
+      </th:block>
+      <th:block th:if="${attr.get('caption')}">
+        <figcaption th:text="${attr.get('caption')}"></figcaption>
+      </th:block>
+    </figure>
+  </th:block>
+
   <th:block th:if="${block.class.simpleName == 'ListItemImpl'}">
     <li>
       <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
