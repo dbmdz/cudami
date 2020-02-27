@@ -27,7 +27,10 @@ public class EntityController<E extends Entity> {
 
   @ApiMethod(description = "Get entity by uuid")
   @GetMapping(
-      value = {"/latest/entities/{uuid:/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i}", "/v2/entities/{uuid:/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i}"},
+      value = {
+        "/latest/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v2/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+      },
       produces = "application/json")
   @ApiResponseObject
   public Entity findById(@PathVariable UUID uuid) {
