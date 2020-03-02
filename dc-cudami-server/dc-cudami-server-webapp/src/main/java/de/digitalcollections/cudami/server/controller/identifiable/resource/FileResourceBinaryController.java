@@ -7,6 +7,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.res
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.MimeType;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
+import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InvalidObjectException;
@@ -71,6 +72,7 @@ public class FileResourceBinaryController {
                   new Locale(localeService.getDefaultLanguage()), originalFilename));
 
           fileResource = fileUploadService.save(fileResource, stream);
+          fileResource.setDescription(new LocalizedStructuredContentImpl());
           LOGGER.info(
               "saved file '"
                   + fileResource.getUri().toString()
