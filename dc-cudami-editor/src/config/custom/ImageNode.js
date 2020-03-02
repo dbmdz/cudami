@@ -41,8 +41,6 @@ export default {
         alignment,
         altText,
         caption,
-        linkNewTab,
-        linkUrl,
         title,
         url,
         width,
@@ -50,17 +48,8 @@ export default {
       const tags = [
         'figure',
         {class: `alignment-${alignment} width-${parseInt(width)}`},
+        ['img', {alt: altText, src: url, title}],
       ]
-      const imageTag = ['img', {alt: altText, src: url, title}]
-      if (linkUrl) {
-        tags.push([
-          'a',
-          {href: linkUrl, target: linkNewTab ? '_blank' : null},
-          imageTag,
-        ])
-      } else {
-        tags.push(imageTag)
-      }
       if (caption) {
         tags.push(['figcaption', caption])
       }
