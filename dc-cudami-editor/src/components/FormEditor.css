@@ -8,10 +8,12 @@
 
 .cudami-editor .text-editor figure.alignment-left {
   float: left;
+  margin-right: 1rem;
 }
 
 .cudami-editor .text-editor figure.alignment-right {
   float: right;
+  margin-left: 1rem;
 }
 
 .cudami-editor .text-editor figure.width-25 {
@@ -27,9 +29,12 @@
 }
 
 .cudami-editor .text-editor figure.width-100 {
+  float: none;
+  margin-left: 0;
+  margin-right: 0;
   width: 100%;
 }
 
 .cudami-editor .text-editor figure > img {
-  width: 100%;
+  max-width: 100%;
 }
