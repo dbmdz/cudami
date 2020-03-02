@@ -1,4 +1,4 @@
-FROM maven:3.6.0-jdk-11-slim
+FROM maven:3.6.3-jdk-11-slim
 
 ARG HYMIR_VERSION
 
@@ -12,4 +12,4 @@ ADD https://github.com/uclouvain/openjpeg/releases/download/v$OPENJPEG_VERSION/o
 
 RUN tar -xvf /tmp/openjpeg.tar.gz
 
-ENTRYPOINT [ "sh", "-c", "java -jar /hymir.jar" ]
+ENTRYPOINT [ "sh", "-c", "java -jar /hymir.jar --server.port=9000 --spring.profiles.active=PROD" ]
