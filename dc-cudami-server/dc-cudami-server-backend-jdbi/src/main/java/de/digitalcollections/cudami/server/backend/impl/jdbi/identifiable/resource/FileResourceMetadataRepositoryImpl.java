@@ -23,6 +23,7 @@ import de.digitalcollections.model.impl.identifiable.resource.LinkedDataFileReso
 import de.digitalcollections.model.impl.identifiable.resource.TextFileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.VideoFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,6 +35,7 @@ import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -64,6 +66,9 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
           + " file.uri pf_uri, file.filename pf_filename"
           + " FROM fileresources as f"
           + " LEFT JOIN fileresources_image as file on f.previewfileresource = file.uuid";
+
+  @Value("${iiif.image.baseUrl}")
+  private URL iiifImageBaseUrl;
 
   @Autowired
   public FileResourceMetadataRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
@@ -272,7 +277,8 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
             + " f.identifiable_type f_type,"
             + " f.created f_created, f.last_modified f_lastModified,"
             + " f.filename f_filename, f.mimetype f_mimetype, f.size_in_bytes f_sizeInBytes, f.uri f_uri,"
-            + " f.height f_height, f.width f_width," // file resource type specific fields
+            // file resource type specific fields:
+            + " f.height f_height, f.width f_width, f.iiif_base_url f_iiifBaseUrl,"
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
             + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimetype, file.size_in_bytes pf_size_in_bytes, file.uri pf_uri"
             + " FROM fileresources_image as f"
@@ -447,14 +453,15 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
                   .bindBean(fileResource)
                   .execute());
     } else if (fileResource instanceof ImageFileResource) {
+      ((ImageFileResource) fileResource).setIiifBaseUrl(iiifImageBaseUrl);
       dbi.withHandle(
           h ->
               h.createUpdate(
                       "INSERT INTO fileresources_image("
                           + baseColumnsSql
-                          + ", width, height) VALUES ("
+                          + ", width, height, iiif_base_url) VALUES ("
                           + basePropertiesSql
-                          + ", :width, :height)")
+                          + ", :width, :height, :iiifBaseUrl)")
                   .bind("previewFileResource", previewImageUuid)
                   .bindBean(fileResource)
                   .execute());

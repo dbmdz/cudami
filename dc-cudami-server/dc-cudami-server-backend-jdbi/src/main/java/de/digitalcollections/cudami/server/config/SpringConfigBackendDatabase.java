@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.commons.jdbi.DcCommonsJdbiPlugin;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.plugins.JsonbJdbiPlugin;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -58,6 +59,13 @@ public class SpringConfigBackendDatabase {
   private boolean flywayEnabled;
 
   @Autowired ObjectMapper objectMapper;
+
+  public static final ThreadLocal<URL> iiifImageBaseUrl = new ThreadLocal<>();
+
+  @Value("${iiif.image.baseUrl}")
+  public void setIiifImageBaseUrl(URL url) {
+    iiifImageBaseUrl.set(url);
+  }
 
   @Bean(initMethod = "migrate")
   @Autowired
