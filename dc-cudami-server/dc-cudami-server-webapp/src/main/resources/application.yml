@@ -12,6 +12,10 @@ cudami:
     locale: en_US
   repositoryFolderPath: '~/cudami/fileResources'
 
+iiif:
+  image:
+    baseUrl: "http://localhost:23232/image/v2/"
+
 info:
   app:
     encoding: "@project.build.sourceEncoding@"
