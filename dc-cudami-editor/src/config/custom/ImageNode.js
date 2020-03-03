@@ -37,14 +37,7 @@ export default {
       },
     ],
     toDOM(node) {
-      const {
-        alignment,
-        altText,
-        caption,
-        title,
-        url,
-        width,
-      } = node.attrs
+      const {alignment, altText, caption, title, url, width} = node.attrs
       const tags = [
         'figure',
         {class: `alignment-${alignment} width-${parseInt(width)}`},
