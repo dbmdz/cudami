@@ -30,7 +30,7 @@ class ImageSelector extends Component {
     onChange(
       {
         label: responseJson.label,
-        uri: responseJson.uri,
+        uri: `${responseJson.iiifBaseUrl}${responseJson.uuid}/full/full/0/default.${responseJson.filenameExtension}`,
         uuid: responseJson.uuid,
       },
       {
