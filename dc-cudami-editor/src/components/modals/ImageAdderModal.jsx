@@ -41,7 +41,7 @@ class ImageAdderModal extends Component {
     )
     const initialFileResource = {
       ...newFileResource,
-      fileresourceType: 'image_fileresource',
+      fileResourceType: 'IMAGE',
       label: {[this.props.activeLanguage]: ''},
       mimeType: 'image/png',
       uri: '',
