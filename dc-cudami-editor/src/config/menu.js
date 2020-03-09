@@ -231,15 +231,6 @@ export default function(t) {
           publish('editor.show-image-modal')
         },
       },
-      /*footnote: {
-        title: t('insert.footnote'),
-        content: icons.footnote,
-        enable: canInsert(schema.nodes.footnote),
-        run: (state, dispatch) => {
-          const footnote = schema.nodes.footnote.create()
-          dispatch(state.tr.replaceSelectionWith(footnote))
-        },
-      },*/
       hr: {
         title: t('insert.hr'),
         content: icons.hr,
