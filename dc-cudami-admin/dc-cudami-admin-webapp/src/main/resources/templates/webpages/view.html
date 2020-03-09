@@ -6,6 +6,8 @@
 
   <head>
     <title th:text="|#{webpages}: #{webpage}|">...</title>
+    <!-- Custom styles for this template -->
+    <link th:href="@{/css/cudami/webpage.css}" rel="stylesheet" />
   </head>
   <body>
     <section layout:fragment="content" th:object="${webpage}">
