@@ -67,12 +67,15 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
           + " FROM fileresources as f"
           + " LEFT JOIN fileresources_image as file on f.previewfileresource = file.uuid";
 
-  @Value("${iiif.image.baseUrl}")
-  private URL iiifImageBaseUrl;
+  private final URL iiifImageBaseUrl;
 
   @Autowired
-  public FileResourceMetadataRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
+  public FileResourceMetadataRepositoryImpl(
+      Jdbi dbi,
+      IdentifierRepository identifierRepository,
+      @Value("${iiif.image.baseUrl}") URL iiifImageBaseUrl) {
     super(dbi, identifierRepository);
+    this.iiifImageBaseUrl = iiifImageBaseUrl;
   }
 
   @Override
