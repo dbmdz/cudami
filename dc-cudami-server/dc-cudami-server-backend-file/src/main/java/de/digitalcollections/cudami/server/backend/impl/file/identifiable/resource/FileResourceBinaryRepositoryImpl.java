@@ -84,16 +84,26 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
   protected URI createUri(@NonNull UUID uuid, MimeType mimeType) {
     Objects.requireNonNull(uuid, "uuid must not be null");
 
+    String extension = "undefined";
+    String primaryType = "";
+    if (mimeType == null) {
+      mimeType = MimeType.MIME_APPLICATION_OCTET_STREAM;
+    }
+    if (!mimeType.getExtensions().isEmpty()) {
+      extension = mimeType.getExtensions().get(0);
+    }
+    primaryType = mimeType.getPrimaryType();
     final String uuidStr = uuid.toString();
     String uuidPath = getSplittedUuidPath(uuidStr);
-    Path path = Paths.get(repositoryFolderPath, uuidPath, uuidStr);
-    String location = "file://" + path.toString();
 
-    if (mimeType != null && !mimeType.getExtensions().isEmpty()) {
-      location = location + "." + mimeType.getExtensions().get(0);
-      // example location =
-      // file:///local/cudami/resourceRepository/a30c/f362/5992/4f5a/8de0/6193/8134/e721/a30cf362-5992-4f5a-8de0-61938134e721.xml
+    Path path = Paths.get(repositoryFolderPath, primaryType, extension, uuidPath, uuidStr);
+    String location = "file://" + path.toString();
+    if (!extension.isBlank() && !"undefined".equals(extension)) {
+      location = location + "." + extension;
     }
+    // example location =
+    // file:///local/cudami/resourceRepository/application/xml/a30c/f362/5992/4f5a/8de0/6193/8134/e721/a30cf362-5992-4f5a-8de0-61938134e721.xml
+
     return URI.create(location);
   }
 
