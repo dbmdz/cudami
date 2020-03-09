@@ -54,11 +54,13 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(FileResourceBinaryRepositoryImpl.class);
-  private String repositoryFolderPath;
+  private final String repositoryFolderPath;
   private final ResourceLoader resourceLoader;
 
   @Autowired
-  public FileResourceBinaryRepositoryImpl(ResourceLoader resourceLoader) {
+  public FileResourceBinaryRepositoryImpl(
+      @Value("${cudami.repositoryFolderPath}") String folderPath, ResourceLoader resourceLoader) {
+    this.repositoryFolderPath = folderPath.replace("~", System.getProperty("user.home"));
     this.resourceLoader = resourceLoader;
   }
 
@@ -167,11 +169,6 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
           "Cannot read document from resolved resource '" + resource.getUri().toString() + "'", ex);
     }
     return doc;
-  }
-
-  @Value(value = "${cudami.repositoryFolderPath}")
-  public void setFolderpath(String folderpath) {
-    this.repositoryFolderPath = folderpath.replace("~", System.getProperty("user.home"));
   }
 
   private void setImageProperties(ImageFileResource fileResource) throws IOException {
