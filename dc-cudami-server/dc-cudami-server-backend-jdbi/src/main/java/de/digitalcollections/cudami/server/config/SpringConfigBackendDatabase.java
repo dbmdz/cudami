@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.server.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.commons.jdbi.DcCommonsJdbiPlugin;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.plugins.JsonbJdbiPlugin;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -14,7 +13,6 @@ import org.apache.commons.dbcp2.PoolableConnectionFactory;
 import org.apache.commons.dbcp2.PoolingDataSource;
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPool;
-import org.flywaydb.core.Flyway;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.spring4.JdbiFactoryBean;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
@@ -26,7 +24,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
@@ -55,45 +52,23 @@ public class SpringConfigBackendDatabase {
   @Value("${cudami.database.username}")
   private String databaseUsername;
 
-  @Value("${spring.flyway.enabled:true}")
-  private boolean flywayEnabled;
+  ObjectMapper objectMapper;
 
-  @Autowired ObjectMapper objectMapper;
-
-  public static final ThreadLocal<URL> iiifImageBaseUrl = new ThreadLocal<>();
-
-  @Value("${iiif.image.baseUrl}")
-  public void setIiifImageBaseUrl(URL url) {
-    iiifImageBaseUrl.set(url);
+  public SpringConfigBackendDatabase(ObjectMapper objectMapper) {
+    this.objectMapper = objectMapper;
   }
 
-  @Bean(initMethod = "migrate")
   @Autowired
-  @Qualifier(value = "pds")
-  public Flyway flyway(DataSource pds) {
-    if (!flywayEnabled) {
-      return null;
-    }
-    return Flyway.configure()
-        .dataSource(pds)
-        .locations("classpath:/de/digitalcollections/cudami/server/backend/impl/database/migration")
-        .baselineOnMigrate(true)
-        .outOfOrder(true)
-        .load();
-  }
-
   @Bean
-  @Autowired
   @Qualifier(value = "pds")
   public PersistentTokenRepository persistentTokenRepository(DataSource pds) {
-    JdbcTokenRepositoryImpl db = new JdbcTokenRepositoryImpl();
-    db.setDataSource(pds);
-    return db;
+    JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
+    tokenRepository.setDataSource(pds);
+    return tokenRepository;
   }
 
-  @Bean
-  @DependsOn(value = "flyway")
   @Autowired
+  @Bean
   @Qualifier(value = "ds")
   public JdbiFactoryBean jdbi(DataSource ds) throws Exception {
     JdbiFactoryBean jdbiFactoryBean = new JdbiFactoryBean(ds);
