@@ -52,12 +52,6 @@ public class SpringConfigBackendDatabase {
   @Value("${cudami.database.username}")
   private String databaseUsername;
 
-  ObjectMapper objectMapper;
-
-  public SpringConfigBackendDatabase(ObjectMapper objectMapper) {
-    this.objectMapper = objectMapper;
-  }
-
   @Autowired
   @Bean
   @Qualifier(value = "pds")
@@ -67,10 +61,9 @@ public class SpringConfigBackendDatabase {
     return tokenRepository;
   }
 
-  @Autowired
   @Bean
   @Qualifier(value = "ds")
-  public JdbiFactoryBean jdbi(DataSource ds) throws Exception {
+  public JdbiFactoryBean jdbi(DataSource ds, ObjectMapper objectMapper) throws Exception {
     JdbiFactoryBean jdbiFactoryBean = new JdbiFactoryBean(ds);
     List plugins = new ArrayList();
     plugins.add(new SqlObjectPlugin());
