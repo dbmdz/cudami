@@ -1,8 +1,7 @@
 import React from 'react'
-import {faPlus} from '@fortawesome/free-solid-svg-icons'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {NavItem, NavLink} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
+import {FaPlus} from 'react-icons/fa'
 
 const LanguageAdder = props => {
   const {t} = useTranslation()
@@ -12,7 +11,7 @@ const LanguageAdder = props => {
         onClick={() => props.onClick('languageAdder')}
         title={t('addLanguage')}
       >
-        <FontAwesomeIcon icon={faPlus} />
+        <FaPlus />
       </NavLink>
     </NavItem>
   )
