@@ -24,7 +24,6 @@
     <version.dc-commons-springboot>4.1.1-SNAPSHOT</version.dc-commons-springboot>
     <version.dc-commons-springdata>4.1.1-SNAPSHOT</version.dc-commons-springdata>
     <version.dc-commons-springmvc>4.1.2-SNAPSHOT</version.dc-commons-springmvc>
-    <version.snakeyaml>1.25</version.snakeyaml>
     <version.thymeleaf-spring-data-dialect>3.4.1</version.thymeleaf-spring-data-dialect>
     <version.webjar-bootstrap>4.3.1</version.webjar-bootstrap>
     <version.webjar-bootswatch>4.2.1</version.webjar-bootswatch>
@@ -229,11 +228,6 @@
       <artifactId>respond.js</artifactId>
       <version>${version.webjar-respond}</version>
     </dependency>
-    <dependency>
-      <groupId>org.yaml</groupId>
-      <artifactId>snakeyaml</artifactId>
-      <version>${version.snakeyaml}</version>
-    </dependency>
   </dependencies>
 
   <build>
@@ -247,7 +241,6 @@
         <filtering>true</filtering>
         <includes>
           <include>application.yml</include>
-          <include>webjar-versions.yml</include>
         </includes>
       </resource>
     </resources>
