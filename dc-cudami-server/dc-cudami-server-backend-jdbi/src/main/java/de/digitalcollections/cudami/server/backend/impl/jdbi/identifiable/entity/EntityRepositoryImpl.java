@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.IdentifiableAggregator;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
@@ -17,7 +18,6 @@ import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
@@ -40,7 +40,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
           + " e.identifiable_type e_type, e.entity_type e_entityType,"
           + " e.created e_created, e.last_modified e_last_modified,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
           + " FROM entities as e"
           + " LEFT JOIN identifiers as id on e.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on e.previewfileresource = file.uuid";
@@ -50,7 +50,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       "SELECT e.uuid e_uuid, e.refid e_refId, e.label e_label, e.description e_description,"
           + " e.identifiable_type e_type, , e.entity_type e_entityType,"
           + " e.created e_created, e.last_modified e_lastModified,"
-          + " file.uri f_uri, file.filename f_filename"
+          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
           + " FROM entities as e"
           + " LEFT JOIN fileresources_image as file on e.previewfileresource = file.uuid";
 
@@ -116,10 +116,25 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
                     .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, EntityImpl>(),
-                        (map, rowView) -> addPreviewImage(map, rowView, EntityImpl.class, "e_uuid"))
+                        new LinkedHashMap<UUID, IdentifiableAggregator<EntityImpl>>(),
+                        (map, rowView) -> {
+                          IdentifiableAggregator<EntityImpl> aggregator =
+                              map.computeIfAbsent(
+                                  rowView.getColumn("e_uuid", UUID.class),
+                                  fn -> {
+                                    return new IdentifiableAggregator<>(
+                                        rowView.getRow(EntityImpl.class));
+                                  });
+                          EntityImpl obj = aggregator.identifiable;
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+                          return map;
+                        })
                     .values().stream()
+                    .map(aggregator -> aggregator.identifiable)
                     .collect(Collectors.toList()));
+
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -129,23 +144,37 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   public E findOne(UUID uuid) {
     String query = FIND_ONE_BASE_SQL + " WHERE e.uuid = :uuid";
 
-    Optional<EntityImpl> resultOpt =
+    EntityImpl result =
         dbi.withHandle(
             h ->
-                h.createQuery(query).bind("uuid", uuid)
+                h.createQuery(query)
+                    .bind("uuid", uuid)
                     .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, EntityImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(map, rowView, EntityImpl.class, "e_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    return (E) resultOpt.get();
+                        new IdentifiableAggregator<EntityImpl>(),
+                        (aggregator, rowView) -> {
+                          if (aggregator.identifiable == null) {
+                            aggregator.identifiable = rowView.getRow(EntityImpl.class);
+                          }
+                          EntityImpl obj = aggregator.identifiable;
+
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+
+                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
+                          if (idUuid != null && !aggregator.identifiers.contains(idUuid)) {
+                            IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                            obj.addIdentifier(identifier);
+                            aggregator.identifiers.add(idUuid);
+                          }
+
+                          return aggregator;
+                        })
+                    .identifiable);
+    return (E) result;
   }
 
   @Override
@@ -159,46 +188,75 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
     String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
-    Optional<EntityImpl> resultOpt =
+    EntityImpl result =
         dbi.withHandle(
             h ->
-                h.createQuery(query).bind("id", identifierId).bind("namespace", namespace)
+                h.createQuery(query)
+                    .bind("id", identifierId)
+                    .bind("namespace", namespace)
                     .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, EntityImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(map, rowView, EntityImpl.class, "e_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    return (E) resultOpt.get();
+                        new IdentifiableAggregator<EntityImpl>(),
+                        (aggregator, rowView) -> {
+                          if (aggregator.identifiable == null) {
+                            aggregator.identifiable = rowView.getRow(EntityImpl.class);
+                          }
+                          EntityImpl obj = aggregator.identifiable;
+
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+
+                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
+                          if (idUuid != null && !aggregator.identifiers.contains(idUuid)) {
+                            IdentifierImpl newIdentifier = rowView.getRow(IdentifierImpl.class);
+                            obj.addIdentifier(newIdentifier);
+                            aggregator.identifiers.add(idUuid);
+                          }
+
+                          return aggregator;
+                        })
+                    .identifiable);
+    return (E) result;
   }
 
   @Override
   public E findOneByRefId(long refId) {
     String query = FIND_ONE_BASE_SQL + " WHERE e.refid = :refId";
 
-    Optional<EntityImpl> resultOpt =
+    EntityImpl result =
         dbi.withHandle(
             h ->
-                h.createQuery(query).bind("refId", refId)
+                h.createQuery(query)
+                    .bind("refId", refId)
                     .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, EntityImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(map, rowView, EntityImpl.class, "e_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    return (E) resultOpt.get();
+                        new IdentifiableAggregator<EntityImpl>(),
+                        (aggregator, rowView) -> {
+                          if (aggregator.identifiable == null) {
+                            aggregator.identifiable = rowView.getRow(EntityImpl.class);
+                          }
+                          EntityImpl obj = aggregator.identifiable;
+
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+
+                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
+                          if (idUuid != null && !aggregator.identifiers.contains(idUuid)) {
+                            IdentifierImpl newIdentifier = rowView.getRow(IdentifierImpl.class);
+                            obj.addIdentifier(newIdentifier);
+                            aggregator.identifiers.add(idUuid);
+                          }
+
+                          return aggregator;
+                        })
+                    .identifiable);
+    return (E) result;
   }
 
   @Override

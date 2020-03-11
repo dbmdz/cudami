@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSortingRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.IdentifiableAggregator;
 import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -15,13 +16,11 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
-import org.jdbi.v3.core.result.RowView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +38,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
           + " i.identifiable_type i_type,"
           + " i.created i_created, i.last_modified i_last_modified,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
           + " FROM identifiables as i"
           + " LEFT JOIN identifiers as id on i.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on i.previewfileresource = file.uuid";
@@ -49,7 +48,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
       "SELECT i.uuid i_uuid, i.label i_label, i.description i_description,"
           + " i.identifiable_type i_type,"
           + " i.created i_created, i.last_modified i_lastModified,"
-          + " file.uri f_uri, file.filename f_filename"
+          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
           + " FROM identifiables as i"
           + " LEFT JOIN fileresources_image as file on i.previewfileresource = file.uuid";
 
@@ -60,53 +59,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   public IdentifiableRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     this.dbi = dbi;
     this.identifierRepository = identifierRepository;
-  }
-
-  // this method can be used, if sql prefix of main object columns is not "f"
-  protected <T extends Identifiable> LinkedHashMap<UUID, T> addPreviewImage(
-      LinkedHashMap<UUID, T> map, RowView rowView, Class<T> clz, String idColumnName) {
-    return addPreviewImage(map, rowView, clz, idColumnName, "f_uri");
-  }
-
-  // this method must be used, if sql prefix of main object columns is equals "f"
-  protected <T extends Identifiable> LinkedHashMap<UUID, T> addPreviewImage(
-      LinkedHashMap<UUID, T> map,
-      RowView rowView,
-      Class<T> clz,
-      String idColumnName,
-      String previewFileColumnName) {
-    T obj =
-        map.computeIfAbsent(
-            rowView.getColumn(idColumnName, UUID.class), uuid -> rowView.getRow(clz));
-    if (rowView.getColumn(previewFileColumnName, String.class) != null) {
-      obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
-    }
-    return map;
-  }
-
-  // this method can be used, if sql prefix of main object columns is not "f"
-  protected <T extends Identifiable> LinkedHashMap<UUID, T> addPreviewImageAndIdentifiers(
-      LinkedHashMap<UUID, T> map, RowView rowView, Class<T> clz, String idColumnName) {
-    return addPreviewImageAndIdentifiers(map, rowView, clz, idColumnName, "f_uri");
-  }
-
-  // this method must be used, if sql prefix of main object columns is equals "f"
-  protected <T extends Identifiable> LinkedHashMap<UUID, T> addPreviewImageAndIdentifiers(
-      LinkedHashMap<UUID, T> map,
-      RowView rowView,
-      Class<T> clz,
-      String idColumnName,
-      String previewFileColumnName) {
-    T obj =
-        map.computeIfAbsent(
-            rowView.getColumn(idColumnName, UUID.class), uuid -> rowView.getRow(clz));
-    if (rowView.getColumn(previewFileColumnName, String.class) != null) {
-      obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
-    }
-    if (rowView.getColumn("id_uuid", UUID.class) != null) {
-      obj.addIdentifier(rowView.getRow(IdentifierImpl.class));
-    }
-    return map;
   }
 
   @Override
@@ -136,10 +88,23 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                     .registerRowMapper(BeanMapper.factory(IdentifiableImpl.class, "i"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, IdentifiableImpl>(),
-                        (map, rowView) ->
-                            addPreviewImage(map, rowView, IdentifiableImpl.class, "i_uuid"))
+                        new LinkedHashMap<UUID, IdentifiableAggregator<IdentifiableImpl>>(),
+                        (map, rowView) -> {
+                          IdentifiableAggregator<IdentifiableImpl> aggregator =
+                              map.computeIfAbsent(
+                                  rowView.getColumn("i_uuid", UUID.class),
+                                  fn -> {
+                                    return new IdentifiableAggregator<>(
+                                        rowView.getRow(IdentifiableImpl.class));
+                                  });
+                          IdentifiableImpl obj = aggregator.identifiable;
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+                          return map;
+                        })
                     .values().stream()
+                    .map(aggregator -> aggregator.identifiable)
                     .collect(Collectors.toList()));
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
@@ -172,24 +137,37 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   public I findOne(UUID uuid) {
     String query = FIND_ONE_BASE_SQL + " WHERE i.uuid = :uuid";
 
-    Optional<IdentifiableImpl> resultOpt =
+    IdentifiableImpl result =
         dbi.withHandle(
             h ->
-                h.createQuery(query).bind("uuid", uuid)
+                h.createQuery(query)
+                    .bind("uuid", uuid)
                     .registerRowMapper(BeanMapper.factory(IdentifiableImpl.class, "i"))
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, IdentifiableImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(
-                                map, rowView, IdentifiableImpl.class, "i_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    return (I) resultOpt.get();
+                        new IdentifiableAggregator<IdentifiableImpl>(),
+                        (aggregator, rowView) -> {
+                          if (aggregator.identifiable == null) {
+                            aggregator.identifiable = rowView.getRow(IdentifiableImpl.class);
+                          }
+                          IdentifiableImpl obj = aggregator.identifiable;
+
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+
+                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
+                          if (idUuid != null && !aggregator.identifiers.contains(idUuid)) {
+                            IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                            obj.addIdentifier(identifier);
+                            aggregator.identifiers.add(idUuid);
+                          }
+
+                          return aggregator;
+                        })
+                    .identifiable);
+    return (I) result;
   }
 
   @Override
@@ -203,24 +181,38 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
     String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
-    Optional<IdentifiableImpl> resultOpt =
+    IdentifiableImpl result =
         dbi.withHandle(
             h ->
-                h.createQuery(query).bind("id", identifierId).bind("namespace", namespace)
+                h.createQuery(query)
+                    .bind("id", identifierId)
+                    .bind("namespace", namespace)
                     .registerRowMapper(BeanMapper.factory(IdentifiableImpl.class, "i"))
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, IdentifiableImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(
-                                map, rowView, IdentifiableImpl.class, "i_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    return (I) resultOpt.get();
+                        new IdentifiableAggregator<IdentifiableImpl>(),
+                        (aggregator, rowView) -> {
+                          if (aggregator.identifiable == null) {
+                            aggregator.identifiable = rowView.getRow(IdentifiableImpl.class);
+                          }
+                          IdentifiableImpl obj = aggregator.identifiable;
+
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+
+                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
+                          if (idUuid != null && !aggregator.identifiers.contains(idUuid)) {
+                            IdentifierImpl newIdentifier = rowView.getRow(IdentifierImpl.class);
+                            obj.addIdentifier(newIdentifier);
+                            aggregator.identifiers.add(idUuid);
+                          }
+
+                          return aggregator;
+                        })
+                    .identifiable);
+    return (I) result;
   }
 
   @Override

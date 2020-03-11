@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CorporationRepository;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.IdentifiableAggregator;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Corporation;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -13,7 +14,6 @@ import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
@@ -36,7 +36,7 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
           + " c.created c_created, c.last_modified c_lastModified,"
           + " c.text c_text, c.homepage_url c_homepageUrl,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
           + " FROM corporations as c"
           + " LEFT JOIN identifiers as id on c.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid";
@@ -46,7 +46,7 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
       "SELECT c.uuid c_uuid, c.refid c_refId, c.label c_label, c.description c_description,"
           + " c.identifiable_type c_type, c.entity_type c_entityType,"
           + " c.created c_created, c.last_modified c_lastModified,"
-          + " file.uri f_uri, file.filename f_filename"
+          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
           + " FROM corporations as c"
           + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid";
 
@@ -74,10 +74,23 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
                     .registerRowMapper(BeanMapper.factory(CorporationImpl.class, "c"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, CorporationImpl>(),
-                        (map, rowView) ->
-                            addPreviewImage(map, rowView, CorporationImpl.class, "c_uuid"))
+                        new LinkedHashMap<UUID, IdentifiableAggregator<CorporationImpl>>(),
+                        (map, rowView) -> {
+                          IdentifiableAggregator<CorporationImpl> aggregator =
+                              map.computeIfAbsent(
+                                  rowView.getColumn("c_uuid", UUID.class),
+                                  fn -> {
+                                    return new IdentifiableAggregator<>(
+                                        rowView.getRow(CorporationImpl.class));
+                                  });
+                          CorporationImpl obj = aggregator.identifiable;
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+                          return map;
+                        })
                     .values().stream()
+                    .map(aggregator -> aggregator.identifiable)
                     .collect(Collectors.toList()));
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
@@ -88,24 +101,37 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
   public Corporation findOne(UUID uuid) {
     String query = FIND_ONE_BASE_SQL + " WHERE c.uuid = :uuid";
 
-    Optional<CorporationImpl> resultOpt =
+    CorporationImpl result =
         dbi.withHandle(
             h ->
-                h.createQuery(query).bind("uuid", uuid)
+                h.createQuery(query)
+                    .bind("uuid", uuid)
                     .registerRowMapper(BeanMapper.factory(CorporationImpl.class, "c"))
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, CorporationImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(
-                                map, rowView, CorporationImpl.class, "c_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    return resultOpt.get();
+                        new IdentifiableAggregator<CorporationImpl>(),
+                        (aggregator, rowView) -> {
+                          if (aggregator.identifiable == null) {
+                            aggregator.identifiable = rowView.getRow(CorporationImpl.class);
+                          }
+                          CorporationImpl obj = aggregator.identifiable;
+
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+
+                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
+                          if (idUuid != null && !aggregator.identifiers.contains(idUuid)) {
+                            IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                            obj.addIdentifier(identifier);
+                            aggregator.identifiers.add(idUuid);
+                          }
+
+                          return aggregator;
+                        })
+                    .identifiable);
+    return result;
   }
 
   @Override
@@ -119,24 +145,38 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
 
     String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
-    Optional<CorporationImpl> resultOpt =
+    CorporationImpl result =
         dbi.withHandle(
             h ->
-                h.createQuery(query).bind("id", identifierId).bind("namespace", namespace)
+                h.createQuery(query)
+                    .bind("id", identifierId)
+                    .bind("namespace", namespace)
                     .registerRowMapper(BeanMapper.factory(CorporationImpl.class, "c"))
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, CorporationImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(
-                                map, rowView, CorporationImpl.class, "c_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    return resultOpt.get();
+                        new IdentifiableAggregator<CorporationImpl>(),
+                        (aggregator, rowView) -> {
+                          if (aggregator.identifiable == null) {
+                            aggregator.identifiable = rowView.getRow(CorporationImpl.class);
+                          }
+                          CorporationImpl obj = aggregator.identifiable;
+
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+
+                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
+                          if (idUuid != null && !aggregator.identifiers.contains(idUuid)) {
+                            IdentifierImpl newIdentifier = rowView.getRow(IdentifierImpl.class);
+                            obj.addIdentifier(newIdentifier);
+                            aggregator.identifiers.add(idUuid);
+                          }
+
+                          return aggregator;
+                        })
+                    .identifiable);
+    return result;
   }
 
   @Override

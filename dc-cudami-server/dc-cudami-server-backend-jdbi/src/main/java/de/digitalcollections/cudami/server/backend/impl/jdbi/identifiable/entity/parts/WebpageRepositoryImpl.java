@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.WebpageRepository;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.IdentifiableAggregator;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
@@ -14,7 +15,6 @@ import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
@@ -37,7 +37,7 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
           + " w.created w_created, w.last_modified w_lastModified,"
           + " w.text w_text,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
           + " FROM webpages as w"
           + " LEFT JOIN identifiers as id on w.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid";
@@ -47,7 +47,7 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
       "SELECT w.uuid w_uuid, w.refid w_refId, w.label w_label, w.description w_description,"
           + " w.identifiable_type w_type,"
           + " w.created w_created, w.last_modified w_lastModified,"
-          + " file.uri f_uri, file.filename f_filename"
+          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
           + " FROM webpages as w"
           + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid";
 
@@ -75,11 +75,25 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
                     .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, WebpageImpl>(),
-                        (map, rowView) ->
-                            addPreviewImage(map, rowView, WebpageImpl.class, "w_uuid"))
+                        new LinkedHashMap<UUID, IdentifiableAggregator<WebpageImpl>>(),
+                        (map, rowView) -> {
+                          IdentifiableAggregator<WebpageImpl> aggregator =
+                              map.computeIfAbsent(
+                                  rowView.getColumn("w_uuid", UUID.class),
+                                  fn -> {
+                                    return new IdentifiableAggregator<>(
+                                        rowView.getRow(WebpageImpl.class));
+                                  });
+                          WebpageImpl obj = aggregator.identifiable;
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+                          return map;
+                        })
                     .values().stream()
+                    .map(aggregator -> aggregator.identifiable)
                     .collect(Collectors.toList()));
+
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -89,29 +103,42 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
   public Webpage findOne(UUID uuid) {
     String query = FIND_ONE_BASE_SQL + " WHERE w.uuid = :uuid";
 
-    Optional<WebpageImpl> resultOpt =
+    WebpageImpl result =
         dbi.withHandle(
             h ->
-                h.createQuery(query).bind("uuid", uuid)
+                h.createQuery(query)
+                    .bind("uuid", uuid)
                     .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, WebpageImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(
-                                map, rowView, WebpageImpl.class, "w_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    Webpage webpage = resultOpt.get();
-    if (webpage != null) {
+                        new IdentifiableAggregator<WebpageImpl>(),
+                        (aggregator, rowView) -> {
+                          if (aggregator.identifiable == null) {
+                            aggregator.identifiable = rowView.getRow(WebpageImpl.class);
+                          }
+                          WebpageImpl obj = aggregator.identifiable;
+
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+
+                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
+                          if (idUuid != null && !aggregator.identifiers.contains(idUuid)) {
+                            IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                            obj.addIdentifier(identifier);
+                            aggregator.identifiers.add(idUuid);
+                          }
+
+                          return aggregator;
+                        })
+                    .identifiable);
+
+    if (result != null) {
       // TODO could be replaced with another join in above query...
-      webpage.setChildren(getChildren(webpage));
+      result.setChildren(getChildren(result));
     }
-    return webpage;
+    return result;
   }
 
   @Override
@@ -125,29 +152,43 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
 
     String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
-    Optional<WebpageImpl> resultOpt =
+    WebpageImpl result =
         dbi.withHandle(
             h ->
-                h.createQuery(query).bind("id", identifierId).bind("namespace", namespace)
+                h.createQuery(query)
+                    .bind("id", identifierId)
+                    .bind("namespace", namespace)
                     .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, WebpageImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(
-                                map, rowView, WebpageImpl.class, "w_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    Webpage webpage = resultOpt.get();
-    if (webpage != null) {
+                        new IdentifiableAggregator<WebpageImpl>(),
+                        (aggregator, rowView) -> {
+                          if (aggregator.identifiable == null) {
+                            aggregator.identifiable = rowView.getRow(WebpageImpl.class);
+                          }
+                          WebpageImpl obj = aggregator.identifiable;
+
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+
+                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
+                          if (idUuid != null && !aggregator.identifiers.contains(idUuid)) {
+                            IdentifierImpl newIdentifier = rowView.getRow(IdentifierImpl.class);
+                            obj.addIdentifier(newIdentifier);
+                            aggregator.identifiers.add(idUuid);
+                          }
+
+                          return aggregator;
+                        })
+                    .identifiable);
+
+    if (result != null) {
       // TODO could be replaced with another join in above query...
-      webpage.setChildren(getChildren(webpage));
+      result.setChildren(getChildren(result));
     }
-    return webpage;
+    return result;
   }
 
   @Override
@@ -167,25 +208,38 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
         "SELECT w.uuid w_uuid, w.label w_label, w.description w_description,"
             + " w.identifiable_type w_type,"
             + " w.created w_created, w.last_modified w_lastModified,"
-            + " file.uri f_uri, file.filename f_filename"
+            + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
             + " FROM webpages as w INNER JOIN webpage_webpages ww ON w.uuid = ww.child_webpage_uuid"
             + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid"
             + " WHERE ww.parent_webpage_uuid = :uuid"
             + " ORDER BY ww.sortIndex ASC";
 
-    List<WebpageImpl> result =
+    List<Webpage> result =
         dbi.withHandle(
             h ->
                 h.createQuery(query).bind("uuid", uuid)
                     .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, WebpageImpl>(),
-                        (map, rowView) ->
-                            addPreviewImage(map, rowView, WebpageImpl.class, "w_uuid"))
+                        new LinkedHashMap<UUID, IdentifiableAggregator<WebpageImpl>>(),
+                        (map, rowView) -> {
+                          IdentifiableAggregator<WebpageImpl> aggregator =
+                              map.computeIfAbsent(
+                                  rowView.getColumn("w_uuid", UUID.class),
+                                  fn -> {
+                                    return new IdentifiableAggregator<>(
+                                        rowView.getRow(WebpageImpl.class));
+                                  });
+                          WebpageImpl obj = aggregator.identifiable;
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+                          return map;
+                        })
                     .values().stream()
+                    .map(aggregator -> (Webpage) aggregator.identifiable)
                     .collect(Collectors.toList()));
-    return result.stream().map(Webpage.class::cast).collect(Collectors.toList());
+    return result;
   }
 
   @Override
@@ -195,23 +249,28 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
             + " INNER JOIN webpage_webpages ww ON w.uuid = ww.parent_webpage_uuid"
             + " WHERE ww.child_webpage_uuid = :uuid";
 
-    Optional<WebpageImpl> resultOpt =
+    WebpageImpl result =
         dbi.withHandle(
             h ->
-                h.createQuery(query).bind("uuid", uuid)
+                h.createQuery(query)
+                    .bind("uuid", uuid)
                     .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, WebpageImpl>(),
-                        (map, rowView) ->
-                            addPreviewImage(map, rowView, WebpageImpl.class, "w_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    Webpage webpage = resultOpt.get();
-    return webpage;
+                        new IdentifiableAggregator<WebpageImpl>(),
+                        (aggregator, rowView) -> {
+                          if (aggregator.identifiable == null) {
+                            aggregator.identifiable = rowView.getRow(WebpageImpl.class);
+                          }
+                          WebpageImpl obj = aggregator.identifiable;
+
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+                          return aggregator;
+                        })
+                    .identifiable);
+    return result;
   }
 
   @Override

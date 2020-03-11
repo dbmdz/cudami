@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.ContentNodeRepository;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.IdentifiableAggregator;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
@@ -18,7 +19,6 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
@@ -41,7 +41,7 @@ public class ContentNodeRepositoryImpl<E extends Entity>
           + " c.identifiable_type c_type,"
           + " c.created c_created, c.last_modified c_lastModified,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
           + " FROM contentnodes as c"
           + " LEFT JOIN identifiers as id on c.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid";
@@ -51,7 +51,7 @@ public class ContentNodeRepositoryImpl<E extends Entity>
       "SELECT c.uuid c_uuid, c.label c_label, c.description c_description,"
           + " c.identifiable_type c_type,"
           + " c.created c_created, c.last_modified c_lastModified,"
-          + " file.uri f_uri, file.filename f_filename"
+          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
           + " FROM contentnodes as c"
           + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid";
 
@@ -79,11 +79,25 @@ public class ContentNodeRepositoryImpl<E extends Entity>
                     .registerRowMapper(BeanMapper.factory(ContentNodeImpl.class, "c"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, ContentNodeImpl>(),
-                        (map, rowView) ->
-                            addPreviewImage(map, rowView, ContentNodeImpl.class, "c_uuid"))
+                        new LinkedHashMap<UUID, IdentifiableAggregator<ContentNodeImpl>>(),
+                        (map, rowView) -> {
+                          IdentifiableAggregator<ContentNodeImpl> aggregator =
+                              map.computeIfAbsent(
+                                  rowView.getColumn("c_uuid", UUID.class),
+                                  fn -> {
+                                    return new IdentifiableAggregator<>(
+                                        rowView.getRow(ContentNodeImpl.class));
+                                  });
+                          ContentNodeImpl obj = aggregator.identifiable;
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+                          return map;
+                        })
                     .values().stream()
+                    .map(aggregator -> aggregator.identifiable)
                     .collect(Collectors.toList()));
+
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -93,29 +107,42 @@ public class ContentNodeRepositoryImpl<E extends Entity>
   public ContentNode findOne(UUID uuid) {
     String query = FIND_ONE_BASE_SQL + " WHERE c.uuid = :uuid";
 
-    Optional<ContentNodeImpl> resultOpt =
+    ContentNodeImpl result =
         dbi.withHandle(
             h ->
-                h.createQuery(query).bind("uuid", uuid)
+                h.createQuery(query)
+                    .bind("uuid", uuid)
                     .registerRowMapper(BeanMapper.factory(ContentNodeImpl.class, "c"))
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, ContentNodeImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(
-                                map, rowView, ContentNodeImpl.class, "c_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    ContentNode contentNode = resultOpt.get();
-    if (contentNode != null) {
+                        new IdentifiableAggregator<ContentNodeImpl>(),
+                        (aggregator, rowView) -> {
+                          if (aggregator.identifiable == null) {
+                            aggregator.identifiable = rowView.getRow(ContentNodeImpl.class);
+                          }
+                          ContentNodeImpl obj = aggregator.identifiable;
+
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+
+                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
+                          if (idUuid != null && !aggregator.identifiers.contains(idUuid)) {
+                            IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                            obj.addIdentifier(identifier);
+                            aggregator.identifiers.add(idUuid);
+                          }
+
+                          return aggregator;
+                        })
+                    .identifiable);
+
+    if (result != null) {
       // TODO could be replaced with another join in above query...
-      contentNode.setChildren(getChildren(contentNode));
+      result.setChildren(getChildren(result));
     }
-    return contentNode;
+    return result;
   }
 
   @Override
@@ -129,29 +156,43 @@ public class ContentNodeRepositoryImpl<E extends Entity>
 
     String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
-    Optional<ContentNodeImpl> resultOpt =
+    ContentNodeImpl result =
         dbi.withHandle(
             h ->
-                h.createQuery(query).bind("id", identifierId).bind("namespace", namespace)
+                h.createQuery(query)
+                    .bind("id", identifierId)
+                    .bind("namespace", namespace)
                     .registerRowMapper(BeanMapper.factory(ContentNodeImpl.class, "c"))
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, ContentNodeImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(
-                                map, rowView, ContentNodeImpl.class, "c_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    ContentNode contentNode = resultOpt.get();
-    if (contentNode != null) {
+                        new IdentifiableAggregator<ContentNodeImpl>(),
+                        (aggregator, rowView) -> {
+                          if (aggregator.identifiable == null) {
+                            aggregator.identifiable = rowView.getRow(ContentNodeImpl.class);
+                          }
+                          ContentNodeImpl obj = aggregator.identifiable;
+
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+
+                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
+                          if (idUuid != null && !aggregator.identifiers.contains(idUuid)) {
+                            IdentifierImpl newIdentifier = rowView.getRow(IdentifierImpl.class);
+                            obj.addIdentifier(newIdentifier);
+                            aggregator.identifiers.add(idUuid);
+                          }
+
+                          return aggregator;
+                        })
+                    .identifiable);
+
+    if (result != null) {
       // TODO could be replaced with another join in above query...
-      contentNode.setChildren(getChildren(contentNode));
+      result.setChildren(getChildren(result));
     }
-    return contentNode;
+    return result;
   }
 
   @Override
@@ -171,25 +212,38 @@ public class ContentNodeRepositoryImpl<E extends Entity>
         "SELECT cn.uuid cn_uuid, cn.label cn_label, cn.description cn_description,"
             + " cn.identifiable_type cn_type,"
             + " cn.created cn_created, cn.last_modified cn_lastModified,"
-            + " file.uri f_uri, file.filename f_filename"
+            + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
             + " FROM contentnodes as cn INNER JOIN contentnode_contentnodes cc ON cn.uuid = cc.child_contentnode_uuid"
             + " LEFT JOIN fileresources_image as file on cn.previewfileresource = file.uuid"
             + " WHERE cc.parent_contentnode_uuid = :uuid"
             + " ORDER BY cc.sortIndex ASC";
 
-    List<ContentNodeImpl> result =
+    List<ContentNode> result =
         dbi.withHandle(
             h ->
                 h.createQuery(query).bind("uuid", uuid)
                     .registerRowMapper(BeanMapper.factory(ContentNodeImpl.class, "cn"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, ContentNodeImpl>(),
-                        (map, rowView) ->
-                            addPreviewImage(map, rowView, ContentNodeImpl.class, "cn_uuid"))
+                        new LinkedHashMap<UUID, IdentifiableAggregator<ContentNodeImpl>>(),
+                        (map, rowView) -> {
+                          IdentifiableAggregator<ContentNodeImpl> aggregator =
+                              map.computeIfAbsent(
+                                  rowView.getColumn("cn_uuid", UUID.class),
+                                  fn -> {
+                                    return new IdentifiableAggregator<>(
+                                        rowView.getRow(ContentNodeImpl.class));
+                                  });
+                          ContentNodeImpl obj = aggregator.identifiable;
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+                          return map;
+                        })
                     .values().stream()
+                    .map(aggregator -> (ContentNode) aggregator.identifiable)
                     .collect(Collectors.toList()));
-    return result.stream().map(ContentNode.class::cast).collect(Collectors.toList());
+    return result;
   }
 
   @Override
@@ -204,24 +258,50 @@ public class ContentNodeRepositoryImpl<E extends Entity>
         "SELECT e.uuid e_uuid, e.refid e_refId, e.label e_label, e.description e_description,"
             + " e.identifiable_type e_type, e.entity_type e_entityType,"
             + " e.created e_created, e.last_modified e_lastModified,"
-            + " file.uri f_uri, file.filename f_filename"
+            + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
+            + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
             + " FROM entities as e INNER JOIN contentnode_entities ce ON e.uuid = ce.entity_uuid"
             + " LEFT JOIN fileresources_image as file on e.previewfileresource = file.uuid"
+            + " LEFT JOIN identifiers as id on e.uuid = id.identifiable"
             + " WHERE ce.contentnode_uuid = :uuid"
             + " ORDER BY ce.sortIndex ASC";
 
-    List<EntityImpl> result =
+    List<E> result =
         dbi.withHandle(
             h ->
                 h.createQuery(query).bind("uuid", contentNodeUuid)
                     .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
+                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, EntityImpl>(),
-                        (map, rowView) -> addPreviewImage(map, rowView, EntityImpl.class, "e_uuid"))
+                        new LinkedHashMap<UUID, IdentifiableAggregator<EntityImpl>>(),
+                        (map, rowView) -> {
+                          IdentifiableAggregator<EntityImpl> aggregator =
+                              map.computeIfAbsent(
+                                  rowView.getColumn("e_uuid", UUID.class),
+                                  fn -> {
+                                    return new IdentifiableAggregator<>(
+                                        rowView.getRow(EntityImpl.class));
+                                  });
+                          EntityImpl obj = aggregator.identifiable;
+
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+
+                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
+                          if (idUuid != null && !aggregator.identifiers.contains(idUuid)) {
+                            IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                            obj.addIdentifier(identifier);
+                            aggregator.identifiers.add(idUuid);
+                          }
+
+                          return map;
+                        })
                     .values().stream()
+                    .map(aggregator -> (E) aggregator.identifiable)
                     .collect(Collectors.toList()));
-    return result.stream().map(s -> (E) s).collect(Collectors.toCollection(LinkedHashSet::new));
+    return new LinkedHashSet<>(result);
   }
 
   @Override
@@ -237,32 +317,48 @@ public class ContentNodeRepositoryImpl<E extends Entity>
             + " f.identifiable_type f_type,"
             + " f.created f_created, f.last_modified f_lastModified,"
             + " f.filename f_filename, f.mimetype f_mimeType,"
-            + " pf.uri pf_uri, pf.filename pf_filename"
+            + " pf.uuid pf_uuid, pf.uri pf_uri, pf.filename pf_filename"
             + " FROM fileresources as f INNER JOIN contentnode_fileresources cf ON f.uuid = cf.fileresource_uuid"
             + " LEFT JOIN fileresources_image as pf on f.previewfileresource = pf.uuid"
             + " WHERE cf.contentnode_uuid = :uuid"
             + " ORDER BY cf.sortIndex ASC";
 
-    List<FileResourceImpl> list =
+    List<FileResourceImpl> result =
         dbi.withHandle(
             h ->
                 h.createQuery(query).bind("uuid", contentNodeUuid)
                     .registerRowMapper(BeanMapper.factory(FileResourceImpl.class, "f"))
+                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, FileResourceImpl>(),
-                        (map, rowView) ->
-                            addPreviewImage(
-                                map, rowView, FileResourceImpl.class, "f_uuid", "pf_uri"))
+                        new LinkedHashMap<UUID, IdentifiableAggregator<FileResourceImpl>>(),
+                        (map, rowView) -> {
+                          IdentifiableAggregator<FileResourceImpl> aggregator =
+                              map.computeIfAbsent(
+                                  rowView.getColumn("f_uuid", UUID.class),
+                                  fn -> {
+                                    return new IdentifiableAggregator<>(
+                                        rowView.getRow(FileResourceImpl.class));
+                                  });
+                          FileResourceImpl obj = aggregator.identifiable;
+
+                          if (rowView.getColumn("pf_uuid", UUID.class) != null) {
+                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+
+                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
+                          if (idUuid != null && !aggregator.identifiers.contains(idUuid)) {
+                            IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                            obj.addIdentifier(identifier);
+                            aggregator.identifiers.add(idUuid);
+                          }
+
+                          return map;
+                        })
                     .values().stream()
+                    .map(aggregator -> aggregator.identifiable)
                     .collect(Collectors.toList()));
-    // TODO it is an implementation: better return List? (LinkedHashSet was used because of getting
-    // guaranteed sorting)
-    LinkedHashSet<FileResource> result =
-        list.stream()
-            .map(s -> (FileResource) s)
-            .collect(Collectors.toCollection(LinkedHashSet::new));
-    return result;
+    return new LinkedHashSet<>(result);
   }
 
   @Override
@@ -272,23 +368,28 @@ public class ContentNodeRepositoryImpl<E extends Entity>
             + " INNER JOIN contentnode_contentnodes cc ON c.uuid = cc.parent_contentnode_uuid"
             + " WHERE cc.child_contentnode_uuid = :uuid";
 
-    Optional<ContentNodeImpl> resultOpt =
+    ContentNodeImpl result =
         dbi.withHandle(
             h ->
-                h.createQuery(query).bind("uuid", uuid)
+                h.createQuery(query)
+                    .bind("uuid", uuid)
                     .registerRowMapper(BeanMapper.factory(ContentNodeImpl.class, "c"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, ContentNodeImpl>(),
-                        (map, rowView) ->
-                            addPreviewImage(map, rowView, ContentNodeImpl.class, "c_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    ContentNode contentNode = resultOpt.get();
-    return contentNode;
+                        new IdentifiableAggregator<ContentNodeImpl>(),
+                        (aggregator, rowView) -> {
+                          if (aggregator.identifiable == null) {
+                            aggregator.identifiable = rowView.getRow(ContentNodeImpl.class);
+                          }
+                          ContentNodeImpl obj = aggregator.identifiable;
+
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+                          return aggregator;
+                        })
+                    .identifiable);
+    return result;
   }
 
   @Override
