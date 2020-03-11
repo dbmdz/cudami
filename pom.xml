@@ -91,7 +91,6 @@
     <version.passay>1.5.0</version.passay>
     <version.postgresql>42.2.11</version.postgresql>
     <version.slf4j>1.7.30</version.slf4j>
-    <version.snakeyaml>1.24</version.snakeyaml>
     <version.spotbugs>4.0.0</version.spotbugs>
     <version.unbescape>1.1.6.RELEASE</version.unbescape>
 
