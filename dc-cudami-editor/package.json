@@ -16,11 +16,6 @@
   "dependencies": {
     "@aeaton/prosemirror-footnotes": "^0.1.0",
     "@aeaton/react-prosemirror": "^0.22.1",
-    "@fortawesome/fontawesome-svg-core": "^1.2.19",
-    "@fortawesome/free-brands-svg-icons": "^5.9.0",
-    "@fortawesome/free-regular-svg-icons": "^5.9.0",
-    "@fortawesome/free-solid-svg-icons": "^5.9.0",
-    "@fortawesome/react-fontawesome": "^0.1.4",
     "babel-polyfill": "^6.26.0",
     "bootstrap": "^4.3.1",
     "classnames": "^2.2.6",
@@ -40,6 +35,7 @@
     "react-dom": "^16.8.6",
     "react-file-drop": "^0.2.8",
     "react-i18next": "^10.11.4",
+    "react-icons": "^3.9.0",
     "react-scripts": "3.3.1",
     "reactstrap": "^8.0.0"
   },
