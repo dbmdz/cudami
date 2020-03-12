@@ -6,6 +6,8 @@
 
   <head>
     <title th:text="|#{collections}: #{collection}|">Collections: Collection</title>
+    <!-- Custom styles for this template -->
+    <link th:href="@{/css/cudami/image-in-text.css}" rel="stylesheet" />
   </head>
   <body>
     <section layout:fragment="content" th:object="${collection}">
