@@ -21,6 +21,9 @@ figure.image-in-text.width-50 {
 }
 
 figure.image-in-text.width-100 {
+  float: none;
+  margin-left: 0;
+  margin-right: 0;
   width: 100%;
 }
 
