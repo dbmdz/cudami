@@ -24,7 +24,7 @@
     "prosemirror-dropcursor": "^1.1.1",
     "prosemirror-gapcursor": "^1.0.4",
     "prosemirror-history": "^1.0.4",
-    "prosemirror-inputrules": "^1.0.4",
+    "prosemirror-inputrules": "^1.1.2",
     "prosemirror-keymap": "^1.0.1",
     "prosemirror-model": "^1.7.1",
     "prosemirror-schema-basic": "^1.0.1",
