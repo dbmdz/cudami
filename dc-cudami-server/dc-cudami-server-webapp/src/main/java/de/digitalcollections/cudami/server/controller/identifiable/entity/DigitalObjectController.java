@@ -12,7 +12,7 @@ import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
@@ -98,7 +98,7 @@ public class DigitalObjectController {
       },
       produces = "application/json")
   @ApiResponseObject
-  public LinkedHashSet<ImageFileResource> getImageFileResources(@PathVariable UUID uuid) {
+  public List<ImageFileResource> getImageFileResources(@PathVariable UUID uuid) {
     return service.getImageFileResources(uuid);
   }
 

@@ -6,7 +6,6 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -42,12 +41,12 @@ public class ContentNodeServiceImpl<E extends Entity> extends EntityPartServiceI
   }
 
   @Override
-  public LinkedHashSet<E> getEntities(ContentNode contentNode) {
+  public List<E> getEntities(ContentNode contentNode) {
     return getEntities(contentNode.getUuid());
   }
 
   @Override
-  public LinkedHashSet<E> getEntities(UUID contentNodeUuid) {
+  public List<E> getEntities(UUID contentNodeUuid) {
     return ((ContentNodeRepository) repository).getEntities(contentNodeUuid);
   }
 
@@ -62,12 +61,12 @@ public class ContentNodeServiceImpl<E extends Entity> extends EntityPartServiceI
   }
 
   @Override
-  public LinkedHashSet<E> saveEntities(ContentNode contentNode, LinkedHashSet<E> entities) {
+  public List<E> saveEntities(ContentNode contentNode, List<E> entities) {
     return saveEntities(contentNode.getUuid(), entities);
   }
 
   @Override
-  public LinkedHashSet<E> saveEntities(UUID contentNodeUuid, LinkedHashSet<E> entities) {
+  public List<E> saveEntities(UUID contentNodeUuid, List<E> entities) {
     return ((ContentNodeRepository) repository).saveEntities(contentNodeUuid, entities);
   }
 
@@ -98,24 +97,24 @@ public class ContentNodeServiceImpl<E extends Entity> extends EntityPartServiceI
   }
 
   @Override
-  public LinkedHashSet<FileResource> getFileResources(ContentNode contentNode) {
+  public List<FileResource> getFileResources(ContentNode contentNode) {
     return getFileResources(contentNode.getUuid());
   }
 
   @Override
-  public LinkedHashSet<FileResource> getFileResources(UUID contentNodeUuid) {
+  public List<FileResource> getFileResources(UUID contentNodeUuid) {
     return ((ContentNodeRepository) repository).getFileResources(contentNodeUuid);
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveFileResources(
-      ContentNode contentNode, LinkedHashSet<FileResource> fileResources) {
+  public List<FileResource> saveFileResources(
+      ContentNode contentNode, List<FileResource> fileResources) {
     return saveFileResources(contentNode.getUuid(), fileResources);
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveFileResources(
-      UUID contentNodeUuid, LinkedHashSet<FileResource> fileResources) {
+  public List<FileResource> saveFileResources(
+      UUID contentNodeUuid, List<FileResource> fileResources) {
     return ((ContentNodeRepository) repository).saveFileResources(contentNodeUuid, fileResources);
   }
 }

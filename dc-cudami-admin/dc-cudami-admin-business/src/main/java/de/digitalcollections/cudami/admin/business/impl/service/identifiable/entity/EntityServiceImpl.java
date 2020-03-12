@@ -6,7 +6,6 @@ import de.digitalcollections.cudami.admin.business.impl.service.identifiable.Ide
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,12 +48,12 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
   }
 
   @Override
-  public LinkedHashSet<FileResource> getRelatedFileResources(E entity) {
+  public List<FileResource> getRelatedFileResources(E entity) {
     return ((EntityRepository) repository).getRelatedFileResources(entity);
   }
 
   @Override
-  public LinkedHashSet<FileResource> getRelatedFileResources(UUID entityUuid) {
+  public List<FileResource> getRelatedFileResources(UUID entityUuid) {
     return ((EntityRepository) repository).getRelatedFileResources(entityUuid);
   }
 
@@ -69,14 +68,13 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveRelatedFileResources(
-      E entity, LinkedHashSet<FileResource> fileResources) {
+  public List<FileResource> saveRelatedFileResources(E entity, List<FileResource> fileResources) {
     return ((EntityRepository) repository).saveRelatedFileResources(entity, fileResources);
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveRelatedFileResources(
-      UUID entityUuid, LinkedHashSet<FileResource> fileResources) {
+  public List<FileResource> saveRelatedFileResources(
+      UUID entityUuid, List<FileResource> fileResources) {
     return ((EntityRepository) repository).saveRelatedFileResources(entityUuid, fileResources);
   }
 

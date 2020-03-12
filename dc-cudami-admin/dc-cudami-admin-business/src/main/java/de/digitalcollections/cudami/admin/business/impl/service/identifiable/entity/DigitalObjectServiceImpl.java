@@ -5,7 +5,7 @@ import de.digitalcollections.cudami.admin.business.api.service.identifiable.enti
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,34 +26,34 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
-  public LinkedHashSet<FileResource> getFileResources(DigitalObject digitalObject) {
+  public List<FileResource> getFileResources(DigitalObject digitalObject) {
     return getFileResources(digitalObject.getUuid());
   }
 
   @Override
-  public LinkedHashSet<FileResource> getFileResources(UUID digitalObjectUuid) {
+  public List<FileResource> getFileResources(UUID digitalObjectUuid) {
     return ((DigitalObjectRepository) repository).getFileResources(digitalObjectUuid);
   }
 
   @Override
-  public LinkedHashSet<ImageFileResource> getImageFileResources(DigitalObject digitalObject) {
+  public List<ImageFileResource> getImageFileResources(DigitalObject digitalObject) {
     return getImageFileResources(digitalObject.getUuid());
   }
 
   @Override
-  public LinkedHashSet<ImageFileResource> getImageFileResources(UUID digitalObjectUuid) {
+  public List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid) {
     return ((DigitalObjectRepository) repository).getImageFileResources(digitalObjectUuid);
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveFileResources(
-      DigitalObject digitalObject, LinkedHashSet<FileResource> fileResources) {
+  public List<FileResource> saveFileResources(
+      DigitalObject digitalObject, List<FileResource> fileResources) {
     return saveFileResources(digitalObject.getUuid(), fileResources);
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveFileResources(
-      UUID digitalObjectUuid, LinkedHashSet<FileResource> fileResources) {
+  public List<FileResource> saveFileResources(
+      UUID digitalObjectUuid, List<FileResource> fileResources) {
     return ((DigitalObjectRepository) repository)
         .saveFileResources(digitalObjectUuid, fileResources);
   }

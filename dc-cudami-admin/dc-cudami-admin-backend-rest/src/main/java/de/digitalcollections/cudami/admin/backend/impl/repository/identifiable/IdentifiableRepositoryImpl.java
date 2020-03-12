@@ -52,7 +52,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
   @Override
   public List<I> find(String searchTerm, int maxResults) {
-    return convertToGenericList(endpoint.find(searchTerm, maxResults));
+    final List<Identifiable> identifiables = endpoint.find(searchTerm, maxResults);
+    return identifiables.stream().map(i -> (I) i).collect(Collectors.toList());
   }
 
   /**
@@ -105,21 +106,13 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     PageResponse<I> genericPageResponse;
     if (pageResponse.hasContent()) {
       List<Identifiable> content = pageResponse.getContent();
-      List<I> genericContent = convertToGenericList(content);
+      List<I> genericContent = content.stream().map(i -> (I) i).collect(Collectors.toList());
       genericPageResponse = (PageResponse<I>) pageResponse;
       genericPageResponse.setContent(genericContent);
     } else {
       genericPageResponse = (PageResponse<I>) pageResponse;
     }
     return genericPageResponse;
-  }
-
-  protected List<I> convertToGenericList(List<Identifiable> identifiables) {
-    if (identifiables == null) {
-      return null;
-    }
-    List<I> genericContent = identifiables.stream().map(s -> (I) s).collect(Collectors.toList());
-    return genericContent;
   }
 
   @Override

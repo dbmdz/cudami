@@ -5,7 +5,7 @@ import de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.I
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.EntityPart;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,64 +37,49 @@ public class EntityPartRepositoryImpl<P extends EntityPart, E extends Entity>
     endpoint.addRelatedFileresource(entityPartUuid, fileResourceUuid);
   }
 
-  protected LinkedHashSet<Entity> convertFromGenericLinkedHashSet(LinkedHashSet<E> entities) {
-    if (entities == null) {
-      return null;
-    }
-    LinkedHashSet<Entity> result =
-        entities.stream().map(s -> (Entity) s).collect(Collectors.toCollection(LinkedHashSet::new));
-    return result;
-  }
-
-  protected LinkedHashSet<E> convertToGenericLinkedHashSet(LinkedHashSet<Entity> entities) {
-    if (entities == null) {
-      return null;
-    }
-    LinkedHashSet<E> genericContent =
-        entities.stream().map(s -> (E) s).collect(Collectors.toCollection(LinkedHashSet::new));
-    return genericContent;
-  }
-
   @Override
-  public LinkedHashSet<E> getRelatedEntities(P entityPart) {
+  public List<E> getRelatedEntities(P entityPart) {
     return getRelatedEntities(entityPart.getUuid());
   }
 
   @Override
-  public LinkedHashSet<E> getRelatedEntities(UUID entityPartUuid) {
-    return convertToGenericLinkedHashSet(endpoint.getRelatedEntities(entityPartUuid));
+  public List<E> getRelatedEntities(UUID entityPartUuid) {
+    List<Entity> relatedEntities = endpoint.getRelatedEntities(entityPartUuid);
+    return relatedEntities.stream().map(e -> (E) e).collect(Collectors.toList());
   }
 
   @Override
-  public LinkedHashSet<FileResource> getRelatedFileResources(P entityPart) {
+  public List<FileResource> getRelatedFileResources(P entityPart) {
     return getRelatedFileResources(entityPart.getUuid());
   }
 
   @Override
-  public LinkedHashSet<FileResource> getRelatedFileResources(UUID entityPartUuid) {
+  public List<FileResource> getRelatedFileResources(UUID entityPartUuid) {
     return endpoint.getRelatedFileResources(entityPartUuid);
   }
 
   @Override
-  public LinkedHashSet<E> saveRelatedEntities(P entityPart, LinkedHashSet<E> entities) {
+  public List<E> saveRelatedEntities(P entityPart, List<E> entities) {
     return saveRelatedEntities(entityPart.getUuid(), entities);
   }
 
   @Override
-  public LinkedHashSet<E> saveRelatedEntities(UUID entityPartUuid, LinkedHashSet<E> entities) {
-    return convertToGenericLinkedHashSet(
-        endpoint.saveRelatedEntities(entityPartUuid, convertFromGenericLinkedHashSet(entities)));
+  public List<E> saveRelatedEntities(UUID entityPartUuid, List<E> entities) {
+    List<Entity> relatedEntities =
+        endpoint.saveRelatedEntities(
+            entityPartUuid, entities.stream().map(Entity.class::cast).collect(Collectors.toList()));
+    return relatedEntities.stream().map(e -> (E) e).collect(Collectors.toList());
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveRelatedFileResources(
-      P entityPart, LinkedHashSet<FileResource> fileResources) {
+  public List<FileResource> saveRelatedFileResources(
+      P entityPart, List<FileResource> fileResources) {
     return saveRelatedFileResources(entityPart.getUuid(), fileResources);
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveRelatedFileResources(
-      UUID entityPartUuid, LinkedHashSet<FileResource> fileResources) {
+  public List<FileResource> saveRelatedFileResources(
+      UUID entityPartUuid, List<FileResource> fileResources) {
     return endpoint.saveRelatedFileResources(entityPartUuid, fileResources);
   }
 }

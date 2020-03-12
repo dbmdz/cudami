@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CorporationRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.IdentifiableAggregator;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Corporation;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -14,6 +13,8 @@ import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
@@ -74,23 +75,22 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
                     .registerRowMapper(BeanMapper.factory(CorporationImpl.class, "c"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, IdentifiableAggregator<CorporationImpl>>(),
+                        new LinkedHashMap<UUID, CorporationImpl>(),
                         (map, rowView) -> {
-                          IdentifiableAggregator<CorporationImpl> aggregator =
+                          CorporationImpl corporation =
                               map.computeIfAbsent(
                                   rowView.getColumn("c_uuid", UUID.class),
                                   fn -> {
-                                    return new IdentifiableAggregator<>(
-                                        rowView.getRow(CorporationImpl.class));
+                                    return rowView.getRow(CorporationImpl.class);
                                   });
-                          CorporationImpl obj = aggregator.identifiable;
+
                           if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                            corporation.setPreviewImage(
+                                rowView.getRow(ImageFileResourceImpl.class));
                           }
                           return map;
                         })
                     .values().stream()
-                    .map(aggregator -> aggregator.identifiable)
                     .collect(Collectors.toList()));
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
@@ -103,34 +103,35 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
 
     CorporationImpl result =
         dbi.withHandle(
-            h ->
-                h.createQuery(query)
-                    .bind("uuid", uuid)
-                    .registerRowMapper(BeanMapper.factory(CorporationImpl.class, "c"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new IdentifiableAggregator<CorporationImpl>(),
-                        (aggregator, rowView) -> {
-                          if (aggregator.identifiable == null) {
-                            aggregator.identifiable = rowView.getRow(CorporationImpl.class);
-                          }
-                          CorporationImpl obj = aggregator.identifiable;
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(CorporationImpl.class, "c"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, CorporationImpl>(),
+                            (map, rowView) -> {
+                              CorporationImpl corporation =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("c_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(CorporationImpl.class);
+                                      });
 
-                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
-                          }
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                corporation.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
 
-                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
-                          if (idUuid != null && !aggregator.identifiers.contains(idUuid)) {
-                            IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
-                            obj.addIdentifier(identifier);
-                            aggregator.identifiers.add(idUuid);
-                          }
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                                corporation.addIdentifier(identifier);
+                              }
 
-                          return aggregator;
-                        })
-                    .identifiable);
+                              return map;
+                            }))
+            .get(uuid);
     return result;
   }
 
@@ -145,38 +146,41 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
 
     String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
-    CorporationImpl result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query)
-                    .bind("id", identifierId)
-                    .bind("namespace", namespace)
-                    .registerRowMapper(BeanMapper.factory(CorporationImpl.class, "c"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new IdentifiableAggregator<CorporationImpl>(),
-                        (aggregator, rowView) -> {
-                          if (aggregator.identifiable == null) {
-                            aggregator.identifiable = rowView.getRow(CorporationImpl.class);
-                          }
-                          CorporationImpl obj = aggregator.identifiable;
+    Optional<CorporationImpl> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("id", identifierId)
+                        .bind("namespace", namespace)
+                        .registerRowMapper(BeanMapper.factory(CorporationImpl.class, "c"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, CorporationImpl>(),
+                            (map, rowView) -> {
+                              CorporationImpl corporation =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("c_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(CorporationImpl.class);
+                                      });
 
-                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
-                          }
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                corporation.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
 
-                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
-                          if (idUuid != null && !aggregator.identifiers.contains(idUuid)) {
-                            IdentifierImpl newIdentifier = rowView.getRow(IdentifierImpl.class);
-                            obj.addIdentifier(newIdentifier);
-                            aggregator.identifiers.add(idUuid);
-                          }
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                                corporation.addIdentifier(dbIdentifier);
+                              }
 
-                          return aggregator;
-                        })
-                    .identifiable);
-    return result;
+                              return map;
+                            }))
+            .values().stream()
+            .findFirst();
+    return result.get();
   }
 
   @Override
@@ -214,7 +218,7 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
                 .execute());
 
     // save identifiers
-    List<Identifier> identifiers = corporation.getIdentifiers();
+    Set<Identifier> identifiers = corporation.getIdentifiers();
     saveIdentifiers(identifiers, corporation);
 
     Corporation result = findOne(corporation.getUuid());
@@ -246,7 +250,7 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
     // save identifiers
     // as we store the whole list new: delete old entries
     deleteIdentifiers(corporation);
-    List<Identifier> identifiers = corporation.getIdentifiers();
+    Set<Identifier> identifiers = corporation.getIdentifiers();
     saveIdentifiers(identifiers, corporation);
 
     Corporation result = findOne(corporation.getUuid());

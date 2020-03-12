@@ -8,7 +8,7 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.UUID;
 
 public interface DigitalObjectRepositoryEndpoint extends RepositoryEndpoint {
@@ -36,19 +36,18 @@ public interface DigitalObjectRepositoryEndpoint extends RepositoryEndpoint {
   DigitalObject findOneByIdentifier(@Param("namespace") String namespace, @Param("id") String id);
 
   @RequestLine("GET /latest/digitalobjects/{uuid}/fileresources")
-  LinkedHashSet<FileResource> getFileResources(@Param("uuid") UUID uuid);
+  List<FileResource> getFileResources(@Param("uuid") UUID uuid);
 
   // http://localhost:9000/latest/digitalobjects/8f543eca-da48-4d21-854a-0c0158110f9b/fileresources/images
   @RequestLine("GET /latest/digitalobjects/{uuid}/fileresources/images")
-  LinkedHashSet<ImageFileResource> getImageFileResources(@Param("uuid") UUID uuid);
+  List<ImageFileResource> getImageFileResources(@Param("uuid") UUID uuid);
 
   @RequestLine("POST /latest/digitalobjects")
   @Headers("Content-Type: application/json")
   DigitalObject save(DigitalObject digitalObject);
 
   @RequestLine("POST /latest/digitalobjects/{uuid}/fileresources")
-  LinkedHashSet<FileResource> saveFileResources(
-      @Param("uuid") UUID uuid, LinkedHashSet<FileResource> fileResources);
+  List<FileResource> saveFileResources(@Param("uuid") UUID uuid, List<FileResource> fileResources);
 
   @RequestLine("PUT /latest/digitalobjects/{uuid}")
   @Headers("Content-Type: application/json")

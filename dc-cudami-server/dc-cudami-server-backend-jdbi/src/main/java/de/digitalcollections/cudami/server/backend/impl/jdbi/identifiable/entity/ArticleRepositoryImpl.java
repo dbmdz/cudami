@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ArticleRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.IdentifiableAggregator;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Article;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -14,6 +13,8 @@ import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
@@ -74,23 +75,21 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
                     .registerRowMapper(BeanMapper.factory(ArticleImpl.class, "a"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, IdentifiableAggregator<ArticleImpl>>(),
+                        new LinkedHashMap<UUID, ArticleImpl>(),
                         (map, rowView) -> {
-                          IdentifiableAggregator<ArticleImpl> aggregator =
+                          ArticleImpl article =
                               map.computeIfAbsent(
                                   rowView.getColumn("a_uuid", UUID.class),
                                   fn -> {
-                                    return new IdentifiableAggregator<>(
-                                        rowView.getRow(ArticleImpl.class));
+                                    return rowView.getRow(ArticleImpl.class);
                                   });
-                          ArticleImpl obj = aggregator.identifiable;
+
                           if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                            article.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
                           }
                           return map;
                         })
                     .values().stream()
-                    .map(aggregator -> aggregator.identifiable)
                     .collect(Collectors.toList()));
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
@@ -103,34 +102,35 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
 
     ArticleImpl result =
         dbi.withHandle(
-            h ->
-                h.createQuery(query)
-                    .bind("uuid", uuid)
-                    .registerRowMapper(BeanMapper.factory(ArticleImpl.class, "a"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new IdentifiableAggregator<ArticleImpl>(),
-                        (aggregator, rowView) -> {
-                          if (aggregator.identifiable == null) {
-                            aggregator.identifiable = rowView.getRow(ArticleImpl.class);
-                          }
-                          ArticleImpl obj = aggregator.identifiable;
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(ArticleImpl.class, "a"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, ArticleImpl>(),
+                            (map, rowView) -> {
+                              ArticleImpl article =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("a_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(ArticleImpl.class);
+                                      });
 
-                          if (rowView.getColumn("a_uuid", UUID.class) != null) {
-                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
-                          }
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                article.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
 
-                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
-                          if (idUuid != null && !aggregator.identifiers.contains(idUuid)) {
-                            IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
-                            obj.addIdentifier(identifier);
-                            aggregator.identifiers.add(idUuid);
-                          }
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                                article.addIdentifier(identifier);
+                              }
 
-                          return aggregator;
-                        })
-                    .identifiable);
+                              return map;
+                            }))
+            .get(uuid);
     return result;
   }
 
@@ -145,38 +145,41 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
 
     String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
-    ArticleImpl result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query)
-                    .bind("id", identifierId)
-                    .bind("namespace", namespace)
-                    .registerRowMapper(BeanMapper.factory(ArticleImpl.class, "a"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new IdentifiableAggregator<ArticleImpl>(),
-                        (aggregator, rowView) -> {
-                          if (aggregator.identifiable == null) {
-                            aggregator.identifiable = rowView.getRow(ArticleImpl.class);
-                          }
-                          ArticleImpl obj = aggregator.identifiable;
+    Optional<ArticleImpl> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("id", identifierId)
+                        .bind("namespace", namespace)
+                        .registerRowMapper(BeanMapper.factory(ArticleImpl.class, "a"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, ArticleImpl>(),
+                            (map, rowView) -> {
+                              ArticleImpl article =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("a_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(ArticleImpl.class);
+                                      });
 
-                          if (rowView.getColumn("a_uuid", UUID.class) != null) {
-                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
-                          }
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                article.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
 
-                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
-                          if (idUuid != null && !aggregator.identifiers.contains(idUuid)) {
-                            IdentifierImpl newIdentifier = rowView.getRow(IdentifierImpl.class);
-                            obj.addIdentifier(newIdentifier);
-                            aggregator.identifiers.add(idUuid);
-                          }
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                                article.addIdentifier(dbIdentifier);
+                              }
 
-                          return aggregator;
-                        })
-                    .identifiable);
-    return result;
+                              return map;
+                            }))
+            .values().stream()
+            .findFirst();
+    return result.get();
   }
 
   @Override
@@ -214,7 +217,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
                 .execute());
 
     // save identifiers
-    List<Identifier> identifiers = article.getIdentifiers();
+    Set<Identifier> identifiers = article.getIdentifiers();
     saveIdentifiers(identifiers, article);
 
     Article result = findOne(article.getUuid());
@@ -246,7 +249,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
     // save identifiers
     // as we store the whole list new: delete old entries
     deleteIdentifiers(article);
-    List<Identifier> identifiers = article.getIdentifiers();
+    Set<Identifier> identifiers = article.getIdentifiers();
     saveIdentifiers(identifiers, article);
 
     Article result = findOne(article.getUuid());

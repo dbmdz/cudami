@@ -6,7 +6,7 @@ import de.digitalcollections.cudami.server.business.impl.service.identifiable.Id
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.EntityPart;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -43,44 +43,44 @@ public class EntityPartServiceImpl<P extends EntityPart, E extends Entity>
   }
 
   @Override
-  public LinkedHashSet<E> getRelatedEntities(P entityPart) {
+  public List<E> getRelatedEntities(P entityPart) {
     return ((EntityPartRepository) repository).getRelatedEntities(entityPart);
   }
 
   @Override
-  public LinkedHashSet<E> getRelatedEntities(UUID entityPartUuid) {
+  public List<E> getRelatedEntities(UUID entityPartUuid) {
     return ((EntityPartRepository) repository).getRelatedEntities(entityPartUuid);
   }
 
   @Override
-  public LinkedHashSet<FileResource> getRelatedFileResources(P entityPart) {
+  public List<FileResource> getRelatedFileResources(P entityPart) {
     return ((EntityPartRepository) repository).getRelatedFileResources(entityPart);
   }
 
   @Override
-  public LinkedHashSet<FileResource> getRelatedFileResources(UUID entityPartUuid) {
+  public List<FileResource> getRelatedFileResources(UUID entityPartUuid) {
     return ((EntityPartRepository) repository).getRelatedFileResources(entityPartUuid);
   }
 
   @Override
-  public LinkedHashSet<E> saveRelatedEntities(P entityPart, LinkedHashSet<E> entities) {
+  public List<E> saveRelatedEntities(P entityPart, List<E> entities) {
     return ((EntityPartRepository) repository).saveRelatedEntities(entityPart, entities);
   }
 
   @Override
-  public LinkedHashSet<E> saveRelatedEntities(UUID entityPartUuid, LinkedHashSet<E> entities) {
+  public List<E> saveRelatedEntities(UUID entityPartUuid, List<E> entities) {
     return ((EntityPartRepository) repository).saveRelatedEntities(entityPartUuid, entities);
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveRelatedFileResources(
-      P entityPart, LinkedHashSet<FileResource> fileResources) {
+  public List<FileResource> saveRelatedFileResources(
+      P entityPart, List<FileResource> fileResources) {
     return ((EntityPartRepository) repository).saveRelatedFileResources(entityPart, fileResources);
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveRelatedFileResources(
-      UUID entityPartUuid, LinkedHashSet<FileResource> fileResources) {
+  public List<FileResource> saveRelatedFileResources(
+      UUID entityPartUuid, List<FileResource> fileResources) {
     return ((EntityPartRepository) repository)
         .saveRelatedFileResources(entityPartUuid, fileResources);
   }

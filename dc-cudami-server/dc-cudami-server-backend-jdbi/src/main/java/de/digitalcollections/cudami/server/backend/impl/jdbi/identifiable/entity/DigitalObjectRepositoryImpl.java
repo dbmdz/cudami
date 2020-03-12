@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.IdentifiableAggregator;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
@@ -16,11 +15,9 @@ import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -93,23 +90,22 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                     .registerRowMapper(BeanMapper.factory(DigitalObjectImpl.class, "d"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, IdentifiableAggregator<DigitalObjectImpl>>(),
+                        new LinkedHashMap<UUID, DigitalObjectImpl>(),
                         (map, rowView) -> {
-                          IdentifiableAggregator<DigitalObjectImpl> aggregator =
+                          DigitalObjectImpl digitalObject =
                               map.computeIfAbsent(
                                   rowView.getColumn("d_uuid", UUID.class),
                                   fn -> {
-                                    return new IdentifiableAggregator<>(
-                                        rowView.getRow(DigitalObjectImpl.class));
+                                    return rowView.getRow(DigitalObjectImpl.class);
                                   });
-                          DigitalObjectImpl obj = aggregator.identifiable;
+
                           if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                            digitalObject.setPreviewImage(
+                                rowView.getRow(ImageFileResourceImpl.class));
                           }
                           return map;
                         })
                     .values().stream()
-                    .map(aggregator -> aggregator.identifiable)
                     .collect(Collectors.toList()));
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
@@ -127,41 +123,44 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
     DigitalObjectImpl result =
         dbi.withHandle(
-            h ->
-                h.createQuery(query)
-                    .bind("uuid", uuid)
-                    .registerRowMapper(BeanMapper.factory(DigitalObjectImpl.class, "d"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .registerRowMapper(BeanMapper.factory(FileResourceImpl.class, "fr"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .reduceRows(
-                        new DigitalObjectRowReducer(),
-                        (rowReducer, rowView) -> {
-                          if (rowReducer.identifiable == null) {
-                            rowReducer.identifiable = rowView.getRow(DigitalObjectImpl.class);
-                          }
-                          DigitalObjectImpl obj = rowReducer.identifiable;
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(DigitalObjectImpl.class, "d"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .registerRowMapper(BeanMapper.factory(FileResourceImpl.class, "fr"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, DigitalObjectImpl>(),
+                            (map, rowView) -> {
+                              DigitalObjectImpl digitalObject =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("d_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(DigitalObjectImpl.class);
+                                      });
 
-                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
-                          }
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                digitalObject.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
 
-                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
-                          if (idUuid != null && !rowReducer.identifiers.contains(idUuid)) {
-                            IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
-                            obj.addIdentifier(identifier);
-                            rowReducer.identifiers.add(idUuid);
-                          }
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                                digitalObject.addIdentifier(identifier);
+                              }
 
-                          final UUID frUuid = rowView.getColumn("fr_uuid", UUID.class);
-                          if (frUuid != null && !rowReducer.fileResources.contains(frUuid)) {
-                            FileResourceImpl fileResource = rowView.getRow(FileResourceImpl.class);
-                            obj.addFileResource(fileResource);
-                            rowReducer.fileResources.add(frUuid);
-                          }
-                          return rowReducer;
-                        })
-                    .identifiable);
+                              if (rowView.getColumn("fr_uuid", UUID.class) != null) {
+                                FileResourceImpl fileResource =
+                                    rowView.getRow(FileResourceImpl.class);
+                                if (!digitalObject.getFileResources().contains(fileResource)) {
+                                  digitalObject.getFileResources().add(fileResource);
+                                }
+                              }
+
+                              return map;
+                            }))
+            .get(uuid);
     return result;
   }
 
@@ -176,45 +175,50 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
     String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
-    DigitalObjectImpl result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query)
-                    .bind("id", identifierId)
-                    .bind("namespace", namespace)
-                    .registerRowMapper(BeanMapper.factory(DigitalObjectImpl.class, "d"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .registerRowMapper(BeanMapper.factory(FileResourceImpl.class, "fr"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .reduceRows(
-                        new DigitalObjectRowReducer(),
-                        (rowReducer, rowView) -> {
-                          if (rowReducer.identifiable == null) {
-                            rowReducer.identifiable = rowView.getRow(DigitalObjectImpl.class);
-                          }
-                          DigitalObjectImpl obj = rowReducer.identifiable;
+    Optional<DigitalObjectImpl> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("id", identifierId)
+                        .bind("namespace", namespace)
+                        .registerRowMapper(BeanMapper.factory(DigitalObjectImpl.class, "d"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .registerRowMapper(BeanMapper.factory(FileResourceImpl.class, "fr"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, DigitalObjectImpl>(),
+                            (map, rowView) -> {
+                              DigitalObjectImpl digitalObject =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("d_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(DigitalObjectImpl.class);
+                                      });
 
-                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
-                          }
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                digitalObject.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
 
-                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
-                          if (idUuid != null && !rowReducer.identifiers.contains(idUuid)) {
-                            IdentifierImpl newIdentifier = rowView.getRow(IdentifierImpl.class);
-                            obj.addIdentifier(newIdentifier);
-                            rowReducer.identifiers.add(idUuid);
-                          }
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl dbIidentifier = rowView.getRow(IdentifierImpl.class);
+                                digitalObject.addIdentifier(dbIidentifier);
+                              }
 
-                          final UUID frUuid = rowView.getColumn("fr_uuid", UUID.class);
-                          if (frUuid != null && !rowReducer.fileResources.contains(frUuid)) {
-                            FileResourceImpl fileResource = rowView.getRow(FileResourceImpl.class);
-                            obj.addFileResource(fileResource);
-                            rowReducer.fileResources.add(frUuid);
-                          }
-                          return rowReducer;
-                        })
-                    .identifiable);
-    return result;
+                              if (rowView.getColumn("fr_uuid", UUID.class) != null) {
+                                FileResourceImpl fileResource =
+                                    rowView.getRow(FileResourceImpl.class);
+                                if (!digitalObject.getFileResources().contains(fileResource)) {
+                                  digitalObject.getFileResources().add(fileResource);
+                                }
+                              }
+
+                              return map;
+                            }))
+            .values().stream()
+            .findFirst();
+    return result.get();
   }
 
   @Override
@@ -223,7 +227,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public LinkedHashSet<FileResource> getFileResources(UUID digitalObjectUuid) {
+  public List<FileResource> getFileResources(UUID digitalObjectUuid) {
     String query =
         "SELECT f.uuid f_uuid, f.label f_label,"
             + " f.created f_created, f.last_modified f_lastModified,"
@@ -237,7 +241,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             + " WHERE df.digitalobject_uuid = :uuid"
             + " ORDER BY df.sortIndex ASC";
 
-    List<FileResourceImpl> result =
+    List<FileResource> result =
         dbi.withHandle(
             h ->
                 h.createQuery(query).bind("uuid", digitalObjectUuid)
@@ -245,38 +249,34 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, IdentifiableAggregator<FileResourceImpl>>(),
+                        new LinkedHashMap<UUID, FileResourceImpl>(),
                         (map, rowView) -> {
-                          IdentifiableAggregator<FileResourceImpl> aggregator =
+                          FileResourceImpl fileResource =
                               map.computeIfAbsent(
                                   rowView.getColumn("f_uuid", UUID.class),
                                   fn -> {
-                                    return new IdentifiableAggregator<>(
-                                        rowView.getRow(FileResourceImpl.class));
+                                    return rowView.getRow(FileResourceImpl.class);
                                   });
-                          FileResourceImpl obj = aggregator.identifiable;
 
                           if (rowView.getColumn("pf_uuid", UUID.class) != null) {
-                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                            fileResource.setPreviewImage(
+                                rowView.getRow(ImageFileResourceImpl.class));
                           }
 
-                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
-                          if (idUuid != null && !aggregator.identifiers.contains(idUuid)) {
-                            IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
-                            obj.addIdentifier(identifier);
-                            aggregator.identifiers.add(idUuid);
+                          if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                            IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                            fileResource.addIdentifier(dbIdentifier);
                           }
-
                           return map;
                         })
                     .values().stream()
-                    .map(aggregator -> aggregator.identifiable)
+                    .map(FileResource.class::cast)
                     .collect(Collectors.toList()));
-    return new LinkedHashSet<>(result);
+    return result;
   }
 
   @Override
-  public LinkedHashSet<ImageFileResource> getImageFileResources(UUID digitalObjectUuid) {
+  public List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid) {
     String query =
         "SELECT f.uuid f_uuid, f.label f_label,"
             + " f.created f_created, f.last_modified f_lastModified,"
@@ -291,7 +291,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             + " WHERE df.digitalobject_uuid = :uuid"
             + " ORDER BY df.sortIndex ASC";
 
-    List<ImageFileResourceImpl> result =
+    List<ImageFileResource> result =
         dbi.withHandle(
             h ->
                 h.createQuery(query).bind("uuid", digitalObjectUuid)
@@ -301,46 +301,30 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                     // rowmappers of same type...
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, IdentifiableAggregator<ImageFileResourceImpl>>(),
+                        new LinkedHashMap<UUID, ImageFileResourceImpl>(),
                         (map, rowView) -> {
-                          IdentifiableAggregator<ImageFileResourceImpl> aggregator =
+                          ImageFileResourceImpl fileResource =
                               map.computeIfAbsent(
                                   rowView.getColumn("f_uuid", UUID.class),
                                   fn -> {
-                                    return new IdentifiableAggregator<>(
-                                        rowView.getRow(ImageFileResourceImpl.class));
+                                    return rowView.getRow(ImageFileResourceImpl.class);
                                   });
-                          ImageFileResourceImpl obj = aggregator.identifiable;
 
                           if (rowView.getColumn("pf_uuid", UUID.class) != null) {
-                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                            fileResource.setPreviewImage(
+                                rowView.getRow(ImageFileResourceImpl.class));
                           }
 
-                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
-                          if (idUuid != null && !aggregator.identifiers.contains(idUuid)) {
-                            IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
-                            obj.addIdentifier(identifier);
-                            aggregator.identifiers.add(idUuid);
+                          if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                            IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                            fileResource.addIdentifier(dbIdentifier);
                           }
-
                           return map;
                         })
                     .values().stream()
-                    .map(aggregator -> aggregator.identifiable)
+                    .map(ImageFileResource.class::cast)
                     .collect(Collectors.toList()));
-    return new LinkedHashSet<>(result);
-  }
-
-  private int getIndex(LinkedHashSet<FileResource> fileResources, FileResource fileResource) {
-    int pos = -1;
-    for (Iterator<FileResource> iterator = fileResources.iterator(); iterator.hasNext(); ) {
-      pos = pos + 1;
-      FileResource fr = iterator.next();
-      if (fr.getUuid().equals(fileResource.getUuid())) {
-        return pos;
-      }
-    }
-    return -1;
+    return result;
   }
 
   @Override
@@ -371,11 +355,11 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                 .execute());
 
     // for now we implement first interesting use case: new digital object with new fileresources...
-    final LinkedHashSet<FileResource> fileResources = digitalObject.getFileResources();
+    final List<FileResource> fileResources = digitalObject.getFileResources();
     saveFileResources(digitalObject, fileResources);
 
     // save identifiers
-    List<Identifier> identifiers = digitalObject.getIdentifiers();
+    Set<Identifier> identifiers = digitalObject.getIdentifiers();
     saveIdentifiers(identifiers, digitalObject);
 
     DigitalObject result = findOne(digitalObject.getUuid());
@@ -383,8 +367,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveFileResources(
-      DigitalObject digitalObject, LinkedHashSet<FileResource> fileResources) {
+  public List<FileResource> saveFileResources(
+      DigitalObject digitalObject, List<FileResource> fileResources) {
     if (fileResources == null) {
       return null;
     }
@@ -392,8 +376,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveFileResources(
-      UUID digitalObjectUuid, LinkedHashSet<FileResource> fileResources) {
+  public List<FileResource> saveFileResources(
+      UUID digitalObjectUuid, List<FileResource> fileResources) {
 
     // as we store the whole list new: delete old entries
     dbi.withHandle(
@@ -455,15 +439,10 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     // save identifiers
     // as we store the whole list new: delete old entries
     deleteIdentifiers(digitalObject);
-    List<Identifier> identifiers = digitalObject.getIdentifiers();
+    Set<Identifier> identifiers = digitalObject.getIdentifiers();
     saveIdentifiers(identifiers, digitalObject);
 
     DigitalObject result = findOne(digitalObject.getUuid());
     return result;
-  }
-
-  static class DigitalObjectRowReducer extends IdentifiableAggregator<DigitalObjectImpl> {
-
-    Set<UUID> fileResources = new HashSet<>();
   }
 }

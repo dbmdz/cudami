@@ -4,7 +4,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.EntityPart;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
@@ -33,7 +33,7 @@ public class EntityPartController<P extends EntityPart, E extends Entity> {
       produces = "application/json",
       method = RequestMethod.GET)
   @ApiResponseObject
-  LinkedHashSet<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
+  List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
     return service.getRelatedFileResources(uuid);
   }
 }

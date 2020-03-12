@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ProjectRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.IdentifiableAggregator;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Project;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -14,6 +13,8 @@ import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
@@ -75,23 +76,21 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
                     .registerRowMapper(BeanMapper.factory(ProjectImpl.class, "p"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, IdentifiableAggregator<ProjectImpl>>(),
+                        new LinkedHashMap<UUID, ProjectImpl>(),
                         (map, rowView) -> {
-                          IdentifiableAggregator<ProjectImpl> aggregator =
+                          ProjectImpl project =
                               map.computeIfAbsent(
                                   rowView.getColumn("p_uuid", UUID.class),
                                   fn -> {
-                                    return new IdentifiableAggregator<>(
-                                        rowView.getRow(ProjectImpl.class));
+                                    return rowView.getRow(ProjectImpl.class);
                                   });
-                          ProjectImpl obj = aggregator.identifiable;
+
                           if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                            project.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
                           }
                           return map;
                         })
                     .values().stream()
-                    .map(aggregator -> aggregator.identifiable)
                     .collect(Collectors.toList()));
 
     long total = count();
@@ -105,34 +104,35 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
 
     ProjectImpl result =
         dbi.withHandle(
-            h ->
-                h.createQuery(query)
-                    .bind("uuid", uuid)
-                    .registerRowMapper(BeanMapper.factory(ProjectImpl.class, "p"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new IdentifiableAggregator<ProjectImpl>(),
-                        (aggregator, rowView) -> {
-                          if (aggregator.identifiable == null) {
-                            aggregator.identifiable = rowView.getRow(ProjectImpl.class);
-                          }
-                          ProjectImpl obj = aggregator.identifiable;
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(ProjectImpl.class, "p"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, ProjectImpl>(),
+                            (map, rowView) -> {
+                              ProjectImpl project =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("p_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(ProjectImpl.class);
+                                      });
 
-                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
-                          }
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                project.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
 
-                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
-                          if (idUuid != null && !aggregator.identifiers.contains(idUuid)) {
-                            IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
-                            obj.addIdentifier(identifier);
-                            aggregator.identifiers.add(idUuid);
-                          }
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                                project.addIdentifier(identifier);
+                              }
 
-                          return aggregator;
-                        })
-                    .identifiable);
+                              return map;
+                            }))
+            .get(uuid);
     return result;
   }
 
@@ -147,38 +147,41 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
 
     String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
-    ProjectImpl result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query)
-                    .bind("id", identifierId)
-                    .bind("namespace", namespace)
-                    .registerRowMapper(BeanMapper.factory(ProjectImpl.class, "p"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new IdentifiableAggregator<ProjectImpl>(),
-                        (aggregator, rowView) -> {
-                          if (aggregator.identifiable == null) {
-                            aggregator.identifiable = rowView.getRow(ProjectImpl.class);
-                          }
-                          ProjectImpl obj = aggregator.identifiable;
+    Optional<ProjectImpl> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("id", identifierId)
+                        .bind("namespace", namespace)
+                        .registerRowMapper(BeanMapper.factory(ProjectImpl.class, "p"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, ProjectImpl>(),
+                            (map, rowView) -> {
+                              ProjectImpl project =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("p_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(ProjectImpl.class);
+                                      });
 
-                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
-                          }
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                project.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
 
-                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
-                          if (idUuid != null && !aggregator.identifiers.contains(idUuid)) {
-                            IdentifierImpl newIdentifier = rowView.getRow(IdentifierImpl.class);
-                            obj.addIdentifier(newIdentifier);
-                            aggregator.identifiers.add(idUuid);
-                          }
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                                project.addIdentifier(dbIdentifier);
+                              }
 
-                          return aggregator;
-                        })
-                    .identifiable);
-    return result;
+                              return map;
+                            }))
+            .values().stream()
+            .findFirst();
+    return result.get();
   }
 
   @Override
@@ -216,7 +219,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
                 .execute());
 
     // save identifiers
-    List<Identifier> identifiers = project.getIdentifiers();
+    Set<Identifier> identifiers = project.getIdentifiers();
     saveIdentifiers(identifiers, project);
 
     Project result = findOne(project.getUuid());
@@ -248,7 +251,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
     // save identifiers
     // as we store the whole list new: delete old entries
     deleteIdentifiers(project);
-    List<Identifier> identifiers = project.getIdentifiers();
+    Set<Identifier> identifiers = project.getIdentifiers();
     saveIdentifiers(identifiers, project);
 
     Project result = findOne(project.getUuid());

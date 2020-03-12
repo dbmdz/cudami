@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.WebpageRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.IdentifiableAggregator;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
@@ -15,6 +14,8 @@ import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
@@ -75,23 +76,21 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
                     .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, IdentifiableAggregator<WebpageImpl>>(),
+                        new LinkedHashMap<UUID, WebpageImpl>(),
                         (map, rowView) -> {
-                          IdentifiableAggregator<WebpageImpl> aggregator =
+                          WebpageImpl webpage =
                               map.computeIfAbsent(
                                   rowView.getColumn("w_uuid", UUID.class),
                                   fn -> {
-                                    return new IdentifiableAggregator<>(
-                                        rowView.getRow(WebpageImpl.class));
+                                    return rowView.getRow(WebpageImpl.class);
                                   });
-                          WebpageImpl obj = aggregator.identifiable;
+
                           if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                            webpage.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
                           }
                           return map;
                         })
                     .values().stream()
-                    .map(aggregator -> aggregator.identifiable)
                     .collect(Collectors.toList()));
 
     long total = count();
@@ -105,34 +104,35 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
 
     WebpageImpl result =
         dbi.withHandle(
-            h ->
-                h.createQuery(query)
-                    .bind("uuid", uuid)
-                    .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new IdentifiableAggregator<WebpageImpl>(),
-                        (aggregator, rowView) -> {
-                          if (aggregator.identifiable == null) {
-                            aggregator.identifiable = rowView.getRow(WebpageImpl.class);
-                          }
-                          WebpageImpl obj = aggregator.identifiable;
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, WebpageImpl>(),
+                            (map, rowView) -> {
+                              WebpageImpl webpage =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("w_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(WebpageImpl.class);
+                                      });
 
-                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
-                          }
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                webpage.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
 
-                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
-                          if (idUuid != null && !aggregator.identifiers.contains(idUuid)) {
-                            IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
-                            obj.addIdentifier(identifier);
-                            aggregator.identifiers.add(idUuid);
-                          }
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                                webpage.addIdentifier(identifier);
+                              }
 
-                          return aggregator;
-                        })
-                    .identifiable);
+                              return map;
+                            }))
+            .get(uuid);
 
     if (result != null) {
       // TODO could be replaced with another join in above query...
@@ -152,43 +152,46 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
 
     String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
-    WebpageImpl result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query)
-                    .bind("id", identifierId)
-                    .bind("namespace", namespace)
-                    .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new IdentifiableAggregator<WebpageImpl>(),
-                        (aggregator, rowView) -> {
-                          if (aggregator.identifiable == null) {
-                            aggregator.identifiable = rowView.getRow(WebpageImpl.class);
-                          }
-                          WebpageImpl obj = aggregator.identifiable;
+    Optional<WebpageImpl> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("id", identifierId)
+                        .bind("namespace", namespace)
+                        .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, WebpageImpl>(),
+                            (map, rowView) -> {
+                              WebpageImpl webpage =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("w_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(WebpageImpl.class);
+                                      });
 
-                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
-                          }
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                webpage.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
 
-                          final UUID idUuid = rowView.getColumn("id_uuid", UUID.class);
-                          if (idUuid != null && !aggregator.identifiers.contains(idUuid)) {
-                            IdentifierImpl newIdentifier = rowView.getRow(IdentifierImpl.class);
-                            obj.addIdentifier(newIdentifier);
-                            aggregator.identifiers.add(idUuid);
-                          }
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                                webpage.addIdentifier(dbIdentifier);
+                              }
 
-                          return aggregator;
-                        })
-                    .identifiable);
-
-    if (result != null) {
+                              return map;
+                            }))
+            .values().stream()
+            .findFirst();
+    Webpage webpage = result.get();
+    if (webpage != null) {
       // TODO could be replaced with another join in above query...
-      result.setChildren(getChildren(result));
+      webpage.setChildren(getChildren(webpage));
     }
-    return result;
+    return webpage;
   }
 
   @Override
@@ -221,23 +224,21 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
                     .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, IdentifiableAggregator<WebpageImpl>>(),
+                        new LinkedHashMap<UUID, WebpageImpl>(),
                         (map, rowView) -> {
-                          IdentifiableAggregator<WebpageImpl> aggregator =
+                          WebpageImpl webpage =
                               map.computeIfAbsent(
                                   rowView.getColumn("w_uuid", UUID.class),
                                   fn -> {
-                                    return new IdentifiableAggregator<>(
-                                        rowView.getRow(WebpageImpl.class));
+                                    return rowView.getRow(WebpageImpl.class);
                                   });
-                          WebpageImpl obj = aggregator.identifiable;
+
                           if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                            webpage.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
                           }
                           return map;
                         })
                     .values().stream()
-                    .map(aggregator -> (Webpage) aggregator.identifiable)
                     .collect(Collectors.toList()));
     return result;
   }
@@ -249,28 +250,39 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
             + " INNER JOIN webpage_webpages ww ON w.uuid = ww.parent_webpage_uuid"
             + " WHERE ww.child_webpage_uuid = :uuid";
 
-    WebpageImpl result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query)
-                    .bind("uuid", uuid)
-                    .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new IdentifiableAggregator<WebpageImpl>(),
-                        (aggregator, rowView) -> {
-                          if (aggregator.identifiable == null) {
-                            aggregator.identifiable = rowView.getRow(WebpageImpl.class);
-                          }
-                          WebpageImpl obj = aggregator.identifiable;
+    Optional<WebpageImpl> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, WebpageImpl>(),
+                            (map, rowView) -> {
+                              WebpageImpl parentWebpage =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("w_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(WebpageImpl.class);
+                                      });
 
-                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                            obj.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
-                          }
-                          return aggregator;
-                        })
-                    .identifiable);
-    return result;
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                parentWebpage.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                                parentWebpage.addIdentifier(dbIdentifier);
+                              }
+
+                              return map;
+                            }))
+            .values().stream()
+            .findFirst();
+    return result.get();
   }
 
   @Override
@@ -302,7 +314,7 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
                 .execute());
 
     // save identifiers
-    List<Identifier> identifiers = webpage.getIdentifiers();
+    Set<Identifier> identifiers = webpage.getIdentifiers();
     saveIdentifiers(identifiers, webpage);
 
     Webpage result = findOne(webpage.getUuid());
@@ -378,7 +390,7 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
     // save identifiers
     // as we store the whole list new: delete old entries
     deleteIdentifiers(webpage);
-    List<Identifier> identifiers = webpage.getIdentifiers();
+    Set<Identifier> identifiers = webpage.getIdentifiers();
     saveIdentifiers(identifiers, webpage);
 
     Webpage result = findOne(webpage.getUuid());

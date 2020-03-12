@@ -3,23 +3,22 @@ package de.digitalcollections.cudami.admin.business.api.service.identifiable.ent
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.UUID;
 
 /** Service for Digital Object. */
 public interface DigitalObjectService extends EntityService<DigitalObject> {
 
-  LinkedHashSet<FileResource> getFileResources(DigitalObject digitalObject);
+  List<FileResource> getFileResources(DigitalObject digitalObject);
 
-  LinkedHashSet<FileResource> getFileResources(UUID digitalObjectUuid);
+  List<FileResource> getFileResources(UUID digitalObjectUuid);
 
-  LinkedHashSet<ImageFileResource> getImageFileResources(DigitalObject digitalObject);
+  List<ImageFileResource> getImageFileResources(DigitalObject digitalObject);
 
-  LinkedHashSet<ImageFileResource> getImageFileResources(UUID digitalObjectUuid);
+  List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid);
 
-  LinkedHashSet<FileResource> saveFileResources(
-      DigitalObject digitalObject, LinkedHashSet<FileResource> fileResources);
+  List<FileResource> saveFileResources(
+      DigitalObject digitalObject, List<FileResource> fileResources);
 
-  LinkedHashSet<FileResource> saveFileResources(
-      UUID digitalObjectUuid, LinkedHashSet<FileResource> fileResources);
+  List<FileResource> saveFileResources(UUID digitalObjectUuid, List<FileResource> fileResources);
 }

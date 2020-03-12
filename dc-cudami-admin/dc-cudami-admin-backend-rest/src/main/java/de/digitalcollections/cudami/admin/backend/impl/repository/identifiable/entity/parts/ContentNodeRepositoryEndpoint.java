@@ -8,7 +8,6 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,10 +39,10 @@ public interface ContentNodeRepositoryEndpoint extends RepositoryEndpoint {
   List<ContentNode> getChildren(@Param("uuid") UUID uuid);
 
   @RequestLine("GET /latest/contentnodes/{uuid}/entities")
-  LinkedHashSet<Entity> getEntities(@Param("uuid") UUID uuid);
+  List<Entity> getEntities(@Param("uuid") UUID uuid);
 
   @RequestLine("GET /latest/contentnodes/{uuid}/fileresources")
-  LinkedHashSet<FileResource> getFileResources(@Param("uuid") UUID uuid);
+  List<FileResource> getFileResources(@Param("uuid") UUID uuid);
 
   @RequestLine("GET /latest/contentnodes/{uuid}/parent")
   ContentNode getParent(@Param("uuid") UUID uuid);
@@ -54,12 +53,11 @@ public interface ContentNodeRepositoryEndpoint extends RepositoryEndpoint {
 
   @RequestLine("POST /latest/contentnodes/{uuid}/entities")
   @Headers("Content-Type: application/json")
-  LinkedHashSet<Entity> saveEntities(@Param("uuid") UUID uuid, LinkedHashSet<Entity> entities);
+  List<Entity> saveEntities(@Param("uuid") UUID uuid, List<Entity> entities);
 
   @RequestLine("POST /latest/contentnodes/{uuid}/fileresources")
   @Headers("Content-Type: application/json")
-  LinkedHashSet<FileResource> saveFileResources(
-      @Param("uuid") UUID uuid, LinkedHashSet<FileResource> fileResources);
+  List<FileResource> saveFileResources(@Param("uuid") UUID uuid, List<FileResource> fileResources);
 
   @RequestLine("POST /latest/contenttrees/{parentContentTreeUuid}/contentnode")
   @Headers("Content-Type: application/json")

@@ -5,7 +5,7 @@ import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import feign.Param;
 import feign.RequestLine;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.UUID;
 
 public interface EntityPartRepositoryEndpoint extends RepositoryEndpoint {
@@ -18,16 +18,15 @@ public interface EntityPartRepositoryEndpoint extends RepositoryEndpoint {
       @Param("uuid") UUID uuid, @Param("fileResourceUuid") UUID fileResourceUuid);
 
   @RequestLine("GET /latest/entityparts/{uuid}/related/entities")
-  LinkedHashSet<Entity> getRelatedEntities(@Param("uuid") UUID uuid);
+  List<Entity> getRelatedEntities(@Param("uuid") UUID uuid);
 
   @RequestLine("GET /latest/entityparts/{uuid}/related/fileresources")
-  LinkedHashSet<FileResource> getRelatedFileResources(@Param("uuid") UUID uuid);
+  List<FileResource> getRelatedFileResources(@Param("uuid") UUID uuid);
 
   @RequestLine("POST /latest/entityparts/{uuid}/related/entities")
-  LinkedHashSet<Entity> saveRelatedEntities(
-      @Param("uuid") UUID uuid, LinkedHashSet<Entity> convertFromGenericLinkedHashSet);
+  List<Entity> saveRelatedEntities(@Param("uuid") UUID uuid, List<Entity> entities);
 
   @RequestLine("POST /latest/entityparts/{uuid}/related/fileresources")
-  LinkedHashSet<FileResource> saveRelatedFileResources(
-      @Param("uuid") UUID uuid, LinkedHashSet<FileResource> fileResources);
+  List<FileResource> saveRelatedFileResources(
+      @Param("uuid") UUID uuid, List<FileResource> fileResources);
 }
