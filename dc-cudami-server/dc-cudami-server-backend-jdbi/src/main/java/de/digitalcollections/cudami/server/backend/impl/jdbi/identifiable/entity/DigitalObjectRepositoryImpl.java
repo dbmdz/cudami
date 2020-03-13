@@ -15,6 +15,7 @@ import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
@@ -84,29 +85,29 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     addPageRequestParams(pageRequest, query);
 
     List<DigitalObjectImpl> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query.toString())
-                    .registerRowMapper(BeanMapper.factory(DigitalObjectImpl.class, "d"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, DigitalObjectImpl>(),
-                        (map, rowView) -> {
-                          DigitalObjectImpl digitalObject =
-                              map.computeIfAbsent(
-                                  rowView.getColumn("d_uuid", UUID.class),
-                                  fn -> {
-                                    return rowView.getRow(DigitalObjectImpl.class);
-                                  });
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .registerRowMapper(BeanMapper.factory(DigitalObjectImpl.class, "d"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, DigitalObjectImpl>(),
+                            (map, rowView) -> {
+                              DigitalObjectImpl digitalObject =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("d_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(DigitalObjectImpl.class);
+                                      });
 
-                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                            digitalObject.setPreviewImage(
-                                rowView.getRow(ImageFileResourceImpl.class));
-                          }
-                          return map;
-                        })
-                    .values().stream()
-                    .collect(Collectors.toList()));
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                digitalObject.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;

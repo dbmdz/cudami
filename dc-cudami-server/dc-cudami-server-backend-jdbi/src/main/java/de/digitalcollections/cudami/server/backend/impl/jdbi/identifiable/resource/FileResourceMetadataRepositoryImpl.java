@@ -25,11 +25,11 @@ import de.digitalcollections.model.impl.identifiable.resource.VideoFileResourceI
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.slf4j.Logger;
@@ -128,29 +128,29 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
     addPageRequestParams(pageRequest, query);
 
     List<FileResourceImpl> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query.toString())
-                    .registerRowMapper(BeanMapper.factory(FileResourceImpl.class, "f"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, FileResourceImpl>(),
-                        (map, rowView) -> {
-                          FileResourceImpl fileResource =
-                              map.computeIfAbsent(
-                                  rowView.getColumn("f_uuid", UUID.class),
-                                  fn -> {
-                                    return rowView.getRow(FileResourceImpl.class);
-                                  });
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .registerRowMapper(BeanMapper.factory(FileResourceImpl.class, "f"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, FileResourceImpl>(),
+                            (map, rowView) -> {
+                              FileResourceImpl fileResource =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("f_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(FileResourceImpl.class);
+                                      });
 
-                          if (rowView.getColumn("pf_uuid", UUID.class) != null) {
-                            fileResource.setPreviewImage(
-                                rowView.getRow(ImageFileResourceImpl.class));
-                          }
-                          return map;
-                        })
-                    .values().stream()
-                    .collect(Collectors.toList()));
+                              if (rowView.getColumn("pf_uuid", UUID.class) != null) {
+                                fileResource.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
 
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);

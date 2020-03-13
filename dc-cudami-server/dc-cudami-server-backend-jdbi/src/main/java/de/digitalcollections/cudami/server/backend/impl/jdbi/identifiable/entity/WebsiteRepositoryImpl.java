@@ -13,6 +13,7 @@ import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
@@ -72,28 +73,29 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     addPageRequestParams(pageRequest, query);
 
     List<WebsiteImpl> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query.toString())
-                    .registerRowMapper(BeanMapper.factory(WebsiteImpl.class, "w"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, WebsiteImpl>(),
-                        (map, rowView) -> {
-                          WebsiteImpl website =
-                              map.computeIfAbsent(
-                                  rowView.getColumn("w_uuid", UUID.class),
-                                  fn -> {
-                                    return rowView.getRow(WebsiteImpl.class);
-                                  });
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .registerRowMapper(BeanMapper.factory(WebsiteImpl.class, "w"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, WebsiteImpl>(),
+                            (map, rowView) -> {
+                              WebsiteImpl website =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("w_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(WebsiteImpl.class);
+                                      });
 
-                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                            website.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
-                          }
-                          return map;
-                        })
-                    .values().stream()
-                    .collect(Collectors.toList()));
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                website.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
 
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);

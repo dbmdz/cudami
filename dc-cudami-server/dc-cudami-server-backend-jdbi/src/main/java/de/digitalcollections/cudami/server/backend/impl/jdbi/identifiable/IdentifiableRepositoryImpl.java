@@ -11,6 +11,7 @@ import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -82,29 +83,29 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     addPageRequestParams(pageRequest, query);
 
     List<Identifiable> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query.toString())
-                    .registerRowMapper(BeanMapper.factory(IdentifiableImpl.class, "i"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, IdentifiableImpl>(),
-                        (map, rowView) -> {
-                          IdentifiableImpl identifiable =
-                              map.computeIfAbsent(
-                                  rowView.getColumn("i_uuid", UUID.class),
-                                  fn -> {
-                                    return rowView.getRow(IdentifiableImpl.class);
-                                  });
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .registerRowMapper(BeanMapper.factory(IdentifiableImpl.class, "i"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, IdentifiableImpl>(),
+                            (map, rowView) -> {
+                              IdentifiableImpl identifiable =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("i_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(IdentifiableImpl.class);
+                                      });
 
-                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                            identifiable.setPreviewImage(
-                                rowView.getRow(ImageFileResourceImpl.class));
-                          }
-                          return map;
-                        })
-                    .values().stream()
-                    .collect(Collectors.toList()));
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                identifiable.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;

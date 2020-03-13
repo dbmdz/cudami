@@ -15,6 +15,7 @@ import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
@@ -73,29 +74,29 @@ public class ContentNodeRepositoryImpl<E extends Entity>
     addPageRequestParams(pageRequest, query);
 
     List<ContentNodeImpl> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query.toString())
-                    .registerRowMapper(BeanMapper.factory(ContentNodeImpl.class, "c"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, ContentNodeImpl>(),
-                        (map, rowView) -> {
-                          ContentNodeImpl contentNode =
-                              map.computeIfAbsent(
-                                  rowView.getColumn("c_uuid", UUID.class),
-                                  fn -> {
-                                    return rowView.getRow(ContentNodeImpl.class);
-                                  });
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .registerRowMapper(BeanMapper.factory(ContentNodeImpl.class, "c"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, ContentNodeImpl>(),
+                            (map, rowView) -> {
+                              ContentNodeImpl contentNode =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("c_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(ContentNodeImpl.class);
+                                      });
 
-                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                            contentNode.setPreviewImage(
-                                rowView.getRow(ImageFileResourceImpl.class));
-                          }
-                          return map;
-                        })
-                    .values().stream()
-                    .collect(Collectors.toList()));
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                contentNode.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
 
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
@@ -223,29 +224,30 @@ public class ContentNodeRepositoryImpl<E extends Entity>
             + " ORDER BY cc.sortIndex ASC";
 
     List<ContentNode> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query).bind("uuid", uuid)
-                    .registerRowMapper(BeanMapper.factory(ContentNodeImpl.class, "cn"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, ContentNodeImpl>(),
-                        (map, rowView) -> {
-                          ContentNodeImpl contentNode =
-                              map.computeIfAbsent(
-                                  rowView.getColumn("cn_uuid", UUID.class),
-                                  fn -> {
-                                    return rowView.getRow(ContentNodeImpl.class);
-                                  });
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(ContentNodeImpl.class, "cn"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, ContentNodeImpl>(),
+                            (map, rowView) -> {
+                              ContentNodeImpl contentNode =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("cn_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(ContentNodeImpl.class);
+                                      });
 
-                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                            contentNode.setPreviewImage(
-                                rowView.getRow(ImageFileResourceImpl.class));
-                          }
-                          return map;
-                        })
-                    .values().stream()
-                    .collect(Collectors.toList()));
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                contentNode.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
     return result;
   }
 

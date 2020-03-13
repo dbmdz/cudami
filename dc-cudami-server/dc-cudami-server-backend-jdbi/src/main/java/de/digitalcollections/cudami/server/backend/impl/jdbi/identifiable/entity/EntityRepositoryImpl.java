@@ -14,6 +14,7 @@ import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
@@ -109,28 +110,28 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     addPageRequestParams(pageRequest, query);
 
     List<EntityImpl> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query.toString())
-                    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, EntityImpl>(),
-                        (map, rowView) -> {
-                          EntityImpl entity =
-                              map.computeIfAbsent(
-                                  rowView.getColumn("e_uuid", UUID.class),
-                                  fn -> {
-                                    return rowView.getRow(EntityImpl.class);
-                                  });
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, EntityImpl>(),
+                            (map, rowView) -> {
+                              EntityImpl entity =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("e_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(EntityImpl.class);
+                                      });
 
-                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                            entity.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
-                          }
-                          return map;
-                        })
-                    .values().stream()
-                    .collect(Collectors.toList()));
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                entity.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
 
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
