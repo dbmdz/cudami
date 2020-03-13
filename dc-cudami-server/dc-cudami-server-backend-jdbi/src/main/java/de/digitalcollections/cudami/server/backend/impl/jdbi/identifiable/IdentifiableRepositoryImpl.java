@@ -269,10 +269,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                     .findOne()
                     .orElse(null));
     if (sortIndex == null) {
-      sortIndex = 0;
+      return 0;
     }
-    final Integer sortIndexDb = sortIndex;
-    return sortIndexDb;
+    return sortIndex;
   }
 
   protected int getIndex(List<? extends Identifiable> list, Identifiable identifiable) {
