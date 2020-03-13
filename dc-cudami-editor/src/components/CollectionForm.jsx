@@ -27,7 +27,7 @@ const CollectionForm = props => {
           </h1>
         </Col>
         <Col xs="6" sm="3">
-          <FormButtons />
+          <FormButtons onAbort={props.onAbort} />
         </Col>
       </Row>
       <Row>

@@ -88,6 +88,23 @@ class IdentifiableForm extends Component {
     })
   }
 
+  abortForm = () => {
+    let nextUrl = `${
+      this.props.apiContextPath
+    }${this.props.type.toLowerCase()}s`
+    const uuid = this.state.identifiable.uuid
+    const parentType = this.props.parentType
+    const parentUuid = this.props.parentUuid
+    if (uuid) {
+      nextUrl += `/${uuid}`
+    } else if (parentType && parentUuid) {
+      nextUrl = `${
+        this.props.apiContextPath
+      }${parentType.toLowerCase()}s/${parentUuid}`
+    }
+    window.location.href = nextUrl
+  }
+
   addLanguage = (selectedLanguage, modalName) => {
     this.setState({
       activeLanguage: selectedLanguage.name,
@@ -153,6 +170,7 @@ class IdentifiableForm extends Component {
         canAddLanguage={this.state.availableLanguages.length > 0}
         existingLanguages={this.state.existingLanguages}
         identifiable={this.state.identifiable}
+        onAbort={this.abortForm}
         onAddLanguage={this.toggleModal}
         onSubmit={this.submitIdentifiable}
         onToggleLanguage={this.toggleLanguage}

@@ -16,6 +16,7 @@ const FileResourceForm = props => {
     return (
       <FileResourceUploadForm
         apiContextPath={props.apiContextPath}
+        onAbort={props.onAbort}
         onUpdate={props.onUpdate}
       />
     )
@@ -32,7 +33,7 @@ const FileResourceForm = props => {
           <h1>{t('editFileResource', {name: props.identifiable.filename})}</h1>
         </Col>
         <Col xs="6" sm="3">
-          <FormButtons />
+          <FormButtons onAbort={props.onAbort} />
         </Col>
       </Row>
       <Row>

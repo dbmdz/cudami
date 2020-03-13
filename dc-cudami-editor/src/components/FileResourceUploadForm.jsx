@@ -41,7 +41,12 @@ class FileResourceUploadForm extends Component {
           </Col>
           <Col xs="6" sm="3">
             <ButtonGroup className="float-right">
-              <Button className="mr-1" color="secondary" type="button">
+              <Button
+                className="mr-1"
+                color="secondary"
+                onClick={() => this.props.onAbort()}
+                type="button"
+              >
                 {t('abort')}
               </Button>
               <Button
