@@ -273,11 +273,6 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
                                     rowView.getRow(ImageFileResourceImpl.class));
                               }
 
-                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
-                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
-                                parentWebpage.addIdentifier(dbIdentifier);
-                              }
-
                               return map;
                             }))
             .values().stream()

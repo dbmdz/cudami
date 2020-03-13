@@ -390,12 +390,6 @@ public class ContentNodeRepositoryImpl<E extends Entity>
                                 parentContentNode.setPreviewImage(
                                     rowView.getRow(ImageFileResourceImpl.class));
                               }
-
-                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
-                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
-                                parentContentNode.addIdentifier(dbIdentifier);
-                              }
-
                               return map;
                             }))
             .values().stream()
