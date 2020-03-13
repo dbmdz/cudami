@@ -188,7 +188,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
             .values().stream()
             .findFirst();
 
-    Website website = result.get();
+    Website website = result.orElse(null);
     if (website != null) {
       website.setRootPages(getRootPages(website));
     }

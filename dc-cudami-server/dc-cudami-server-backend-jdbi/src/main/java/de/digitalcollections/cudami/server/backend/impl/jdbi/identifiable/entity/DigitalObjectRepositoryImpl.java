@@ -218,7 +218,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                             }))
             .values().stream()
             .findFirst();
-    return result.get();
+    return result.orElse(null);
   }
 
   @Override

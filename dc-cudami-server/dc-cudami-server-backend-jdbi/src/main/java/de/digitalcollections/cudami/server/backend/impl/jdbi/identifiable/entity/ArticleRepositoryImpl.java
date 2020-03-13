@@ -179,7 +179,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
                             }))
             .values().stream()
             .findFirst();
-    return result.get();
+    return result.orElse(null);
   }
 
   @Override

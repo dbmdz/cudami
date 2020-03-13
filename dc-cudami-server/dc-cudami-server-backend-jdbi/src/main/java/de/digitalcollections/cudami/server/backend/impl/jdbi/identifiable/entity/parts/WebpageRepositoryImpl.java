@@ -186,7 +186,7 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
                             }))
             .values().stream()
             .findFirst();
-    Webpage webpage = result.get();
+    Webpage webpage = result.orElse(null);
     if (webpage != null) {
       // TODO could be replaced with another join in above query...
       webpage.setChildren(getChildren(webpage));
@@ -277,7 +277,7 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
                             }))
             .values().stream()
             .findFirst();
-    return result.get();
+    return result.orElse(null);
   }
 
   @Override

@@ -181,7 +181,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
                             }))
             .values().stream()
             .findFirst();
-    return result.get();
+    return result.orElse(null);
   }
 
   @Override

@@ -180,7 +180,7 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
                             }))
             .values().stream()
             .findFirst();
-    return result.get();
+    return result.orElse(null);
   }
 
   @Override

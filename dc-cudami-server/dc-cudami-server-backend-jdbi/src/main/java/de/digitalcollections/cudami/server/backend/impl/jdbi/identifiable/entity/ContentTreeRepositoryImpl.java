@@ -187,7 +187,7 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
             .values().stream()
             .findFirst();
 
-    ContentTree contentTree = result.get();
+    ContentTree contentTree = result.orElse(null);
     if (contentTree != null) {
       // TODO could be replaced with another join in above query...
       contentTree.setRootNodes(getRootNodes(contentTree));

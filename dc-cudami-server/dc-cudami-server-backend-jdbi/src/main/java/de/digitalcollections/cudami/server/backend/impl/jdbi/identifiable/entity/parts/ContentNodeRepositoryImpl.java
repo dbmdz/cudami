@@ -191,7 +191,7 @@ public class ContentNodeRepositoryImpl<E extends Entity>
             .values().stream()
             .findFirst();
 
-    ContentNode contentNode = result.get();
+    ContentNode contentNode = result.orElse(null);
     if (contentNode != null) {
       // TODO could be replaced with another join in above query...
       contentNode.setChildren(getChildren(contentNode));
@@ -394,7 +394,7 @@ public class ContentNodeRepositoryImpl<E extends Entity>
                             }))
             .values().stream()
             .findFirst();
-    return result.get();
+    return result.orElse(null);
   }
 
   @Override

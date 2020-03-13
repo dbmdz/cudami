@@ -215,7 +215,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                             }))
             .values().stream()
             .findFirst();
-    return (I) result.get();
+    return (I) result.orElse(null);
   }
 
   @Override

@@ -218,7 +218,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
                             }))
             .values().stream()
             .findFirst();
-    return (E) result.get();
+    return (E) result.orElse(null);
   }
 
   @Override
@@ -257,7 +257,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
                             }))
             .values().stream()
             .findFirst();
-    return (E) result.get();
+    return (E) result.orElse(null);
   }
 
   @Override
