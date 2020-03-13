@@ -12,7 +12,6 @@ import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
@@ -276,9 +275,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
   protected int getIndex(List<? extends Identifiable> list, Identifiable identifiable) {
     int pos = -1;
-    for (Iterator iterator = list.iterator(); iterator.hasNext(); ) {
-      pos = pos + 1;
-      Identifiable idf = (Identifiable) iterator.next();
+    for (Identifiable idf : list) {
+      pos += 1;
       if (idf.getUuid().equals(identifiable.getUuid())) {
         return pos;
       }
