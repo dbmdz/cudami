@@ -41,9 +41,6 @@ class FileResourceUploadForm extends Component {
           </Col>
           <Col xs="6" sm="3">
             <ButtonGroup className="float-right">
-              <Button className="mr-1" color="secondary" type="button">
-                {t('abort')}
-              </Button>
               <Button
                 color="primary"
                 disabled={!this.state.submitEnabled}

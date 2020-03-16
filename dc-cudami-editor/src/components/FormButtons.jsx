@@ -7,9 +7,6 @@ const FormButtons = () => {
   return (
     <div className="float-right">
       <ButtonGroup>
-        <Button className="mr-1" color="secondary" type="button">
-          {t('abort')}
-        </Button>
         <Button color="primary" type="submit">
           {t('save')}
         </Button>
