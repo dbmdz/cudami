@@ -1,3 +1,4 @@
+import * as fromEntries from 'object.fromentries'
 import {publish, subscribe} from 'pubsub-js'
 import React, {Component} from 'react'
 import {Button, Form, Label, Modal, ModalBody, ModalHeader} from 'reactstrap'
@@ -53,7 +54,7 @@ class ImageAdderModal extends Component {
   }
 
   addImageToEditor = resourceId => {
-    const filteredAttributes = Object.fromEntries(
+    const filteredAttributes = fromEntries(
       Object.entries(this.state.attributes).filter(([_, value]) => value !== '')
     )
     const data = {
