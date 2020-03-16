@@ -21,7 +21,7 @@
     "classnames": "^2.2.6",
     "i18next": "^17.0.6",
     "object.fromentries": "^2.0.2",
-    "prosemirror-commands": "^1.0.8",
+    "prosemirror-commands": "^1.1.3",
     "prosemirror-dropcursor": "^1.1.1",
     "prosemirror-gapcursor": "^1.0.4",
     "prosemirror-history": "^1.0.4",
