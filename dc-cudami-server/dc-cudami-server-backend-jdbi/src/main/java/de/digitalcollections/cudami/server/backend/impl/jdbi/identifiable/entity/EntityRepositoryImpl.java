@@ -14,8 +14,8 @@ import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -40,7 +40,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
           + " e.identifiable_type e_type, e.entity_type e_entityType,"
           + " e.created e_created, e.last_modified e_last_modified,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
           + " FROM entities as e"
           + " LEFT JOIN identifiers as id on e.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on e.previewfileresource = file.uuid";
@@ -50,7 +50,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       "SELECT e.uuid e_uuid, e.refid e_refId, e.label e_label, e.description e_description,"
           + " e.identifiable_type e_type, , e.entity_type e_entityType,"
           + " e.created e_created, e.last_modified e_lastModified,"
-          + " file.uri f_uri, file.filename f_filename"
+          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
           + " FROM entities as e"
           + " LEFT JOIN fileresources_image as file on e.previewfileresource = file.uuid";
 
@@ -110,16 +110,29 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     addPageRequestParams(pageRequest, query);
 
     List<EntityImpl> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query.toString())
-                    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, EntityImpl>(),
-                        (map, rowView) -> addPreviewImage(map, rowView, EntityImpl.class, "e_uuid"))
-                    .values().stream()
-                    .collect(Collectors.toList()));
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, EntityImpl>(),
+                            (map, rowView) -> {
+                              EntityImpl entity =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("e_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(EntityImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                entity.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
+
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -129,23 +142,37 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   public E findOne(UUID uuid) {
     String query = FIND_ONE_BASE_SQL + " WHERE e.uuid = :uuid";
 
-    Optional<EntityImpl> resultOpt =
+    EntityImpl result =
         dbi.withHandle(
-            h ->
-                h.createQuery(query).bind("uuid", uuid)
-                    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, EntityImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(map, rowView, EntityImpl.class, "e_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    return (E) resultOpt.get();
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, EntityImpl>(),
+                            (map, rowView) -> {
+                              EntityImpl entity =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("e_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(EntityImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                entity.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                              }
+
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                                entity.addIdentifier(identifier);
+                              }
+
+                              return map;
+                            }))
+            .get(uuid);
+    return (E) result;
   }
 
   @Override
@@ -159,46 +186,79 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
     String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
-    Optional<EntityImpl> resultOpt =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query).bind("id", identifierId).bind("namespace", namespace)
-                    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, EntityImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(map, rowView, EntityImpl.class, "e_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    return (E) resultOpt.get();
+    Optional<EntityImpl> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("id", identifierId)
+                        .bind("namespace", namespace)
+                        .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, EntityImpl>(),
+                            (map, rowView) -> {
+                              EntityImpl entity =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("e_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(EntityImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                entity.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                              }
+
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                                entity.addIdentifier(dbIdentifier);
+                              }
+
+                              return map;
+                            }))
+            .values().stream()
+            .findFirst();
+    return (E) result.orElse(null);
   }
 
   @Override
   public E findOneByRefId(long refId) {
     String query = FIND_ONE_BASE_SQL + " WHERE e.refid = :refId";
 
-    Optional<EntityImpl> resultOpt =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query).bind("refId", refId)
-                    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, EntityImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(map, rowView, EntityImpl.class, "e_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    return (E) resultOpt.get();
+    Optional<EntityImpl> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("refId", refId)
+                        .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, EntityImpl>(),
+                            (map, rowView) -> {
+                              EntityImpl entity =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("e_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(EntityImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                entity.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                              }
+
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                                entity.addIdentifier(dbIdentifier);
+                              }
+
+                              return map;
+                            }))
+            .values().stream()
+            .findFirst();
+    return (E) result.orElse(null);
   }
 
   @Override
@@ -207,26 +267,26 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public LinkedHashSet<FileResource> getRelatedFileResources(E entity) {
+  public List<FileResource> getRelatedFileResources(E entity) {
     return getRelatedFileResources(entity.getUuid());
   }
 
   @Override
-  public LinkedHashSet<FileResource> getRelatedFileResources(UUID entityUuid) {
+  public List<FileResource> getRelatedFileResources(UUID entityUuid) {
     String query =
         "SELECT * FROM fileresources f"
             + " INNER JOIN rel_entity_fileresources ref ON f.uuid=ref.fileresource_uuid"
             + " WHERE ref.entity_uuid = :entityUuid"
             + " ORDER BY ref.sortindex";
 
-    List<FileResourceImpl> result =
+    List<FileResource> result =
         dbi.withHandle(
             h ->
-                h.createQuery(query)
-                    .bind("entityUuid", entityUuid)
-                    .mapToBean(FileResourceImpl.class)
-                    .list());
-    return new LinkedHashSet<>(result);
+                h.createQuery(query).bind("entityUuid", entityUuid)
+                    .mapToBean(FileResourceImpl.class).list().stream()
+                    .map(FileResource.class::cast)
+                    .collect(Collectors.toList()));
+    return result;
   }
 
   @Override
@@ -260,14 +320,13 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveRelatedFileResources(
-      E entity, LinkedHashSet<FileResource> fileResources) {
+  public List<FileResource> saveRelatedFileResources(E entity, List<FileResource> fileResources) {
     return saveRelatedFileResources(entity.getUuid(), fileResources);
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveRelatedFileResources(
-      UUID entityUuid, LinkedHashSet<FileResource> fileResources) {
+  public List<FileResource> saveRelatedFileResources(
+      UUID entityUuid, List<FileResource> fileResources) {
     if (fileResources == null) {
       return null;
     }

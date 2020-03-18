@@ -7,7 +7,6 @@ import de.digitalcollections.cudami.admin.business.api.service.identifiable.enti
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -136,7 +135,7 @@ public class WebpagesController extends AbstractController {
     model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("webpage", webpage);
 
-    LinkedHashSet<FileResource> relatedFileResources = service.getRelatedFileResources(webpage);
+    List<FileResource> relatedFileResources = service.getRelatedFileResources(webpage);
     model.addAttribute("relatedFileResources", relatedFileResources);
 
     return "webpages/view";

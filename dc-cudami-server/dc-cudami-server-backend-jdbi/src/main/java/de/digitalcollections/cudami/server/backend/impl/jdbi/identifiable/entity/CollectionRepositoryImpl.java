@@ -11,11 +11,12 @@ import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.slf4j.Logger;
@@ -36,7 +37,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
           + " c.created c_created, c.last_modified c_lastModified,"
           + " c.text c_text,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
           + " FROM collections as c"
           + " LEFT JOIN identifiers as id on c.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid";
@@ -47,7 +48,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
       "SELECT c.uuid c_uuid, c.refid c_refId, c.label c_label, c.description c_description,"
           + " c.identifiable_type c_type, c.entity_type c_entityType,"
           + " c.created c_created, c.last_modified c_lastModified,"
-          + " file.uri f_uri, file.filename f_filename"
+          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
           + " FROM collections as c"
           + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid";
 
@@ -69,17 +70,29 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     addPageRequestParams(pageRequest, query);
 
     List<CollectionImpl> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query.toString())
-                    .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, CollectionImpl>(),
-                        (map, rowView) ->
-                            addPreviewImage(map, rowView, CollectionImpl.class, "c_uuid"))
-                    .values().stream()
-                    .collect(Collectors.toList()));
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, CollectionImpl>(),
+                            (map, rowView) -> {
+                              CollectionImpl collection =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("c_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(CollectionImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                collection.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -89,24 +102,38 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   public Collection findOne(UUID uuid) {
     String query = FIND_ONE_BASE_SQL + " WHERE c.uuid = :uuid";
 
-    Optional<CollectionImpl> resultOpt =
+    CollectionImpl result =
         dbi.withHandle(
-            h ->
-                h.createQuery(query).bind("uuid", uuid)
-                    .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, CollectionImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(
-                                map, rowView, CollectionImpl.class, "c_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    return resultOpt.get();
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, CollectionImpl>(),
+                            (map, rowView) -> {
+                              CollectionImpl collection =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("c_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(CollectionImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                collection.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                                collection.addIdentifier(identifier);
+                              }
+
+                              return map;
+                            }))
+            .get(uuid);
+    return result;
   }
 
   @Override
@@ -120,24 +147,41 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
     String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
-    Optional<CollectionImpl> resultOpt =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query).bind("id", identifierId).bind("namespace", namespace)
-                    .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, CollectionImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(
-                                map, rowView, CollectionImpl.class, "c_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    return resultOpt.get();
+    Optional<CollectionImpl> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("id", identifierId)
+                        .bind("namespace", namespace)
+                        .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, CollectionImpl>(),
+                            (map, rowView) -> {
+                              CollectionImpl collection =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("c_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(CollectionImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                collection.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                                collection.addIdentifier(dbIdentifier);
+                              }
+
+                              return map;
+                            }))
+            .values().stream()
+            .findFirst();
+    return result.orElse(null);
   }
 
   @Override
@@ -175,7 +219,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                 .execute());
 
     // save identifiers
-    List<Identifier> identifiers = collection.getIdentifiers();
+    Set<Identifier> identifiers = collection.getIdentifiers();
     saveIdentifiers(identifiers, collection);
 
     Collection result = findOne(collection.getUuid());
@@ -207,7 +251,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     // save identifiers
     // as we store the whole list new: delete old entries
     deleteIdentifiers(collection);
-    List<Identifier> identifiers = collection.getIdentifiers();
+    Set<Identifier> identifiers = collection.getIdentifiers();
     saveIdentifiers(identifiers, collection);
 
     Collection result = findOne(collection.getUuid());

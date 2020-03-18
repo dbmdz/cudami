@@ -8,7 +8,6 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -48,7 +47,7 @@ public interface EntityRepositoryEndpoint extends RepositoryEndpoint {
   Entity findOneByRefId(@Param("refId") long refId);
 
   @RequestLine("GET /latest/entities/{uuid}/related/fileresources")
-  LinkedHashSet<FileResource> getRelatedFileResources(@Param("uuid") UUID uuid);
+  List<FileResource> getRelatedFileResources(@Param("uuid") UUID uuid);
 
   @RequestLine("GET /latest/entities/relations/{subjectEntityUuid}")
   List<EntityRelation> getRelations(@Param("subjectEntityUuid") UUID subjectEntityUuid);
@@ -58,8 +57,8 @@ public interface EntityRepositoryEndpoint extends RepositoryEndpoint {
   Entity save(Entity entity);
 
   @RequestLine("POST /latest/entities/{uuid}/related/fileresources")
-  LinkedHashSet<FileResource> saveRelatedFileResources(
-      @Param("uuid") UUID uuid, LinkedHashSet<FileResource> fileResources);
+  List<FileResource> saveRelatedFileResources(
+      @Param("uuid") UUID uuid, List<FileResource> fileResources);
 
   @RequestLine("POST /latest/entities/relations")
   List<EntityRelation> saveRelations(List<EntityRelation> relations);

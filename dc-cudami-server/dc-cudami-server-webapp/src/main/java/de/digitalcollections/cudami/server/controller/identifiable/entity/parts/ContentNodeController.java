@@ -13,7 +13,6 @@ import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -167,7 +166,7 @@ public class ContentNodeController {
       produces = "application/json",
       method = RequestMethod.GET)
   @ApiResponseObject
-  public LinkedHashSet<Entity> getEntities(@PathVariable UUID uuid) {
+  public List<Entity> getEntities(@PathVariable UUID uuid) {
     return service.getEntities(uuid);
   }
 
@@ -177,8 +176,7 @@ public class ContentNodeController {
       value = {"/latest/contentnodes/{uuid}/entities", "/v2/contentnodes/{uuid}/entities"},
       produces = "application/json")
   @ApiResponseObject
-  public LinkedHashSet<Entity> saveEntities(
-      @PathVariable UUID uuid, @RequestBody LinkedHashSet<Entity> entities) {
+  public List<Entity> saveEntities(@PathVariable UUID uuid, @RequestBody List<Entity> entities) {
     return service.saveEntities(uuid, entities);
   }
 
@@ -191,7 +189,7 @@ public class ContentNodeController {
       produces = "application/json",
       method = RequestMethod.GET)
   @ApiResponseObject
-  public LinkedHashSet<FileResource> getFileResources(@PathVariable UUID uuid) {
+  public List<FileResource> getFileResources(@PathVariable UUID uuid) {
     return service.getFileResources(uuid);
   }
 
@@ -204,8 +202,8 @@ public class ContentNodeController {
       },
       produces = "application/json")
   @ApiResponseObject
-  public LinkedHashSet<FileResource> saveFileresources(
-      @PathVariable UUID uuid, @RequestBody LinkedHashSet<FileResource> fileResources) {
+  public List<FileResource> saveFileresources(
+      @PathVariable UUID uuid, @RequestBody List<FileResource> fileResources) {
     return service.saveFileResources(uuid, fileResources);
   }
 

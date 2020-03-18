@@ -13,7 +13,7 @@ import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
@@ -145,7 +145,7 @@ public class WebpageController {
       },
       produces = "application/json")
   @ApiResponseObject
-  public LinkedHashSet<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
+  public List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
     return webpageService.getRelatedFileResources(uuid);
   }
 

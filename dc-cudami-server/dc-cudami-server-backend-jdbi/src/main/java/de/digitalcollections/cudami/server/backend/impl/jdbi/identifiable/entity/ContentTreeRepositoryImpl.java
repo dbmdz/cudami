@@ -13,11 +13,12 @@ import de.digitalcollections.model.impl.identifiable.entity.parts.ContentNodeImp
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.slf4j.Logger;
@@ -37,7 +38,7 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
           + " c.identifiable_type c_type, c.entity_type c_entityType,"
           + " c.created c_created, c.last_modified c_lastModified,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
           + " FROM contenttrees as c"
           + " LEFT JOIN identifiers as id on c.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid";
@@ -47,7 +48,7 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
       "SELECT c.uuid c_uuid, c.refid c_refId, c.label c_label, c.description c_description,"
           + " c.identifiable_type c_type, c.entity_type c_entityType,"
           + " c.created c_created, c.last_modified c_lastModified,"
-          + " file.uri f_uri, file.filename f_filename"
+          + " file.uuid f_uuid, file.filename f_filename, file.uri f_uri"
           + " FROM contenttrees as c"
           + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid";
 
@@ -69,17 +70,30 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
     addPageRequestParams(pageRequest, query);
 
     List<ContentTreeImpl> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query.toString())
-                    .registerRowMapper(BeanMapper.factory(ContentTreeImpl.class, "c"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, ContentTreeImpl>(),
-                        (map, rowView) ->
-                            addPreviewImage(map, rowView, ContentTreeImpl.class, "c_uuid"))
-                    .values().stream()
-                    .collect(Collectors.toList()));
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .registerRowMapper(BeanMapper.factory(ContentTreeImpl.class, "c"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, ContentTreeImpl>(),
+                            (map, rowView) -> {
+                              ContentTreeImpl contentTree =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("c_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(ContentTreeImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                contentTree.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
+
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -89,29 +103,42 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
   public ContentTree findOne(UUID uuid) {
     String query = FIND_ONE_BASE_SQL + " WHERE c.uuid = :uuid";
 
-    Optional<ContentTreeImpl> resultOpt =
+    ContentTreeImpl result =
         dbi.withHandle(
-            h ->
-                h.createQuery(query).bind("uuid", uuid)
-                    .registerRowMapper(BeanMapper.factory(ContentTreeImpl.class, "c"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, ContentTreeImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(
-                                map, rowView, ContentTreeImpl.class, "c_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    ContentTree contentTree = resultOpt.get();
-    if (contentTree != null) {
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(ContentTreeImpl.class, "c"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, ContentTreeImpl>(),
+                            (map, rowView) -> {
+                              ContentTreeImpl contentTree =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("c_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(ContentTreeImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                contentTree.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                                contentTree.addIdentifier(identifier);
+                              }
+
+                              return map;
+                            }))
+            .get(uuid);
+    if (result != null) {
       // TODO could be replaced with another join in above query...
-      contentTree.setRootNodes(getRootNodes(contentTree));
+      result.setRootNodes(getRootNodes(result));
     }
-    return contentTree;
+    return result;
   }
 
   @Override
@@ -125,24 +152,42 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
 
     String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
-    Optional<ContentTreeImpl> resultOpt =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query).bind("id", identifierId).bind("namespace", namespace)
-                    .registerRowMapper(BeanMapper.factory(ContentTreeImpl.class, "c"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, ContentTreeImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(
-                                map, rowView, ContentTreeImpl.class, "c_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    ContentTree contentTree = resultOpt.get();
+    Optional<ContentTreeImpl> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("id", identifierId)
+                        .bind("namespace", namespace)
+                        .registerRowMapper(BeanMapper.factory(ContentTreeImpl.class, "c"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, ContentTreeImpl>(),
+                            (map, rowView) -> {
+                              ContentTreeImpl contentTree =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("c_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(ContentTreeImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                contentTree.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                                contentTree.addIdentifier(dbIdentifier);
+                              }
+
+                              return map;
+                            }))
+            .values().stream()
+            .findFirst();
+
+    ContentTree contentTree = result.orElse(null);
     if (contentTree != null) {
       // TODO could be replaced with another join in above query...
       contentTree.setRootNodes(getRootNodes(contentTree));
@@ -168,25 +213,38 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
         "SELECT cn.uuid cn_uuid, cn.label cn_label, cn.description cn_description,"
             + " cn.identifiable_type cn_type,"
             + " cn.created cn_created, cn.last_modified cn_lastModified,"
-            + " file.uri f_uri, file.filename f_filename"
+            + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
             + " FROM contentnodes as cn INNER JOIN contenttree_contentnodes cc ON cn.uuid = cc.contentnode_uuid"
             + " LEFT JOIN fileresources_image as file on cn.previewfileresource = file.uuid"
             + " WHERE cc.contenttree_uuid = :uuid"
             + " ORDER BY cc.sortIndex ASC";
 
-    List<ContentNodeImpl> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query).bind("uuid", uuid)
-                    .registerRowMapper(BeanMapper.factory(ContentNodeImpl.class, "cn"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, ContentNodeImpl>(),
-                        (map, rowView) ->
-                            addPreviewImage(map, rowView, ContentNodeImpl.class, "cn_uuid"))
-                    .values().stream()
-                    .collect(Collectors.toList()));
-    return result.stream().map(ContentNode.class::cast).collect(Collectors.toList());
+    List<ContentNode> result =
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(ContentNodeImpl.class, "cn"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, ContentNodeImpl>(),
+                            (map, rowView) -> {
+                              ContentNodeImpl contentNode =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("cn_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(ContentNodeImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                contentNode.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
+    return result;
   }
 
   @Override
@@ -217,7 +275,7 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
                 .execute());
 
     // save identifiers
-    List<Identifier> identifiers = contentTree.getIdentifiers();
+    Set<Identifier> identifiers = contentTree.getIdentifiers();
     saveIdentifiers(identifiers, contentTree);
 
     ContentTree result = findOne(contentTree.getUuid());
@@ -249,7 +307,7 @@ public class ContentTreeRepositoryImpl extends EntityRepositoryImpl<ContentTree>
     // save identifiers
     // as we store the whole list new: delete old entries
     deleteIdentifiers(contentTree);
-    List<Identifier> identifiers = contentTree.getIdentifiers();
+    Set<Identifier> identifiers = contentTree.getIdentifiers();
     saveIdentifiers(identifiers, contentTree);
 
     ContentTree result = findOne(contentTree.getUuid());

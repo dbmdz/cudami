@@ -10,7 +10,6 @@ import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -98,12 +97,12 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public LinkedHashSet<FileResource> getRelatedFileResources(E entity) {
+  public List<FileResource> getRelatedFileResources(E entity) {
     return getRelatedFileResources(entity.getUuid());
   }
 
   @Override
-  public LinkedHashSet<FileResource> getRelatedFileResources(UUID entityUuid) {
+  public List<FileResource> getRelatedFileResources(UUID entityUuid) {
     return endpoint.getRelatedFileResources(entityUuid);
   }
 
@@ -123,14 +122,13 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveRelatedFileResources(
-      E entity, LinkedHashSet<FileResource> fileResources) {
+  public List<FileResource> saveRelatedFileResources(E entity, List<FileResource> fileResources) {
     return saveRelatedFileResources(entity.getUuid(), fileResources);
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveRelatedFileResources(
-      UUID entityUuid, LinkedHashSet<FileResource> fileResources) {
+  public List<FileResource> saveRelatedFileResources(
+      UUID entityUuid, List<FileResource> fileResources) {
     return endpoint.saveRelatedFileResources(entityUuid, fileResources);
   }
 

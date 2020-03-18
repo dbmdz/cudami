@@ -4,7 +4,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
@@ -27,7 +27,10 @@ public class EntityController<E extends Entity> {
 
   @ApiMethod(description = "Get entity by uuid")
   @GetMapping(
-      value = {"/latest/entities/{uuid}", "/v2/entities/{uuid}"},
+      value = {
+        "/latest/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v2/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+      },
       produces = "application/json")
   @ApiResponseObject
   public Entity findById(@PathVariable UUID uuid) {
@@ -74,7 +77,7 @@ public class EntityController<E extends Entity> {
       produces = "application/json",
       method = RequestMethod.GET)
   @ApiResponseObject
-  LinkedHashSet<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
+  List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
     return service.getRelatedFileResources(uuid);
   }
 }

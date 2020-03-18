@@ -9,7 +9,6 @@ import de.digitalcollections.model.api.identifiable.entity.parts.EntityPart;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -73,12 +72,12 @@ public class EntityPartRepositoryImpl<P extends EntityPart, E extends Entity>
   }
 
   @Override
-  public LinkedHashSet<E> getRelatedEntities(P entityPart) {
+  public List<E> getRelatedEntities(P entityPart) {
     return getRelatedEntities(entityPart.getUuid());
   }
 
   @Override
-  public LinkedHashSet<E> getRelatedEntities(UUID entityPartUuid) {
+  public List<E> getRelatedEntities(UUID entityPartUuid) {
     String query =
         "SELECT * FROM entities e"
             + " INNER JOIN rel_entitypart_entities ref ON e.uuid=ref.entity_uuid"
@@ -92,42 +91,41 @@ public class EntityPartRepositoryImpl<P extends EntityPart, E extends Entity>
                     .bind("entityPartUuid", entityPartUuid)
                     .mapToBean(EntityImpl.class)
                     .list());
-    // TODO maybe does not work, then we have to refactor to LinkedHashSet<Entity>...
-    LinkedHashSet<E> result =
-        list.stream().map(s -> (E) s).collect(Collectors.toCollection(LinkedHashSet::new));
+    List<E> result = list.stream().map(s -> (E) s).collect(Collectors.toList());
     return result;
   }
 
   @Override
-  public LinkedHashSet<FileResource> getRelatedFileResources(P entityPart) {
+  public List<FileResource> getRelatedFileResources(P entityPart) {
     return getRelatedFileResources(entityPart.getUuid());
   }
 
   @Override
-  public LinkedHashSet<FileResource> getRelatedFileResources(UUID entityPartUuid) {
+  public List<FileResource> getRelatedFileResources(UUID entityPartUuid) {
     String query =
         "SELECT * FROM fileresources f"
             + " INNER JOIN rel_entitypart_fileresources ref ON f.uuid=ref.fileresource_uuid"
             + " WHERE ref.entitypart_uuid = :entityPartUuid"
             + " ORDER BY ref.sortindex";
 
-    List<FileResourceImpl> result =
+    List<FileResource> result =
         dbi.withHandle(
             h ->
                 h.createQuery(query)
                     .bind("entityPartUuid", entityPartUuid)
                     .mapToBean(FileResourceImpl.class)
+                    .map(FileResource.class::cast)
                     .list());
-    return new LinkedHashSet<>(result);
+    return result;
   }
 
   @Override
-  public LinkedHashSet<E> saveRelatedEntities(P entityPart, LinkedHashSet<E> entities) {
+  public List<E> saveRelatedEntities(P entityPart, List<E> entities) {
     return saveRelatedEntities(entityPart.getUuid(), entities);
   }
 
   @Override
-  public LinkedHashSet<E> saveRelatedEntities(UUID entityPartUuid, LinkedHashSet<E> entities) {
+  public List<E> saveRelatedEntities(UUID entityPartUuid, List<E> entities) {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
         h ->
@@ -156,14 +154,14 @@ public class EntityPartRepositoryImpl<P extends EntityPart, E extends Entity>
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveRelatedFileResources(
-      P entityPart, LinkedHashSet<FileResource> fileResources) {
+  public List<FileResource> saveRelatedFileResources(
+      P entityPart, List<FileResource> fileResources) {
     return saveRelatedFileResources(entityPart.getUuid(), fileResources);
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveRelatedFileResources(
-      UUID entityPartUuid, LinkedHashSet<FileResource> fileResources) {
+  public List<FileResource> saveRelatedFileResources(
+      UUID entityPartUuid, List<FileResource> fileResources) {
     if (fileResources == null) {
       return null;
     }

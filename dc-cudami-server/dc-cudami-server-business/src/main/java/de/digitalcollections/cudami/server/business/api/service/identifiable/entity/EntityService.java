@@ -4,7 +4,6 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,9 +32,9 @@ public interface EntityService<E extends Entity> extends IdentifiableService<E> 
 
   void addRelatedFileresource(UUID entityUuid, UUID fileResourceUuid);
 
-  LinkedHashSet<FileResource> getRelatedFileResources(E entity);
+  List<FileResource> getRelatedFileResources(E entity);
 
-  LinkedHashSet<FileResource> getRelatedFileResources(UUID entityUuid);
+  List<FileResource> getRelatedFileResources(UUID entityUuid);
 
   /**
    * Save list of file resources related to an entity. Prerequisite: file resources have been saved
@@ -45,9 +44,7 @@ public interface EntityService<E extends Entity> extends IdentifiableService<E> 
    * @param fileResources the fileresources that are related to the entity
    * @return the list of the related fileresources
    */
-  LinkedHashSet<FileResource> saveRelatedFileResources(
-      E entity, LinkedHashSet<FileResource> fileResources);
+  List<FileResource> saveRelatedFileResources(E entity, List<FileResource> fileResources);
 
-  LinkedHashSet<FileResource> saveRelatedFileResources(
-      UUID entityUuid, LinkedHashSet<FileResource> fileResources);
+  List<FileResource> saveRelatedFileResources(UUID entityUuid, List<FileResource> fileResources);
 }

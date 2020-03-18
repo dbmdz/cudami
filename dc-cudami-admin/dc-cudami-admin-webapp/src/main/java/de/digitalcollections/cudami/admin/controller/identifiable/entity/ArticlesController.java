@@ -12,7 +12,6 @@ import de.digitalcollections.model.api.identifiable.entity.Article;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -139,7 +138,7 @@ public class ArticlesController extends AbstractController {
     model.addAttribute("article", article);
     model.addAttribute("existingLanguages", existingLanguages);
 
-    LinkedHashSet<FileResource> relatedFileResources = service.getRelatedFileResources(article);
+    List<FileResource> relatedFileResources = service.getRelatedFileResources(article);
     model.addAttribute("relatedFileResources", relatedFileResources);
 
     return "articles/view";

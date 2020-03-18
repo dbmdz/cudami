@@ -8,7 +8,7 @@ import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,17 +63,17 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public LinkedHashSet<FileResource> getFileResources(DigitalObject digitalObject) {
+  public List<FileResource> getFileResources(DigitalObject digitalObject) {
     return getFileResources(digitalObject.getUuid());
   }
 
   @Override
-  public LinkedHashSet<FileResource> getFileResources(UUID digitalObjectUuid) {
+  public List<FileResource> getFileResources(UUID digitalObjectUuid) {
     return endpoint.getFileResources(digitalObjectUuid);
   }
 
   @Override
-  public LinkedHashSet<ImageFileResource> getImageFileResources(UUID uuid) {
+  public List<ImageFileResource> getImageFileResources(UUID uuid) {
     return endpoint.getImageFileResources(uuid);
   }
 
@@ -83,14 +83,14 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveFileResources(
-      DigitalObject digitalObject, LinkedHashSet<FileResource> fileResources) {
+  public List<FileResource> saveFileResources(
+      DigitalObject digitalObject, List<FileResource> fileResources) {
     return saveFileResources(digitalObject.getUuid(), fileResources);
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveFileResources(
-      UUID digitalObjectUuid, LinkedHashSet<FileResource> fileResources) {
+  public List<FileResource> saveFileResources(
+      UUID digitalObjectUuid, List<FileResource> fileResources) {
     return endpoint.saveFileResources(digitalObjectUuid, fileResources);
   }
 

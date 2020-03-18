@@ -3,25 +3,24 @@ package de.digitalcollections.cudami.admin.backend.api.repository.identifiable.e
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.UUID;
 
 /** Repository for Digital Object persistence handling. */
 public interface DigitalObjectRepository extends EntityRepository<DigitalObject> {
 
-  LinkedHashSet<FileResource> getFileResources(DigitalObject digitalObject);
+  List<FileResource> getFileResources(DigitalObject digitalObject);
 
-  LinkedHashSet<FileResource> getFileResources(UUID digitalObjectUuid);
+  List<FileResource> getFileResources(UUID digitalObjectUuid);
 
-  default LinkedHashSet<ImageFileResource> getImageFileResources(DigitalObject digitalObject) {
+  default List<ImageFileResource> getImageFileResources(DigitalObject digitalObject) {
     return getImageFileResources(digitalObject.getUuid());
   }
 
-  LinkedHashSet<ImageFileResource> getImageFileResources(UUID digitalObjectUuid);
+  List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid);
 
-  LinkedHashSet<FileResource> saveFileResources(
-      DigitalObject digitalObject, LinkedHashSet<FileResource> fileResources);
+  List<FileResource> saveFileResources(
+      DigitalObject digitalObject, List<FileResource> fileResources);
 
-  LinkedHashSet<FileResource> saveFileResources(
-      UUID digitalObjectUuid, LinkedHashSet<FileResource> fileResources);
+  List<FileResource> saveFileResources(UUID digitalObjectUuid, List<FileResource> fileResources);
 }

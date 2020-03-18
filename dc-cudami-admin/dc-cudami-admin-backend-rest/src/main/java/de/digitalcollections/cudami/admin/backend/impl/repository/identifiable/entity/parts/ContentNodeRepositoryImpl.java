@@ -8,10 +8,10 @@ import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.parts.ContentNodeImpl;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -64,22 +64,23 @@ public class ContentNodeRepositoryImpl<E extends Entity>
   }
 
   @Override
-  public LinkedHashSet<E> getEntities(ContentNode contentNode) {
+  public List<E> getEntities(ContentNode contentNode) {
     return getEntities(contentNode.getUuid());
   }
 
   @Override
-  public LinkedHashSet<E> getEntities(UUID contentNodeUuid) {
-    return convertToGenericLinkedHashSet(endpoint.getEntities(contentNodeUuid));
+  public List<E> getEntities(UUID contentNodeUuid) {
+    List<Entity> entities = endpoint.getEntities(contentNodeUuid);
+    return entities.stream().map(e -> (E) e).collect(Collectors.toList());
   }
 
   @Override
-  public LinkedHashSet<FileResource> getFileResources(ContentNode contentNode) {
+  public List<FileResource> getFileResources(ContentNode contentNode) {
     return getFileResources(contentNode.getUuid());
   }
 
   @Override
-  public LinkedHashSet<FileResource> getFileResources(UUID contentNodeUuid) {
+  public List<FileResource> getFileResources(UUID contentNodeUuid) {
     return endpoint.getFileResources(contentNodeUuid);
   }
 
@@ -94,25 +95,28 @@ public class ContentNodeRepositoryImpl<E extends Entity>
   }
 
   @Override
-  public LinkedHashSet<E> saveEntities(ContentNode contentNode, LinkedHashSet<E> entities) {
+  public List<E> saveEntities(ContentNode contentNode, List<E> entities) {
     return saveEntities(contentNode.getUuid(), entities);
   }
 
   @Override
-  public LinkedHashSet<E> saveEntities(UUID contentNodeUuid, LinkedHashSet<E> entities) {
-    return convertToGenericLinkedHashSet(
-        endpoint.saveEntities(contentNodeUuid, convertFromGenericLinkedHashSet(entities)));
+  public List<E> saveEntities(UUID contentNodeUuid, List<E> entities) {
+    List<Entity> savedEntities =
+        endpoint.saveEntities(
+            contentNodeUuid,
+            entities.stream().map(Entity.class::cast).collect(Collectors.toList()));
+    return savedEntities.stream().map(e -> (E) e).collect(Collectors.toList());
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveFileResources(
-      ContentNode contentNode, LinkedHashSet<FileResource> fileResources) {
+  public List<FileResource> saveFileResources(
+      ContentNode contentNode, List<FileResource> fileResources) {
     return saveFileResources(contentNode.getUuid(), fileResources);
   }
 
   @Override
-  public LinkedHashSet<FileResource> saveFileResources(
-      UUID contentNodeUuid, LinkedHashSet<FileResource> fileResources) {
+  public List<FileResource> saveFileResources(
+      UUID contentNodeUuid, List<FileResource> fileResources) {
     return endpoint.saveFileResources(contentNodeUuid, fileResources);
   }
 

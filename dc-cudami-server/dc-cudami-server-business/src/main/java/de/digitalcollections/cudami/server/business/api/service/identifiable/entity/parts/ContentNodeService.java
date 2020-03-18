@@ -5,7 +5,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Nod
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.ContentNode;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -20,23 +20,21 @@ public interface ContentNodeService<E extends Entity>
   @Override
   ContentNode get(UUID uuid, Locale locale) throws IdentifiableServiceException;
 
-  LinkedHashSet<E> getEntities(ContentNode contentNode);
+  List<E> getEntities(ContentNode contentNode);
 
-  LinkedHashSet<E> getEntities(UUID contentNodeUuid);
+  List<E> getEntities(UUID contentNodeUuid);
 
-  LinkedHashSet<E> saveEntities(ContentNode contentNode, LinkedHashSet<E> entities);
+  List<E> saveEntities(ContentNode contentNode, List<E> entities);
 
-  LinkedHashSet<E> saveEntities(UUID contentNodeUuid, LinkedHashSet<E> entities);
+  List<E> saveEntities(UUID contentNodeUuid, List<E> entities);
 
-  LinkedHashSet<FileResource> getFileResources(ContentNode contentNode);
+  List<FileResource> getFileResources(ContentNode contentNode);
 
-  LinkedHashSet<FileResource> getFileResources(UUID contentNodeUuid);
+  List<FileResource> getFileResources(UUID contentNodeUuid);
 
-  LinkedHashSet<FileResource> saveFileResources(
-      ContentNode contentNode, LinkedHashSet<FileResource> fileResources);
+  List<FileResource> saveFileResources(ContentNode contentNode, List<FileResource> fileResources);
 
-  LinkedHashSet<FileResource> saveFileResources(
-      UUID contentNodeUuid, LinkedHashSet<FileResource> fileResources);
+  List<FileResource> saveFileResources(UUID contentNodeUuid, List<FileResource> fileResources);
 
   ContentNode saveWithParentContentTree(ContentNode contentNode, UUID parentContentTreeUuid)
       throws IdentifiableServiceException;

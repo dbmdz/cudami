@@ -10,7 +10,6 @@ import de.digitalcollections.model.impl.identifiable.IdentifierTypeImpl;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,22 +109,12 @@ public class IdentifierTypeRepositoryImpl implements IdentifierTypeRepository {
     PageResponse<IdentifierType> genericPageResponse;
     if (pageResponse.hasContent()) {
       List<IdentifierType> content = pageResponse.getContent();
-      List<IdentifierType> genericContent = convertToGenericList(content);
       genericPageResponse = (PageResponse<IdentifierType>) pageResponse;
-      genericPageResponse.setContent(genericContent);
+      genericPageResponse.setContent(content);
     } else {
       genericPageResponse = (PageResponse<IdentifierType>) pageResponse;
     }
     return genericPageResponse;
-  }
-
-  protected List<IdentifierType> convertToGenericList(List<IdentifierType> identifierTypes) {
-    if (identifierTypes == null) {
-      return null;
-    }
-    List<IdentifierType> genericContent =
-        identifierTypes.stream().map(s -> (IdentifierType) s).collect(Collectors.toList());
-    return genericContent;
   }
 
   @Override

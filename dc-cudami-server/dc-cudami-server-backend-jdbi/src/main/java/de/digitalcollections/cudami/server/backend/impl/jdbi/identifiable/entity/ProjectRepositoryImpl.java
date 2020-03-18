@@ -11,11 +11,12 @@ import de.digitalcollections.model.impl.identifiable.entity.ProjectImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.slf4j.Logger;
@@ -36,7 +37,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
           + " p.created p_created, p.last_modified p_lastModified,"
           + " p.text p_text, p.start_date p_startDate, p.end_date p_endDate,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
           + " FROM projects as p"
           + " LEFT JOIN identifiers as id on p.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on p.previewfileresource = file.uuid";
@@ -47,7 +48,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
           + " p.identifiable_type p_type, p.entity_type p_entityType,"
           + " p.created p_created, p.last_modified p_lastModified,"
           + " p.start_date p_startDate, p.end_date p_endDate,"
-          + " file.uri f_uri, file.filename f_filename"
+          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
           + " FROM projects as p"
           + " LEFT JOIN fileresources_image as file on p.previewfileresource = file.uuid";
 
@@ -69,17 +70,30 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
     addPageRequestParams(pageRequest, query);
 
     List<ProjectImpl> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query.toString())
-                    .registerRowMapper(BeanMapper.factory(ProjectImpl.class, "p"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, ProjectImpl>(),
-                        (map, rowView) ->
-                            addPreviewImage(map, rowView, ProjectImpl.class, "p_uuid"))
-                    .values().stream()
-                    .collect(Collectors.toList()));
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .registerRowMapper(BeanMapper.factory(ProjectImpl.class, "p"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, ProjectImpl>(),
+                            (map, rowView) -> {
+                              ProjectImpl project =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("p_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(ProjectImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                project.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
+
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -89,24 +103,38 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   public Project findOne(UUID uuid) {
     String query = FIND_ONE_BASE_SQL + " WHERE p.uuid = :uuid";
 
-    Optional<ProjectImpl> resultOpt =
+    ProjectImpl result =
         dbi.withHandle(
-            h ->
-                h.createQuery(query).bind("uuid", uuid)
-                    .registerRowMapper(BeanMapper.factory(ProjectImpl.class, "p"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, ProjectImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(
-                                map, rowView, ProjectImpl.class, "p_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    return resultOpt.get();
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(ProjectImpl.class, "p"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, ProjectImpl>(),
+                            (map, rowView) -> {
+                              ProjectImpl project =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("p_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(ProjectImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                project.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                                project.addIdentifier(identifier);
+                              }
+
+                              return map;
+                            }))
+            .get(uuid);
+    return result;
   }
 
   @Override
@@ -120,24 +148,41 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
 
     String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
-    Optional<ProjectImpl> resultOpt =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query).bind("id", identifierId).bind("namespace", namespace)
-                    .registerRowMapper(BeanMapper.factory(ProjectImpl.class, "p"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, ProjectImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(
-                                map, rowView, ProjectImpl.class, "p_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    return resultOpt.get();
+    Optional<ProjectImpl> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("id", identifierId)
+                        .bind("namespace", namespace)
+                        .registerRowMapper(BeanMapper.factory(ProjectImpl.class, "p"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, ProjectImpl>(),
+                            (map, rowView) -> {
+                              ProjectImpl project =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("p_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(ProjectImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                project.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                                project.addIdentifier(dbIdentifier);
+                              }
+
+                              return map;
+                            }))
+            .values().stream()
+            .findFirst();
+    return result.orElse(null);
   }
 
   @Override
@@ -175,7 +220,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
                 .execute());
 
     // save identifiers
-    List<Identifier> identifiers = project.getIdentifiers();
+    Set<Identifier> identifiers = project.getIdentifiers();
     saveIdentifiers(identifiers, project);
 
     Project result = findOne(project.getUuid());
@@ -207,7 +252,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
     // save identifiers
     // as we store the whole list new: delete old entries
     deleteIdentifiers(project);
-    List<Identifier> identifiers = project.getIdentifiers();
+    Set<Identifier> identifiers = project.getIdentifiers();
     saveIdentifiers(identifiers, project);
 
     Project result = findOne(project.getUuid());

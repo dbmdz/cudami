@@ -13,9 +13,11 @@ import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
@@ -38,7 +40,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
           + " w.created w_created, w.last_modified w_lastModified,"
           + " w.url w_url, w.registration_date w_registrationDate,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
           + " FROM websites as w"
           + " LEFT JOIN identifiers as id on w.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid";
@@ -49,7 +51,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
           + " w.identifiable_type w_type, w.entity_type w_entityType,"
           + " w.created w_created, w.last_modified w_lastModified,"
           + " w.url w_url, w.registration_date w_registrationDate,"
-          + " file.uri f_uri, file.filename f_filename"
+          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
           + " FROM websites as w"
           + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid";
 
@@ -71,17 +73,30 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     addPageRequestParams(pageRequest, query);
 
     List<WebsiteImpl> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query.toString())
-                    .registerRowMapper(BeanMapper.factory(WebsiteImpl.class, "w"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, WebsiteImpl>(),
-                        (map, rowView) ->
-                            addPreviewImage(map, rowView, WebsiteImpl.class, "w_uuid"))
-                    .values().stream()
-                    .collect(Collectors.toList()));
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .registerRowMapper(BeanMapper.factory(WebsiteImpl.class, "w"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, WebsiteImpl>(),
+                            (map, rowView) -> {
+                              WebsiteImpl website =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("w_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(WebsiteImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                website.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
+
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -91,28 +106,42 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   public Website findOne(UUID uuid) {
     String query = FIND_ONE_BASE_SQL + " WHERE w.uuid = :uuid";
 
-    Optional<WebsiteImpl> resultOpt =
+    WebsiteImpl result =
         dbi.withHandle(
-            h ->
-                h.createQuery(query).bind("uuid", uuid)
-                    .registerRowMapper(BeanMapper.factory(WebsiteImpl.class, "w"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, WebsiteImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(
-                                map, rowView, WebsiteImpl.class, "w_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(WebsiteImpl.class, "w"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, WebsiteImpl>(),
+                            (map, rowView) -> {
+                              WebsiteImpl website =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("w_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(WebsiteImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                website.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                                website.addIdentifier(identifier);
+                              }
+
+                              return map;
+                            }))
+            .get(uuid);
+
+    if (result != null) {
+      result.setRootPages(getRootPages(result));
     }
-    Website website = resultOpt.get();
-    if (website != null) {
-      website.setRootPages(getRootPages(website));
-    }
-    return website;
+    return result;
   }
 
   @Override
@@ -126,24 +155,42 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
 
     String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
-    Optional<WebsiteImpl> resultOpt =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query).bind("id", identifierId).bind("namespace", namespace)
-                    .registerRowMapper(BeanMapper.factory(WebsiteImpl.class, "w"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, WebsiteImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(
-                                map, rowView, WebsiteImpl.class, "w_uuid"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    Website website = resultOpt.get();
+    Optional<WebsiteImpl> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("id", identifierId)
+                        .bind("namespace", namespace)
+                        .registerRowMapper(BeanMapper.factory(WebsiteImpl.class, "w"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, WebsiteImpl>(),
+                            (map, rowView) -> {
+                              WebsiteImpl website =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("w_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(WebsiteImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                website.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                                website.addIdentifier(dbIdentifier);
+                              }
+
+                              return map;
+                            }))
+            .values().stream()
+            .findFirst();
+
+    Website website = result.orElse(null);
     if (website != null) {
       website.setRootPages(getRootPages(website));
     }
@@ -185,7 +232,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
                 .execute());
 
     // save identifiers
-    List<Identifier> identifiers = website.getIdentifiers();
+    Set<Identifier> identifiers = website.getIdentifiers();
     saveIdentifiers(identifiers, website);
 
     Website result = findOne(website.getUuid());
@@ -217,7 +264,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     // save identifiers
     // as we store the whole list new: delete old entries
     deleteIdentifiers(website);
-    List<Identifier> identifiers = website.getIdentifiers();
+    Set<Identifier> identifiers = website.getIdentifiers();
     saveIdentifiers(identifiers, website);
 
     Website result = findOne(website.getUuid());

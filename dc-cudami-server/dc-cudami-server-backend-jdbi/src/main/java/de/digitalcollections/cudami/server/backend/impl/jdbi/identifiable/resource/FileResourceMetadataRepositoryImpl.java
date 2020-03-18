@@ -25,11 +25,11 @@ import de.digitalcollections.model.impl.identifiable.resource.VideoFileResourceI
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.slf4j.Logger;
@@ -52,7 +52,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
           + " f.created f_created, f.last_modified f_lastModified,"
           + " f.filename f_filename, f.mimetype f_mimetype, f.size_in_bytes f_sizeInBytes, f.uri f_uri,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.filename pf_filename, file.mimetype pf_mimetype, file.size_in_bytes pf_size_in_bytes, file.uri pf_uri"
+          + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimetype, file.size_in_bytes pf_size_in_bytes, file.uri pf_uri"
           + " FROM fileresources as f"
           + " LEFT JOIN identifiers as id on f.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on f.previewfileresource = file.uuid";
@@ -63,7 +63,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
           + " f.identifiable_type f_type,"
           + " f.created f_created, f.last_modified f_lastModified,"
           + " f.filename f_filename, f.mimetype f_mimetype, f.size_in_bytes f_sizeInBytes, f.uri f_uri,"
-          + " file.uri pf_uri, file.filename pf_filename"
+          + " file.uuid pf_uuid, file.uri pf_uri, file.filename pf_filename"
           + " FROM fileresources as f"
           + " LEFT JOIN fileresources_image as file on f.previewfileresource = file.uuid";
 
@@ -128,17 +128,30 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
     addPageRequestParams(pageRequest, query);
 
     List<FileResourceImpl> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query.toString())
-                    .registerRowMapper(BeanMapper.factory(FileResourceImpl.class, "f"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, FileResourceImpl>(),
-                        (map, rowView) ->
-                            addPreviewImage(map, rowView, FileResourceImpl.class, "f_uuid"))
-                    .values().stream()
-                    .collect(Collectors.toList()));
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .registerRowMapper(BeanMapper.factory(FileResourceImpl.class, "f"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, FileResourceImpl>(),
+                            (map, rowView) -> {
+                              FileResourceImpl fileResource =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("f_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(FileResourceImpl.class);
+                                      });
+
+                              if (rowView.getColumn("pf_uuid", UUID.class) != null) {
+                                fileResource.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
+
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
@@ -217,28 +230,39 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
             + " LEFT JOIN identifiers as id on f.uuid = id.identifiable"
             + " LEFT JOIN fileresources_image as file on f.previewfileresource = file.uuid"
             + " WHERE f.uuid = :uuid";
-    Optional<ApplicationFileResourceImpl> resultOpt =
+    ApplicationFileResourceImpl result =
         dbi.withHandle(
-            h ->
-                h.createQuery(query).bind("uuid", uuid)
-                    .registerRowMapper(BeanMapper.factory(ApplicationFileResourceImpl.class, "f"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, ApplicationFileResourceImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(
-                                map,
-                                rowView,
-                                ApplicationFileResourceImpl.class,
-                                "f_uuid",
-                                "pf_uri"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    return resultOpt.get();
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(
+                            BeanMapper.factory(ApplicationFileResourceImpl.class, "f"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, ApplicationFileResourceImpl>(),
+                            (map, rowView) -> {
+                              ApplicationFileResourceImpl fileResource =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("f_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(ApplicationFileResourceImpl.class);
+                                      });
+
+                              if (rowView.getColumn("pf_uuid", UUID.class) != null) {
+                                fileResource.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                                fileResource.addIdentifier(identifier);
+                              }
+
+                              return map;
+                            }))
+            .get(uuid);
+    return result;
   }
 
   private AudioFileResource findOneAudioFileResource(UUID uuid) {
@@ -254,24 +278,39 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
             + " LEFT JOIN identifiers as id on f.uuid = id.identifiable"
             + " LEFT JOIN fileresources_image as file on f.previewfileresource = file.uuid"
             + " WHERE f.uuid = :uuid";
-    Optional<AudioFileResourceImpl> resultOpt =
+
+    AudioFileResourceImpl result =
         dbi.withHandle(
-            h ->
-                h.createQuery(query).bind("uuid", uuid)
-                    .registerRowMapper(BeanMapper.factory(AudioFileResourceImpl.class, "f"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, AudioFileResourceImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(
-                                map, rowView, AudioFileResourceImpl.class, "f_uuid", "pf_uri"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    return resultOpt.get();
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(AudioFileResourceImpl.class, "f"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, AudioFileResourceImpl>(),
+                            (map, rowView) -> {
+                              AudioFileResourceImpl fileResource =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("f_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(AudioFileResourceImpl.class);
+                                      });
+
+                              if (rowView.getColumn("pf_uuid", UUID.class) != null) {
+                                fileResource.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                                fileResource.addIdentifier(identifier);
+                              }
+
+                              return map;
+                            }))
+            .get(uuid);
+    return result;
   }
 
   private ImageFileResource findOneImageFileResource(UUID uuid) {
@@ -288,27 +327,43 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
             + " LEFT JOIN identifiers as id on f.uuid = id.identifiable"
             + " LEFT JOIN fileresources_image as file on f.previewfileresource = file.uuid"
             + " WHERE f.uuid = :uuid";
-    Optional<ImageFileResourceImpl> resultOpt =
+
+    ImageFileResourceImpl result =
         dbi.withHandle(
-            h ->
-                h.createQuery(query).bind("uuid", uuid)
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(FileResourceImpl.class, "pf"))
-                    // FIXME: FileResourceImpl.class is a workaround, because using
-                    // ImageFileResoureImpl leads to empty result bean... maybe clash of jdbi being
-                    // not able to map to two identical classes
-                    .reduceRows(
-                        new LinkedHashMap<UUID, ImageFileResourceImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(
-                                map, rowView, ImageFileResourceImpl.class, "f_uuid", "pf_uri"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    return resultOpt.get();
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(FileResourceImpl.class, "pf"))
+                        // FIXME: FileResourceImpl.class is a workaround, because using
+                        // ImageFileResoureImpl leads to empty result bean... maybe clash of jdbi
+                        // being
+                        // not able to map to two identical classes
+                        .reduceRows(
+                            new LinkedHashMap<UUID, ImageFileResourceImpl>(),
+                            (map, rowView) -> {
+                              ImageFileResourceImpl fileResource =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("f_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(ImageFileResourceImpl.class);
+                                      });
+
+                              if (rowView.getColumn("pf_uuid", UUID.class) != null) {
+                                fileResource.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                                fileResource.addIdentifier(identifier);
+                              }
+
+                              return map;
+                            }))
+            .get(uuid);
+    return result;
   }
 
   private LinkedDataFileResource findOneLinkedDataFileResource(UUID uuid) {
@@ -325,24 +380,39 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
             + " LEFT JOIN identifiers as id on f.uuid = id.identifiable"
             + " LEFT JOIN fileresources_image as file on f.previewfileresource = file.uuid"
             + " WHERE f.uuid = :uuid";
-    Optional<LinkedDataFileResourceImpl> resultOpt =
+    LinkedDataFileResourceImpl result =
         dbi.withHandle(
-            h ->
-                h.createQuery(query).bind("uuid", uuid)
-                    .registerRowMapper(BeanMapper.factory(LinkedDataFileResourceImpl.class, "f"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, LinkedDataFileResourceImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(
-                                map, rowView, LinkedDataFileResourceImpl.class, "f_uuid", "pf_uri"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    return resultOpt.get();
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(
+                            BeanMapper.factory(LinkedDataFileResourceImpl.class, "f"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, LinkedDataFileResourceImpl>(),
+                            (map, rowView) -> {
+                              LinkedDataFileResourceImpl fileResource =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("f_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(LinkedDataFileResourceImpl.class);
+                                      });
+
+                              if (rowView.getColumn("pf_uuid", UUID.class) != null) {
+                                fileResource.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                                fileResource.addIdentifier(identifier);
+                              }
+
+                              return map;
+                            }))
+            .get(uuid);
+    return result;
   }
 
   private TextFileResource findOneTextFileResource(UUID uuid) {
@@ -357,24 +427,38 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
             + " LEFT JOIN identifiers as id on f.uuid = id.identifiable"
             + " LEFT JOIN fileresources_image as file on f.previewfileresource = file.uuid"
             + " WHERE f.uuid = :uuid";
-    Optional<TextFileResourceImpl> resultOpt =
+    TextFileResourceImpl result =
         dbi.withHandle(
-            h ->
-                h.createQuery(query).bind("uuid", uuid)
-                    .registerRowMapper(BeanMapper.factory(TextFileResourceImpl.class, "f"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, TextFileResourceImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(
-                                map, rowView, TextFileResourceImpl.class, "f_uuid", "pf_uri"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    return resultOpt.get();
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(TextFileResourceImpl.class, "f"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, TextFileResourceImpl>(),
+                            (map, rowView) -> {
+                              TextFileResourceImpl fileResource =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("f_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(TextFileResourceImpl.class);
+                                      });
+
+                              if (rowView.getColumn("pf_uuid", UUID.class) != null) {
+                                fileResource.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                                fileResource.addIdentifier(identifier);
+                              }
+
+                              return map;
+                            }))
+            .get(uuid);
+    return result;
   }
 
   private VideoFileResource findOneVideoFileResource(UUID uuid) {
@@ -390,24 +474,38 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
             + " LEFT JOIN identifiers as id on f.uuid = id.identifiable"
             + " LEFT JOIN fileresources_image as file on f.previewfileresource = file.uuid"
             + " WHERE f.uuid = :uuid";
-    Optional<VideoFileResourceImpl> resultOpt =
+    VideoFileResourceImpl result =
         dbi.withHandle(
-            h ->
-                h.createQuery(query).bind("uuid", uuid)
-                    .registerRowMapper(BeanMapper.factory(VideoFileResourceImpl.class, "f"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, VideoFileResourceImpl>(),
-                        (map, rowView) ->
-                            addPreviewImageAndIdentifiers(
-                                map, rowView, VideoFileResourceImpl.class, "f_uuid", "pf_uri"))
-                    .values().stream()
-                    .findFirst());
-    if (!resultOpt.isPresent()) {
-      return null;
-    }
-    return resultOpt.get();
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(VideoFileResourceImpl.class, "f"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, VideoFileResourceImpl>(),
+                            (map, rowView) -> {
+                              VideoFileResourceImpl fileResource =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("f_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(VideoFileResourceImpl.class);
+                                      });
+
+                              if (rowView.getColumn("pf_uuid", UUID.class) != null) {
+                                fileResource.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                                fileResource.addIdentifier(identifier);
+                              }
+
+                              return map;
+                            }))
+            .get(uuid);
+    return result;
   }
 
   @Override
@@ -511,7 +609,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
     }
 
     // save identifiers
-    List<Identifier> identifiers = fileResource.getIdentifiers();
+    Set<Identifier> identifiers = fileResource.getIdentifiers();
     saveIdentifiers(identifiers, fileResource);
 
     FileResource result = findOne(fileResource.getUuid());
@@ -600,7 +698,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
     // save identifiers
     // as we store the whole list new: delete old entries
     deleteIdentifiers(fileResource);
-    List<Identifier> identifiers = fileResource.getIdentifiers();
+    Set<Identifier> identifiers = fileResource.getIdentifiers();
     saveIdentifiers(identifiers, fileResource);
 
     FileResource result = findOne(fileResource.getUuid());
