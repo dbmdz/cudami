@@ -333,7 +333,6 @@ public class ContentNodeRepositoryImpl<E extends Entity>
                     h.createQuery(query)
                         .bind("uuid", contentNodeUuid)
                         .registerRowMapper(BeanMapper.factory(FileResourceImpl.class, "f"))
-                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                         .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
                         .reduceRows(
                             new LinkedHashMap<UUID, FileResourceImpl>(),
@@ -348,11 +347,6 @@ public class ContentNodeRepositoryImpl<E extends Entity>
                               if (rowView.getColumn("pf_uuid", UUID.class) != null) {
                                 fileResource.setPreviewImage(
                                     rowView.getRow(ImageFileResourceImpl.class));
-                              }
-
-                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
-                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
-                                fileResource.addIdentifier(dbIdentifier);
                               }
 
                               return map;
