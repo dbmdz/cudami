@@ -17,7 +17,6 @@ services:
       dockerfile: Dockerfile-iiif
     ports:
       - "23232:9000"
-      - "24242:9010"
     volumes:
       - ./iiif_rules.yml:/application.yml
       - ~/cudami/fileResources:/iiif/upload
