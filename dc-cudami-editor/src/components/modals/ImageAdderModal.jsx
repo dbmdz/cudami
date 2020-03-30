@@ -53,7 +53,7 @@ class ImageAdderModal extends Component {
     })
   }
 
-  addImageToEditor = resourceId => {
+  addImageToEditor = (resourceId) => {
     /* TODO: needs more investigation */
     if (!Object.fromEntries) {
       fromEntries.shim()
@@ -90,7 +90,7 @@ class ImageAdderModal extends Component {
     })
   }
 
-  setAttributes = attributes => {
+  setAttributes = (attributes) => {
     this.setState({
       attributes: {
         ...this.state.attributes,
@@ -130,7 +130,7 @@ class ImageAdderModal extends Component {
         <ModalHeader toggle={this.destroy}>{t('insert.image')}</ModalHeader>
         <ModalBody>
           <Form
-            onSubmit={async evt => {
+            onSubmit={async (evt) => {
               evt.preventDefault()
               const resourceId = await this.submitFileResource()
               this.addImageToEditor(resourceId)

@@ -6,13 +6,13 @@ import {FaCopy, FaUpload} from 'react-icons/fa'
 
 import './FileUploadForm.css'
 
-const FileUploadForm = props => {
+const FileUploadForm = (props) => {
   const {t} = useTranslation()
   const {onChange, progress} = props
   return (
     <>
       <FileDrop
-        onDrop={files => onChange(files[0])}
+        onDrop={(files) => onChange(files[0])}
         draggingOverTargetClassName="file-drop-dragging-over-target"
         targetClassName="file-drop-target p-1"
       >
@@ -31,7 +31,7 @@ const FileUploadForm = props => {
         <Input
           className="d-none"
           id="file-upload"
-          onChange={evt => onChange(evt.target.files[0])}
+          onChange={(evt) => onChange(evt.target.files[0])}
           type="file"
         />
       </FileDrop>

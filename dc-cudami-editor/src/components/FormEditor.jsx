@@ -32,7 +32,7 @@ class FormEditor extends Component {
         <div className="text-editor">
           <Editor
             options={this.editorOptions}
-            onChange={doc => {
+            onChange={(doc) => {
               onUpdate(JSON.parse(JSON.stringify(doc)))
             }}
             render={({editor, view}) => (

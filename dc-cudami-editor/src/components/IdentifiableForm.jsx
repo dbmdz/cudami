@@ -92,7 +92,7 @@ class IdentifiableForm extends Component {
     this.setState({
       activeLanguage: selectedLanguage.name,
       availableLanguages: this.state.availableLanguages.filter(
-        language => language.name !== selectedLanguage.name
+        (language) => language.name !== selectedLanguage.name
       ),
       existingLanguages: [
         ...this.state.existingLanguages,
@@ -115,7 +115,7 @@ class IdentifiableForm extends Component {
   /*
    * Removes languages with empty content from the json
    */
-  cleanUpJson = editorJson => {
+  cleanUpJson = (editorJson) => {
     const cleanedJson = Object.entries(editorJson).reduce(
       (json, [language, doc]) => {
         if (this.isEmptyContent(doc.content)) {
@@ -161,7 +161,7 @@ class IdentifiableForm extends Component {
     )
   }
 
-  isEmptyContent = content => {
+  isEmptyContent = (content) => {
     return (
       content.length === 1 &&
       content[0].type === 'paragraph' &&
@@ -213,13 +213,13 @@ class IdentifiableForm extends Component {
     }
   }
 
-  toggleLanguage = activeLanguage => {
+  toggleLanguage = (activeLanguage) => {
     this.setState({
       activeLanguage,
     })
   }
 
-  toggleModal = name => {
+  toggleModal = (name) => {
     this.setState({
       modalsOpen: {
         ...this.state.modalsOpen,
@@ -228,7 +228,7 @@ class IdentifiableForm extends Component {
     })
   }
 
-  updateIdentifiable = identifiable => {
+  updateIdentifiable = (identifiable) => {
     this.setState({
       identifiable,
     })
@@ -263,7 +263,7 @@ class IdentifiableForm extends Component {
         <LanguageAdderModal
           availableLanguages={this.state.availableLanguages}
           isOpen={this.state.modalsOpen.languageAdder}
-          onClick={language => this.addLanguage(language, 'languageAdder')}
+          onClick={(language) => this.addLanguage(language, 'languageAdder')}
           onToggle={() => this.toggleModal('languageAdder')}
         />
         <LinkAdderModal

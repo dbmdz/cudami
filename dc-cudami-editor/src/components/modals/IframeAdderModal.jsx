@@ -44,14 +44,14 @@ class IframeAdderModal extends Component {
         </ModalHeader>
         <ModalBody>
           <Form
-            onSubmit={evt => {
+            onSubmit={(evt) => {
               evt.preventDefault()
               this.addIframeToEditor()
             }}
           >
             <FormGroup>
               <Input
-                onChange={evt => this.setState({src: evt.target.value})}
+                onChange={(evt) => this.setState({src: evt.target.value})}
                 placeholder="URL"
                 required
                 type="url"
@@ -60,7 +60,7 @@ class IframeAdderModal extends Component {
             </FormGroup>
             <FormGroup>
               <Input
-                onChange={evt => this.setState({width: evt.target.value})}
+                onChange={(evt) => this.setState({width: evt.target.value})}
                 placeholder={t('width')}
                 type="text"
                 value={this.state.width}
@@ -73,7 +73,7 @@ class IframeAdderModal extends Component {
             </FormGroup>
             <FormGroup>
               <Input
-                onChange={evt => this.setState({height: evt.target.value})}
+                onChange={(evt) => this.setState({height: evt.target.value})}
                 placeholder={t('height')}
                 type="text"
                 value={this.state.height}

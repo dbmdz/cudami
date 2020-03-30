@@ -4,7 +4,7 @@ import 'babel-polyfill'
 
 import IdentifiableForm from '../components/IdentifiableForm'
 
-export default function(config) {
+export default function (config) {
   ReactDOM.render(
     <IdentifiableForm
       activeLanguage={config.activeLanguage}

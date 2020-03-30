@@ -70,7 +70,7 @@ const keys = {
   'Shift-Tab': goToNextCell(-1),
 }
 
-Object.keys(baseKeymap).forEach(key => {
+Object.keys(baseKeymap).forEach((key) => {
   if (keys[key]) {
     keys[key] = chainCommands(keys[key], baseKeymap[key])
   } else {

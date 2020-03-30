@@ -9,11 +9,11 @@ import LanguageAdder from './LanguageAdder'
 import LanguageTab from './LanguageTab'
 import LanguageTabContent from './LanguageTabContent'
 
-const WebpageForm = props => {
+const WebpageForm = (props) => {
   const {t} = useTranslation()
   return (
     <Form
-      onSubmit={evt => {
+      onSubmit={(evt) => {
         evt.preventDefault()
         props.onSubmit()
       }}
@@ -39,12 +39,12 @@ const WebpageForm = props => {
             <FormIdInput id={props.identifiable.uuid} />
           )}
           <Nav tabs>
-            {props.existingLanguages.map(language => (
+            {props.existingLanguages.map((language) => (
               <LanguageTab
                 activeLanguage={props.activeLanguage}
                 key={language}
                 language={language}
-                onClick={language => props.onToggleLanguage(language)}
+                onClick={(language) => props.onToggleLanguage(language)}
               />
             ))}
             {props.canAddLanguage && (
@@ -52,7 +52,7 @@ const WebpageForm = props => {
             )}
           </Nav>
           <TabContent activeTab={props.activeLanguage}>
-            {props.existingLanguages.map(language => (
+            {props.existingLanguages.map((language) => (
               <LanguageTabContent
                 description={props.identifiable.description[language]}
                 key={language}
@@ -71,7 +71,7 @@ const WebpageForm = props => {
                 <FormEditor
                   document={props.identifiable.text[language]}
                   type="text"
-                  onUpdate={document => {
+                  onUpdate={(document) => {
                     props.onUpdate({
                       ...props.identifiable,
                       text: {
