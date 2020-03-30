@@ -10,7 +10,7 @@ import {
 } from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-const ImageMetadataForm = props => {
+const ImageMetadataForm = (props) => {
   const {t} = useTranslation()
   const {attributes, isOpen, onChange, toggle, toggleEnabled} = props
   return (
@@ -30,7 +30,7 @@ const ImageMetadataForm = props => {
           <FormGroup>
             <Input
               name="caption"
-              onChange={evt => onChange('caption', evt.target.value)}
+              onChange={(evt) => onChange('caption', evt.target.value)}
               placeholder={t('caption')}
               type="text"
               value={attributes.caption}
@@ -39,7 +39,7 @@ const ImageMetadataForm = props => {
           <FormGroup>
             <Input
               name="title"
-              onChange={evt => onChange('title', evt.target.value)}
+              onChange={(evt) => onChange('title', evt.target.value)}
               placeholder={t('title')}
               type="text"
               value={attributes.title}
@@ -48,7 +48,7 @@ const ImageMetadataForm = props => {
           <FormGroup className="mb-0">
             <Input
               name="altText"
-              onChange={evt => onChange('altText', evt.target.value)}
+              onChange={(evt) => onChange('altText', evt.target.value)}
               placeholder={t('altText')}
               type="text"
               value={attributes.altText}

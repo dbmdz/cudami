@@ -9,11 +9,11 @@ import LanguageAdder from './LanguageAdder'
 import LanguageTab from './LanguageTab'
 import LanguageTabContent from './LanguageTabContent'
 
-const ProjectForm = props => {
+const ProjectForm = (props) => {
   const {t} = useTranslation()
   return (
     <Form
-      onSubmit={evt => {
+      onSubmit={(evt) => {
         evt.preventDefault()
         props.onSubmit()
       }}
@@ -44,7 +44,7 @@ const ProjectForm = props => {
                 activeLanguage={props.activeLanguage}
                 key={language}
                 language={language}
-                onClick={language => props.onToggleLanguage(language)}
+                onClick={(language) => props.onToggleLanguage(language)}
               />
             ))}
             {props.canAddLanguage && (
@@ -72,7 +72,7 @@ const ProjectForm = props => {
                   <FormEditor
                     document={props.identifiable.text[language]}
                     type="text"
-                    onUpdate={document => {
+                    onUpdate={(document) => {
                       props.onUpdate({
                         ...props.identifiable,
                         text: {

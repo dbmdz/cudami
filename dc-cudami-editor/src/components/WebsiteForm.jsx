@@ -9,11 +9,11 @@ import LanguageAdder from './LanguageAdder'
 import LanguageTab from './LanguageTab'
 import LanguageTabContent from './LanguageTabContent'
 
-const WebsiteForm = props => {
+const WebsiteForm = (props) => {
   const {t} = useTranslation()
   return (
     <Form
-      onSubmit={evt => {
+      onSubmit={(evt) => {
         evt.preventDefault()
         props.onSubmit()
       }}
@@ -41,18 +41,18 @@ const WebsiteForm = props => {
             <FormIdInput id={props.identifiable.uuid} />
           )}
           <FormUrlInput
-            onChange={evt =>
+            onChange={(evt) =>
               props.onUpdate({...props.identifiable, url: evt.target.value})
             }
             url={props.identifiable.url}
           />
           <Nav tabs>
-            {props.existingLanguages.map(language => (
+            {props.existingLanguages.map((language) => (
               <LanguageTab
                 activeLanguage={props.activeLanguage}
                 key={language}
                 language={language}
-                onClick={language => props.onToggleLanguage(language)}
+                onClick={(language) => props.onToggleLanguage(language)}
               />
             ))}
             {props.canAddLanguage && (
@@ -60,7 +60,7 @@ const WebsiteForm = props => {
             )}
           </Nav>
           <TabContent activeTab={props.activeLanguage}>
-            {props.existingLanguages.map(language => (
+            {props.existingLanguages.map((language) => (
               <LanguageTabContent
                 description={props.identifiable.description[language]}
                 key={language}

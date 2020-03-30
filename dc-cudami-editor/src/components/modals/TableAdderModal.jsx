@@ -42,7 +42,7 @@ class TableAdderModal extends Component {
         </ModalHeader>
         <ModalBody>
           <Form
-            onSubmit={evt => {
+            onSubmit={(evt) => {
               evt.preventDefault()
               this.addTableToEditor()
             }}
@@ -54,7 +54,7 @@ class TableAdderModal extends Component {
               <Input
                 id="table-rows"
                 min="1"
-                onChange={evt =>
+                onChange={(evt) =>
                   this.setState({rows: parseInt(evt.target.value)})
                 }
                 required
@@ -69,7 +69,7 @@ class TableAdderModal extends Component {
               <Input
                 id="table-columns"
                 min="1"
-                onChange={evt =>
+                onChange={(evt) =>
                   this.setState({columns: parseInt(evt.target.value)})
                 }
                 required

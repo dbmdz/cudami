@@ -18,12 +18,12 @@ class LanguageAdderModal extends Component {
 
   addLanguage = () => {
     const selectedLanguage = this.props.availableLanguages.filter(
-      language => language.name === this.state.selectedLanguage
+      (language) => language.name === this.state.selectedLanguage
     )[0]
     this.props.onClick(selectedLanguage)
   }
 
-  setLanguage = selectedLanguage => {
+  setLanguage = (selectedLanguage) => {
     this.setState({
       selectedLanguage,
     })
@@ -44,17 +44,17 @@ class LanguageAdderModal extends Component {
         <ModalHeader toggle={this.toggle}>{t('chooseLanguage')}</ModalHeader>
         <ModalBody>
           <Form
-            onSubmit={evt => {
+            onSubmit={(evt) => {
               evt.preventDefault()
               this.addLanguage()
             }}
           >
             <FormGroup>
               <Input
-                onChange={evt => this.setLanguage(evt.target.value)}
+                onChange={(evt) => this.setLanguage(evt.target.value)}
                 type="select"
               >
-                {this.props.availableLanguages.map(language => (
+                {this.props.availableLanguages.map((language) => (
                   <option key={language.name} value={language.name}>
                     {language.displayName}
                   </option>

@@ -15,7 +15,7 @@ const Button = ({dispatch, fullWidth, item, state}) => {
         'menu-button': true,
         'text-left': fullWidth,
       })}
-      onClick={evt => {
+      onClick={(evt) => {
         evt.preventDefault()
         if (!disabled && item.run) {
           item.run(state, dispatch)

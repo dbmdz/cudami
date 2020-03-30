@@ -4,7 +4,7 @@ import {Card, CardBody, TabPane} from 'reactstrap'
 import FormEditor from './FormEditor'
 import FormLabelInput from './FormLabelInput'
 
-const LanguageTabContent = props => {
+const LanguageTabContent = (props) => {
   return (
     <TabPane tabId={props.language}>
       <Card>
@@ -12,13 +12,13 @@ const LanguageTabContent = props => {
           <FormLabelInput
             label={props.label}
             language={props.language}
-            onUpdate={evt => {
+            onUpdate={(evt) => {
               props.onUpdate('label', evt.target.value)
             }}
           />
           <FormEditor
             document={props.description}
-            onUpdate={document => {
+            onUpdate={(document) => {
               props.onUpdate('description', document)
             }}
             restrictedMenu={true}

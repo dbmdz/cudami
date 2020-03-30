@@ -41,14 +41,14 @@ class LinkAdderModal extends Component {
         </ModalHeader>
         <ModalBody>
           <Form
-            onSubmit={evt => {
+            onSubmit={(evt) => {
               evt.preventDefault()
               this.addLinkToEditor()
             }}
           >
             <FormGroup>
               <Input
-                onChange={evt => this.setState({href: evt.target.value})}
+                onChange={(evt) => this.setState({href: evt.target.value})}
                 placeholder="URL"
                 required
                 type="url"
@@ -57,7 +57,7 @@ class LinkAdderModal extends Component {
             </FormGroup>
             <FormGroup>
               <Input
-                onChange={evt => this.setState({title: evt.target.value})}
+                onChange={(evt) => this.setState({title: evt.target.value})}
                 placeholder={t('label')}
                 type="text"
                 value={this.state.height}

@@ -13,7 +13,7 @@ import {publish, subscribe, unsubscribe} from 'pubsub-js'
 import schema from './schema'
 import icons from './icons'
 
-const blockActive = (type, attrs = {}) => state => {
+const blockActive = (type, attrs = {}) => (state) => {
   const {$from, to, node} = state.selection
 
   if (node) {
@@ -23,7 +23,7 @@ const blockActive = (type, attrs = {}) => state => {
   return to <= $from.end() && $from.parent.hasMarkup(type, attrs)
 }
 
-const canInsert = type => state => {
+const canInsert = (type) => (state) => {
   const {$from} = state.selection
 
   for (let d = $from.depth; d >= 0; d--) {
@@ -37,7 +37,7 @@ const canInsert = type => state => {
   return false
 }
 
-const headingActive = () => state => {
+const headingActive = () => (state) => {
   let active = false
   const levels = [1, 2, 3, 4, 5, 6]
   for (let level of levels) {
@@ -49,7 +49,7 @@ const headingActive = () => state => {
   return active
 }
 
-const markActive = type => state => {
+const markActive = (type) => (state) => {
   const {from, $from, to, empty} = state.selection
 
   return empty
@@ -57,7 +57,7 @@ const markActive = type => state => {
     : state.doc.rangeHasMark(from, to, type)
 }
 
-export default function(t) {
+export default function (t) {
   return {
     marks: {
       strong: {
@@ -106,7 +106,7 @@ export default function(t) {
         title: t('marks.link'),
         content: icons.link,
         active: markActive(schema.marks.link),
-        enable: state => !state.selection.empty,
+        enable: (state) => !state.selection.empty,
         run(state, dispatch) {
           if (markActive(schema.marks.link)(state)) {
             toggleMark(schema.marks.link)(state, dispatch)

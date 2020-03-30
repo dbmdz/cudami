@@ -119,7 +119,7 @@ export async function uploadFile(contextPath, file, updateProgress) {
         reject(request.statusText)
       }
     }
-    request.upload.addEventListener('progress', evt => {
+    request.upload.addEventListener('progress', (evt) => {
       if (evt.lengthComputable) {
         updateProgress(Math.round((evt.loaded / evt.total) * 100))
       }

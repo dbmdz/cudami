@@ -13,13 +13,13 @@ class ImageSelector extends Component {
     }
   }
 
-  updateProgress = progress => {
+  updateProgress = (progress) => {
     this.setState({
       progress,
     })
   }
 
-  uploadImage = async image => {
+  uploadImage = async (image) => {
     const {apiContextPath, onChange} = this.props
     const response = await uploadFile(
       apiContextPath,
@@ -47,13 +47,13 @@ class ImageSelector extends Component {
         <CardHeader>{t('selectImage')}</CardHeader>
         <CardBody className="text-center">
           <FileUploadForm
-            onChange={file => this.uploadImage(file)}
+            onChange={(file) => this.uploadImage(file)}
             progress={this.state.progress}
           />
           <FormGroup className="mt-3">
             <Input
               name="url"
-              onChange={evt =>
+              onChange={(evt) =>
                 onChange(
                   {uri: evt.target.value, uuid: undefined},
                   {metadataOpen: true, toggleEnabled: true}
@@ -68,7 +68,7 @@ class ImageSelector extends Component {
           <FormGroup>
             <Input
               name="label"
-              onChange={evt =>
+              onChange={(evt) =>
                 onChange({
                   label: {
                     [Object.keys(fileResource.label)[0]]: evt.target.value,

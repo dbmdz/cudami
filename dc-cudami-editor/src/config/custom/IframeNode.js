@@ -11,7 +11,7 @@ export default {
     parseDOM: [
       {
         tag: 'iframe[src]',
-        getAttrs: function(element) {
+        getAttrs: function (element) {
           return {
             height: element.getAttribute('height'),
             src: element.getAttribute('src'),
@@ -20,7 +20,7 @@ export default {
         },
       },
     ],
-    toDOM: function(node) {
+    toDOM: function (node) {
       const {height, src, width} = node.attrs
       return [
         'iframe',

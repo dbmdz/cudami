@@ -10,7 +10,7 @@ import LanguageAdder from './LanguageAdder'
 import LanguageTab from './LanguageTab'
 import LanguageTabContent from './LanguageTabContent'
 
-const FileResourceForm = props => {
+const FileResourceForm = (props) => {
   const {t} = useTranslation()
   if (!props.identifiable.uuid) {
     return (
@@ -22,7 +22,7 @@ const FileResourceForm = props => {
   }
   return (
     <Form
-      onSubmit={evt => {
+      onSubmit={(evt) => {
         evt.preventDefault()
         props.onSubmit()
       }}
@@ -44,12 +44,12 @@ const FileResourceForm = props => {
         <Col sm="12">
           <FormIdInput id={props.identifiable.uuid} />
           <Nav tabs>
-            {props.existingLanguages.map(language => (
+            {props.existingLanguages.map((language) => (
               <LanguageTab
                 activeLanguage={props.activeLanguage}
                 key={language}
                 language={language}
-                onClick={language => props.onToggleLanguage(language)}
+                onClick={(language) => props.onToggleLanguage(language)}
               />
             ))}
             {props.canAddLanguage && (
@@ -57,7 +57,7 @@ const FileResourceForm = props => {
             )}
           </Nav>
           <TabContent activeTab={props.activeLanguage}>
-            {props.existingLanguages.map(language => (
+            {props.existingLanguages.map((language) => (
               <LanguageTabContent
                 description={props.identifiable.description[language]}
                 key={language}

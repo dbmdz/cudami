@@ -12,7 +12,7 @@ import {
 } from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-const ImageRenderingHintsForm = props => {
+const ImageRenderingHintsForm = (props) => {
   const {t} = useTranslation()
   const {attributes, isOpen, onChange, toggle, toggleEnabled} = props
   return (
@@ -37,7 +37,7 @@ const ImageRenderingHintsForm = props => {
                 id="rendering-hits-alignment-left"
                 inline
                 label={t('left')}
-                onChange={evt => onChange('alignment', evt.target.value)}
+                onChange={(evt) => onChange('alignment', evt.target.value)}
                 type="radio"
                 value="left"
               />
@@ -46,7 +46,7 @@ const ImageRenderingHintsForm = props => {
                 id="rendering-hits-alignment-right"
                 inline
                 label={t('right')}
-                onChange={evt => onChange('alignment', evt.target.value)}
+                onChange={(evt) => onChange('alignment', evt.target.value)}
                 type="radio"
                 value="right"
               />
@@ -60,7 +60,7 @@ const ImageRenderingHintsForm = props => {
                 id="rendering-hits-width-25"
                 inline
                 label="25%"
-                onChange={evt => onChange('width', evt.target.value)}
+                onChange={(evt) => onChange('width', evt.target.value)}
                 type="radio"
                 value="25%"
               />
@@ -69,7 +69,7 @@ const ImageRenderingHintsForm = props => {
                 id="rendering-hits-width-33"
                 inline
                 label="33%"
-                onChange={evt => onChange('width', evt.target.value)}
+                onChange={(evt) => onChange('width', evt.target.value)}
                 type="radio"
                 value="33%"
               />
@@ -78,7 +78,7 @@ const ImageRenderingHintsForm = props => {
                 id="rendering-hits-width-50"
                 inline
                 label="50%"
-                onChange={evt => onChange('width', evt.target.value)}
+                onChange={(evt) => onChange('width', evt.target.value)}
                 type="radio"
                 value="50%"
               />
@@ -87,7 +87,7 @@ const ImageRenderingHintsForm = props => {
                 id="rendering-hits-width-100"
                 inline
                 label="100%"
-                onChange={evt => onChange('width', evt.target.value)}
+                onChange={(evt) => onChange('width', evt.target.value)}
                 type="radio"
                 value="100%"
               />
@@ -98,7 +98,7 @@ const ImageRenderingHintsForm = props => {
             <Input
               id="rendering-hints-image-link"
               name="imageLink"
-              onChange={evt => onChange('linkUrl', evt.target.value)}
+              onChange={(evt) => onChange('linkUrl', evt.target.value)}
               placeholder="URL"
               type="url"
               value={attributes.linkUrl}

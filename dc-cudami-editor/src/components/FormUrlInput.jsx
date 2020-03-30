@@ -1,7 +1,7 @@
 import React from 'react'
 import {FormGroup, Input, Label} from 'reactstrap'
 
-const FormUrlInput = props => {
+const FormUrlInput = (props) => {
   return (
     <FormGroup>
       <Label className="font-weight-bold" for="url">

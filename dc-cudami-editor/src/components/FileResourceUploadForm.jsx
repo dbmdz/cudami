@@ -15,7 +15,7 @@ class FileResourceUploadForm extends Component {
     }
   }
 
-  updateProgress = progress => {
+  updateProgress = (progress) => {
     this.setState({
       progress,
     })
@@ -25,7 +25,7 @@ class FileResourceUploadForm extends Component {
     const {t} = this.props
     return (
       <Form
-        onSubmit={async evt => {
+        onSubmit={async (evt) => {
           evt.preventDefault()
           const responseJson = await uploadFile(
             this.props.apiContextPath,
@@ -60,7 +60,7 @@ class FileResourceUploadForm extends Component {
           <Col sm="12">
             <Card body className="text-center">
               <FileUploadForm
-                onChange={file =>
+                onChange={(file) =>
                   this.setState({
                     file: file,
                     submitEnabled: true,

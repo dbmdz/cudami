@@ -2,7 +2,7 @@ import React from 'react'
 import {NavItem, NavLink} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-const LanguageTab = props => {
+const LanguageTab = (props) => {
   const {t} = useTranslation()
   return (
     <NavItem>
