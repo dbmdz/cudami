@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Button, Card, CardBody, CardHeader, FormGroup, Input} from 'reactstrap'
+import {Card, CardBody, CardHeader, FormGroup, Input} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
 import FileUploadForm from '../../FileUploadForm'
