@@ -31,7 +31,7 @@
     "prosemirror-schema-basic": "^1.0.1",
     "prosemirror-schema-list": "^1.0.3",
     "prosemirror-tables": "^0.8.1",
-    "pubsub-js": "^1.7.0",
+    "pubsub-js": "^1.8.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-file-drop": "^0.2.8",
