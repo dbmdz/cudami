@@ -19,6 +19,7 @@ class IframeAdderModal extends Component {
     this.state = {
       height: '',
       src: '',
+      title: '',
       width: '',
     }
     subscribe('editor.show-iframe-modal', () => {
@@ -43,6 +44,7 @@ class IframeAdderModal extends Component {
     this.setState({
       height: '',
       src: '',
+      title: '',
       width: '',
     })
   }
@@ -95,6 +97,14 @@ class IframeAdderModal extends Component {
                 <code className="ml-1">500</code>, <code>300px</code> or
                 <code className="ml-1">50%</code>
               </FormText>
+            </FormGroup>
+            <FormGroup>
+              <Input
+                onChange={(evt) => this.setState({title: evt.target.value})}
+                placeholder={t('title')}
+                type="text"
+                value={this.state.title}
+              />
             </FormGroup>
             <Button className="float-right" color="primary" type="submit">
               {t('add')}
