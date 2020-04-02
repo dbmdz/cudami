@@ -45,7 +45,7 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
 
   // select only what is shown/needed in paged list (to avoid unnecessary payload/traffic):
   private static final String REDUCED_FIND_ONE_BASE_SQL =
-      "SELECT w.uuid w_uuid, w.refid w_refId, w.label w_label, w.description w_description,"
+      "SELECT w.uuid w_uuid, w.label w_label, w.description w_description,"
           + " w.identifiable_type w_type,"
           + " w.created w_created, w.last_modified w_lastModified,"
           + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
