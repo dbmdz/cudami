@@ -53,9 +53,7 @@ class IframeAdderModal extends Component {
     const {t} = this.props
     return (
       <Modal isOpen={this.props.isOpen} toggle={this.destroy}>
-        <ModalHeader toggle={this.destroy}>
-          {t('insert.iframe')}
-        </ModalHeader>
+        <ModalHeader toggle={this.destroy}>{t('insert.iframe')}</ModalHeader>
         <ModalBody>
           <Form
             onSubmit={(evt) => {
