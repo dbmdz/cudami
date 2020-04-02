@@ -117,9 +117,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     // see: https://www.postgresql.org/docs/10/datatype-json.html
     StringBuilder query =
         new StringBuilder(
-            "WITH flattened AS (SELECT uuid, label, description, identifiable_type, jsonb_array_elements(label#>'{translations}')->>'text' AS text FROM identifiables)");
-    query.append(
-        " SELECT uuid, label, description, identifiable_type FROM flattened WHERE text ILIKE '%' || :searchTerm || '%'");
+            "SELECT uuid, label, description, identifiable_type FROM identifiables WHERE (label::text) ILIKE '%' || :searchTerm || '%'");
     query.append(" LIMIT :maxResults");
 
     List<I> result =
