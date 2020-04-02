@@ -1,4 +1,3 @@
-import fromEntries from 'object.fromentries'
 import {publish, subscribe} from 'pubsub-js'
 import React, {Component} from 'react'
 import {
@@ -28,10 +27,6 @@ class IframeAdderModal extends Component {
   }
 
   addIframeToEditor = () => {
-    /* TODO: needs more investigation */
-    if (!Object.fromEntries) {
-      fromEntries.shim()
-    }
     const filteredState = Object.fromEntries(
       Object.entries(this.state).filter(([_, value]) => value !== '')
     )
