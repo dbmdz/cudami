@@ -78,7 +78,7 @@
   </th:block>
 
   <th:block th:if="${block.class.simpleName == 'IFrameImpl'}" th:with="attr=${block.attributes}">
-    <iframe th:attr="src=${attr.get('src') != null}?${attr.get('src')}, width=${attr.get('width') != null}?${attr.get('width')}, height=${attr.get('height') != null}?${attr.get('height')}">
+    <iframe th:attr="src=${attr.get('src') != null}?${attr.get('src')}, width=${attr.get('width') != null}?${attr.get('width')}, height=${attr.get('height') != null}?${attr.get('height')}, title=${attr.get('title') != null}?${attr.get('title')}">
       [Your user agent does not support frames or is currently configured not to display frames. However, you may visit <a th:attr="href=${attr.get('src') != null}?${attr.get('src')}">the related document.</a>]
     </iframe>
   </th:block>

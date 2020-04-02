@@ -18,6 +18,7 @@ class IframeAdderModal extends Component {
     this.state = {
       height: '',
       src: '',
+      title: '',
       width: '',
     }
     subscribe('editor.show-iframe-modal', () => {
@@ -26,11 +27,19 @@ class IframeAdderModal extends Component {
   }
 
   addIframeToEditor = () => {
+    const filteredState = Object.fromEntries(
+      Object.entries(this.state).filter(([_, value]) => value !== '')
+    )
+    publish('editor.add-iframe', filteredState)
+    this.destroy()
+  }
+
+  destroy = () => {
     this.props.onToggle()
-    publish('editor.add-iframe', this.state)
     this.setState({
       height: '',
       src: '',
+      title: '',
       width: '',
     })
   }
@@ -38,10 +47,8 @@ class IframeAdderModal extends Component {
   render() {
     const {t} = this.props
     return (
-      <Modal isOpen={this.props.isOpen} toggle={this.props.onToggle}>
-        <ModalHeader toggle={this.props.onToggle}>
-          {t('insert.iframe')}
-        </ModalHeader>
+      <Modal isOpen={this.props.isOpen} toggle={this.destroy}>
+        <ModalHeader toggle={this.destroy}>{t('insert.iframe')}</ModalHeader>
         <ModalBody>
           <Form
             onSubmit={(evt) => {
@@ -83,6 +90,14 @@ class IframeAdderModal extends Component {
                 <code className="ml-1">500</code>, <code>300px</code> or
                 <code className="ml-1">50%</code>
               </FormText>
+            </FormGroup>
+            <FormGroup>
+              <Input
+                onChange={(evt) => this.setState({title: evt.target.value})}
+                placeholder={t('title')}
+                type="text"
+                value={this.state.title}
+              />
             </FormGroup>
             <Button className="float-right" color="primary" type="submit">
               {t('add')}
