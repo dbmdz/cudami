@@ -26,8 +26,12 @@ class IframeAdderModal extends Component {
   }
 
   addIframeToEditor = () => {
-    this.props.onToggle()
     publish('editor.add-iframe', this.state)
+    this.destroy()
+  }
+
+  destroy = () => {
+    this.props.onToggle()
     this.setState({
       height: '',
       src: '',
@@ -38,8 +42,8 @@ class IframeAdderModal extends Component {
   render() {
     const {t} = this.props
     return (
-      <Modal isOpen={this.props.isOpen} toggle={this.props.onToggle}>
-        <ModalHeader toggle={this.props.onToggle}>
+      <Modal isOpen={this.props.isOpen} toggle={this.destroy}>
+        <ModalHeader toggle={this.destroy}>
           {t('insert.iframe')}
         </ModalHeader>
         <ModalBody>
