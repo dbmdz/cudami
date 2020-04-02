@@ -1,9 +1,9 @@
 export default {
   iframe: {
     attrs: {
-      height: {},
+      height: {default: '150px'},
       src: {},
-      width: {},
+      width: {default: '300px'},
     },
     draggable: true,
     group: 'block',
