@@ -3,12 +3,12 @@ package de.digitalcollections.cudami.config;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.IdentifierTypeRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.ArticleRepository;
-import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.ContentTreeRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.EntityRepository;
+import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.TopicRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.WebsiteRepository;
-import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.ContentNodeRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.EntityPartRepository;
+import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.SubtopicRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.WebpageRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.FileResourceBinaryRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
@@ -29,15 +29,15 @@ public class SpringConfigBackendForTest {
   }
 
   @Bean
-  @Qualifier("contentNodeRepositoryImpl")
-  public ContentNodeRepository contentNodeRepositoryImpl() {
-    return Mockito.mock(ContentNodeRepository.class);
+  @Qualifier("subtopicRepositoryImpl")
+  public SubtopicRepository subtopicRepositoryImpl() {
+    return Mockito.mock(SubtopicRepository.class);
   }
 
   @Bean
-  @Qualifier("contentTreeRepositoryImpl")
-  public ContentTreeRepository contentTreeRepositoryImpl() {
-    return Mockito.mock(ContentTreeRepository.class);
+  @Qualifier("topicRepositoryImpl")
+  public TopicRepository topicRepositoryImpl() {
+    return Mockito.mock(TopicRepository.class);
   }
 
   @Bean

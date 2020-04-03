@@ -1,10 +1,10 @@
 package de.digitalcollections.cudami.admin.test.config;
 
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.IdentifiableService;
-import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.ContentTreeService;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.EntityService;
+import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.TopicService;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.WebsiteService;
-import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.ContentNodeService;
+import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.SubtopicService;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.WebpageService;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
@@ -29,14 +29,14 @@ public class SpringConfigBusinessForTest {
 
   @Primary
   @Bean
-  public ContentNodeService contentNodeService() {
-    return Mockito.mock(ContentNodeService.class);
+  public SubtopicService subtopicService() {
+    return Mockito.mock(SubtopicService.class);
   }
 
   @Primary
   @Bean
-  public ContentTreeService contentTreeService() {
-    return Mockito.mock(ContentTreeService.class);
+  public TopicService topicService() {
+    return Mockito.mock(TopicService.class);
   }
 
   @Primary

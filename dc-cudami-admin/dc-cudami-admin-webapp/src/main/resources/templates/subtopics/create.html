@@ -1,0 +1,27 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+
+  <head>
+    <title th:text="|#{subtopics}: #{subtopic_create}|">Subtopics: Create a new subtopic</title>
+  </head>
+  <body>
+    <section layout:fragment="content">
+      <div id="editor"></div>
+      <script th:src="@{/js/cudami-editor.bundle.js}"></script>
+      <script th:inline="javascript">
+        CudamiEditor({
+          activeLanguage: /*[[${activeLanguage}]]*/,
+          apiContextPath: /*[[@{/}]]*/ '',
+          id: "editor",
+          parentType: /*[[${parentType}]]*/,
+          parentUuid: /*[[${parentUuid}]]*/,
+          type: "subtopic",
+          uiLocale: /*[[${#locale.language}]]*/
+        });
+      </script>
+    </section>
+  </body>
+</html>
