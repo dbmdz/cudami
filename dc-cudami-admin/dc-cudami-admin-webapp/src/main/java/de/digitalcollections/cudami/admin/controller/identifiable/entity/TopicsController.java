@@ -6,10 +6,9 @@ import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
-import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.ArticleService;
+import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.TopicService;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
-import de.digitalcollections.model.api.identifiable.entity.Article;
-import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import de.digitalcollections.model.api.identifiable.entity.Topic;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.List;
@@ -34,21 +33,21 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-/** Controller for articles management pages. */
+/** Controller for topics management pages. */
 @Controller
-public class ArticlesController extends AbstractController {
+public class TopicsController extends AbstractController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ArticlesController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(TopicsController.class);
 
   LanguageSortingHelper languageSortingHelper;
   LocaleRepository localeRepository;
-  ArticleService service;
+  TopicService service;
 
   @Autowired
-  public ArticlesController(
+  public TopicsController(
       LanguageSortingHelper languageSortingHelper,
       LocaleRepository localeRepository,
-      ArticleService service) {
+      TopicService service) {
     this.languageSortingHelper = languageSortingHelper;
     this.localeRepository = localeRepository;
     this.service = service;
@@ -56,42 +55,42 @@ public class ArticlesController extends AbstractController {
 
   @ModelAttribute("menu")
   protected String module() {
-    return "articles";
+    return "topics";
   }
 
-  @GetMapping("/articles/new")
+  @GetMapping("/topics/new")
   public String create(Model model) {
     model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
-    return "articles/create";
+    return "topics/create";
   }
 
-  @GetMapping("/api/articles/new")
+  @GetMapping("/api/topics/new")
   @ResponseBody
-  public Article create() {
+  public Topic create() {
     return service.create();
   }
 
-  @GetMapping("/articles/{uuid}/edit")
+  @GetMapping("/topics/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Article article = service.get(uuid);
+    Topic topic = service.get(uuid);
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, article.getLabel().getLocales());
+        languageSortingHelper.sortLanguages(displayLocale, topic.getLabel().getLocales());
 
     model.addAttribute("activeLanguage", existingLanguages.get(0));
     model.addAttribute("existingLanguages", existingLanguages);
-    model.addAttribute("uuid", article.getUuid());
+    model.addAttribute("uuid", topic.getUuid());
 
-    return "articles/edit";
+    return "topics/edit";
   }
 
-  @GetMapping("/api/articles/{uuid}")
+  @GetMapping("/api/topics/{uuid}")
   @ResponseBody
-  public Article get(@PathVariable UUID uuid) {
+  public Topic get(@PathVariable UUID uuid) {
     return service.get(uuid);
   }
 
-  @GetMapping("/articles")
+  @GetMapping("/topics")
   public String list(
       Model model,
       @PageableDefault(
@@ -101,46 +100,43 @@ public class ArticlesController extends AbstractController {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
-    model.addAttribute("page", new PageWrapper(page, "/articles"));
-    return "articles/list";
+    model.addAttribute("page", new PageWrapper(page, "/topics"));
+    return "topics/list";
   }
 
-  @PostMapping("/api/articles/new")
-  public ResponseEntity save(@RequestBody Article article) throws IdentifiableServiceException {
+  @PostMapping("/api/topics/new")
+  public ResponseEntity save(@RequestBody Topic topic) throws IdentifiableServiceException {
     try {
-      Article articleDb = service.save(article);
-      return ResponseEntity.status(HttpStatus.CREATED).body(articleDb);
+      Topic topicDb = service.save(topic);
+      return ResponseEntity.status(HttpStatus.CREATED).body(topicDb);
     } catch (Exception e) {
-      LOGGER.error("Cannot save article: ", e);
+      LOGGER.error("Cannot save topic: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
 
-  @PutMapping("/api/articles/{uuid}")
-  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Article article)
+  @PutMapping("/api/topics/{uuid}")
+  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Topic topic)
       throws IdentifiableServiceException {
     try {
-      Article articleDb = service.update(article);
-      return ResponseEntity.ok(articleDb);
+      Topic topicDb = service.update(topic);
+      return ResponseEntity.ok(topicDb);
     } catch (Exception e) {
-      LOGGER.error("Cannot save article with uuid={}", uuid, e);
+      LOGGER.error("Cannot save topic with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
 
-  @GetMapping("/articles/{uuid}")
+  @GetMapping("/topics/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Article article = (Article) service.get(uuid);
+    Topic topic = (Topic) service.get(uuid);
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, article.getLabel().getLocales());
+        languageSortingHelper.sortLanguages(displayLocale, topic.getLabel().getLocales());
 
-    model.addAttribute("article", article);
     model.addAttribute("existingLanguages", existingLanguages);
+    model.addAttribute("topic", topic);
 
-    List<FileResource> relatedFileResources = service.getRelatedFileResources(article);
-    model.addAttribute("relatedFileResources", relatedFileResources);
-
-    return "articles/view";
+    return "topics/view";
   }
 }

@@ -5,12 +5,12 @@ import {Container, Label} from 'reactstrap'
 import './IdentifiableForm.css'
 import ArticleForm from './ArticleForm'
 import CollectionForm from './CollectionForm'
-import ContentNodeForm from './ContentNodeForm'
-import ContentTreeForm from './ContentTreeForm'
 import CorporationForm from './CorporationForm'
 import FileResourceForm from './FileResourceForm'
 import FormErrors from './FormErrors'
 import ProjectForm from './ProjectForm'
+import SubtopicForm from './SubtopicForm'
+import TopicForm from './TopicForm'
 import WebpageForm from './WebpageForm'
 import WebsiteForm from './WebsiteForm'
 import {
@@ -143,11 +143,11 @@ class IdentifiableForm extends Component {
     const FORM_COMPONENT_MAPPING = {
       article: ArticleForm,
       collection: CollectionForm,
-      contentNode: ContentNodeForm,
-      contentTree: ContentTreeForm,
       corporation: CorporationForm,
       fileResource: FileResourceForm,
       project: ProjectForm,
+      subtopic: SubtopicForm,
+      topic: TopicForm,
       webpage: WebpageForm,
       website: WebsiteForm,
     }
