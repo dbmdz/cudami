@@ -1,7 +1,4 @@
 -- drop constraints
-ALTER TABLE IF EXISTS contentnodes DROP CONSTRAINT IF EXISTS new_contentnodes_pkey;
-ALTER TABLE IF EXISTS contenttrees DROP CONSTRAINT IF EXISTS new_contenttrees_pkey;
-
 ALTER TABLE IF EXISTS contentnode_contentnodes DROP CONSTRAINT IF EXISTS new_contentnode_contentnodes_parent_contentnode_uuid_fkey;
 ALTER TABLE IF EXISTS contentnode_contentnodes DROP CONSTRAINT IF EXISTS new_contentnode_contentnodes_child_contentnode_uuid_fkey;
 ALTER TABLE IF EXISTS contentnode_contentnodes DROP CONSTRAINT IF EXISTS new_contentnode_contentnodes_pkey;
@@ -17,6 +14,9 @@ ALTER TABLE IF EXISTS contenttree_contentnodes DROP CONSTRAINT IF EXISTS new_con
 ALTER TABLE IF EXISTS contenttree_contentnodes DROP CONSTRAINT IF EXISTS new_contenttree_contentnodes_contentnode_uuid_fkey;
 ALTER TABLE IF EXISTS contenttree_contentnodes DROP CONSTRAINT IF EXISTS new_contenttree_contentnodes_pkey;
 ALTER TABLE IF EXISTS contenttree_contentnodes DROP CONSTRAINT IF EXISTS new_contenttree_contentnodes_contentnode_uuid_key;
+
+ALTER TABLE IF EXISTS contentnodes DROP CONSTRAINT IF EXISTS new_contentnodes_pkey;
+ALTER TABLE IF EXISTS contenttrees DROP CONSTRAINT IF EXISTS new_contenttrees_pkey;
 
 -- rename tables
 ALTER TABLE IF EXISTS contentnode_contentnodes RENAME TO subtopic_subtopics;
@@ -36,7 +36,6 @@ ALTER TABLE IF EXISTS topic_subtopics RENAME COLUMN contenttree_uuid TO topic_uu
 ALTER TABLE IF EXISTS topic_subtopics RENAME COLUMN contentnode_uuid TO subtopic_uuid;
 
 -- add constraints
-ALTER TABLE IF EXISTS entities ADD PRIMARY KEY (uuid);
 ALTER TABLE IF EXISTS topics ADD PRIMARY KEY (uuid);
 ALTER TABLE IF EXISTS subtopics ADD PRIMARY KEY (uuid);
 
