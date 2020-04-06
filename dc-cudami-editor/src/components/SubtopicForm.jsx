@@ -20,9 +20,7 @@ const SubtopicForm = (props) => {
       <Row>
         <Col xs="6" sm="9">
           <h1>
-            {props.identifiable.uuid
-              ? t('editSubtopic')
-              : t('createSubtopic')}
+            {props.identifiable.uuid ? t('editSubtopic') : t('createSubtopic')}
           </h1>
         </Col>
         <Col xs="6" sm="3">
