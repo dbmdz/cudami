@@ -19,11 +19,7 @@ const TopicForm = (props) => {
     >
       <Row>
         <Col xs="6" sm="9">
-          <h1>
-            {props.identifiable.uuid
-              ? t('editTopic')
-              : t('createTopic')}
-          </h1>
+          <h1>{props.identifiable.uuid ? t('editTopic') : t('createTopic')}</h1>
         </Col>
         <Col xs="6" sm="3">
           <FormButtons />
