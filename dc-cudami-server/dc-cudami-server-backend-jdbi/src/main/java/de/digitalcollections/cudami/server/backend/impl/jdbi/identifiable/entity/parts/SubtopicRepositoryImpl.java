@@ -229,7 +229,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
                 h ->
                     h.createQuery(query)
                         .bind("uuid", uuid)
-                        .registerRowMapper(BeanMapper.factory(SubtopicImpl.class, "cn"))
+                        .registerRowMapper(BeanMapper.factory(SubtopicImpl.class, "s"))
                         .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                         .reduceRows(
                             new LinkedHashMap<UUID, SubtopicImpl>(),
