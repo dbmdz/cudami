@@ -9,7 +9,7 @@
           "content": [
             {
               "type": "text",
-              "text": "Das ist mein erster Inhaltsbaum."
+              "text": "Das ist mein erstes Thema."
             }
           ]
         }
@@ -23,18 +23,18 @@
           "content": [
             {
               "type": "text",
-              "text": "This is my first content tree."
+              "text": "This is my first topic."
             }
           ]
         }
       ]
     }
   },
-  "entityType": "CONTENT_TREE",
+  "entityType": "TOPIC",
   "identifiers": [],
   "label": {
-    "de": "Mein erster Inhaltsbaum",
-    "en": "My first content tree"
+    "de": "Mein erstes Thema",
+    "en": "My first topic"
   },
   "lastModified": "2019-08-05T16:54:29.711332",
   "type": "ENTITY",
