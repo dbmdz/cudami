@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource;
 
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import de.digitalcollections.model.api.identifiable.resource.MimeType;
 import de.digitalcollections.model.api.identifiable.resource.exceptions.ResourceIOException;
 import de.digitalcollections.model.api.identifiable.resource.exceptions.ResourceNotFoundException;
 import java.io.InputStream;
@@ -12,7 +13,8 @@ public interface FileResourceBinaryRepository {
   void assertReadability(FileResource resource)
       throws ResourceIOException, ResourceNotFoundException;
 
-  FileResource find(String uuid) throws ResourceIOException, ResourceNotFoundException;
+  FileResource find(String uuid, MimeType mimeType)
+      throws ResourceIOException, ResourceNotFoundException;
 
   byte[] getAsBytes(FileResource resource) throws ResourceIOException, ResourceNotFoundException;
 
