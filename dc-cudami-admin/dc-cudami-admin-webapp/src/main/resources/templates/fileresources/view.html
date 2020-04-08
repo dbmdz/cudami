@@ -27,21 +27,6 @@
         </div>
       </div>
 
-      <div class="row">
-        <div class="col-sm-12">
-          <div class="container-fluid rows-striped">
-            <div class="row">
-              <div class="col-md-3"><label th:text="#{id}">ID</label></div>
-              <div class="col-md-9"><span th:text="*{uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
-            </div>
-            <div class="row">
-              <div class="col-md-3"><label th:text="#{filename}">Filename</label></div>
-              <div class="col-md-9"><span th:text="*{filename}">image001.jpg</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div class="row main-content">
         <div class="col-sm-12">
           <ul class="nav nav-tabs" role="tablist">
@@ -56,6 +41,41 @@
                   <div th:replace="fragments/identifiable::renderTeaser(${fileresource}, ${language})"></div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12">&nbsp;</div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="container-fluid rows-striped">
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{id}">ID</label></div>
+              <div class="col-md-9"><span th:text="*{uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{filename}">Filename</label></div>
+              <div class="col-md-9"><span th:text="*{filename}">image001.jpg</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{mimetype}">Mimetype</label></div>
+              <div class="col-md-9"><span th:text="*{mimeType.getTypeName()}">image/jpeg</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{fileResourceType}">Type</label></div>
+              <div class="col-md-9"><span th:text="*{fileResourceType}">VIDEO</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{filesize}">Filesize</label></div>
+              <div class="col-md-9"><span>
+                  <script type="text/javascript" th:inline="javascript">
+                    document.write(bytesToSize([[*{sizeInBytes}]], " "));</script></span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-3"><label th:text="#{uri}">URI</label></div>
+              <div class="col-md-9"><span th:text="*{uri}">file:///home/ralf/cudami/fileResources/application/undefined/114f/998e/57a8/4f9a/a45b/59c6/7d5f/0f70/114f998e-57a8-4f9a-a45b-59c67d5f0f70</span></div>
             </div>
           </div>
         </div>
