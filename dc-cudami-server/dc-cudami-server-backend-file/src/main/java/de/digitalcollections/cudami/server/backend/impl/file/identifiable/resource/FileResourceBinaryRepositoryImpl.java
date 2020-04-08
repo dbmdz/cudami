@@ -10,7 +10,6 @@ import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -56,6 +55,7 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
       LoggerFactory.getLogger(FileResourceBinaryRepositoryImpl.class);
   private final String repositoryFolderPath;
   private final ResourceLoader resourceLoader;
+  public static final String DEFAULT_FILENAME_WITHOUT_EXTENSION = "resource";
 
   @Autowired
   public FileResourceBinaryRepositoryImpl(
@@ -85,36 +85,43 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
     Objects.requireNonNull(uuid, "uuid must not be null");
 
     String extension = "undefined";
-    String primaryType = "";
     if (mimeType == null) {
       mimeType = MimeType.MIME_APPLICATION_OCTET_STREAM;
     }
     if (!mimeType.getExtensions().isEmpty()) {
       extension = mimeType.getExtensions().get(0);
     }
-    primaryType = mimeType.getPrimaryType();
+    String primaryType = mimeType.getPrimaryType();
+
     final String uuidStr = uuid.toString();
     String uuidPath = getSplittedUuidPath(uuidStr);
 
-    Path path = Paths.get(repositoryFolderPath, primaryType, extension, uuidPath, uuidStr);
+    Path path =
+        Paths.get(
+            repositoryFolderPath,
+            primaryType,
+            extension,
+            uuidPath,
+            DEFAULT_FILENAME_WITHOUT_EXTENSION);
     String location = "file://" + path.toString();
     if (!extension.isBlank() && !"undefined".equals(extension)) {
       location = location + "." + extension;
     }
     // example location =
-    // file:///local/cudami/resourceRepository/application/xml/a30c/f362/5992/4f5a/8de0/6193/8134/e721/a30cf362-5992-4f5a-8de0-61938134e721.xml
+    // file:///local/cudami/resourceRepository/application/xml/a30c/f362/5992/4f5a/8de0/6193/8134/e721/resource.xml
 
     return URI.create(location);
   }
 
   @Override
-  public FileResource find(String uuidStr) throws ResourceIOException, ResourceNotFoundException {
+  public FileResource find(String uuidStr, MimeType mimeType)
+      throws ResourceIOException, ResourceNotFoundException {
     FileResource resource = new FileResourceImpl();
 
     final UUID uuid = UUID.fromString(uuidStr);
     resource.setUuid(uuid);
 
-    URI uri = getUri(uuid);
+    URI uri = createUri(uuid, mimeType);
     if (!resourceLoader.getResource(uri.toString()).isReadable()) {
       throw new ResourceIOException("File resource at uri " + uri + " is not readable");
     }
@@ -253,34 +260,6 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
     String[] pathParts = splitEqually(uuidWithoutDashes, 4);
     String splittedUuidPath = String.join(File.separator, pathParts);
     return splittedUuidPath;
-  }
-
-  protected URI getUri(@NonNull UUID uuid) throws ResourceNotFoundException {
-    Objects.requireNonNull(uuid, "uuid must not be null");
-
-    final String uuidStr = uuid.toString();
-    String uuidPath = getSplittedUuidPath(uuidStr);
-    Path path = Paths.get(repositoryFolderPath, uuidPath);
-    String location = "file://" + path.toString();
-
-    File directory = path.toFile();
-    if (!directory.isDirectory()) {
-      throw new ResourceNotFoundException(path.toString() + " does not exist");
-    }
-    // create new filename filter
-    FilenameFilter fileNameFilter =
-        (File dir, String name) -> {
-          return name.startsWith(uuidStr);
-        };
-
-    File[] matchingFiles = directory.listFiles(fileNameFilter);
-    if (matchingFiles != null && matchingFiles.length > 0) {
-      File file = matchingFiles[0];
-      String filename = file.getName();
-      location = location + "/" + filename;
-      return URI.create(location);
-    }
-    throw new ResourceNotFoundException("No matching file found in " + path.toString());
   }
 
   @Override

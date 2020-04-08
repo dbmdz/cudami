@@ -35,7 +35,7 @@ public class FileResourceBinaryRepositoryTest {
             + "/"
             + extension
             + "/135e/c10b/ac65/4217/83fc/db5e/9ff6/2cac/"
-            + uuid
+            + FileResourceBinaryRepositoryImpl.DEFAULT_FILENAME_WITHOUT_EXTENSION
             + "."
             + extension;
     assertThat(uri.toString()).isEqualTo(expectedUri);
@@ -52,7 +52,7 @@ public class FileResourceBinaryRepositoryTest {
             + "/"
             + mimeType.getPrimaryType()
             + "/undefined/135e/c10b/ac65/4217/83fc/db5e/9ff6/2cac/"
-            + uuid;
+            + FileResourceBinaryRepositoryImpl.DEFAULT_FILENAME_WITHOUT_EXTENSION;
     assertThat(uri.toString()).isEqualTo(expectedUri);
   }
 
@@ -64,7 +64,7 @@ public class FileResourceBinaryRepositoryTest {
         "file://"
             + FOLDER_PATH
             + "/application/bin/135e/c10b/ac65/4217/83fc/db5e/9ff6/2cac/"
-            + uuid
+            + FileResourceBinaryRepositoryImpl.DEFAULT_FILENAME_WITHOUT_EXTENSION
             + ".bin";
     assertThat(uri.toString()).isEqualTo(expectedUri);
   }
