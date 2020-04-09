@@ -1,6 +1,6 @@
 import React from 'react'
 import {Input, Label, Progress} from 'reactstrap'
-import FileDrop from 'react-file-drop'
+import {FileDrop} from 'react-file-drop'
 import {useTranslation} from 'react-i18next'
 import {FaCopy, FaUpload} from 'react-icons/fa'
 
