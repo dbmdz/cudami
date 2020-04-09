@@ -8,7 +8,6 @@ public class V1_6_3__DML_Change_fileresource_filename_to_resourceTest {
 
   @Test
   public void testConvertUri() throws Exception {
-    System.out.println("convertUri");
     V1_6_3__DML_Change_fileresource_filename_to_resource instance =
         new V1_6_3__DML_Change_fileresource_filename_to_resource();
     String oldUri =
