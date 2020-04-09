@@ -34,7 +34,7 @@ public class V1_6_3__DML_Change_fileresource_filename_to_resource extends BaseJa
     List<Map<String, String>> identifiables = jdbcTemplate.queryForList(selectQuery);
     for (Map<String, String> identifiable : identifiables) {
       final String currentUri = identifiable.get("uri");
-      if (currentUri != null) {
+      if (currentUri != null && currentUri.startsWith("file")) {
         String newUri = convertUri(currentUri);
         jdbcTemplate.update(updateQuery, newUri, identifiable.get("uuid"));
         // rename file on disk
