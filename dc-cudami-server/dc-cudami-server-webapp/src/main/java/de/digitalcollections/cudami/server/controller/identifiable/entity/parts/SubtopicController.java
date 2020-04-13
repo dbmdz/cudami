@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -73,7 +74,7 @@ public class SubtopicController {
   public ResponseEntity<Subtopic> getSubtopic(
       @ApiPathParam(
               description =
-                  "UUID of the content node, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+                  "UUID of the subtopic, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid,
       @ApiQueryParam(
@@ -103,9 +104,32 @@ public class SubtopicController {
       method = RequestMethod.POST)
   @ApiResponseObject
   public Subtopic saveWithParentTopic(
-      @PathVariable UUID parentTopicUuid, @RequestBody Subtopic subtopic, BindingResult errors)
+      @ApiPathParam(name = "parentTopicUuid", description = "The uuid of the parent topic")
+          @PathVariable
+          UUID parentTopicUuid,
+      @RequestBody Subtopic subtopic,
+      BindingResult errors)
       throws IdentifiableServiceException {
     return service.saveWithParentTopic(subtopic, parentTopicUuid);
+  }
+
+  @ApiMethod(description = "Add an existing subtopic to an existing topic")
+  @RequestMapping(
+      value = {
+        "/latest/topics/{parentTopicUuid}/subtopic/{subtopicUuid}",
+        "/v2/topics/{parentTopicUuid}/subtopic/{subtopicUuid}"
+      },
+      produces = "application/json",
+      method = RequestMethod.POST)
+  @ApiResponseObject
+  public Subtopic addSubtopicToParentTopic(
+      @ApiPathParam(name = "parentTopicUuid", description = "The uuid of the parent topic")
+          @PathVariable
+          UUID parentTopicUuid,
+      @ApiPathParam(name = "subtopicUuid", description = "The uuid of the subtopic") @PathVariable
+          UUID subtopicUuid)
+      throws IdentifiableServiceException {
+    return service.addSubtopicToParentTopic(subtopicUuid, parentTopicUuid);
   }
 
   @ApiMethod(description = "Save a newly created subtopic")
@@ -118,25 +142,50 @@ public class SubtopicController {
       method = RequestMethod.POST)
   @ApiResponseObject
   public Subtopic saveWithParentSubtopic(
-      @PathVariable UUID parentSubtopicUuid, @RequestBody Subtopic subtopic, BindingResult errors)
+      @ApiPathParam(name = "parentSubtopicUuid", description = "The uuid of the parent subtopic")
+          @PathVariable
+          UUID parentSubtopicUuid,
+      @RequestBody Subtopic subtopic)
       throws IdentifiableServiceException {
     return service.saveWithParentSubtopic(subtopic, parentSubtopicUuid);
   }
 
-  @ApiMethod(description = "Update a content node")
+  @ApiMethod(description = "Add an existing subtopic to an existing parent subtopic")
+  @RequestMapping(
+      value = {
+        "/latest/subtopics/{parentSubtopicUuid}/subtopic/{subtopicUuid}",
+        "/v2/subtopics/{parentSubtopicUuid}/subtopic/{subtopicUuid}"
+      },
+      produces = "application/json",
+      method = RequestMethod.POST)
+  @ApiResponseObject
+  public Subtopic addSubtopicToParentSubtopic(
+      @ApiPathParam(name = "parentSubtopicUuid", description = "The uuid of the parent subtopic")
+          @PathVariable
+          UUID parentSubtopicUuid,
+      @ApiPathParam(name = "subtopicUuid", description = "The uuid of the subtopic") @PathVariable
+          UUID subtopicUuid)
+      throws IdentifiableServiceException {
+    return service.addSubtopicToParentSubtopic(subtopicUuid, parentSubtopicUuid);
+  }
+
+  @ApiMethod(description = "Update a subtopic")
   @RequestMapping(
       value = {"/latest/subtopics/{uuid}", "/v2/subtopics/{uuid}"},
       produces = "application/json",
       method = RequestMethod.PUT)
   @ApiResponseObject
   public Subtopic update(
-      @PathVariable UUID uuid, @RequestBody Subtopic subtopic, BindingResult errors)
+      @ApiPathParam(name = "uuid", description = "The uuid of the subtopic") @PathVariable
+          UUID uuid,
+      @RequestBody Subtopic subtopic,
+      BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, subtopic.getUuid());
     return service.update(subtopic);
   }
 
-  @ApiMethod(description = "Get count of content nodes")
+  @ApiMethod(description = "Get count of subtopics")
   @RequestMapping(
       value = {"/latest/subtopics/count", "/v2/subtopics/count"},
       produces = "application/json",
@@ -146,7 +195,7 @@ public class SubtopicController {
     return service.count();
   }
 
-  @ApiMethod(description = "Get child content nodes of content node")
+  @ApiMethod(description = "Get child subtopics of subtopic")
   @RequestMapping(
       value = {"/latest/subtopics/{uuid}/children", "/v2/subtopics/{uuid}/children"},
       produces = "application/json",
@@ -156,18 +205,19 @@ public class SubtopicController {
     return service.getChildren(uuid);
   }
 
-  @ApiMethod(description = "Get entities of content node")
+  @ApiMethod(description = "Get entities of subtopic")
   @RequestMapping(
       value = {"/latest/subtopics/{uuid}/entities", "/v2/subtopics/{uuid}/entities"},
       produces = "application/json",
       method = RequestMethod.GET)
-  @ApiResponseObject
-  public List<Entity> getEntities(@PathVariable UUID uuid) {
+  public @ApiResponseObject @ResponseBody List<Entity> getEntities(
+      @ApiPathParam(name = "uuid", description = "The uuid of the subtopic") @PathVariable
+          UUID uuid) {
     return service.getEntities(uuid);
   }
 
   // FIXME
-  @ApiMethod(description = "Save entities of content node")
+  @ApiMethod(description = "Save entities of subtopic")
   @PostMapping(
       value = {"/latest/subtopics/{uuid}/entities", "/v2/subtopics/{uuid}/entities"},
       produces = "application/json")
@@ -176,7 +226,7 @@ public class SubtopicController {
     return service.saveEntities(uuid, entities);
   }
 
-  @ApiMethod(description = "Get file resources of content node")
+  @ApiMethod(description = "Get file resources of subtopic")
   @RequestMapping(
       value = {"/latest/subtopics/{uuid}/fileresources", "/v2/subtopics/{uuid}/fileresources"},
       produces = "application/json",
@@ -187,7 +237,7 @@ public class SubtopicController {
   }
 
   // FIXME
-  @ApiMethod(description = "Save fileresources of content node")
+  @ApiMethod(description = "Save fileresources of subtopic")
   @PostMapping(
       value = {"/latest/subtopics/{uuid}/fileresources", "/v2/subtopics/{uuid}/fileresources"},
       produces = "application/json")
@@ -197,7 +247,7 @@ public class SubtopicController {
     return service.saveFileResources(uuid, fileResources);
   }
 
-  @ApiMethod(description = "Get parent content node of content node")
+  @ApiMethod(description = "Get parent subtopic of subtopic")
   @RequestMapping(
       value = {"/latest/subtopics/{uuid}/parent", "/v2/subtopics/{uuid}/parent"},
       produces = "application/json",
@@ -227,7 +277,7 @@ public class SubtopicController {
     return service.getSubtopicsOfFileResource(uuid);
   }
 
-  //  @ApiMethod(description = "add identifiable to content node")
+  //  @ApiMethod(description = "add identifiable to subtopic")
   //  @PostMapping(value = {"/latest/subtopics/{uuid}/identifiables/{identifiableUuid}",
   // "/v2/subtopics/{uuid}/identifiables/{identifiableUuid}"})
   //  @ResponseStatus(value = HttpStatus.OK)
@@ -235,4 +285,40 @@ public class SubtopicController {
   //  public void addIdentifiable(@PathVariable UUID uuid, @PathVariable UUID identifiableUuid) {
   //    service.addIdentifiable(uuid, identifiableUuid);
   //  }
+
+  @ApiMethod(
+      description = "Delete child-relation of the given subtopic to the given parent subtopic")
+  @RequestMapping(
+      value = {
+        "/latest/subtopics/{parentSubtopicUuid}/subtopic/{subtopicUuid}",
+        "/v2/subtopics/{parentSubtopicUuid}/subtopic/{subtopicUuid}"
+      },
+      produces = "application/json",
+      method = RequestMethod.DELETE)
+  @ApiResponseObject
+  Integer deleteSubtopicFromParentSubtopic(
+      @ApiPathParam(name = "parentSubtopicUuid", description = "The uuid of the parent subtopic")
+          @PathVariable
+          UUID parentSubtopicUuid,
+      @ApiPathParam(name = "subtopicUuid", description = "The uuid of the subtopic") @PathVariable
+          UUID subtopicUuid) {
+    return service.deleteFromParentSubtopic(subtopicUuid, parentSubtopicUuid);
+  }
+
+  @ApiMethod(description = "Delete child-relation of the given subtopic to the given parent topic")
+  @RequestMapping(
+      value = {
+        "/latest/topic/{topicUuid}/subtopic/{subtopicUuid}",
+        "/v2/topic/{topicUuid}/subtopic/{subtopicUuid}"
+      },
+      produces = "application/json",
+      method = RequestMethod.DELETE)
+  @ApiResponseObject
+  Integer deleteSubtopicFromParentTopic(
+      @ApiPathParam(name = "topicUuid", description = "The uuid of the parent topic") @PathVariable
+          UUID topicUuid,
+      @ApiPathParam(name = "subtopicUuid", description = "The uuid of the subtopic") @PathVariable
+          UUID subtopicUuid) {
+    return service.deleteFromParentTopic(subtopicUuid, topicUuid);
+  }
 }

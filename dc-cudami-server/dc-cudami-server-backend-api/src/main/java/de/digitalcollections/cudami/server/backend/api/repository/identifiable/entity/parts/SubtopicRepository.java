@@ -36,4 +36,12 @@ public interface SubtopicRepository
   List<Subtopic> getSubtopicsOfFileResource(FileResource fileResource);
 
   List<Subtopic> getSubtopicsOfFileResource(UUID fileResourceUuid);
+
+  Integer deleteFromParentSubtopic(Subtopic subtopic, UUID parentSubtopicUuid);
+
+  Integer deleteFromParentSubtopic(UUID subtopicUuid, UUID parentSubtopicUuid);
+
+  Integer deleteFromParentTopic(Subtopic subtopic, UUID topicUuid);
+
+  Integer deleteFromParentTopic(UUID subtopicUuid, UUID topicUuid);
 }

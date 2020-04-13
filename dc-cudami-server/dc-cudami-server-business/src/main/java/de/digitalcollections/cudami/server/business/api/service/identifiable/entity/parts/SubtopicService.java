@@ -41,4 +41,18 @@ public interface SubtopicService
   List<Subtopic> getSubtopicsOfEntity(UUID entityUuid);
 
   List<Subtopic> getSubtopicsOfFileResource(UUID fileResourceUuid);
+
+  Integer deleteFromParentSubtopic(Subtopic subtopic, UUID parentSubtopicUuid);
+
+  Integer deleteFromParentSubtopic(UUID subtopicUuid, UUID parentSubtopicUuid);
+
+  Integer deleteFromParentTopic(Subtopic subtopic, UUID topicUuid);
+
+  Integer deleteFromParentTopic(UUID subtopicUuid, UUID topicUuid);
+
+  Subtopic addSubtopicToParentTopic(UUID subtopicUuid, UUID parentTopicUuid)
+      throws IdentifiableServiceException;
+
+  Subtopic addSubtopicToParentSubtopic(UUID subtopicUuid, UUID parentSubtopicUuid)
+      throws IdentifiableServiceException;
 }
