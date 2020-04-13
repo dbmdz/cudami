@@ -394,6 +394,11 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
   }
 
   @Override
+  public List<Subtopic> getSubtopicsOfFileResource(FileResource fileResource) {
+    return getSubtopicsOfFileResource(fileResource.getUuid());
+  }
+
+  @Override
   public Subtopic save(Subtopic subtopic) {
     subtopic.setUuid(UUID.randomUUID());
     subtopic.setCreated(LocalDateTime.now());
@@ -459,6 +464,80 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
           });
     }
     return getEntities(subtopicUuid);
+  }
+
+  @Override
+  public List<Subtopic> getSubtopicsOfEntity(UUID entityUuid) {
+    String query =
+        REDUCED_FIND_ONE_BASE_SQL
+            + " INNER JOIN subtopic_entities se ON s.uuid = se.subtopic_uuid"
+            + " WHERE se.entity_uuid = :uuid";
+
+    List<Subtopic> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", entityUuid)
+                        .registerRowMapper(BeanMapper.factory(SubtopicImpl.class, "s"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, SubtopicImpl>(),
+                            (map, rowView) -> {
+                              SubtopicImpl parentSubtopic =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("s_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(SubtopicImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                parentSubtopic.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            }))
+            .values().stream()
+            .map(Subtopic.class::cast)
+            .collect(Collectors.toList());
+    return result;
+  }
+
+  @Override
+  public List<Subtopic> getSubtopicsOfFileResource(UUID fileResourceUuid) {
+    String query =
+        REDUCED_FIND_ONE_BASE_SQL
+            + " INNER JOIN subtopic_fileresources sf ON s.uuid = sf.subtopic_uuid"
+            + " WHERE sf.fileresource_uuid = :uuid";
+
+    List<Subtopic> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", fileResourceUuid)
+                        .registerRowMapper(BeanMapper.factory(SubtopicImpl.class, "s"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, SubtopicImpl>(),
+                            (map, rowView) -> {
+                              SubtopicImpl parentSubtopic =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("s_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(SubtopicImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                parentSubtopic.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            }))
+            .values().stream()
+            .map(Subtopic.class::cast)
+            .collect(Collectors.toList());
+    return result;
   }
 
   @Override

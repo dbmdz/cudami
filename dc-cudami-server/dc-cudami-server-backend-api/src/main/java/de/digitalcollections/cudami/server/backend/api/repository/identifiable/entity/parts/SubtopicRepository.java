@@ -30,4 +30,10 @@ public interface SubtopicRepository
   Subtopic saveWithParentTopic(Subtopic subtopic, UUID parentTopicUuid);
 
   Subtopic saveWithParentSubtopic(Subtopic subtopic, UUID parentSubtopicUuid);
+
+  List<Subtopic> getSubtopicsOfEntity(UUID entityUuid);
+
+  List<Subtopic> getSubtopicsOfFileResource(FileResource fileResource);
+
+  List<Subtopic> getSubtopicsOfFileResource(UUID fileResourceUuid);
 }

@@ -37,4 +37,8 @@ public interface SubtopicService
 
   Subtopic saveWithParentSubtopic(Subtopic subtopic, UUID parentSubtopicUuid)
       throws IdentifiableServiceException;
+
+  List<Subtopic> getSubtopicsOfEntity(UUID entityUuid);
+
+  List<Subtopic> getSubtopicsOfFileResource(UUID fileResourceUuid);
 }

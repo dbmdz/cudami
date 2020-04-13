@@ -71,4 +71,10 @@ public interface SubtopicRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine("PUT /latest/subtopics/{uuid}")
   @Headers("Content-Type: application/json")
   Subtopic update(@Param("uuid") UUID uuid, Subtopic subtopic);
+
+  @RequestLine("GET /latest/subtopics/entity/{uuid}")
+  List<Subtopic> getSubtopicsOfEntity(@Param("uuid") UUID uuid);
+
+  @RequestLine("GET /latest/subtopics/fileresource/{uuid}")
+  List<Subtopic> getSubtopicsOfFileResource(@Param("uuid") UUID uuid);
 }

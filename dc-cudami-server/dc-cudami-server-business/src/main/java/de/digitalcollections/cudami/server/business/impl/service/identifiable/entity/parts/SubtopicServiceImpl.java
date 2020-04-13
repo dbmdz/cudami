@@ -56,6 +56,16 @@ public class SubtopicServiceImpl extends EntityPartServiceImpl<Subtopic, Entity>
   }
 
   @Override
+  public List<Subtopic> getSubtopicsOfEntity(UUID entityUuid) {
+    return ((SubtopicRepository) repository).getSubtopicsOfEntity(entityUuid);
+  }
+
+  @Override
+  public List<Subtopic> getSubtopicsOfFileResource(UUID fileResourceUuid) {
+    return ((SubtopicRepository) repository).getSubtopicsOfEntity(fileResourceUuid);
+  }
+
+  @Override
   public List<Entity> saveEntities(Subtopic subtopic, List<Entity> entities) {
     return saveEntities(subtopic.getUuid(), entities);
   }

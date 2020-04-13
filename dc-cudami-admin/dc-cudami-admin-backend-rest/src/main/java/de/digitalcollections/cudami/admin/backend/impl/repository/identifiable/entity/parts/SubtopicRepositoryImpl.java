@@ -90,6 +90,28 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
   }
 
   @Override
+  public List<Subtopic> getSubtopicsOfEntity(Entity entity) {
+    return getSubtopicsOfEntity(entity.getUuid());
+  }
+
+  @Override
+  public List<Subtopic> getSubtopicsOfEntity(UUID entityUuid) {
+    List<Subtopic> subtopics = endpoint.getSubtopicsOfEntity(entityUuid);
+    return subtopics.stream().map(s -> (Subtopic) s).collect(Collectors.toList());
+  }
+
+  @Override
+  public List<Subtopic> getSubtopicsOfFileResource(FileResource fileResource) {
+    return getSubtopicsOfFileResource(fileResource.getUuid());
+  }
+
+  @Override
+  public List<Subtopic> getSubtopicsOfFileResource(UUID fileResourceUuid) {
+    List<Subtopic> subtopics = endpoint.getSubtopicsOfFileResource(fileResourceUuid);
+    return subtopics.stream().map(s -> (Subtopic) s).collect(Collectors.toList());
+  }
+
+  @Override
   public Subtopic save(Subtopic subtopic) {
     return endpoint.save(subtopic);
   }

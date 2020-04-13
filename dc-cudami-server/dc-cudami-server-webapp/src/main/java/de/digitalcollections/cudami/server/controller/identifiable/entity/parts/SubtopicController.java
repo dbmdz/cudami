@@ -207,6 +207,26 @@ public class SubtopicController {
     return service.getParent(uuid);
   }
 
+  @ApiMethod(description = "Get subtopics an entity is linked to")
+  @RequestMapping(
+      value = {"/latest/subtopics/entity/{uuid}", "/v2/subtopics/entity/{uuid}"},
+      produces = "application/json",
+      method = RequestMethod.GET)
+  @ApiResponseObject
+  List<Subtopic> getSubtopicsOfEntity(@PathVariable UUID uuid) {
+    return service.getSubtopicsOfEntity(uuid);
+  }
+
+  @ApiMethod(description = "Get subtopics a fileresource is linked to")
+  @RequestMapping(
+      value = {"/latest/subtopics/fileresource/{uuid}", "/v2/subtopics/fileresource/{uuid}"},
+      produces = "application/json",
+      method = RequestMethod.GET)
+  @ApiResponseObject
+  List<Subtopic> getSubtopicsOfFileResource(@PathVariable UUID uuid) {
+    return service.getSubtopicsOfFileResource(uuid);
+  }
+
   //  @ApiMethod(description = "add identifiable to content node")
   //  @PostMapping(value = {"/latest/subtopics/{uuid}/identifiables/{identifiableUuid}",
   // "/v2/subtopics/{uuid}/identifiables/{identifiableUuid}"})
