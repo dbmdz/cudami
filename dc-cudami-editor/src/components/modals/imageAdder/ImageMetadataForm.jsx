@@ -40,7 +40,7 @@ const ImageMetadataForm = (props) => {
             <Input
               name="title"
               onChange={(evt) => onChange('title', evt.target.value)}
-              placeholder={t('title')}
+              placeholder={t('tooltip')}
               type="text"
               value={attributes.title}
             />

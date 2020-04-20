@@ -78,6 +78,7 @@
     "selectImage": "Select image",
     "text": "Long text",
     "title": "Title",
+    "tooltip": "Tooltip",
     "uploadFileResource": "Upload a new file",
     "width": "Width"
   }
