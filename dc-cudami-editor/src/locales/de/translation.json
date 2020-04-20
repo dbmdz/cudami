@@ -80,6 +80,7 @@
     "selectImage": "Bild auswählen",
     "text": "Langtext",
     "title": "Titel",
+    "tooltip": "Tooltip",
     "uploadFileResource": "Neue Datei hochladen",
     "width": "Breite"
   }
