@@ -1,6 +1,16 @@
 import React, {Component} from 'react'
-import {Card, CardBody, CardHeader, FormGroup, Input} from 'reactstrap'
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  FormGroup,
+  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
+} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
+import {FaQuestionCircle} from 'react-icons/fa'
 
 import FileUploadForm from '../../FileUploadForm'
 import {uploadFile} from '../../../api'
@@ -66,22 +76,29 @@ class ImageSelector extends Component {
             />
           </FormGroup>
           <FormGroup>
-            <Input
-              name="label"
-              onChange={(evt) =>
-                onChange({
-                  label: {
-                    [Object.keys(fileResource.label)[0]]: evt.target.value,
-                  },
-                })
-              }
-              placeholder={t('label')}
-              required
-              type="text"
-              value={
-                fileResource.label ? Object.values(fileResource.label)[0] : ''
-              }
-            />
+            <InputGroup>
+              <Input
+                name="label"
+                onChange={(evt) =>
+                  onChange({
+                    label: {
+                      [Object.keys(fileResource.label)[0]]: evt.target.value,
+                    },
+                  })
+                }
+                placeholder={t('label')}
+                required
+                type="text"
+                value={
+                  fileResource.label ? Object.values(fileResource.label)[0] : ''
+                }
+              />
+              <InputGroupAddon addonType="append">
+                <InputGroupText>
+                  <FaQuestionCircle title={t('tooltips.label')} />
+                </InputGroupText>
+              </InputGroupAddon>
+            </InputGroup>
           </FormGroup>
         </CardBody>
       </Card>
