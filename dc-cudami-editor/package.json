@@ -41,7 +41,7 @@
     "reactstrap": "^8.4.1"
   },
   "devDependencies": {
-    "@fisker/prettier-config": "^2.1.0",
+    "@fisker/prettier-config": "^2.1.1",
     "prettier": "2.0.4",
     "webpack-cli": "^3.3.11"
   },
