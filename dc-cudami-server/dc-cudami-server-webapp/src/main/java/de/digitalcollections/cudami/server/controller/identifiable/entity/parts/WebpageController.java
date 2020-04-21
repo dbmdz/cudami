@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.parts
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.WebpageService;
+import de.digitalcollections.model.api.filter.FilterCriteria;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
@@ -13,6 +14,7 @@ import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -23,6 +25,7 @@ import org.jsondoc.core.annotation.ApiPathParam;
 import org.jsondoc.core.annotation.ApiQueryParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +46,8 @@ public class WebpageController {
 
   @Autowired private WebpageService<Entity> webpageService;
 
+  @Autowired ConversionService conversionService;
+
   @ApiMethod(description = "Get all webpages")
   @RequestMapping(
       value = {"/latest/webpages", "/v2/webpages"},
@@ -56,9 +61,20 @@ public class WebpageController {
       @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
           Direction sortDirection,
       @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
-          NullHandling nullHandling) {
+          NullHandling nullHandling,
+      @RequestParam(name = "publicationStart", required = false) String publicationStart,
+      @RequestParam(name = "publicationEnd", required = false)
+          FilterCriteria<LocalDate> publicationEnd) {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
+
+    //    Filtering filtering = Filtering.defaultBuilder()
+    //            .add(new FilterCriteria("publicationStart", publicationStart, LocalDate.class))
+    //            .add(new FilterCriteria("publicationEnd", publicationEnd, LocalDate.class))
+    //            .build();
+
+    // new with filtering
+    //    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting, filtering);
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
     return webpageService.find(pageRequest);
   }
