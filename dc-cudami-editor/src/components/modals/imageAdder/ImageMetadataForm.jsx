@@ -23,7 +23,7 @@ const InputTooltip = (props) => {
   return (
     <Popover
       isOpen={tooltipOpen}
-      placement="auto"
+      placement="left"
       target={target}
       toggle={toggle}
     >

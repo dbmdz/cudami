@@ -104,7 +104,7 @@ class ImageSelector extends Component {
                   />
                   <Popover
                     isOpen={this.state.labelTooltipOpen}
-                    placement="auto"
+                    placement="left"
                     target="label-tooltip"
                     toggle={() =>
                       this.setState({
