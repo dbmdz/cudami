@@ -2,7 +2,8 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.parts
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.WebpageService;
-import de.digitalcollections.model.api.filter.FilterCriteria;
+import de.digitalcollections.model.impl.filter.FilterCriteriaImpl;
+import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
@@ -62,17 +63,19 @@ public class WebpageController {
           Direction sortDirection,
       @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
           NullHandling nullHandling,
-      @RequestParam(name = "publicationStart", required = false) String publicationStart,
+      @RequestParam(name = "publicationStart", required = false)
+          FilterCriteriaImpl<LocalDate> publicationStart,
       @RequestParam(name = "publicationEnd", required = false)
-          FilterCriteria<LocalDate> publicationEnd) {
+          FilterCriteriaImpl<LocalDate> publicationEnd) {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
 
-    //    Filtering filtering = Filtering.defaultBuilder()
-    //            .add(new FilterCriteria("publicationStart", publicationStart, LocalDate.class))
-    //            .add(new FilterCriteria("publicationEnd", publicationEnd, LocalDate.class))
-    //            .build();
-
+    Filtering filtering =
+        Filtering.defaultBuilder()
+            .add("publicationStart", publicationStart)
+            .add("publicationEnd", publicationEnd)
+            .build();
+    System.out.println(filtering);
     // new with filtering
     //    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting, filtering);
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
