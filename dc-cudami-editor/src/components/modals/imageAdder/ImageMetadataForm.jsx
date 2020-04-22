@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState} from 'react'
 import {
   Button,
   Card,
@@ -10,9 +10,27 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
+  Popover,
+  PopoverBody,
 } from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 import {FaQuestionCircle} from 'react-icons/fa'
+
+const InputTooltip = (props) => {
+  const {target, text} = props
+  const [tooltipOpen, setTooltipOpen] = useState(false)
+  const toggle = () => setTooltipOpen(!tooltipOpen)
+  return (
+    <Popover
+      isOpen={tooltipOpen}
+      placement="auto"
+      target={target}
+      toggle={toggle}
+    >
+      <PopoverBody>{text}</PopoverBody>
+    </Popover>
+  )
+}
 
 const ImageMetadataForm = (props) => {
   const {t} = useTranslation()
@@ -42,7 +60,14 @@ const ImageMetadataForm = (props) => {
               />
               <InputGroupAddon addonType="append">
                 <InputGroupText>
-                  <FaQuestionCircle title={t('tooltips.caption')} />
+                  <FaQuestionCircle
+                    id="caption-tooltip"
+                    style={{cursor: 'pointer'}}
+                  />
+                  <InputTooltip
+                    target="caption-tooltip"
+                    text={t('tooltips.caption')}
+                  />
                 </InputGroupText>
               </InputGroupAddon>
             </InputGroup>
@@ -58,7 +83,14 @@ const ImageMetadataForm = (props) => {
               />
               <InputGroupAddon addonType="append">
                 <InputGroupText>
-                  <FaQuestionCircle title={t('tooltips.tooltip')} />
+                  <FaQuestionCircle
+                    id="title-tooltip"
+                    style={{cursor: 'pointer'}}
+                  />
+                  <InputTooltip
+                    target="title-tooltip"
+                    text={t('tooltips.title')}
+                  />
                 </InputGroupText>
               </InputGroupAddon>
             </InputGroup>
@@ -74,7 +106,14 @@ const ImageMetadataForm = (props) => {
               />
               <InputGroupAddon addonType="append">
                 <InputGroupText>
-                  <FaQuestionCircle title={t('tooltips.altText')} />
+                  <FaQuestionCircle
+                    id="altText-tooltip"
+                    style={{cursor: 'pointer'}}
+                  />
+                  <InputTooltip
+                    target="altText-tooltip"
+                    text={t('tooltips.altText')}
+                  />
                 </InputGroupText>
               </InputGroupAddon>
             </InputGroup>
