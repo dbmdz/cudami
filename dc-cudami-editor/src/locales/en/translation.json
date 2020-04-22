@@ -83,7 +83,7 @@
       "altText": "is read out in the screen reader or is output if image cannot be displayed",
       "caption": "is displayed as a caption",
       "label": "name of the image (for retrievability in the system)",
-      "tooltip": "appears when the mouse moves over the image"
+      "title": "appears when the mouse moves over the image"
     },
     "uploadFileResource": "Upload a new file",
     "width": "Width"

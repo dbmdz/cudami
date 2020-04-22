@@ -8,6 +8,8 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
+  Popover,
+  PopoverBody,
 } from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 import {FaQuestionCircle} from 'react-icons/fa'
@@ -19,6 +21,7 @@ class ImageSelector extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      labelTooltipOpen: false,
       progress: 0,
     }
   }
@@ -95,7 +98,22 @@ class ImageSelector extends Component {
               />
               <InputGroupAddon addonType="append">
                 <InputGroupText>
-                  <FaQuestionCircle title={t('tooltips.label')} />
+                  <FaQuestionCircle
+                    id="label-tooltip"
+                    style={{cursor: 'pointer'}}
+                  />
+                  <Popover
+                    isOpen={this.state.labelTooltipOpen}
+                    placement="auto"
+                    target="label-tooltip"
+                    toggle={() =>
+                      this.setState({
+                        labelTooltipOpen: !this.state.labelTooltipOpen,
+                      })
+                    }
+                  >
+                    <PopoverBody>{t('tooltips.label')}</PopoverBody>
+                  </Popover>
                 </InputGroupText>
               </InputGroupAddon>
             </InputGroup>

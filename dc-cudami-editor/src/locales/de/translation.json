@@ -85,7 +85,7 @@
       "altText": "wird im Screen-Reader vorgelesen bzw. ausgegeben, falls das Bild nicht angezeigt werden kann",
       "caption": "wird als Bildunterschrift ausgegeben",
       "label": "Name des Bildes (zur Wiederauffindbarkeit im System)",
-      "tooltip": "wird beim Bewegen der Maus über das Bild eingeblendet"
+      "title": "wird beim Bewegen der Maus über das Bild eingeblendet"
     },
     "uploadFileResource": "Neue Datei hochladen",
     "width": "Breite"
