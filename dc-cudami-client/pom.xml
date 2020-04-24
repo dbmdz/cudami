@@ -25,6 +25,10 @@
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.model</groupId>
+      <artifactId>dc-model-feign</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.model</groupId>
       <artifactId>dc-model-jackson</artifactId>
     </dependency>
     <dependency>

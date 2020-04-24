@@ -168,6 +168,11 @@
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.model</groupId>
+        <artifactId>dc-model-feign</artifactId>
+        <version>${version.dc-model}</version>
+      </dependency>
+      <dependency>
+        <groupId>de.digitalcollections.model</groupId>
         <artifactId>dc-model-jackson</artifactId>
         <version>${version.dc-model}</version>
       </dependency>

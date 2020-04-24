@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.parts
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.WebpageService;
-import de.digitalcollections.model.impl.filter.FilterCriteriaImpl;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
@@ -12,6 +11,7 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.paging.enums.Direction;
 import de.digitalcollections.model.api.paging.enums.NullHandling;
+import de.digitalcollections.model.impl.filter.FilterCriteriaImpl;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
@@ -112,6 +112,23 @@ public class WebpageController {
       webpage = webpageService.get(uuid, pLocale);
     }
     return new ResponseEntity<>(webpage, HttpStatus.OK);
+  }
+
+  @ApiMethod(description = "Get children of a webpage as JSON")
+  @RequestMapping(
+      value = {"/latest/webpages/{uuid}/children", "/v3/webpages/{uuid}/children"},
+      produces = {MediaType.APPLICATION_JSON_VALUE},
+      method = RequestMethod.GET)
+  @ApiResponseObject
+  public PageResponse<Webpage> getWebpageChildren(
+      @ApiPathParam(
+              description =
+                  "UUID of the parent webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      PageRequestImpl pageRequest)
+      throws IdentifiableServiceException {
+    return webpageService.find(pageRequest);
   }
 
   @ApiMethod(description = "Save a newly created top-level webpage")

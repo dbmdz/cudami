@@ -36,7 +36,7 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
       "SELECT w.uuid w_uuid, w.label w_label, w.description w_description,"
           + " w.identifiable_type w_type,"
           + " w.created w_created, w.last_modified w_lastModified,"
-          + " w.text w_text, w.publish_start w_publishStart, w.publish_end w_publishEnd,"
+          + " w.text w_text, w.publication_start w_publicationStart, w.publication_end w_publicationEnd,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
           + " FROM webpages as w"
@@ -48,7 +48,7 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
       "SELECT w.uuid w_uuid, w.label w_label, w.description w_description,"
           + " w.identifiable_type w_type,"
           + " w.created w_created, w.last_modified w_lastModified,"
-          + " w.publish_start w_publishStart, w.publish_end w_publishEnd,"
+          + " w.publication_start w_publicationStart, w.publication_end w_publicationEnd,"
           + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
           + " FROM webpages as w"
           + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid";
@@ -297,12 +297,12 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
             + "uuid, label, description, previewfileresource,"
             + " identifiable_type,"
             + " created, last_modified,"
-            + " text, publish_start, publish_end"
+            + " text, publication_start, publication_end"
             + ") VALUES ("
             + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource,"
             + " :type,"
             + " :created, :lastModified,"
-            + " :text::JSONB, :publishStart, :publishEnd"
+            + " :text::JSONB, :publicationStart, :publicationEnd"
             + ")";
 
     dbi.withHandle(
@@ -376,7 +376,7 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
         "UPDATE webpages SET"
             + " label=:label::JSONB, description=:description::JSONB, previewfileresource=:previewFileResource,"
             + " last_modified=:lastModified,"
-            + " text=:text::JSONB, publish_start=:publishStart, publish_end=:publishEnd"
+            + " text=:text::JSONB, publication_start=:publicationStart, publication_end=:publicationEnd"
             + " WHERE uuid=:uuid";
 
     dbi.withHandle(
