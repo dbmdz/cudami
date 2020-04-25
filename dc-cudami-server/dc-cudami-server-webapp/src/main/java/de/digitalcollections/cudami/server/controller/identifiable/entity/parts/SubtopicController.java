@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -210,7 +209,8 @@ public class SubtopicController {
       value = {"/latest/subtopics/{uuid}/entities", "/v2/subtopics/{uuid}/entities"},
       produces = "application/json",
       method = RequestMethod.GET)
-  public @ApiResponseObject @ResponseBody List<Entity> getEntities(
+  @ApiResponseObject
+  public List<Entity> getEntities(
       @ApiPathParam(name = "uuid", description = "The uuid of the subtopic") @PathVariable
           UUID uuid) {
     return service.getEntities(uuid);
@@ -276,15 +276,6 @@ public class SubtopicController {
   List<Subtopic> getSubtopicsOfFileResource(@PathVariable UUID uuid) {
     return service.getSubtopicsOfFileResource(uuid);
   }
-
-  //  @ApiMethod(description = "add identifiable to subtopic")
-  //  @PostMapping(value = {"/latest/subtopics/{uuid}/identifiables/{identifiableUuid}",
-  // "/v2/subtopics/{uuid}/identifiables/{identifiableUuid}"})
-  //  @ResponseStatus(value = HttpStatus.OK)
-  //  @ApiResponseObject
-  //  public void addIdentifiable(@PathVariable UUID uuid, @PathVariable UUID identifiableUuid) {
-  //    service.addIdentifiable(uuid, identifiableUuid);
-  //  }
 
   @ApiMethod(
       description = "Delete child-relation of the given subtopic to the given parent subtopic")
