@@ -206,11 +206,6 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
   }
 
   @Override
-  public List<Subtopic> getChildren(Subtopic subtopic) {
-    return getChildren(subtopic.getUuid());
-  }
-
-  @Override
   public List<Subtopic> getChildren(UUID uuid) {
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
     String query =
@@ -249,11 +244,6 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
                             })
                         .values()));
     return result;
-  }
-
-  @Override
-  public List<Entity> getEntities(Subtopic subtopic) {
-    return getEntities(subtopic.getUuid());
   }
 
   @Override
@@ -305,11 +295,6 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
             .map(e -> (Entity) e)
             .collect(Collectors.toList());
     return result;
-  }
-
-  @Override
-  public List<FileResource> getFileResources(Subtopic subtopic) {
-    return getFileResources(subtopic.getUuid());
   }
 
   @Override
@@ -394,11 +379,6 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
   }
 
   @Override
-  public List<Subtopic> getSubtopicsOfFileResource(FileResource fileResource) {
-    return getSubtopicsOfFileResource(fileResource.getUuid());
-  }
-
-  @Override
   public Subtopic save(Subtopic subtopic) {
     subtopic.setUuid(UUID.randomUUID());
     subtopic.setCreated(LocalDateTime.now());
@@ -430,11 +410,6 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
 
     Subtopic result = findOne(subtopic.getUuid());
     return result;
-  }
-
-  @Override
-  public List<Entity> saveEntities(Subtopic subtopic, List<Entity> entities) {
-    return saveEntities(subtopic.getUuid(), entities);
   }
 
   @Override
@@ -541,11 +516,6 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
   }
 
   @Override
-  public List<FileResource> saveFileResources(Subtopic subtopic, List<FileResource> fileResources) {
-    return saveFileResources(subtopic.getUuid(), fileResources);
-  }
-
-  @Override
   public List<FileResource> saveFileResources(UUID subtopicUuid, List<FileResource> fileResources) {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
@@ -595,11 +565,6 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
   }
 
   @Override
-  public Integer deleteFromParentSubtopic(Subtopic subtopic, UUID parentSubtopicUuid) {
-    return deleteFromParentSubtopic(subtopic.getUuid(), parentSubtopicUuid);
-  }
-
-  @Override
   public Integer deleteFromParentSubtopic(UUID subtopicUuid, UUID parentSubtopicUuid) {
     Integer count =
         dbi.withHandle(
@@ -630,11 +595,6 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
                 .execute());
 
     return findOne(childSubtopicUuid);
-  }
-
-  @Override
-  public Integer deleteFromParentTopic(Subtopic subtopic, UUID topicUuid) {
-    return deleteFromParentSubtopic(subtopic.getUuid(), topicUuid);
   }
 
   @Override
