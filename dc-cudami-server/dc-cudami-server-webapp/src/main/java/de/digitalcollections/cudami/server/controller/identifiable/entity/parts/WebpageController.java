@@ -58,8 +58,9 @@ public class WebpageController {
   public PageResponse<Webpage> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
-      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
+      @RequestParam(name = "sortField", required = false, defaultValue = "lastModified")
+          String sortField,
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "DESC")
           Direction sortDirection,
       @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
           NullHandling nullHandling,
@@ -69,16 +70,12 @@ public class WebpageController {
           FilterCriteriaImpl<LocalDate> publicationEnd) {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
-
     Filtering filtering =
         Filtering.defaultBuilder()
             .add("publicationStart", publicationStart)
             .add("publicationEnd", publicationEnd)
             .build();
-    System.out.println(filtering);
-    // new with filtering
-    //    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting, filtering);
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting, filtering);
     return webpageService.find(pageRequest);
   }
 
@@ -126,9 +123,28 @@ public class WebpageController {
                   "UUID of the parent webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid,
-      PageRequestImpl pageRequest)
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortField", required = false, defaultValue = "lastModified")
+          String sortField,
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "DESC")
+          Direction sortDirection,
+      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
+          NullHandling nullHandling,
+      @RequestParam(name = "publicationStart", required = false)
+          FilterCriteriaImpl<LocalDate> publicationStart,
+      @RequestParam(name = "publicationEnd", required = false)
+          FilterCriteriaImpl<LocalDate> publicationEnd)
       throws IdentifiableServiceException {
-    return webpageService.find(pageRequest);
+    OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
+    Sorting sorting = new SortingImpl(order);
+    Filtering filtering =
+        Filtering.defaultBuilder()
+            .add("publicationStart", publicationStart)
+            .add("publicationEnd", publicationEnd)
+            .build();
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting, filtering);
+    return webpageService.getChildren(uuid, pageRequest);
   }
 
   @ApiMethod(description = "Save a newly created top-level webpage")

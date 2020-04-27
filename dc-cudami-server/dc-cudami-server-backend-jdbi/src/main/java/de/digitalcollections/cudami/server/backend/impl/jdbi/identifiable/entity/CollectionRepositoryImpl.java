@@ -185,11 +185,6 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"c.created", "c.last_modified", "c.refid"};
-  }
-
-  @Override
   public Collection save(Collection collection) {
     collection.setUuid(UUID.randomUUID());
     collection.setCreated(LocalDateTime.now());
@@ -256,5 +251,27 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
     Collection result = findOne(collection.getUuid());
     return result;
+  }
+  
+  @Override
+  protected String[] getAllowedOrderByFields() {
+    return new String[]{getColumnName("created"), getColumnName("lastModified"), getColumnName("refId")};
+  }
+
+  @Override
+  protected String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "created":
+        return "c.created";
+      case "lastModified":
+        return "c.last_modified";
+      case "refId":
+        return "c.refid";
+      default:
+        return null;
+    }
   }
 }

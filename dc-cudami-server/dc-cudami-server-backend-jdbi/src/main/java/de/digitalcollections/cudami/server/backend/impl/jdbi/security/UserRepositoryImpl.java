@@ -83,11 +83,6 @@ public class UserRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"email", "lastname", "firstname"};
-  }
-
-  @Override
   public UserImpl save(UserImpl user) {
     user.setUuid(UUID.randomUUID());
     //    UserImpl result = dbi.withHandle(h -> h.createQuery(
@@ -125,5 +120,27 @@ public class UserRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl
                     .findOne()
                     .orElse(null));
     return result;
+  }
+  
+    @Override
+  protected String[] getAllowedOrderByFields() {
+    return new String[] {getColumnName("email"), getColumnName("lastname"), getColumnName("firstname")};
+  }
+
+  @Override
+  protected String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "email":
+        return "email";
+      case "lastname":
+        return "lastname";
+      case "firstname":
+        return "firstname";
+      default:
+        return null;
+    }
   }
 }

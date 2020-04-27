@@ -509,11 +509,6 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"f.created", "f.filename", "f.last_modified", "f.size_in_bytes"};
-  }
-
-  @Override
   public FileResource save(FileResource fileResource) {
     if (fileResource.getUuid() == null) {
       fileResource.setUuid(UUID.randomUUID());
@@ -703,5 +698,29 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
 
     FileResource result = findOne(fileResource.getUuid());
     return result;
+  }
+
+  @Override
+  protected String[] getAllowedOrderByFields() {
+    return new String[]{getColumnName("created"), getColumnName("filename"), getColumnName("lastModified"), getColumnName("sizeInBytes")};
+  }
+
+  @Override
+  protected String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "created":
+        return "f.created";
+      case "filename":
+        return "f.filename";
+      case "lastModified":
+        return "f.last_modified";
+      case "sizeInBytes":
+        return "f.size_in_bytes";
+      default:
+        return null;
+    }
   }
 }

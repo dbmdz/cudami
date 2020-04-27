@@ -1,11 +1,14 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.parts;
 
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.SubtopicRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.SubtopicService;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -33,6 +36,11 @@ public class SubtopicServiceImpl extends EntityPartServiceImpl<Subtopic, Entity>
   @Override
   public List<Subtopic> getChildren(UUID uuid) {
     return ((SubtopicRepository) repository).getChildren(uuid);
+  }
+
+  @Override
+  public PageResponse<Subtopic> getChildren(UUID uuid, PageRequest pageRequest) {
+    return ((NodeRepository) repository).getChildren(uuid, pageRequest);
   }
 
   @Override

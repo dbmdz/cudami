@@ -94,11 +94,6 @@ public class IdentifierRepositoryImpl extends AbstractPagingAndSortingRepository
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"identifiable", "namespace", "id"};
-  }
-
-  @Override
   public Identifier save(Identifier identifier) {
     identifier.setUuid(UUID.randomUUID());
 
@@ -119,5 +114,27 @@ public class IdentifierRepositoryImpl extends AbstractPagingAndSortingRepository
   public Identifier update(Identifier identifier) {
     throw new UnsupportedOperationException(
         "An update on identifiable, namespace and identifier has no use case.");
+  }
+  
+  @Override
+  protected String[] getAllowedOrderByFields() {
+    return new String[] {getColumnName("identifiable"), getColumnName("namespace"), getColumnName("id")};
+  }
+
+  @Override
+  protected String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "identifiable":
+        return "identifiable";
+      case "namespace":
+        return "namespace";
+      case "id":
+        return "id";
+      default:
+        return null;
+    }
   }
 }

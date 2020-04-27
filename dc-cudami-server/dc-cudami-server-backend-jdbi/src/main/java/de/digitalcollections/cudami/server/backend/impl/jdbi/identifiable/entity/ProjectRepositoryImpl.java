@@ -26,13 +26,13 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
-    implements ProjectRepository {
+        implements ProjectRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProjectRepositoryImpl.class);
 
   // select all details shown/needed in single object details page
-  private static final String FIND_ONE_BASE_SQL =
-      "SELECT p.uuid p_uuid, p.refid p_refId, p.label p_label, p.description p_description,"
+  private static final String FIND_ONE_BASE_SQL
+          = "SELECT p.uuid p_uuid, p.refid p_refId, p.label p_label, p.description p_description,"
           + " p.identifiable_type p_type, p.entity_type p_entityType,"
           + " p.created p_created, p.last_modified p_lastModified,"
           + " p.text p_text, p.start_date p_startDate, p.end_date p_endDate,"
@@ -43,8 +43,8 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
           + " LEFT JOIN fileresources_image as file on p.previewfileresource = file.uuid";
 
   // select only what is shown/needed in paged list (to avoid unnecessary payload/traffic):
-  private static final String REDUCED_FIND_ONE_BASE_SQL =
-      "SELECT p.uuid p_uuid, p.refid p_refId, p.label p_label, p.description p_description,"
+  private static final String REDUCED_FIND_ONE_BASE_SQL
+          = "SELECT p.uuid p_uuid, p.refid p_refId, p.label p_label, p.description p_description,"
           + " p.identifiable_type p_type, p.entity_type p_entityType,"
           + " p.created p_created, p.last_modified p_lastModified,"
           + " p.start_date p_startDate, p.end_date p_endDate,"
@@ -69,30 +69,30 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
     StringBuilder query = new StringBuilder(REDUCED_FIND_ONE_BASE_SQL);
     addPageRequestParams(pageRequest, query);
 
-    List<ProjectImpl> result =
-        new ArrayList(
-            dbi.withHandle(
-                h ->
-                    h.createQuery(query.toString())
-                        .registerRowMapper(BeanMapper.factory(ProjectImpl.class, "p"))
-                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                        .reduceRows(
-                            new LinkedHashMap<UUID, ProjectImpl>(),
-                            (map, rowView) -> {
-                              ProjectImpl project =
-                                  map.computeIfAbsent(
-                                      rowView.getColumn("p_uuid", UUID.class),
-                                      fn -> {
-                                        return rowView.getRow(ProjectImpl.class);
-                                      });
+    List<ProjectImpl> result
+            = new ArrayList(
+                    dbi.withHandle(
+                            h
+                            -> h.createQuery(query.toString())
+                                    .registerRowMapper(BeanMapper.factory(ProjectImpl.class, "p"))
+                                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                                    .reduceRows(
+                                            new LinkedHashMap<UUID, ProjectImpl>(),
+                                            (map, rowView) -> {
+                                              ProjectImpl project
+                                              = map.computeIfAbsent(
+                                                      rowView.getColumn("p_uuid", UUID.class),
+                                                      fn -> {
+                                                        return rowView.getRow(ProjectImpl.class);
+                                                      });
 
-                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                project.setPreviewImage(
-                                    rowView.getRow(ImageFileResourceImpl.class));
-                              }
-                              return map;
-                            })
-                        .values()));
+                                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                                project.setPreviewImage(
+                                                        rowView.getRow(ImageFileResourceImpl.class));
+                                              }
+                                              return map;
+                                            })
+                                    .values()));
 
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
@@ -103,37 +103,37 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   public Project findOne(UUID uuid) {
     String query = FIND_ONE_BASE_SQL + " WHERE p.uuid = :uuid";
 
-    ProjectImpl result =
-        dbi.withHandle(
-                h ->
-                    h.createQuery(query)
-                        .bind("uuid", uuid)
-                        .registerRowMapper(BeanMapper.factory(ProjectImpl.class, "p"))
-                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                        .reduceRows(
-                            new LinkedHashMap<UUID, ProjectImpl>(),
-                            (map, rowView) -> {
-                              ProjectImpl project =
-                                  map.computeIfAbsent(
-                                      rowView.getColumn("p_uuid", UUID.class),
-                                      fn -> {
-                                        return rowView.getRow(ProjectImpl.class);
-                                      });
+    ProjectImpl result
+            = dbi.withHandle(
+                    h
+                    -> h.createQuery(query)
+                            .bind("uuid", uuid)
+                            .registerRowMapper(BeanMapper.factory(ProjectImpl.class, "p"))
+                            .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                            .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                            .reduceRows(
+                                    new LinkedHashMap<UUID, ProjectImpl>(),
+                                    (map, rowView) -> {
+                                      ProjectImpl project
+                                      = map.computeIfAbsent(
+                                              rowView.getColumn("p_uuid", UUID.class),
+                                              fn -> {
+                                                return rowView.getRow(ProjectImpl.class);
+                                              });
 
-                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                project.setPreviewImage(
-                                    rowView.getRow(ImageFileResourceImpl.class));
-                              }
+                                      if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                        project.setPreviewImage(
+                                                rowView.getRow(ImageFileResourceImpl.class));
+                                      }
 
-                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
-                                IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
-                                project.addIdentifier(identifier);
-                              }
+                                      if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                        IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                                        project.addIdentifier(identifier);
+                                      }
 
-                              return map;
-                            }))
-            .get(uuid);
+                                      return map;
+                                    }))
+                    .get(uuid);
     return result;
   }
 
@@ -148,46 +148,41 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
 
     String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
-    Optional<ProjectImpl> result =
-        dbi
-            .withHandle(
-                h ->
-                    h.createQuery(query)
-                        .bind("id", identifierId)
-                        .bind("namespace", namespace)
-                        .registerRowMapper(BeanMapper.factory(ProjectImpl.class, "p"))
-                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                        .reduceRows(
-                            new LinkedHashMap<UUID, ProjectImpl>(),
-                            (map, rowView) -> {
-                              ProjectImpl project =
-                                  map.computeIfAbsent(
-                                      rowView.getColumn("p_uuid", UUID.class),
-                                      fn -> {
-                                        return rowView.getRow(ProjectImpl.class);
-                                      });
+    Optional<ProjectImpl> result
+            = dbi
+                    .withHandle(
+                            h
+                            -> h.createQuery(query)
+                                    .bind("id", identifierId)
+                                    .bind("namespace", namespace)
+                                    .registerRowMapper(BeanMapper.factory(ProjectImpl.class, "p"))
+                                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                                    .reduceRows(
+                                            new LinkedHashMap<UUID, ProjectImpl>(),
+                                            (map, rowView) -> {
+                                              ProjectImpl project
+                                              = map.computeIfAbsent(
+                                                      rowView.getColumn("p_uuid", UUID.class),
+                                                      fn -> {
+                                                        return rowView.getRow(ProjectImpl.class);
+                                                      });
 
-                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                project.setPreviewImage(
-                                    rowView.getRow(ImageFileResourceImpl.class));
-                              }
+                                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                                project.setPreviewImage(
+                                                        rowView.getRow(ImageFileResourceImpl.class));
+                                              }
 
-                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
-                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
-                                project.addIdentifier(dbIdentifier);
-                              }
+                                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                                                project.addIdentifier(dbIdentifier);
+                                              }
 
-                              return map;
-                            }))
-            .values().stream()
-            .findFirst();
+                                              return map;
+                                            }))
+                    .values().stream()
+                    .findFirst();
     return result.orElse(null);
-  }
-
-  @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"p.created", "p.last_modified", "p.refid"};
   }
 
   @Override
@@ -196,11 +191,11 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
     project.setCreated(LocalDateTime.now());
     project.setLastModified(LocalDateTime.now());
     // refid is generated as serial, DO NOT SET!
-    final UUID previewImageUuid =
-        project.getPreviewImage() == null ? null : project.getPreviewImage().getUuid();
+    final UUID previewImageUuid
+            = project.getPreviewImage() == null ? null : project.getPreviewImage().getUuid();
 
-    String query =
-        "INSERT INTO projects("
+    String query
+            = "INSERT INTO projects("
             + "uuid, label, description, previewfileresource,"
             + " identifiable_type, entity_type,"
             + " created, last_modified,"
@@ -213,11 +208,11 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
             + ")";
 
     dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(project)
-                .execute());
+            h
+            -> h.createUpdate(query)
+                    .bind("previewFileResource", previewImageUuid)
+                    .bindBean(project)
+                    .execute());
 
     // save identifiers
     Set<Identifier> identifiers = project.getIdentifiers();
@@ -232,22 +227,22 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
     project.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, entity_type, refid
-    final UUID previewImageUuid =
-        project.getPreviewImage() == null ? null : project.getPreviewImage().getUuid();
+    final UUID previewImageUuid
+            = project.getPreviewImage() == null ? null : project.getPreviewImage().getUuid();
 
-    String query =
-        "UPDATE projects SET"
+    String query
+            = "UPDATE projects SET"
             + " label=:label::JSONB, description=:description::JSONB, previewfileresource=:previewFileResource,"
             + " last_modified=:lastModified,"
             + " text=:text::JSONB, start_date=:startDate, end_date=:endDate"
             + " WHERE uuid=:uuid";
 
     dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(project)
-                .execute());
+            h
+            -> h.createUpdate(query)
+                    .bind("previewFileResource", previewImageUuid)
+                    .bindBean(project)
+                    .execute());
 
     // save identifiers
     // as we store the whole list new: delete old entries
@@ -257,5 +252,27 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
 
     Project result = findOne(project.getUuid());
     return result;
+  }
+
+  @Override
+  protected String[] getAllowedOrderByFields() {
+    return new String[]{getColumnName("created"), getColumnName("lastModified"), getColumnName("refId")};
+  }
+
+  @Override
+  protected String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "created":
+        return "p.created";
+      case "lastModified":
+        return "p.last_modified";
+      case "refId":
+        return "p.refid";
+      default:
+        return null;
+    }
   }
 }

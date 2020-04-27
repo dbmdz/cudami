@@ -77,11 +77,6 @@ public class IdentifierTypeRepositoryImpl extends AbstractPagingAndSortingReposi
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"namespace"};
-  }
-
-  @Override
   public IdentifierType save(IdentifierType identifierType) {
     identifierType.setUuid(UUID.randomUUID());
 
@@ -111,5 +106,23 @@ public class IdentifierTypeRepositoryImpl extends AbstractPagingAndSortingReposi
                     .findOne()
                     .orElse(null));
     return result;
+  }
+  
+  @Override
+  protected String[] getAllowedOrderByFields() {
+    return new String[] {getColumnName("namespace")};
+  }
+
+  @Override
+  protected String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "namespace":
+        return "namespace";
+      default:
+        return null;
+    }
   }
 }

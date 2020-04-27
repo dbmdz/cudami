@@ -7,63 +7,77 @@ import de.digitalcollections.model.api.paging.enums.Direction;
 import java.util.Arrays;
 import java.util.Iterator;
 
+/**
+ * Convenience repository implementation to be inherited from if applicable.
+ *
+ * <p>
+ * Tries best to translate paging and sorting params into valid SQL.<br>
+ * If result does not fit your use case: implement it yourself and do not use these convenience methods.</p>
+ */
 public abstract class AbstractPagingAndSortingRepositoryImpl {
 
-  private void addLimit(PageRequest pageRequest, StringBuilder query) {
+  public void addLimit(PageRequest pageRequest, StringBuilder query) {
     int pageSize = pageRequest.getPageSize();
     if (pageSize > 0) {
-      query.append(" LIMIT ").append(pageSize);
+      query.append(" ").append("LIMIT").append(" ").append(pageSize);
     }
   }
 
-  private void addOffset(PageRequest pageRequest, StringBuilder query) {
+  public void addOffset(PageRequest pageRequest, StringBuilder query) {
     int offset = pageRequest.getOffset();
     if (offset >= 0) {
-      query.append(" OFFSET ").append(offset);
+      query.append(" ").append("OFFSET").append(" ").append(offset);
     }
   }
 
-  private void addOrderBy(
-      PageRequest pageRequest, StringBuilder query, String[] allowedOrderByFields) {
+  public void addOrderBy(PageRequest pageRequest, StringBuilder query) {
+    String[] allowedOrderByFields = getAllowedOrderByFields();
+
     // Sorting
-    String sortDirection = null;
-    String sortField = null;
     Sorting sorting = pageRequest.getSorting();
     if (sorting != null) {
       Iterator<Order> iterator = sorting.iterator();
       if (iterator.hasNext()) {
+        // TODO only one sort field supported by now...
         Order order = iterator.next();
-        sortField = order.getProperty();
+        String sortField = order.getProperty();
+        String sortDirection = null;
         if (sortField != null) {
-          Direction direction = order.getDirection();
-          if (direction != null && direction.isDescending()) {
-            sortDirection = " DESC";
+          if (allowedOrderByFields != null && Arrays.asList(allowedOrderByFields).contains(sortField)) {
+            String fullQualifiedColumnName = getColumnName(sortField);
+            Direction direction = order.getDirection();
+            if (direction != null && direction.isDescending()) {
+              sortDirection = "DESC";
+            } else {
+              sortDirection = "ASC";
+            }
+            query.append(" ").append("ORDER BY").append(" ").append(fullQualifiedColumnName).append(" ").append(sortDirection);
           }
         }
       }
     }
-    if (sortField == null) {
-      sortField = "id";
-    }
-
-    if ("id".equals(sortField)
-        || (allowedOrderByFields != null
-            && Arrays.asList(allowedOrderByFields).contains(sortField))) {
-      // Do not just append sortFiels value (check if is in allowed fields or equals "id")
-      // binding of jdbi/database does not work for order by!!!
-      query.append(" ORDER BY ").append(sortField);
-      if (sortDirection == null) {
-        sortDirection = " ASC";
-      }
-      query.append(sortDirection);
-    }
   }
 
   protected void addPageRequestParams(PageRequest pageRequest, StringBuilder query) {
-    addOrderBy(pageRequest, query, getAllowedOrderByFields());
-    addLimit(pageRequest, query);
-    addOffset(pageRequest, query);
+    if (pageRequest != null) {
+      addOrderBy(pageRequest, query);
+      addLimit(pageRequest, query);
+      addOffset(pageRequest, query);
+    }
   }
 
+  /**
+   * full qualified column names in database table that are applicable for sorting
+   *
+   * @return full qualified column name as used in sql queries ("last_modified" or e.g. "w.last_modified" if prefix used in queries)
+   */
   protected abstract String[] getAllowedOrderByFields();
+
+  /**
+   * full qualified column name in database table may vary from property name in model object
+   *
+   * @param modelProperty name of model property passed as String, e.g. "lastModified"
+   * @return column name as used in sql queries ("last_modified" or e.g. "w.last_modified" if prefix used in queries)
+   */
+  protected abstract String getColumnName(String modelProperty);
 }

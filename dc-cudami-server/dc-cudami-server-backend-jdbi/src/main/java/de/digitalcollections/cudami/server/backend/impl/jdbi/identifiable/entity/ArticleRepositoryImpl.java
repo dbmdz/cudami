@@ -184,11 +184,6 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"a.created", "a.last_modified", "a.refid"};
-  }
-
-  @Override
   public Article save(Article article) {
     article.setUuid(UUID.randomUUID());
     article.setCreated(LocalDateTime.now());
@@ -255,5 +250,27 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
 
     Article result = findOne(article.getUuid());
     return result;
+  }
+  
+  @Override
+  protected String[] getAllowedOrderByFields() {
+    return new String[]{getColumnName("created"), getColumnName("lastModified"), getColumnName("refId")};
+  }
+
+  @Override
+  protected String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "created":
+        return "a.created";
+      case "lastModified":
+        return "a.last_modified";
+      case "refId":
+        return "a.refid";
+      default:
+        return null;
+    }
   }
 }

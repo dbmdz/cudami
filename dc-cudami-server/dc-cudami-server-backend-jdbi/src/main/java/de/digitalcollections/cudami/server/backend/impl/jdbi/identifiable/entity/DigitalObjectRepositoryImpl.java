@@ -223,11 +223,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"d.last_modified"};
-  }
-
-  @Override
   public List<FileResource> getFileResources(UUID digitalObjectUuid) {
     String query =
         "SELECT f.uuid f_uuid, f.label f_label,"
@@ -445,5 +440,27 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
     DigitalObject result = findOne(digitalObject.getUuid());
     return result;
+  }
+  
+  @Override
+  protected String[] getAllowedOrderByFields() {
+    return new String[]{getColumnName("created"), getColumnName("lastModified"), getColumnName("refId")};
+  }
+
+  @Override
+  protected String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "created":
+        return "d.created";
+      case "lastModified":
+        return "d.last_modified";
+      case "refId":
+        return "d.refid";
+      default:
+        return null;
+    }
   }
 }

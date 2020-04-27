@@ -184,11 +184,6 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"c.created", "c.last_modified", "c.refid"};
-  }
-
-  @Override
   public Corporation save(Corporation corporation) {
     corporation.setUuid(UUID.randomUUID());
     corporation.setCreated(LocalDateTime.now());
@@ -255,5 +250,27 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
 
     Corporation result = findOne(corporation.getUuid());
     return result;
+  }
+  
+  @Override
+  protected String[] getAllowedOrderByFields() {
+    return new String[]{getColumnName("created"), getColumnName("lastModified"), getColumnName("refId")};
+  }
+
+  @Override
+  protected String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "created":
+        return "c.created";
+      case "lastModified":
+        return "c.last_modified";
+      case "refId":
+        return "c.refid";
+      default:
+        return null;
+    }
   }
 }

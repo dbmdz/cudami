@@ -9,13 +9,14 @@ import de.digitalcollections.model.feign.expander.paging.PageRequestToUrlParamsE
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import feign.Logger;
 import feign.Param;
+import feign.QueryMap;
 import feign.ReflectiveFeign;
 import feign.RequestLine;
 import feign.Retryer;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.slf4j.Slf4jLogger;
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public interface CudamiWebpagesClient {
@@ -39,12 +40,6 @@ public interface CudamiWebpagesClient {
       @Param(value = "pageRequestParams", expander = PageRequestToUrlParamsExpander.class)
           PageRequest pageRequest);
 
-  @RequestLine("GET /latest/webpages/{uuid}/children?{pageRequestParams}")
-  List<Webpage> getChildren(
-      @Param("uuid") UUID uuid,
-      @Param(
-              value = "pageRequestParams",
-              expander = PageRequestToUrlParamsExpander.class,
-              encoded = true)
-          PageRequest pageRequest);
+  @RequestLine("GET /latest/webpages/{uuid}/children")
+  PageResponse<Webpage> getChildren(@Param("uuid") UUID uuid, @QueryMap Map queryMap);
 }
