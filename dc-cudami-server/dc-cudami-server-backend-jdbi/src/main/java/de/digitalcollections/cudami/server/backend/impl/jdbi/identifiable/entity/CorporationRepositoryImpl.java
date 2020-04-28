@@ -251,10 +251,12 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
     Corporation result = findOne(corporation.getUuid());
     return result;
   }
-  
+
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[]{getColumnName("created"), getColumnName("lastModified"), getColumnName("refId")};
+    return new String[] {
+      getColumnName("created"), getColumnName("lastModified"), getColumnName("refId")
+    };
   }
 
   @Override

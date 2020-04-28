@@ -441,10 +441,12 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     DigitalObject result = findOne(digitalObject.getUuid());
     return result;
   }
-  
+
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[]{getColumnName("created"), getColumnName("lastModified"), getColumnName("refId")};
+    return new String[] {
+      getColumnName("created"), getColumnName("lastModified"), getColumnName("refId")
+    };
   }
 
   @Override

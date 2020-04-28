@@ -251,10 +251,12 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
     Article result = findOne(article.getUuid());
     return result;
   }
-  
+
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[]{getColumnName("created"), getColumnName("lastModified"), getColumnName("refId")};
+    return new String[] {
+      getColumnName("created"), getColumnName("lastModified"), getColumnName("refId")
+    };
   }
 
   @Override

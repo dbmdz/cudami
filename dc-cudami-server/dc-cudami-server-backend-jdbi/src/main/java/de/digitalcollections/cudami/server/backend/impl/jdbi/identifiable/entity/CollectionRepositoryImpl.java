@@ -252,10 +252,12 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     Collection result = findOne(collection.getUuid());
     return result;
   }
-  
+
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[]{getColumnName("created"), getColumnName("lastModified"), getColumnName("refId")};
+    return new String[] {
+      getColumnName("created"), getColumnName("lastModified"), getColumnName("refId")
+    };
   }
 
   @Override
