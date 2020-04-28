@@ -14,10 +14,7 @@ import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,14 +29,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class WebpageRepositoryImpl<E extends Entity, T extends Comparable> extends EntityPartRepositoryImpl<Webpage, E>
-        implements WebpageRepository<E> {
+public class WebpageRepositoryImpl<E extends Entity, T extends Comparable>
+    extends EntityPartRepositoryImpl<Webpage, E> implements WebpageRepository<E> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpageRepositoryImpl.class);
 
   // select all details shown/needed in single object details page
-  private static final String FIND_ONE_BASE_SQL
-          = "SELECT w.uuid w_uuid, w.label w_label, w.description w_description,"
+  private static final String FIND_ONE_BASE_SQL =
+      "SELECT w.uuid w_uuid, w.label w_label, w.description w_description,"
           + " w.identifiable_type w_type,"
           + " w.created w_created, w.last_modified w_lastModified,"
           + " w.text w_text, w.publication_start w_publicationStart, w.publication_end w_publicationEnd,"
@@ -50,8 +47,8 @@ public class WebpageRepositoryImpl<E extends Entity, T extends Comparable> exten
           + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid";
 
   // select only what is shown/needed in paged list (to avoid unnecessary payload/traffic):
-  private static final String REDUCED_FIND_ONE_BASE_SQL
-          = "SELECT w.uuid w_uuid, w.label w_label, w.description w_description,"
+  private static final String REDUCED_FIND_ONE_BASE_SQL =
+      "SELECT w.uuid w_uuid, w.label w_label, w.description w_description,"
           + " w.identifiable_type w_type,"
           + " w.created w_created, w.last_modified w_lastModified,"
           + " w.publication_start w_publicationStart, w.publication_end w_publicationEnd,"
@@ -59,8 +56,8 @@ public class WebpageRepositoryImpl<E extends Entity, T extends Comparable> exten
           + " FROM webpages as w"
           + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid";
 
-  private static final String BASE_CHILDREN_QUERY
-          = "SELECT w.uuid w_uuid, w.label w_label, w.description w_description,"
+  private static final String BASE_CHILDREN_QUERY =
+      "SELECT w.uuid w_uuid, w.label w_label, w.description w_description,"
           + " w.identifiable_type w_type,"
           + " w.created w_created, w.last_modified w_lastModified,"
           + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
@@ -85,30 +82,30 @@ public class WebpageRepositoryImpl<E extends Entity, T extends Comparable> exten
     StringBuilder query = new StringBuilder(REDUCED_FIND_ONE_BASE_SQL);
     addPageRequestParams(pageRequest, query);
 
-    List<WebpageImpl> result
-            = new ArrayList(
-                    dbi.withHandle(
-                            h
-                            -> h.createQuery(query.toString())
-                                    .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
-                                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                                    .reduceRows(
-                                            new LinkedHashMap<UUID, WebpageImpl>(),
-                                            (map, rowView) -> {
-                                              WebpageImpl webpage
-                                              = map.computeIfAbsent(
-                                                      rowView.getColumn("w_uuid", UUID.class),
-                                                      fn -> {
-                                                        return rowView.getRow(WebpageImpl.class);
-                                                      });
+    List<WebpageImpl> result =
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, WebpageImpl>(),
+                            (map, rowView) -> {
+                              WebpageImpl webpage =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("w_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(WebpageImpl.class);
+                                      });
 
-                                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                                webpage.setPreviewImage(
-                                                        rowView.getRow(ImageFileResourceImpl.class));
-                                              }
-                                              return map;
-                                            })
-                                    .values()));
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                webpage.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
 
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
@@ -119,37 +116,37 @@ public class WebpageRepositoryImpl<E extends Entity, T extends Comparable> exten
   public Webpage findOne(UUID uuid) {
     String query = FIND_ONE_BASE_SQL + " WHERE w.uuid = :uuid";
 
-    WebpageImpl result
-            = dbi.withHandle(
-                    h
-                    -> h.createQuery(query)
-                            .bind("uuid", uuid)
-                            .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
-                            .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                            .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                            .reduceRows(
-                                    new LinkedHashMap<UUID, WebpageImpl>(),
-                                    (map, rowView) -> {
-                                      WebpageImpl webpage
-                                      = map.computeIfAbsent(
-                                              rowView.getColumn("w_uuid", UUID.class),
-                                              fn -> {
-                                                return rowView.getRow(WebpageImpl.class);
-                                              });
+    WebpageImpl result =
+        dbi.withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, WebpageImpl>(),
+                            (map, rowView) -> {
+                              WebpageImpl webpage =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("w_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(WebpageImpl.class);
+                                      });
 
-                                      if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                        webpage.setPreviewImage(
-                                                rowView.getRow(ImageFileResourceImpl.class));
-                                      }
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                webpage.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
 
-                                      if (rowView.getColumn("id_uuid", UUID.class) != null) {
-                                        IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
-                                        webpage.addIdentifier(identifier);
-                                      }
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                                webpage.addIdentifier(identifier);
+                              }
 
-                                      return map;
-                                    }))
-                    .get(uuid);
+                              return map;
+                            }))
+            .get(uuid);
 
     if (result != null) {
       // TODO could be replaced with another join in above query...
@@ -169,40 +166,40 @@ public class WebpageRepositoryImpl<E extends Entity, T extends Comparable> exten
 
     String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
-    Optional<WebpageImpl> result
-            = dbi
-                    .withHandle(
-                            h
-                            -> h.createQuery(query)
-                                    .bind("id", identifierId)
-                                    .bind("namespace", namespace)
-                                    .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
-                                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                                    .reduceRows(
-                                            new LinkedHashMap<UUID, WebpageImpl>(),
-                                            (map, rowView) -> {
-                                              WebpageImpl webpage
-                                              = map.computeIfAbsent(
-                                                      rowView.getColumn("w_uuid", UUID.class),
-                                                      fn -> {
-                                                        return rowView.getRow(WebpageImpl.class);
-                                                      });
+    Optional<WebpageImpl> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("id", identifierId)
+                        .bind("namespace", namespace)
+                        .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, WebpageImpl>(),
+                            (map, rowView) -> {
+                              WebpageImpl webpage =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("w_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(WebpageImpl.class);
+                                      });
 
-                                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                                webpage.setPreviewImage(
-                                                        rowView.getRow(ImageFileResourceImpl.class));
-                                              }
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                webpage.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
 
-                                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
-                                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
-                                                webpage.addIdentifier(dbIdentifier);
-                                              }
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                                webpage.addIdentifier(dbIdentifier);
+                              }
 
-                                              return map;
-                                            }))
-                    .values().stream()
-                    .findFirst();
+                              return map;
+                            }))
+            .values().stream()
+            .findFirst();
     Webpage webpage = result.orElse(null);
     if (webpage != null) {
       // TODO could be replaced with another join in above query...
@@ -221,31 +218,31 @@ public class WebpageRepositoryImpl<E extends Entity, T extends Comparable> exten
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
     String query = BASE_CHILDREN_QUERY + " ORDER BY ww.sortIndex ASC";
 
-    List<Webpage> result
-            = new ArrayList(
-                    dbi.withHandle(
-                            h
-                            -> h.createQuery(query)
-                                    .bind("uuid", uuid)
-                                    .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
-                                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                                    .reduceRows(
-                                            new LinkedHashMap<UUID, WebpageImpl>(),
-                                            (map, rowView) -> {
-                                              WebpageImpl webpage
-                                              = map.computeIfAbsent(
-                                                      rowView.getColumn("w_uuid", UUID.class),
-                                                      fn -> {
-                                                        return rowView.getRow(WebpageImpl.class);
-                                                      });
+    List<Webpage> result =
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, WebpageImpl>(),
+                            (map, rowView) -> {
+                              WebpageImpl webpage =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("w_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(WebpageImpl.class);
+                                      });
 
-                                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                                webpage.setPreviewImage(
-                                                        rowView.getRow(ImageFileResourceImpl.class));
-                                              }
-                                              return map;
-                                            })
-                                    .values()));
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                webpage.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
     return result;
   }
 
@@ -254,137 +251,102 @@ public class WebpageRepositoryImpl<E extends Entity, T extends Comparable> exten
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
     StringBuilder query = new StringBuilder(BASE_CHILDREN_QUERY);
 
-    // handle possible filtering params
+    // handle optional filtering params
     Filtering filtering = pageRequest.getFiltering();
     if (filtering != null) {
+      // handle publication start criteria
       FilterCriteria<T> fc = (FilterCriteria<T>) filtering.getFilterCriteriaFor("publicationStart");
       if (fc != null) {
-        FilterOperation filterOperation = fc.getOperation();
-        // @see https://www.postgresql.org/docs/11/functions.html
-        switch (filterOperation) {
-          case BETWEEN:
-            if (fc.getMinValue() == null || fc.getMaxValue() == null) {
-              throw new IllegalArgumentException("For 'BETWEEN' operation two values are expected");
-            } else {
-              // example: BETWEEN '2015-01-01' AND '2015-12-31'
-              T minValue = fc.getMinValue();
-              T maxValue = fc.getMaxValue();
-              query.append(" AND (")
-                      .append(getColumnName(fc.getFieldName())).append(" BETWEEN ")
-                      .append(convertToString(fc.getMinValue())).append(" AND ")
-                      .append(convertToString(fc.getMaxValue()))
-                      .append(")");
-            }
-            break;
-          case IN:
-          case NOT_IN:
-            // For 'in' or 'nin' operation
-            query.append(" AND (")
-                    .append(getColumnName(fc.getFieldName()));
-            if (filterOperation == FilterOperation.NOT_IN) {
-              query.append(" NOT");
-            }
-            query.append(" IN (");
-            int i = 0;
-            for (T value : fc.getValues()) {
-              i++;
-              query.append(convertToString(value));
-              if (i < fc.getValues().size()) {
-                query.append(",");
-              }
-            }
-            query.append("))");
-            break;
-          case LESSTHAN_OR_EQUAL_TO:
-            // @see https://www.postgresql.org/docs/11/functions-comparison.html
-            query.append(" AND (")
-                    .append(getColumnName(fc.getFieldName()))
-                    .append(" <= ")
-                    .append(convertToString(fc.getValue()))
-                    .append(")");
-            break;
-          default:
-            // All other operation
-//            sb.append(convertToString(fc.getValue()));
-
-            break;
-        }
-        query.append(" AND ").append(getColumnName(fc.getFieldName()));
-
+        query.append(" AND ").append(getWhereClause(fc));
       }
-      FilterCriteria publicationEndCriteria = filtering.getFilterCriteriaFor("publicationEnd");
+
+      // handle publication end criteria
+      fc = (FilterCriteria<T>) filtering.getFilterCriteriaFor("publicationEnd");
+      if (fc != null) {
+        if (fc.getOperation() == FilterOperation.GREATER_THAN_OR_EQUAL_TO) {
+          query
+              .append(" AND (")
+              .append(getWhereClause(fc))
+              .append(" OR ")
+              .append(getColumnName("publicationEnd"))
+              .append(" IS NULL")
+              .append(")");
+        } else {
+          query.append(" AND ").append(getWhereClause(fc));
+        }
+      }
     }
     addPageRequestParams(pageRequest, query);
-    List<Webpage> result
-            = new ArrayList(
-                    dbi.withHandle(
-                            h
-                            -> h.createQuery(query.toString())
-                                    .bind("uuid", uuid)
-                                    .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
-                                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                                    .reduceRows(
-                                            new LinkedHashMap<UUID, WebpageImpl>(),
-                                            (map, rowView) -> {
-                                              WebpageImpl webpage
-                                              = map.computeIfAbsent(
-                                                      rowView.getColumn("w_uuid", UUID.class),
-                                                      fn -> {
-                                                        return rowView.getRow(WebpageImpl.class);
-                                                      });
+    List<Webpage> result =
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, WebpageImpl>(),
+                            (map, rowView) -> {
+                              WebpageImpl webpage =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("w_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(WebpageImpl.class);
+                                      });
 
-                                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                                webpage.setPreviewImage(
-                                                        rowView.getRow(ImageFileResourceImpl.class));
-                                              }
-                                              return map;
-                                            })
-                                    .values()));
-    String sql
-            = "SELECT count(*) FROM webpages as w"
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                webpage.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
+    String sql =
+        "SELECT count(*) FROM webpages as w"
             + " INNER JOIN webpage_webpages ww ON w.uuid = ww.child_webpage_uuid"
             + " WHERE ww.parent_webpage_uuid = :uuid";
-    long total
-            = dbi.withHandle(
-                    h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Long.class).findOne().get());
+    long total =
+        dbi.withHandle(
+            h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Long.class).findOne().get());
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
   }
 
   @Override
   public Webpage getParent(UUID uuid) {
-    String query
-            = REDUCED_FIND_ONE_BASE_SQL
+    String query =
+        REDUCED_FIND_ONE_BASE_SQL
             + " INNER JOIN webpage_webpages ww ON w.uuid = ww.parent_webpage_uuid"
             + " WHERE ww.child_webpage_uuid = :uuid";
 
-    Optional<WebpageImpl> result
-            = dbi
-                    .withHandle(
-                            h
-                            -> h.createQuery(query)
-                                    .bind("uuid", uuid)
-                                    .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
-                                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                                    .reduceRows(
-                                            new LinkedHashMap<UUID, WebpageImpl>(),
-                                            (map, rowView) -> {
-                                              WebpageImpl parentWebpage
-                                              = map.computeIfAbsent(
-                                                      rowView.getColumn("w_uuid", UUID.class),
-                                                      fn -> {
-                                                        return rowView.getRow(WebpageImpl.class);
-                                                      });
+    Optional<WebpageImpl> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, WebpageImpl>(),
+                            (map, rowView) -> {
+                              WebpageImpl parentWebpage =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("w_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(WebpageImpl.class);
+                                      });
 
-                                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                                parentWebpage.setPreviewImage(
-                                                        rowView.getRow(ImageFileResourceImpl.class));
-                                              }
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                parentWebpage.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
 
-                                              return map;
-                                            }))
-                    .values().stream()
-                    .findFirst();
+                              return map;
+                            }))
+            .values().stream()
+            .findFirst();
     return result.orElse(null);
   }
 
@@ -393,11 +355,11 @@ public class WebpageRepositoryImpl<E extends Entity, T extends Comparable> exten
     webpage.setUuid(UUID.randomUUID());
     webpage.setCreated(LocalDateTime.now());
     webpage.setLastModified(LocalDateTime.now());
-    final UUID previewImageUuid
-            = webpage.getPreviewImage() == null ? null : webpage.getPreviewImage().getUuid();
+    final UUID previewImageUuid =
+        webpage.getPreviewImage() == null ? null : webpage.getPreviewImage().getUuid();
 
-    String query
-            = "INSERT INTO webpages("
+    String query =
+        "INSERT INTO webpages("
             + "uuid, label, description, previewfileresource,"
             + " identifiable_type,"
             + " created, last_modified,"
@@ -410,11 +372,11 @@ public class WebpageRepositoryImpl<E extends Entity, T extends Comparable> exten
             + ")";
 
     dbi.withHandle(
-            h
-            -> h.createUpdate(query)
-                    .bind("previewFileResource", previewImageUuid)
-                    .bindBean(webpage)
-                    .execute());
+        h ->
+            h.createUpdate(query)
+                .bind("previewFileResource", previewImageUuid)
+                .bindBean(webpage)
+                .execute());
 
     // save identifiers
     Set<Identifier> identifiers = webpage.getIdentifiers();
@@ -428,20 +390,20 @@ public class WebpageRepositoryImpl<E extends Entity, T extends Comparable> exten
   public Webpage saveWithParentWebpage(Webpage webpage, UUID parentWebpageUuid) {
     Webpage savedWebpage = save(webpage);
 
-    Integer sortIndex
-            = selectNextSortIndexForParentChildren(
-                    dbi, "webpage_webpages", "parent_webpage_uuid", parentWebpageUuid);
+    Integer sortIndex =
+        selectNextSortIndexForParentChildren(
+            dbi, "webpage_webpages", "parent_webpage_uuid", parentWebpageUuid);
 
-    String query
-            = "INSERT INTO webpage_webpages(parent_webpage_uuid, child_webpage_uuid, sortIndex)"
+    String query =
+        "INSERT INTO webpage_webpages(parent_webpage_uuid, child_webpage_uuid, sortIndex)"
             + " VALUES (:parent_webpage_uuid, :uuid, :sortIndex)";
     dbi.withHandle(
-            h
-            -> h.createUpdate(query)
-                    .bind("parent_webpage_uuid", parentWebpageUuid)
-                    .bind("sortIndex", sortIndex)
-                    .bindBean(savedWebpage)
-                    .execute());
+        h ->
+            h.createUpdate(query)
+                .bind("parent_webpage_uuid", parentWebpageUuid)
+                .bind("sortIndex", sortIndex)
+                .bindBean(savedWebpage)
+                .execute());
 
     return findOne(savedWebpage.getUuid());
   }
@@ -450,19 +412,19 @@ public class WebpageRepositoryImpl<E extends Entity, T extends Comparable> exten
   public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid) {
     Webpage savedWebpage = save(webpage);
 
-    Integer sortIndex
-            = selectNextSortIndexForParentChildren(
-                    dbi, "website_webpages", "website_uuid", parentWebsiteUuid);
-    String query
-            = "INSERT INTO website_webpages(website_uuid, webpage_uuid, sortIndex)"
+    Integer sortIndex =
+        selectNextSortIndexForParentChildren(
+            dbi, "website_webpages", "website_uuid", parentWebsiteUuid);
+    String query =
+        "INSERT INTO website_webpages(website_uuid, webpage_uuid, sortIndex)"
             + " VALUES (:parent_website_uuid, :uuid, :sortIndex)";
     dbi.withHandle(
-            h
-            -> h.createUpdate(query)
-                    .bind("parent_website_uuid", parentWebsiteUuid)
-                    .bind("sortIndex", sortIndex)
-                    .bindBean(savedWebpage)
-                    .execute());
+        h ->
+            h.createUpdate(query)
+                .bind("parent_website_uuid", parentWebsiteUuid)
+                .bind("sortIndex", sortIndex)
+                .bindBean(savedWebpage)
+                .execute());
 
     return findOne(savedWebpage.getUuid());
   }
@@ -473,22 +435,22 @@ public class WebpageRepositoryImpl<E extends Entity, T extends Comparable> exten
 
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type
-    final UUID previewImageUuid
-            = webpage.getPreviewImage() == null ? null : webpage.getPreviewImage().getUuid();
+    final UUID previewImageUuid =
+        webpage.getPreviewImage() == null ? null : webpage.getPreviewImage().getUuid();
 
-    String query
-            = "UPDATE webpages SET"
+    String query =
+        "UPDATE webpages SET"
             + " label=:label::JSONB, description=:description::JSONB, previewfileresource=:previewFileResource,"
             + " last_modified=:lastModified,"
             + " text=:text::JSONB, publication_start=:publicationStart, publication_end=:publicationEnd"
             + " WHERE uuid=:uuid";
 
     dbi.withHandle(
-            h
-            -> h.createUpdate(query)
-                    .bind("previewFileResource", previewImageUuid)
-                    .bindBean(webpage)
-                    .execute());
+        h ->
+            h.createUpdate(query)
+                .bind("previewFileResource", previewImageUuid)
+                .bindBean(webpage)
+                .execute());
 
     // save identifiers
     // as we store the whole list new: delete old entries
@@ -502,7 +464,12 @@ public class WebpageRepositoryImpl<E extends Entity, T extends Comparable> exten
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[]{getColumnName("created"), getColumnName("lastModified"), getColumnName("publicationEnd"), getColumnName("publicationStart")};
+    return new String[] {
+      getColumnName("created"),
+      getColumnName("lastModified"),
+      getColumnName("publicationEnd"),
+      getColumnName("publicationStart")
+    };
   }
 
   @Override
@@ -522,16 +489,5 @@ public class WebpageRepositoryImpl<E extends Entity, T extends Comparable> exten
       default:
         return null;
     }
-  }
-
-  private String convertToString(T value) {
-    if (value == null) {
-      return "";
-    }
-    if (value instanceof LocalDate) {
-      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("'yyyy-MM-dd'");
-      return ((ChronoLocalDate) value).format(formatter);
-    }
-    return value.toString();
   }
 }
