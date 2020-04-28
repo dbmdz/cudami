@@ -32,13 +32,13 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, Entity>
-        implements SubtopicRepository {
+    implements SubtopicRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SubtopicRepositoryImpl.class);
 
   // select all details shown/needed in single object details page
-  private static final String FIND_ONE_BASE_SQL
-          = "SELECT s.uuid s_uuid, s.label s_label, s.description s_description,"
+  private static final String FIND_ONE_BASE_SQL =
+      "SELECT s.uuid s_uuid, s.label s_label, s.description s_description,"
           + " s.identifiable_type s_type,"
           + " s.created s_created, s.last_modified s_lastModified,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
@@ -48,16 +48,16 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
           + " LEFT JOIN fileresources_image as file on s.previewfileresource = file.uuid";
 
   // select only what is shown/needed in paged list (to avoid unnecessary payload/traffic):
-  private static final String REDUCED_FIND_ONE_BASE_SQL
-          = "SELECT s.uuid s_uuid, s.label s_label, s.description s_description,"
+  private static final String REDUCED_FIND_ONE_BASE_SQL =
+      "SELECT s.uuid s_uuid, s.label s_label, s.description s_description,"
           + " s.identifiable_type s_type,"
           + " s.created s_created, s.last_modified s_lastModified,"
           + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
           + " FROM subtopics as s"
           + " LEFT JOIN fileresources_image as file on s.previewfileresource = file.uuid";
 
-  private static final String BASE_CHILDREN_QUERY
-          = "SELECT s.uuid s_uuid, s.label s_label, s.description s_description,"
+  private static final String BASE_CHILDREN_QUERY =
+      "SELECT s.uuid s_uuid, s.label s_label, s.description s_description,"
           + " s.identifiable_type s_type,"
           + " s.created s_created, s.last_modified s_lastModified,"
           + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
@@ -82,30 +82,30 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
     StringBuilder query = new StringBuilder(REDUCED_FIND_ONE_BASE_SQL);
     addPageRequestParams(pageRequest, query);
 
-    List<SubtopicImpl> result
-            = new ArrayList(
-                    dbi.withHandle(
-                            h
-                            -> h.createQuery(query.toString())
-                                    .registerRowMapper(BeanMapper.factory(SubtopicImpl.class, "s"))
-                                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                                    .reduceRows(
-                                            new LinkedHashMap<UUID, SubtopicImpl>(),
-                                            (map, rowView) -> {
-                                              SubtopicImpl subtopic
-                                              = map.computeIfAbsent(
-                                                      rowView.getColumn("s_uuid", UUID.class),
-                                                      fn -> {
-                                                        return rowView.getRow(SubtopicImpl.class);
-                                                      });
+    List<SubtopicImpl> result =
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .registerRowMapper(BeanMapper.factory(SubtopicImpl.class, "s"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, SubtopicImpl>(),
+                            (map, rowView) -> {
+                              SubtopicImpl subtopic =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("s_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(SubtopicImpl.class);
+                                      });
 
-                                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                                subtopic.setPreviewImage(
-                                                        rowView.getRow(ImageFileResourceImpl.class));
-                                              }
-                                              return map;
-                                            })
-                                    .values()));
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                subtopic.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
 
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
@@ -116,37 +116,37 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
   public Subtopic findOne(UUID uuid) {
     String query = FIND_ONE_BASE_SQL + " WHERE s.uuid = :uuid";
 
-    SubtopicImpl result
-            = dbi.withHandle(
-                    h
-                    -> h.createQuery(query)
-                            .bind("uuid", uuid)
-                            .registerRowMapper(BeanMapper.factory(SubtopicImpl.class, "s"))
-                            .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                            .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                            .reduceRows(
-                                    new LinkedHashMap<UUID, SubtopicImpl>(),
-                                    (map, rowView) -> {
-                                      SubtopicImpl subtopic
-                                      = map.computeIfAbsent(
-                                              rowView.getColumn("s_uuid", UUID.class),
-                                              fn -> {
-                                                return rowView.getRow(SubtopicImpl.class);
-                                              });
+    SubtopicImpl result =
+        dbi.withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(SubtopicImpl.class, "s"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, SubtopicImpl>(),
+                            (map, rowView) -> {
+                              SubtopicImpl subtopic =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("s_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(SubtopicImpl.class);
+                                      });
 
-                                      if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                        subtopic.setPreviewImage(
-                                                rowView.getRow(ImageFileResourceImpl.class));
-                                      }
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                subtopic.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
 
-                                      if (rowView.getColumn("id_uuid", UUID.class) != null) {
-                                        IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
-                                        subtopic.addIdentifier(identifier);
-                                      }
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                                subtopic.addIdentifier(identifier);
+                              }
 
-                                      return map;
-                                    }))
-                    .get(uuid);
+                              return map;
+                            }))
+            .get(uuid);
 
     if (result != null) {
       // TODO could be replaced with another join in above query...
@@ -166,40 +166,40 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
 
     String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
-    Optional<SubtopicImpl> result
-            = dbi
-                    .withHandle(
-                            h
-                            -> h.createQuery(query)
-                                    .bind("id", identifierId)
-                                    .bind("namespace", namespace)
-                                    .registerRowMapper(BeanMapper.factory(SubtopicImpl.class, "s"))
-                                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                                    .reduceRows(
-                                            new LinkedHashMap<UUID, SubtopicImpl>(),
-                                            (map, rowView) -> {
-                                              SubtopicImpl subtopic
-                                              = map.computeIfAbsent(
-                                                      rowView.getColumn("s_uuid", UUID.class),
-                                                      fn -> {
-                                                        return rowView.getRow(SubtopicImpl.class);
-                                                      });
+    Optional<SubtopicImpl> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("id", identifierId)
+                        .bind("namespace", namespace)
+                        .registerRowMapper(BeanMapper.factory(SubtopicImpl.class, "s"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, SubtopicImpl>(),
+                            (map, rowView) -> {
+                              SubtopicImpl subtopic =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("s_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(SubtopicImpl.class);
+                                      });
 
-                                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                                subtopic.setPreviewImage(
-                                                        rowView.getRow(ImageFileResourceImpl.class));
-                                              }
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                subtopic.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
 
-                                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
-                                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
-                                                subtopic.addIdentifier(dbIdentifier);
-                                              }
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                                subtopic.addIdentifier(dbIdentifier);
+                              }
 
-                                              return map;
-                                            }))
-                    .values().stream()
-                    .findFirst();
+                              return map;
+                            }))
+            .values().stream()
+            .findFirst();
 
     Subtopic subtopic = result.orElse(null);
     if (subtopic != null) {
@@ -219,31 +219,31 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
     String query = BASE_CHILDREN_QUERY + " ORDER BY ss.sortIndex ASC";
 
-    List<Subtopic> result
-            = new ArrayList(
-                    dbi.withHandle(
-                            h
-                            -> h.createQuery(query)
-                                    .bind("uuid", uuid)
-                                    .registerRowMapper(BeanMapper.factory(SubtopicImpl.class, "s"))
-                                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                                    .reduceRows(
-                                            new LinkedHashMap<UUID, SubtopicImpl>(),
-                                            (map, rowView) -> {
-                                              SubtopicImpl subtopic
-                                              = map.computeIfAbsent(
-                                                      rowView.getColumn("s_uuid", UUID.class),
-                                                      fn -> {
-                                                        return rowView.getRow(SubtopicImpl.class);
-                                                      });
+    List<Subtopic> result =
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(SubtopicImpl.class, "s"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, SubtopicImpl>(),
+                            (map, rowView) -> {
+                              SubtopicImpl subtopic =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("s_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(SubtopicImpl.class);
+                                      });
 
-                                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                                subtopic.setPreviewImage(
-                                                        rowView.getRow(ImageFileResourceImpl.class));
-                                              }
-                                              return map;
-                                            })
-                                    .values()));
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                subtopic.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
     return result;
   }
 
@@ -252,38 +252,38 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
     StringBuilder query = new StringBuilder(BASE_CHILDREN_QUERY);
     addPageRequestParams(pageRequest, query);
-    List<Subtopic> result
-            = new ArrayList(
-                    dbi.withHandle(
-                            h
-                            -> h.createQuery(query.toString())
-                                    .bind("uuid", uuid)
-                                    .registerRowMapper(BeanMapper.factory(SubtopicImpl.class, "s"))
-                                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                                    .reduceRows(
-                                            new LinkedHashMap<UUID, SubtopicImpl>(),
-                                            (map, rowView) -> {
-                                              SubtopicImpl subtopic
-                                              = map.computeIfAbsent(
-                                                      rowView.getColumn("s_uuid", UUID.class),
-                                                      fn -> {
-                                                        return rowView.getRow(SubtopicImpl.class);
-                                                      });
+    List<Subtopic> result =
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(SubtopicImpl.class, "s"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, SubtopicImpl>(),
+                            (map, rowView) -> {
+                              SubtopicImpl subtopic =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("s_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(SubtopicImpl.class);
+                                      });
 
-                                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                                subtopic.setPreviewImage(
-                                                        rowView.getRow(ImageFileResourceImpl.class));
-                                              }
-                                              return map;
-                                            })
-                                    .values()));
-    String sql
-            = "SELECT count(*) FROM subtopics as s"
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                subtopic.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
+    String sql =
+        "SELECT count(*) FROM subtopics as s"
             + " INNER JOIN subtopic_subtopics ss ON s.uuid = ss.child_subtopic_uuid"
             + " WHERE ss.parent_subtopic_uuid = :uuid";
-    long total
-            = dbi.withHandle(
-                    h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Long.class).findOne().get());
+    long total =
+        dbi.withHandle(
+            h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Long.class).findOne().get());
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
   }
@@ -296,8 +296,8 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
   @Override
   public List<Entity> getEntities(UUID subtopicUuid) {
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
-    String query
-            = "SELECT e.uuid e_uuid, e.refid e_refId, e.label e_label, e.description e_description,"
+    String query =
+        "SELECT e.uuid e_uuid, e.refid e_refId, e.label e_label, e.description e_description,"
             + " e.identifiable_type e_type, e.entity_type e_entityType,"
             + " e.created e_created, e.last_modified e_lastModified,"
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
@@ -308,39 +308,39 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
             + " WHERE se.subtopic_uuid = :uuid"
             + " ORDER BY se.sortIndex ASC";
 
-    List<Entity> result
-            = dbi
-                    .withHandle(
-                            h
-                            -> h.createQuery(query)
-                                    .bind("uuid", subtopicUuid)
-                                    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
-                                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                                    .reduceRows(
-                                            new LinkedHashMap<UUID, EntityImpl>(),
-                                            (map, rowView) -> {
-                                              EntityImpl entity
-                                              = map.computeIfAbsent(
-                                                      rowView.getColumn("e_uuid", UUID.class),
-                                                      fn -> {
-                                                        return rowView.getRow(EntityImpl.class);
-                                                      });
+    List<Entity> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", subtopicUuid)
+                        .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, EntityImpl>(),
+                            (map, rowView) -> {
+                              EntityImpl entity =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("e_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(EntityImpl.class);
+                                      });
 
-                                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                                entity.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
-                                              }
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                entity.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                              }
 
-                                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
-                                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
-                                                entity.addIdentifier(dbIdentifier);
-                                              }
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                                entity.addIdentifier(dbIdentifier);
+                              }
 
-                                              return map;
-                                            }))
-                    .values().stream()
-                    .map(e -> (Entity) e)
-                    .collect(Collectors.toList());
+                              return map;
+                            }))
+            .values().stream()
+            .map(e -> (Entity) e)
+            .collect(Collectors.toList());
     return result;
   }
 
@@ -352,8 +352,8 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
   @Override
   public List<FileResource> getFileResources(UUID subtopicUuid) {
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
-    String query
-            = "SELECT f.uuid f_uuid, f.label f_label, f.description f_description,"
+    String query =
+        "SELECT f.uuid f_uuid, f.label f_label, f.description f_description,"
             + " f.identifiable_type f_type,"
             + " f.created f_created, f.last_modified f_lastModified,"
             + " f.filename f_filename, f.mimetype f_mimeType,"
@@ -363,70 +363,70 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
             + " WHERE sf.subtopic_uuid = :uuid"
             + " ORDER BY sf.sortIndex ASC";
 
-    List<FileResource> result
-            = dbi
-                    .withHandle(
-                            h
-                            -> h.createQuery(query)
-                                    .bind("uuid", subtopicUuid)
-                                    .registerRowMapper(BeanMapper.factory(FileResourceImpl.class, "f"))
-                                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
-                                    .reduceRows(
-                                            new LinkedHashMap<UUID, FileResourceImpl>(),
-                                            (map, rowView) -> {
-                                              FileResourceImpl fileResource
-                                              = map.computeIfAbsent(
-                                                      rowView.getColumn("f_uuid", UUID.class),
-                                                      fn -> {
-                                                        return rowView.getRow(FileResourceImpl.class);
-                                                      });
+    List<FileResource> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", subtopicUuid)
+                        .registerRowMapper(BeanMapper.factory(FileResourceImpl.class, "f"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, FileResourceImpl>(),
+                            (map, rowView) -> {
+                              FileResourceImpl fileResource =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("f_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(FileResourceImpl.class);
+                                      });
 
-                                              if (rowView.getColumn("pf_uuid", UUID.class) != null) {
-                                                fileResource.setPreviewImage(
-                                                        rowView.getRow(ImageFileResourceImpl.class));
-                                              }
+                              if (rowView.getColumn("pf_uuid", UUID.class) != null) {
+                                fileResource.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
 
-                                              return map;
-                                            }))
-                    .values().stream()
-                    .map(FileResource.class::cast)
-                    .collect(Collectors.toList());
+                              return map;
+                            }))
+            .values().stream()
+            .map(FileResource.class::cast)
+            .collect(Collectors.toList());
     return result;
   }
 
   @Override
   public Subtopic getParent(UUID uuid) {
-    String query
-            = REDUCED_FIND_ONE_BASE_SQL
+    String query =
+        REDUCED_FIND_ONE_BASE_SQL
             + " INNER JOIN subtopic_subtopics ss ON s.uuid = ss.parent_subtopic_uuid"
             + " WHERE ss.child_subtopic_uuid = :uuid";
 
-    Optional<SubtopicImpl> result
-            = dbi
-                    .withHandle(
-                            h
-                            -> h.createQuery(query)
-                                    .bind("uuid", uuid)
-                                    .registerRowMapper(BeanMapper.factory(SubtopicImpl.class, "s"))
-                                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                                    .reduceRows(
-                                            new LinkedHashMap<UUID, SubtopicImpl>(),
-                                            (map, rowView) -> {
-                                              SubtopicImpl parentSubtopic
-                                              = map.computeIfAbsent(
-                                                      rowView.getColumn("s_uuid", UUID.class),
-                                                      fn -> {
-                                                        return rowView.getRow(SubtopicImpl.class);
-                                                      });
+    Optional<SubtopicImpl> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(SubtopicImpl.class, "s"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, SubtopicImpl>(),
+                            (map, rowView) -> {
+                              SubtopicImpl parentSubtopic =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("s_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(SubtopicImpl.class);
+                                      });
 
-                                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                                parentSubtopic.setPreviewImage(
-                                                        rowView.getRow(ImageFileResourceImpl.class));
-                                              }
-                                              return map;
-                                            }))
-                    .values().stream()
-                    .findFirst();
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                parentSubtopic.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            }))
+            .values().stream()
+            .findFirst();
     return result.orElse(null);
   }
 
@@ -435,11 +435,11 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
     subtopic.setUuid(UUID.randomUUID());
     subtopic.setCreated(LocalDateTime.now());
     subtopic.setLastModified(LocalDateTime.now());
-    final UUID previewImageUuid
-            = subtopic.getPreviewImage() == null ? null : subtopic.getPreviewImage().getUuid();
+    final UUID previewImageUuid =
+        subtopic.getPreviewImage() == null ? null : subtopic.getPreviewImage().getUuid();
 
-    String query
-            = "INSERT INTO subtopics("
+    String query =
+        "INSERT INTO subtopics("
             + "uuid, label, description, previewfileresource,"
             + " identifiable_type,"
             + " created, last_modified"
@@ -450,11 +450,11 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
             + ")";
 
     dbi.withHandle(
-            h
-            -> h.createUpdate(query)
-                    .bind("previewFileResource", previewImageUuid)
-                    .bindBean(subtopic)
-                    .execute());
+        h ->
+            h.createUpdate(query)
+                .bind("previewFileResource", previewImageUuid)
+                .bindBean(subtopic)
+                .execute());
 
     // save identifiers
     Set<Identifier> identifiers = subtopic.getIdentifiers();
@@ -473,27 +473,27 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
   public List<Entity> saveEntities(UUID subtopicUuid, List<Entity> entities) {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
-            h
-            -> h.createUpdate("DELETE FROM subtopic_entities WHERE subtopic_uuid = :uuid")
-                    .bind("uuid", subtopicUuid)
-                    .execute());
+        h ->
+            h.createUpdate("DELETE FROM subtopic_entities WHERE subtopic_uuid = :uuid")
+                .bind("uuid", subtopicUuid)
+                .execute());
 
     if (entities != null) {
       // we assume that the entities are already saved...
       dbi.useHandle(
-              handle -> {
-                PreparedBatch preparedBatch
-                = handle.prepareBatch(
-                        "INSERT INTO subtopic_entities(subtopic_uuid, entity_uuid, sortIndex) VALUES(:uuid, :entityUuid, :sortIndex)");
-                for (Entity entity : entities) {
-                  preparedBatch
-                          .bind("uuid", subtopicUuid)
-                          .bind("entityUuid", entity.getUuid())
-                          .bind("sortIndex", getIndex(entities, entity))
-                          .add();
-                }
-                preparedBatch.execute();
-              });
+          handle -> {
+            PreparedBatch preparedBatch =
+                handle.prepareBatch(
+                    "INSERT INTO subtopic_entities(subtopic_uuid, entity_uuid, sortIndex) VALUES(:uuid, :entityUuid, :sortIndex)");
+            for (Entity entity : entities) {
+              preparedBatch
+                  .bind("uuid", subtopicUuid)
+                  .bind("entityUuid", entity.getUuid())
+                  .bind("sortIndex", getIndex(entities, entity))
+                  .add();
+            }
+            preparedBatch.execute();
+          });
     }
     return getEntities(subtopicUuid);
   }
@@ -507,27 +507,27 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
   public List<FileResource> saveFileResources(UUID subtopicUuid, List<FileResource> fileResources) {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
-            h
-            -> h.createUpdate("DELETE FROM subtopic_fileresources WHERE subtopic_uuid = :uuid")
-                    .bind("uuid", subtopicUuid)
-                    .execute());
+        h ->
+            h.createUpdate("DELETE FROM subtopic_fileresources WHERE subtopic_uuid = :uuid")
+                .bind("uuid", subtopicUuid)
+                .execute());
 
     if (fileResources != null) {
       // we assume that the fileresources are already saved...
       dbi.useHandle(
-              handle -> {
-                PreparedBatch preparedBatch
-                = handle.prepareBatch(
-                        "INSERT INTO subtopic_fileresources(subtopic_uuid, fileresource_uuid, sortIndex) VALUES(:uuid, :fileResourceUuid, :sortIndex)");
-                for (FileResource fileResource : fileResources) {
-                  preparedBatch
-                          .bind("uuid", subtopicUuid)
-                          .bind("fileResourceUuid", fileResource.getUuid())
-                          .bind("sortIndex", getIndex(fileResources, fileResource))
-                          .add();
-                }
-                preparedBatch.execute();
-              });
+          handle -> {
+            PreparedBatch preparedBatch =
+                handle.prepareBatch(
+                    "INSERT INTO subtopic_fileresources(subtopic_uuid, fileresource_uuid, sortIndex) VALUES(:uuid, :fileResourceUuid, :sortIndex)");
+            for (FileResource fileResource : fileResources) {
+              preparedBatch
+                  .bind("uuid", subtopicUuid)
+                  .bind("fileResourceUuid", fileResource.getUuid())
+                  .bind("sortIndex", getIndex(fileResources, fileResource))
+                  .add();
+            }
+            preparedBatch.execute();
+          });
     }
     return getFileResources(subtopicUuid);
   }
@@ -536,18 +536,18 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
   public Subtopic saveWithParentSubtopic(Subtopic subtopic, UUID parentSubtopicUuid) {
     Subtopic savedSubtopic = save(subtopic);
 
-    Integer sortindex
-            = selectNextSortIndexForParentChildren(
-                    dbi, "subtopic_subtopics", "parent_subtopic_uuid", parentSubtopicUuid);
+    Integer sortindex =
+        selectNextSortIndexForParentChildren(
+            dbi, "subtopic_subtopics", "parent_subtopic_uuid", parentSubtopicUuid);
     dbi.withHandle(
-            h
-            -> h.createUpdate(
+        h ->
+            h.createUpdate(
                     "INSERT INTO subtopic_subtopics(parent_subtopic_uuid, child_subtopic_uuid, sortindex)"
-                    + " VALUES (:parent_subtopic_uuid, :uuid, :sortindex)")
-                    .bind("parent_subtopic_uuid", parentSubtopicUuid)
-                    .bind("sortindex", sortindex)
-                    .bindBean(savedSubtopic)
-                    .execute());
+                        + " VALUES (:parent_subtopic_uuid, :uuid, :sortindex)")
+                .bind("parent_subtopic_uuid", parentSubtopicUuid)
+                .bind("sortindex", sortindex)
+                .bindBean(savedSubtopic)
+                .execute());
 
     return findOne(savedSubtopic.getUuid());
   }
@@ -556,17 +556,17 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
   public Subtopic saveWithParentTopic(Subtopic subtopic, UUID parentTopicUuid) {
     Subtopic savedSubtopic = save(subtopic);
 
-    Integer sortindex
-            = selectNextSortIndexForParentChildren(dbi, "topic_subtopics", "topic_uuid", parentTopicUuid);
+    Integer sortindex =
+        selectNextSortIndexForParentChildren(dbi, "topic_subtopics", "topic_uuid", parentTopicUuid);
     dbi.withHandle(
-            h
-            -> h.createUpdate(
+        h ->
+            h.createUpdate(
                     "INSERT INTO topic_subtopics(topic_uuid, subtopic_uuid, sortindex)"
-                    + " VALUES (:parent_topic_uuid, :uuid, :sortindex)")
-                    .bind("parent_topic_uuid", parentTopicUuid)
-                    .bind("sortindex", sortindex)
-                    .bindBean(savedSubtopic)
-                    .execute());
+                        + " VALUES (:parent_topic_uuid, :uuid, :sortindex)")
+                .bind("parent_topic_uuid", parentTopicUuid)
+                .bind("sortindex", sortindex)
+                .bindBean(savedSubtopic)
+                .execute());
 
     return findOne(savedSubtopic.getUuid());
   }
@@ -577,21 +577,21 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
 
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type
-    final UUID previewImageUuid
-            = subtopic.getPreviewImage() == null ? null : subtopic.getPreviewImage().getUuid();
+    final UUID previewImageUuid =
+        subtopic.getPreviewImage() == null ? null : subtopic.getPreviewImage().getUuid();
 
-    String query
-            = "UPDATE subtopics SET"
+    String query =
+        "UPDATE subtopics SET"
             + " label=:label::JSONB, description=:description::JSONB, previewfileresource=:previewFileResource,"
             + " last_modified=:lastModified"
             + " WHERE uuid=:uuid";
 
     dbi.withHandle(
-            h
-            -> h.createUpdate(query)
-                    .bind("previewFileResource", previewImageUuid)
-                    .bindBean(subtopic)
-                    .execute());
+        h ->
+            h.createUpdate(query)
+                .bind("previewFileResource", previewImageUuid)
+                .bindBean(subtopic)
+                .execute());
 
     // save identifiers
     // as we store the whole list new: delete old entries
@@ -605,7 +605,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[]{getColumnName("created"), getColumnName("lastModified")};
+    return new String[] {getColumnName("created"), getColumnName("lastModified")};
   }
 
   @Override

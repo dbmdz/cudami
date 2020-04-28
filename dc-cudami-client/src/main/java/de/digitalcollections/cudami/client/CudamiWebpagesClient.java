@@ -3,9 +3,7 @@ package de.digitalcollections.cudami.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.CudamiRestErrorDecoder;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
-import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.feign.expander.paging.PageRequestToUrlParamsExpander;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import feign.Logger;
 import feign.Param;
@@ -34,11 +32,6 @@ public interface CudamiWebpagesClient {
             .target(CudamiWebpagesClient.class, serverUrl);
     return backend;
   }
-
-  @RequestLine("GET /latest/webpages?{pageRequestParams}")
-  PageResponse<Webpage> find(
-      @Param(value = "pageRequestParams", expander = PageRequestToUrlParamsExpander.class)
-          PageRequest pageRequest);
 
   @RequestLine("GET /latest/webpages/{uuid}/children")
   PageResponse<Webpage> getChildren(@Param("uuid") UUID uuid, @QueryMap Map queryMap);

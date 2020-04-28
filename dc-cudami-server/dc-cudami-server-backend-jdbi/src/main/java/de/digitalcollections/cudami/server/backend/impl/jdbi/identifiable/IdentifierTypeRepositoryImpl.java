@@ -107,7 +107,7 @@ public class IdentifierTypeRepositoryImpl extends AbstractPagingAndSortingReposi
                     .orElse(null));
     return result;
   }
-  
+
   @Override
   protected String[] getAllowedOrderByFields() {
     return new String[] {getColumnName("namespace")};

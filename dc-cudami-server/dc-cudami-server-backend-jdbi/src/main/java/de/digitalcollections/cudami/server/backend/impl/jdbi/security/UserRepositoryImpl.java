@@ -121,10 +121,12 @@ public class UserRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl
                     .orElse(null));
     return result;
   }
-  
-    @Override
+
+  @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[] {getColumnName("email"), getColumnName("lastname"), getColumnName("firstname")};
+    return new String[] {
+      getColumnName("email"), getColumnName("lastname"), getColumnName("firstname")
+    };
   }
 
   @Override

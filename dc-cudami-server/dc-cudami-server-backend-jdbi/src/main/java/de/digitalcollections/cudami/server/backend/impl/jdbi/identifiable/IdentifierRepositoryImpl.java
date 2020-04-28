@@ -115,10 +115,12 @@ public class IdentifierRepositoryImpl extends AbstractPagingAndSortingRepository
     throw new UnsupportedOperationException(
         "An update on identifiable, namespace and identifier has no use case.");
   }
-  
+
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[] {getColumnName("identifiable"), getColumnName("namespace"), getColumnName("id")};
+    return new String[] {
+      getColumnName("identifiable"), getColumnName("namespace"), getColumnName("id")
+    };
   }
 
   @Override
