@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.WebpageRepository;
-import de.digitalcollections.model.api.filter.FilterCriteria;
+import de.digitalcollections.model.api.filter.FilterCriterion;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.filter.enums.FilterOperation;
 import de.digitalcollections.model.api.identifiable.Identifier;
@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class WebpageRepositoryImpl<E extends Entity, T extends Comparable>
+public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
     extends EntityPartRepositoryImpl<Webpage, E> implements WebpageRepository<E> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpageRepositoryImpl.class);
@@ -255,13 +255,14 @@ public class WebpageRepositoryImpl<E extends Entity, T extends Comparable>
     Filtering filtering = pageRequest.getFiltering();
     if (filtering != null) {
       // handle publication start criteria
-      FilterCriteria<T> fc = (FilterCriteria<T>) filtering.getFilterCriteriaFor("publicationStart");
+      FilterCriterion<C> fc =
+          (FilterCriterion<C>) filtering.getFilterCriterionFor("publicationStart");
       if (fc != null) {
         query.append(" AND ").append(getWhereClause(fc));
       }
 
       // handle publication end criteria
-      fc = (FilterCriteria<T>) filtering.getFilterCriteriaFor("publicationEnd");
+      fc = (FilterCriterion<C>) filtering.getFilterCriterionFor("publicationEnd");
       if (fc != null) {
         if (fc.getOperation() == FilterOperation.GREATER_THAN_OR_EQUAL_TO) {
           query

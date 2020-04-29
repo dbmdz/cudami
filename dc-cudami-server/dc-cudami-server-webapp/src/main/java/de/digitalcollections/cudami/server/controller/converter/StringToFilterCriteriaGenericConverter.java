@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.controller.converter;
 
+import de.digitalcollections.model.api.filter.FilterCriterion;
 import de.digitalcollections.model.api.filter.enums.FilterOperation;
-import de.digitalcollections.model.impl.filter.FilterCriteriaImpl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,14 +17,14 @@ import org.springframework.util.StringUtils;
 
 @Component
 /**
- * Converter for converting URL params for Filtering from String to FilterCriteria-instance. Used in
- * WebController. Fills model object FilterCriteria.
+ * Converter for converting URL params for Filtering from String to FilterCriterion-instance. Used
+ * in WebController. Fills model object FilterCriterion.
  *
  * <p>The following table describes available filter operation params and how to define fieldName,
  * operation and operation values in URL:
  *
  * <table border="1">
- * <caption>Filter Criteria Structure</caption>
+ * <caption>Filter Criterion Structure</caption>
  * <tr>
  * <td>Symbol</td>
  * <td>Operation</td>
@@ -72,9 +72,9 @@ import org.springframework.util.StringUtils;
  * </tr>
  * </table>
  *
- * @see FilterCriteria
+ * @see FilterCriterion
  */
-public class StringToFilterCriteriaGenericConverter<T extends Comparable>
+public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>>
     implements GenericConverter {
 
   @Autowired private ConversionService conversionService;
@@ -82,7 +82,7 @@ public class StringToFilterCriteriaGenericConverter<T extends Comparable>
   @Override
   public Set<ConvertiblePair> getConvertibleTypes() {
     Set<ConvertiblePair> convertibleTypes = new HashSet<>();
-    convertibleTypes.add(new ConvertiblePair(String.class, FilterCriteriaImpl.class));
+    convertibleTypes.add(new ConvertiblePair(String.class, FilterCriterion.class));
     return convertibleTypes;
   }
 
@@ -111,12 +111,12 @@ public class StringToFilterCriteriaGenericConverter<T extends Comparable>
     }
     Collection<String> originalValues = Arrays.asList(operationValues);
 
-    T convertedSingleValue = null;
-    T minValue = null;
-    T maxValue = null;
-    Collection<T> convertedValues = new ArrayList<>();
+    Object convertedSingleValue = null;
+    C minValue = null;
+    C maxValue = null;
+    Collection convertedValues = new ArrayList<>();
 
-    Class<T> targetClass = (Class<T>) targetType.getResolvableType().getGeneric(0).getType();
+    Class targetClass = (Class<?>) targetType.getResolvableType().getGeneric(0).getType();
     if (null == filterOperation) {
       // All other operation
       convertedSingleValue = conversionService.convert(operationValues[0], targetClass);
@@ -129,8 +129,8 @@ public class StringToFilterCriteriaGenericConverter<T extends Comparable>
           } else {
 
             // Convert
-            T value1 = conversionService.convert(operationValues[0], targetClass);
-            T value2 = conversionService.convert(operationValues[1], targetClass);
+            C value1 = (C) conversionService.convert(operationValues[0], targetClass);
+            C value2 = (C) conversionService.convert(operationValues[1], targetClass);
 
             if (value1 != null && value2 != null) {
               // Set min and max values
@@ -158,8 +158,8 @@ public class StringToFilterCriteriaGenericConverter<T extends Comparable>
           break;
       }
     }
-    FilterCriteriaImpl<T> fc =
-        new FilterCriteriaImpl<>(
+    FilterCriterion fc =
+        new FilterCriterion(
             null, filterOperation, convertedSingleValue, minValue, maxValue, convertedValues);
     return fc;
   }

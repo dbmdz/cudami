@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.parts
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.WebpageService;
+import de.digitalcollections.model.api.filter.FilterCriterion;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
@@ -11,7 +12,6 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.paging.enums.Direction;
 import de.digitalcollections.model.api.paging.enums.NullHandling;
-import de.digitalcollections.model.impl.filter.FilterCriteriaImpl;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
@@ -65,9 +65,9 @@ public class WebpageController {
       @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
           NullHandling nullHandling,
       @RequestParam(name = "publicationStart", required = false)
-          FilterCriteriaImpl<LocalDate> publicationStart,
+          FilterCriterion<LocalDate> publicationStart,
       @RequestParam(name = "publicationEnd", required = false)
-          FilterCriteriaImpl<LocalDate> publicationEnd) {
+          FilterCriterion<LocalDate> publicationEnd) {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
     Filtering filtering =
@@ -132,9 +132,9 @@ public class WebpageController {
       @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
           NullHandling nullHandling,
       @RequestParam(name = "publicationStart", required = false)
-          FilterCriteriaImpl<LocalDate> publicationStart,
+          FilterCriterion<LocalDate> publicationStart,
       @RequestParam(name = "publicationEnd", required = false)
-          FilterCriteriaImpl<LocalDate> publicationEnd)
+          FilterCriterion<LocalDate> publicationEnd)
       throws IdentifiableServiceException {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);

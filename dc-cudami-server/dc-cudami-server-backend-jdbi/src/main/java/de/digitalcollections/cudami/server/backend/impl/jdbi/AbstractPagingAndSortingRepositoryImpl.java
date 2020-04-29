@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi;
 
-import de.digitalcollections.model.api.filter.FilterCriteria;
+import de.digitalcollections.model.api.filter.FilterCriterion;
 import de.digitalcollections.model.api.filter.enums.FilterOperation;
 import de.digitalcollections.model.api.paging.Order;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -18,8 +18,9 @@ import java.util.Iterator;
  * <p>Tries best to translate paging and sorting params into valid SQL.<br>
  * If result does not fit your use case: implement it yourself and do not use these convenience
  * methods.
+ * @param <C> type of comparable object when BETWEEN filter operation has to be handled
  */
-public abstract class AbstractPagingAndSortingRepositoryImpl<T extends Comparable> {
+public abstract class AbstractPagingAndSortingRepositoryImpl<C extends Comparable<C>> {
 
   public void addLimit(PageRequest pageRequest, StringBuilder query) {
     int pageSize = pageRequest.getPageSize();
@@ -95,7 +96,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl<T extends Comparabl
    */
   protected abstract String getColumnName(String modelProperty);
 
-  protected String getWhereClause(FilterCriteria<T> fc)
+  protected String getWhereClause(FilterCriterion<?> fc)
       throws IllegalArgumentException, UnsupportedOperationException {
     StringBuilder query = new StringBuilder();
     if (fc != null) {
@@ -111,9 +112,9 @@ public abstract class AbstractPagingAndSortingRepositoryImpl<T extends Comparabl
                 .append("(")
                 .append(getColumnName(fc.getFieldName()))
                 .append(" BETWEEN ")
-                .append(convertToSqlString(fc.getMinValue()))
+                .append(convertToSqlString((C) fc.getMinValue()))
                 .append(" AND ")
-                .append(convertToSqlString(fc.getMaxValue()))
+                .append(convertToSqlString((C) fc.getMaxValue()))
                 .append(")");
           }
           break;
@@ -126,7 +127,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl<T extends Comparabl
           }
           query.append(" IN (");
           int i = 0;
-          for (T value : fc.getValues()) {
+          for (Object value : fc.getValues()) {
             i++;
             query.append(convertToSqlString(value));
             if (i < fc.getValues().size()) {
@@ -217,7 +218,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl<T extends Comparabl
     return query.toString();
   }
 
-  private String convertToSqlString(T value) {
+  private String convertToSqlString(Object value) {
     if (value == null) {
       return "";
     }
