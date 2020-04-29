@@ -6,7 +6,17 @@
   <th:block th:fragment="renderTeaser(identifiable, language)">
     <div class="row">
       <div class="col-sm-2">
-        <img alt="no preview" class="media-object" th:src="@{/images/no-image.png}" style="width: 100px;" />
+        <th:block th:if="${identifiable.previewImage}">
+          <th:block th:if="${identifiable.previewImage.iiifBaseUrl}">
+            <img th:src="${identifiable.previewImage.iiifBaseUrl} + '/' + ${identifiable.previewImage.uuid} + '/full/100,/0/default.jpg'" th:attr="alt=${identifiable.previewImage.filename}" />
+          </th:block>
+          <th:block th:unless="${identifiable.previewImage.iiifBaseUrl}">
+            <img th:src="${identifiable.previewImage.uri}" th:attr="alt=${identifiable.previewImage.filename}" style="width: 100px;" />
+          </th:block>
+        </th:block>
+        <th:block th:unless="${identifiable.previewImage}">
+          <img alt="no preview" class="media-object" th:src="@{/images/no-image.png}" style="width: 100px;" />
+        </th:block>
       </div>
       <div class="col-sm-10">
         <label>
