@@ -110,7 +110,7 @@ public class IdentifierTypeRepositoryImpl extends AbstractPagingAndSortingReposi
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[] {getColumnName("namespace")};
+    return new String[] {"namespace"};
   }
 
   @Override

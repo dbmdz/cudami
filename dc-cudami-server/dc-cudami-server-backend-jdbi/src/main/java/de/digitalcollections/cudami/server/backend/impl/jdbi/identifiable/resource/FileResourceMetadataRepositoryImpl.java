@@ -702,12 +702,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[] {
-      getColumnName("created"),
-      getColumnName("filename"),
-      getColumnName("lastModified"),
-      getColumnName("sizeInBytes")
-    };
+    return new String[] {"created", "filename", "lastModified", "sizeInBytes"};
   }
 
   @Override

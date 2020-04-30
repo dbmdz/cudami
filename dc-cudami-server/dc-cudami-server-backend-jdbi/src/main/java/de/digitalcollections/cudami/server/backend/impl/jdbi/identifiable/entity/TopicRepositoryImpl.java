@@ -307,9 +307,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[] {
-      getColumnName("created"), getColumnName("lastModified"), getColumnName("refId")
-    };
+    return new String[] {"created", "lastModified", "refId"};
   }
 
   @Override

@@ -290,12 +290,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[] {
-      getColumnName("created"),
-      getColumnName("lastModified"),
-      getColumnName("refId"),
-      getColumnName("url")
-    };
+    return new String[] {"created", "lastModified", "refId", "url"};
   }
 
   @Override

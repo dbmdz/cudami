@@ -387,13 +387,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[] {
-      getColumnName("created"),
-      getColumnName("entityType"),
-      getColumnName("lastModified"),
-      getColumnName("refId"),
-      getColumnName("type")
-    };
+    return new String[] {"created", "entityType", "lastModified", "refId", "type"};
   }
 
   @Override

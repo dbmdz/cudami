@@ -279,9 +279,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[] {
-      getColumnName("created"), getColumnName("lastModified"), getColumnName("type")
-    };
+    return new String[] {"created", "lastModified", "type"};
   }
 
   @Override

@@ -605,7 +605,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[] {getColumnName("created"), getColumnName("lastModified")};
+    return new String[] {"created", "lastModified"};
   }
 
   @Override

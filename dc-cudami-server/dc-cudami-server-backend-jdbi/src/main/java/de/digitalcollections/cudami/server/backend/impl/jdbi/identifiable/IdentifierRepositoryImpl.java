@@ -118,9 +118,7 @@ public class IdentifierRepositoryImpl extends AbstractPagingAndSortingRepository
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[] {
-      getColumnName("identifiable"), getColumnName("namespace"), getColumnName("id")
-    };
+    return new String[] {"identifiable", "namespace", "id"};
   }
 
   @Override

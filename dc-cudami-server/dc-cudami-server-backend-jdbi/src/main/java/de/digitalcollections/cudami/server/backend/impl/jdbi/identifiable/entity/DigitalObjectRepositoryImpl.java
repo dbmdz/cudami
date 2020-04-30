@@ -444,9 +444,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[] {
-      getColumnName("created"), getColumnName("lastModified"), getColumnName("refId")
-    };
+    return new String[] {"created", "lastModified", "refId"};
   }
 
   @Override

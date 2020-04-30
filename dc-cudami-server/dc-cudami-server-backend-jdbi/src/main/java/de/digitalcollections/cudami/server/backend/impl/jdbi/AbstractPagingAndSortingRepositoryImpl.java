@@ -18,6 +18,7 @@ import java.util.Iterator;
  * <p>Tries best to translate paging and sorting params into valid SQL.<br>
  * If result does not fit your use case: implement it yourself and do not use these convenience
  * methods.
+ *
  * @param <C> type of comparable object when BETWEEN filter operation has to be handled
  */
 public abstract class AbstractPagingAndSortingRepositoryImpl<C extends Comparable<C>> {

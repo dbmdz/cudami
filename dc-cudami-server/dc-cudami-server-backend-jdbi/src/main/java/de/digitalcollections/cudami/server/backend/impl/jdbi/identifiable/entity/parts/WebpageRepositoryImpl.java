@@ -60,6 +60,7 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
       "SELECT w.uuid w_uuid, w.label w_label, w.description w_description,"
           + " w.identifiable_type w_type,"
           + " w.created w_created, w.last_modified w_lastModified,"
+          + " w.publication_start w_publicationStart, w.publication_end w_publicationEnd,"
           + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
           + " FROM webpages as w INNER JOIN webpage_webpages ww ON w.uuid = ww.child_webpage_uuid"
           + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid"
@@ -465,12 +466,7 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[] {
-      getColumnName("created"),
-      getColumnName("lastModified"),
-      getColumnName("publicationEnd"),
-      getColumnName("publicationStart")
-    };
+    return new String[] {"created", "lastModified", "publicationEnd", "publicationStart"};
   }
 
   @Override
