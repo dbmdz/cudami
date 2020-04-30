@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepositor
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.SubtopicService;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
+import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import java.util.List;
@@ -135,8 +136,11 @@ public class SubtopicsController extends AbstractController {
     model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("subtopic", subtopic);
 
-    List<FileResource> relatedFileResources = service.getRelatedFileResources(subtopic);
+    List<FileResource> relatedFileResources = service.getFileResources(subtopic);
     model.addAttribute("relatedFileResources", relatedFileResources);
+
+    List<Entity> relatedEntities = service.getEntities(subtopic);
+    model.addAttribute("relatedEntities", relatedEntities);
 
     return "subtopics/view";
   }

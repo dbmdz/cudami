@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -100,6 +101,18 @@ public class DigitalObjectController {
   @ApiResponseObject
   public List<ImageFileResource> getImageFileResources(@PathVariable UUID uuid) {
     return service.getImageFileResources(uuid);
+  }
+
+  @ApiMethod(description = "Get file resources of a digital object")
+  @GetMapping(
+      value = {
+        "/latest/digitalobjects/{uuid}/fileresources",
+        "/v2/digitalobjects/{uuid}/fileresources"
+      },
+      produces = "application/json")
+  @ApiResponseObject
+  public List<FileResource> getFileResources(@PathVariable UUID uuid) {
+    return service.getFileResources(uuid);
   }
 
   @ApiMethod(description = "Save a newly created digital object")

@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.commons.springmvc.thymeleaf.SpacesDialect;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import de.digitalcollections.model.xml.xstream.DigitalCollectionsXStreamMarshaller;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.List;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +20,7 @@ import org.thymeleaf.dialect.AbstractProcessorDialect;
 
 @Configuration
 @EnableAspectJAutoProxy
-public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
+public class SpringConfigWeb implements WebMvcConfigurer {
 
   @Value("${server.port:80}")
   Integer port;
@@ -31,31 +28,10 @@ public class SpringConfigWeb implements WebMvcConfigurer, InitializingBean {
   @Value("${info.app.project.version:unknown}")
   String projectVersion;
 
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    setupJsondoc();
-  }
-
   @Bean
   @Primary
   public ObjectMapper objectMapper() {
     return new DigitalCollectionsObjectMapper();
-  }
-
-  private void setupJsondoc() {
-    String hostName;
-    try {
-      InetAddress addr = InetAddress.getLocalHost();
-      hostName = addr.getCanonicalHostName();
-      if (!hostName.contains(".")) {
-        hostName = "localhost";
-      }
-    } catch (UnknownHostException e) {
-      hostName = "localhost";
-    }
-
-    System.setProperty("jsondoc.basePath", "http://" + hostName + ":" + port);
-    System.setProperty("jsondoc.version", projectVersion);
   }
 
   @Override
