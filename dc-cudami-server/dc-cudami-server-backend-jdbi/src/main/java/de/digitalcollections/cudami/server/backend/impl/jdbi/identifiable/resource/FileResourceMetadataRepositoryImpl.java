@@ -647,7 +647,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
       String query =
           "UPDATE fileresources_image SET "
               + baseColumnsSql
-              + ", width=:width, height=:height WHERE uuid=:uuid";
+              + ", width=:width, height=:height, iiif_base_url=:iiifBaseUrl WHERE uuid=:uuid";
       dbi.withHandle(
           h ->
               h.createUpdate(query)
