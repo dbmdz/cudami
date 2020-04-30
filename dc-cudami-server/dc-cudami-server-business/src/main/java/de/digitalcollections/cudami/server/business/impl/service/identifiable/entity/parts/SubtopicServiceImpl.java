@@ -9,6 +9,7 @@ import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.identifiable.entity.parts.SubtopicImpl;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -64,6 +65,16 @@ public class SubtopicServiceImpl extends EntityPartServiceImpl<Subtopic, Entity>
   }
 
   @Override
+  public List<Subtopic> getSubtopicsOfEntity(UUID entityUuid) {
+    return ((SubtopicRepository) repository).getSubtopicsOfEntity(entityUuid);
+  }
+
+  @Override
+  public List<Subtopic> getSubtopicsOfFileResource(UUID fileResourceUuid) {
+    return ((SubtopicRepository) repository).getSubtopicsOfEntity(fileResourceUuid);
+  }
+
+  @Override
   public List<Entity> saveEntities(Subtopic subtopic, List<Entity> entities) {
     return saveEntities(subtopic.getUuid(), entities);
   }
@@ -113,5 +124,42 @@ public class SubtopicServiceImpl extends EntityPartServiceImpl<Subtopic, Entity>
   @Override
   public List<FileResource> saveFileResources(UUID subtopicUuid, List<FileResource> fileResources) {
     return ((SubtopicRepository) repository).saveFileResources(subtopicUuid, fileResources);
+  }
+
+  @Override
+  public Integer deleteFromParentSubtopic(Subtopic subtopic, UUID parentSubtopicUuid) {
+    return ((SubtopicRepository) repository).deleteFromParentSubtopic(subtopic, parentSubtopicUuid);
+  }
+
+  @Override
+  public Integer deleteFromParentSubtopic(UUID subtopicUuid, UUID parentSubtopicUuid) {
+    return ((SubtopicRepository) repository)
+        .deleteFromParentSubtopic(subtopicUuid, parentSubtopicUuid);
+  }
+
+  @Override
+  public Integer deleteFromParentTopic(Subtopic subtopic, UUID topicUuid) {
+    return ((SubtopicRepository) repository).deleteFromParentTopic(subtopic, topicUuid);
+  }
+
+  @Override
+  public Integer deleteFromParentTopic(UUID subtopicUuid, UUID topicUuid) {
+    return ((SubtopicRepository) repository).deleteFromParentTopic(subtopicUuid, topicUuid);
+  }
+
+  @Override
+  public Subtopic addSubtopicToParentTopic(UUID subtopicUuid, UUID parentTopicUuid)
+      throws IdentifiableServiceException {
+    SubtopicImpl subtopic = new SubtopicImpl();
+    subtopic.setUuid(subtopicUuid);
+    return saveWithParentTopic(subtopic, parentTopicUuid);
+  }
+
+  @Override
+  public Subtopic addSubtopicToParentSubtopic(UUID subtopicUuid, UUID parentSubtopicUuid)
+      throws IdentifiableServiceException {
+    SubtopicImpl subtopic = new SubtopicImpl();
+    subtopic.setUuid(subtopicUuid);
+    return saveWithParentSubtopic(subtopic, parentSubtopicUuid);
   }
 }
