@@ -4,12 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.commons.springmvc.thymeleaf.SpacesDialect;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import de.digitalcollections.model.xml.xstream.DigitalCollectionsXStreamMarshaller;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Primary;
+import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
+import org.springframework.format.support.DefaultFormattingConversionService;
+import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
@@ -32,6 +36,20 @@ public class SpringConfigWeb implements WebMvcConfigurer {
   @Primary
   public ObjectMapper objectMapper() {
     return new DigitalCollectionsObjectMapper();
+  }
+
+  @Bean
+  public FormattingConversionService conversionService() {
+    DefaultFormattingConversionService conversionService =
+        new DefaultFormattingConversionService(false);
+
+    // for conversion of String to LocalDate for controller method arguments:
+    DateTimeFormatterRegistrar registrar = new DateTimeFormatterRegistrar();
+    registrar.setDateFormatter(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    registrar.setDateTimeFormatter(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"));
+    registrar.registerFormatters(conversionService);
+
+    return conversionService;
   }
 
   @Override

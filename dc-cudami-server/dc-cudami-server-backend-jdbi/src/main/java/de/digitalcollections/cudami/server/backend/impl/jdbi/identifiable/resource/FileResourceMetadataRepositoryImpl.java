@@ -23,7 +23,6 @@ import de.digitalcollections.model.impl.identifiable.resource.LinkedDataFileReso
 import de.digitalcollections.model.impl.identifiable.resource.TextFileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.VideoFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
-import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -35,7 +34,6 @@ import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -52,7 +50,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
           + " f.created f_created, f.last_modified f_lastModified,"
           + " f.filename f_filename, f.mimetype f_mimetype, f.size_in_bytes f_sizeInBytes, f.uri f_uri,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimetype, file.size_in_bytes pf_size_in_bytes, file.uri pf_uri"
+          + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimetype, file.size_in_bytes pf_size_in_bytes, file.uri pf_uri, file.iiif_base_url pf_iiifBaseUrl"
           + " FROM fileresources as f"
           + " LEFT JOIN identifiers as id on f.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on f.previewfileresource = file.uuid";
@@ -63,19 +61,13 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
           + " f.identifiable_type f_type,"
           + " f.created f_created, f.last_modified f_lastModified,"
           + " f.filename f_filename, f.mimetype f_mimetype, f.size_in_bytes f_sizeInBytes, f.uri f_uri,"
-          + " file.uuid pf_uuid, file.uri pf_uri, file.filename pf_filename"
+          + " file.uuid pf_uuid, file.uri pf_uri, file.filename pf_filename, file.iiif_base_url pf_iiifBaseUrl"
           + " FROM fileresources as f"
           + " LEFT JOIN fileresources_image as file on f.previewfileresource = file.uuid";
 
-  private final URL iiifImageBaseUrl;
-
   @Autowired
-  public FileResourceMetadataRepositoryImpl(
-      Jdbi dbi,
-      IdentifierRepository identifierRepository,
-      @Value("${iiif.image.baseUrl}") URL iiifImageBaseUrl) {
+  public FileResourceMetadataRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     super(dbi, identifierRepository);
-    this.iiifImageBaseUrl = iiifImageBaseUrl;
   }
 
   @Override
@@ -509,11 +501,6 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"f.created", "f.filename", "f.last_modified", "f.size_in_bytes"};
-  }
-
-  @Override
   public FileResource save(FileResource fileResource) {
     if (fileResource.getUuid() == null) {
       fileResource.setUuid(UUID.randomUUID());
@@ -554,7 +541,6 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
                   .bindBean(fileResource)
                   .execute());
     } else if (fileResource instanceof ImageFileResource) {
-      ((ImageFileResource) fileResource).setIiifBaseUrl(iiifImageBaseUrl);
       dbi.withHandle(
           h ->
               h.createUpdate(
@@ -652,7 +638,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
       String query =
           "UPDATE fileresources_image SET "
               + baseColumnsSql
-              + ", width=:width, height=:height WHERE uuid=:uuid";
+              + ", width=:width, height=:height, iiif_base_url=:iiifBaseUrl WHERE uuid=:uuid";
       dbi.withHandle(
           h ->
               h.createUpdate(query)
@@ -703,5 +689,29 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
 
     FileResource result = findOne(fileResource.getUuid());
     return result;
+  }
+
+  @Override
+  protected String[] getAllowedOrderByFields() {
+    return new String[] {"created", "filename", "lastModified", "sizeInBytes"};
+  }
+
+  @Override
+  protected String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "created":
+        return "f.created";
+      case "filename":
+        return "f.filename";
+      case "lastModified":
+        return "f.last_modified";
+      case "sizeInBytes":
+        return "f.size_in_bytes";
+      default:
+        return null;
+    }
   }
 }

@@ -2,6 +2,8 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.parts
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.WebpageService;
+import de.digitalcollections.model.api.filter.FilterCriterion;
+import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
@@ -13,6 +15,7 @@ import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -23,6 +26,7 @@ import org.jsondoc.core.annotation.ApiPathParam;
 import org.jsondoc.core.annotation.ApiQueryParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +47,8 @@ public class WebpageController {
 
   @Autowired private WebpageService<Entity> webpageService;
 
+  @Autowired ConversionService conversionService;
+
   @ApiMethod(description = "Get all webpages")
   @RequestMapping(
       value = {"/latest/webpages", "/v2/webpages"},
@@ -52,14 +58,24 @@ public class WebpageController {
   public PageResponse<Webpage> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
-      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
+      @RequestParam(name = "sortField", required = false, defaultValue = "lastModified")
+          String sortField,
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "DESC")
           Direction sortDirection,
       @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
-          NullHandling nullHandling) {
+          NullHandling nullHandling,
+      @RequestParam(name = "publicationStart", required = false)
+          FilterCriterion<LocalDate> publicationStart,
+      @RequestParam(name = "publicationEnd", required = false)
+          FilterCriterion<LocalDate> publicationEnd) {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
+    Filtering filtering =
+        Filtering.defaultBuilder()
+            .add("publicationStart", publicationStart)
+            .add("publicationEnd", publicationEnd)
+            .build();
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting, filtering);
     return webpageService.find(pageRequest);
   }
 
@@ -93,6 +109,42 @@ public class WebpageController {
       webpage = webpageService.get(uuid, pLocale);
     }
     return new ResponseEntity<>(webpage, HttpStatus.OK);
+  }
+
+  @ApiMethod(description = "Get children of a webpage as JSON")
+  @RequestMapping(
+      value = {"/latest/webpages/{uuid}/children", "/v3/webpages/{uuid}/children"},
+      produces = {MediaType.APPLICATION_JSON_VALUE},
+      method = RequestMethod.GET)
+  @ApiResponseObject
+  public PageResponse<Webpage> getWebpageChildren(
+      @ApiPathParam(
+              description =
+                  "UUID of the parent webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortField", required = false, defaultValue = "lastModified")
+          String sortField,
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "DESC")
+          Direction sortDirection,
+      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
+          NullHandling nullHandling,
+      @RequestParam(name = "publicationStart", required = false)
+          FilterCriterion<LocalDate> publicationStart,
+      @RequestParam(name = "publicationEnd", required = false)
+          FilterCriterion<LocalDate> publicationEnd)
+      throws IdentifiableServiceException {
+    OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
+    Sorting sorting = new SortingImpl(order);
+    Filtering filtering =
+        Filtering.defaultBuilder()
+            .add("publicationStart", publicationStart)
+            .add("publicationEnd", publicationEnd)
+            .build();
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting, filtering);
+    return webpageService.getChildren(uuid, pageRequest);
   }
 
   @ApiMethod(description = "Save a newly created top-level webpage")

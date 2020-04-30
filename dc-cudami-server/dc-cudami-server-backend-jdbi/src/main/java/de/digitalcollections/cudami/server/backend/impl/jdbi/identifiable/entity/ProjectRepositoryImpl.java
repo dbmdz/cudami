@@ -37,7 +37,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
           + " p.created p_created, p.last_modified p_lastModified,"
           + " p.text p_text, p.start_date p_startDate, p.end_date p_endDate,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM projects as p"
           + " LEFT JOIN identifiers as id on p.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on p.previewfileresource = file.uuid";
@@ -48,7 +48,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
           + " p.identifiable_type p_type, p.entity_type p_entityType,"
           + " p.created p_created, p.last_modified p_lastModified,"
           + " p.start_date p_startDate, p.end_date p_endDate,"
-          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
+          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename, file.iiif_base_url f_iiifBaseUrl"
           + " FROM projects as p"
           + " LEFT JOIN fileresources_image as file on p.previewfileresource = file.uuid";
 
@@ -186,11 +186,6 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"p.created", "p.last_modified", "p.refid"};
-  }
-
-  @Override
   public Project save(Project project) {
     project.setUuid(UUID.randomUUID());
     project.setCreated(LocalDateTime.now());
@@ -257,5 +252,27 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
 
     Project result = findOne(project.getUuid());
     return result;
+  }
+
+  @Override
+  protected String[] getAllowedOrderByFields() {
+    return new String[] {"created", "lastModified", "refId"};
+  }
+
+  @Override
+  protected String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "created":
+        return "p.created";
+      case "lastModified":
+        return "p.last_modified";
+      case "refId":
+        return "p.refid";
+      default:
+        return null;
+    }
   }
 }

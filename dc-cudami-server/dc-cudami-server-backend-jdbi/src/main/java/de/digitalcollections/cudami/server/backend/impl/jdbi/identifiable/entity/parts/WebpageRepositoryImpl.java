@@ -2,6 +2,9 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.WebpageRepository;
+import de.digitalcollections.model.api.filter.FilterCriterion;
+import de.digitalcollections.model.api.filter.Filtering;
+import de.digitalcollections.model.api.filter.enums.FilterOperation;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
@@ -26,8 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositoryImpl<Webpage, E>
-    implements WebpageRepository<E> {
+public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
+    extends EntityPartRepositoryImpl<Webpage, E> implements WebpageRepository<E> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpageRepositoryImpl.class);
 
@@ -36,9 +39,9 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
       "SELECT w.uuid w_uuid, w.label w_label, w.description w_description,"
           + " w.identifiable_type w_type,"
           + " w.created w_created, w.last_modified w_lastModified,"
-          + " w.text w_text,"
+          + " w.text w_text, w.publication_start w_publicationStart, w.publication_end w_publicationEnd,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM webpages as w"
           + " LEFT JOIN identifiers as id on w.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid";
@@ -48,9 +51,20 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
       "SELECT w.uuid w_uuid, w.label w_label, w.description w_description,"
           + " w.identifiable_type w_type,"
           + " w.created w_created, w.last_modified w_lastModified,"
-          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
+          + " w.publication_start w_publicationStart, w.publication_end w_publicationEnd,"
+          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename, file.iiif_base_url f_iiifBaseUrl"
           + " FROM webpages as w"
           + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid";
+
+  private static final String BASE_CHILDREN_QUERY =
+      "SELECT w.uuid w_uuid, w.label w_label, w.description w_description,"
+          + " w.identifiable_type w_type,"
+          + " w.created w_created, w.last_modified w_lastModified,"
+          + " w.publication_start w_publicationStart, w.publication_end w_publicationEnd,"
+          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename, file.iiif_base_url f_iiifBaseUrl"
+          + " FROM webpages as w INNER JOIN webpage_webpages ww ON w.uuid = ww.child_webpage_uuid"
+          + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid"
+          + " WHERE ww.parent_webpage_uuid = :uuid";
 
   @Autowired
   public WebpageRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
@@ -196,11 +210,6 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"w.created", "w.last_modified"};
-  }
-
-  @Override
   public List<Webpage> getChildren(Webpage webpage) {
     return getChildren(webpage.getUuid());
   }
@@ -208,15 +217,7 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
   @Override
   public List<Webpage> getChildren(UUID uuid) {
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
-    String query =
-        "SELECT w.uuid w_uuid, w.label w_label, w.description w_description,"
-            + " w.identifiable_type w_type,"
-            + " w.created w_created, w.last_modified w_lastModified,"
-            + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
-            + " FROM webpages as w INNER JOIN webpage_webpages ww ON w.uuid = ww.child_webpage_uuid"
-            + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid"
-            + " WHERE ww.parent_webpage_uuid = :uuid"
-            + " ORDER BY ww.sortIndex ASC";
+    String query = BASE_CHILDREN_QUERY + " ORDER BY ww.sortIndex ASC";
 
     List<Webpage> result =
         new ArrayList(
@@ -244,6 +245,74 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
                             })
                         .values()));
     return result;
+  }
+
+  @Override
+  public PageResponse<Webpage> getChildren(UUID uuid, PageRequest pageRequest) {
+    // minimal data required (= identifiable fields) for creating text links/teasers in a list
+    StringBuilder query = new StringBuilder(BASE_CHILDREN_QUERY);
+
+    // handle optional filtering params
+    Filtering filtering = pageRequest.getFiltering();
+    if (filtering != null) {
+      // handle publication start criteria
+      FilterCriterion<C> fc =
+          (FilterCriterion<C>) filtering.getFilterCriterionFor("publicationStart");
+      if (fc != null) {
+        query.append(" AND ").append(getWhereClause(fc));
+      }
+
+      // handle publication end criteria
+      fc = (FilterCriterion<C>) filtering.getFilterCriterionFor("publicationEnd");
+      if (fc != null) {
+        if (fc.getOperation() == FilterOperation.GREATER_THAN_OR_EQUAL_TO) {
+          query
+              .append(" AND (")
+              .append(getWhereClause(fc))
+              .append(" OR ")
+              .append(getColumnName("publicationEnd"))
+              .append(" IS NULL")
+              .append(")");
+        } else {
+          query.append(" AND ").append(getWhereClause(fc));
+        }
+      }
+    }
+    addPageRequestParams(pageRequest, query);
+    List<Webpage> result =
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, WebpageImpl>(),
+                            (map, rowView) -> {
+                              WebpageImpl webpage =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("w_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(WebpageImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                webpage.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
+    String sql =
+        "SELECT count(*) FROM webpages as w"
+            + " INNER JOIN webpage_webpages ww ON w.uuid = ww.child_webpage_uuid"
+            + " WHERE ww.parent_webpage_uuid = :uuid";
+    long total =
+        dbi.withHandle(
+            h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Long.class).findOne().get());
+    PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
+    return pageResponse;
   }
 
   @Override
@@ -296,12 +365,12 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
             + "uuid, label, description, previewfileresource,"
             + " identifiable_type,"
             + " created, last_modified,"
-            + " text"
+            + " text, publication_start, publication_end"
             + ") VALUES ("
             + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource,"
             + " :type,"
             + " :created, :lastModified,"
-            + " :text::JSONB"
+            + " :text::JSONB, :publicationStart, :publicationEnd"
             + ")";
 
     dbi.withHandle(
@@ -375,7 +444,7 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
         "UPDATE webpages SET"
             + " label=:label::JSONB, description=:description::JSONB, previewfileresource=:previewFileResource,"
             + " last_modified=:lastModified,"
-            + " text=:text::JSONB"
+            + " text=:text::JSONB, publication_start=:publicationStart, publication_end=:publicationEnd"
             + " WHERE uuid=:uuid";
 
     dbi.withHandle(
@@ -393,5 +462,29 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
 
     Webpage result = findOne(webpage.getUuid());
     return result;
+  }
+
+  @Override
+  protected String[] getAllowedOrderByFields() {
+    return new String[] {"created", "lastModified", "publicationEnd", "publicationStart"};
+  }
+
+  @Override
+  protected String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "created":
+        return "w.created";
+      case "lastModified":
+        return "w.last_modified";
+      case "publicationEnd":
+        return "w.publication_end";
+      case "publicationStart":
+        return "w.publication_start";
+      default:
+        return null;
+    }
   }
 }

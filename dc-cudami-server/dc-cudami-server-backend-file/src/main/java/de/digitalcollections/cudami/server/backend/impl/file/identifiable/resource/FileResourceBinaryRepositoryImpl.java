@@ -15,7 +15,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -53,13 +55,17 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(FileResourceBinaryRepositoryImpl.class);
+  public static final String DEFAULT_FILENAME_WITHOUT_EXTENSION = "resource";
+  private final URL iiifImageBaseUrl;
   private final String repositoryFolderPath;
   private final ResourceLoader resourceLoader;
-  public static final String DEFAULT_FILENAME_WITHOUT_EXTENSION = "resource";
 
   @Autowired
   public FileResourceBinaryRepositoryImpl(
-      @Value("${cudami.repositoryFolderPath}") String folderPath, ResourceLoader resourceLoader) {
+      @Value("${cudami.repositoryFolderPath}") String folderPath,
+      @Value("${iiif.image.baseUrl:#{null}}") URL iiifImageBaseUrl,
+      ResourceLoader resourceLoader) {
+    this.iiifImageBaseUrl = iiifImageBaseUrl;
     this.repositoryFolderPath = folderPath.replace("~", System.getProperty("user.home"));
     this.resourceLoader = resourceLoader;
   }
@@ -294,7 +300,9 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
       fileResource.setSizeInBytes(size);
 
       if (fileResource instanceof ImageFileResource) {
-        setImageProperties((ImageFileResource) fileResource);
+        ImageFileResource imageFileResource = (ImageFileResource) fileResource;
+        setImageProperties(imageFileResource);
+        setIiifProperties(imageFileResource);
       }
 
     } catch (IOException ex) {
@@ -344,5 +352,32 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
     }
 
     return parts;
+  }
+
+  private void setIiifProperties(ImageFileResource imageFileResource) {
+    if (iiifImageBaseUrl != null) {
+      try {
+        String iiifUrl = iiifImageBaseUrl.toString();
+        if (!iiifUrl.endsWith("/")) {
+          iiifUrl += "/";
+        }
+        iiifUrl += getIiifIdentifier(imageFileResource);
+        imageFileResource.setIiifBaseUrl(URI.create(iiifUrl).toURL());
+      } catch (MalformedURLException ex) {
+        throw new IllegalStateException(
+            "creating a valid iiif url failed! check configuration!", ex);
+      }
+    }
+  }
+
+  /**
+   * default implementation: IIIF identifier is uuid
+   *
+   * @param imageFileResource image fileresource
+   * @return iiif identifier for image fileresource
+   */
+  public String getIiifIdentifier(ImageFileResource imageFileResource) {
+    // default: IIIF identifier is uuid
+    return imageFileResource.getUuid().toString();
   }
 }

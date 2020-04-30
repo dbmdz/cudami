@@ -40,7 +40,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
           + " e.identifiable_type e_type, e.entity_type e_entityType,"
           + " e.created e_created, e.last_modified e_last_modified,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM entities as e"
           + " LEFT JOIN identifiers as id on e.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on e.previewfileresource = file.uuid";
@@ -50,7 +50,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       "SELECT e.uuid e_uuid, e.refid e_refId, e.label e_label, e.description e_description,"
           + " e.identifiable_type e_type, , e.entity_type e_entityType,"
           + " e.created e_created, e.last_modified e_lastModified,"
-          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
+          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename, file.iiif_base_url f_iiifBaseUrl"
           + " FROM entities as e"
           + " LEFT JOIN fileresources_image as file on e.previewfileresource = file.uuid";
 
@@ -262,11 +262,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"e.created", "e.last_modified", "e.identifiable_type", "e.entity_type"};
-  }
-
-  @Override
   public List<FileResource> getRelatedFileResources(E entity) {
     return getRelatedFileResources(entity.getUuid());
   }
@@ -388,5 +383,31 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   @Override
   public E update(E entity) {
     throw new UnsupportedOperationException("use update of specific/inherited entity repository");
+  }
+
+  @Override
+  protected String[] getAllowedOrderByFields() {
+    return new String[] {"created", "entityType", "lastModified", "refId", "type"};
+  }
+
+  @Override
+  protected String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "created":
+        return "e.created";
+      case "entityType":
+        return "e.entity_type";
+      case "lastModified":
+        return "e.last_modified";
+      case "refId":
+        return "e.refid";
+      case "type":
+        return "e.identifiable_type";
+      default:
+        return null;
+    }
   }
 }

@@ -37,7 +37,7 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
           + " c.created c_created, c.last_modified c_lastModified,"
           + " c.text c_text, c.homepage_url c_homepageUrl,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM corporations as c"
           + " LEFT JOIN identifiers as id on c.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid";
@@ -47,7 +47,7 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
       "SELECT c.uuid c_uuid, c.refid c_refId, c.label c_label, c.description c_description,"
           + " c.identifiable_type c_type, c.entity_type c_entityType,"
           + " c.created c_created, c.last_modified c_lastModified,"
-          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
+          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename, file.iiif_base_url f_iiifBaseUrl"
           + " FROM corporations as c"
           + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid";
 
@@ -184,11 +184,6 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"c.created", "c.last_modified", "c.refid"};
-  }
-
-  @Override
   public Corporation save(Corporation corporation) {
     corporation.setUuid(UUID.randomUUID());
     corporation.setCreated(LocalDateTime.now());
@@ -255,5 +250,27 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
 
     Corporation result = findOne(corporation.getUuid());
     return result;
+  }
+
+  @Override
+  protected String[] getAllowedOrderByFields() {
+    return new String[] {"created", "lastModified", "refId"};
+  }
+
+  @Override
+  protected String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "created":
+        return "c.created";
+      case "lastModified":
+        return "c.last_modified";
+      case "refId":
+        return "c.refid";
+      default:
+        return null;
+    }
   }
 }

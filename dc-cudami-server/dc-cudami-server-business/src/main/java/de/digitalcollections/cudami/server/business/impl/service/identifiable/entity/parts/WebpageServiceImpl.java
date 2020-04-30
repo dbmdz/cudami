@@ -6,6 +6,8 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.WebpageService;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -56,6 +58,11 @@ public class WebpageServiceImpl<E extends Entity> extends EntityPartServiceImpl<
   @Override
   public List<Webpage> getChildren(UUID uuid) {
     return ((NodeRepository) repository).getChildren(uuid);
+  }
+
+  @Override
+  public PageResponse<Webpage> getChildren(UUID uuid, PageRequest pageRequest) {
+    return ((NodeRepository) repository).getChildren(uuid, pageRequest);
   }
 
   @Override

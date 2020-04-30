@@ -18,7 +18,7 @@ public class FileResourceBinaryRepositoryTest {
   @BeforeAll
   public static void setUp() {
     ResourceLoader rl = Mockito.mock(ResourceLoader.class);
-    repository = new FileResourceBinaryRepositoryImpl(FOLDER_PATH, rl);
+    repository = new FileResourceBinaryRepositoryImpl(FOLDER_PATH, null, rl);
   }
 
   @Test

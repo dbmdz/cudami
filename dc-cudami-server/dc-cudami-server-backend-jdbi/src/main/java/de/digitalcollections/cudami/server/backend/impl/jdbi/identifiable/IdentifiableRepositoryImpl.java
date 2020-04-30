@@ -38,7 +38,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
           + " i.identifiable_type i_type,"
           + " i.created i_created, i.last_modified i_last_modified,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM identifiables as i"
           + " LEFT JOIN identifiers as id on i.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on i.previewfileresource = file.uuid";
@@ -48,7 +48,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
       "SELECT i.uuid i_uuid, i.label i_label, i.description i_description,"
           + " i.identifiable_type i_type,"
           + " i.created i_created, i.last_modified i_lastModified,"
-          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
+          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename, file.iiif_base_url f_iiifBaseUrl"
           + " FROM identifiables as i"
           + " LEFT JOIN fileresources_image as file on i.previewfileresource = file.uuid";
 
@@ -222,11 +222,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"i.created", "i.last_modified", "i.identifiable_type"};
-  }
-
-  @Override
   public I save(I identifiable) {
     throw new UnsupportedOperationException(
         "use save of specific/inherited identifiable repository");
@@ -280,5 +275,27 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
       }
     }
     return -1;
+  }
+
+  @Override
+  protected String[] getAllowedOrderByFields() {
+    return new String[] {"created", "lastModified", "type"};
+  }
+
+  @Override
+  protected String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "created":
+        return "i.created";
+      case "lastModified":
+        return "i.last_modified";
+      case "type":
+        return "i.identifiable_type";
+      default:
+        return null;
+    }
   }
 }
