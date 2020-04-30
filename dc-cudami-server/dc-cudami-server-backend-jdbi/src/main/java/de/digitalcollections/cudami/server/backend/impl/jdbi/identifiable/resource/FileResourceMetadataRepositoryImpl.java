@@ -23,7 +23,6 @@ import de.digitalcollections.model.impl.identifiable.resource.LinkedDataFileReso
 import de.digitalcollections.model.impl.identifiable.resource.TextFileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.VideoFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
-import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -35,7 +34,6 @@ import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -67,15 +65,9 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
           + " FROM fileresources as f"
           + " LEFT JOIN fileresources_image as file on f.previewfileresource = file.uuid";
 
-  private final URL iiifImageBaseUrl;
-
   @Autowired
-  public FileResourceMetadataRepositoryImpl(
-      Jdbi dbi,
-      IdentifierRepository identifierRepository,
-      @Value("${iiif.image.baseUrl}") URL iiifImageBaseUrl) {
+  public FileResourceMetadataRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     super(dbi, identifierRepository);
-    this.iiifImageBaseUrl = iiifImageBaseUrl;
   }
 
   @Override
@@ -549,7 +541,6 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
                   .bindBean(fileResource)
                   .execute());
     } else if (fileResource instanceof ImageFileResource) {
-      ((ImageFileResource) fileResource).setIiifBaseUrl(iiifImageBaseUrl);
       dbi.withHandle(
           h ->
               h.createUpdate(

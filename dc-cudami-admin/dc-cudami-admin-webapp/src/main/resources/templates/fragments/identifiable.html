@@ -8,7 +8,7 @@
       <div class="col-sm-2">
         <th:block th:if="${identifiable.previewImage}">
           <th:block th:if="${identifiable.previewImage.iiifBaseUrl}">
-            <img th:src="${identifiable.previewImage.iiifBaseUrl} + '/' + ${identifiable.previewImage.uuid} + '/full/100,/0/default.jpg'" th:attr="alt=${identifiable.previewImage.filename}" />
+            <img th:src="${identifiable.previewImage.iiifBaseUrl} + '/full/100,/0/default.jpg'" th:attr="alt=${identifiable.previewImage.filename}" />
           </th:block>
           <th:block th:unless="${identifiable.previewImage.iiifBaseUrl}">
             <img th:src="${identifiable.previewImage.uri}" th:attr="alt=${identifiable.previewImage.filename}" style="width: 100px;" />
