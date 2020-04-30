@@ -37,7 +37,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
           + " t.identifiable_type t_type, t.entity_type t_entityType,"
           + " t.created t_created, t.last_modified t_lastModified,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM topics as t"
           + " LEFT JOIN identifiers as id on t.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on t.previewfileresource = file.uuid";
@@ -47,7 +47,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
       "SELECT t.uuid t_uuid, t.refid t_refId, t.label t_label, t.description t_description,"
           + " t.identifiable_type t_type, t.entity_type t_entityType,"
           + " t.created t_created, t.last_modified t_lastModified,"
-          + " file.uuid f_uuid, file.filename f_filename, file.uri f_uri"
+          + " file.uuid f_uuid, file.filename f_filename, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM topics as t"
           + " LEFT JOIN fileresources_image as file on t.previewfileresource = file.uuid";
 

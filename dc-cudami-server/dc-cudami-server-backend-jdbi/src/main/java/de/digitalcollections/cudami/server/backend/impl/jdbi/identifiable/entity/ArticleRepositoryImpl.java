@@ -37,7 +37,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
           + " a.created a_created, a.last_modified a_lastModified,"
           + " a.text a_text,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM articles as a"
           + " LEFT JOIN identifiers as id on a.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on a.previewfileresource = file.uuid";
@@ -47,7 +47,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
       "SELECT a.uuid a_uuid, a.refid a_refId, a.label a_label, a.description a_description,"
           + " a.identifiable_type a_type, a.entity_type a_entityType,"
           + " a.created a_created, a.last_modified a_lastModified,"
-          + " file.uuid f_uuid, file.filename f_filename, file.uri f_uri"
+          + " file.uuid f_uuid, file.filename f_filename, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM articles as a"
           + " LEFT JOIN fileresources_image as file on a.previewfileresource = file.uuid";
 

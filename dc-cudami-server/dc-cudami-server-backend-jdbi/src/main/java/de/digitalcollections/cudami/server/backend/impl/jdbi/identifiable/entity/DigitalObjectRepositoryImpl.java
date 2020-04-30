@@ -43,7 +43,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
           + " d.created d_created, d.last_modified d_lastModified,"
           // TODO: add d.license d_license, d.version d_version, when features added
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_sizeInBytes, file.uri f_uri,"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl,"
           // related file resources
           + " fr.uuid fr_uuid, fr.filename fr_filename, fr.mimetype fr_mimetype, fr.size_in_bytes fr_sizeInBytes, fr.uri fr_uri"
           + " FROM digitalobjects as d"
@@ -57,7 +57,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       "SELECT d.uuid d_uuid, d.refid d_refId, d.label d_label, d.description d_description,"
           + " d.identifiable_type d_type, d.entity_type d_entityType,"
           + " d.created d_created, d.last_modified d_lastModified,"
-          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
+          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename, file.iiif_base_url f_iiifBaseUrl"
           + " FROM digitalobjects as d"
           + " LEFT JOIN fileresources_image as file on d.previewfileresource = file.uuid";
 
