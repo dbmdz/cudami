@@ -30,7 +30,7 @@
     "prosemirror-model": "^1.9.1",
     "prosemirror-schema-basic": "^1.1.2",
     "prosemirror-schema-list": "^1.1.2",
-    "prosemirror-tables": "^1.0.0",
+    "prosemirror-tables": "^1.1.0",
     "pubsub-js": "^1.8.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
