@@ -1,57 +1,38 @@
 package de.digitalcollections.cudami.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.client.exceptions.CudamiRestErrorDecoder;
-import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.entity.Website;
-import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
-import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
-import feign.Logger;
-import feign.Param;
-import feign.ReflectiveFeign;
-import feign.RequestLine;
-import feign.Retryer;
-import feign.jackson.JacksonDecoder;
-import feign.jackson.JacksonEncoder;
-import feign.slf4j.Slf4jLogger;
-import java.util.List;
-import java.util.Locale;
+public class CudamiClient {
 
-public interface CudamiClient {
+  private final CudamiCollectionsClient cudamiCollectionsClient;
+  private final CudamiCorporationsClient cudamiCorporationsClient;
+  private final CudamiProjectsClient cudamiProjectsClient;
+  private final CudamiSystemClient cudamiSystemClient;
+  private final CudamiWebpagesClient cudamiWebpagesClient;
 
-  public static CudamiClient build(String serverUrl) {
-    ObjectMapper mapper = new DigitalCollectionsObjectMapper();
-    CudamiClient client =
-        ReflectiveFeign.builder()
-            .decoder(new JacksonDecoder(mapper))
-            .encoder(new JacksonEncoder(mapper))
-            .errorDecoder(new CudamiRestErrorDecoder())
-            .logger(new Slf4jLogger())
-            .logLevel(Logger.Level.BASIC)
-            .retryer(new Retryer.Default())
-            .target(CudamiClient.class, serverUrl);
-    return client;
+  public CudamiClient(String cudamiServerUrl) {
+    this.cudamiCollectionsClient = CudamiCollectionsClient.build(cudamiServerUrl);
+    this.cudamiCorporationsClient = CudamiCorporationsClient.build(cudamiServerUrl);
+    this.cudamiProjectsClient = CudamiProjectsClient.build(cudamiServerUrl);
+    this.cudamiSystemClient = CudamiSystemClient.build(cudamiServerUrl);
+    this.cudamiWebpagesClient = CudamiWebpagesClient.build(cudamiServerUrl);
   }
 
-  @RequestLine("GET /v2/languages/default")
-  String getDefaultLanguage() throws HttpException;
+  public CudamiCollectionsClient forCollections() {
+    return cudamiCollectionsClient;
+  }
 
-  @RequestLine("GET /v2/locales/default")
-  Locale getDefaultLocale() throws HttpException;
+  public CudamiCorporationsClient forCorporations() {
+    return cudamiCorporationsClient;
+  }
 
-  @RequestLine("GET /v2/languages")
-  List<String> getSupportedLanguages() throws HttpException;
+  public CudamiProjectsClient forProjects() {
+    return cudamiProjectsClient;
+  }
 
-  @RequestLine("GET /v2/locales")
-  List<Locale> getSupportedLocales() throws HttpException;
+  public CudamiSystemClient forSystem() {
+    return cudamiSystemClient;
+  }
 
-  @RequestLine("GET /v3/webpages/{uuid}")
-  Webpage getWebpage(@Param("uuid") String uuid) throws HttpException;
-
-  @RequestLine("GET /v3/webpages/{uuid}?pLocale={locale}")
-  Webpage getWebpage(@Param("locale") Locale locale, @Param("uuid") String uuid)
-      throws HttpException;
-
-  @RequestLine("GET /V2/websites/{uuid}")
-  Website getWebsite(@Param("uuid") String uuid) throws HttpException;
+  public CudamiWebpagesClient forWebpages() {
+    return cudamiWebpagesClient;
+  }
 }
