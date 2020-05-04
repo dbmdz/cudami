@@ -15,9 +15,9 @@ import java.util.Iterator;
 /**
  * Convenience repository implementation to be inherited from if applicable.
  *
- * <p>Tries best to translate paging and sorting params into valid SQL.<br>
- * If result does not fit your use case: implement it yourself and do not use these convenience
- * methods.
+ * <p>
+ * Tries best to translate paging and sorting params into valid SQL.<br>
+ * If result does not fit your use case: implement it yourself and do not use these convenience methods.
  *
  * @param <C> type of comparable object when BETWEEN filter operation has to be handled
  */
@@ -51,7 +51,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl<C extends Comparabl
         String sortDirection = null;
         if (sortField != null) {
           if (allowedOrderByFields != null
-              && Arrays.asList(allowedOrderByFields).contains(sortField)) {
+                  && Arrays.asList(allowedOrderByFields).contains(sortField)) {
             String fullQualifiedColumnName = getColumnName(sortField);
             Direction direction = order.getDirection();
             if (direction != null && direction.isDescending()) {
@@ -60,12 +60,12 @@ public abstract class AbstractPagingAndSortingRepositoryImpl<C extends Comparabl
               sortDirection = "ASC";
             }
             query
-                .append(" ")
-                .append("ORDER BY")
-                .append(" ")
-                .append(fullQualifiedColumnName)
-                .append(" ")
-                .append(sortDirection);
+                    .append(" ")
+                    .append("ORDER BY")
+                    .append(" ")
+                    .append(fullQualifiedColumnName)
+                    .append(" ")
+                    .append(sortDirection);
           }
         }
       }
@@ -81,24 +81,18 @@ public abstract class AbstractPagingAndSortingRepositoryImpl<C extends Comparabl
   }
 
   /**
-   * full qualified column names in database table that are applicable for sorting
-   *
-   * @return full qualified column name as used in sql queries ("last_modified" or e.g.
-   *     "w.last_modified" if prefix used in queries)
+   * @return model properties names that are applicable for sorting, will be mapped to database column names using @see #getColumnName
    */
   protected abstract String[] getAllowedOrderByFields();
 
   /**
-   * full qualified column name in database table may vary from property name in model object
-   *
    * @param modelProperty name of model property passed as String, e.g. "lastModified"
-   * @return column name as used in sql queries ("last_modified" or e.g. "w.last_modified" if prefix
-   *     used in queries)
+   * @return full qualified column name as used in sql queries ("last_modified" or e.g. "w.last_modified" if prefix used in queries)
    */
   protected abstract String getColumnName(String modelProperty);
 
   protected String getWhereClause(FilterCriterion<?> fc)
-      throws IllegalArgumentException, UnsupportedOperationException {
+          throws IllegalArgumentException, UnsupportedOperationException {
     StringBuilder query = new StringBuilder();
     if (fc != null) {
       FilterOperation filterOperation = fc.getOperation();
@@ -110,13 +104,13 @@ public abstract class AbstractPagingAndSortingRepositoryImpl<C extends Comparabl
           } else {
             // example: BETWEEN '2015-01-01' AND '2015-12-31'
             query
-                .append("(")
-                .append(getColumnName(fc.getFieldName()))
-                .append(" BETWEEN ")
-                .append(convertToSqlString((C) fc.getMinValue()))
-                .append(" AND ")
-                .append(convertToSqlString((C) fc.getMaxValue()))
-                .append(")");
+                    .append("(")
+                    .append(getColumnName(fc.getFieldName()))
+                    .append(" BETWEEN ")
+                    .append(convertToSqlString((C) fc.getMinValue()))
+                    .append(" AND ")
+                    .append(convertToSqlString((C) fc.getMaxValue()))
+                    .append(")");
           }
           break;
         case IN:
@@ -140,73 +134,73 @@ public abstract class AbstractPagingAndSortingRepositoryImpl<C extends Comparabl
         case CONTAINS:
           // @see https://www.postgresql.org/docs/11/functions-matching.html
           query
-              .append("(")
-              .append(getColumnName(fc.getFieldName()))
-              .append(" ILIKE '%")
-              .append(convertToSqlString(fc.getValue()))
-              .append("%')");
+                  .append("(")
+                  .append(getColumnName(fc.getFieldName()))
+                  .append(" ILIKE '%")
+                  .append(convertToSqlString(fc.getValue()))
+                  .append("%')");
           break;
         case EQUALS:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
-              .append("(")
-              .append(getColumnName(fc.getFieldName()))
-              .append(" = ")
-              .append(convertToSqlString(fc.getValue()))
-              .append(")");
+                  .append("(")
+                  .append(getColumnName(fc.getFieldName()))
+                  .append(" = ")
+                  .append(convertToSqlString(fc.getValue()))
+                  .append(")");
           break;
         case NOT_EQUALS:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
-              .append("(")
-              .append(getColumnName(fc.getFieldName()))
-              .append(" != ")
-              .append(convertToSqlString(fc.getValue()))
-              .append(")");
+                  .append("(")
+                  .append(getColumnName(fc.getFieldName()))
+                  .append(" != ")
+                  .append(convertToSqlString(fc.getValue()))
+                  .append(")");
           break;
         case GREATER_THAN:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
-              .append("(")
-              .append(getColumnName(fc.getFieldName()))
-              .append(" > ")
-              .append(convertToSqlString(fc.getValue()))
-              .append(")");
+                  .append("(")
+                  .append(getColumnName(fc.getFieldName()))
+                  .append(" > ")
+                  .append(convertToSqlString(fc.getValue()))
+                  .append(")");
           break;
         case GREATER_THAN_OR_EQUAL_TO:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
-              .append("(")
-              .append(getColumnName(fc.getFieldName()))
-              .append(" >= ")
-              .append(convertToSqlString(fc.getValue()))
-              .append(")");
+                  .append("(")
+                  .append(getColumnName(fc.getFieldName()))
+                  .append(" >= ")
+                  .append(convertToSqlString(fc.getValue()))
+                  .append(")");
           break;
         case LESS_THAN:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
-              .append("(")
-              .append(getColumnName(fc.getFieldName()))
-              .append(" < ")
-              .append(convertToSqlString(fc.getValue()))
-              .append(")");
+                  .append("(")
+                  .append(getColumnName(fc.getFieldName()))
+                  .append(" < ")
+                  .append(convertToSqlString(fc.getValue()))
+                  .append(")");
           break;
         case LESSTHAN_OR_EQUAL_TO:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
-              .append("(")
-              .append(getColumnName(fc.getFieldName()))
-              .append(" <= ")
-              .append(convertToSqlString(fc.getValue()))
-              .append(")");
+                  .append("(")
+                  .append(getColumnName(fc.getFieldName()))
+                  .append(" <= ")
+                  .append(convertToSqlString(fc.getValue()))
+                  .append(")");
           break;
         case SET:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
-              .append("(")
-              .append(getColumnName(fc.getFieldName()))
-              .append(" IS NOT NULL")
-              .append(")");
+                  .append("(")
+                  .append(getColumnName(fc.getFieldName()))
+                  .append(" IS NOT NULL")
+                  .append(")");
           break;
         case NOT_SET:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
