@@ -18,10 +18,8 @@ import java.util.Iterator;
  * <p>Tries best to translate paging and sorting params into valid SQL.<br>
  * If result does not fit your use case: implement it yourself and do not use these convenience
  * methods.
- *
- * @param <C> type of comparable object when BETWEEN filter operation has to be handled
  */
-public abstract class AbstractPagingAndSortingRepositoryImpl<C extends Comparable<C>> {
+public abstract class AbstractPagingAndSortingRepositoryImpl {
 
   public void addLimit(PageRequest pageRequest, StringBuilder query) {
     int pageSize = pageRequest.getPageSize();
@@ -109,9 +107,9 @@ public abstract class AbstractPagingAndSortingRepositoryImpl<C extends Comparabl
                 .append("(")
                 .append(getColumnName(fc.getFieldName()))
                 .append(" BETWEEN ")
-                .append(convertToSqlString((C) fc.getMinValue()))
+                .append(convertToSqlString(fc.getMinValue()))
                 .append(" AND ")
-                .append(convertToSqlString((C) fc.getMaxValue()))
+                .append(convertToSqlString(fc.getMaxValue()))
                 .append(")");
           }
           break;
