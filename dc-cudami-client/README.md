@@ -14,22 +14,23 @@ Add library to `pom.xml` of your project:
 </dependency>
 ```
 
+### Plain Java environment (no Spring)
+
+Create an instance of CudamiClient:
+
+```
+String serverUrl = "http://localhost:9000"; // example url of cudami server
+CudamiCient cudamiClient = new CudamiClient(serverUrl);
+```
+
+### Spring Boot environment
+
 Configure cudami server url by environment (e.g. in your `application.yml`):
 
 ```yml
 cudami:
   server:
     url: https://api.myserver.com/cudami
-```
-
-Configure unique id of cudami pages (e.g. in your `application.yml`):
-
-```yml
-cudami:
-  server:
-    url: https://api.myserver.com/cudami
-  webpages:
-    foobar: '91ad474d-a463-41de-a367-51b196eec621'
 ```
 
 Add cudami spring beans to your application context:
@@ -50,7 +51,7 @@ public class SpringConfig {
 
   @Bean
   public CudamiClient cudamiClient() {
-    return CudamiClient.build(serverUrl);
+    return new CudamiClient(serverUrl);
   }
   ...
 }
@@ -58,7 +59,17 @@ public class SpringConfig {
 
 ## Usage
 
-### Get webpage from cudami and render it
+Your instance of CudamiClient is the single entry point to all cudami clients:
+
+- For access to `Collection`-endpoint: `CudamiCollectionsClient cudamiCollectionsClient = cudamiClient.forCollections();`
+- For access to `Corporation`-endpoint: `CudamiCorporationsClient cudamiCorporationsClient = cudamiClient.forCorporations();`
+- For access to `Project`-endpoint: `CudamiProjectsClient cudamiProjectsClient = cudamiClient.forProjects();`
+- For access to cudami system endpoint: `CudamiSystemClient cudamiSystemClient = cudamiClient.forSystem();`
+- For access to `Webpage`-endpoint: `CudamiWebpagesClient cudamiWebpagesClient = cudamiClient.forWebpages();`
+
+### CudamiWebpagesClient
+
+#### Get webpage from cudami and render it
 
 After configuring the unique id for a webpage, you can get a webpage from cudami server using the cudami client (configuration see above). cudami offers also a Thymeleaf rendering fragment (`cudami/fragments/webpage-to-html`) to render a webpage in a template.
 
@@ -83,14 +94,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class CudamiWebpageController {
 
-  private final CudamiClient cudamiClient;
+  private final CudamiWebpagesClient cudamiWebpagesClient;
   private final UUID uuid;
 
-  public CudamiWebpageController(
-    @Autowired CudamiClient cudamiClient,
-    @Value("${cudami.webpages.foobar}") UUID uuid
+  public CudamiWebpageController(@Autowired CudamiClient cudamiClient, @Value("${cudami.webpages.foobar}") UUID uuid
   ) {
-    this.cudamiClient = cudamiClient;
+    this.cudamiWebpagesClient = cudamiClient.forWebPages();
     this.uuid = uuid;
   }
 
@@ -106,7 +115,7 @@ public class CudamiWebpageController {
     Webpage webpage;
     try {
       Locale locale = LocaleContextHolder.getLocale();
-      webpage = cudamiClient.getWebpage(locale, uuid.toString());
+      webpage = cudamiWebpagesClient.getWebpage(locale, uuid.toString());
     } catch (HttpException ex) {
       // fallback to static text with link to external privacy page
       webpage = null;
