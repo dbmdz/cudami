@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.template.website.springboot.repository;
 
-import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.CudamiSystemClient;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -14,7 +14,7 @@ public class LocaleRepositoryImpl implements LocaleRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LocaleRepositoryImpl.class);
 
-  @Autowired private CudamiClient cudamiClient;
+  @Autowired private CudamiSystemClient cudamiClient;
 
   @Override
   public Locale getDefault() {

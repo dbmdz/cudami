@@ -18,10 +18,8 @@ import java.util.Iterator;
  * <p>Tries best to translate paging and sorting params into valid SQL.<br>
  * If result does not fit your use case: implement it yourself and do not use these convenience
  * methods.
- *
- * @param <C> type of comparable object when BETWEEN filter operation has to be handled
  */
-public abstract class AbstractPagingAndSortingRepositoryImpl<C extends Comparable<C>> {
+public abstract class AbstractPagingAndSortingRepositoryImpl {
 
   public void addLimit(PageRequest pageRequest, StringBuilder query) {
     int pageSize = pageRequest.getPageSize();
@@ -81,19 +79,15 @@ public abstract class AbstractPagingAndSortingRepositoryImpl<C extends Comparabl
   }
 
   /**
-   * full qualified column names in database table that are applicable for sorting
-   *
-   * @return full qualified column name as used in sql queries ("last_modified" or e.g.
-   *     "w.last_modified" if prefix used in queries)
+   * @return model properties names that are applicable for sorting, will be mapped to database
+   *     column names using @see #getColumnName
    */
   protected abstract String[] getAllowedOrderByFields();
 
   /**
-   * full qualified column name in database table may vary from property name in model object
-   *
    * @param modelProperty name of model property passed as String, e.g. "lastModified"
-   * @return column name as used in sql queries ("last_modified" or e.g. "w.last_modified" if prefix
-   *     used in queries)
+   * @return full qualified column name as used in sql queries ("last_modified" or e.g.
+   *     "w.last_modified" if prefix used in queries)
    */
   protected abstract String getColumnName(String modelProperty);
 
@@ -113,9 +107,9 @@ public abstract class AbstractPagingAndSortingRepositoryImpl<C extends Comparabl
                 .append("(")
                 .append(getColumnName(fc.getFieldName()))
                 .append(" BETWEEN ")
-                .append(convertToSqlString((C) fc.getMinValue()))
+                .append(convertToSqlString(fc.getMinValue()))
                 .append(" AND ")
-                .append(convertToSqlString((C) fc.getMaxValue()))
+                .append(convertToSqlString(fc.getMaxValue()))
                 .append(")");
           }
           break;
