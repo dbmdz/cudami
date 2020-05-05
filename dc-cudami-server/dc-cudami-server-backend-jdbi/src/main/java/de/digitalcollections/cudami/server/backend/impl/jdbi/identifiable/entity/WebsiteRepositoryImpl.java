@@ -39,6 +39,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
           + " w.identifiable_type w_type, w.entity_type w_entityType,"
           + " w.created w_created, w.last_modified w_lastModified,"
           + " w.url w_url, w.registration_date w_registrationDate,"
+          + " w.preview_hints w_previewImageRenderingHints,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM websites as w"
@@ -51,6 +52,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
           + " w.identifiable_type w_type, w.entity_type w_entityType,"
           + " w.created w_created, w.last_modified w_lastModified,"
           + " w.url w_url, w.registration_date w_registrationDate,"
+          + " w.preview_hints w_previewImageRenderingHints,"
           + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename, file.iiif_base_url f_iiifBaseUrl"
           + " FROM websites as w"
           + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid";
@@ -208,12 +210,12 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
 
     String query =
         "INSERT INTO websites("
-            + "uuid, label, description, previewfileresource,"
+            + "uuid, label, description, previewfileresource, preview_hints,"
             + " identifiable_type, entity_type,"
             + " created, last_modified,"
             + " url, registration_date"
             + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource,"
+            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
             + " :type, :entityType,"
             + " :created, :lastModified,"
             + " :url, :registrationDate"
@@ -244,7 +246,8 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
 
     String query =
         "UPDATE websites SET"
-            + " label=:label::JSONB, description=:description::JSONB, previewfileresource=:previewFileResource,"
+            + " label=:label::JSONB, description=:description::JSONB,"
+            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
             + " last_modified=:lastModified,"
             + " url=:url, registration_date=:registrationDate"
             + " WHERE uuid=:uuid";

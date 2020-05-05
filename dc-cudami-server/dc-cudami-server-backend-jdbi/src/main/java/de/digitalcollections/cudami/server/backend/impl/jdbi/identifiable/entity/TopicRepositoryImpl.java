@@ -36,6 +36,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
       "SELECT t.uuid t_uuid, t.refid t_refId, t.label t_label, t.description t_description,"
           + " t.identifiable_type t_type, t.entity_type t_entityType,"
           + " t.created t_created, t.last_modified t_lastModified,"
+          + " t.preview_hints t_previewImageRenderingHints,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM topics as t"
@@ -47,6 +48,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
       "SELECT t.uuid t_uuid, t.refid t_refId, t.label t_label, t.description t_description,"
           + " t.identifiable_type t_type, t.entity_type t_entityType,"
           + " t.created t_created, t.last_modified t_lastModified,"
+          + " t.preview_hints t_previewImageRenderingHints,"
           + " file.uuid f_uuid, file.filename f_filename, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM topics as t"
           + " LEFT JOIN fileresources_image as file on t.previewfileresource = file.uuid";
@@ -249,11 +251,11 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
     String query =
         "INSERT INTO topics("
-            + "uuid, label, description, previewfileresource,"
+            + "uuid, label, description, previewfileresource, preview_hints,"
             + " identifiable_type, entity_type,"
             + " created, last_modified"
             + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource,"
+            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
             + " :type, :entityType,"
             + " :created, :lastModified"
             + ")";
@@ -284,7 +286,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
     String query =
         "UPDATE topics SET"
-            + " label=:label::JSONB, description=:description::JSONB, previewfileresource=:previewFileResource,"
+            + " label=:label::JSONB, description=:description::JSONB,"
+            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
             + " last_modified=:lastModified"
             + " WHERE uuid=:uuid";
 

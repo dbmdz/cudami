@@ -41,6 +41,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
       "SELECT s.uuid s_uuid, s.label s_label, s.description s_description,"
           + " s.identifiable_type s_type,"
           + " s.created s_created, s.last_modified s_lastModified,"
+          + " s.preview_hints s_previewImageRenderingHints,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM subtopics as s"
@@ -52,6 +53,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
       "SELECT s.uuid s_uuid, s.label s_label, s.description s_description,"
           + " s.identifiable_type s_type,"
           + " s.created s_created, s.last_modified s_lastModified,"
+          + " s.preview_hints s_previewImageRenderingHints,"
           + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename, file.iiif_base_url f_iiifBaseUrl"
           + " FROM subtopics as s"
           + " LEFT JOIN fileresources_image as file on s.previewfileresource = file.uuid";
@@ -60,6 +62,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
       "SELECT s.uuid s_uuid, s.label s_label, s.description s_description,"
           + " s.identifiable_type s_type,"
           + " s.created s_created, s.last_modified s_lastModified,"
+          + " s.preview_hints s_previewImageRenderingHints,"
           + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename, file.iiif_base_url f_iiifBaseUrl"
           + " FROM subtopics as s INNER JOIN subtopic_subtopics ss ON s.uuid = ss.child_subtopic_uuid"
           + " LEFT JOIN fileresources_image as file on s.previewfileresource = file.uuid"
@@ -435,11 +438,11 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
 
     String query =
         "INSERT INTO subtopics("
-            + "uuid, label, description, previewfileresource,"
+            + "uuid, label, description, previewfileresource, preview_hints,"
             + " identifiable_type,"
             + " created, last_modified"
             + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource,"
+            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
             + " :type,"
             + " :created, :lastModified"
             + ")";
@@ -668,7 +671,8 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
 
     String query =
         "UPDATE subtopics SET"
-            + " label=:label::JSONB, description=:description::JSONB, previewfileresource=:previewFileResource,"
+            + " label=:label::JSONB, description=:description::JSONB,"
+            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
             + " last_modified=:lastModified"
             + " WHERE uuid=:uuid";
 

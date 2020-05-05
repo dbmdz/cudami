@@ -40,6 +40,7 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
           + " w.identifiable_type w_type,"
           + " w.created w_created, w.last_modified w_lastModified,"
           + " w.text w_text, w.publication_start w_publicationStart, w.publication_end w_publicationEnd,"
+          + " w.preview_hints w_previewImageRenderingHints,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM webpages as w"
@@ -52,6 +53,7 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
           + " w.identifiable_type w_type,"
           + " w.created w_created, w.last_modified w_lastModified,"
           + " w.publication_start w_publicationStart, w.publication_end w_publicationEnd,"
+          + " w.preview_hints w_previewImageRenderingHints,"
           + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename, file.iiif_base_url f_iiifBaseUrl"
           + " FROM webpages as w"
           + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid";
@@ -61,6 +63,7 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
           + " w.identifiable_type w_type,"
           + " w.created w_created, w.last_modified w_lastModified,"
           + " w.publication_start w_publicationStart, w.publication_end w_publicationEnd,"
+          + " w.preview_hints w_previewImageRenderingHints,"
           + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename, file.iiif_base_url f_iiifBaseUrl"
           + " FROM webpages as w INNER JOIN webpage_webpages ww ON w.uuid = ww.child_webpage_uuid"
           + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid"
@@ -362,12 +365,12 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
 
     String query =
         "INSERT INTO webpages("
-            + "uuid, label, description, previewfileresource,"
+            + "uuid, label, description, previewfileresource, preview_hints,"
             + " identifiable_type,"
             + " created, last_modified,"
             + " text, publication_start, publication_end"
             + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource,"
+            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
             + " :type,"
             + " :created, :lastModified,"
             + " :text::JSONB, :publicationStart, :publicationEnd"
@@ -442,7 +445,8 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
 
     String query =
         "UPDATE webpages SET"
-            + " label=:label::JSONB, description=:description::JSONB, previewfileresource=:previewFileResource,"
+            + " label=:label::JSONB, description=:description::JSONB,"
+            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
             + " last_modified=:lastModified,"
             + " text=:text::JSONB, publication_start=:publicationStart, publication_end=:publicationEnd"
             + " WHERE uuid=:uuid";

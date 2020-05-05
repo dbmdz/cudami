@@ -35,7 +35,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
       "SELECT c.uuid c_uuid, c.refid c_refId, c.label c_label, c.description c_description,"
           + " c.identifiable_type c_type, c.entity_type c_entityType,"
           + " c.created c_created, c.last_modified c_lastModified,"
-          + " c.text c_text,"
+          + " c.text c_text, c.preview_hints c_previewImageRenderingHints,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM collections as c"
@@ -48,6 +48,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
       "SELECT c.uuid c_uuid, c.refid c_refId, c.label c_label, c.description c_description,"
           + " c.identifiable_type c_type, c.entity_type c_entityType,"
           + " c.created c_created, c.last_modified c_lastModified,"
+          + " c.preview_hints c_previewImageRenderingHints,"
           + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename, file.iiif_base_url f_iiifBaseUrl"
           + " FROM collections as c"
           + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid";
@@ -195,12 +196,12 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
     String query =
         "INSERT INTO collections("
-            + "uuid, label, description, previewfileresource,"
+            + "uuid, label, description, previewfileresource, preview_hints,"
             + " identifiable_type, entity_type,"
             + " created, last_modified,"
             + " text"
             + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource,"
+            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
             + " :type, :entityType,"
             + " :created, :lastModified,"
             + " :text::JSONB"
@@ -231,7 +232,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
     String query =
         "UPDATE collections SET"
-            + " label=:label::JSONB, description=:description::JSONB, previewfileresource=:previewFileResource,"
+            + " label=:label::JSONB, description=:description::JSONB,"
+            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
             + " last_modified=:lastModified,"
             + " text=:text::JSONB"
             + " WHERE uuid=:uuid";

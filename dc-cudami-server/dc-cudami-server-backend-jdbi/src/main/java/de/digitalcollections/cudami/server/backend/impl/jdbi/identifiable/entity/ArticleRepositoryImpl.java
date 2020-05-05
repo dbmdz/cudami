@@ -35,7 +35,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
       "SELECT a.uuid a_uuid, a.refid a_refId, a.label a_label, a.description a_description,"
           + " a.identifiable_type a_type, a.entity_type a_entityType,"
           + " a.created a_created, a.last_modified a_lastModified,"
-          + " a.text a_text,"
+          + " a.text a_text, a.preview_hints a_previewImageRenderingHints,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM articles as a"
@@ -47,6 +47,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
       "SELECT a.uuid a_uuid, a.refid a_refId, a.label a_label, a.description a_description,"
           + " a.identifiable_type a_type, a.entity_type a_entityType,"
           + " a.created a_created, a.last_modified a_lastModified,"
+          + " a.preview_hints a_previewImageRenderingHints,"
           + " file.uuid f_uuid, file.filename f_filename, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM articles as a"
           + " LEFT JOIN fileresources_image as file on a.previewfileresource = file.uuid";
@@ -194,12 +195,12 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
 
     String query =
         "INSERT INTO articles("
-            + "uuid, label, description, previewfileresource,"
+            + "uuid, label, description, previewfileresource, preview_hints,"
             + " identifiable_type, entity_type,"
             + " created, last_modified,"
             + " text"
             + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource,"
+            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
             + " :type, :entityType,"
             + " :created, :lastModified,"
             + " :text::JSONB"
@@ -230,7 +231,8 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
 
     String query =
         "UPDATE articles SET"
-            + " label=:label::JSONB, description=:description::JSONB, previewfileresource=:previewFileResource,"
+            + " label=:label::JSONB, description=:description::JSONB,"
+            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
             + " last_modified=:lastModified,"
             + " text=:text::JSONB"
             + " WHERE uuid=:uuid";
