@@ -33,7 +33,7 @@
 
           <div  class="col-sm-12">
             <div class="form-group">
-              <label for="email" th:text="#{username}">Username / Email</label>
+              <label class="font-weight-bold" for="email" th:text="#{username}">Username / Email</label>
               <div th:classappend="${#fields.hasErrors('email')}? has-error">
                 <input id="email" th:field="*{email}" type="text" class="form-control" th:placeholder="#{username}" autofocus="autofocus"/>
                 <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}">...</p>
@@ -42,7 +42,7 @@
 
             <div class="form-row">
               <div class="form-group col-md-6">
-                <label for="lastname" th:text="#{lastname}">Lastname</label>
+                <label class="font-weight-bold" for="lastname" th:text="#{lastname}">Lastname</label>
 
                 <div th:classappend="${#fields.hasErrors('lastname')}? has-error">
                   <input id="lastname" th:field="*{lastname}" type="text" class="form-control" th:placeholder="#{lastname}"/>
@@ -50,7 +50,7 @@
                 </div>
               </div>
               <div class="form-group col-md-6">
-                <label for="firstname" th:text="#{firstname}">Firstname</label>
+                <label class="font-weight-bold" for="firstname" th:text="#{firstname}">Firstname</label>
 
                 <div th:classappend="${#fields.hasErrors('firstname')}? has-error">
                   <input id="firstname" th:field="*{firstname}" type="text" class="form-control" th:placeholder="#{firstname}"/>
@@ -61,24 +61,24 @@
 
             <th:block th:unless="${createAdmin}">
               <div class="form-group">
-                <label for="role" th:text="#{roles}">Role(s)</label>
+                <label class="font-weight-bold" for="role" th:text="#{roles}">Role(s)</label>
 
                 <div th:classappend="${#fields.hasErrors('roles')}? has-error">
                   <ul class="checkbox-list">
                     <li th:each="userRole : ${allRoles}">
-                      <input type="checkbox" th:field="*{roles}" th:value="${userRole}" />
-                      <label th:for="${#ids.prev('roles')}" 
-                             th:text="${userRole}">Administrator</label>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" th:field="*{roles}" th:value="${userRole}" />
+                        <label class="font-weight-bold form-check-label" th:for="${#ids.prev('roles')}" th:text="${userRole}">Administrator</label>
+                      </div>
                     </li>
                   </ul>
                 </div>
               </div>
               <div class="form-group">
-                <label th:text="#{status}">Status</label>
+                <label class="font-weight-bold" th:text="#{status}">Status</label>
                 <div class="form-check" th:classappend="${#fields.hasErrors('enabled')}? has-error">
-                  <label>
-                    <input th:field="*{enabled}" type="checkbox"/> <th:block th:text="#{active}">active</th:block>
-                  </label>
+                  <input class="form-check-input" type="checkbox" th:field="*{enabled}" />
+                  <label class="font-weight-bold form-check-label" th:text="#{active}">active</label>
                 </div>
               </div>
 
@@ -89,11 +89,11 @@
 
             <div class="form-row">
               <div class="form-group col-md-6">
-                <label for="pwd1" th:text="#{new_password}">New password</label>
+                <label class="font-weight-bold" for="pwd1" th:text="#{new_password}">New password</label>
                 <input id="pwd1" name="pwd1" type="password" class="form-control" autocomplete="new-password"/>
               </div>
               <div class="form-group col-md-6">
-                <label for="pwd2" th:text="#{verify_password}">Verify password</label>
+                <label class="font-weight-bold" for="pwd2" th:text="#{verify_password}">Verify password</label>
                 <input id="pwd2" name="pwd2" type="password" class="form-control" autocomplete="new-password"/>
               </div>
             </div>

@@ -19,7 +19,7 @@
         </th:block>
       </div>
       <div class="col-sm-10">
-        <label>
+        <label class="font-weight-bold">
           <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${identifiable.label}, ${language})"></th:block>
         </label>
         <th:block th:if="${identifiable.description} and ${identifiable.description.containsKey(language)}">

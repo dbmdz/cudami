@@ -33,7 +33,7 @@
 
           <div  class="col-sm-12">
             <div class="form-group">
-              <label for="label" th:text="#{label}">Label</label>
+              <label class="font-weight-bold" for="label" th:text="#{label}">Label</label>
               <div th:classappend="${#fields.hasErrors('label')}? has-error">
                 <input id="label" th:field="*{label}" type="text" class="form-control" th:placeholder="#{label}" autofocus="autofocus" required />
                 <p th:if="${#fields.hasErrors('label')}" th:errors="*{label}">...</p>
@@ -42,14 +42,14 @@
 
             <div class="form-row">
               <div class="form-group col-md-6">
-                <label for="namespace" th:text="#{namespace}">Namespace</label>
+                <label class="font-weight-bold" for="namespace" th:text="#{namespace}">Namespace</label>
                 <div th:classappend="${#fields.hasErrors('namespace')}? has-error">
                   <input id="namespace" th:field="*{namespace}" type="text" class="form-control" th:placeholder="#{namespace}" required />
                   <p th:if="${#fields.hasErrors('namespace')}" th:errors="*{namespace}">...</p>
                 </div>
               </div>
               <div class="form-group col-md-6">
-                <label for="pattern" th:text="#{pattern}">Pattern</label>
+                <label class="font-weight-bold" for="pattern" th:text="#{pattern}">Pattern</label>
                 <div th:classappend="${#fields.hasErrors('pattern')}? has-error">
                   <input id="pattern" th:field="*{pattern}" type="text" class="form-control" th:placeholder="#{pattern}" required />
                   <p th:if="${#fields.hasErrors('pattern')}" th:errors="*{pattern}">...</p>
