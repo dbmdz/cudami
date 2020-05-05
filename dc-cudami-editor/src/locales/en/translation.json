@@ -82,7 +82,7 @@
     "tooltips": {
       "altText": "is read out in the screen reader or is output if image cannot be displayed",
       "caption": "is displayed as a caption",
-      "label": "name of the image (for retrievability in the system)",
+      "label": "name of the image (for retrievability in the system); default value=file name (e.g. picture.jpg); changeable",
       "title": "appears when the mouse moves over the image"
     },
     "uploadFileResource": "Upload a new file",
