@@ -34,14 +34,13 @@ const InputTooltip = (props) => {
 
 const ImageMetadataForm = (props) => {
   const {t} = useTranslation()
-  const {attributes, isOpen, onChange, toggle, toggleEnabled} = props
+  const {attributes, isOpen, onChange, toggle} = props
   return (
     <Card>
       <CardHeader>
         <Button
           className="ml-0 p-0"
           color="link"
-          disabled={!toggleEnabled}
           onClick={toggle}
         >
           {t('enterMetadata')}

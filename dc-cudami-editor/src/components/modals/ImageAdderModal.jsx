@@ -24,9 +24,8 @@ class ImageAdderModal extends Component {
     this.state = {
       attributes: this.initialAttributes,
       fileResource: {},
-      metadataOpen: false,
+      metadataOpen: true,
       renderingHintsOpen: false,
-      toggleEnabled: false,
     }
     subscribe('editor.show-image-modal', () => {
       this.props.onToggle()
@@ -70,9 +69,8 @@ class ImageAdderModal extends Component {
     this.setState({
       attributes: this.initialAttributes,
       fileResource: this.state.initialFileResource,
-      metadataOpen: false,
+      metadataOpen: true,
       renderingHintsOpen: false,
-      toggleEnabled: false,
     })
   }
 
@@ -145,7 +143,6 @@ class ImageAdderModal extends Component {
               toggle={() =>
                 this.setState({metadataOpen: !this.state.metadataOpen})
               }
-              toggleEnabled={this.state.toggleEnabled}
             />
             <ImageRenderingHintsForm
               attributes={this.state.attributes}
@@ -156,7 +153,6 @@ class ImageAdderModal extends Component {
                   renderingHintsOpen: !this.state.renderingHintsOpen,
                 })
               }
-              toggleEnabled={this.state.toggleEnabled}
             />
             {debug && (
               <>
