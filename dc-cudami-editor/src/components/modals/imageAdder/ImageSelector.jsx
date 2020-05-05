@@ -51,7 +51,7 @@ class ImageSelector extends Component {
     const {fileResource, onChange, t} = this.props
     return (
       <Card className="mt-0">
-        <CardHeader>{t('selectImage')}</CardHeader>
+        <CardHeader className="font-weight-bold">{t('selectImage')}</CardHeader>
         <CardBody className="text-center">
           <FileUploadForm
             onChange={(file) => this.uploadImage(file)}

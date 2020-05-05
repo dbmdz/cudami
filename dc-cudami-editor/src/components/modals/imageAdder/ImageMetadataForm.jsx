@@ -39,7 +39,7 @@ const ImageMetadataForm = (props) => {
     <Card>
       <CardHeader>
         <Button
-          className="ml-0 p-0"
+          className="font-weight-bold ml-0 p-0"
           color="link"
           onClick={toggle}
         >
