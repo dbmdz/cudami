@@ -37,6 +37,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
       "SELECT i.uuid i_uuid, i.label i_label, i.description i_description,"
           + " i.identifiable_type i_type,"
           + " i.created i_created, i.last_modified i_last_modified,"
+          + " i.preview_hints i_previewImageRenderingHints,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM identifiables as i"
@@ -48,6 +49,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
       "SELECT i.uuid i_uuid, i.label i_label, i.description i_description,"
           + " i.identifiable_type i_type,"
           + " i.created i_created, i.last_modified i_lastModified,"
+          + " i.preview_hints i_previewImageRenderingHints,"
           + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename, file.iiif_base_url f_iiifBaseUrl"
           + " FROM identifiables as i"
           + " LEFT JOIN fileresources_image as file on i.previewfileresource = file.uuid";

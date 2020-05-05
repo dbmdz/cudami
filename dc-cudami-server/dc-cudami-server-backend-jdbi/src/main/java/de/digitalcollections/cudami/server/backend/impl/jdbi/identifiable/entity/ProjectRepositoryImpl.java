@@ -36,6 +36,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
           + " p.identifiable_type p_type, p.entity_type p_entityType,"
           + " p.created p_created, p.last_modified p_lastModified,"
           + " p.text p_text, p.start_date p_startDate, p.end_date p_endDate,"
+          + " p.preview_hints p_previewImageRenderingHints,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM projects as p"
@@ -48,6 +49,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
           + " p.identifiable_type p_type, p.entity_type p_entityType,"
           + " p.created p_created, p.last_modified p_lastModified,"
           + " p.start_date p_startDate, p.end_date p_endDate,"
+          + " p.preview_hints p_previewImageRenderingHints,"
           + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename, file.iiif_base_url f_iiifBaseUrl"
           + " FROM projects as p"
           + " LEFT JOIN fileresources_image as file on p.previewfileresource = file.uuid";
@@ -196,12 +198,12 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
 
     String query =
         "INSERT INTO projects("
-            + "uuid, label, description, previewfileresource,"
+            + "uuid, label, description, previewfileresource, preview_hints,"
             + " identifiable_type, entity_type,"
             + " created, last_modified,"
             + " text, start_date, end_date"
             + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource,"
+            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
             + " :type, :entityType,"
             + " :created, :lastModified,"
             + " :text::JSONB, :startDate, :endDate"
@@ -232,7 +234,8 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
 
     String query =
         "UPDATE projects SET"
-            + " label=:label::JSONB, description=:description::JSONB, previewfileresource=:previewFileResource,"
+            + " label=:label::JSONB, description=:description::JSONB,"
+            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
             + " last_modified=:lastModified,"
             + " text=:text::JSONB, start_date=:startDate, end_date=:endDate"
             + " WHERE uuid=:uuid";
