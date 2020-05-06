@@ -6,7 +6,7 @@ import {withTranslation} from 'react-i18next'
 import ImageMetadataForm from './imageAdder/ImageMetadataForm'
 import ImageRenderingHintsForm from './imageAdder/ImageRenderingHintsForm'
 import ImageSelector from './imageAdder/ImageSelector'
-import {loadIdentifiable, saveFileResource, updateFileResource} from '../../api'
+import {loadIdentifiable, saveFileResource} from '../../api'
 
 class ImageAdderModal extends Component {
   initialAttributes = {
@@ -74,6 +74,12 @@ class ImageAdderModal extends Component {
     })
   }
 
+  resetFileResource = () => {
+    this.setState({
+      fileResource: this.state.initialFileResource,
+    })
+  }
+
   setAttribute = (name, value) => {
     this.setState({
       attributes: {
@@ -94,9 +100,7 @@ class ImageAdderModal extends Component {
 
   submitFileResource = async () => {
     let resourceId = this.state.fileResource.uuid
-    if (resourceId) {
-      updateFileResource(this.props.apiContextPath, this.state.fileResource)
-    } else {
+    if (!resourceId) {
       const {uuid} = await saveFileResource(
         this.props.apiContextPath,
         this.state.fileResource
@@ -135,6 +139,7 @@ class ImageAdderModal extends Component {
               onChange={(updateFields, additionalFields) =>
                 this.updateFileResource(updateFields, additionalFields)
               }
+              resetFileResource={() => this.resetFileResource()}
             />
             <ImageMetadataForm
               attributes={this.state.attributes}
