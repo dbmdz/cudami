@@ -16,17 +16,17 @@
               <div class="alert alert-danger" th:if="${param.error}" th:text="#{login_failed}">Wrong username or password</div>
               <form role="form" name="input" th:action="@{/login}" method="post">
                 <div class="form-group">
-                  <label for="j_username" th:text="#{lbl_username}">Username</label>
+                  <label class="font-weight-bold" for="j_username" th:text="#{lbl_username}">Username</label>
                   <input type="text" class="form-control" id="j_username" name="username" autofocus="autofocus"/>
                 </div>
                 <div class="form-group">
-                  <label for="j_password" th:text="#{lbl_password}">Password</label>
+                  <label class="font-weight-bold" for="j_password" th:text="#{lbl_password}">Password</label>
                   <input type="password" class="form-control" id="j_password" name="password" />
                 </div>
                 <div class="form-group">
                   <div class="form-check">
                     <input class="form-check-input" id="remember-me" name="remember-me" type="checkbox">
-                    <label class="form-check-label" for="remember-me" th:text="#{lbl_stay_logged_in}">
+                    <label class="font-weight-bold form-check-label" for="remember-me" th:text="#{lbl_stay_logged_in}">
                       Stay logged in
                     </label>
                   </div>

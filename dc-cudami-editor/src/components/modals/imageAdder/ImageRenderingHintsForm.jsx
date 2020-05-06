@@ -14,14 +14,13 @@ import {useTranslation} from 'react-i18next'
 
 const ImageRenderingHintsForm = (props) => {
   const {t} = useTranslation()
-  const {attributes, isOpen, onChange, toggle, toggleEnabled} = props
+  const {attributes, isOpen, onChange, toggle} = props
   return (
     <Card>
       <CardHeader>
         <Button
-          className="ml-0 p-0"
+          className="font-weight-bold ml-0 p-0"
           color="link"
-          disabled={!toggleEnabled}
           onClick={toggle}
         >
           {t('defineRenderingHints')}

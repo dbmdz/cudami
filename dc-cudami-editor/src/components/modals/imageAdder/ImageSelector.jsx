@@ -40,24 +40,18 @@ class ImageSelector extends Component {
       this.updateProgress
     )
     const responseJson = JSON.parse(response)
-    onChange(
-      {
-        label: responseJson.label,
-        uri: `${responseJson.iiifBaseUrl}/full/full/0/default.${responseJson.filenameExtension}`,
-        uuid: responseJson.uuid,
-      },
-      {
-        metadataOpen: true,
-        toggleEnabled: true,
-      }
-    )
+    onChange({
+      label: responseJson.label,
+      uri: `${responseJson.iiifBaseUrl}/full/full/0/default.${responseJson.filenameExtension}`,
+      uuid: responseJson.uuid,
+    })
   }
 
   render() {
     const {fileResource, onChange, t} = this.props
     return (
       <Card className="mt-0">
-        <CardHeader>{t('selectImage')}</CardHeader>
+        <CardHeader className="font-weight-bold">{t('selectImage')}</CardHeader>
         <CardBody className="text-center">
           <FileUploadForm
             onChange={(file) => this.uploadImage(file)}
@@ -67,10 +61,7 @@ class ImageSelector extends Component {
             <Input
               name="url"
               onChange={(evt) =>
-                onChange(
-                  {uri: evt.target.value, uuid: undefined},
-                  {metadataOpen: true, toggleEnabled: true}
-                )
+                onChange({uri: evt.target.value, uuid: undefined})
               }
               placeholder="URL"
               required
