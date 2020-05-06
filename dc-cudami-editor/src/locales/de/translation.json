@@ -77,7 +77,10 @@
     "right": "rechts",
     "sameTab": "in gleichem Tab",
     "save": "Speichern",
-    "selectImage": "Bild auswählen",
+    "selectImage": {
+      "useUpload": "Bild hochladen",
+      "useUrl": "Bild per Weblink einbinden"
+    },
     "text": "Langtext",
     "title": "Titel",
     "tooltip": "Tooltip",

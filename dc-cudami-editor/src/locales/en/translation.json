@@ -75,7 +75,10 @@
     "openLinkSameTab": "open in the same tab",
     "right": "right",
     "save": "Save",
-    "selectImage": "Select image",
+    "selectImage": {
+      "useUpload": "Upload image",
+      "useUrl": "Integrate image via web link"
+    },
     "text": "Long text",
     "title": "Title",
     "tooltip": "Tooltip",
