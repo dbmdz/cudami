@@ -29,7 +29,9 @@ const ImageRenderingHintsForm = (props) => {
       <Collapse isOpen={isOpen}>
         <CardBody>
           <FormGroup>
-            <Label for="rendering-hints-alignment">{t('alignment')}</Label>
+            <Label className="font-weight-bold" for="rendering-hints-alignment">
+              {t('alignment')}
+            </Label>
             <div id="rendering-hints-alignment">
               <CustomInput
                 checked={attributes.alignment === 'left'}
@@ -52,7 +54,9 @@ const ImageRenderingHintsForm = (props) => {
             </div>
           </FormGroup>
           <FormGroup>
-            <Label for="rendering-hints-width">{t('width')}</Label>
+            <Label className="font-weight-bold" for="rendering-hints-width">
+              {t('width')}
+            </Label>
             <div id="rendering-hints-width">
               <CustomInput
                 checked={attributes.width === '25%'}
@@ -93,7 +97,12 @@ const ImageRenderingHintsForm = (props) => {
             </div>
           </FormGroup>
           <FormGroup className="mb-0">
-            <Label for="rendering-hints-image-link">{t('imageLink')}</Label>
+            <Label
+              className="font-weight-bold"
+              for="rendering-hints-image-link"
+            >
+              {t('imageLink')}
+            </Label>
             <Input
               id="rendering-hints-image-link"
               name="imageLink"
