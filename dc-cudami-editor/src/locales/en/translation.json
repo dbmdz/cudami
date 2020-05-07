@@ -76,6 +76,7 @@
     "right": "right",
     "save": "Save",
     "selectImage": {
+      "uploadSuccessful": "Image uploaded successfully",
       "useUpload": "Upload image",
       "useUrl": "Integrate image via web link"
     },

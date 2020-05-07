@@ -78,6 +78,7 @@
     "sameTab": "in gleichem Tab",
     "save": "Speichern",
     "selectImage": {
+      "uploadSuccessful": "Bild erfolgreich hochgeladen",
       "useUpload": "Bild hochladen",
       "useUrl": "Bild per Weblink einbinden"
     },
