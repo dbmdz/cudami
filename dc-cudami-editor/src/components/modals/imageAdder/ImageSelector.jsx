@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import classNames from 'classnames'
 import {
+  Alert,
   Card,
   CardBody,
   CardHeader,
@@ -30,6 +31,7 @@ class ImageSelector extends Component {
       activeTab: 'upload',
       labelTooltipOpen: false,
       progress: 0,
+      showUploadSuccess: false,
       tabToggleEnabled: true,
     }
   }
@@ -62,7 +64,9 @@ class ImageSelector extends Component {
     const responseJson = JSON.parse(response)
     this.setState({
       tabToggleEnabled: true,
+      showUploadSuccess: true,
     })
+    setTimeout(() => this.setState({showUploadSuccess: false}), 3000)
     onChange({
       ...responseJson,
       uri: `${responseJson.iiifBaseUrl}/full/full/0/default.${responseJson.filenameExtension}`,
@@ -102,6 +106,9 @@ class ImageSelector extends Component {
         <CardBody className="text-center">
           <TabContent activeTab={this.state.activeTab} className="border-0 p-0">
             <TabPane tabId="upload">
+              <Alert color="success" isOpen={this.state.showUploadSuccess}>
+                {t('selectImage.uploadSuccessful')}
+              </Alert>
               <FileUploadForm
                 onChange={(file) => this.uploadImage(file)}
                 progress={this.state.progress}
