@@ -30,6 +30,7 @@ class ImageSelector extends Component {
       activeTab: 'upload',
       labelTooltipOpen: false,
       progress: 0,
+      tabToggleEnabled: true,
     }
   }
 
@@ -50,12 +51,18 @@ class ImageSelector extends Component {
 
   uploadImage = async (image) => {
     const {apiContextPath, onChange} = this.props
+    this.setState({
+      tabToggleEnabled: false,
+    })
     const response = await uploadFile(
       apiContextPath,
       image,
       this.updateProgress
     )
     const responseJson = JSON.parse(response)
+    this.setState({
+      tabToggleEnabled: true,
+    })
     onChange({
       ...responseJson,
       uri: `${responseJson.iiifBaseUrl}/full/full/0/default.${responseJson.filenameExtension}`,
@@ -73,6 +80,7 @@ class ImageSelector extends Component {
                 className={classNames({
                   active: this.state.activeTab === 'upload',
                 })}
+                disabled={!this.state.tabToggleEnabled}
                 href="#"
                 onClick={() => this.toggleTab('upload')}
               >
@@ -82,6 +90,7 @@ class ImageSelector extends Component {
             <NavItem>
               <NavLink
                 className={classNames({active: this.state.activeTab === 'url'})}
+                disabled={!this.state.tabToggleEnabled}
                 href="#"
                 onClick={() => this.toggleTab('url')}
               >
