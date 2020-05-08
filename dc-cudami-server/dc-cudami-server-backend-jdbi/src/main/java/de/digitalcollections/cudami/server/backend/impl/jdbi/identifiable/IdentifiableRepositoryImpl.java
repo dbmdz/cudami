@@ -7,10 +7,16 @@ import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
+import de.digitalcollections.model.api.paging.Sorting;
+import de.digitalcollections.model.api.paging.enums.Direction;
 import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
+import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import de.digitalcollections.model.impl.paging.SearchPageResponseImpl;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -109,6 +115,76 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                         .values()));
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
+    return pageResponse;
+  }
+
+  @Override
+  public SearchPageResponse<I> find(SearchPageRequest searchPageRequest) {
+    // TODO make dependend from language the user has chosen...
+    String language = "de";
+    Sorting sorting =
+        Sorting.defaultBuilder().order(new OrderImpl(Direction.DESC, "lastModified")).build();
+    searchPageRequest.setSorting(sorting);
+
+    // select only what is shown/needed in paged result list:
+    StringBuilder query =
+        new StringBuilder(
+            "SELECT i.uuid i_uuid, i.label i_label, i.description i_description,"
+                + " i.identifiable_type i_identifiableType,"
+                + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
+                + " FROM identifiables as i"
+                + " LEFT JOIN fileresources_image as file on i.previewfileresource = file.uuid"
+                + " WHERE (i.label->> :language ilike '%' || :searchTerm || '%'"
+                + " OR i.description->> :language ilike '%' || :searchTerm || '%'"
+                + " OR i.label->> '' ilike '%' || :searchTerm || '%'"
+                + " OR i.description->> '' ilike '%' || :searchTerm || '%')"
+                + " AND NOT i.identifiable_type='RESOURCE'"); // TODO: resources should not be
+                                                              // visible, yet...
+    addPageRequestParams(searchPageRequest, query);
+
+    List<Identifiable> result =
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .bind("language", language)
+                        .bind("searchTerm", searchPageRequest.getQuery())
+                        .registerRowMapper(BeanMapper.factory(IdentifiableImpl.class, "i"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, Identifiable>(),
+                            (map, rowView) -> {
+                              Identifiable identifiable =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("i_uuid", UUID.class),
+                                      uuid -> rowView.getRow(IdentifiableImpl.class));
+                              if (rowView.getColumn("f_uri", String.class) != null) {
+                                identifiable.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
+
+    String countQuery =
+        "SELECT count(*) FROM identifiables as i"
+            + " WHERE (i.label->> :language ilike '%' || :searchTerm || '%'"
+            + " OR i.description->> :language ilike '%' || :searchTerm || '%'"
+            + " OR i.label->> '' ilike '%' || :searchTerm || '%'"
+            + " OR i.description->> '' ilike '%' || :searchTerm || '%')"
+            + " AND NOT i.identifiable_type='RESOURCE'"; // TODO: resources should not be visible,
+                                                         // yet...;
+    long total =
+        dbi.withHandle(
+            h ->
+                h.createQuery(countQuery)
+                    .bind("language", language)
+                    .bind("searchTerm", searchPageRequest.getQuery())
+                    .mapTo(Long.class)
+                    .findOne()
+                    .get());
+
+    SearchPageResponse pageResponse = new SearchPageResponseImpl(result, searchPageRequest, total);
     return pageResponse;
   }
 

@@ -9,6 +9,8 @@ import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
 import java.util.List;
 import java.util.Locale;
@@ -64,6 +66,22 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
             f.getSortDirection(),
             f.getNullHandling());
     return getGenericPageResponse(pageResponse);
+  }
+
+  @Override
+  public SearchPageResponse<E> find(SearchPageRequest searchPageRequest) {
+    FindParams f = getFindParams(searchPageRequest);
+    SearchPageResponse<Entity> pageResponse =
+        endpoint.find(
+            searchPageRequest.getQuery(),
+            f.getPageNumber(),
+            f.getPageSize(),
+            f.getSortField(),
+            f.getSortDirection(),
+            f.getNullHandling());
+    SearchPageResponse<E> response = (SearchPageResponse<E>) getGenericPageResponse(pageResponse);
+    response.setQuery(searchPageRequest.getQuery());
+    return response;
   }
 
   @Override

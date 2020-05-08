@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable;
 import de.digitalcollections.cudami.admin.backend.impl.repository.RepositoryEndpoint;
 import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
 import feign.Headers;
 import feign.Param;
@@ -15,6 +16,16 @@ public interface IdentifiableRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine(
       "GET /latest/identifiables?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<Identifiable> find(
+      @Param("pageNumber") int pageNumber,
+      @Param("pageSize") int pageSize,
+      @Param("sortField") String sortField,
+      @Param("sortDirection") String sortDirection,
+      @Param("nullHandling") String nullHandling);
+
+  @RequestLine(
+      "GET /latest/identifiables/search?searchTerm={searchTerm}&pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
+  SearchPageResponse<Identifiable> find(
+      @Param("searchTerm") String searchTerm,
       @Param("pageNumber") int pageNumber,
       @Param("pageSize") int pageSize,
       @Param("sortField") String sortField,

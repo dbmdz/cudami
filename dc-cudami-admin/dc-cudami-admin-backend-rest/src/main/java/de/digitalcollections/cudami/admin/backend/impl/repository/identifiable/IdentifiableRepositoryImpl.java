@@ -7,6 +7,8 @@ import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.paging.Order;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
 import java.util.Iterator;
@@ -48,6 +50,22 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
             f.getSortDirection(),
             f.getNullHandling());
     return getGenericPageResponse(pageResponse);
+  }
+
+  @Override
+  public SearchPageResponse<I> find(SearchPageRequest searchPageRequest) {
+    FindParams f = getFindParams(searchPageRequest);
+    SearchPageResponse<Identifiable> pageResponse =
+        endpoint.find(
+            searchPageRequest.getQuery(),
+            f.getPageNumber(),
+            f.getPageSize(),
+            f.getSortField(),
+            f.getSortDirection(),
+            f.getNullHandling());
+    SearchPageResponse<I> response = (SearchPageResponse<I>) getGenericPageResponse(pageResponse);
+    response.setQuery(searchPageRequest.getQuery());
+    return response;
   }
 
   @Override

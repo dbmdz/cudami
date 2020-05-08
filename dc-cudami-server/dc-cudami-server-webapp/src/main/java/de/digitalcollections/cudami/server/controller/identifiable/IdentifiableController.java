@@ -3,6 +3,14 @@ package de.digitalcollections.cudami.server.controller.identifiable;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.model.api.identifiable.Identifiable;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
+import de.digitalcollections.model.api.paging.Sorting;
+import de.digitalcollections.model.api.paging.enums.Direction;
+import de.digitalcollections.model.api.paging.enums.NullHandling;
+import de.digitalcollections.model.impl.paging.OrderImpl;
+import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
+import de.digitalcollections.model.impl.paging.SortingImpl;
 import java.util.List;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
@@ -25,6 +33,30 @@ public class IdentifiableController {
   @Autowired
   @Qualifier("identifiableServiceImpl")
   private IdentifiableService service;
+
+  @ApiMethod(
+      description =
+          "Find limited amount of identifiables containing searchTerm in label or description")
+  @GetMapping(
+      value = {"/latest/identifiables/search", "/v2/identifiables/search"},
+      produces = "application/json")
+  @ApiResponseObject
+  public SearchPageResponse<Identifiable> find(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
+          Direction sortDirection,
+      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
+          NullHandling nullHandling,
+      @RequestParam(name = "language", required = false, defaultValue = "de") String language,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+    OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
+    Sorting sorting = new SortingImpl(order);
+    SearchPageRequest pageRequest =
+        new SearchPageRequestImpl(searchTerm, pageNumber, pageSize, sorting);
+    return service.find(pageRequest);
+  }
 
   @ApiMethod(description = "Find limited amount of identifiables containing searchTerm in label")
   @GetMapping(

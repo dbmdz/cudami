@@ -7,6 +7,8 @@ import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
 import java.util.List;
 import java.util.Locale;
@@ -41,6 +43,21 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             f.getSortDirection(),
             f.getNullHandling());
     return getGenericPageResponse(pageResponse);
+  }
+
+  @Override
+  public SearchPageResponse<DigitalObject> find(SearchPageRequest searchPageRequest) {
+    FindParams f = getFindParams(searchPageRequest);
+    SearchPageResponse<DigitalObject> pageResponse =
+        endpoint.find(
+            searchPageRequest.getQuery(),
+            f.getPageNumber(),
+            f.getPageSize(),
+            f.getSortField(),
+            f.getSortDirection(),
+            f.getNullHandling());
+    pageResponse.setQuery(searchPageRequest.getQuery());
+    return pageResponse;
   }
 
   @Override

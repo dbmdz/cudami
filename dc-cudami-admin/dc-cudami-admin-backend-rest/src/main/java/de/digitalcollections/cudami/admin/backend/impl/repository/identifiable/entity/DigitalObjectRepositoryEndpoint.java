@@ -5,6 +5,7 @@ import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -19,6 +20,20 @@ public interface DigitalObjectRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine(
       "GET /latest/digitalobjects?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<DigitalObject> find(
+      @Param("pageNumber") int pageNumber,
+      @Param("pageSize") int pageSize,
+      @Param("sortField") String sortField,
+      @Param("sortDirection") String sortDirection,
+      @Param("nullHandling") String nullHandling);
+
+  @RequestLine("GET /latest/digitalobjects/search?searchTerm={searchTerm}&maxResults={maxResults}")
+  List<DigitalObject> find(
+      @Param("searchTerm") String searchTerm, @Param("maxResults") int maxResults);
+
+  @RequestLine(
+      "GET /latest/digitalobjects/search?searchTerm={searchTerm}&pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
+  SearchPageResponse<DigitalObject> find(
+      @Param("searchTerm") String searchTerm,
       @Param("pageNumber") int pageNumber,
       @Param("pageSize") int pageSize,
       @Param("sortField") String sortField,
