@@ -29,20 +29,36 @@ class ImageSelector extends Component {
     super(props)
     this.state = {
       activeTab: 'upload',
-      labelTooltipOpen: false,
       progress: 0,
+      tooltipsOpen: {
+        label: false,
+        upload: false,
+        url: false,
+      },
       showUploadSuccess: false,
       tabToggleEnabled: true,
     }
   }
 
-  toggleTab = (activeTab) => {
-    if (activeTab !== this.state.activeTab) {
+  toggleTab = (activeTab, evt) => {
+    if (
+      activeTab !== this.state.activeTab &&
+      evt.currentTarget === evt.target
+    ) {
       this.props.resetFileResource()
       this.setState({
         activeTab,
       })
     }
+  }
+
+  toggleTooltip = (name) => {
+    this.setState({
+      tooltipsOpen: {
+        ...this.state.tooltipsOpen,
+        [name]: !this.state.tooltipsOpen[name],
+      },
+    })
   }
 
   updateProgress = (progress) => {
@@ -86,9 +102,22 @@ class ImageSelector extends Component {
                 })}
                 disabled={!this.state.tabToggleEnabled}
                 href="#"
-                onClick={() => this.toggleTab('upload')}
+                onClick={(evt) => this.toggleTab('upload', evt)}
               >
                 {t('selectImage.useUpload')}
+                <FaQuestionCircle
+                  className="ml-1"
+                  id="upload-tooltip"
+                  style={{cursor: 'pointer'}}
+                />
+                <Popover
+                  isOpen={this.state.tooltipsOpen.upload}
+                  placement="left"
+                  target="upload-tooltip"
+                  toggle={() => this.toggleTooltip('upload')}
+                >
+                  <PopoverBody>{t('tooltips.upload')}</PopoverBody>
+                </Popover>
               </NavLink>
             </NavItem>
             <NavItem>
@@ -96,9 +125,22 @@ class ImageSelector extends Component {
                 className={classNames({active: this.state.activeTab === 'url'})}
                 disabled={!this.state.tabToggleEnabled}
                 href="#"
-                onClick={() => this.toggleTab('url')}
+                onClick={(evt) => this.toggleTab('url', evt)}
               >
                 {t('selectImage.useUrl')}
+                <FaQuestionCircle
+                  className="ml-1"
+                  id="url-tooltip"
+                  style={{cursor: 'pointer'}}
+                />
+                <Popover
+                  isOpen={this.state.tooltipsOpen.url}
+                  placement="left"
+                  target="url-tooltip"
+                  toggle={() => this.toggleTooltip('url')}
+                >
+                  <PopoverBody>{t('tooltips.url')}</PopoverBody>
+                </Popover>
               </NavLink>
             </NavItem>
           </Nav>
@@ -153,14 +195,10 @@ class ImageSelector extends Component {
                         style={{cursor: 'pointer'}}
                       />
                       <Popover
-                        isOpen={this.state.labelTooltipOpen}
+                        isOpen={this.state.tooltipsOpen.label}
                         placement="left"
                         target="label-tooltip"
-                        toggle={() =>
-                          this.setState({
-                            labelTooltipOpen: !this.state.labelTooltipOpen,
-                          })
-                        }
+                        toggle={() => this.toggleTooltip('label')}
                       >
                         <PopoverBody>{t('tooltips.label')}</PopoverBody>
                       </Popover>

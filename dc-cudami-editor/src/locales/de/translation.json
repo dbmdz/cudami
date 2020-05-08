@@ -89,7 +89,9 @@
       "altText": "wird im Screen-Reader vorgelesen bzw. ausgegeben, falls das Bild nicht angezeigt werden kann",
       "caption": "wird als Bildunterschrift ausgegeben",
       "label": "Name des Bildes (zur Wiederauffindbarkeit im System); Standardwert=Dateiname (z.B. bild.jpg); änderbar",
-      "title": "wird beim Bewegen der Maus über das Bild eingeblendet"
+      "title": "wird beim Bewegen der Maus über das Bild eingeblendet",
+      "upload": "Auswählen und Hochladen eines Bildes von der lokalen Festplatte",
+      "url": "Einbinden eines Bilds aus dem Internet durch Eingabe einer gültigen URL"
     },
     "uploadFileResource": "Neue Datei hochladen",
     "width": "Breite"
