@@ -139,7 +139,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                 + " OR i.label->> '' ilike '%' || :searchTerm || '%'"
                 + " OR i.description->> '' ilike '%' || :searchTerm || '%')"
                 + " AND NOT i.identifiable_type='RESOURCE'"); // TODO: resources should not be
-                                                              // visible, yet...
+    // visible, yet...
     addPageRequestParams(searchPageRequest, query);
 
     List<Identifiable> result =
@@ -173,7 +173,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
             + " OR i.label->> '' ilike '%' || :searchTerm || '%'"
             + " OR i.description->> '' ilike '%' || :searchTerm || '%')"
             + " AND NOT i.identifiable_type='RESOURCE'"; // TODO: resources should not be visible,
-                                                         // yet...;
+    // yet...;
     long total =
         dbi.withHandle(
             h ->
