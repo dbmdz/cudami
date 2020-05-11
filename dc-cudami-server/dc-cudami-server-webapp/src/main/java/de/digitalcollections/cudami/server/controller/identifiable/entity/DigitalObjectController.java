@@ -152,6 +152,19 @@ public class DigitalObjectController {
     return service.save(digitalObject);
   }
 
+  @ApiMethod(description = "Save list of fileresources for a given digital object")
+  @PostMapping(
+      value = {
+        "/latest/digitalobjects/{uuid}/fileresources",
+        "/v3/digitalobjects/{uuid}/fileresources"
+      },
+      produces = "application/json")
+  @ApiResponseObject
+  public List<FileResource> saveFileResources(
+      @PathVariable UUID uuid, @RequestBody List<FileResource> fileResources) {
+    return service.saveFileResources(uuid, fileResources);
+  }
+
   @ApiMethod(description = "Update a digital object")
   @PutMapping(
       value = {"/latest/digitalobjects/{uuid}", "/v2/digitalobjects/{uuid}"},
