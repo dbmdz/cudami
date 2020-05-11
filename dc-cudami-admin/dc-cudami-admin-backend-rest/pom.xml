@@ -13,16 +13,7 @@
   <artifactId>dc-cudami-admin-backend-rest</artifactId>
   <packaging>jar</packaging>
   
-  <properties>
-    <version.dc-commons-feign>4.1.1-SNAPSHOT</version.dc-commons-feign>
-  </properties>
-
   <dependencies>
-    <dependency>
-      <groupId>de.digitalcollections.commons</groupId>
-      <artifactId>dc-commons-feign</artifactId>
-      <version>${version.dc-commons-feign}</version>
-    </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-admin-backend-api</artifactId>
@@ -30,6 +21,10 @@
     <dependency>
       <groupId>de.digitalcollections.model</groupId>
       <artifactId>dc-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.model</groupId>
+      <artifactId>dc-model-feign</artifactId>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.model</groupId>

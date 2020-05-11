@@ -8,6 +8,8 @@ import de.digitalcollections.model.api.http.exceptions.client.ResourceNotFoundEx
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -47,6 +49,40 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
             f.getSortDirection(),
             f.getNullHandling());
     return getGenericPageResponse(pageResponse);
+  }
+
+  @Override
+  public SearchPageResponse<FileResource> find(SearchPageRequest searchPageRequest) {
+    FindParams f = getFindParams(searchPageRequest);
+    SearchPageResponse<FileResource> pageResponse =
+        endpoint.find(
+            searchPageRequest.getQuery(),
+            f.getPageNumber(),
+            f.getPageSize(),
+            f.getSortField(),
+            f.getSortDirection(),
+            f.getNullHandling());
+    SearchPageResponse<FileResource> response =
+        (SearchPageResponse<FileResource>) getGenericPageResponse(pageResponse);
+    response.setQuery(searchPageRequest.getQuery());
+    return response;
+  }
+
+  @Override
+  public SearchPageResponse<FileResource> findImages(SearchPageRequest searchPageRequest) {
+    FindParams f = getFindParams(searchPageRequest);
+    SearchPageResponse<FileResource> pageResponse =
+        endpoint.findImages(
+            searchPageRequest.getQuery(),
+            f.getPageNumber(),
+            f.getPageSize(),
+            f.getSortField(),
+            f.getSortDirection(),
+            f.getNullHandling());
+    SearchPageResponse<FileResource> response =
+        (SearchPageResponse<FileResource>) getGenericPageResponse(pageResponse);
+    response.setQuery(searchPageRequest.getQuery());
+    return response;
   }
 
   @Override

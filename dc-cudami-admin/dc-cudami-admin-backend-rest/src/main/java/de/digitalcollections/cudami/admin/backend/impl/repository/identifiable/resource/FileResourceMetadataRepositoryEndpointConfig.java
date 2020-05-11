@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.commons.feign.codec.EndpointErrorDecoder;
+import de.digitalcollections.model.feign.codec.EndpointErrorDecoder;
 import feign.Feign;
 import feign.form.spring.SpringFormEncoder;
 import feign.jackson.JacksonDecoder;

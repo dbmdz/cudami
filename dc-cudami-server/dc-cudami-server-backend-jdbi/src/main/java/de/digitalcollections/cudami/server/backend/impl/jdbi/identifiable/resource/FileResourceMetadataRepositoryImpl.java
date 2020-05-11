@@ -3,6 +3,9 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resou
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
+import de.digitalcollections.model.api.filter.FilterCriterion;
+import de.digitalcollections.model.api.filter.Filtering;
+import de.digitalcollections.model.api.filter.enums.FilterOperation;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.resource.ApplicationFileResource;
 import de.digitalcollections.model.api.identifiable.resource.AudioFileResource;
@@ -12,8 +15,11 @@ import de.digitalcollections.model.api.identifiable.resource.LinkedDataFileResou
 import de.digitalcollections.model.api.identifiable.resource.MimeType;
 import de.digitalcollections.model.api.identifiable.resource.TextFileResource;
 import de.digitalcollections.model.api.identifiable.resource.VideoFileResource;
+import de.digitalcollections.model.api.identifiable.resource.enums.FileResourceType;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ApplicationFileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.AudioFileResourceImpl;
@@ -23,6 +29,7 @@ import de.digitalcollections.model.impl.identifiable.resource.LinkedDataFileReso
 import de.digitalcollections.model.impl.identifiable.resource.TextFileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.VideoFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import de.digitalcollections.model.impl.paging.SearchPageResponseImpl;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -46,7 +53,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
   // select all details shown/needed in single object details page
   private static final String FIND_ONE_BASE_SQL =
       "SELECT f.uuid f_uuid, f.label f_label, f.description f_description,"
-          + " f.identifiable_type f_type, f.entity_type f_entityType,"
+          + " f.identifiable_type f_type,"
           + " f.created f_created, f.last_modified f_lastModified,"
           + " f.filename f_filename, f.mimetype f_mimetype, f.size_in_bytes f_sizeInBytes, f.uri f_uri,"
           + " f.preview_hints f_previewImageRenderingHints,"
@@ -148,6 +155,85 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
 
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
+    return pageResponse;
+  }
+
+  @Override
+  public SearchPageResponse<FileResource> find(SearchPageRequest searchPageRequest) {
+    // TODO make dependend from language the user has chosen...
+    String language = "de";
+
+    // select only what is shown/needed in paged result list:
+    StringBuilder query =
+        new StringBuilder(
+            REDUCED_FIND_ONE_BASE_SQL
+                + " WHERE (f.label->> :language ilike '%' || :searchTerm || '%'"
+                + " OR f.description->> :language ilike '%' || :searchTerm || '%'"
+                + " OR f.label->> '' ilike '%' || :searchTerm || '%'"
+                + " OR f.description->> '' ilike '%' || :searchTerm || '%')");
+
+    String filterQuery = "";
+    Filtering filtering = searchPageRequest.getFiltering();
+    if (filtering != null) {
+      FilterCriterion<FileResourceType> fileResourceTypeCriterion =
+          filtering.getFilterCriterionFor("fileResourceType");
+      if (FilterOperation.EQUALS == fileResourceTypeCriterion.getOperation()) {
+        FileResourceType fileResourceType = (FileResourceType) fileResourceTypeCriterion.getValue();
+        switch (fileResourceType) {
+          case IMAGE:
+            filterQuery = " AND f.mimetype ilike 'image/%'";
+            query.append(filterQuery);
+            break;
+          default:
+            break;
+        }
+      }
+    }
+
+    addPageRequestParams(searchPageRequest, query);
+
+    List<FileResource> result =
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .bind("language", language)
+                        .bind("searchTerm", searchPageRequest.getQuery())
+                        .registerRowMapper(BeanMapper.factory(FileResourceImpl.class, "f"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, FileResource>(),
+                            (map, rowView) -> {
+                              FileResource fileResource =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("f_uuid", UUID.class),
+                                      uuid -> rowView.getRow(FileResourceImpl.class));
+                              if (rowView.getColumn("pf_uuid", String.class) != null) {
+                                fileResource.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
+
+    String countQuery =
+        "SELECT count(*) FROM fileresources as f"
+            + " WHERE f.label->> :language ilike '%' || :searchTerm || '%'"
+            + " OR f.description->> :language ilike '%' || :searchTerm || '%'"
+            + " OR f.label->> '' ilike '%' || :searchTerm || '%'"
+            + " OR f.description->> '' ilike '%' || :searchTerm || '%'"
+            + filterQuery;
+    long total =
+        dbi.withHandle(
+            h ->
+                h.createQuery(countQuery)
+                    .bind("language", language)
+                    .bind("searchTerm", searchPageRequest.getQuery())
+                    .mapTo(Long.class)
+                    .findOne()
+                    .get());
+
+    SearchPageResponse pageResponse = new SearchPageResponseImpl(result, searchPageRequest, total);
     return pageResponse;
   }
 
