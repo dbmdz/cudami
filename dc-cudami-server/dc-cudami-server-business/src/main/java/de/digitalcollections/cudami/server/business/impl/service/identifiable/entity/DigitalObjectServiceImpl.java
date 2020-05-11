@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.VersionService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
@@ -22,7 +21,8 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectServiceImpl.class);
 
-  @Autowired VersionService versionService;
+  //  @Autowired
+  //  VersionService versionService;
 
   @Autowired
   public DigitalObjectServiceImpl(DigitalObjectRepository repository) {
@@ -96,6 +96,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   //    // todo find
   //    return digitalObject;
   //  }
+
   @Override
   public List<FileResource> saveFileResources(
       DigitalObject digitalObject, List<FileResource> fileResources) {
