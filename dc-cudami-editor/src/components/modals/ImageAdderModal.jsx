@@ -26,6 +26,14 @@ class ImageAdderModal extends Component {
       fileResource: {},
       metadataOpen: true,
       renderingHintsOpen: false,
+      tooltipsOpen: {
+        altText: false,
+        caption: false,
+        label: false,
+        title: false,
+        upload: false,
+        url: false,
+      },
     }
     subscribe('editor.show-image-modal', () => {
       this.props.onToggle()
@@ -110,6 +118,20 @@ class ImageAdderModal extends Component {
     return resourceId
   }
 
+  toggleTooltip = (name) => {
+    this.setState({
+      tooltipsOpen: {
+        ...Object.fromEntries(
+          Object.entries(this.state.tooltipsOpen).map(([name, _]) => [
+            name,
+            false,
+          ])
+        ),
+        [name]: !this.state.tooltipsOpen[name],
+      },
+    })
+  }
+
   updateFileResource = (updateFields, additionalFields = {}) => {
     this.setState({
       fileResource: {
@@ -140,6 +162,8 @@ class ImageAdderModal extends Component {
                 this.updateFileResource(updateFields, additionalFields)
               }
               resetFileResource={() => this.resetFileResource()}
+              toggleTooltip={(name) => this.toggleTooltip(name)}
+              tooltipsOpen={this.state.tooltipsOpen}
             />
             <ImageMetadataForm
               attributes={this.state.attributes}
@@ -148,6 +172,8 @@ class ImageAdderModal extends Component {
               toggle={() =>
                 this.setState({metadataOpen: !this.state.metadataOpen})
               }
+              toggleTooltip={this.toggleTooltip}
+              tooltipsOpen={this.state.tooltipsOpen}
             />
             <ImageRenderingHintsForm
               attributes={this.state.attributes}

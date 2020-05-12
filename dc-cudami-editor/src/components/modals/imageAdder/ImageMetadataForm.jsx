@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React from 'react'
 import {
   Button,
   Card,
@@ -17,16 +17,9 @@ import {useTranslation} from 'react-i18next'
 import {FaQuestionCircle} from 'react-icons/fa'
 
 const InputTooltip = (props) => {
-  const {target, text} = props
-  const [tooltipOpen, setTooltipOpen] = useState(false)
-  const toggle = () => setTooltipOpen(!tooltipOpen)
+  const {isOpen, target, text, toggle} = props
   return (
-    <Popover
-      isOpen={tooltipOpen}
-      placement="left"
-      target={target}
-      toggle={toggle}
-    >
+    <Popover isOpen={isOpen} placement="left" target={target} toggle={toggle}>
       <PopoverBody>{text}</PopoverBody>
     </Popover>
   )
@@ -34,7 +27,14 @@ const InputTooltip = (props) => {
 
 const ImageMetadataForm = (props) => {
   const {t} = useTranslation()
-  const {attributes, isOpen, onChange, toggle} = props
+  const {
+    attributes,
+    isOpen,
+    onChange,
+    toggle,
+    toggleTooltip,
+    tooltipsOpen,
+  } = props
   return (
     <Card>
       <CardHeader>
@@ -64,8 +64,10 @@ const ImageMetadataForm = (props) => {
                     style={{cursor: 'pointer'}}
                   />
                   <InputTooltip
+                    isOpen={tooltipsOpen.caption}
                     target="caption-tooltip"
                     text={t('tooltips.caption')}
+                    toggle={() => toggleTooltip('caption')}
                   />
                 </InputGroupText>
               </InputGroupAddon>
@@ -87,8 +89,10 @@ const ImageMetadataForm = (props) => {
                     style={{cursor: 'pointer'}}
                   />
                   <InputTooltip
+                    isOpen={tooltipsOpen.title}
                     target="title-tooltip"
                     text={t('tooltips.title')}
+                    toggle={() => toggleTooltip('title')}
                   />
                 </InputGroupText>
               </InputGroupAddon>
@@ -110,8 +114,10 @@ const ImageMetadataForm = (props) => {
                     style={{cursor: 'pointer'}}
                   />
                   <InputTooltip
+                    isOpen={tooltipsOpen.altText}
                     target="altText-tooltip"
                     text={t('tooltips.altText')}
+                    toggle={() => toggleTooltip('altText')}
                   />
                 </InputGroupText>
               </InputGroupAddon>
