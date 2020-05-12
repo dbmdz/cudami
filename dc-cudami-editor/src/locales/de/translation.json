@@ -91,7 +91,7 @@
       "label": "Name des Bildes (zur Wiederauffindbarkeit im System); Standardwert=Dateiname (z.B. bild.jpg); änderbar",
       "title": "wird beim Bewegen der Maus über das Bild eingeblendet",
       "upload": "Auswählen und Hochladen eines Bildes von der lokalen Festplatte",
-      "url": "Einbinden eines Bilds aus dem Internet durch Eingabe einer gültigen URL"
+      "url": "Einbinden eines Bildes aus dem Internet durch Eingabe einer gültigen URL"
     },
     "uploadFileResource": "Neue Datei hochladen",
     "width": "Breite"
