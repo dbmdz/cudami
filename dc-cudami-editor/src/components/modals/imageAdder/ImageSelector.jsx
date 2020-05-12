@@ -112,7 +112,7 @@ class ImageSelector extends Component {
                 />
                 <Popover
                   isOpen={this.state.tooltipsOpen.upload}
-                  placement="left"
+                  placement="top"
                   target="upload-tooltip"
                   toggle={() => this.toggleTooltip('upload')}
                 >
@@ -135,7 +135,7 @@ class ImageSelector extends Component {
                 />
                 <Popover
                   isOpen={this.state.tooltipsOpen.url}
-                  placement="left"
+                  placement="top"
                   target="url-tooltip"
                   toggle={() => this.toggleTooltip('url')}
                 >
