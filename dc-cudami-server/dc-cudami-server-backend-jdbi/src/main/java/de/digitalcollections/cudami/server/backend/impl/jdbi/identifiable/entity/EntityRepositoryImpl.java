@@ -145,9 +145,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public SearchPageResponse<E> find(SearchPageRequest searchPageRequest) {
-    // TODO make dependend from language the user has chosen...
-    String language = "de";
-
     // select only what is shown/needed in paged result list:
     StringBuilder query =
         new StringBuilder(
@@ -156,10 +153,10 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
                 + " file.uri f_uri, file.filename f_filename"
                 + " FROM entities as e"
                 + " LEFT JOIN fileresources_image as file on e.previewfileresource = file.uuid"
-                + " WHERE (e.label->> :language ilike '%' || :searchTerm || '%'"
-                + " OR e.description->> :language ilike '%' || :searchTerm || '%'"
-                + " OR e.label->> '' ilike '%' || :searchTerm || '%'"
-                + " OR e.description->> '' ilike '%' || :searchTerm || '%')");
+                + " LEFT JOIN LATERAL jsonb_object_keys(e.label) l(keys) on e.label is not null"
+                + " LEFT JOIN LATERAL jsonb_object_keys(e.description) d(keys) on e.description is not null"
+                + " WHERE (e.label->>l.keys ilike '%' || :searchTerm || '%'"
+                + " OR e.description->>d.keys ilike '%' || :searchTerm || '%')");
     addPageRequestParams(searchPageRequest, query);
 
     List<Entity> result =
@@ -167,7 +164,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
             dbi.withHandle(
                 h ->
                     h.createQuery(query.toString())
-                        .bind("language", language)
                         .bind("searchTerm", searchPageRequest.getQuery())
                         .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
                         .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
@@ -187,14 +183,14 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
     String countQuery =
         "SELECT count(*) FROM entities as e"
-            + " WHERE e.label->> :language ilike '%' || :searchTerm || '%'"
-            + " OR e.description->> :language ilike '%' || :searchTerm || '%'"
-            + " AND NOT e.entity_type='PERSON'"; // TODO: persons should not be visible, yet...;
+            + " LEFT JOIN LATERAL jsonb_object_keys(e.label) l(keys) on e.label is not null"
+            + " LEFT JOIN LATERAL jsonb_object_keys(e.description) d(keys) on e.description is not null"
+            + " WHERE (e.label->>l.keys ilike '%' || :searchTerm || '%'"
+            + " OR e.description->>d.keys ilike '%' || :searchTerm || '%')";
     long total =
         dbi.withHandle(
             h ->
                 h.createQuery(countQuery)
-                    .bind("language", language)
                     .bind("searchTerm", searchPageRequest.getQuery())
                     .mapTo(Long.class)
                     .findOne()

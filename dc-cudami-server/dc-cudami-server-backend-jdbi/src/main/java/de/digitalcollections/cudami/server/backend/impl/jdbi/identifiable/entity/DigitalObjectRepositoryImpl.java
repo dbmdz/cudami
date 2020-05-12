@@ -120,9 +120,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   @Override
   public SearchPageResponse<DigitalObject> find(SearchPageRequest searchPageRequest) {
-    // TODO make dependend from language the user has chosen...
-    String language = "de";
-
     // select only what is shown/needed in paged result list:
     StringBuilder query =
         new StringBuilder(
@@ -131,10 +128,10 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                 + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
                 + " FROM digitalobjects as d"
                 + " LEFT JOIN fileresources_image as file on d.previewfileresource = file.uuid"
-                + " WHERE (d.label->> :language ilike '%' || :searchTerm || '%'"
-                + " OR d.description->> :language ilike '%' || :searchTerm || '%'"
-                + " OR d.label->> '' ilike '%' || :searchTerm || '%'"
-                + " OR d.description->> '' ilike '%' || :searchTerm || '%')");
+                + " LEFT JOIN LATERAL jsonb_object_keys(d.label) l(keys) on d.label is not null"
+                + " LEFT JOIN LATERAL jsonb_object_keys(d.description) n(keys) on d.description is not null"
+                + " WHERE (d.label->>l.keys ilike '%' || :searchTerm || '%'"
+                + " OR d.description->>n.keys ilike '%' || :searchTerm || '%')");
     addPageRequestParams(searchPageRequest, query);
 
     List<DigitalObject> result =
@@ -142,7 +139,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             dbi.withHandle(
                 h ->
                     h.createQuery(query.toString())
-                        .bind("language", language)
                         .bind("searchTerm", searchPageRequest.getQuery())
                         .registerRowMapper(BeanMapper.factory(DigitalObjectImpl.class, "d"))
                         .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
@@ -163,15 +159,14 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
     String countQuery =
         "SELECT count(*) FROM digitalobjects as d"
-            + " WHERE d.label->> :language ilike '%' || :searchTerm || '%'"
-            + " OR d.description->> :language ilike '%' || :searchTerm || '%'"
-            + " OR d.label->> '' ilike '%' || :searchTerm || '%'"
-            + " OR d.description->> '' ilike '%' || :searchTerm || '%'";
+            + " LEFT JOIN LATERAL jsonb_object_keys(d.label) l(keys) on d.label is not null"
+            + " LEFT JOIN LATERAL jsonb_object_keys(d.description) n(keys) on d.description is not null"
+            + " WHERE (d.label->>l.keys ilike '%' || :searchTerm || '%'"
+            + " OR d.description->>n.keys ilike '%' || :searchTerm || '%')";
     long total =
         dbi.withHandle(
             h ->
                 h.createQuery(countQuery)
-                    .bind("language", language)
                     .bind("searchTerm", searchPageRequest.getQuery())
                     .mapTo(Long.class)
                     .findOne()

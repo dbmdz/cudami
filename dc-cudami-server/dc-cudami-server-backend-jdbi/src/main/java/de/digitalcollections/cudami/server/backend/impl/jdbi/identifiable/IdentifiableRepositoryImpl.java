@@ -121,7 +121,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   @Override
   public SearchPageResponse<I> find(SearchPageRequest searchPageRequest) {
     // TODO make dependend from language the user has chosen...
-    String language = "de";
     Sorting sorting =
         Sorting.defaultBuilder().order(new OrderImpl(Direction.DESC, "lastModified")).build();
     searchPageRequest.setSorting(sorting);
@@ -134,11 +133,10 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                 + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
                 + " FROM identifiables as i"
                 + " LEFT JOIN fileresources_image as file on i.previewfileresource = file.uuid"
-                + " WHERE (i.label->> :language ilike '%' || :searchTerm || '%'"
-                + " OR i.description->> :language ilike '%' || :searchTerm || '%'"
-                + " OR i.label->> '' ilike '%' || :searchTerm || '%'"
-                + " OR i.description->> '' ilike '%' || :searchTerm || '%')"
-                + " AND NOT i.identifiable_type='RESOURCE'"); // TODO: resources should not be
+                + " LEFT JOIN LATERAL jsonb_object_keys(i.label) l(keys) on i.label is not null"
+                + " LEFT JOIN LATERAL jsonb_object_keys(i.description) d(keys) on i.description is not null"
+                + " WHERE (i.label->>l.keys ilike '%' || :searchTerm || '%'"
+                + " OR i.description->>d.keys ilike '%' || :searchTerm || '%')");
     // visible, yet...
     addPageRequestParams(searchPageRequest, query);
 
@@ -147,7 +145,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
             dbi.withHandle(
                 h ->
                     h.createQuery(query.toString())
-                        .bind("language", language)
                         .bind("searchTerm", searchPageRequest.getQuery())
                         .registerRowMapper(BeanMapper.factory(IdentifiableImpl.class, "i"))
                         .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
@@ -168,17 +165,15 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
     String countQuery =
         "SELECT count(*) FROM identifiables as i"
-            + " WHERE (i.label->> :language ilike '%' || :searchTerm || '%'"
-            + " OR i.description->> :language ilike '%' || :searchTerm || '%'"
-            + " OR i.label->> '' ilike '%' || :searchTerm || '%'"
-            + " OR i.description->> '' ilike '%' || :searchTerm || '%')"
-            + " AND NOT i.identifiable_type='RESOURCE'"; // TODO: resources should not be visible,
+            + " LEFT JOIN LATERAL jsonb_object_keys(i.label) l(keys) on i.label is not null"
+            + " LEFT JOIN LATERAL jsonb_object_keys(i.description) d(keys) on i.description is not null"
+            + " WHERE (i.label->>l.keys ilike '%' || :searchTerm || '%'"
+            + " OR i.description->>d.keys ilike '%' || :searchTerm || '%')";
     // yet...;
     long total =
         dbi.withHandle(
             h ->
                 h.createQuery(countQuery)
-                    .bind("language", language)
                     .bind("searchTerm", searchPageRequest.getQuery())
                     .mapTo(Long.class)
                     .findOne()
