@@ -49,7 +49,6 @@ public class IdentifiableController {
           Direction sortDirection,
       @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
           NullHandling nullHandling,
-      @RequestParam(name = "language", required = false, defaultValue = "de") String language,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
