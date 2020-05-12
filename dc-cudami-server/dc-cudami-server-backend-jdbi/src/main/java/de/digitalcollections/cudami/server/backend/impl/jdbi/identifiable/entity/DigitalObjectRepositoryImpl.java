@@ -9,11 +9,14 @@ import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import de.digitalcollections.model.impl.paging.SearchPageResponseImpl;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -112,6 +115,64 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                         .values()));
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
+    return pageResponse;
+  }
+
+  @Override
+  public SearchPageResponse<DigitalObject> find(SearchPageRequest searchPageRequest) {
+    // select only what is shown/needed in paged result list:
+    StringBuilder query =
+        new StringBuilder(
+            "SELECT d.uuid d_uuid, d.refid d_refId, d.label d_label, d.description d_description,"
+                + " d.entity_type d_entityType,"
+                + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
+                + " FROM digitalobjects as d"
+                + " LEFT JOIN fileresources_image as file on d.previewfileresource = file.uuid"
+                + " LEFT JOIN LATERAL jsonb_object_keys(d.label) l(keys) on d.label is not null"
+                + " LEFT JOIN LATERAL jsonb_object_keys(d.description) n(keys) on d.description is not null"
+                + " WHERE (d.label->>l.keys ilike '%' || :searchTerm || '%'"
+                + " OR d.description->>n.keys ilike '%' || :searchTerm || '%')");
+    addPageRequestParams(searchPageRequest, query);
+
+    List<DigitalObject> result =
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .bind("searchTerm", searchPageRequest.getQuery())
+                        .registerRowMapper(BeanMapper.factory(DigitalObjectImpl.class, "d"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, DigitalObject>(),
+                            (map, rowView) -> {
+                              DigitalObject digitalObject =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("d_uuid", UUID.class),
+                                      uuid -> rowView.getRow(DigitalObjectImpl.class));
+                              if (rowView.getColumn("f_uuid", String.class) != null) {
+                                digitalObject.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
+
+    String countQuery =
+        "SELECT count(*) FROM digitalobjects as d"
+            + " LEFT JOIN LATERAL jsonb_object_keys(d.label) l(keys) on d.label is not null"
+            + " LEFT JOIN LATERAL jsonb_object_keys(d.description) n(keys) on d.description is not null"
+            + " WHERE (d.label->>l.keys ilike '%' || :searchTerm || '%'"
+            + " OR d.description->>n.keys ilike '%' || :searchTerm || '%')";
+    long total =
+        dbi.withHandle(
+            h ->
+                h.createQuery(countQuery)
+                    .bind("searchTerm", searchPageRequest.getQuery())
+                    .mapTo(Long.class)
+                    .findOne()
+                    .get());
+
+    SearchPageResponse pageResponse = new SearchPageResponseImpl(result, searchPageRequest, total);
     return pageResponse;
   }
 

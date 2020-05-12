@@ -4,6 +4,17 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
+import de.digitalcollections.model.api.paging.Sorting;
+import de.digitalcollections.model.api.paging.enums.Direction;
+import de.digitalcollections.model.api.paging.enums.NullHandling;
+import de.digitalcollections.model.impl.paging.OrderImpl;
+import de.digitalcollections.model.impl.paging.PageRequestImpl;
+import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
+import de.digitalcollections.model.impl.paging.SortingImpl;
 import java.util.List;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
@@ -15,6 +26,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -23,7 +35,57 @@ public class EntityController<E extends Entity> {
 
   @Autowired
   @Qualifier("entityServiceImpl")
-  private EntityService<E> service;
+  private EntityService<Entity> service;
+
+  @ApiMethod(description = "Get count of entities")
+  @GetMapping(
+      value = {"/latest/entities/count", "/v3/entities/count"},
+      produces = "application/json")
+  @ApiResponseObject
+  public long count() {
+    return service.count();
+  }
+
+  @ApiMethod(description = "Get all entities")
+  @GetMapping(
+      value = {"/latest/entities", "/v3/entities"},
+      produces = "application/json")
+  @ApiResponseObject
+  public PageResponse<Entity> findAll(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
+          Direction sortDirection,
+      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
+          NullHandling nullHandling) {
+    OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
+    Sorting sorting = new SortingImpl(order);
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
+    return service.find(pageRequest);
+  }
+
+  @ApiMethod(
+      description = "Find limited amount of entities containing searchTerm in label or description")
+  @GetMapping(
+      value = {"/latest/entities/search", "/v2/entities/search"},
+      produces = "application/json")
+  @ApiResponseObject
+  public SearchPageResponse<Entity> find(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
+          Direction sortDirection,
+      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
+          NullHandling nullHandling,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+    OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
+    Sorting sorting = new SortingImpl(order);
+    SearchPageRequest pageRequest =
+        new SearchPageRequestImpl(searchTerm, pageNumber, pageSize, sorting);
+    return service.find(pageRequest);
+  }
 
   @ApiMethod(description = "Get entity by uuid")
   @GetMapping(

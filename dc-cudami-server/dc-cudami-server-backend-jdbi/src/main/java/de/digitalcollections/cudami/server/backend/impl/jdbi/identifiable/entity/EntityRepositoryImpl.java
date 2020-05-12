@@ -9,11 +9,14 @@ import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import de.digitalcollections.model.impl.paging.SearchPageResponseImpl;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -137,6 +140,63 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
+    return pageResponse;
+  }
+
+  @Override
+  public SearchPageResponse<E> find(SearchPageRequest searchPageRequest) {
+    // select only what is shown/needed in paged result list:
+    StringBuilder query =
+        new StringBuilder(
+            "SELECT e.uuid e_uuid, e.refid e_refId, e.label e_label, e.description e_description,"
+                + " e.entity_type e_entityType,"
+                + " file.uri f_uri, file.filename f_filename"
+                + " FROM entities as e"
+                + " LEFT JOIN fileresources_image as file on e.previewfileresource = file.uuid"
+                + " LEFT JOIN LATERAL jsonb_object_keys(e.label) l(keys) on e.label is not null"
+                + " LEFT JOIN LATERAL jsonb_object_keys(e.description) d(keys) on e.description is not null"
+                + " WHERE (e.label->>l.keys ilike '%' || :searchTerm || '%'"
+                + " OR e.description->>d.keys ilike '%' || :searchTerm || '%')");
+    addPageRequestParams(searchPageRequest, query);
+
+    List<Entity> result =
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .bind("searchTerm", searchPageRequest.getQuery())
+                        .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, Entity>(),
+                            (map, rowView) -> {
+                              Entity entity =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("e_uuid", UUID.class),
+                                      uuid -> rowView.getRow(EntityImpl.class));
+                              if (rowView.getColumn("f_uri", String.class) != null) {
+                                entity.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
+
+    String countQuery =
+        "SELECT count(*) FROM entities as e"
+            + " LEFT JOIN LATERAL jsonb_object_keys(e.label) l(keys) on e.label is not null"
+            + " LEFT JOIN LATERAL jsonb_object_keys(e.description) d(keys) on e.description is not null"
+            + " WHERE (e.label->>l.keys ilike '%' || :searchTerm || '%'"
+            + " OR e.description->>d.keys ilike '%' || :searchTerm || '%')";
+    long total =
+        dbi.withHandle(
+            h ->
+                h.createQuery(countQuery)
+                    .bind("searchTerm", searchPageRequest.getQuery())
+                    .mapTo(Long.class)
+                    .findOne()
+                    .get());
+
+    SearchPageResponse pageResponse = new SearchPageResponseImpl(result, searchPageRequest, total);
     return pageResponse;
   }
 

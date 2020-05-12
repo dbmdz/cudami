@@ -6,6 +6,8 @@ import de.digitalcollections.cudami.admin.business.api.service.identifiable.Iden
 import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -44,6 +46,11 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   @Override
   public PageResponse<I> find(PageRequest pageRequest) {
     return repository.find(pageRequest);
+  }
+
+  @Override
+  public SearchPageResponse<I> find(SearchPageRequest searchPageRequest) {
+    return repository.find(searchPageRequest);
   }
 
   @Override

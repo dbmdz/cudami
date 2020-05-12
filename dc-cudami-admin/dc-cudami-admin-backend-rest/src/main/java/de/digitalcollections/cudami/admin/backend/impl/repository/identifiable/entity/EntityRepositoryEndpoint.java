@@ -5,6 +5,7 @@ import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -26,6 +27,19 @@ public interface EntityRepositoryEndpoint extends RepositoryEndpoint {
   @RequestLine(
       "GET /latest/entities?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<Entity> find(
+      @Param("pageNumber") int pageNumber,
+      @Param("pageSize") int pageSize,
+      @Param("sortField") String sortField,
+      @Param("sortDirection") String sortDirection,
+      @Param("nullHandling") String nullHandling);
+
+  @RequestLine("GET /latest/entities?searchTerm={searchTerm}&maxResults={maxResults}")
+  List<Entity> find(@Param("searchTerm") String searchTerm, @Param("maxResults") int maxResults);
+
+  @RequestLine(
+      "GET /latest/entities?searchTerm={searchTerm}&pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
+  SearchPageResponse<Entity> find(
+      @Param("searchTerm") String searchTerm,
       @Param("pageNumber") int pageNumber,
       @Param("pageSize") int pageSize,
       @Param("sortField") String sortField,

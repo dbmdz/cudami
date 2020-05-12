@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.VersionService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
@@ -16,13 +15,10 @@ import org.springframework.stereotype.Service;
 
 /** Service for Digital Object handling. */
 @Service
-// @Transactional(readOnly = true)
 public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     implements DigitalObjectService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectServiceImpl.class);
-
-  @Autowired VersionService versionService;
 
   @Autowired
   public DigitalObjectServiceImpl(DigitalObjectRepository repository) {
@@ -68,34 +64,6 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     return null;
   }
 
-  //  @Override
-  //  public DigitalObject save(DigitalObject digitalObject) throws IdentifiableServiceException {
-  //
-  //    Version version = null;
-  //    if (digitalObject.getVersion() == null) {
-  //      String instanceVersionKey = versionService.extractInstanceVersionkey(digitalObject);
-  //      if (instanceVersionKey == null) {
-  //        throw new RuntimeException("No instanceVersionKey defined for: " + digitalObject);
-  //      }
-  //      version = versionService.get(instanceVersionKey);
-  //      if (version == null) {
-  //        Identifier zendIdentifier = getidentifer(digitalObject, "zend");
-  //        if (zendIdentifier == null) {
-  //          throw new RuntimeException("No zendid defined for: " + digitalObject);
-  //        }
-  //        String instanceKey = zendIdentifier.getId();
-  //        LOGGER.info("Digital object saved: " + digitalObject);
-  //        version = versionService.create(instanceKey, instanceVersionKey);
-  //        digitalObject.setVersion(version);
-  //        return (DigitalObject) repository.save(digitalObject);
-  //      }
-  //    }
-  //
-  //    LOGGER.info("Digital object version already stored: " + digitalObject + " : " + version);
-  //    // throw new RuntimeException("update digital object not implemented");
-  //    // todo find
-  //    return digitalObject;
-  //  }
   @Override
   public List<FileResource> saveFileResources(
       DigitalObject digitalObject, List<FileResource> fileResources) {
