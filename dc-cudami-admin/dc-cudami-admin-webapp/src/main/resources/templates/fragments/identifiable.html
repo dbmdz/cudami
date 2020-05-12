@@ -6,34 +6,7 @@
   <th:block th:fragment="renderTeaser(identifiable, language)">
     <div class="row">
       <div class="col-sm-2">
-        <figure th:with="previewImage=${identifiable.previewImage}">
-          <th:block th:if="${previewImage}" th:with="hints=${identifiable.previewImageRenderingHints}">
-            <th:block th:if="${hints != null && hints.targetLink != null}">
-              <a th:href="${hints.targetLink}" th:target="${hints.isOpenLinkInNewWindow()}? '_blank'">
-            </th:block>
-            <th:block th:if="${previewImage.iiifBaseUrl}">
-              <img th:src="${previewImage.iiifBaseUrl} + '/full/100,/0/default.jpg'"
-                   th:alt="${hints != null && hints.altText != null}? ${hints.altText.getText(language)} : ${previewImage.filename}"
-                   th:title="${hints != null && hints.title != null}? ${hints.title.getText(language)}"
-                   />
-            </th:block>
-            <th:block th:unless="${previewImage.iiifBaseUrl}">
-              <img th:src="${previewImage.uri}"
-                   th:alt="${hints != null && hints.altText != null}? ${hints.altText.getText(language)} : ${previewImage.filename}"
-                   th:title="${hints != null && hints.title != null}? ${hints.title.getText(language)}"
-                   style="width: 100px;" />
-            </th:block>
-            <th:block th:if="${hints != null && hints.targetLink != null}">
-              </a>
-            </th:block>
-            <th:block th:if="${hints != null && hints.caption != null}">
-              <figcaption th:text="${hints.caption.getText(language)}">image caption</figcaption>
-            </th:block>
-          </th:block>
-          <th:block th:unless="${previewImage}">
-            <img alt="no preview" class="media-object" th:src="@{/images/no-image.png}" style="width: 100px;" />
-          </th:block>
-        </figure>
+        <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${identifiable.previewImage}, ${identifiable.previewImageRenderingHints}, ${language})"></th:block>
       </div>
       <div class="col-sm-10">
         <label class="font-weight-bold">
