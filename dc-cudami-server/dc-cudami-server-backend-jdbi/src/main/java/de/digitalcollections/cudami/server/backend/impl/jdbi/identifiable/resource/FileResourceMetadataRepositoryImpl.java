@@ -160,18 +160,14 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
 
   @Override
   public SearchPageResponse<FileResource> find(SearchPageRequest searchPageRequest) {
-    // TODO make dependend from language the user has chosen...
-    String language = "de";
-
     // select only what is shown/needed in paged result list:
     StringBuilder query =
         new StringBuilder(
             REDUCED_FIND_ONE_BASE_SQL
-                + " WHERE (f.label->> :language ilike '%' || :searchTerm || '%'"
-                + " OR f.description->> :language ilike '%' || :searchTerm || '%'"
-                + " OR f.label->> '' ilike '%' || :searchTerm || '%'"
-                + " OR f.description->> '' ilike '%' || :searchTerm || '%')");
-
+                + " LEFT JOIN LATERAL jsonb_object_keys(f.label) l(keys) on f.label is not null"
+                + " LEFT JOIN LATERAL jsonb_object_keys(f.description) d(keys) on f.description is not null"
+                + " WHERE (f.label->>l.keys ilike '%' || :searchTerm || '%'"
+                + " OR f.description->>d.keys ilike '%' || :searchTerm || '%')");
     String filterQuery = "";
     Filtering filtering = searchPageRequest.getFiltering();
     if (filtering != null) {
@@ -197,7 +193,6 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
             dbi.withHandle(
                 h ->
                     h.createQuery(query.toString())
-                        .bind("language", language)
                         .bind("searchTerm", searchPageRequest.getQuery())
                         .registerRowMapper(BeanMapper.factory(FileResourceImpl.class, "f"))
                         .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
@@ -218,16 +213,15 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
 
     String countQuery =
         "SELECT count(*) FROM fileresources as f"
-            + " WHERE f.label->> :language ilike '%' || :searchTerm || '%'"
-            + " OR f.description->> :language ilike '%' || :searchTerm || '%'"
-            + " OR f.label->> '' ilike '%' || :searchTerm || '%'"
-            + " OR f.description->> '' ilike '%' || :searchTerm || '%'"
+            + " LEFT JOIN LATERAL jsonb_object_keys(f.label) l(keys) on f.label is not null"
+            + " LEFT JOIN LATERAL jsonb_object_keys(f.description) d(keys) on f.description is not null"
+            + " WHERE (f.label->>l.keys ilike '%' || :searchTerm || '%'"
+            + " OR f.description->>d.keys ilike '%' || :searchTerm || '%')"
             + filterQuery;
     long total =
         dbi.withHandle(
             h ->
                 h.createQuery(countQuery)
-                    .bind("language", language)
                     .bind("searchTerm", searchPageRequest.getQuery())
                     .mapTo(Long.class)
                     .findOne()
