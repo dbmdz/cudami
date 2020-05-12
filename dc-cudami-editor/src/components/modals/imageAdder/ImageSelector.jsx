@@ -30,11 +30,6 @@ class ImageSelector extends Component {
     this.state = {
       activeTab: 'upload',
       progress: 0,
-      tooltipsOpen: {
-        label: false,
-        upload: false,
-        url: false,
-      },
       showUploadSuccess: false,
       tabToggleEnabled: true,
     }
@@ -50,15 +45,6 @@ class ImageSelector extends Component {
         activeTab,
       })
     }
-  }
-
-  toggleTooltip = (name) => {
-    this.setState({
-      tooltipsOpen: {
-        ...this.state.tooltipsOpen,
-        [name]: !this.state.tooltipsOpen[name],
-      },
-    })
   }
 
   updateProgress = (progress) => {
@@ -90,7 +76,7 @@ class ImageSelector extends Component {
   }
 
   render() {
-    const {fileResource, onChange, t} = this.props
+    const {fileResource, onChange, t, toggleTooltip, tooltipsOpen} = this.props
     return (
       <Card className="mt-0">
         <CardHeader className="font-weight-bold">
@@ -111,10 +97,10 @@ class ImageSelector extends Component {
                   style={{cursor: 'pointer'}}
                 />
                 <Popover
-                  isOpen={this.state.tooltipsOpen.upload}
+                  isOpen={tooltipsOpen.upload}
                   placement="top"
                   target="upload-tooltip"
-                  toggle={() => this.toggleTooltip('upload')}
+                  toggle={() => toggleTooltip('upload')}
                 >
                   <PopoverBody>{t('tooltips.upload')}</PopoverBody>
                 </Popover>
@@ -134,10 +120,10 @@ class ImageSelector extends Component {
                   style={{cursor: 'pointer'}}
                 />
                 <Popover
-                  isOpen={this.state.tooltipsOpen.url}
+                  isOpen={tooltipsOpen.url}
                   placement="top"
                   target="url-tooltip"
-                  toggle={() => this.toggleTooltip('url')}
+                  toggle={() => toggleTooltip('url')}
                 >
                   <PopoverBody>{t('tooltips.url')}</PopoverBody>
                 </Popover>
@@ -195,10 +181,10 @@ class ImageSelector extends Component {
                         style={{cursor: 'pointer'}}
                       />
                       <Popover
-                        isOpen={this.state.tooltipsOpen.label}
+                        isOpen={tooltipsOpen.label}
                         placement="left"
                         target="label-tooltip"
-                        toggle={() => this.toggleTooltip('label')}
+                        toggle={() => toggleTooltip('label')}
                       >
                         <PopoverBody>{t('tooltips.label')}</PopoverBody>
                       </Popover>
