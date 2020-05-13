@@ -9,8 +9,17 @@ import de.digitalcollections.cudami.admin.business.api.service.exceptions.Identi
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import de.digitalcollections.model.api.paging.Order;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
+import de.digitalcollections.model.api.paging.Sorting;
+import de.digitalcollections.model.api.paging.enums.Direction;
+import de.digitalcollections.model.api.paging.enums.NullHandling;
+import de.digitalcollections.model.impl.paging.OrderImpl;
+import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
+import de.digitalcollections.model.impl.paging.SortingImpl;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -31,6 +40,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /** Controller for resource management pages. */
@@ -116,6 +126,24 @@ public class FileResourcesMetadataController extends AbstractController {
       LOGGER.error("Cannot save fileresource: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
+  }
+
+  @GetMapping("/api/fileresources/images")
+  @ResponseBody
+  public SearchPageResponse<FileResource> search(
+      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
+          NullHandling nullHandling,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
+          Direction sortDirection,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+    Order order = new OrderImpl(sortDirection, sortField, nullHandling);
+    Sorting sorting = new SortingImpl(order);
+    SearchPageRequest pageRequest =
+        new SearchPageRequestImpl(searchTerm, pageNumber, pageSize, sorting);
+    return service.findImages(pageRequest);
   }
 
   @PutMapping("/api/fileresources/{uuid}")
