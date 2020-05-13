@@ -4,6 +4,8 @@ import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.re
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.cudami.admin.business.impl.service.identifiable.IdentifiableServiceImpl;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,5 +22,10 @@ public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<Fil
   @Autowired
   public FileResourceMetadataServiceImpl(FileResourceMetadataRepository repository) {
     super(repository);
+  }
+
+  @Override
+  public SearchPageResponse<FileResource> findImages(SearchPageRequest searchPageRequest) {
+    return ((FileResourceMetadataRepository) repository).findImages(searchPageRequest);
   }
 }
