@@ -129,6 +129,31 @@ class ImageSelector extends Component {
                 </Popover>
               </NavLink>
             </NavItem>
+            <NavItem>
+              <NavLink
+                className={classNames({
+                  active: this.state.activeTab === 'search',
+                })}
+                disabled={!this.state.tabToggleEnabled}
+                href="#"
+                onClick={(evt) => this.toggleTab('search', evt)}
+              >
+                {t('selectImage.useSearch')}
+                <FaQuestionCircle
+                  className="ml-1"
+                  id="search-tooltip"
+                  style={{cursor: 'pointer'}}
+                />
+                <Popover
+                  isOpen={tooltipsOpen.search}
+                  placement="top"
+                  target="search-tooltip"
+                  toggle={() => toggleTooltip('search')}
+                >
+                  <PopoverBody>{t('tooltips.search')}</PopoverBody>
+                </Popover>
+              </NavLink>
+            </NavItem>
           </Nav>
         </CardHeader>
         <CardBody className="text-center">
@@ -193,6 +218,7 @@ class ImageSelector extends Component {
                 </InputGroup>
               </FormGroup>
             </TabPane>
+            <TabPane tabId="search"></TabPane>
           </TabContent>
         </CardBody>
       </Card>

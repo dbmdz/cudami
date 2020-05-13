@@ -30,6 +30,7 @@ class ImageAdderModal extends Component {
         altText: false,
         caption: false,
         label: false,
+        search: false,
         title: false,
         upload: false,
         url: false,
