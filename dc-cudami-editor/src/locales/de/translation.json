@@ -79,6 +79,7 @@
     "save": "Speichern",
     "selectImage": {
       "uploadSuccessful": "Bild erfolgreich hochgeladen",
+      "useSearch": "Vorhandenes Bild verwenden",
       "useUpload": "Bild hochladen",
       "useUrl": "Bild per Weblink einbinden"
     },
@@ -89,6 +90,7 @@
       "altText": "wird im Screen-Reader vorgelesen bzw. ausgegeben, falls das Bild nicht angezeigt werden kann",
       "caption": "wird als Bildunterschrift ausgegeben",
       "label": "Name des Bildes (zur Wiederauffindbarkeit im System); Standardwert=Dateiname (z.B. bild.jpg); änderbar",
+      "search": "Nutzung eines bereits im System vorhandenen Bildes",
       "title": "wird beim Bewegen der Maus über das Bild eingeblendet",
       "upload": "Auswählen und Hochladen eines Bildes von der lokalen Festplatte",
       "url": "Einbinden eines Bildes aus dem Internet durch Eingabe einer gültigen URL"
