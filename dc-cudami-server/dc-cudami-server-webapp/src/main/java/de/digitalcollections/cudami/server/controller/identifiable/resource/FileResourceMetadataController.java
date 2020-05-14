@@ -74,7 +74,7 @@ public class FileResourceMetadataController {
       description =
           "Find limited amount of image fileresources containing searchTerm in label or description")
   @GetMapping(
-      value = {"/latest/fileresources/images", "/v2/fileresources/iamges/search"},
+      value = {"/latest/fileresources/images", "/v2/fileresources/images"},
       produces = "application/json")
   @ApiResponseObject
   public SearchPageResponse<FileResource> findImages(
