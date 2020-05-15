@@ -21,6 +21,7 @@ import {
 import {withTranslation} from 'react-i18next'
 import {FaQuestionCircle} from 'react-icons/fa'
 
+import ImageAutocomplete from './ImageAutocomplete'
 import FileUploadForm from '../../FileUploadForm'
 import {uploadFile} from '../../../api'
 
@@ -76,7 +77,14 @@ class ImageSelector extends Component {
   }
 
   render() {
-    const {fileResource, onChange, t, toggleTooltip, tooltipsOpen} = this.props
+    const {
+      apiContextPath,
+      fileResource,
+      onChange,
+      t,
+      toggleTooltip,
+      tooltipsOpen,
+    } = this.props
     return (
       <Card className="mt-0">
         <CardHeader className="font-weight-bold">
@@ -218,7 +226,9 @@ class ImageSelector extends Component {
                 </InputGroup>
               </FormGroup>
             </TabPane>
-            <TabPane tabId="search"></TabPane>
+            <TabPane tabId="search">
+              <ImageAutocomplete apiContextPath={apiContextPath} />
+            </TabPane>
           </TabContent>
         </CardBody>
       </Card>
