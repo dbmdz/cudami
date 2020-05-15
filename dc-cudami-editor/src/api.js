@@ -70,6 +70,17 @@ export async function saveIdentifiable(
   }
 }
 
+export async function searchImages(searchTerm, pageNumber = 0, pageSize = 10) {
+  const url = `${contextPath}api/fileresources/images?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
+  try {
+    const result = await fetch(url)
+    const json = await result.json()
+    return json.content ?? []
+  } catch (err) {
+    return []
+  }
+}
+
 export async function updateFileResource(contextPath, fileResource) {
   const updatedFileResource = await updateIdentifiable(
     contextPath,
