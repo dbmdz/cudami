@@ -45,7 +45,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
           + " i.created i_created, i.last_modified i_last_modified,"
           + " i.preview_hints i_previewImageRenderingHints,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM identifiables as i"
           + " LEFT JOIN identifiers as id on i.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on i.previewfileresource = file.uuid";
@@ -130,7 +130,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
         new StringBuilder(
             "SELECT i.uuid i_uuid, i.label i_label, i.description i_description,"
                 + " i.identifiable_type i_identifiableType,"
-                + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
+                + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
                 + " FROM identifiables as i"
                 + " LEFT JOIN fileresources_image as file on i.previewfileresource = file.uuid"
                 + " LEFT JOIN LATERAL jsonb_object_keys(i.label) l(keys) on i.label is not null"

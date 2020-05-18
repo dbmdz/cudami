@@ -44,7 +44,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
           + " e.created e_created, e.last_modified e_last_modified,"
           + " e.preview_hints e_previewImageRenderingHints,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM entities as e"
           + " LEFT JOIN identifiers as id on e.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on e.previewfileresource = file.uuid";
@@ -55,7 +55,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
           + " e.identifiable_type e_type, , e.entity_type e_entityType,"
           + " e.created e_created, e.last_modified e_lastModified,"
           + " e.preview_hints e_previewImageRenderingHints,"
-          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename, file.iiif_base_url f_iiifBaseUrl"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM entities as e"
           + " LEFT JOIN fileresources_image as file on e.previewfileresource = file.uuid";
 
@@ -150,7 +150,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         new StringBuilder(
             "SELECT e.uuid e_uuid, e.refid e_refId, e.label e_label, e.description e_description,"
                 + " e.entity_type e_entityType,"
-                + " file.uri f_uri, file.filename f_filename"
+                + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
                 + " FROM entities as e"
                 + " LEFT JOIN fileresources_image as file on e.previewfileresource = file.uuid"
                 + " LEFT JOIN LATERAL jsonb_object_keys(e.label) l(keys) on e.label is not null"

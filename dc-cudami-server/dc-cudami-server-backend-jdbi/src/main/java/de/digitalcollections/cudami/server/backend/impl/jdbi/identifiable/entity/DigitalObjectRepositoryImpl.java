@@ -47,7 +47,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
           + " d.preview_hints d_previewImageRenderingHints,"
           // TODO: add d.license d_license, d.version d_version, when features added
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl,"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl,"
           // related file resources
           + " fr.uuid fr_uuid, fr.filename fr_filename, fr.mimetype fr_mimetype, fr.size_in_bytes fr_sizeInBytes, fr.uri fr_uri"
           + " FROM digitalobjects as d"
@@ -62,7 +62,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
           + " d.identifiable_type d_type, d.entity_type d_entityType,"
           + " d.created d_created, d.last_modified d_lastModified,"
           + " d.preview_hints d_previewImageRenderingHints,"
-          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename, file.iiif_base_url f_iiifBaseUrl"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM digitalobjects as d"
           + " LEFT JOIN fileresources_image as file on d.previewfileresource = file.uuid";
 
@@ -125,7 +125,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         new StringBuilder(
             "SELECT d.uuid d_uuid, d.refid d_refId, d.label d_label, d.description d_description,"
                 + " d.entity_type d_entityType,"
-                + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename"
+                + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
                 + " FROM digitalobjects as d"
                 + " LEFT JOIN fileresources_image as file on d.previewfileresource = file.uuid"
                 + " LEFT JOIN LATERAL jsonb_object_keys(d.label) l(keys) on d.label is not null"
@@ -292,7 +292,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             + " f.created f_created, f.last_modified f_lastModified,"
             + " f.filename f_filename, f.mimetype f_mimeType, f.size_in_bytes f_sizeInBytes, f.uri f_uri,"
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimetype, file.size_in_bytes pf_size_in_bytes, file.uri pf_uri"
+            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.iiif_base_url pf_iiifBaseUrl"
             + " FROM fileresources as f"
             + " LEFT JOIN identifiers as id on f.uuid = id.identifiable"
             + " LEFT JOIN fileresources_image as file on f.previewfileresource = file.uuid"
@@ -342,7 +342,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             + " f.filename f_filename, f.mimetype f_mimeType, f.size_in_bytes f_sizeInBytes, f.uri f_uri,"
             + " f.height f_height, f.width f_width,"
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimetype, file.size_in_bytes pf_size_in_bytes, file.uri pf_uri"
+            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.iiif_base_url pf_iiifBaseUrl"
             + " FROM fileresources_image as f"
             + " LEFT JOIN identifiers as id on f.uuid = id.identifiable"
             + " LEFT JOIN fileresources_image as file on f.previewfileresource = file.uuid"

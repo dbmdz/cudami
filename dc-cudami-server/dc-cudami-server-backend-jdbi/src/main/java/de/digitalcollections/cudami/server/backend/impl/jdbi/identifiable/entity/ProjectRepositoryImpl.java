@@ -38,7 +38,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
           + " p.text p_text, p.start_date p_startDate, p.end_date p_endDate,"
           + " p.preview_hints p_previewImageRenderingHints,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM projects as p"
           + " LEFT JOIN identifiers as id on p.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on p.previewfileresource = file.uuid";
@@ -50,7 +50,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
           + " p.created p_created, p.last_modified p_lastModified,"
           + " p.start_date p_startDate, p.end_date p_endDate,"
           + " p.preview_hints p_previewImageRenderingHints,"
-          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename, file.iiif_base_url f_iiifBaseUrl"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM projects as p"
           + " LEFT JOIN fileresources_image as file on p.previewfileresource = file.uuid";
 

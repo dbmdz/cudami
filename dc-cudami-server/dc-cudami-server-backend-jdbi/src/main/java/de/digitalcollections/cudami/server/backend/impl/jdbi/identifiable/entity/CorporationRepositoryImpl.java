@@ -37,7 +37,7 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
           + " c.created c_created, c.last_modified c_lastModified,"
           + " c.text c_text, c.homepage_url c_homepageUrl, c.preview_hints c_previewImageRenderingHints,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM corporations as c"
           + " LEFT JOIN identifiers as id on c.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid";
@@ -48,7 +48,7 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
           + " c.identifiable_type c_type, c.entity_type c_entityType,"
           + " c.created c_created, c.last_modified c_lastModified,"
           + " c.preview_hints c_previewImageRenderingHints,"
-          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename, file.iiif_base_url f_iiifBaseUrl"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM corporations as c"
           + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid";
 

@@ -58,7 +58,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
           + " f.filename f_filename, f.mimetype f_mimetype, f.size_in_bytes f_sizeInBytes, f.uri f_uri,"
           + " f.preview_hints f_previewImageRenderingHints,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimetype, file.size_in_bytes pf_size_in_bytes, file.uri pf_uri, file.iiif_base_url pf_iiifBaseUrl"
+          + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.iiif_base_url pf_iiifBaseUrl"
           + " FROM fileresources as f"
           + " LEFT JOIN identifiers as id on f.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on f.previewfileresource = file.uuid";
@@ -70,7 +70,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
           + " f.created f_created, f.last_modified f_lastModified,"
           + " f.filename f_filename, f.mimetype f_mimetype, f.size_in_bytes f_sizeInBytes, f.uri f_uri,"
           + " f.preview_hints f_previewImageRenderingHints,"
-          + " file.uuid pf_uuid, file.uri pf_uri, file.filename pf_filename, file.iiif_base_url pf_iiifBaseUrl"
+          + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.iiif_base_url pf_iiifBaseUrl"
           + " FROM fileresources as f"
           + " LEFT JOIN fileresources_image as file on f.previewfileresource = file.uuid";
 
@@ -217,7 +217,8 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
             + " LEFT JOIN LATERAL jsonb_object_keys(f.label) l(keys) on f.label is not null"
             + " LEFT JOIN LATERAL jsonb_object_keys(f.description) d(keys) on f.description is not null"
             + " WHERE (f.label->>l.keys ilike '%' || :searchTerm || '%'"
-            + " OR f.description->>d.keys ilike '%' || :searchTerm || '%')"
+            + " OR f.description->>d.keys ilike '%' || :searchTerm || '%'"
+            + " OR f.filename ilike '%' || :searchTerm || '%')"
             + filterQuery;
     long total =
         dbi.withHandle(
@@ -300,7 +301,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
             + " f.created f_created, f.last_modified f_lastModified,"
             + " f.filename f_filename, f.mimetype f_mimetype, f.size_in_bytes f_sizeInBytes, f.uri f_uri,"
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimetype, file.size_in_bytes pf_size_in_bytes, file.uri pf_uri"
+            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.iiif_base_url pf_iiifBaseUrl"
             + " FROM fileresources_application as f"
             + " LEFT JOIN identifiers as id on f.uuid = id.identifiable"
             + " LEFT JOIN fileresources_image as file on f.previewfileresource = file.uuid"
@@ -348,7 +349,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
             + " f.filename f_filename, f.mimetype f_mimetype, f.size_in_bytes f_sizeInBytes, f.uri f_uri,"
             + " f.duration f_duration," // file resource type specific fields
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimetype, file.size_in_bytes pf_size_in_bytes, file.uri pf_uri"
+            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.iiif_base_url pf_iiifBaseUrl"
             + " FROM fileresources_audio as f"
             + " LEFT JOIN identifiers as id on f.uuid = id.identifiable"
             + " LEFT JOIN fileresources_image as file on f.previewfileresource = file.uuid"
@@ -397,7 +398,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
             // file resource type specific fields:
             + " f.height f_height, f.width f_width, f.iiif_base_url f_iiifBaseUrl,"
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimetype, file.size_in_bytes pf_size_in_bytes, file.uri pf_uri"
+            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.iiif_base_url pf_iiifBaseUrl"
             + " FROM fileresources_image as f"
             + " LEFT JOIN identifiers as id on f.uuid = id.identifiable"
             + " LEFT JOIN fileresources_image as file on f.previewfileresource = file.uuid"
@@ -450,7 +451,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
             + " f.context f_context, f.object_type f_objectType," // file resource type specific
             // fields
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimetype, file.size_in_bytes pf_size_in_bytes, file.uri pf_uri"
+            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.iiif_base_url pf_iiifBaseUrl"
             + " FROM fileresources_linkeddata as f"
             + " LEFT JOIN identifiers as id on f.uuid = id.identifiable"
             + " LEFT JOIN fileresources_image as file on f.previewfileresource = file.uuid"
@@ -497,7 +498,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
             + " f.created f_created, f.last_modified f_lastModified,"
             + " f.filename f_filename, f.mimetype f_mimetype, f.size_in_bytes f_sizeInBytes, f.uri f_uri,"
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimetype, file.size_in_bytes pf_size_in_bytes, file.uri pf_uri"
+            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.iiif_base_url pf_iiifBaseUrl"
             + " FROM fileresources_text as f"
             + " LEFT JOIN identifiers as id on f.uuid = id.identifiable"
             + " LEFT JOIN fileresources_image as file on f.previewfileresource = file.uuid"
@@ -544,7 +545,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
             + " f.filename f_filename, f.mimetype f_mimetype, f.size_in_bytes f_sizeInBytes, f.uri f_uri,"
             + " f.duration f_duration," // file resource type specific fields
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimetype, file.size_in_bytes pf_size_in_bytes, file.uri pf_uri"
+            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.iiif_base_url pf_iiifBaseUrl"
             + " FROM fileresources_video as f"
             + " LEFT JOIN identifiers as id on f.uuid = id.identifiable"
             + " LEFT JOIN fileresources_image as file on f.previewfileresource = file.uuid"
