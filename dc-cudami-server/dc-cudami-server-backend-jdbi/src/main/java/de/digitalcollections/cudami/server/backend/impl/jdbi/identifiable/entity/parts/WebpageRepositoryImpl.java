@@ -42,7 +42,7 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
           + " w.text w_text, w.publication_start w_publicationStart, w.publication_end w_publicationEnd,"
           + " w.preview_hints w_previewImageRenderingHints,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM webpages as w"
           + " LEFT JOIN identifiers as id on w.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid";
@@ -54,7 +54,7 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
           + " w.created w_created, w.last_modified w_lastModified,"
           + " w.publication_start w_publicationStart, w.publication_end w_publicationEnd,"
           + " w.preview_hints w_previewImageRenderingHints,"
-          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename, file.iiif_base_url f_iiifBaseUrl"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM webpages as w"
           + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid";
 
@@ -64,7 +64,7 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
           + " w.created w_created, w.last_modified w_lastModified,"
           + " w.publication_start w_publicationStart, w.publication_end w_publicationEnd,"
           + " w.preview_hints w_previewImageRenderingHints,"
-          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename, file.iiif_base_url f_iiifBaseUrl"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM webpages as w INNER JOIN webpage_webpages ww ON w.uuid = ww.child_webpage_uuid"
           + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid"
           + " WHERE ww.parent_webpage_uuid = :uuid";
