@@ -41,7 +41,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
           + " w.url w_url, w.registration_date w_registrationDate,"
           + " w.preview_hints w_previewImageRenderingHints,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimetype, file.size_in_bytes f_size_in_bytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM websites as w"
           + " LEFT JOIN identifiers as id on w.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid";
@@ -53,7 +53,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
           + " w.created w_created, w.last_modified w_lastModified,"
           + " w.url w_url, w.registration_date w_registrationDate,"
           + " w.preview_hints w_previewImageRenderingHints,"
-          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename, file.iiif_base_url f_iiifBaseUrl"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM websites as w"
           + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid";
 

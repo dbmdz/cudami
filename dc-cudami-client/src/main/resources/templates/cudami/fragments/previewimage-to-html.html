@@ -10,7 +10,7 @@
           <a th:href="${hints.targetLink}" th:target="${hints.openLinkInNewWindow}? '_blank'">
         </th:block>
         <th:block th:if="${previewImage.iiifBaseUrl}">
-          <img th:src="${previewImage.iiifBaseUrl} + '/full/' + ${width} + ',/0/default.jpg'"
+          <img th:src="|${previewImage.iiifBaseUrl}/full/${width},/0/default.${#strings.equals(previewImage.mimeType.subType, 'png')?'png':'jpg'}|"
                th:alt="${hints != null && hints.altText != null}? ${hints.altText.getText(language)} : ${previewImage.filename}"
                th:title="${hints != null && hints.title != null}? ${hints.title.getText(language)}"
                />
@@ -29,7 +29,7 @@
         </th:block>
       </th:block>
       <th:block th:unless="${previewImage}">
-        <img alt="no preview" th:src="@{/images/no-image.png}" th:style="|width: __${width}__px;|" />
+        <img alt="no preview" class="media-object" th:src="@{/images/no-image.png}" th:style="|width: __${width}__px;|" />
       </th:block>
     </figure>
   </th:block>
