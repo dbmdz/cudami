@@ -7,7 +7,7 @@
     <figure>
       <th:block th:if="${previewImage}">
         <th:block th:if="${hints != null && hints.targetLink != null}">
-          <a th:href="${hints.targetLink}" th:target="${hints.isOpenLinkInNewWindow()}? '_blank'">
+          <a th:href="${hints.targetLink}" th:target="${hints.openLinkInNewWindow}? '_blank'">
         </th:block>
         <th:block th:if="${previewImage.iiifBaseUrl}">
           <img th:src="|${previewImage.iiifBaseUrl}/full/${width},/0/default.${#strings.equals(previewImage.mimeType.subType, 'png')?'png':'jpg'}|"
