@@ -167,7 +167,8 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
                 + " LEFT JOIN LATERAL jsonb_object_keys(f.label) l(keys) on f.label is not null"
                 + " LEFT JOIN LATERAL jsonb_object_keys(f.description) d(keys) on f.description is not null"
                 + " WHERE (f.label->>l.keys ilike '%' || :searchTerm || '%'"
-                + " OR f.description->>d.keys ilike '%' || :searchTerm || '%')");
+                + " OR f.description->>d.keys ilike '%' || :searchTerm || '%'"
+                + " OR f.filename ilike '%' || :searchTerm || '%')");
     String filterQuery = "";
     Filtering filtering = searchPageRequest.getFiltering();
     if (filtering != null) {
@@ -623,6 +624,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
                   .bindBean(fileResource)
                   .execute());
     } else if (fileResource instanceof ImageFileResource) {
+      final UUID previewUuid = previewImageUuid == null ? fileResource.getUuid() : previewImageUuid;
       dbi.withHandle(
           h ->
               h.createUpdate(
@@ -631,7 +633,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
                           + ", width, height, iiif_base_url) VALUES ("
                           + basePropertiesSql
                           + ", :width, :height, :iiifBaseUrl)")
-                  .bind("previewFileResource", previewImageUuid)
+                  .bind("previewFileResource", previewUuid)
                   .bindBean(fileResource)
                   .execute());
     } else if (fileResource instanceof LinkedDataFileResource) {
@@ -718,6 +720,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
                   .bindBean(fileResource)
                   .execute());
     } else if (fileResource instanceof ImageFileResource) {
+      final UUID previewUuid = previewImageUuid == null ? fileResource.getUuid() : previewImageUuid;
       String query =
           "UPDATE fileresources_image SET "
               + baseColumnsSql
@@ -725,7 +728,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
       dbi.withHandle(
           h ->
               h.createUpdate(query)
-                  .bind("previewFileResource", previewImageUuid)
+                  .bind("previewFileResource", previewUuid)
                   .bindBean(fileResource)
                   .execute());
     } else if (fileResource instanceof LinkedDataFileResource) {
