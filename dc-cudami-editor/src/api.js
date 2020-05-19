@@ -2,6 +2,10 @@ export function getAvailableLanguages() {
   return ['es', 'fr']
 }
 
+export async function getDefaultLanguage() {
+  return 'en'
+}
+
 export async function loadAvailableLanguages(contextPath) {
   const url = `${contextPath}api/languages`
   try {
@@ -9,6 +13,16 @@ export async function loadAvailableLanguages(contextPath) {
     return result.json()
   } catch (err) {
     return []
+  }
+}
+
+export async function loadDefaultLanguage(contextPath) {
+  const url = `${contextPath}api/languages/default`
+  try {
+    const result = await fetch(url)
+    return result.json()
+  } catch (err) {
+    return getDefaultLanguage()
   }
 }
 
