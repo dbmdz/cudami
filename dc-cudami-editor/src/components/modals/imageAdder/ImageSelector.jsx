@@ -233,6 +233,7 @@ class ImageSelector extends Component {
                 activeLanguage={activeLanguage}
                 apiContextPath={apiContextPath}
                 defaultLanguage={defaultLanguage}
+                onChange={onChange}
               />
             </TabPane>
           </TabContent>
