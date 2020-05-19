@@ -25,7 +25,7 @@ class ImageAutocomplete extends Component {
     return Object.values(label)[0]
   }
 
-  getPreviewImageUrl = (previewImage, width='full') => {
+  getPreviewImageUrl = (previewImage, width = 'full') => {
     return previewImage.iiifBaseUrl
       ? `${previewImage.iiifBaseUrl}/full/${width}/0/default.${previewImage.filenameExtension}`
       : previewImage.uri
