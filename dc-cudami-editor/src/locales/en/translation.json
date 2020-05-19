@@ -26,6 +26,14 @@
     "createTopic": "Create a new topic",
     "createWebpage": "Create a new webpage",
     "createWebsite": "Create a new website",
+    "datePickerAriaLabel": {
+      "calendarAriaLabel": "Toggle calendar",
+      "clearAriaLabel": "Clear value",
+      "dayAriaLabel": "Day",
+      "monthAriaLabel": "Month",
+      "nativeInputAriaLabel": "Date",
+      "yearAriaLabel": "Year"
+    },
     "defineRenderingHints": "Define rendering hints",
     "description": "Abstract",
     "dragAndDropImage": "Drag and drop file to upload here",
@@ -38,6 +46,7 @@
     "editTopic": "Edit topic",
     "editWebpage": "Edit webpage",
     "editWebsite": "Edit website {{ url }}",
+    "endPublicationDate": "End of publication date",
     "enterMetadata": "Enter metadata",
     "file": "File",
     "forExample": "e.g.",
@@ -82,6 +91,7 @@
       "useUpload": "Upload image",
       "useUrl": "Integrate image via web link"
     },
+    "startPublicationDate": "Start publication date",
     "text": "Long text",
     "title": "Title",
     "tooltip": "Tooltip",
