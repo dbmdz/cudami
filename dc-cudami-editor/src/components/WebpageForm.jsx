@@ -8,6 +8,7 @@ import FormButtons from './FormButtons'
 import LanguageAdder from './LanguageAdder'
 import LanguageTab from './LanguageTab'
 import LanguageTabContent from './LanguageTabContent'
+import PublicationDatesForm from './PublicationDatesForm'
 
 const WebpageForm = (props) => {
   const {t} = useTranslation()
@@ -81,6 +82,12 @@ const WebpageForm = (props) => {
                     })
                   }}
                 />
+                <Row>
+                  <Col sm="12">
+                    <hr />
+                  </Col>
+                </Row>
+                <PublicationDatesForm />
               </LanguageTabContent>
             ))}
           </TabContent>
