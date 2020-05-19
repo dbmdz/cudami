@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import {FormGroup, Input} from 'reactstrap'
 import Autosuggest from 'react-autosuggest'
 
+import './ImageAutocomplete.css'
 import {searchImages} from '../../../api'
 
 class ImageAutocomplete extends Component {
@@ -11,6 +12,16 @@ class ImageAutocomplete extends Component {
       searchTerm: '',
       suggestions: [],
     }
+  }
+
+  getLabelValue = (label) => {
+    const {activeLanguage, defaultLanguage} = this.props
+    if (label[activeLanguage]) {
+      return label[activeLanguage]
+    } else if (label[defaultLanguage]) {
+      return label[defaultLanguage]
+    }
+    return Object.values(label)[0]
   }
 
   getSuggestionAsString = (suggestion) =>
@@ -49,6 +60,20 @@ class ImageAutocomplete extends Component {
     )
   }
 
+  renderSuggestion = ({label, previewImage}) => {
+    const previewImageUrl = previewImage.iiifBaseUrl
+      ? `${previewImage.iiifBaseUrl}/full/50,/0/default.${previewImage.filenameExtension}`
+      : previewImage.uri
+    return (
+      <>
+        <div className="mr-3 suggestion-image">
+          <img className="img-fluid" src={previewImageUrl} />
+        </div>
+        {this.getLabelValue(label)}
+      </>
+    )
+  }
+
   render() {
     const {searchTerm, suggestions} = this.state
     const inputProps = {
@@ -63,12 +88,12 @@ class ImageAutocomplete extends Component {
         onSuggestionsClearRequested={this.onSuggestionsClearRequested}
         onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
         renderInputComponent={this.renderInputComponent}
-        renderSuggestion={this.getSuggestionAsString}
+        renderSuggestion={this.renderSuggestion}
         suggestions={suggestions}
         theme={{
-          suggestion: 'list-group-item text-left',
+          suggestion: 'align-items-center d-flex list-group-item',
           suggestionHighlighted: 'active',
-          suggestionsList: 'list-group',
+          suggestionsList: 'list-group suggestion-list',
         }}
       />
     )
