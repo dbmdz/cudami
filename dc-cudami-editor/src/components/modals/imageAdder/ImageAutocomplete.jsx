@@ -29,7 +29,13 @@ class ImageAutocomplete extends Component {
   }
 
   onSuggestionsFetchRequested = async ({value: searchTerm}) => {
-    const suggestions = await searchImages(searchTerm)
+    if (searchTerm.length < 2) {
+      return
+    }
+    const suggestions = await searchImages(
+      this.props.apiContextPath,
+      searchTerm
+    )
     this.setState({
       suggestions,
     })
