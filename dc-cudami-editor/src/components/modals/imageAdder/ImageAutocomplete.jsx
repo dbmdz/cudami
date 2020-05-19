@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import {FormGroup, Input} from 'reactstrap'
 import Autosuggest from 'react-autosuggest'
+import {withTranslation} from 'react-i18next'
 
 import './ImageAutocomplete.css'
 import {searchImages} from '../../../api'
@@ -91,7 +92,7 @@ class ImageAutocomplete extends Component {
     const {searchTerm, suggestions} = this.state
     const inputProps = {
       onChange: this.onChange,
-      placeholder: 'Type to search in label, description and filename...',
+      placeholder: this.props.t('selectImage.searchTerm'),
       value: searchTerm,
     }
     return (
@@ -114,4 +115,4 @@ class ImageAutocomplete extends Component {
   }
 }
 
-export default ImageAutocomplete
+export default withTranslation()(ImageAutocomplete)

@@ -76,6 +76,7 @@
     "right": "right",
     "save": "Save",
     "selectImage": {
+      "searchTerm": "Search term (from title, file name, description)",
       "uploadSuccessful": "Image uploaded successfully",
       "useSearch": "Use existing image",
       "useUpload": "Upload image",
