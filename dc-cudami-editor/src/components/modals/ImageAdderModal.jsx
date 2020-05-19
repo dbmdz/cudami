@@ -144,7 +144,14 @@ class ImageAdderModal extends Component {
   }
 
   render() {
-    const {apiContextPath, debug, isOpen, t} = this.props
+    const {
+      activeLanguage,
+      apiContextPath,
+      debug,
+      defaultLanguage,
+      isOpen,
+      t,
+    } = this.props
     return (
       <Modal isOpen={isOpen} size="lg" toggle={this.destroy}>
         <ModalHeader toggle={this.destroy}>{t('insert.image')}</ModalHeader>
@@ -157,7 +164,9 @@ class ImageAdderModal extends Component {
             }}
           >
             <ImageSelector
+              activeLanguage={activeLanguage}
               apiContextPath={apiContextPath}
+              defaultLanguage={defaultLanguage}
               fileResource={this.state.fileResource}
               onChange={(updateFields, additionalFields) =>
                 this.updateFileResource(updateFields, additionalFields)
