@@ -8,17 +8,17 @@ class ImageAutocomplete extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      searchTerm: '',
       suggestions: [],
-      value: '',
     }
   }
 
   getSuggestionAsString = (suggestion) =>
     `${suggestion.name} (${suggestion.year})`
 
-  onChange = (_, {newValue}) => {
+  onChange = (_, {newValue: searchTerm}) => {
     this.setState({
-      value: newValue,
+      searchTerm,
     })
   }
 
@@ -28,8 +28,8 @@ class ImageAutocomplete extends Component {
     })
   }
 
-  onSuggestionsFetchRequested = async ({value}) => {
-    const suggestions = await searchImages(value)
+  onSuggestionsFetchRequested = async ({value: searchTerm}) => {
+    const suggestions = await searchImages(searchTerm)
     this.setState({
       suggestions,
     })
@@ -44,11 +44,11 @@ class ImageAutocomplete extends Component {
   }
 
   render() {
-    const {value, suggestions} = this.state
+    const {searchTerm, suggestions} = this.state
     const inputProps = {
       onChange: this.onChange,
       placeholder: 'Type to search in label, description and filename...',
-      value,
+      value: searchTerm,
     }
     return (
       <Autosuggest
