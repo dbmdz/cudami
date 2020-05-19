@@ -24,6 +24,12 @@ class ImageAutocomplete extends Component {
     return Object.values(label)[0]
   }
 
+  getPreviewImageUrl = (previewImage, width='full') => {
+    return previewImage.iiifBaseUrl
+      ? `${previewImage.iiifBaseUrl}/full/${width}/0/default.${previewImage.filenameExtension}`
+      : previewImage.uri
+  }
+
   getSuggestionAsString = (suggestion) =>
     `${suggestion.name} (${suggestion.year})`
 
@@ -61,17 +67,24 @@ class ImageAutocomplete extends Component {
   }
 
   renderSuggestion = ({label, previewImage}) => {
-    const previewImageUrl = previewImage.iiifBaseUrl
-      ? `${previewImage.iiifBaseUrl}/full/50,/0/default.${previewImage.filenameExtension}`
-      : previewImage.uri
     return (
       <>
         <div className="mr-3 suggestion-image">
-          <img className="img-fluid" src={previewImageUrl} />
+          <img
+            className="img-fluid"
+            src={this.getPreviewImageUrl(previewImage, '50,')}
+          />
         </div>
         {this.getLabelValue(label)}
       </>
     )
+  }
+
+  selectFileResource = (_, {suggestion}) => {
+    this.props.onChange({
+      ...suggestion,
+      uri: this.getPreviewImageUrl(suggestion.previewImage),
+    })
   }
 
   render() {
@@ -87,6 +100,7 @@ class ImageAutocomplete extends Component {
         inputProps={inputProps}
         onSuggestionsClearRequested={this.onSuggestionsClearRequested}
         onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+        onSuggestionSelected={this.selectFileResource}
         renderInputComponent={this.renderInputComponent}
         renderSuggestion={this.renderSuggestion}
         suggestions={suggestions}
