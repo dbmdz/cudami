@@ -84,7 +84,12 @@ export async function saveIdentifiable(
   }
 }
 
-export async function searchImages(searchTerm, pageNumber = 0, pageSize = 10) {
+export async function searchImages(
+  contextPath,
+  searchTerm,
+  pageNumber = 0,
+  pageSize = 10
+) {
   const url = `${contextPath}api/fileresources/images?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
   try {
     const result = await fetch(url)
