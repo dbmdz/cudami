@@ -15,7 +15,9 @@ import WebpageForm from './WebpageForm'
 import WebsiteForm from './WebsiteForm'
 import {
   getAvailableLanguages,
+  getDefaultLanguage,
   loadAvailableLanguages,
+  loadDefaultLanguage,
   loadIdentifiable,
   saveIdentifiable,
   updateIdentifiable,
@@ -63,6 +65,9 @@ class IdentifiableForm extends Component {
     const availableLanguages = this.props.mockApi
       ? getAvailableLanguages()
       : await loadAvailableLanguages(this.props.apiContextPath)
+    const defaultLanguage = this.props.mockApi
+      ? getDefaultLanguage()
+      : await loadDefaultLanguage(this.props.apiContextPath)
     let identifiable = await loadIdentifiable(
       this.props.apiContextPath,
       this.props.type,
@@ -90,6 +95,7 @@ class IdentifiableForm extends Component {
           return languages
         }, [])
         .sort((a, b) => (a.displayName > b.displayName ? 1 : -1)),
+      defaultLanguage,
       identifiable,
     })
   }
