@@ -31,7 +31,7 @@ class ImageAutocomplete extends Component {
   }
 
   getSuggestionAsString = (suggestion) =>
-    `${suggestion.name} (${suggestion.year})`
+    `${this.getLabelValue(suggestion.label)}`
 
   onChange = (_, {newValue: searchTerm}) => {
     this.setState({
