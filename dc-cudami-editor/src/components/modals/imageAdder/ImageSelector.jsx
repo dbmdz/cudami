@@ -78,7 +78,9 @@ class ImageSelector extends Component {
 
   render() {
     const {
+      activeLanguage,
       apiContextPath,
+      defaultLanguage,
       fileResource,
       onChange,
       t,
@@ -227,7 +229,11 @@ class ImageSelector extends Component {
               </FormGroup>
             </TabPane>
             <TabPane tabId="search">
-              <ImageAutocomplete apiContextPath={apiContextPath} />
+              <ImageAutocomplete
+                activeLanguage={activeLanguage}
+                apiContextPath={apiContextPath}
+                defaultLanguage={defaultLanguage}
+              />
             </TabPane>
           </TabContent>
         </CardBody>
