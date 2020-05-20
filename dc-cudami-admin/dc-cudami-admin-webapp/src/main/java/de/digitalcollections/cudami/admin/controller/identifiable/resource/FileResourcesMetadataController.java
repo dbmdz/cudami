@@ -132,8 +132,8 @@ public class FileResourcesMetadataController extends AbstractController {
   public SearchPageResponse<FileResource> searchImages(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
-      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
+      @RequestParam(name = "sortField", required = false, defaultValue = "lastModified") String sortField,
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "DESC")
           Direction sortDirection,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
     Order order = new OrderImpl(sortDirection, sortField);
