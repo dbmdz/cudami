@@ -16,7 +16,6 @@ import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.paging.enums.Direction;
-import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
@@ -131,15 +130,13 @@ public class FileResourcesMetadataController extends AbstractController {
   @GetMapping("/api/fileresources/images")
   @ResponseBody
   public SearchPageResponse<FileResource> searchImages(
-      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
-          NullHandling nullHandling,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
       @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
           Direction sortDirection,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    Order order = new OrderImpl(sortDirection, sortField, nullHandling);
+    Order order = new OrderImpl(sortDirection, sortField);
     Sorting sorting = new SortingImpl(order);
     SearchPageRequest pageRequest =
         new SearchPageRequestImpl(searchTerm, pageNumber, pageSize, sorting);
