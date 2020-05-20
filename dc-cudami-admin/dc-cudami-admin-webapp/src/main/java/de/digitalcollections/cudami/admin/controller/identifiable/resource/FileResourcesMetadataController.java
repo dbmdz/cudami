@@ -130,7 +130,7 @@ public class FileResourcesMetadataController extends AbstractController {
 
   @GetMapping("/api/fileresources/images")
   @ResponseBody
-  public SearchPageResponse<FileResource> search(
+  public SearchPageResponse<FileResource> searchImages(
       @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
           NullHandling nullHandling,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
