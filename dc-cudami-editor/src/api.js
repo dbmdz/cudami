@@ -2,7 +2,7 @@ export function getAvailableLanguages() {
   return ['es', 'fr']
 }
 
-export async function getDefaultLanguage() {
+export function getDefaultLanguage() {
   return 'en'
 }
 
