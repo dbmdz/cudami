@@ -87,10 +87,19 @@ const WebpageForm = (props) => {
                     <hr />
                   </Col>
                 </Row>
-                <PublicationDatesForm />
               </LanguageTabContent>
             ))}
           </TabContent>
+          <Row>
+            <Col sm="12">
+              <hr />
+            </Col>
+          </Row>
+          <PublicationDatesForm
+            onChange={(updateKey, updateValue) =>
+              props.onUpdate({...props.identifiable, [updateKey]: updateValue})
+            }
+          />
         </Col>
       </Row>
     </Form>
