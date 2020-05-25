@@ -2,7 +2,7 @@ import React from 'react'
 import {FormGroup, Input, Label} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-const FormLabelComponent = (props) => {
+const FormLabelInput = (props) => {
   const {t} = useTranslation()
   return (
     <FormGroup>
@@ -19,4 +19,4 @@ const FormLabelComponent = (props) => {
   )
 }
 
-export default FormLabelComponent
+export default FormLabelInput
