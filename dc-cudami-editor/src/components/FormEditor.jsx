@@ -29,7 +29,7 @@ class FormEditor extends Component {
     return (
       <>
         <Label className="font-weight-bold">{t(type)}</Label>
-        <div className="text-editor">
+        <div className="clearfix text-editor">
           <Editor
             options={this.editorOptions}
             onChange={(doc) => {
