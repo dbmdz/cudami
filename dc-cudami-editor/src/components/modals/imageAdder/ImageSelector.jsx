@@ -22,6 +22,7 @@ import {withTranslation} from 'react-i18next'
 import {FaQuestionCircle} from 'react-icons/fa'
 
 import ImageAutocomplete from './ImageAutocomplete'
+import {mimeExtensionMapping} from '../utils'
 import FileUploadForm from '../../FileUploadForm'
 import {uploadFile} from '../../../api'
 
@@ -70,9 +71,12 @@ class ImageSelector extends Component {
       showUploadSuccess: true,
     })
     setTimeout(() => this.setState({showUploadSuccess: false}), 3000)
+    const subMimeType = responseJson.mimeType.split('/')[1]
     onChange({
       ...responseJson,
-      uri: `${responseJson.iiifBaseUrl}/full/full/0/default.${responseJson.filenameExtension}`,
+      uri: `${responseJson.iiifBaseUrl}/full/full/0/default.${
+        mimeExtensionMapping[subMimeType] ?? 'jpg'
+      }`,
     })
   }
 
