@@ -4,6 +4,7 @@ import Autosuggest from 'react-autosuggest'
 import {withTranslation} from 'react-i18next'
 
 import './ImageAutocomplete.css'
+import {mimeExtensionMapping} from '../utils'
 import {searchImages} from '../../../api'
 
 class ImageAutocomplete extends Component {
@@ -26,8 +27,11 @@ class ImageAutocomplete extends Component {
   }
 
   getPreviewImageUrl = (previewImage, width = 'full') => {
+    const subMimeType = previewImage.mimeType.split('/')[1]
     return previewImage.iiifBaseUrl
-      ? `${previewImage.iiifBaseUrl}/full/${width}/0/default.${previewImage.filenameExtension}`
+      ? `${previewImage.iiifBaseUrl}/full/${width}/0/default.${
+          mimeExtensionMapping[subMimeType] ?? 'jpg'
+        }`
       : previewImage.uri
   }
 
