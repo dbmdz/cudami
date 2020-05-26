@@ -10,20 +10,33 @@ const PublicationDatesForm = (props) => {
     <FormGroup>
       <Row>
         <Col>
-            <Label className="font-weight-bold" for="publication-start-date">
+          <Label className="font-weight-bold" for="publication-start-date">
             {t('startPublicationDate')}:
           </Label>
         </Col>
         <Col>
-            <DatePicker
+          <DatePicker
             calendarAriaLabel={t('datePickerAriaLabel.calendarAriaLabel')}
             clearAriaLabel={t('datePickerAriaLabel.clearAriaLabel')}
             dayAriaLabel={t('datePickerAriaLabel.dayAriaLabel')}
             monthAriaLabel={t('datePickerAriaLabel.monthAriaLabel')}
             nativeInputAriaLabel={t('datePickerAriaLabel.nativeInputAriaLabel')}
-            onChange={(date) => props.onChange("publicationStart", `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`)}
+            onChange={(date) =>
+              props.onChange(
+                'publicationStart',
+                date
+                  ? date.getFullYear() +
+                      '-' +
+                      ('0' + (date.getMonth() + 1)).slice(-2) +
+                      '-' +
+                      ('0' + date.getDate()).slice(-2)
+                  : undefined
+              )
+            }
             required={false}
-            value={props.publicationStartDate ? new Date(props.publicationStartDate) : null}
+            value={
+              props.publicationStartDate && new Date(props.publicationStartDate)
+            }
             yearAriaLabel={t('datePickerAriaLabel.yearAriaLabel')}
           />
         </Col>
@@ -39,9 +52,22 @@ const PublicationDatesForm = (props) => {
             dayAriaLabel={t('datePickerAriaLabel.dayAriaLabel')}
             monthAriaLabel={t('datePickerAriaLabel.monthAriaLabel')}
             nativeInputAriaLabel={t('datePickerAriaLabel.nativeInputAriaLabel')}
-            onChange={(date) => props.onChange("publicationEnd", `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`)}
+            onChange={(date) =>
+              props.onChange(
+                'publicationEnd',
+                date
+                  ? date.getFullYear() +
+                      '-' +
+                      ('0' + (date.getMonth() + 1)).slice(-2) +
+                      '-' +
+                      ('0' + date.getDate()).slice(-2)
+                  : undefined
+              )
+            }
             required={false}
-            value={props.publicationEndDate ? new Date(props.publicationEndDate) : null}
+            value={
+              props.publicationEndDate && new Date(props.publicationEndDate)
+            }
             yearAriaLabel={t('datePickerAriaLabel.yearAriaLabel')}
           />
         </Col>
@@ -49,5 +75,5 @@ const PublicationDatesForm = (props) => {
     </FormGroup>
   )
 }
-  
+
 export default PublicationDatesForm
