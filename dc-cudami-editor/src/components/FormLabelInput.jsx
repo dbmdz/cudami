@@ -6,11 +6,11 @@ const FormLabelInput = (props) => {
   const {t} = useTranslation()
   return (
     <FormGroup>
-      <Label className="font-weight-bold" for={'label-' + props.language}>
+      <Label className="font-weight-bold" for={`label-${props.language}`}>
         {t('label')}
       </Label>
       <Input
-        id={'label-' + props.language}
+        id={`label-${props.language}`}
         onChange={props.onUpdate}
         type="text"
         value={props.label}
