@@ -6,7 +6,7 @@ import {withTranslation} from 'react-i18next'
 import ImageMetadataForm from './imageAdder/ImageMetadataForm'
 import ImageRenderingHintsForm from './imageAdder/ImageRenderingHintsForm'
 import ImageSelector from './imageAdder/ImageSelector'
-import {loadIdentifiable, saveFileResource} from '../../api'
+import {loadIdentifiable, saveFileResource, updateFileResource} from '../../api'
 
 class ImageAdderModal extends Component {
   initialAttributes = {
@@ -29,7 +29,8 @@ class ImageAdderModal extends Component {
       tooltipsOpen: {
         altText: false,
         caption: false,
-        label: false,
+        labelUpload: false,
+        labelUrl: false,
         search: false,
         title: false,
         upload: false,
