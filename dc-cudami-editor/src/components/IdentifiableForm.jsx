@@ -1,4 +1,3 @@
-import fromEntries from 'object.fromentries'
 import React, {Component} from 'react'
 import {Container, Label} from 'reactstrap'
 
