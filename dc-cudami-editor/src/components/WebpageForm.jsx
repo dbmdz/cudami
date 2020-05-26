@@ -99,6 +99,8 @@ const WebpageForm = (props) => {
             onChange={(updateKey, updateValue) =>
               props.onUpdate({...props.identifiable, [updateKey]: updateValue})
             }
+            publicationEndDate={props.publicationEndDate}
+            publicationStartDate={props.publicationStartDate}
           />
         </Col>
       </Row>
