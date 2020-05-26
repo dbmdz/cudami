@@ -110,15 +110,6 @@ class ImageAdderModal extends Component {
     })
   }
 
-  setAttributes = (attributes) => {
-    this.setState({
-      attributes: {
-        ...this.state.attributes,
-        ...attributes,
-      },
-    })
-  }
-
   submitFileResource = async () => {
     let resourceId = this.state.fileResource.uuid
     if (!resourceId) {
