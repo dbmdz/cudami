@@ -6,9 +6,8 @@ import {FaCopy, FaUpload} from 'react-icons/fa'
 
 import './FileUploadForm.css'
 
-const FileUploadForm = (props) => {
+const FileUploadForm = ({onChange, progress}) => {
   const {t} = useTranslation()
-  const {onChange, progress} = props
   return (
     <>
       <FileDrop

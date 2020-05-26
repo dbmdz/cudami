@@ -1,7 +1,7 @@
 import React from 'react'
 import {FormGroup, Input, Label} from 'reactstrap'
 
-const FormUrlInput = (props) => {
+const FormUrlInput = ({onChange, url}) => {
   return (
     <FormGroup>
       <Label className="font-weight-bold" for="url">
@@ -9,10 +9,10 @@ const FormUrlInput = (props) => {
       </Label>
       <Input
         id="url"
-        onChange={props.onChange}
+        onChange={onChange}
         required="required"
         type="url"
-        value={props.url}
+        value={url}
       />
     </FormGroup>
   )

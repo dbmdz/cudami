@@ -33,12 +33,10 @@ class LinkAdderModal extends Component {
   }
 
   render() {
-    const {t} = this.props
+    const {isOpen, onToggle, t} = this.props
     return (
-      <Modal isOpen={this.props.isOpen} toggle={this.props.onToggle}>
-        <ModalHeader toggle={this.props.onToggle}>
-          {t('insertLink')}
-        </ModalHeader>
+      <Modal isOpen={isOpen} toggle={onToggle}>
+        <ModalHeader toggle={onToggle}>{t('insertLink')}</ModalHeader>
         <ModalBody>
           <Form
             onSubmit={(evt) => {

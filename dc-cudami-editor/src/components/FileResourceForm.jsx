@@ -10,13 +10,23 @@ import LanguageAdder from './LanguageAdder'
 import LanguageTab from './LanguageTab'
 import LanguageTabContent from './LanguageTabContent'
 
-const FileResourceForm = (props) => {
+const FileResourceForm = ({
+  activeLanguage,
+  apiContextPath,
+  canAddLanguage,
+  existingLanguages,
+  identifiable,
+  onAddLanguage,
+  onSubmit,
+  onToggleLanguage,
+  onUpdate,
+}) => {
   const {t} = useTranslation()
-  if (!props.identifiable.uuid) {
+  if (!identifiable.uuid) {
     return (
       <FileResourceUploadForm
-        apiContextPath={props.apiContextPath}
-        onUpdate={props.onUpdate}
+        apiContextPath={apiContextPath}
+        onUpdate={onUpdate}
       />
     )
   }
@@ -24,12 +34,12 @@ const FileResourceForm = (props) => {
     <Form
       onSubmit={(evt) => {
         evt.preventDefault()
-        props.onSubmit()
+        onSubmit()
       }}
     >
       <Row>
         <Col xs="6" sm="9">
-          <h1>{t('editFileResource', {name: props.identifiable.filename})}</h1>
+          <h1>{t('editFileResource', {name: identifiable.filename})}</h1>
         </Col>
         <Col xs="6" sm="3">
           <FormButtons />
@@ -42,32 +52,30 @@ const FileResourceForm = (props) => {
       </Row>
       <Row>
         <Col sm="12">
-          <FormIdInput id={props.identifiable.uuid} />
+          <FormIdInput id={identifiable.uuid} />
           <Nav tabs>
-            {props.existingLanguages.map((language) => (
+            {existingLanguages.map((language) => (
               <LanguageTab
-                activeLanguage={props.activeLanguage}
+                activeLanguage={activeLanguage}
                 key={language}
                 language={language}
-                onClick={(language) => props.onToggleLanguage(language)}
+                onClick={(language) => onToggleLanguage(language)}
               />
             ))}
-            {props.canAddLanguage && (
-              <LanguageAdder onClick={props.onAddLanguage} />
-            )}
+            {canAddLanguage && <LanguageAdder onClick={onAddLanguage} />}
           </Nav>
-          <TabContent activeTab={props.activeLanguage}>
-            {props.existingLanguages.map((language) => (
+          <TabContent activeTab={activeLanguage}>
+            {existingLanguages.map((language) => (
               <LanguageTabContent
-                description={props.identifiable.description[language]}
+                description={identifiable.description[language]}
                 key={language}
-                label={props.identifiable.label[language]}
+                label={identifiable.label[language]}
                 language={language}
                 onUpdate={(updateKey, updateValue) =>
-                  props.onUpdate({
-                    ...props.identifiable,
+                  onUpdate({
+                    ...identifiable,
                     [updateKey]: {
-                      ...props.identifiable[updateKey],
+                      ...identifiable[updateKey],
                       [language]: updateValue,
                     },
                   })

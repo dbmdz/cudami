@@ -57,26 +57,25 @@ class IdentifiableForm extends Component {
   }
 
   async componentDidMount() {
-    const i18n = initI18n(this.props.uiLocale)
-    const availableLanguages = this.props.mockApi
+    const {apiContextPath, mockApi, type, uiLocale, uuid} = this.props
+    const i18n = initI18n(uiLocale)
+    const availableLanguages = mockApi
       ? getAvailableLanguages()
-      : await loadAvailableLanguages(this.props.apiContextPath)
-    const defaultLanguage = this.props.mockApi
+      : await loadAvailableLanguages(apiContextPath)
+    const defaultLanguage = mockApi
       ? getDefaultLanguage()
-      : await loadDefaultLanguage(this.props.apiContextPath)
+      : await loadDefaultLanguage(apiContextPath)
     let identifiable = await loadIdentifiable(
-      this.props.apiContextPath,
-      this.props.type,
-      this.props.uuid || 'new'
+      apiContextPath,
+      type,
+      uuid || 'new'
     )
     identifiable = {
       description: {},
       label: {
         [this.state.activeLanguage]: '',
       },
-      text: this.identifiablesWithLongText.includes(this.props.type)
-        ? {}
-        : undefined,
+      text: this.identifiablesWithLongText.includes(type) ? {} : undefined,
       ...identifiable,
     }
     this.setState({
@@ -196,6 +195,7 @@ class IdentifiableForm extends Component {
 
   submitIdentifiable = () => {
     if (this.isFormValid()) {
+      const {apiContextPath, parentType, parentUuid, type} = this.props
       const identifiable = {
         ...this.state.identifiable,
         description: this.cleanUpJson(this.state.identifiable.description),
@@ -204,18 +204,14 @@ class IdentifiableForm extends Component {
         identifiable.text = this.cleanUpJson(this.state.identifiable.text)
       }
       if (identifiable.uuid) {
-        updateIdentifiable(
-          this.props.apiContextPath,
-          identifiable,
-          this.props.type
-        )
+        updateIdentifiable(apiContextPath, identifiable, type)
       } else {
         saveIdentifiable(
-          this.props.apiContextPath,
+          apiContextPath,
           identifiable,
-          this.props.parentType,
-          this.props.parentUuid,
-          this.props.type
+          parentType,
+          parentUuid,
+          type
         )
       }
     }

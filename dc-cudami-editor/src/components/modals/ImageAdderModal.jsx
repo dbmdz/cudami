@@ -44,15 +44,16 @@ class ImageAdderModal extends Component {
   }
 
   async componentDidMount() {
+    const {activeLanguage, apiContextPath} = this.props
     const newFileResource = await loadIdentifiable(
-      this.props.apiContextPath,
+      apiContextPath,
       'fileResource',
       'new'
     )
     const initialFileResource = {
       ...newFileResource,
       fileResourceType: 'IMAGE',
-      label: {[this.props.activeLanguage]: ''},
+      label: {[activeLanguage]: ''},
       mimeType: 'image/png',
       uri: '',
     }

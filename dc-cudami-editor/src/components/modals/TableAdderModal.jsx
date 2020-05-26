@@ -34,12 +34,10 @@ class TableAdderModal extends Component {
   }
 
   render() {
-    const {t} = this.props
+    const {isOpen, onToggle, t} = this.props
     return (
-      <Modal isOpen={this.props.isOpen} toggle={this.props.onToggle}>
-        <ModalHeader toggle={this.props.onToggle}>
-          {t('insert.table')}
-        </ModalHeader>
+      <Modal isOpen={isOpen} toggle={onToggle}>
+        <ModalHeader toggle={onToggle}>{t('insert.table')}</ModalHeader>
         <ModalBody>
           <Form
             onSubmit={(evt) => {

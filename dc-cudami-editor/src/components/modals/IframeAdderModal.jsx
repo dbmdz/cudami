@@ -45,9 +45,9 @@ class IframeAdderModal extends Component {
   }
 
   render() {
-    const {t} = this.props
+    const {isOpen, t} = this.props
     return (
-      <Modal isOpen={this.props.isOpen} toggle={this.destroy}>
+      <Modal isOpen={isOpen} toggle={this.destroy}>
         <ModalHeader toggle={this.destroy}>{t('insert.iframe')}</ModalHeader>
         <ModalBody>
           <Form

@@ -2,15 +2,15 @@ import React from 'react'
 import {NavItem, NavLink} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-const LanguageTab = (props) => {
+const LanguageTab = ({activeLanguage, language, onClick}) => {
   const {t} = useTranslation()
   return (
     <NavItem>
       <NavLink
-        className={props.language === props.activeLanguage ? 'active' : ''}
-        onClick={() => props.onClick(props.language)}
+        className={language === activeLanguage ? 'active' : ''}
+        onClick={() => onClick(language)}
       >
-        {t(`languageNames:${props.language}`)}
+        {t(`languageNames:${language}`)}
       </NavLink>
     </NavItem>
   )
