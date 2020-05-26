@@ -9,7 +9,7 @@ import LanguageAdder from './LanguageAdder'
 import LanguageTab from './LanguageTab'
 import LanguageTabContent from './LanguageTabContent'
 
-const WebpageForm = (props) => {
+const ArticleForm = (props) => {
   const {t} = useTranslation()
   return (
     <Form
@@ -90,4 +90,4 @@ const WebpageForm = (props) => {
   )
 }
 
-export default WebpageForm
+export default ArticleForm
