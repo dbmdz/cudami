@@ -31,15 +31,16 @@ import initI18n from '../i18n'
 import '../polyfills'
 
 class IdentifiableForm extends Component {
+  identifiablesWithLongText = [
+    'article',
+    'collection',
+    'corporation',
+    'project',
+    'webpage',
+  ]
+
   constructor(props) {
     super(props)
-    this.identifiablesWithLongText = [
-      'article',
-      'collection',
-      'corporation',
-      'project',
-      'webpage',
-    ]
     this.state = {
       activeLanguage: props.activeLanguage,
       availableLanguages: [],
