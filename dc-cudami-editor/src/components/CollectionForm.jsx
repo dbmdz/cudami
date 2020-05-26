@@ -46,7 +46,7 @@ const CollectionForm = ({
         <Col sm="12">
           {identifiable.uuid && <FormIdInput id={identifiable.uuid} />}
           <Nav tabs>
-            {props.existingLanguages.map((language) => (
+            {existingLanguages.map((language) => (
               <LanguageTab
                 activeLanguage={activeLanguage}
                 key={language}

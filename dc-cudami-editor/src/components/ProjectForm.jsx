@@ -46,10 +46,10 @@ const ProjectForm = ({
           <Nav tabs>
             {existingLanguages.map((language) => (
               <LanguageTab
-                activeLanguage={props.activeLanguage}
+                activeLanguage={activeLanguage}
                 key={language}
                 language={language}
-                onClick={(language) => props.onToggleLanguage(language)}
+                onClick={(language) => onToggleLanguage(language)}
               />
             ))}
             {canAddLanguage && <LanguageAdder onClick={onAddLanguage} />}
