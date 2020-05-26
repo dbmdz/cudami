@@ -39,7 +39,7 @@ const ProjectForm = (props) => {
             <FormIdInput id={props.identifiable.uuid} />
           )}
           <Nav tabs>
-            {Object.entries(props.identifiable.label).map(([language]) => (
+            {props.existingLanguages.map((language) => (
               <LanguageTab
                 activeLanguage={props.activeLanguage}
                 key={language}
@@ -47,44 +47,40 @@ const ProjectForm = (props) => {
                 onClick={(language) => props.onToggleLanguage(language)}
               />
             ))}
-            {props.canAddLanguage && (
-              <LanguageAdder onClick={props.onAddLanguage} />
-            )}
+            {canAddLanguage && <LanguageAdder onClick={onAddLanguage} />}
           </Nav>
           <TabContent activeTab={props.activeLanguage}>
-            {Object.entries(props.identifiable.label).map(
-              ([language, text]) => (
-                <LanguageTabContent
-                  description={props.identifiable.description[language]}
-                  key={language}
-                  label={text}
-                  language={language}
-                  onUpdate={(updateKey, updateValue) =>
+            {props.existingLanguages.map((language) => (
+              <LanguageTabContent
+                description={props.identifiable.description[language]}
+                key={language}
+                label={props.identifiable.label[language]}
+                language={language}
+                onUpdate={(updateKey, updateValue) =>
+                  props.onUpdate({
+                    ...props.identifiable,
+                    [updateKey]: {
+                      ...props.identifiable[updateKey],
+                      [language]: updateValue,
+                    },
+                  })
+                }
+              >
+                <FormEditor
+                  document={props.identifiable.text[language]}
+                  type="text"
+                  onUpdate={(document) => {
                     props.onUpdate({
                       ...props.identifiable,
-                      [updateKey]: {
-                        ...props.identifiable[updateKey],
-                        [language]: updateValue,
+                      text: {
+                        ...props.identifiable['text'],
+                        [language]: document,
                       },
                     })
-                  }
-                >
-                  <FormEditor
-                    document={props.identifiable.text[language]}
-                    type="text"
-                    onUpdate={(document) => {
-                      props.onUpdate({
-                        ...props.identifiable,
-                        text: {
-                          ...props.identifiable['text'],
-                          [language]: document,
-                        },
-                      })
-                    }}
-                  />
-                </LanguageTabContent>
-              )
-            )}
+                  }}
+                />
+              </LanguageTabContent>
+            ))}
           </TabContent>
         </Col>
       </Row>
