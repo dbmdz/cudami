@@ -28,11 +28,7 @@ import LanguageAdderModal from './modals/LanguageAdderModal'
 import LinkAdderModal from './modals/LinkAdderModal'
 import TableAdderModal from './modals/TableAdderModal'
 import initI18n from '../i18n'
-
-/* TODO: needs more investigation */
-if (!Object.fromEntries) {
-  fromEntries.shim()
-}
+import '../polyfills'
 
 class IdentifiableForm extends Component {
   constructor(props) {
