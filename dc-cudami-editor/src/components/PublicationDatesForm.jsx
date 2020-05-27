@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {FormGroup, Label, Row, Col} from 'reactstrap'
+import {Col, FormGroup, Label, Row} from 'reactstrap'
 import DatePicker from 'react-date-picker'
 import {useTranslation} from 'react-i18next'
 
