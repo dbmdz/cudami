@@ -3,7 +3,11 @@ import {Col, FormGroup, Label, Row} from 'reactstrap'
 import DatePicker from 'react-date-picker'
 import {useTranslation} from 'react-i18next'
 
-const PublicationDatesForm = (props) => {
+const PublicationDatesForm = ({
+  onChange,
+  publicationEndDate,
+  publicationStartDate,
+}) => {
   const {t} = useTranslation()
 
   const formatDate = (date) => {
@@ -34,13 +38,9 @@ const PublicationDatesForm = (props) => {
             id={'publication-start-date'}
             monthAriaLabel={t('datePicker.month')}
             nativeInputAriaLabel={t('datePicker.date')}
-            onChange={(date) =>
-              props.onChange('publicationStart', formatDate(date))
-            }
+            onChange={(date) => onChange('publicationStart', formatDate(date))}
             required={false}
-            value={
-              props.publicationStartDate && new Date(props.publicationStartDate)
-            }
+            value={publicationStartDate && new Date(publicationStartDate)}
             yearAriaLabel={t('datePicker.year')}
           />
         </Col>
@@ -57,13 +57,9 @@ const PublicationDatesForm = (props) => {
             id={'publication-end-date'}
             monthAriaLabel={t('datePicker.month')}
             nativeInputAriaLabel={t('datePicker.date')}
-            onChange={(date) =>
-              props.onChange('publicationEnd', formatDate(date))
-            }
+            onChange={(date) => onChange('publicationEnd', formatDate(date))}
             required={false}
-            value={
-              props.publicationEndDate && new Date(props.publicationEndDate)
-            }
+            value={publicationEndDate && new Date(publicationEndDate)}
             yearAriaLabel={t('datePicker.year')}
           />
         </Col>

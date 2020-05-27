@@ -46,10 +46,10 @@ const WebpageForm = ({
           {identifiable.uuid && <FormIdInput id={identifiable.uuid} />}
           <PublicationDatesForm
             onChange={(updateKey, updateValue) =>
-              props.onUpdate({...props.identifiable, [updateKey]: updateValue})
+              onUpdate({...identifiable, [updateKey]: updateValue})
             }
-            publicationEndDate={props.identifiable.publicationEnd}
-            publicationStartDate={props.identifiable.publicationStart}
+            publicationEndDate={identifiable.publicationEnd}
+            publicationStartDate={identifiable.publicationStart}
           />
           <Nav tabs>
             {existingLanguages.map((language) => (
