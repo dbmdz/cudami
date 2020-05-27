@@ -39,6 +39,13 @@ const WebpageForm = (props) => {
           {props.identifiable.uuid && (
             <FormIdInput id={props.identifiable.uuid} />
           )}
+          <PublicationDatesForm
+            onChange={(updateKey, updateValue) =>
+              props.onUpdate({...props.identifiable, [updateKey]: updateValue})
+            }
+            publicationEndDate={props.identifiable.publicationEnd}
+            publicationStartDate={props.identifiable.publicationStart}
+          />
           <Nav tabs>
             {props.existingLanguages.map((language) => (
               <LanguageTab
@@ -90,18 +97,6 @@ const WebpageForm = (props) => {
               </LanguageTabContent>
             ))}
           </TabContent>
-          <Row>
-            <Col sm="12">
-              <hr />
-            </Col>
-          </Row>
-          <PublicationDatesForm
-            onChange={(updateKey, updateValue) =>
-              props.onUpdate({...props.identifiable, [updateKey]: updateValue})
-            }
-            publicationEndDate={props.identifiable.publicationEnd}
-            publicationStartDate={props.identifiable.publicationStart}
-          />
         </Col>
       </Row>
     </Form>
