@@ -26,13 +26,13 @@
     "createTopic": "Neues Thema anlegen",
     "createWebpage": "Neue Webseite anlegen",
     "createWebsite": "Neue Website anlegen",
-    "datePickerAriaLabel": {
-      "calendarAriaLabel": "Kalender ein-/ausblenden",
-      "clearAriaLabel": "Datum löschen",
-      "dayAriaLabel": "Tag",
-      "monthAriaLabel": "Monat",
-      "nativeInputAriaLabel": "Datum",
-      "yearAriaLabel": "Jahr"
+    "datePicker": {
+      "clearDate": "Datum löschen",
+      "date": "Datum",
+      "day": "Tag",
+      "month": "Monat",
+      "toggleCalendar": "Kalender ein-/ausblenden",
+      "year": "Jahr"
     },
     "defineRenderingHints": "Darstellungshinweise festlegen",
     "description": "Kurzbeschreibung",
