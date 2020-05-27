@@ -40,7 +40,7 @@ class ImageSelector extends Component {
       activeTab !== this.state.activeTab &&
       evt.currentTarget === evt.target
     ) {
-      this.props.resetFileResource()
+      this.props.onTabChanged()
       this.setState({
         activeTab,
       })
