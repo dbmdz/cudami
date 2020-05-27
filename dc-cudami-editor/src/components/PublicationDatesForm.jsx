@@ -7,13 +7,13 @@ const PublicationDatesForm = (props) => {
   const {t} = useTranslation()
 
   const formatDate = (date) => {
-    if (date != undefined) {
+    if (date) {
       // Selected datetime will be displayed correctly in DatePicker.
       // But after reloading, there's a minus one-day offset. Here
-      // we add 12 hours to the user-defined date to workaround
-      // this issue 😒
+      // we add 12 hours (could be related to the time zone of the user)
+      // to the user-defined date to workaround this issue 😒
       date.setHours(date.getHours() + 12)
-      return date.toISOString()
+      return date.toISOString().slice(0,10)
     }
     return undefined
   }
