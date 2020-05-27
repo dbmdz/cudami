@@ -27,13 +27,7 @@ const ImageLabelInput = ({
       <InputGroup>
         <Input
           name={name}
-          onChange={(evt) =>
-            onChange({
-              label: {
-                [Object.keys(label)[0]]: evt.target.value,
-              },
-            })
-          }
+          onChange={onChange}
           placeholder={t('label')}
           required
           type="text"

@@ -182,7 +182,18 @@ class ImageSelector extends Component {
                 className="mt-3"
                 label={fileResource.label}
                 name="label-upload"
-                onChange={onChange}
+                onChange={(evt) =>
+                  onChange(
+                    {
+                      label: {
+                        [Object.keys(fileResource.label)[0]]: evt.target.value,
+                      },
+                    },
+                    {
+                      doUpdateRequest: true,
+                    }
+                  )
+                }
                 toggleTooltip={toggleTooltip}
                 tooltipName="labelUpload"
                 tooltipsOpen={tooltipsOpen}
@@ -202,7 +213,13 @@ class ImageSelector extends Component {
               <ImageLabelInput
                 label={fileResource.label}
                 name="label-url"
-                onChange={onChange}
+                onChange={(evt) =>
+                  onChange({
+                    label: {
+                      [Object.keys(fileResource.label)[0]]: evt.target.value,
+                    },
+                  })
+                }
                 toggleTooltip={toggleTooltip}
                 tooltipName="labelUrl"
                 tooltipsOpen={tooltipsOpen}

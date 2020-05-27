@@ -23,6 +23,7 @@ class ImageAdderModal extends Component {
     super(props)
     this.state = {
       attributes: this.initialAttributes,
+      doUpdateRequest: false,
       fileResource: {},
       metadataOpen: true,
       renderingHintsOpen: false,
@@ -78,6 +79,7 @@ class ImageAdderModal extends Component {
     this.props.onToggle()
     this.setState({
       attributes: this.initialAttributes,
+      doUpdateRequest: false,
       fileResource: this.state.initialFileResource,
       metadataOpen: true,
       renderingHintsOpen: false,
@@ -86,6 +88,7 @@ class ImageAdderModal extends Component {
 
   resetFileResource = () => {
     this.setState({
+      doUpdateRequest: false,
       fileResource: this.state.initialFileResource,
     })
   }
@@ -116,6 +119,8 @@ class ImageAdderModal extends Component {
         this.state.fileResource
       )
       resourceId = uuid
+    } else if (this.state.doUpdateRequest) {
+      updateFileResource(this.props.apiContextPath, this.state.fileResource)
     }
     return resourceId
   }
