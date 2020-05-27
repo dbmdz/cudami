@@ -83,13 +83,21 @@ class ImageAdderModal extends Component {
       fileResource: this.state.initialFileResource,
       metadataOpen: true,
       renderingHintsOpen: false,
+      tooltipsOpen: this.getClosedTooltipsState(),
     })
   }
 
-  resetFileResource = () => {
+  getClosedTooltipsState = () => {
+    return Object.fromEntries(
+      Object.entries(this.state.tooltipsOpen).map(([name, _]) => [name, false])
+    )
+  }
+
+  onTabChanged = () => {
     this.setState({
       doUpdateRequest: false,
       fileResource: this.state.initialFileResource,
+      tooltipsOpen: this.getClosedTooltipsState(),
     })
   }
 
@@ -128,12 +136,7 @@ class ImageAdderModal extends Component {
   toggleTooltip = (name) => {
     this.setState({
       tooltipsOpen: {
-        ...Object.fromEntries(
-          Object.entries(this.state.tooltipsOpen).map(([name, _]) => [
-            name,
-            false,
-          ])
-        ),
+        ...this.getClosedTooltipsState(),
         [name]: !this.state.tooltipsOpen[name],
       },
     })
@@ -177,7 +180,7 @@ class ImageAdderModal extends Component {
               onChange={(updateFields, additionalFields) =>
                 this.updateFileResource(updateFields, additionalFields)
               }
-              resetFileResource={() => this.resetFileResource()}
+              onTabChanged={this.onTabChanged}
               toggleTooltip={(name) => this.toggleTooltip(name)}
               tooltipsOpen={this.state.tooltipsOpen}
             />
