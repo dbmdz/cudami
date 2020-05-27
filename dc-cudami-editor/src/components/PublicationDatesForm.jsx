@@ -13,7 +13,7 @@ const PublicationDatesForm = (props) => {
       // we add 12 hours (could be related to the time zone of the user)
       // to the user-defined date to workaround this issue 😒
       date.setHours(date.getHours() + 12)
-      return date.toISOString().slice(0,10)
+      return date.toISOString().slice(0, 10)
     }
     return undefined
   }
