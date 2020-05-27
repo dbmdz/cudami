@@ -19,6 +19,7 @@ const PublicationDatesForm = (props) => {
             calendarAriaLabel={t('datePicker.toggleCalendar')}
             clearAriaLabel={t('datePicker.clearDate')}
             dayAriaLabel={t('datePicker.day')}
+            id={"publication-start-date"}
             monthAriaLabel={t('datePicker.month')}
             nativeInputAriaLabel={t('datePicker.date')}
             onChange={(date) =>
@@ -50,6 +51,7 @@ const PublicationDatesForm = (props) => {
             calendarAriaLabel={t('datePicker.toggleCalendar')}
             clearAriaLabel={t('datePicker.clearDate')}
             dayAriaLabel={t('datePicker.day')}
+            id={"publication-end-date"}
             monthAriaLabel={t('datePicker.month')}
             nativeInputAriaLabel={t('datePicker.date')}
             onChange={(date) =>
