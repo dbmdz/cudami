@@ -7,9 +7,6 @@ import {
   CardHeader,
   FormGroup,
   Input,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
   Nav,
   NavItem,
   NavLink,
@@ -22,6 +19,7 @@ import {withTranslation} from 'react-i18next'
 import {FaQuestionCircle} from 'react-icons/fa'
 
 import ImageAutocomplete from './ImageAutocomplete'
+import ImageLabelInput from './ImageLabelInput'
 import {mimeExtensionMapping} from '../utils'
 import FileUploadForm from '../../FileUploadForm'
 import {uploadFile} from '../../../api'
@@ -47,6 +45,17 @@ class ImageSelector extends Component {
         activeTab,
       })
     }
+  }
+
+  updateLabel = (newValue, additionalFields = {}) => {
+    this.props.onChange(
+      {
+        label: {
+          [Object.keys(this.props.fileResource.label)[0]]: newValue,
+        },
+      },
+      additionalFields
+    )
   }
 
   updateProgress = (progress) => {
@@ -180,6 +189,19 @@ class ImageSelector extends Component {
                 onChange={(file) => this.uploadImage(file)}
                 progress={this.state.progress}
               />
+              <ImageLabelInput
+                className="mt-3"
+                label={fileResource.label}
+                name="label-upload"
+                onChange={(evt) =>
+                  this.updateLabel(evt.target.value, {
+                    doUpdateRequest: true,
+                  })
+                }
+                toggleTooltip={toggleTooltip}
+                tooltipName="labelUpload"
+                tooltipsOpen={tooltipsOpen}
+              />
             </TabPane>
             <TabPane tabId="url">
               <FormGroup>
@@ -192,45 +214,14 @@ class ImageSelector extends Component {
                   value={fileResource.uri}
                 />
               </FormGroup>
-              <FormGroup className="mb-0">
-                <InputGroup>
-                  <Input
-                    name="label"
-                    onChange={(evt) =>
-                      onChange({
-                        label: {
-                          [Object.keys(fileResource.label)[0]]:
-                            evt.target.value,
-                        },
-                      })
-                    }
-                    placeholder={t('label')}
-                    required
-                    type="text"
-                    value={
-                      fileResource.label
-                        ? Object.values(fileResource.label)[0]
-                        : ''
-                    }
-                  />
-                  <InputGroupAddon addonType="append">
-                    <InputGroupText>
-                      <FaQuestionCircle
-                        id="label-tooltip"
-                        style={{cursor: 'pointer'}}
-                      />
-                      <Popover
-                        isOpen={tooltipsOpen.label}
-                        placement="left"
-                        target="label-tooltip"
-                        toggle={() => toggleTooltip('label')}
-                      >
-                        <PopoverBody>{t('tooltips.label')}</PopoverBody>
-                      </Popover>
-                    </InputGroupText>
-                  </InputGroupAddon>
-                </InputGroup>
-              </FormGroup>
+              <ImageLabelInput
+                label={fileResource.label}
+                name="label-url"
+                onChange={(evt) => this.updateLabel(evt.target.value)}
+                toggleTooltip={toggleTooltip}
+                tooltipName="labelUrl"
+                tooltipsOpen={tooltipsOpen}
+              />
             </TabPane>
             <TabPane tabId="search">
               <ImageAutocomplete
