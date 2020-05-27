@@ -47,6 +47,17 @@ class ImageSelector extends Component {
     }
   }
 
+  updateLabel = (newValue, additionalFields = {}) => {
+    this.props.onChange(
+      {
+        label: {
+          [Object.keys(this.props.fileResource.label)[0]]: newValue,
+        },
+      },
+      additionalFields
+    )
+  }
+
   updateProgress = (progress) => {
     this.setState({
       progress,
@@ -183,16 +194,9 @@ class ImageSelector extends Component {
                 label={fileResource.label}
                 name="label-upload"
                 onChange={(evt) =>
-                  onChange(
-                    {
-                      label: {
-                        [Object.keys(fileResource.label)[0]]: evt.target.value,
-                      },
-                    },
-                    {
-                      doUpdateRequest: true,
-                    }
-                  )
+                  this.updateLabel(evt.target.value, {
+                    doUpdateRequest: true,
+                  })
                 }
                 toggleTooltip={toggleTooltip}
                 tooltipName="labelUpload"
@@ -213,13 +217,7 @@ class ImageSelector extends Component {
               <ImageLabelInput
                 label={fileResource.label}
                 name="label-url"
-                onChange={(evt) =>
-                  onChange({
-                    label: {
-                      [Object.keys(fileResource.label)[0]]: evt.target.value,
-                    },
-                  })
-                }
+                onChange={(evt) => this.updateLabel(evt.target.value)}
                 toggleTooltip={toggleTooltip}
                 tooltipName="labelUrl"
                 tooltipsOpen={tooltipsOpen}
