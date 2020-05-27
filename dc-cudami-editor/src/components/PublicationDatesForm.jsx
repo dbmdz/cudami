@@ -16,11 +16,11 @@ const PublicationDatesForm = (props) => {
         </Col>
         <Col>
           <DatePicker
-            calendarAriaLabel={t('datePickerAriaLabel.calendarAriaLabel')}
-            clearAriaLabel={t('datePickerAriaLabel.clearAriaLabel')}
-            dayAriaLabel={t('datePickerAriaLabel.dayAriaLabel')}
-            monthAriaLabel={t('datePickerAriaLabel.monthAriaLabel')}
-            nativeInputAriaLabel={t('datePickerAriaLabel.nativeInputAriaLabel')}
+            calendarAriaLabel={t('datePicker.toggleCalendar')}
+            clearAriaLabel={t('datePicker.clearDate')}
+            dayAriaLabel={t('datePicker.day')}
+            monthAriaLabel={t('datePicker.month')}
+            nativeInputAriaLabel={t('datePicker.date')}
             onChange={(date) =>
               props.onChange(
                 'publicationStart',
@@ -37,7 +37,7 @@ const PublicationDatesForm = (props) => {
             value={
               props.publicationStartDate && new Date(props.publicationStartDate)
             }
-            yearAriaLabel={t('datePickerAriaLabel.yearAriaLabel')}
+            yearAriaLabel={t('datePicker.year')}
           />
         </Col>
         <Col>
@@ -47,11 +47,11 @@ const PublicationDatesForm = (props) => {
         </Col>
         <Col>
           <DatePicker
-            calendarAriaLabel={t('datePickerAriaLabel.calendarAriaLabel')}
-            clearAriaLabel={t('datePickerAriaLabel.clearAriaLabel')}
-            dayAriaLabel={t('datePickerAriaLabel.dayAriaLabel')}
-            monthAriaLabel={t('datePickerAriaLabel.monthAriaLabel')}
-            nativeInputAriaLabel={t('datePickerAriaLabel.nativeInputAriaLabel')}
+            calendarAriaLabel={t('datePicker.toggleCalendar')}
+            clearAriaLabel={t('datePicker.clearDate')}
+            dayAriaLabel={t('datePicker.day')}
+            monthAriaLabel={t('datePicker.month')}
+            nativeInputAriaLabel={t('datePicker.date')}
             onChange={(date) =>
               props.onChange(
                 'publicationEnd',
@@ -68,7 +68,7 @@ const PublicationDatesForm = (props) => {
             value={
               props.publicationEndDate && new Date(props.publicationEndDate)
             }
-            yearAriaLabel={t('datePickerAriaLabel.yearAriaLabel')}
+            yearAriaLabel={t('datePicker.year')}
           />
         </Col>
       </Row>
