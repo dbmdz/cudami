@@ -89,11 +89,6 @@ const WebpageForm = (props) => {
                     })
                   }}
                 />
-                <Row>
-                  <Col sm="12">
-                    <hr />
-                  </Col>
-                </Row>
               </LanguageTabContent>
             ))}
           </TabContent>
