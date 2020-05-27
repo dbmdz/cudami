@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React from 'react'
 import {Col, FormGroup, Label, Row} from 'reactstrap'
 import DatePicker from 'react-date-picker'
 import {useTranslation} from 'react-i18next'
