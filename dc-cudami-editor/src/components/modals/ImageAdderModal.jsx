@@ -39,7 +39,7 @@ class ImageAdderModal extends Component {
       },
     }
     subscribe('editor.show-image-modal', () => {
-      this.props.onToggle('imageAdder')
+      this.props.onToggle()
     })
   }
 
@@ -77,7 +77,7 @@ class ImageAdderModal extends Component {
   }
 
   destroy = () => {
-    this.props.onToggle('imageAdder')
+    this.props.onToggle()
     this.setState({
       attributes: this.initialAttributes,
       doUpdateRequest: false,

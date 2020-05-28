@@ -22,7 +22,7 @@ class IframeAdderModal extends Component {
       width: '',
     }
     subscribe('editor.show-iframe-modal', () => {
-      this.props.onToggle('iframeAdder')
+      this.props.onToggle()
     })
   }
 
@@ -35,7 +35,7 @@ class IframeAdderModal extends Component {
   }
 
   destroy = () => {
-    this.props.onToggle('iframeAdder')
+    this.props.onToggle()
     this.setState({
       height: '',
       src: '',

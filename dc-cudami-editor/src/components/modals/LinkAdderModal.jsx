@@ -19,7 +19,7 @@ class LinkAdderModal extends Component {
       title: '',
     }
     subscribe('editor.show-link-modal', () => {
-      this.props.onToggle('linkAdder')
+      this.props.onToggle()
     })
   }
 
@@ -29,7 +29,7 @@ class LinkAdderModal extends Component {
   }
 
   destroy = () => {
-    this.props.onToggle('linkAdder')
+    this.props.onToggle()
     this.setState({
       href: '',
       title: '',

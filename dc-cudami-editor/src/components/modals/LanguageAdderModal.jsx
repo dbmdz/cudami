@@ -26,7 +26,7 @@ class LanguageAdderModal extends Component {
   }
 
   destroy = () => {
-    this.props.onToggle('languageAdder')
+    this.props.onToggle()
   }
 
   setLanguage = (selectedLanguage) => {

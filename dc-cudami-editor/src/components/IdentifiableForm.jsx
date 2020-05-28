@@ -251,7 +251,7 @@ class IdentifiableForm extends Component {
         )}
         <IframeAdderModal
           isOpen={this.state.modalsOpen.iframeAdder}
-          onToggle={this.toggleModal}
+          onToggle={() => this.toggleModal('iframeAdder')}
         />
         <ImageAdderModal
           activeLanguage={this.state.activeLanguage}
@@ -259,7 +259,7 @@ class IdentifiableForm extends Component {
           debug={this.props.debug}
           defaultLanguage={this.state.defaultLanguage}
           isOpen={this.state.modalsOpen.imageAdder}
-          onToggle={this.toggleModal}
+          onToggle={() => this.toggleModal('imageAdder')}
         />
         <LanguageAdderModal
           addLanguage={this.addLanguage}
@@ -269,11 +269,11 @@ class IdentifiableForm extends Component {
         />
         <LinkAdderModal
           isOpen={this.state.modalsOpen.linkAdder}
-          onToggle={this.toggleModal}
+          onToggle={() => this.toggleModal('linkAdder')}
         />
         <TableAdderModal
           isOpen={this.state.modalsOpen.tableAdder}
-          onToggle={this.toggleModal}
+          onToggle={() => this.toggleModal('tableAdder')}
         />
       </Container>
     ) : null

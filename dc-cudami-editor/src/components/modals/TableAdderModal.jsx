@@ -20,7 +20,7 @@ class TableAdderModal extends Component {
       rows: 2,
     }
     subscribe('editor.show-table-modal', () => {
-      this.props.onToggle('tableAdder')
+      this.props.onToggle()
     })
   }
 
@@ -30,7 +30,7 @@ class TableAdderModal extends Component {
   }
 
   destroy = () => {
-    this.props.onToggle('tableAdder')
+    this.props.onToggle()
     this.setState({
       columns: 2,
       rows: 2,
