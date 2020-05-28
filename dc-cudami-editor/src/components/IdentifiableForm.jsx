@@ -95,7 +95,7 @@ class IdentifiableForm extends Component {
     })
   }
 
-  addLanguage = (selectedLanguage, modalName) => {
+  addLanguage = (selectedLanguage) => {
     this.setState({
       activeLanguage: selectedLanguage.name,
       availableLanguages: this.state.availableLanguages.filter(
@@ -111,10 +111,6 @@ class IdentifiableForm extends Component {
           ...this.state.identifiable.label,
           [selectedLanguage.name]: '',
         },
-      },
-      modalsOpen: {
-        ...this.state.modalsOpen,
-        [modalName]: !this.state.modalsOpen[modalName],
       },
     })
   }
@@ -255,7 +251,7 @@ class IdentifiableForm extends Component {
         )}
         <IframeAdderModal
           isOpen={this.state.modalsOpen.iframeAdder}
-          onToggle={() => this.toggleModal('iframeAdder')}
+          onToggle={this.toggleModal}
         />
         <ImageAdderModal
           activeLanguage={this.state.activeLanguage}
@@ -263,21 +259,21 @@ class IdentifiableForm extends Component {
           debug={this.props.debug}
           defaultLanguage={this.state.defaultLanguage}
           isOpen={this.state.modalsOpen.imageAdder}
-          onToggle={() => this.toggleModal('imageAdder')}
+          onToggle={this.toggleModal}
         />
         <LanguageAdderModal
+          addLanguage={this.addLanguage}
           availableLanguages={this.state.availableLanguages}
           isOpen={this.state.modalsOpen.languageAdder}
-          onClick={(language) => this.addLanguage(language, 'languageAdder')}
           onToggle={() => this.toggleModal('languageAdder')}
         />
         <LinkAdderModal
           isOpen={this.state.modalsOpen.linkAdder}
-          onToggle={() => this.toggleModal('linkAdder')}
+          onToggle={this.toggleModal}
         />
         <TableAdderModal
           isOpen={this.state.modalsOpen.tableAdder}
-          onToggle={() => this.toggleModal('tableAdder')}
+          onToggle={this.toggleModal}
         />
       </Container>
     ) : null

@@ -20,13 +20,17 @@ class TableAdderModal extends Component {
       rows: 2,
     }
     subscribe('editor.show-table-modal', () => {
-      this.props.onToggle()
+      this.props.onToggle('tableAdder')
     })
   }
 
   addTableToEditor = () => {
-    this.props.onToggle()
     publish('editor.add-table', this.state)
+    this.destroy()
+  }
+
+  destroy = () => {
+    this.props.onToggle('tableAdder')
     this.setState({
       columns: 2,
       rows: 2,
@@ -34,10 +38,10 @@ class TableAdderModal extends Component {
   }
 
   render() {
-    const {isOpen, onToggle, t} = this.props
+    const {isOpen, t} = this.props
     return (
-      <Modal isOpen={isOpen} toggle={onToggle}>
-        <ModalHeader toggle={onToggle}>{t('insert.table')}</ModalHeader>
+      <Modal isOpen={isOpen} toggle={this.destroy}>
+        <ModalHeader toggle={this.destroy}>{t('insert.table')}</ModalHeader>
         <ModalBody>
           <Form
             onSubmit={(evt) => {

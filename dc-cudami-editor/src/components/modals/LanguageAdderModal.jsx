@@ -17,11 +17,16 @@ class LanguageAdderModal extends Component {
   }
 
   addLanguage = () => {
-    const {availableLanguages, onClick} = this.props
+    const {addLanguage, availableLanguages} = this.props
     const selectedLanguage = availableLanguages.filter(
       (language) => language.name === this.state.selectedLanguage
     )[0]
-    onClick(selectedLanguage)
+    addLanguage(selectedLanguage)
+    this.destroy()
+  }
+
+  destroy = () => {
+    this.props.onToggle('languageAdder')
   }
 
   setLanguage = (selectedLanguage) => {
@@ -31,14 +36,14 @@ class LanguageAdderModal extends Component {
   }
 
   render() {
-    const {availableLanguages, isOpen, onToggle, t} = this.props
+    const {availableLanguages, isOpen, t} = this.props
     return (
       <Modal
         isOpen={isOpen}
         onOpened={() => this.setLanguage(availableLanguages[0].name)}
-        toggle={onToggle}
+        toggle={this.destroy}
       >
-        <ModalHeader toggle={onToggle}>{t('chooseLanguage')}</ModalHeader>
+        <ModalHeader toggle={this.destroy}>{t('chooseLanguage')}</ModalHeader>
         <ModalBody>
           <Form
             onSubmit={(evt) => {
