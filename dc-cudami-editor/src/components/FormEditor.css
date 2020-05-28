@@ -1,3 +1,8 @@
+.ProseMirror {
+  max-height: 500px;
+  overflow-y: scroll;
+}
+
 .cudami-editor iframe.editable {
   border: 5px dashed;
 }
