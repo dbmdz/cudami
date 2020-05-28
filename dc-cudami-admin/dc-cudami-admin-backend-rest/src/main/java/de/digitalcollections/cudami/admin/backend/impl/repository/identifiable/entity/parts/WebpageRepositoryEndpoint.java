@@ -45,7 +45,7 @@ public interface WebpageRepositoryEndpoint extends RepositoryEndpoint {
   List<Webpage> getChildren(@Param("uuid") UUID uuid);
 
   @RequestLine("GET /latest/webpages/{uuid}/parent")
-  Webpage getParent(UUID uuid);
+  Webpage getParent(@Param("uuid") UUID uuid);
 
   @RequestLine("POST /latest/websites/{parentWebsiteUuid}/webpage")
   @Headers("Content-Type: application/json")

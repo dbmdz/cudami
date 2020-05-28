@@ -13,6 +13,22 @@
     <section layout:fragment="content" th:object="${webpage}">
 
       <div class="row">
+        <div class="col-12">
+          <ol class="breadcrumb hidden-xs-down">
+            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/websites}">Websites</a></li>
+            <li class="breadcrumb-item">TODO</li>
+            <th:block th:if="${not #lists.isEmpty(breadcrumbs)}">
+              <th:block th:each="breadcrumb,iterStat: ${breadcrumbs}">
+                <li class="breadcrumb-item"><a th:href="@{/webpages/} + ${breadcrumb.uuid}"><th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${breadcrumb.label}, ${locale})">Node Label</th:block></a></li>
+              </th:block>
+            </th:block>
+          </ol>
+        </div>
+      </div>
+      
+
+      <div class="row">
         <div class="col-sm-6">
           <h1 th:text="#{webpage}">Webpage</h1>
         </div>
@@ -74,7 +90,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="row">
         <div class="col-sm-12">
           <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
@@ -109,7 +125,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="row">
         <div class="col-sm-12">
           <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">

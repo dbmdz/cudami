@@ -5,8 +5,11 @@ import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepositor
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.WebpageService;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
+import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -138,6 +141,19 @@ public class WebpagesController extends AbstractController {
     List<FileResource> relatedFileResources = service.getRelatedFileResources(webpage);
     model.addAttribute("relatedFileResources", relatedFileResources);
 
+    List<Node> breadcrumbs = new ArrayList<>();
+    addParentNodeToBreadcrumb(webpage, breadcrumbs);
+    Collections.reverse(breadcrumbs);
+    model.addAttribute("breadcrumbs", breadcrumbs);
+    
     return "webpages/view";
+  }
+  
+  private void addParentNodeToBreadcrumb(Node currentWebpage, List<Node> breadcrumbs) {
+    Node parent = service.getParent(currentWebpage);
+    if (parent != null && parent.getUuid() != null) {
+      breadcrumbs.add(parent);
+      addParentNodeToBreadcrumb(parent, breadcrumbs);
+    }
   }
 }
