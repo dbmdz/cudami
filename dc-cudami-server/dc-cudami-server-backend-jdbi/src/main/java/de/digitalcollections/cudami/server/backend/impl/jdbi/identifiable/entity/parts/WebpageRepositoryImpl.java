@@ -497,31 +497,18 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
   @Override
   public Website getWebsite(UUID rootWebpageUuid) {
     String query =
-        "SELECT w.uuid w_uuid, w.refid w_refId, w.label w_label"
-            + " FROM websites w"
-            + " INNER JOIN website_webpages ww ON w.uuid = ww.website_uuid"
+        "SELECT uuid, refid, label"
+            + " FROM websites"
+            + " INNER JOIN website_webpages ww ON uuid = ww.website_uuid"
             + " WHERE ww.webpage_uuid = :uuid";
 
-    Optional<WebsiteImpl> result =
-        dbi
-            .withHandle(
-                h ->
-                    h.createQuery(query)
-                        .bind("uuid", rootWebpageUuid)
-                        .registerRowMapper(BeanMapper.factory(WebsiteImpl.class, "w"))
-                        .reduceRows(
-                            new LinkedHashMap<UUID, WebsiteImpl>(),
-                            (map, rowView) -> {
-                              WebsiteImpl website =
-                                  map.computeIfAbsent(
-                                      rowView.getColumn("w_uuid", UUID.class),
-                                      fn -> {
-                                        return rowView.getRow(WebsiteImpl.class);
-                                      });
-                              return map;
-                            }))
-            .values().stream()
-            .findFirst();
-    return result.orElse(null);
+    WebsiteImpl result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(query)
+                    .bind("uuid", rootWebpageUuid)
+                    .mapToBean(WebsiteImpl.class)
+                    .one());
+    return result;
   }
 }
