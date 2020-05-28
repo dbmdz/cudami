@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Editor, Floater, MenuBar} from '@aeaton/react-prosemirror'
+import {Editor} from '@aeaton/react-prosemirror'
 import {Label} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
@@ -38,11 +38,6 @@ class FormEditor extends Component {
             render={({editor, view}) => (
               <>
                 <FormEditorMenu menu={translatedMenu} view={view} />
-
-                <Floater view={view}>
-                  <MenuBar menu={{marks: translatedMenu.marks}} view={view} />
-                </Floater>
-
                 {editor}
               </>
             )}
