@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.admin.business.api.service.exceptions.Identi
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.WebpageService;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.model.api.identifiable.Node;
+import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import java.util.ArrayList;
@@ -145,10 +146,13 @@ public class WebpagesController extends AbstractController {
     addParentNodeToBreadcrumb(webpage, breadcrumbs);
     Collections.reverse(breadcrumbs);
     model.addAttribute("breadcrumbs", breadcrumbs);
-    
+
+    Website website = service.getWebsite(uuid);
+    model.addAttribute("website", website);
+
     return "webpages/view";
   }
-  
+
   private void addParentNodeToBreadcrumb(Node currentWebpage, List<Node> breadcrumbs) {
     Node parent = service.getParent(currentWebpage);
     if (parent != null && parent.getUuid() != null) {

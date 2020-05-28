@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.admin.backend.api.repository.identifiable.e
 
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
+import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import java.util.UUID;
 
@@ -16,4 +17,6 @@ public interface WebpageRepository<E extends Entity>
   Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUUID);
 
   Webpage saveWithParentWebpage(Webpage webpage, UUID parentWebpageUUID);
+
+  Website getWebsite(UUID rootWebpageUuid);
 }

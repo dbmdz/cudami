@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.WebpageRepository;
 import de.digitalcollections.model.api.http.exceptions.client.ResourceNotFoundException;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
+import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -74,6 +75,11 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
   @Override
   public Webpage getParent(UUID uuid) {
     return endpoint.getParent(uuid);
+  }
+
+  @Override
+  public Website getWebsite(UUID rootWebpageUuid) {
+    return endpoint.getWebsite(rootWebpageUuid);
   }
 
   @Override
