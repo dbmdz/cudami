@@ -48,9 +48,7 @@ const WebsiteForm = ({
         <Col sm="12">
           {identifiable.uuid && <FormIdInput id={identifiable.uuid} />}
           <FormUrlInput
-            onChange={(evt) =>
-              onUpdate({...identifiable, url: evt.target.value})
-            }
+            onChange={(url) => onUpdate({...identifiable, url})}
             url={identifiable.url}
           />
           <Nav tabs>
@@ -59,7 +57,7 @@ const WebsiteForm = ({
                 activeLanguage={activeLanguage}
                 key={language}
                 language={language}
-                onClick={(language) => onToggleLanguage(language)}
+                toggle={onToggleLanguage}
               />
             ))}
             {canAddLanguage && <LanguageAdder onClick={onAddLanguage} />}

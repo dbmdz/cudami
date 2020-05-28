@@ -11,7 +11,7 @@ const FormLabelInput = ({label, language, onUpdate}) => {
       </Label>
       <Input
         id={`label-${language}`}
-        onChange={onUpdate}
+        onChange={(evt) => onUpdate(evt.target.value)}
         type="text"
         value={label}
       />

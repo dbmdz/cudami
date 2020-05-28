@@ -18,8 +18,8 @@ const LanguageTabContent = ({
           <FormLabelInput
             label={label}
             language={language}
-            onUpdate={(evt) => {
-              onUpdate('label', evt.target.value)
+            onUpdate={(label) => {
+              onUpdate('label', label)
             }}
           />
           <FormEditor

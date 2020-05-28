@@ -7,7 +7,13 @@ const FormUrlInput = ({onChange, url}) => {
       <Label className="font-weight-bold" for="url">
         URL
       </Label>
-      <Input id="url" onChange={onChange} required type="url" value={url} />
+      <Input
+        id="url"
+        onChange={(evt) => onChange(evt.target.value)}
+        required
+        type="url"
+        value={url}
+      />
     </FormGroup>
   )
 }

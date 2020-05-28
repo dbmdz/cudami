@@ -169,17 +169,15 @@ class ImageAdderModal extends Component {
               apiContextPath={apiContextPath}
               defaultLanguage={defaultLanguage}
               fileResource={this.state.fileResource}
-              onChange={(updateFields, additionalFields) =>
-                this.updateFileResource(updateFields, additionalFields)
-              }
+              onChange={this.updateFileResource}
               onTabChanged={this.onTabChanged}
-              toggleTooltip={(name) => this.toggleTooltip(name)}
+              toggleTooltip={this.toggleTooltip}
               tooltipsOpen={this.state.tooltipsOpen}
             />
             <ImageMetadataForm
               attributes={this.state.attributes}
               isOpen={this.state.metadataOpen}
-              onChange={(name, value) => this.setAttribute(name, value)}
+              onChange={this.setAttribute}
               toggle={() =>
                 this.setState({metadataOpen: !this.state.metadataOpen})
               }
@@ -189,7 +187,7 @@ class ImageAdderModal extends Component {
             <ImageRenderingHintsForm
               attributes={this.state.attributes}
               isOpen={this.state.renderingHintsOpen}
-              onChange={(name, value) => this.setAttribute(name, value)}
+              onChange={this.setAttribute}
               toggle={() =>
                 this.setState({
                   renderingHintsOpen: !this.state.renderingHintsOpen,

@@ -48,7 +48,7 @@ const SubtopicForm = ({
                 activeLanguage={activeLanguage}
                 key={language}
                 language={language}
-                onClick={(language) => onToggleLanguage(language)}
+                toggle={onToggleLanguage}
               />
             ))}
             {canAddLanguage && <LanguageAdder onClick={onAddLanguage} />}
