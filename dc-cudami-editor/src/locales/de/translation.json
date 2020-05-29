@@ -87,7 +87,7 @@
     "sameTab": "in gleichem Tab",
     "save": "Speichern",
     "selectImage": {
-      "searchTerm": "Suchbegriff (aus Titel, Dateiname, Kurzbeschreibung)",
+      "searchTerm": "Suchbegriff (aus Bild-Titel, Dateiname, Kurzbeschreibung)",
       "uploadSuccessful": "Bild erfolgreich hochgeladen",
       "useSearch": "Vorhandenes Bild verwenden",
       "useUpload": "Bild hochladen",
