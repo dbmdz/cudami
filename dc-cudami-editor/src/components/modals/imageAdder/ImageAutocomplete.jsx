@@ -8,6 +8,7 @@ import {mimeExtensionMapping} from '../utils'
 import {searchImages} from '../../../api'
 
 class ImageAutocomplete extends Component {
+  /* defines the number of suggestions to be fetched */
   maxElements = 25
 
   constructor(props) {
