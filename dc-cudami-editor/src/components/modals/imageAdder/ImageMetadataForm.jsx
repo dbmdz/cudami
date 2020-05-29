@@ -104,6 +104,7 @@ const ImageMetadataForm = (props) => {
                 name="altText"
                 onChange={(evt) => onChange('altText', evt.target.value)}
                 placeholder={t('altText')}
+                required
                 type="text"
                 value={attributes.altText}
               />
