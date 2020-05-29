@@ -85,7 +85,7 @@
     "right": "right",
     "save": "Save",
     "selectImage": {
-      "moreElementsFound": "{{ maxElements }} out of {{ totalElemenets }} results, please refine your search.",
+      "moreElementsFound": "{{ maxElements }} out of {{ totalElements }} results, please refine your search.",
       "searchTerm": "Search term (from label, file name, description)",
       "uploadSuccessful": "Image uploaded successfully",
       "useSearch": "Use existing image",
