@@ -1,3 +1,11 @@
+.suggestion-container {
+  max-height: 350px;
+  overflow-y: scroll;
+  position: absolute;
+  width: calc(100% - 2.5rem);
+  z-index: 1;
+}
+
 .suggestion-list .suggestion-image {
   max-width: 50px;
 }
