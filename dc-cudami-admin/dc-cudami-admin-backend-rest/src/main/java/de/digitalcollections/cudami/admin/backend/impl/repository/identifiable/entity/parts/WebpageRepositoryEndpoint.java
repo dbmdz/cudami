@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.entity.parts;
 
 import de.digitalcollections.cudami.admin.backend.impl.repository.RepositoryEndpoint;
+import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageResponse;
 import feign.Headers;
@@ -45,7 +46,10 @@ public interface WebpageRepositoryEndpoint extends RepositoryEndpoint {
   List<Webpage> getChildren(@Param("uuid") UUID uuid);
 
   @RequestLine("GET /latest/webpages/{uuid}/parent")
-  Webpage getParent(UUID uuid);
+  Webpage getParent(@Param("uuid") UUID uuid);
+
+  @RequestLine("GET /latest/webpages/{uuid}/website")
+  Website getWebsite(@Param("uuid") UUID rootWebpageUuid);
 
   @RequestLine("POST /latest/websites/{parentWebsiteUuid}/webpage")
   @Headers("Content-Type: application/json")

@@ -9,6 +9,15 @@
   </head>
   <body>
     <section layout:fragment="content" th:object="${website}">
+      
+      <div class="row">
+        <div class="col-12">
+          <ol class="breadcrumb hidden-xs-down">
+            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/websites}" th:text="#{websites}">Websites</a></li>
+          </ol>
+        </div>
+      </div>
 
       <div class="row">
         <div class="col-sm-6">

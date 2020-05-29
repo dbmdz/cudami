@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.en
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.WebpageService;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
+import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import java.util.List;
 import java.util.UUID;
@@ -48,6 +49,11 @@ public class WebpageServiceImpl<E extends Entity> extends EntityPartServiceImpl<
   @Override
   public Webpage getParent(UUID webpageUuid) {
     return (Webpage) ((WebpageRepository) repository).getParent(webpageUuid);
+  }
+
+  @Override
+  public Website getWebsite(UUID webpageUuid) {
+    return (Website) ((WebpageRepository) repository).getWebsite(webpageUuid);
   }
 
   @Override

@@ -7,10 +7,12 @@ import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.filter.enums.FilterOperation;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
+import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
+import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
@@ -490,5 +492,23 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
       default:
         return null;
     }
+  }
+
+  @Override
+  public Website getWebsite(UUID rootWebpageUuid) {
+    String query =
+        "SELECT uuid, refid, label"
+            + " FROM websites"
+            + " INNER JOIN website_webpages ww ON uuid = ww.website_uuid"
+            + " WHERE ww.webpage_uuid = :uuid";
+
+    WebsiteImpl result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(query)
+                    .bind("uuid", rootWebpageUuid)
+                    .mapToBean(WebsiteImpl.class)
+                    .one());
+    return result;
   }
 }

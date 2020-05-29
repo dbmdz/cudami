@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.business.api.service.identifiable.en
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.NodeService;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
+import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import java.util.Locale;
 import java.util.UUID;
@@ -16,6 +17,8 @@ public interface WebpageService<E extends Entity>
     extends NodeService<Webpage>, EntityPartService<Webpage, E> {
 
   Webpage get(UUID uuid, Locale locale) throws IdentifiableServiceException;
+
+  Website getWebsite(UUID webpageUuid);
 
   Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid)
       throws IdentifiableServiceException;

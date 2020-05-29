@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.model.api.filter.FilterCriterion;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
+import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -145,6 +146,38 @@ public class WebpageController {
             .build();
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting, filtering);
     return webpageService.getChildren(uuid, pageRequest);
+  }
+
+  @ApiMethod(description = "Get parent of a webpage as JSON")
+  @RequestMapping(
+      value = {"/latest/webpages/{uuid}/parent", "/v3/webpages/{uuid}/parent"},
+      produces = {MediaType.APPLICATION_JSON_VALUE},
+      method = RequestMethod.GET)
+  @ApiResponseObject
+  public Webpage getWebpageParent(
+      @ApiPathParam(
+              description =
+                  "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid)
+      throws IdentifiableServiceException {
+    return webpageService.getParent(uuid);
+  }
+
+  @ApiMethod(description = "Get website of a webpage as JSON")
+  @RequestMapping(
+      value = {"/latest/webpages/{uuid}/website", "/v3/webpages/{uuid}/website"},
+      produces = {MediaType.APPLICATION_JSON_VALUE},
+      method = RequestMethod.GET)
+  @ApiResponseObject
+  public Website getWebsite(
+      @ApiPathParam(
+              description =
+                  "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid)
+      throws IdentifiableServiceException {
+    return webpageService.getWebsite(uuid);
   }
 
   @ApiMethod(description = "Save a newly created top-level webpage")
