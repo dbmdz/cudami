@@ -117,19 +117,19 @@
             <tbody>
               <tr th:each="subpage :*{children}">
                 <td class="center" th:with="now=${T(java.time.LocalDate).now()}">
-            <th:block th:if="${subpage.publicationStart}  == null OR  ${subpage.publicationStart.isAfter(now)}"><span class="badge badge-pill badge-warning">&nbsp;</span></th:block>
-            <th:block th:if="(${subpage.publicationStart} != null AND ${subpage.publicationStart.isBefore(now)}) AND (${subpage.publicationEnd} == null OR ${subpage.publicationEnd.isAfter(now)})"><span class="badge badge-pill badge-success">&nbsp;</span></th:block>
-            <th:block th:if="(${subpage.publicationStart} != null AND ${subpage.publicationStart.isBefore(now)}) AND (${subpage.publicationEnd} != null AND ${subpage.publicationEnd.isBefore(now)})"><span class="badge badge-pill badge-danger">&nbsp;</span></th:block>
-            </td>
-            <td>
-              <a th:href="@{'/webpages/' + ${subpage.uuid}}" th:text="${subpage.label.text}">Label</a>
-            </td>
-            <td><span th:with="df=#{date.format},pubStart=${subpage.publicationStart}" th:text="${#temporals.format(pubStart,df)}">01.01.2000</span></td>
-            <td><span th:with="df=#{date.format},pubEnd=${subpage.publicationEnd}" th:text="${#temporals.format(pubEnd,df)}">01.01.2000</span></td>
-            <td class="center">
-              <a th:href="@{'/webpages/' + ${subpage.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
-              <a th:href="@{'/webpages/' + ${subpage.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
-            </td>
+                  <th:block th:if="${subpage.publicationStart}  == null OR  ${subpage.publicationStart.isAfter(now)}"><span class="badge badge-pill badge-warning">&nbsp;</span></th:block>
+                  <th:block th:if="(${subpage.publicationStart} != null AND ${subpage.publicationStart.isBefore(now)}) AND (${subpage.publicationEnd} == null OR ${subpage.publicationEnd.isAfter(now)})"><span class="badge badge-pill badge-success">&nbsp;</span></th:block>
+                  <th:block th:if="(${subpage.publicationStart} != null AND ${subpage.publicationStart.isBefore(now)}) AND (${subpage.publicationEnd} != null AND ${subpage.publicationEnd.isBefore(now)})"><span class="badge badge-pill badge-danger">&nbsp;</span></th:block>
+                </td>
+                <td>
+                  <a th:href="@{'/webpages/' + ${subpage.uuid}}" th:text="${subpage.label.text}">Label</a>
+                </td>
+                <td><span th:with="df=#{date.format},pubStart=${subpage.publicationStart}" th:text="${#temporals.format(pubStart,df)}">01.01.2000</span></td>
+                <td><span th:with="df=#{date.format},pubEnd=${subpage.publicationEnd}" th:text="${#temporals.format(pubEnd,df)}">01.01.2000</span></td>
+                <td class="center">
+                  <a th:href="@{'/webpages/' + ${subpage.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
+                  <a th:href="@{'/webpages/' + ${subpage.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
+                </td>
             </tr>
             </tbody>
           </table>
