@@ -136,6 +136,7 @@ class ImageAutocomplete extends Component {
         theme={{
           suggestion: 'align-items-center d-flex list-group-item',
           suggestionHighlighted: 'active',
+          suggestionsContainer: 'suggestion-container',
           suggestionsList: 'list-group suggestion-list',
         }}
       />
