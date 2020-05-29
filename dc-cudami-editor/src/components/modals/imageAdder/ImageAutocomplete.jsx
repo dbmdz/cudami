@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {FormGroup, Input} from 'reactstrap'
+import {Alert, FormGroup, Input} from 'reactstrap'
 import Autosuggest from 'react-autosuggest'
 import {withTranslation} from 'react-i18next'
 
@@ -8,11 +8,14 @@ import {mimeExtensionMapping} from '../utils'
 import {searchImages} from '../../../api'
 
 class ImageAutocomplete extends Component {
+  maxElements = 25
+
   constructor(props) {
     super(props)
     this.state = {
       searchTerm: '',
       suggestions: [],
+      totalElements: 0,
     }
   }
 
@@ -47,6 +50,7 @@ class ImageAutocomplete extends Component {
   onSuggestionsClearRequested = () => {
     this.setState({
       suggestions: [],
+      totalElements: 0,
     })
   }
 
@@ -54,12 +58,15 @@ class ImageAutocomplete extends Component {
     if (searchTerm.length < 2) {
       return
     }
-    const suggestions = await searchImages(
+    const {suggestions, totalElements} = await searchImages(
       this.props.apiContextPath,
-      searchTerm
+      searchTerm,
+      0,
+      this.maxElements
     )
     this.setState({
       suggestions,
+      totalElements,
     })
   }
 
@@ -82,6 +89,22 @@ class ImageAutocomplete extends Component {
         </div>
         {this.getLabelValue(label)}
       </>
+    )
+  }
+
+  renderSuggestionsContainer = ({containerProps, children}) => {
+    return (
+      <div {...containerProps}>
+        {this.state.totalElements > this.maxElements && (
+          <Alert className="mb-0" color="info">
+            {this.props.t('selectImage.moreElementsFound', {
+              maxElements: this.maxElements,
+              totalElements: this.state.totalElements,
+            })}
+          </Alert>
+        )}
+        {children}
+      </div>
     )
   }
 
@@ -108,6 +131,7 @@ class ImageAutocomplete extends Component {
         onSuggestionSelected={this.selectFileResource}
         renderInputComponent={this.renderInputComponent}
         renderSuggestion={this.renderSuggestion}
+        renderSuggestionsContainer={this.renderSuggestionsContainer}
         suggestions={suggestions}
         theme={{
           suggestion: 'align-items-center d-flex list-group-item',
