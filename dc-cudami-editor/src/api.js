@@ -94,9 +94,15 @@ export async function searchImages(
   try {
     const result = await fetch(url)
     const json = await result.json()
-    return json.content ?? []
+    return {
+      suggestions: json.content,
+      totalElements: json.totalElements,
+    }
   } catch (err) {
-    return []
+    return {
+      suggestions: [],
+      totalElements: 0,
+    }
   }
 }
 
