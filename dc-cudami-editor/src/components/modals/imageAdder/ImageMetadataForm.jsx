@@ -16,8 +16,7 @@ import {
 import {useTranslation} from 'react-i18next'
 import {FaQuestionCircle} from 'react-icons/fa'
 
-const InputTooltip = (props) => {
-  const {isOpen, target, text, toggle} = props
+const InputTooltip = ({isOpen, target, text, toggle}) => {
   return (
     <Popover isOpen={isOpen} placement="left" target={target} toggle={toggle}>
       <PopoverBody>{text}</PopoverBody>
@@ -25,16 +24,15 @@ const InputTooltip = (props) => {
   )
 }
 
-const ImageMetadataForm = (props) => {
+const ImageMetadataForm = ({
+  attributes,
+  isOpen,
+  onChange,
+  toggle,
+  toggleTooltip,
+  tooltipsOpen,
+}) => {
   const {t} = useTranslation()
-  const {
-    attributes,
-    isOpen,
-    onChange,
-    toggle,
-    toggleTooltip,
-    tooltipsOpen,
-  } = props
   return (
     <Card>
       <CardHeader>

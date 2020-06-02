@@ -24,8 +24,12 @@ class LinkAdderModal extends Component {
   }
 
   addLinkToEditor = () => {
-    this.props.onToggle()
     publish('editor.add-link', this.state)
+    this.destroy()
+  }
+
+  destroy = () => {
+    this.props.onToggle()
     this.setState({
       href: '',
       title: '',
@@ -33,12 +37,10 @@ class LinkAdderModal extends Component {
   }
 
   render() {
-    const {t} = this.props
+    const {isOpen, t} = this.props
     return (
-      <Modal isOpen={this.props.isOpen} toggle={this.props.onToggle}>
-        <ModalHeader toggle={this.props.onToggle}>
-          {t('insertLink')}
-        </ModalHeader>
+      <Modal isOpen={isOpen} toggle={this.destroy}>
+        <ModalHeader toggle={this.destroy}>{t('insertLink')}</ModalHeader>
         <ModalBody>
           <Form
             onSubmit={(evt) => {

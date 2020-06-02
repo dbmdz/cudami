@@ -22,17 +22,17 @@ class FileResourceUploadForm extends Component {
   }
 
   render() {
-    const {t} = this.props
+    const {apiContextPath, onUpdate, t} = this.props
     return (
       <Form
         onSubmit={async (evt) => {
           evt.preventDefault()
           const responseJson = await uploadFile(
-            this.props.apiContextPath,
+            apiContextPath,
             this.state.file,
             this.updateProgress
           )
-          this.props.onUpdate(JSON.parse(responseJson))
+          onUpdate(JSON.parse(responseJson))
         }}
       >
         <Row>

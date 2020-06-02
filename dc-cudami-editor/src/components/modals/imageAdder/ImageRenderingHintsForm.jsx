@@ -12,9 +12,8 @@ import {
 } from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-const ImageRenderingHintsForm = (props) => {
+const ImageRenderingHintsForm = ({attributes, isOpen, onChange, toggle}) => {
   const {t} = useTranslation()
-  const {attributes, isOpen, onChange, toggle} = props
   return (
     <Card>
       <CardHeader>

@@ -9,20 +9,27 @@ import LanguageAdder from './LanguageAdder'
 import LanguageTab from './LanguageTab'
 import LanguageTabContent from './LanguageTabContent'
 
-const ProjectForm = (props) => {
+const ProjectForm = ({
+  activeLanguage,
+  canAddLanguage,
+  existingLanguages,
+  identifiable,
+  onAddLanguage,
+  onSubmit,
+  onToggleLanguage,
+  onUpdate,
+}) => {
   const {t} = useTranslation()
   return (
     <Form
       onSubmit={(evt) => {
         evt.preventDefault()
-        props.onSubmit()
+        onSubmit()
       }}
     >
       <Row>
         <Col xs="6" sm="9">
-          <h1>
-            {props.identifiable.uuid ? t('editProject') : t('createProject')}
-          </h1>
+          <h1>{identifiable.uuid ? t('editProject') : t('createProject')}</h1>
         </Col>
         <Col xs="6" sm="3">
           <FormButtons />
@@ -35,56 +42,50 @@ const ProjectForm = (props) => {
       </Row>
       <Row>
         <Col sm="12">
-          {props.identifiable.uuid && (
-            <FormIdInput id={props.identifiable.uuid} />
-          )}
+          {identifiable.uuid && <FormIdInput id={identifiable.uuid} />}
           <Nav tabs>
-            {Object.entries(props.identifiable.label).map(([language]) => (
+            {existingLanguages.map((language) => (
               <LanguageTab
-                activeLanguage={props.activeLanguage}
+                activeLanguage={activeLanguage}
                 key={language}
                 language={language}
-                onClick={(language) => props.onToggleLanguage(language)}
+                toggle={onToggleLanguage}
               />
             ))}
-            {props.canAddLanguage && (
-              <LanguageAdder onClick={props.onAddLanguage} />
-            )}
+            {canAddLanguage && <LanguageAdder onClick={onAddLanguage} />}
           </Nav>
-          <TabContent activeTab={props.activeLanguage}>
-            {Object.entries(props.identifiable.label).map(
-              ([language, text]) => (
-                <LanguageTabContent
-                  description={props.identifiable.description[language]}
-                  key={language}
-                  label={text}
-                  language={language}
-                  onUpdate={(updateKey, updateValue) =>
-                    props.onUpdate({
-                      ...props.identifiable,
-                      [updateKey]: {
-                        ...props.identifiable[updateKey],
-                        [language]: updateValue,
+          <TabContent activeTab={activeLanguage}>
+            {existingLanguages.map((language) => (
+              <LanguageTabContent
+                description={identifiable.description[language]}
+                key={language}
+                label={identifiable.label[language]}
+                language={language}
+                onUpdate={(updateKey, updateValue) =>
+                  onUpdate({
+                    ...identifiable,
+                    [updateKey]: {
+                      ...identifiable[updateKey],
+                      [language]: updateValue,
+                    },
+                  })
+                }
+              >
+                <FormEditor
+                  document={identifiable.text[language]}
+                  type="text"
+                  onUpdate={(document) => {
+                    onUpdate({
+                      ...identifiable,
+                      text: {
+                        ...identifiable['text'],
+                        [language]: document,
                       },
                     })
-                  }
-                >
-                  <FormEditor
-                    document={props.identifiable.text[language]}
-                    type="text"
-                    onUpdate={(document) => {
-                      props.onUpdate({
-                        ...props.identifiable,
-                        text: {
-                          ...props.identifiable['text'],
-                          [language]: document,
-                        },
-                      })
-                    }}
-                  />
-                </LanguageTabContent>
-              )
-            )}
+                  }}
+                />
+              </LanguageTabContent>
+            ))}
           </TabContent>
         </Col>
       </Row>

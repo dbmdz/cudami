@@ -1,4 +1,3 @@
-import fromEntries from 'object.fromentries'
 import React, {Component} from 'react'
 import {Container, Label} from 'reactstrap'
 
@@ -28,22 +27,19 @@ import LanguageAdderModal from './modals/LanguageAdderModal'
 import LinkAdderModal from './modals/LinkAdderModal'
 import TableAdderModal from './modals/TableAdderModal'
 import initI18n from '../i18n'
-
-/* TODO: needs more investigation */
-if (!Object.fromEntries) {
-  fromEntries.shim()
-}
+import '../polyfills'
 
 class IdentifiableForm extends Component {
+  identifiablesWithLongText = [
+    'article',
+    'collection',
+    'corporation',
+    'project',
+    'webpage',
+  ]
+
   constructor(props) {
     super(props)
-    this.identifiablesWithLongText = [
-      'article',
-      'collection',
-      'corporation',
-      'project',
-      'webpage',
-    ]
     this.state = {
       activeLanguage: props.activeLanguage,
       availableLanguages: [],
@@ -61,26 +57,25 @@ class IdentifiableForm extends Component {
   }
 
   async componentDidMount() {
-    const i18n = initI18n(this.props.uiLocale)
-    const availableLanguages = this.props.mockApi
+    const {apiContextPath, mockApi, type, uiLocale, uuid} = this.props
+    const i18n = initI18n(uiLocale)
+    const availableLanguages = mockApi
       ? getAvailableLanguages()
-      : await loadAvailableLanguages(this.props.apiContextPath)
-    const defaultLanguage = this.props.mockApi
+      : await loadAvailableLanguages(apiContextPath)
+    const defaultLanguage = mockApi
       ? getDefaultLanguage()
-      : await loadDefaultLanguage(this.props.apiContextPath)
+      : await loadDefaultLanguage(apiContextPath)
     let identifiable = await loadIdentifiable(
-      this.props.apiContextPath,
-      this.props.type,
-      this.props.uuid || 'new'
+      apiContextPath,
+      type,
+      uuid || 'new'
     )
     identifiable = {
       description: {},
       label: {
         [this.state.activeLanguage]: '',
       },
-      text: this.identifiablesWithLongText.includes(this.props.type)
-        ? {}
-        : undefined,
+      text: this.identifiablesWithLongText.includes(type) ? {} : undefined,
       ...identifiable,
     }
     this.setState({
@@ -100,7 +95,7 @@ class IdentifiableForm extends Component {
     })
   }
 
-  addLanguage = (selectedLanguage, modalName) => {
+  addLanguage = (selectedLanguage) => {
     this.setState({
       activeLanguage: selectedLanguage.name,
       availableLanguages: this.state.availableLanguages.filter(
@@ -116,10 +111,6 @@ class IdentifiableForm extends Component {
           ...this.state.identifiable.label,
           [selectedLanguage.name]: '',
         },
-      },
-      modalsOpen: {
-        ...this.state.modalsOpen,
-        [modalName]: !this.state.modalsOpen[modalName],
       },
     })
   }
@@ -200,6 +191,7 @@ class IdentifiableForm extends Component {
 
   submitIdentifiable = () => {
     if (this.isFormValid()) {
+      const {apiContextPath, parentType, parentUuid, type} = this.props
       const identifiable = {
         ...this.state.identifiable,
         description: this.cleanUpJson(this.state.identifiable.description),
@@ -208,18 +200,14 @@ class IdentifiableForm extends Component {
         identifiable.text = this.cleanUpJson(this.state.identifiable.text)
       }
       if (identifiable.uuid) {
-        updateIdentifiable(
-          this.props.apiContextPath,
-          identifiable,
-          this.props.type
-        )
+        updateIdentifiable(apiContextPath, identifiable, type)
       } else {
         saveIdentifiable(
-          this.props.apiContextPath,
+          apiContextPath,
           identifiable,
-          this.props.parentType,
-          this.props.parentUuid,
-          this.props.type
+          parentType,
+          parentUuid,
+          type
         )
       }
     }
@@ -274,9 +262,9 @@ class IdentifiableForm extends Component {
           onToggle={() => this.toggleModal('imageAdder')}
         />
         <LanguageAdderModal
+          addLanguage={this.addLanguage}
           availableLanguages={this.state.availableLanguages}
           isOpen={this.state.modalsOpen.languageAdder}
-          onClick={(language) => this.addLanguage(language, 'languageAdder')}
           onToggle={() => this.toggleModal('languageAdder')}
         />
         <LinkAdderModal
