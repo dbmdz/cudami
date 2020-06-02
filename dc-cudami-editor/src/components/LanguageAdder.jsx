@@ -7,10 +7,7 @@ const LanguageAdder = ({onClick}) => {
   const {t} = useTranslation()
   return (
     <NavItem>
-      <NavLink
-        onClick={() => onClick('languageAdder')}
-        title={t('addLanguage')}
-      >
+      <NavLink onClick={onClick} title={t('addLanguage')}>
         <FaPlus />
       </NavLink>
     </NavItem>

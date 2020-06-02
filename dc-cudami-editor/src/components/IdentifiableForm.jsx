@@ -156,7 +156,7 @@ class IdentifiableForm extends Component {
         canAddLanguage={this.state.availableLanguages.length > 0}
         existingLanguages={this.state.existingLanguages}
         identifiable={this.state.identifiable}
-        onAddLanguage={this.toggleModal}
+        onAddLanguage={() => this.toggleModal('languageAdder')}
         onSubmit={this.submitIdentifiable}
         onToggleLanguage={this.toggleLanguage}
         onUpdate={this.updateIdentifiable}
