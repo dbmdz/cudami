@@ -4,7 +4,7 @@ import Autosuggest from 'react-autosuggest'
 import {withTranslation} from 'react-i18next'
 
 import './ImageAutocomplete.css'
-import {mimeExtensionMapping} from '../utils'
+import {getImageUrl} from '../utils'
 import {searchImages} from '../../../api'
 
 class ImageAutocomplete extends Component {
@@ -28,15 +28,6 @@ class ImageAutocomplete extends Component {
       return label[defaultLanguage]
     }
     return Object.values(label)[0]
-  }
-
-  getPreviewImageUrl = (previewImage, width = 'full') => {
-    const subMimeType = previewImage.mimeType.split('/')[1]
-    return previewImage.iiifBaseUrl
-      ? `${previewImage.iiifBaseUrl}/full/${width}/0/default.${
-          mimeExtensionMapping[subMimeType] ?? 'jpg'
-        }`
-      : previewImage.uri
   }
 
   getSuggestionAsString = (suggestion) =>
@@ -83,10 +74,7 @@ class ImageAutocomplete extends Component {
     return (
       <>
         <div className="mr-3 suggestion-image">
-          <img
-            className="img-fluid"
-            src={this.getPreviewImageUrl(previewImage, '50,')}
-          />
+          <img className="img-fluid" src={getImageUrl(previewImage, '50,')} />
         </div>
         {this.getLabelValue(label)}
       </>
@@ -111,8 +99,8 @@ class ImageAutocomplete extends Component {
 
   selectFileResource = (_, {suggestion}) => {
     this.props.onChange({
-      ...suggestion,
-      uri: this.getPreviewImageUrl(suggestion.previewImage),
+      ...suggestion.previewImage,
+      uri: getImageUrl(suggestion.previewImage),
     })
   }
 
