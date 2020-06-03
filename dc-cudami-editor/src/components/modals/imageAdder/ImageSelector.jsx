@@ -20,7 +20,8 @@ import {FaQuestionCircle} from 'react-icons/fa'
 
 import ImageAutocomplete from './ImageAutocomplete'
 import ImageLabelInput from './ImageLabelInput'
-import {mimeExtensionMapping} from '../utils'
+import ImagePreview from './ImagePreview'
+import {getImageUrl} from '../utils'
 import FileUploadForm from '../../FileUploadForm'
 import {uploadFile} from '../../../api'
 
@@ -80,12 +81,9 @@ class ImageSelector extends Component {
       showUploadSuccess: true,
     })
     setTimeout(() => this.setState({showUploadSuccess: false}), 3000)
-    const subMimeType = responseJson.mimeType.split('/')[1]
     onChange({
       ...responseJson,
-      uri: `${responseJson.iiifBaseUrl}/full/full/0/default.${
-        mimeExtensionMapping[subMimeType] ?? 'jpg'
-      }`,
+      uri: getImageUrl(responseJson),
     })
   }
 
@@ -182,6 +180,14 @@ class ImageSelector extends Component {
         <CardBody className="text-center">
           <TabContent activeTab={this.state.activeTab} className="border-0 p-0">
             <TabPane tabId="upload">
+              {fileResource.uuid && (
+                <ImagePreview
+                  iiifBaseUrl={fileResource.iiifBaseUrl}
+                  filename={fileResource.filename}
+                  mimeType={fileResource.mimeType}
+                  uri={fileResource.uri}
+                />
+              )}
               <Alert color="success" isOpen={this.state.showUploadSuccess}>
                 {t('selectImage.uploadSuccessful')}
               </Alert>
@@ -224,6 +230,14 @@ class ImageSelector extends Component {
               />
             </TabPane>
             <TabPane tabId="search">
+              {fileResource.uuid && (
+                <ImagePreview
+                  iiifBaseUrl={fileResource.iiifBaseUrl}
+                  filename={fileResource.filename}
+                  mimeType={fileResource.mimeType}
+                  uri={fileResource.uri}
+                />
+              )}
               <ImageAutocomplete
                 activeLanguage={activeLanguage}
                 apiContextPath={apiContextPath}
