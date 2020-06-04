@@ -207,6 +207,7 @@ class ImageSelector extends Component {
               />
             </TabPane>
             <TabPane tabId="url">
+              {fileResource.uri && <ImagePreview uri={fileResource.uri} />}
               <FormGroup>
                 <Input
                   name="url"
