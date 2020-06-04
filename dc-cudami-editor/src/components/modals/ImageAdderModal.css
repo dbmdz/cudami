@@ -1,3 +1,7 @@
+.image-preview {
+  max-width: 250px;
+}
+
 .suggestion-container {
   max-height: 350px;
   overflow-y: scroll;
