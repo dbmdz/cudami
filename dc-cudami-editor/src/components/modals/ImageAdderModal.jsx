@@ -3,6 +3,7 @@ import React, {Component} from 'react'
 import {Button, Form, Label, Modal, ModalBody, ModalHeader} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
+import './ImageAdderModal.css'
 import ImageMetadataForm from './imageAdder/ImageMetadataForm'
 import ImageRenderingHintsForm from './imageAdder/ImageRenderingHintsForm'
 import ImageSelector from './imageAdder/ImageSelector'

@@ -35,10 +35,7 @@ const ImageLabelInput = ({
         />
         <InputGroupAddon addonType="append">
           <InputGroupText>
-            <FaQuestionCircle
-              id={`${name}-tooltip`}
-              style={{cursor: 'pointer'}}
-            />
+            <FaQuestionCircle className="tooltip-icon" id={`${name}-tooltip`} />
             <Popover
               isOpen={tooltipsOpen[tooltipName]}
               placement="left"

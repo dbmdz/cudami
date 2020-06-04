@@ -58,8 +58,8 @@ const ImageMetadataForm = ({
               <InputGroupAddon addonType="append">
                 <InputGroupText>
                   <FaQuestionCircle
+                    className="tooltip-icon"
                     id="caption-tooltip"
-                    style={{cursor: 'pointer'}}
                   />
                   <InputTooltip
                     isOpen={tooltipsOpen.caption}
@@ -83,8 +83,8 @@ const ImageMetadataForm = ({
               <InputGroupAddon addonType="append">
                 <InputGroupText>
                   <FaQuestionCircle
+                    className="tooltip-icon"
                     id="title-tooltip"
-                    style={{cursor: 'pointer'}}
                   />
                   <InputTooltip
                     isOpen={tooltipsOpen.title}
@@ -109,8 +109,8 @@ const ImageMetadataForm = ({
               <InputGroupAddon addonType="append">
                 <InputGroupText>
                   <FaQuestionCircle
+                    className="tooltip-icon"
                     id="altText-tooltip"
-                    style={{cursor: 'pointer'}}
                   />
                   <InputTooltip
                     isOpen={tooltipsOpen.altText}
