@@ -99,6 +99,7 @@ class ImageAutocomplete extends Component {
   selectFileResource = (_, {suggestion}) => {
     this.props.onChange({
       ...suggestion.previewImage,
+      ...suggestion,
       uri: getImageUrl(suggestion.previewImage),
     })
   }
