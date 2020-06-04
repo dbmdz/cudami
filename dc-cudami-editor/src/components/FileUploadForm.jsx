@@ -11,7 +11,7 @@ const FileUploadForm = ({onChange, progress}) => {
   return (
     <>
       <FileDrop
-        onDrop={(files) => onChange(files[0])}
+        onDrop={(files) => files && onChange(files[0])}
         draggingOverTargetClassName="file-drop-dragging-over-target"
         targetClassName="file-drop-target p-1"
       >
@@ -30,7 +30,12 @@ const FileUploadForm = ({onChange, progress}) => {
         <Input
           className="d-none"
           id="file-upload"
-          onChange={(evt) => onChange(evt.target.files[0])}
+          onChange={(evt) => {
+            const {files} = evt.target
+            if (files.length) {
+              onChange(files[0])
+            }
+          }}
           type="file"
         />
       </FileDrop>
