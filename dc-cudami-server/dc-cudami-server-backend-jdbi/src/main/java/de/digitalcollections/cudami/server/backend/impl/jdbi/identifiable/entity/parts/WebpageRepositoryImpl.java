@@ -204,7 +204,8 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
 
                               return map;
                             }))
-            .values().stream()
+            .values()
+            .stream()
             .findFirst();
     Webpage webpage = result.orElse(null);
     if (webpage != null) {
@@ -352,7 +353,8 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
 
                               return map;
                             }))
-            .values().stream()
+            .values()
+            .stream()
             .findFirst();
     return result.orElse(null);
   }

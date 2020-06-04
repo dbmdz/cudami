@@ -180,7 +180,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
                               return map;
                             }))
-            .values().stream()
+            .values()
+            .stream()
             .findFirst();
     return result.orElse(null);
   }

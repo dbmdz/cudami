@@ -189,7 +189,8 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
 
                               return map;
                             }))
-            .values().stream()
+            .values()
+            .stream()
             .findFirst();
 
     Website website = result.orElse(null);

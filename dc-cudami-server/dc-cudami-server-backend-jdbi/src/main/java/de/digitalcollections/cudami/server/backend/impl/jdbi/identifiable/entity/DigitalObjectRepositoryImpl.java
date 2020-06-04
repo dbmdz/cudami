@@ -280,7 +280,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
                               return map;
                             }))
-            .values().stream()
+            .values()
+            .stream()
             .findFirst();
     return result.orElse(null);
   }
@@ -303,7 +304,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     List<FileResource> result =
         dbi.withHandle(
             h ->
-                h.createQuery(query).bind("uuid", digitalObjectUuid)
+                h
+                    .createQuery(query)
+                    .bind("uuid", digitalObjectUuid)
                     .registerRowMapper(BeanMapper.factory(FileResourceImpl.class, "f"))
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
@@ -328,7 +331,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                           }
                           return map;
                         })
-                    .values().stream()
+                    .values()
+                    .stream()
                     .map(FileResource.class::cast)
                     .collect(Collectors.toList()));
     return result;
@@ -353,7 +357,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     List<ImageFileResource> result =
         dbi.withHandle(
             h ->
-                h.createQuery(query).bind("uuid", digitalObjectUuid)
+                h
+                    .createQuery(query)
+                    .bind("uuid", digitalObjectUuid)
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     // TODO: test it if it is working, because I think there were problems using two
@@ -380,7 +386,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                           }
                           return map;
                         })
-                    .values().stream()
+                    .values()
+                    .stream()
                     .map(ImageFileResource.class::cast)
                     .collect(Collectors.toList()));
     return result;

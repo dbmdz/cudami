@@ -55,8 +55,11 @@ public class IdentifierTypeRepositoryImpl extends AbstractPagingAndSortingReposi
         (IdentifierType)
             dbi.withHandle(
                 h ->
-                    h.createQuery("SELECT * FROM identifiertypes WHERE namespace = :namespace")
-                        .bind("namespace", namespace).mapToBean(IdentifierTypeImpl.class).stream()
+                    h
+                        .createQuery("SELECT * FROM identifiertypes WHERE namespace = :namespace")
+                        .bind("namespace", namespace)
+                        .mapToBean(IdentifierTypeImpl.class)
+                        .stream()
                         .map(IdentifierType.class::cast)
                         .collect(Collectors.toList()));
     return identifierType;

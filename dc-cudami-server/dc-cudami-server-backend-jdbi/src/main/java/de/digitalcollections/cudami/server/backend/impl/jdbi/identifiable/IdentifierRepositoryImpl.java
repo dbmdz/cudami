@@ -58,8 +58,12 @@ public class IdentifierRepositoryImpl extends AbstractPagingAndSortingRepository
     List<Identifier> result =
         dbi.withHandle(
             h ->
-                h.createQuery(query.toString()).bind("searchTerm", searchTerm)
-                    .bind("maxResults", maxResults).mapToBean(IdentifierImpl.class).stream()
+                h
+                    .createQuery(query.toString())
+                    .bind("searchTerm", searchTerm)
+                    .bind("maxResults", maxResults)
+                    .mapToBean(IdentifierImpl.class)
+                    .stream()
                     .map(Identifier.class::cast)
                     .collect(Collectors.toList()));
     return result;
@@ -70,8 +74,11 @@ public class IdentifierRepositoryImpl extends AbstractPagingAndSortingRepository
     List<Identifier> result =
         dbi.withHandle(
             h ->
-                h.createQuery("SELECT * FROM identifiers WHERE identifiable = :identifiable")
-                    .bind("identifiable", identifiable).mapToBean(IdentifierImpl.class).stream()
+                h
+                    .createQuery("SELECT * FROM identifiers WHERE identifiable = :identifiable")
+                    .bind("identifiable", identifiable)
+                    .mapToBean(IdentifierImpl.class)
+                    .stream()
                     .map(Identifier.class::cast)
                     .collect(Collectors.toList()));
     return result;

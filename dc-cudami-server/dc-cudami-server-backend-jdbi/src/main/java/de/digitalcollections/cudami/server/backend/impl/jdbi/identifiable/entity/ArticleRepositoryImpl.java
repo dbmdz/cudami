@@ -179,7 +179,8 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
 
                               return map;
                             }))
-            .values().stream()
+            .values()
+            .stream()
             .findFirst();
     return result.orElse(null);
   }

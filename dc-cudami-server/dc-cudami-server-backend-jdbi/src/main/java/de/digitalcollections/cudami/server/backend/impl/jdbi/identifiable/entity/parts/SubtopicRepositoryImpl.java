@@ -201,7 +201,8 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
 
                               return map;
                             }))
-            .values().stream()
+            .values()
+            .stream()
             .findFirst();
 
     Subtopic subtopic = result.orElse(null);
@@ -341,7 +342,8 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
 
                               return map;
                             }))
-            .values().stream()
+            .values()
+            .stream()
             .map(e -> (Entity) e)
             .collect(Collectors.toList());
     return result;
@@ -386,7 +388,8 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
 
                               return map;
                             }))
-            .values().stream()
+            .values()
+            .stream()
             .map(FileResource.class::cast)
             .collect(Collectors.toList());
     return result;
@@ -423,7 +426,8 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
                               }
                               return map;
                             }))
-            .values().stream()
+            .values()
+            .stream()
             .findFirst();
     return result.orElse(null);
   }
@@ -522,7 +526,8 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
                               }
                               return map;
                             }))
-            .values().stream()
+            .values()
+            .stream()
             .map(Subtopic.class::cast)
             .collect(Collectors.toList());
     return result;
@@ -559,7 +564,8 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
                               }
                               return map;
                             }))
-            .values().stream()
+            .values()
+            .stream()
             .map(Subtopic.class::cast)
             .collect(Collectors.toList());
     return result;

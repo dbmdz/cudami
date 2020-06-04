@@ -179,7 +179,8 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
 
                               return map;
                             }))
-            .values().stream()
+            .values()
+            .stream()
             .findFirst();
     return result.orElse(null);
   }
