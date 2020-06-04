@@ -113,9 +113,8 @@ class ImageSelector extends Component {
               >
                 {t('selectImage.useUpload')}
                 <FaQuestionCircle
-                  className="ml-1"
+                  className="ml-1 tooltip-icon"
                   id="upload-tooltip"
-                  style={{cursor: 'pointer'}}
                 />
                 <Popover
                   isOpen={tooltipsOpen.upload}
@@ -136,9 +135,8 @@ class ImageSelector extends Component {
               >
                 {t('selectImage.useUrl')}
                 <FaQuestionCircle
-                  className="ml-1"
+                  className="ml-1 tooltip-icon"
                   id="url-tooltip"
-                  style={{cursor: 'pointer'}}
                 />
                 <Popover
                   isOpen={tooltipsOpen.url}
@@ -161,9 +159,8 @@ class ImageSelector extends Component {
               >
                 {t('selectImage.useSearch')}
                 <FaQuestionCircle
-                  className="ml-1"
+                  className="ml-1 tooltip-icon"
                   id="search-tooltip"
-                  style={{cursor: 'pointer'}}
                 />
                 <Popover
                   isOpen={tooltipsOpen.search}
@@ -210,6 +207,7 @@ class ImageSelector extends Component {
               />
             </TabPane>
             <TabPane tabId="url">
+              {fileResource.uri && <ImagePreview uri={fileResource.uri} />}
               <FormGroup>
                 <Input
                   name="url"
