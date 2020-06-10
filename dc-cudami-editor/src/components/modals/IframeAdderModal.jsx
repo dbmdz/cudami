@@ -21,7 +21,12 @@ class IframeAdderModal extends Component {
       title: '',
       width: '',
     }
-    subscribe('editor.show-iframe-modal', () => {
+    subscribe('editor.show-iframe-modal', (_msg, data = {}) => {
+      this.setState({
+        ...this.state,
+        ...data,
+        title: data.title ?? '',
+      })
       this.props.onToggle()
     })
   }
