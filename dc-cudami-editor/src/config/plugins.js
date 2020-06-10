@@ -10,6 +10,7 @@ import '@aeaton/prosemirror-footnotes/style/footnotes.css'
 
 import keys from './keys'
 import rules from './rules'
+import customPlugin from './custom/Plugin'
 
 export default [
   rules,
@@ -20,6 +21,7 @@ export default [
   history(),
   columnResizing(),
   tableEditing(),
+  customPlugin(),
 ]
 
 // for tables
