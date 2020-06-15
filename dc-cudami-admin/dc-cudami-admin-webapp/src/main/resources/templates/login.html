@@ -17,7 +17,14 @@
               <form role="form" name="input" th:action="@{/login}" method="post">
                 <div class="form-group">
                   <label class="font-weight-bold" for="j_username" th:text="#{lbl_username}">Username</label>
-                  <input type="text" class="form-control" id="j_username" name="username" autofocus="autofocus"/>
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="j_username" name="username" autofocus="autofocus"/>
+                    <div class="input-group-append">
+                      <button class="btn btn-secondary ml-0" data-container="body" data-placement="top" data-toggle="popover" type="button" th:attr="data-content=#{tooltip_username}">
+                        <i class="fas fa-question-circle"></i>
+                      </button>
+                    </div>
+                  </div>
                 </div>
                 <div class="form-group">
                   <label class="font-weight-bold" for="j_password" th:text="#{lbl_password}">Password</label>
@@ -37,6 +44,13 @@
           </div>
         </div>
       </div>
+    </section>
+    <section layout:fragment="beforeBodyEnds">
+      <script>
+        $(function () {
+          $('[data-toggle="popover"]').popover()
+        })
+      </script>
     </section>
   </body>
 </html>
