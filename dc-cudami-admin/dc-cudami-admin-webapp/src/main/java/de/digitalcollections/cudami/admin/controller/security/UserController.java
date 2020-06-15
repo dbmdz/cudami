@@ -190,11 +190,11 @@ public class UserController extends AbstractController {
       RedirectAttributes redirectAttributes) {
     verifyBinding(results);
     if (results.hasErrors()) {
-      return "users/updatePassword";
+      return "users/edit-password";
     }
     service.update(user, password1, password2, (Errors) results);
     if (results.hasErrors()) {
-      return "users/updatePassword";
+      return "users/edit-password";
     }
     status.setComplete();
     String message =
