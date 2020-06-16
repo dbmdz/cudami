@@ -4,6 +4,8 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.N
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
+import de.digitalcollections.model.api.view.BreadcrumbNavigation;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -33,4 +35,17 @@ public interface WebpageRepository<E extends Entity>
    * @return the website the given root-webpage belongs to (webpage is top level webpage)
    */
   Website getWebsite(UUID rootWebpageUuid);
+
+  /**
+   * @param uuid the uuid of the current webpage
+   * @return the breadcrumb navigation
+   */
+  BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid);
+
+  /**
+   * @param uuid the uuid of the current webpage
+   * @param locale the locale for which the breadcrumb shall be created
+   * @return the breadcrumb navigation for the given locale
+   */
+  BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid, Locale locale);
 }

@@ -9,6 +9,7 @@ import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -110,5 +111,17 @@ public class WebpageServiceImpl<E extends Entity> extends EntityPartServiceImpl<
       LOGGER.error("Cannot save webpage " + webpage + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
     }
+  }
+
+  @Override
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid)
+      throws IdentifiableServiceException {
+    return ((WebpageRepository) repository).getBreadcrumbNavigation(uuid);
+  }
+
+  @Override
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid, Locale locale)
+      throws IdentifiableServiceException {
+    return ((WebpageRepository) repository).getBreadcrumbNavigation(uuid, locale);
   }
 }
