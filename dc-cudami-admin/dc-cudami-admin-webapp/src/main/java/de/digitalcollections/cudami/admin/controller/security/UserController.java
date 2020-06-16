@@ -189,11 +189,16 @@ public class UserController extends AbstractController {
       SessionStatus status,
       RedirectAttributes redirectAttributes) {
     verifyBinding(results);
+    String errorMessage =
+        messageSource.getMessage(
+            "error.password_change_failed", null, LocaleContextHolder.getLocale());
     if (results.hasErrors()) {
+      model.addAttribute("error_message", errorMessage);
       return "users/edit-password";
     }
     service.update(user, password1, password2, (Errors) results);
     if (results.hasErrors()) {
+      model.addAttribute("error_message", errorMessage);
       return "users/edit-password";
     }
     status.setComplete();
