@@ -14,39 +14,7 @@ export default {
     draggable: true,
     group: 'block',
     inline: false,
-    parseDOM: [
-      {
-        tag: 'figure',
-        getAttrs(dom) {
-          const caption = dom.querySelector('figcaption')
-          const image = dom.querySelector('img')
-          const link = dom.querySelector('a[href]')
-          const linkAttributes = {}
-          if (link) {
-            linkAttributes.linkNewTab = link.getAttribute('target') === '_blank'
-            linkAttributes.linkUrl = link.getAttribute('href')
-          }
-          return {
-            altText: image.getAttribute('alt'),
-            caption: caption?.innerText,
-            title: image.getAttribute('title'),
-            url: image.getAttribute('src'),
-            ...linkAttributes,
-          }
-        },
-      },
-    ],
-    toDOM(node) {
-      const {alignment, altText, caption, title, url, width} = node.attrs
-      const tags = [
-        'figure',
-        {class: `alignment-${alignment} width-${parseInt(width)}`},
-        ['img', {alt: altText, src: url, title}],
-      ]
-      if (caption) {
-        tags.push(['figcaption', caption])
-      }
-      return tags
-    },
+    parseDOM: [{tag: 'prosemirror-image'}],
+    toDOM: () => ['prosemirror-image'],
   },
 }
