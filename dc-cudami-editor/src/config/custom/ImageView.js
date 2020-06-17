@@ -7,7 +7,12 @@ class IframeView {
   constructor(node, view, getPos) {
     const {alignment, altText, caption, title, url, width} = node.attrs
     const dom = document.createElement('prosemirror-image')
-    dom.setAttribute('class', `alignment-${alignment} width-${parseInt(width)}`)
+    dom.setAttribute(
+      'class',
+      `alignment-${alignment} d-inline-block position-relative width-${parseInt(
+        width
+      )}`
+    )
     const figure = document.createElement('figure')
     const image = document.createElement('img')
     image.setAttribute('alt', altText)
@@ -57,6 +62,7 @@ class IframeView {
   selectNode() {
     this.dom.classList.add('ProseMirror-selectednode')
     const menu = document.createElement('span')
+    menu.setAttribute('class', 'contentblock-menu')
     render(createEditButton(this.editContent), menu)
     this.dom.appendChild(menu)
   }

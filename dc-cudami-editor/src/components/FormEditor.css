@@ -43,3 +43,14 @@
 .cudami-editor .text-editor figure > img {
   max-width: 100%;
 }
+
+.cudami-editor .text-editor .contentblock-menu {
+  position: absolute;
+  right: -35px;
+  top: 0;
+}
+
+.cudami-editor .text-editor prosemirror-image.alignment-right .contentblock-menu,
+.cudami-editor .text-editor prosemirror-image.width-100 .contentblock-menu {
+  right: 0;
+}
