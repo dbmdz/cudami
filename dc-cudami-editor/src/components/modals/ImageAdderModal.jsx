@@ -28,6 +28,7 @@ class ImageAdderModal extends Component {
       fileResource: {},
       metadataOpen: true,
       renderingHintsOpen: false,
+      showImageSelector: true,
       tooltipsOpen: {
         altText: false,
         caption: false,
@@ -39,7 +40,24 @@ class ImageAdderModal extends Component {
         url: false,
       },
     }
-    subscribe('editor.show-image-modal', () => {
+    subscribe('editor.show-image-modal', (_msg, data = {}) => {
+      const attributes = Object.fromEntries(
+        Object.entries(data).filter(
+          ([key, value]) => key !== 'showImageSelector' && value !== null
+        )
+      )
+      this.setState({
+        attributes: {
+          ...this.initialAttributes,
+          ...attributes,
+        },
+        fileResource: {
+          ...this.state.fileResource,
+          uri: attributes.url ?? '',
+          uuid: attributes.resourceId,
+        },
+        showImageSelector: data.showImageSelector ?? true,
+      })
       this.props.onToggle()
     })
   }
@@ -165,16 +183,18 @@ class ImageAdderModal extends Component {
               this.addImageToEditor(resourceId)
             }}
           >
-            <ImageSelector
-              activeLanguage={activeLanguage}
-              apiContextPath={apiContextPath}
-              defaultLanguage={defaultLanguage}
-              fileResource={this.state.fileResource}
-              onChange={this.updateFileResource}
-              onTabChanged={this.onTabChanged}
-              toggleTooltip={this.toggleTooltip}
-              tooltipsOpen={this.state.tooltipsOpen}
-            />
+            {this.state.showImageSelector && (
+              <ImageSelector
+                activeLanguage={activeLanguage}
+                apiContextPath={apiContextPath}
+                defaultLanguage={defaultLanguage}
+                fileResource={this.state.fileResource}
+                onChange={this.updateFileResource}
+                onTabChanged={this.onTabChanged}
+                toggleTooltip={this.toggleTooltip}
+                tooltipsOpen={this.state.tooltipsOpen}
+              />
+            )}
             <ImageMetadataForm
               attributes={this.state.attributes}
               isOpen={this.state.metadataOpen}
