@@ -182,7 +182,8 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
 
                               return map;
                             }))
-            .values().stream()
+            .values()
+            .stream()
             .findFirst();
     return result.orElse(null);
   }

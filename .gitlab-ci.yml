@@ -13,6 +13,7 @@ stages:
 ###################
 
 check_java_codestyle:
+  image: "$BUILD_IMAGE_ANSIBLE_MAVEN_JDK11"
   script:
     - mvn com.coveo:fmt-maven-plugin:check
   stage: check

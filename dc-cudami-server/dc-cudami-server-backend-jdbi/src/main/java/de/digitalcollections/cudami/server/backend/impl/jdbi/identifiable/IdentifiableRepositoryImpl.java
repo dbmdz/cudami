@@ -196,8 +196,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     List<I> result =
         dbi.withHandle(
             h ->
-                h.createQuery(query.toString()).bind("searchTerm", searchTerm)
-                    .bind("maxResults", maxResults).mapToBean(IdentifiableImpl.class).stream()
+                h
+                    .createQuery(query.toString())
+                    .bind("searchTerm", searchTerm)
+                    .bind("maxResults", maxResults)
+                    .mapToBean(IdentifiableImpl.class)
+                    .stream()
                     .map(s -> (I) s)
                     .collect(Collectors.toList()));
     return result;
@@ -284,7 +288,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
                               return map;
                             }))
-            .values().stream()
+            .values()
+            .stream()
             .findFirst();
     return (I) result.orElse(null);
   }

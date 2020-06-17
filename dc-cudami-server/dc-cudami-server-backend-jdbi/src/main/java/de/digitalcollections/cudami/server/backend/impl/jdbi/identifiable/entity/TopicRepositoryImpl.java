@@ -182,7 +182,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
                               return map;
                             }))
-            .values().stream()
+            .values()
+            .stream()
             .findFirst();
 
     Topic topic = result.orElse(null);

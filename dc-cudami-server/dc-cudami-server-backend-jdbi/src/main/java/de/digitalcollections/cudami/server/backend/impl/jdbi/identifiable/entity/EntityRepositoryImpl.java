@@ -279,7 +279,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
                               return map;
                             }))
-            .values().stream()
+            .values()
+            .stream()
             .findFirst();
     return (E) result.orElse(null);
   }
@@ -318,7 +319,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
                               return map;
                             }))
-            .values().stream()
+            .values()
+            .stream()
             .findFirst();
     return (E) result.orElse(null);
   }
@@ -339,8 +341,12 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     List<FileResource> result =
         dbi.withHandle(
             h ->
-                h.createQuery(query).bind("entityUuid", entityUuid)
-                    .mapToBean(FileResourceImpl.class).list().stream()
+                h
+                    .createQuery(query)
+                    .bind("entityUuid", entityUuid)
+                    .mapToBean(FileResourceImpl.class)
+                    .list()
+                    .stream()
                     .map(FileResource.class::cast)
                     .collect(Collectors.toList()));
     return result;
