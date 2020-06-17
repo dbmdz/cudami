@@ -122,6 +122,7 @@ public class WebpageServiceImpl<E extends Entity> extends EntityPartServiceImpl<
   @Override
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid, Locale locale)
       throws IdentifiableServiceException {
-    return ((WebpageRepository) repository).getBreadcrumbNavigation(uuid, locale);
+    // FIXME: Deal with navigation items, which don't exist for the wanted locale
+    return ((WebpageRepository) repository).getBreadcrumbNavigation(uuid);
   }
 }

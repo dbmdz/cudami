@@ -22,10 +22,8 @@ import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -79,20 +77,25 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
           + " WHERE ww.parent_webpage_uuid = :uuid";
 
   private static final String BREADCRUMB_QUERY =
-      "WITH recursive breadcrumb (uuid,label,parent_uuid)"
-          + "AS ("
-          + "        SELECT w.uuid as uuid, w.label as label, ww.parent_webpage_uuid as parent_uuid"
+      "WITH recursive breadcrumb (uuid,label,parent_uuid,depth)"
+          + " AS ("
+          + "        SELECT w.uuid as uuid, w.label as label, ww.parent_webpage_uuid as parent_uuid,99 as depth"
           + "        FROM webpages w, webpage_webpages ww"
           + "        WHERE uuid= :uuid and ww.child_webpage_uuid = w.uuid"
           + ""
           + "        UNION ALL"
-          + "        SELECT w.uuid as uuid, w.label as label, ww.parent_webpage_uuid as parent_uuid"
+          + "        SELECT w.uuid as uuid, w.label as label, ww.parent_webpage_uuid as parent_uuid, depth-1 as depth"
           + "        FROM webpages w,"
           + "             webpage_webpages ww,"
           + "             breadcrumb b"
           + "        WHERE b.uuid = ww.child_webpage_uuid and ww.parent_webpage_uuid = w.uuid AND ww.parent_webpage_uuid is not null"
           + "    )"
-          + "SELECT * from breadcrumb";
+          + " SELECT * from breadcrumb"
+          + " UNION"
+          + " SELECT null as uuid, w.label as label, null as parent_uuid, 0 as depth"
+          + " FROM websites w, website_webpages ww, breadcrumb b"
+          + " WHERE ww.webpage_uuid = b.parent_uuid and w.uuid = ww.website_uuid"
+          + " ORDER BY depth ASC";
 
   @Autowired
   public WebpageRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
@@ -536,7 +539,6 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
   }
 
   @Override
-  // FIXME: Root-Element fehlt noch. Aber das rekursiv reinzubringen ist nicht trivial!
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) {
 
     List<NodeImpl> result =
@@ -549,13 +551,7 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
                     .list());
 
     List<Node> nodes = result.stream().map(s -> (Node) s).collect(Collectors.toList());
-    Collections.reverse(nodes);
 
     return new BreadcrumbNavigationImpl(nodes);
-  }
-
-  @Override
-  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid, Locale locale) {
-    return null;
   }
 }
