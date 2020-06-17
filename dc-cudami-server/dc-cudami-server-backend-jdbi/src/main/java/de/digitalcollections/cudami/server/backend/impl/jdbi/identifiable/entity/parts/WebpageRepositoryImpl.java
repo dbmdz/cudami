@@ -97,6 +97,11 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
           + " WHERE ww.webpage_uuid = b.parent_uuid and w.uuid = ww.website_uuid"
           + " ORDER BY depth ASC";
 
+  private static final String BREADCRUMB_WITHOUT_PARENT_QUERY =
+      "SELECT w.uuid as uuid, w.label as label"
+          + "        FROM webpages w"
+          + "        WHERE uuid= :uuid";
+
   @Autowired
   public WebpageRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     super(dbi, identifierRepository);
@@ -549,6 +554,19 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
                     .registerRowMapper(BeanMapper.factory(NodeImpl.class))
                     .mapTo(NodeImpl.class)
                     .list());
+
+    if (result.isEmpty()) {
+      // Special case: If we are on a top level webpage, we have no parent, so
+      // we must construct a breadcrumb more or less manually
+      result =
+          dbi.withHandle(
+              h ->
+                  h.createQuery(BREADCRUMB_WITHOUT_PARENT_QUERY)
+                      .bind("uuid", uuid)
+                      .registerRowMapper(BeanMapper.factory(NodeImpl.class))
+                      .mapTo(NodeImpl.class)
+                      .list());
+    }
 
     List<Node> nodes = result.stream().map(s -> (Node) s).collect(Collectors.toList());
 

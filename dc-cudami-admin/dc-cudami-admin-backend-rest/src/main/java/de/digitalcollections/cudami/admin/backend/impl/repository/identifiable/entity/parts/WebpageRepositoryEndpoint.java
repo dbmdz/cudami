@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.admin.backend.impl.repository.RepositoryEndp
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -60,4 +61,7 @@ public interface WebpageRepositoryEndpoint extends RepositoryEndpoint {
   @Headers("Content-Type: application/json")
   Webpage saveWithParentWebpage(
       Webpage webpage, @Param("parentWebpageUuid") UUID parentWebpageUuid);
+
+  @RequestLine("GET /latest/webpages/{uuid}/breadcrumb")
+  BreadcrumbNavigation getBreadcrumbNavigation(@Param("uuid") UUID uuid);
 }

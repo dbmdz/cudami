@@ -7,6 +7,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
+import de.digitalcollections.model.api.identifiable.parts.LocalizedText;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
@@ -114,15 +115,43 @@ public class WebpageServiceImpl<E extends Entity> extends EntityPartServiceImpl<
   }
 
   @Override
-  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid)
-      throws IdentifiableServiceException {
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) {
     return ((WebpageRepository) repository).getBreadcrumbNavigation(uuid);
   }
 
   @Override
-  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid, Locale locale)
-      throws IdentifiableServiceException {
-    // FIXME: Deal with navigation items, which don't exist for the wanted locale
-    return ((WebpageRepository) repository).getBreadcrumbNavigation(uuid);
+  public BreadcrumbNavigation getBreadcrumbNavigation(
+      UUID uuid, Locale locale, Locale fallbackLocale) {
+
+    BreadcrumbNavigation localizedBreadcrumbNavigation =
+        ((WebpageRepository) repository).getBreadcrumbNavigation(uuid);
+
+    localizedBreadcrumbNavigation.getNavigationItems().stream()
+        .forEach(
+            n -> {
+              LocalizedText label = n.getLabel();
+
+              // Prepare the fallback solutions, when no label for the desired locale exists.
+              String defaultLabel = label.getText(fallbackLocale);
+              Locale firstLocale =
+                  (label.getLocales() != null && !label.getLocales().isEmpty())
+                      ? label.getLocales().get(0)
+                      : null;
+              String firstLocaleLabel = firstLocale != null ? label.getText(firstLocale) : null;
+
+              label.entrySet().removeIf(e -> e.getKey() != locale);
+              if (label.keySet().isEmpty()) {
+                // No entry for the desired language found!
+                if (defaultLabel != null) {
+                  // The entry for the "default" language exists. We use it.
+                  label.put(fallbackLocale, defaultLabel);
+                } else if (firstLocale != null) {
+                  // Pick the first locale and its text (if it exists)
+                  label.put(firstLocale, firstLocaleLabel);
+                }
+              }
+            });
+
+    return localizedBreadcrumbNavigation;
   }
 }

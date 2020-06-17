@@ -7,6 +7,8 @@ import de.digitalcollections.cudami.admin.business.api.service.identifiable.enti
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
+import de.digitalcollections.model.api.view.BreadcrumbNavigation;
+import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -77,6 +79,16 @@ public class WebpageServiceImpl<E extends Entity> extends EntityPartServiceImpl<
     } catch (Exception e) {
       LOGGER.error("Cannot save webpage " + webpage + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
+    }
+  }
+
+  @Override
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID webpageUuid) {
+    try {
+      return ((WebpageRepository) repository).getBreadcrumbNavigation(webpageUuid);
+    } catch (Exception e) {
+      LOGGER.error("Found no breadcrumb for UUID={}: e", webpageUuid, e, e);
+      return new BreadcrumbNavigationImpl();
     }
   }
 }

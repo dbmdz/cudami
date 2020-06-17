@@ -1,10 +1,10 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.parts;
 
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.WebpageService;
 import de.digitalcollections.model.api.filter.FilterCriterion;
 import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
@@ -18,7 +18,6 @@ import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
@@ -52,6 +51,8 @@ public class WebpageController {
   @Autowired private WebpageService<Entity> webpageService;
 
   @Autowired ConversionService conversionService;
+
+  @Autowired LocaleService localeService;
 
   @ApiMethod(description = "Get all webpages")
   @RequestMapping(
@@ -266,29 +267,21 @@ public class WebpageController {
               description =
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
-          Locale pLocale)
-      throws IdentifiableServiceException, IOException {
+          Locale pLocale) {
 
     BreadcrumbNavigation breadcrumbNavigation;
 
     if (pLocale == null) {
       breadcrumbNavigation = webpageService.getBreadcrumbNavigation(uuid);
     } else {
-      breadcrumbNavigation = webpageService.getBreadcrumbNavigation(uuid, pLocale);
+      breadcrumbNavigation =
+          webpageService.getBreadcrumbNavigation(uuid, pLocale, localeService.getDefaultLocale());
     }
 
-    if (breadcrumbNavigation == null || breadcrumbNavigation.getLocationItems().isEmpty()) {
+    if (breadcrumbNavigation == null || breadcrumbNavigation.getNavigationItems().isEmpty()) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     return new ResponseEntity<>(breadcrumbNavigation, HttpStatus.OK);
-  }
-
-  private void addParentNodeToBreadcrumb(Node currentWebpage, List<Node> breadcrumbs) {
-    Node parent = currentWebpage.getParent();
-    if (parent != null && parent.getUuid() != null) {
-      breadcrumbs.add(parent);
-      addParentNodeToBreadcrumb(parent, breadcrumbs);
-    }
   }
 }

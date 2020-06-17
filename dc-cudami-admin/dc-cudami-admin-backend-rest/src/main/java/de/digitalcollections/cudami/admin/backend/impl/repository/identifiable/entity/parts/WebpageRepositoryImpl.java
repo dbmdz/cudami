@@ -7,6 +7,7 @@ import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import java.util.List;
 import java.util.Locale;
@@ -100,5 +101,10 @@ public class WebpageRepositoryImpl<E extends Entity> extends EntityPartRepositor
   @Override
   public Webpage update(Webpage identifiable) {
     return endpoint.update(identifiable.getUuid(), identifiable);
+  }
+
+  @Override
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID webpageUuid) {
+    return endpoint.getBreadcrumbNavigation(webpageUuid);
   }
 }
