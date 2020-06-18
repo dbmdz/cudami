@@ -9,6 +9,8 @@ class IframeView {
     const {height, src, title, width} = node.attrs
     const dom = document.createElement('prosemirror-iframe')
     dom.classList.add('d-inline-block', 'position-relative')
+    dom.style.height = height
+    dom.style.width = width
     const iframe = document.createElement('iframe')
     iframe.classList.add('editable')
     iframe.setAttribute('height', height)

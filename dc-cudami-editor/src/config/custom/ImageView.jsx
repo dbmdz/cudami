@@ -15,6 +15,7 @@ class IframeView {
       `width-${parseInt(width)}`
     )
     const figure = document.createElement('figure')
+    figure.classList.add('m-0')
     const image = document.createElement('img')
     image.setAttribute('alt', altText)
     image.setAttribute('src', url)
