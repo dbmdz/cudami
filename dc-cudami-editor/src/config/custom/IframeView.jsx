@@ -13,10 +13,10 @@ class IframeView {
     dom.style.width = width
     const iframe = document.createElement('iframe')
     iframe.classList.add('editable')
-    iframe.setAttribute('height', height)
+    iframe.setAttribute('height', '100%')
     iframe.setAttribute('sandbox', '')
     iframe.setAttribute('src', src)
-    iframe.setAttribute('width', width)
+    iframe.setAttribute('width', '100%')
     if (title) {
       iframe.setAttribute('title', title)
     }
