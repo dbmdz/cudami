@@ -8,16 +8,16 @@ class IframeView {
   constructor(node, view, getPos) {
     const {height, src, title, width} = node.attrs
     const dom = document.createElement('prosemirror-iframe')
-    dom.setAttribute('class', 'd-inline-block position-relative')
+    dom.classList.add('d-inline-block', 'position-relative')
     const iframe = document.createElement('iframe')
-    iframe.setAttribute('class', 'editable')
+    iframe.classList.add('editable')
     iframe.setAttribute('height', height)
     iframe.setAttribute('sandbox', '')
     iframe.setAttribute('src', src)
+    iframe.setAttribute('width', width)
     if (title) {
       iframe.setAttribute('title', title)
     }
-    iframe.setAttribute('width', width)
     dom.appendChild(iframe)
     this.dom = dom
     this.getPos = getPos
@@ -51,7 +51,7 @@ class IframeView {
   selectNode() {
     this.dom.classList.add('ProseMirror-selectednode')
     const menu = document.createElement('span')
-    menu.setAttribute('class', 'contentblock-menu')
+    menu.classList.add('contentblock-menu')
     render(<EditButton onClick={this.editContent} />, menu)
     this.dom.appendChild(menu)
   }
