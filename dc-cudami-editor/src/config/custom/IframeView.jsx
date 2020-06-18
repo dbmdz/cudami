@@ -1,7 +1,8 @@
-import {render} from 'react-dom'
+import React from 'react'
 import {publish, subscribe, unsubscribe} from 'pubsub-js'
+import {render} from 'react-dom'
 
-import {createEditButton} from './utils'
+import EditButton from '../../components/EditButton'
 
 class IframeView {
   constructor(node, view, getPos) {
@@ -51,7 +52,7 @@ class IframeView {
     this.dom.classList.add('ProseMirror-selectednode')
     const menu = document.createElement('span')
     menu.setAttribute('class', 'contentblock-menu')
-    render(createEditButton(this.editContent), menu)
+    render(<EditButton onClick={this.editContent} />, menu)
     this.dom.appendChild(menu)
   }
 }
