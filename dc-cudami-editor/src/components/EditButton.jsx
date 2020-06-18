@@ -1,12 +1,14 @@
 import React from 'react'
 import {Button} from 'reactstrap'
 
-import icons from '../icons'
+import icons from '../config/icons'
 
-export function createEditButton(onClick) {
+const EditButton = ({onClick}) => {
   return (
     <Button color="light" onClick={onClick} size="sm">
       {icons.edit}
     </Button>
   )
 }
+
+export default EditButton
