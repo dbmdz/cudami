@@ -84,7 +84,7 @@
   </th:block>
 
   <th:block th:if="${block.class.simpleName == 'ImageImpl'}" th:with="attr=${block.attributes}">
-    <figure class="image-in-text" th:classappend="${'alignment-' + attr.get('alignment') + ' width-' + #strings.substringBefore(attr.get('width'),'%')}">
+    <figure class="image-in-text" th:classappend="${(alignment != null ? 'alignment-' + aligment + ' ' : ' ') + 'width-' + #strings.substringBefore(attr.get('width'),'%')}" th:with="aligment=${attr.get('alignment')}">
       <th:block th:if="${attr.get('linkUrl')}">
         <a th:attr="href=${attr.get('linkUrl')}, target=${attr.get('linkNewTab') ? '_blank' : ''}">
           <img th:attr="alt=${attr.get('altText')}, src=${attr.get('url')}, title=${attr.get('title')}" />
