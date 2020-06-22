@@ -42,9 +42,13 @@ class ImageAdderModal extends Component {
     }
     subscribe('editor.show-image-modal', (_msg, data = {}) => {
       const attributes = Object.fromEntries(
-        Object.entries(data).filter(
-          ([key, value]) => key !== 'showImageSelector' && value !== null
-        )
+        Object.entries(data).filter(([key, value]) => {
+          // alignment is allowed to be null and should not be filtered out in that case
+          if (key === 'alignment') {
+            return true
+          }
+          return key !== 'showImageSelector' && value !== null
+        })
       )
       this.setState({
         attributes: {

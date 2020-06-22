@@ -9,11 +9,13 @@ class IframeView {
     const {alignment, altText, caption, title, url, width} = node.attrs
     const dom = document.createElement('prosemirror-image')
     dom.classList.add(
-      `alignment-${alignment}`,
       'd-inline-block',
       'position-relative',
       `width-${parseInt(width)}`
     )
+    if (alignment) {
+      dom.classList.add(`alignment-${alignment}`)
+    }
     const figure = document.createElement('figure')
     figure.classList.add('m-0')
     const image = document.createElement('img')

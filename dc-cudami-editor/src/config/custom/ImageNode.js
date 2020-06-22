@@ -1,7 +1,7 @@
 export default {
   image: {
     attrs: {
-      alignment: {default: 'left'},
+      alignment: {default: null},
       altText: {default: null},
       caption: {default: null},
       linkNewTab: {default: true},
