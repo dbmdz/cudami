@@ -3,6 +3,8 @@
     "add": "Hinzufügen",
     "addLanguage": "Sprache hinzufügen",
     "alignment": "Ausrichtung",
+    "alignmentLeft": "links (mit Textumlauf)",
+    "alignmentRight": "rechts (mit Textumlauf)",
     "altText": "Alt-Text",
     "blocks": {
       "blockquote": "Zitat einfügen",
@@ -66,7 +68,6 @@
     "insertLink": "Verlinkung einfügen",
     "invalidLabels": "Bitte füllen Sie in den folgenden Sprachen das Feld \"$t(label)\" noch aus):",
     "label": "Titel",
-    "left": "links",
     "marks": {
       "code": "Code-Stil",
       "em": "Kursiv",
@@ -79,11 +80,11 @@
     },
     "newTab": "in neuem Tab",
     "next": "Weiter",
+    "noAlignment": "ohne Textumlauf",
     "numberOfColumns": "Anzahl an Spalten",
     "numberOfRows": "Anzahl an Zeilen",
     "openLinkNewTab": "in einem neuen Tab öffnen",
     "openLinkSameTab": "im selben Tab öffnen",
-    "right": "rechts",
     "sameTab": "in gleichem Tab",
     "save": "Speichern",
     "selectImage": {

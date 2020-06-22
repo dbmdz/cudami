@@ -36,7 +36,7 @@ const ImageRenderingHintsForm = ({attributes, isOpen, onChange, toggle}) => {
                 checked={attributes.alignment === 'left'}
                 id="rendering-hits-alignment-left"
                 inline
-                label={t('left')}
+                label={t('alignmentLeft')}
                 onChange={(evt) => onChange('alignment', evt.target.value)}
                 type="radio"
                 value="left"
@@ -45,10 +45,18 @@ const ImageRenderingHintsForm = ({attributes, isOpen, onChange, toggle}) => {
                 checked={attributes.alignment === 'right'}
                 id="rendering-hits-alignment-right"
                 inline
-                label={t('right')}
+                label={t('alignmentRight')}
                 onChange={(evt) => onChange('alignment', evt.target.value)}
                 type="radio"
                 value="right"
+              />
+              <CustomInput
+                checked={!attributes.alignment}
+                id="rendering-hits-no-alignment"
+                inline
+                label={t('noAlignment')}
+                onChange={(evt) => onChange('alignment', null)}
+                type="radio"
               />
             </div>
           </FormGroup>
