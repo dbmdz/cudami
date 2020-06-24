@@ -64,7 +64,7 @@
         </div>
       </div>
 
-      <div class="row main-content">
+<!--      <div class="row main-content">
         <div class="col-sm-6">
           <h2 th:text="#{linked_data}">Linked Data</h2>
         </div>
@@ -81,30 +81,30 @@
             <thead>
               <tr>
                 <th class="center" th:text="#{label}">Label</th>
-                <!-- TODO
+                 TODO
                 <th class="center" th:text="#{actions}">Actions</th>
-                -->
+                
               </tr>
             </thead>
             <tbody>
               <tr th:each="relatedFileResource: ${relatedFileResources}">
                 <td>
-                  <!-- TODO
+                   TODO
                   <a th:href="@{'/fileresources/' + ${relatedFileResource.uuid}}" th:text="${relatedFileResource.label.text}">Label</a>
-                  -->
+                  
                   <span th:text="${relatedFileResource.label.text}">Label</span>
                 </td>
-                <!-- TODO
+                 TODO
                 <td class="center">
                   <a th:href="@{'/fileresources/' + ${relatedFileResource.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
                   <a th:href="@{'/fileresources/' + ${relatedFileResource.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
                 </td>
-                -->
+                
               </tr>
             </tbody>
           </table>
         </div>
-      </div>
+      </div>-->
     </section>
 
   <th:block layout:fragment="beforeBodyEnds">
