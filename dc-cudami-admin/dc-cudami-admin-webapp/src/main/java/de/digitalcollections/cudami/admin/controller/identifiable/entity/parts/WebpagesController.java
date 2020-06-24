@@ -9,8 +9,7 @@ import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import java.util.ArrayList;
-import java.util.Collections;
+import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -142,22 +141,18 @@ public class WebpagesController extends AbstractController {
     List<FileResource> relatedFileResources = service.getRelatedFileResources(webpage);
     model.addAttribute("relatedFileResources", relatedFileResources);
 
-    List<Node> breadcrumbs = new ArrayList<>();
-    addParentNodeToBreadcrumb(webpage, breadcrumbs);
-    Collections.reverse(breadcrumbs);
+    BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
+
+    List<Node> breadcrumbs = breadcrumbNavigation.getNavigationItems();
+    // Cut out first breadcrumb node (the one with empty uuid), which identifies the website, since
+    // it is
+    // handled individually
+    breadcrumbs.removeIf(n -> n.getUuid() == null);
     model.addAttribute("breadcrumbs", breadcrumbs);
 
     Website website = service.getWebsite(uuid);
     model.addAttribute("website", website);
 
     return "webpages/view";
-  }
-
-  private void addParentNodeToBreadcrumb(Node currentWebpage, List<Node> breadcrumbs) {
-    Node parent = service.getParent(currentWebpage);
-    if (parent != null && parent.getUuid() != null) {
-      breadcrumbs.add(parent);
-      addParentNodeToBreadcrumb(parent, breadcrumbs);
-    }
   }
 }

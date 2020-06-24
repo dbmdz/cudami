@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.admin.business.api.service.identifiable.Node
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
+import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import java.util.UUID;
 
 /**
@@ -22,4 +23,6 @@ public interface WebpageService<E extends Entity>
 
   Webpage saveWithParentWebpage(Webpage webpage, UUID parentWebpageUuid)
       throws IdentifiableServiceException;
+
+  BreadcrumbNavigation getBreadcrumbNavigation(UUID webpageUuid);
 }

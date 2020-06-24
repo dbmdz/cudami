@@ -6,16 +6,20 @@ import de.digitalcollections.model.api.filter.FilterCriterion;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.filter.enums.FilterOperation;
 import de.digitalcollections.model.api.identifiable.Identifier;
+import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
+import de.digitalcollections.model.impl.identifiable.NodeImpl;
 import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -23,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.slf4j.Logger;
@@ -70,6 +75,32 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
           + " FROM webpages as w INNER JOIN webpage_webpages ww ON w.uuid = ww.child_webpage_uuid"
           + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid"
           + " WHERE ww.parent_webpage_uuid = :uuid";
+
+  private static final String BREADCRUMB_QUERY =
+      "WITH recursive breadcrumb (uuid,label,parent_uuid,depth)"
+          + " AS ("
+          + "        SELECT w.uuid as uuid, w.label as label, ww.parent_webpage_uuid as parent_uuid,99 as depth"
+          + "        FROM webpages w, webpage_webpages ww"
+          + "        WHERE uuid= :uuid and ww.child_webpage_uuid = w.uuid"
+          + ""
+          + "        UNION ALL"
+          + "        SELECT w.uuid as uuid, w.label as label, ww.parent_webpage_uuid as parent_uuid, depth-1 as depth"
+          + "        FROM webpages w,"
+          + "             webpage_webpages ww,"
+          + "             breadcrumb b"
+          + "        WHERE b.uuid = ww.child_webpage_uuid and ww.parent_webpage_uuid = w.uuid AND ww.parent_webpage_uuid is not null"
+          + "    )"
+          + " SELECT * from breadcrumb"
+          + " UNION"
+          + " SELECT null as uuid, w.label as label, null as parent_uuid, 0 as depth"
+          + " FROM websites w, website_webpages ww, breadcrumb b"
+          + " WHERE ww.webpage_uuid = b.parent_uuid and w.uuid = ww.website_uuid"
+          + " ORDER BY depth ASC";
+
+  private static final String BREADCRUMB_WITHOUT_PARENT_QUERY =
+      "SELECT w.uuid as uuid, w.label as label"
+          + "        FROM webpages w"
+          + "        WHERE uuid= :uuid";
 
   @Autowired
   public WebpageRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
@@ -512,5 +543,35 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
                     .mapToBean(WebsiteImpl.class)
                     .one());
     return result;
+  }
+
+  @Override
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) {
+
+    List<NodeImpl> result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(BREADCRUMB_QUERY)
+                    .bind("uuid", uuid)
+                    .registerRowMapper(BeanMapper.factory(NodeImpl.class))
+                    .mapTo(NodeImpl.class)
+                    .list());
+
+    if (result.isEmpty()) {
+      // Special case: If we are on a top level webpage, we have no parent, so
+      // we must construct a breadcrumb more or less manually
+      result =
+          dbi.withHandle(
+              h ->
+                  h.createQuery(BREADCRUMB_WITHOUT_PARENT_QUERY)
+                      .bind("uuid", uuid)
+                      .registerRowMapper(BeanMapper.factory(NodeImpl.class))
+                      .mapTo(NodeImpl.class)
+                      .list());
+    }
+
+    List<Node> nodes = result.stream().map(s -> (Node) s).collect(Collectors.toList());
+
+    return new BreadcrumbNavigationImpl(nodes);
   }
 }
