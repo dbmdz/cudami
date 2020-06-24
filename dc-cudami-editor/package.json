@@ -41,7 +41,7 @@
     "react-i18next": "^11.7.0",
     "react-icons": "^3.10.0",
     "react-scripts": "3.4.1",
-    "reactstrap": "^8.4.1"
+    "reactstrap": "^8.5.0"
   },
   "devDependencies": {
     "@fisker/prettier-config": "^2.3.0",
