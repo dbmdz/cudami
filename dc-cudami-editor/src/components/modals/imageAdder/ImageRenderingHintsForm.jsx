@@ -12,7 +12,15 @@ import {
 } from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-const ImageRenderingHintsForm = ({attributes, isOpen, onChange, toggle}) => {
+const ImageRenderingHintsForm = ({
+  alignment,
+  isOpen,
+  linkNewTab,
+  linkUrl,
+  onChange,
+  toggle,
+  width,
+}) => {
   const {t} = useTranslation()
   return (
     <Card>
@@ -33,7 +41,7 @@ const ImageRenderingHintsForm = ({attributes, isOpen, onChange, toggle}) => {
             </Label>
             <div id="rendering-hints-alignment">
               <CustomInput
-                checked={attributes.alignment === 'left'}
+                checked={alignment === 'left'}
                 id="rendering-hits-alignment-left"
                 inline
                 label={t('alignmentLeft')}
@@ -42,7 +50,7 @@ const ImageRenderingHintsForm = ({attributes, isOpen, onChange, toggle}) => {
                 value="left"
               />
               <CustomInput
-                checked={attributes.alignment === 'right'}
+                checked={alignment === 'right'}
                 id="rendering-hits-alignment-right"
                 inline
                 label={t('alignmentRight')}
@@ -51,7 +59,7 @@ const ImageRenderingHintsForm = ({attributes, isOpen, onChange, toggle}) => {
                 value="right"
               />
               <CustomInput
-                checked={!attributes.alignment}
+                checked={!alignment}
                 id="rendering-hits-no-alignment"
                 inline
                 label={t('noAlignment')}
@@ -66,7 +74,7 @@ const ImageRenderingHintsForm = ({attributes, isOpen, onChange, toggle}) => {
             </Label>
             <div id="rendering-hints-width">
               <CustomInput
-                checked={attributes.width === '25%'}
+                checked={width === '25%'}
                 id="rendering-hits-width-25"
                 inline
                 label="25%"
@@ -75,7 +83,7 @@ const ImageRenderingHintsForm = ({attributes, isOpen, onChange, toggle}) => {
                 value="25%"
               />
               <CustomInput
-                checked={attributes.width === '33%'}
+                checked={width === '33%'}
                 id="rendering-hits-width-33"
                 inline
                 label="33%"
@@ -84,7 +92,7 @@ const ImageRenderingHintsForm = ({attributes, isOpen, onChange, toggle}) => {
                 value="33%"
               />
               <CustomInput
-                checked={attributes.width === '50%'}
+                checked={width === '50%'}
                 id="rendering-hits-width-50"
                 inline
                 label="50%"
@@ -93,7 +101,7 @@ const ImageRenderingHintsForm = ({attributes, isOpen, onChange, toggle}) => {
                 value="50%"
               />
               <CustomInput
-                checked={attributes.width === '100%'}
+                checked={width === '100%'}
                 id="rendering-hits-width-100"
                 inline
                 label="100%"
@@ -116,10 +124,10 @@ const ImageRenderingHintsForm = ({attributes, isOpen, onChange, toggle}) => {
               onChange={(evt) => onChange('linkUrl', evt.target.value)}
               placeholder="URL"
               type="url"
-              value={attributes.linkUrl}
+              value={linkUrl}
             />
             <CustomInput
-              checked={attributes.linkNewTab}
+              checked={linkNewTab}
               className="mt-1"
               id="rendering-hits-image-link-blank"
               label={t('openLinkNewTab')}
@@ -127,7 +135,7 @@ const ImageRenderingHintsForm = ({attributes, isOpen, onChange, toggle}) => {
               type="radio"
             />
             <CustomInput
-              checked={!attributes.linkNewTab}
+              checked={!linkNewTab}
               id="rendering-hits-image-link-no-blank"
               label={t('openLinkSameTab')}
               onChange={() => onChange('linkNewTab', false)}

@@ -176,6 +176,15 @@ class ImageAdderModal extends Component {
       isOpen,
       t,
     } = this.props
+    const {
+      alignment,
+      altText,
+      caption,
+      linkNewTab,
+      linkUrl,
+      title,
+      width,
+    } = this.state.attributes
     return (
       <Modal isOpen={isOpen} size="lg" toggle={this.destroy}>
         <ModalHeader toggle={this.destroy}>{t('insert.image')}</ModalHeader>
@@ -200,9 +209,11 @@ class ImageAdderModal extends Component {
               />
             )}
             <ImageMetadataForm
-              attributes={this.state.attributes}
+              altText={altText}
+              caption={caption}
               isOpen={this.state.metadataOpen}
               onChange={this.setAttribute}
+              title={title}
               toggle={() =>
                 this.setState({metadataOpen: !this.state.metadataOpen})
               }
@@ -210,14 +221,17 @@ class ImageAdderModal extends Component {
               tooltipsOpen={this.state.tooltipsOpen}
             />
             <ImageRenderingHintsForm
-              attributes={this.state.attributes}
+              alignment={alignment}
               isOpen={this.state.renderingHintsOpen}
+              linkNewTab={linkNewTab}
+              linkUrl={linkUrl}
               onChange={this.setAttribute}
               toggle={() =>
                 this.setState({
                   renderingHintsOpen: !this.state.renderingHintsOpen,
                 })
               }
+              width={width}
             />
             {debug && (
               <>
