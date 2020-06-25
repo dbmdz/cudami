@@ -230,7 +230,10 @@ class IdentifiableForm extends Component {
 
   updateIdentifiable = (identifiable) => {
     this.setState({
-      identifiable,
+      identifiable: {
+        ...this.state.identifiable,
+        ...identifiable,
+      },
     })
   }
 

@@ -1,5 +1,14 @@
 import React from 'react'
-import {Col, Form, Nav, Row, TabContent} from 'reactstrap'
+import {
+  Card,
+  CardBody,
+  Col,
+  Form,
+  Nav,
+  Row,
+  TabContent,
+  TabPane,
+} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
 import FormEditor from './FormEditor'
@@ -7,8 +16,8 @@ import FormIdInput from './FormIdInput'
 import FormButtons from './FormButtons'
 import LanguageAdder from './LanguageAdder'
 import LanguageTab from './LanguageTab'
-import LanguageTabContent from './LanguageTabContent'
 import PublicationDatesForm from './PublicationDatesForm'
+import Teaser from './Teaser'
 
 const WebpageForm = ({
   activeLanguage,
@@ -64,35 +73,37 @@ const WebpageForm = ({
           </Nav>
           <TabContent activeTab={activeLanguage}>
             {existingLanguages.map((language) => (
-              <LanguageTabContent
-                description={identifiable.description[language]}
-                key={language}
-                label={identifiable.label[language]}
-                language={language}
-                onUpdate={(updateKey, updateValue) =>
-                  onUpdate({
-                    ...identifiable,
-                    [updateKey]: {
-                      ...identifiable[updateKey],
-                      [language]: updateValue,
-                    },
-                  })
-                }
-              >
-                <FormEditor
-                  document={identifiable.text[language]}
-                  type="text"
-                  onUpdate={(document) => {
+              <TabPane key={language} tabId={language}>
+                <Teaser
+                  description={identifiable.description[language]}
+                  label={identifiable.label[language]}
+                  language={language}
+                  onUpdate={(updateKey, updateValue) =>
                     onUpdate({
-                      ...identifiable,
-                      text: {
-                        ...identifiable['text'],
-                        [language]: document,
+                      [updateKey]: {
+                        ...identifiable[updateKey],
+                        [language]: updateValue,
                       },
                     })
-                  }}
+                  }
                 />
-              </LanguageTabContent>
+                <Card className="border-top-0">
+                  <CardBody>
+                    <FormEditor
+                      document={identifiable.text[language]}
+                      type="text"
+                      onUpdate={(document) => {
+                        onUpdate({
+                          text: {
+                            ...identifiable['text'],
+                            [language]: document,
+                          },
+                        })
+                      }}
+                    />
+                  </CardBody>
+                </Card>
+              </TabPane>
             ))}
           </TabContent>
         </Col>

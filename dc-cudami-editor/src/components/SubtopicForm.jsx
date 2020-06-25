@@ -1,12 +1,12 @@
 import React from 'react'
-import {Col, Form, Nav, Row, TabContent} from 'reactstrap'
+import {Col, Form, Nav, Row, TabContent, TabPane} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
 import FormIdInput from './FormIdInput'
 import FormButtons from './FormButtons'
 import LanguageAdder from './LanguageAdder'
 import LanguageTab from './LanguageTab'
-import LanguageTabContent from './LanguageTabContent'
+import Teaser from './Teaser'
 
 const SubtopicForm = ({
   activeLanguage,
@@ -55,21 +55,21 @@ const SubtopicForm = ({
           </Nav>
           <TabContent activeTab={activeLanguage}>
             {existingLanguages.map((language) => (
-              <LanguageTabContent
-                description={identifiable.description[language]}
-                key={language}
-                label={identifiable.label[language]}
-                language={language}
-                onUpdate={(updateKey, updateValue) =>
-                  onUpdate({
-                    ...identifiable,
-                    [updateKey]: {
-                      ...identifiable[updateKey],
-                      [language]: updateValue,
-                    },
-                  })
-                }
-              />
+              <TabPane key={language} tabId={language}>
+                <Teaser
+                  description={identifiable.description[language]}
+                  label={identifiable.label[language]}
+                  language={language}
+                  onUpdate={(updateKey, updateValue) =>
+                    onUpdate({
+                      [updateKey]: {
+                        ...identifiable[updateKey],
+                        [language]: updateValue,
+                      },
+                    })
+                  }
+                />
+              </TabPane>
             ))}
           </TabContent>
         </Col>
