@@ -19,8 +19,11 @@ body {
   margin-left: 5px;
 }
 
-.card {
+.card-deck > .card {
   margin-top: 10px;
+}
+
+.card {
   /*max-width: 250px;*/
   min-width: 150px;
 }
