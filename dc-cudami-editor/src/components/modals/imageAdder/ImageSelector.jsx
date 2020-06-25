@@ -21,8 +21,8 @@ import {FaQuestionCircle} from 'react-icons/fa'
 import ImageAutocomplete from './ImageAutocomplete'
 import ImageLabelInput from './ImageLabelInput'
 import ImagePreview from './ImagePreview'
-import {getImageUrl} from '../utils'
 import FileUploadForm from '../../FileUploadForm'
+import {getImageUrl} from '../../utils'
 import {uploadFile} from '../../../api'
 
 class ImageSelector extends Component {

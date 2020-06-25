@@ -3,7 +3,7 @@ import {Alert, FormGroup, Input} from 'reactstrap'
 import Autosuggest from 'react-autosuggest'
 import {withTranslation} from 'react-i18next'
 
-import {getImageUrl} from '../utils'
+import {getImageUrl} from '../../utils'
 import {searchImages} from '../../../api'
 
 class ImageAutocomplete extends Component {
