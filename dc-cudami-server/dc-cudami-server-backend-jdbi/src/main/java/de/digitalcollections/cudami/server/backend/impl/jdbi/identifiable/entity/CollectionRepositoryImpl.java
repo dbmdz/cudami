@@ -62,16 +62,6 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
       REDUCED_FIND_ONE_BASE_SQL
           + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = c.uuid)";
 
-  /*
-    SELECT ip
-  FROM   login_log l
-  WHERE  NOT EXISTS (
-     SELECT  -- SELECT list mostly irrelevant; can just be empty in Postgres
-     FROM   ip_location
-     WHERE  ip = l.ip
-     );
-     */
-
   @Autowired
   public CollectionRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     super(dbi, identifierRepository);
