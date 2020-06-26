@@ -38,11 +38,7 @@ const ImageMetadataForm = ({
   return (
     <Card>
       <CardHeader>
-        <Button
-          className="font-weight-bold ml-0 p-0"
-          color="link"
-          onClick={toggle}
-        >
+        <Button className="font-weight-bold p-0" color="link" onClick={toggle}>
           {t('enterMetadata')}
         </Button>
       </CardHeader>
