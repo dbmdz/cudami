@@ -60,4 +60,9 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   public PageResponse<Collection> getChildren(UUID uuid, PageRequest pageRequest) {
     return ((NodeRepository<Collection>) repository).getChildren(uuid, pageRequest);
   }
+
+  @Override
+  public PageResponse<Collection> getRootCollections(PageRequest pageRequest) {
+    return ((CollectionRepository) repository).getRootCollections(pageRequest);
+  }
 }

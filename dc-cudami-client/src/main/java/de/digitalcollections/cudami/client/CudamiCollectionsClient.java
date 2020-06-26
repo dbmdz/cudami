@@ -41,6 +41,18 @@ public interface CudamiCollectionsClient {
     return new CollectionImpl();
   }
 
+  default PageResponse findTopCollections(PageRequest pageRequest) {
+    FindParams f = new FindParamsImpl(pageRequest);
+    PageResponse<Collection> pageResponse =
+        findTopCollections(
+            f.getPageNumber(),
+            f.getPageSize(),
+            f.getSortField(),
+            f.getSortDirection(),
+            f.getNullHandling());
+    return pageResponse;
+  }
+
   default PageResponse findCollections(PageRequest pageRequest) {
     FindParams f = new FindParamsImpl(pageRequest);
     PageResponse<Collection> pageResponse =
@@ -56,6 +68,15 @@ public interface CudamiCollectionsClient {
   @RequestLine(
       "GET /latest/collections?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
   PageResponse<Collection> findCollections(
+      @Param("pageNumber") int pageNumber,
+      @Param("pageSize") int pageSize,
+      @Param("sortField") String sortField,
+      @Param("sortDirection") String sortDirection,
+      @Param("nullHandling") String nullHandling);
+
+  @RequestLine(
+      "GET /latest/collections/top?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
+  PageResponse<Collection> findTopCollections(
       @Param("pageNumber") int pageNumber,
       @Param("pageSize") int pageSize,
       @Param("sortField") String sortField,

@@ -54,14 +54,23 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
           + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid";
 
   private static final String BASE_CHILDREN_QUERY =
-      "SELECT c.uuid c_uuid, c.refid c_refId, c.label c_label, c.description c_description,"
-          + " c.identifiable_type c_type, c.entity_type c_entityType,"
-          + " c.created c_created, c.last_modified c_lastModified,"
-          + " c.preview_hints c_previewImageRenderingHints,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
-          + " FROM collections as c INNER JOIN collection_collections cc ON c.uuid = cc.child_collection_uuid"
-          + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid"
+      REDUCED_FIND_ONE_BASE_SQL
+          + " INNER JOIN collection_collections cc ON c.uuid = cc.child_collection_uuid"
           + " WHERE cc.parent_collection_uuid = :uuid";
+
+  private static final String BASE_TOP_QUERY =
+      REDUCED_FIND_ONE_BASE_SQL
+          + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = c.uuid)";
+
+  /*
+    SELECT ip
+  FROM   login_log l
+  WHERE  NOT EXISTS (
+     SELECT  -- SELECT list mostly irrelevant; can just be empty in Postgres
+     FROM   ip_location
+     WHERE  ip = l.ip
+     );
+     */
 
   @Autowired
   public CollectionRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
@@ -430,6 +439,43 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     long total =
         dbi.withHandle(
             h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Long.class).findOne().get());
+    PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
+    return pageResponse;
+  }
+
+  @Override
+  public PageResponse<Collection> getRootCollections(PageRequest pageRequest) {
+    // minimal data required (= identifiable fields) for creating text links/teasers in a list
+    StringBuilder query = new StringBuilder(BASE_TOP_QUERY);
+    addPageRequestParams(pageRequest, query);
+    List<Collection> result =
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, CollectionImpl>(),
+                            (map, rowView) -> {
+                              CollectionImpl collection =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("c_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(CollectionImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                collection.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
+    String sql =
+        "SELECT count(*) FROM collections as c"
+            + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = c.uuid)";
+    long total = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
   }

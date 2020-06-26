@@ -105,7 +105,7 @@ public class CollectionsController extends AbstractController {
               size = 25)
           Pageable pageable) {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
-    final PageResponse pageResponse = cudamiCollectionsClient.findCollections(pageRequest);
+    final PageResponse pageResponse = cudamiCollectionsClient.findTopCollections(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
     model.addAttribute("page", new PageWrapper(page, "/collections"));
     return "collections/list";
