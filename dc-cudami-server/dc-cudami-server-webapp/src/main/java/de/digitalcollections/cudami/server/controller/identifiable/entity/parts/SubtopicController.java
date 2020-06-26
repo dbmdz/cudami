@@ -27,6 +27,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,10 +43,9 @@ public class SubtopicController {
   @Autowired private SubtopicService service;
 
   @ApiMethod(description = "Get all subtopics")
-  @RequestMapping(
+  @GetMapping(
       value = {"/latest/subtopics", "/v2/subtopics"},
-      produces = "application/json",
-      method = RequestMethod.GET)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Subtopic> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -65,10 +65,9 @@ public class SubtopicController {
   @ApiMethod(
       description =
           "Get a subtopic as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
-  @RequestMapping(
+  @GetMapping(
       value = {"/latest/subtopics/{uuid}", "/v2/subtopics/{uuid}"},
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
-      method = RequestMethod.GET)
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   @ApiResponseObject
   public ResponseEntity<Subtopic> getSubtopic(
       @ApiPathParam(
@@ -94,13 +93,12 @@ public class SubtopicController {
   }
 
   @ApiMethod(description = "Save a newly created top-level subtopic")
-  @RequestMapping(
+  @PostMapping(
       value = {
         "/latest/topics/{parentTopicUuid}/subtopic",
         "/v2/topics/{parentTopicUuid}/subtopic"
       },
-      produces = "application/json",
-      method = RequestMethod.POST)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Subtopic saveWithParentTopic(
       @ApiPathParam(name = "parentTopicUuid", description = "The uuid of the parent topic")

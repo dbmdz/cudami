@@ -19,11 +19,13 @@ import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,10 +36,9 @@ public class TopicController {
   @Autowired private TopicService service;
 
   @ApiMethod(description = "Get all topics")
-  @RequestMapping(
+  @GetMapping(
       value = {"/latest/topics", "/v2/topics"},
-      produces = "application/json",
-      method = RequestMethod.GET)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Topic> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -54,20 +55,18 @@ public class TopicController {
   }
 
   @ApiMethod(description = "Get topic by uuid")
-  @RequestMapping(
+  @GetMapping(
       value = {"/latest/topics/{uuid}", "/v2/topics/{uuid}"},
-      produces = "application/json",
-      method = RequestMethod.GET)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Topic findById(@PathVariable UUID uuid) {
     return (Topic) service.get(uuid);
   }
 
   @ApiMethod(description = "Save a newly created topic")
-  @RequestMapping(
+  @PostMapping(
       value = {"/latest/topics", "/v2/topics"},
-      produces = "application/json",
-      method = RequestMethod.POST)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Topic save(@RequestBody Topic topic, BindingResult errors)
       throws IdentifiableServiceException {
@@ -75,10 +74,9 @@ public class TopicController {
   }
 
   @ApiMethod(description = "Update a topic")
-  @RequestMapping(
+  @PutMapping(
       value = {"/latest/topics/{uuid}", "/v2/topics/{uuid}"},
-      produces = "application/json",
-      method = RequestMethod.PUT)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Topic update(@PathVariable UUID uuid, @RequestBody Topic topic, BindingResult errors)
       throws IdentifiableServiceException {
@@ -87,22 +85,20 @@ public class TopicController {
   }
 
   @ApiMethod(description = "Get count of topics")
-  @RequestMapping(
+  @GetMapping(
       value = {"/latest/topics/count", "/v2/topics/count"},
-      produces = "application/json",
-      method = RequestMethod.GET)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public long count() {
     return service.count();
   }
 
   @ApiMethod(description = "Get subtopics of topic")
-  @RequestMapping(
-      value = {"/latest/topics/{uuid}/rootNodes", "/v2/topics/{uuid}/subtopics"},
-      produces = "application/json",
-      method = RequestMethod.GET)
+  @GetMapping(
+      value = {"/latest/topics/{uuid}/subtopics", "/v2/topics/{uuid}/subtopics"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
-  List<Subtopic> getRootNodes(@PathVariable UUID uuid) {
+  List<Subtopic> getSubtopics(@PathVariable UUID uuid) {
     return service.getSubtopics(uuid);
   }
 }

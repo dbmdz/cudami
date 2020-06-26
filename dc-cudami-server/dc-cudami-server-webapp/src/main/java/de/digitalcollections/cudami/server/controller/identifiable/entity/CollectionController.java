@@ -24,10 +24,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -43,10 +44,9 @@ public class CollectionController {
   }
 
   @ApiMethod(description = "Get all collections")
-  @RequestMapping(
+  @GetMapping(
       value = {"/latest/collections", "/v2/collections"},
-      produces = "application/json",
-      method = RequestMethod.GET)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Collection> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -66,12 +66,11 @@ public class CollectionController {
   @ApiMethod(
       description =
           "Get an collection as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
-  @RequestMapping(
+  @GetMapping(
       value = {"/latest/collections/{uuid}", "/v2/collections/{uuid}"},
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
-      method = RequestMethod.GET)
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   @ApiResponseObject
-  public ResponseEntity<Collection> getWebpage(
+  public ResponseEntity<Collection> findByUuid(
       @ApiPathParam(
               description =
                   "UUID of the collection, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
@@ -95,26 +94,50 @@ public class CollectionController {
   }
 
   @ApiMethod(description = "Save a newly created collection")
-  @RequestMapping(
+  @PostMapping(
       value = {"/latest/collections", "/v2/collections"},
-      produces = "application/json",
-      method = RequestMethod.POST)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Collection save(@RequestBody Collection collection, BindingResult errors)
       throws IdentifiableServiceException {
     return collectionService.save(collection);
   }
 
+  @ApiMethod(description = "Save a newly created collection with parent collection")
+  @PostMapping(
+      value = {
+        "/latest/collections/{parentUuid}/collection",
+        "/v2/collections/{parentUuid}/collection"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public Collection saveWithParentCollection(
+      @ApiPathParam(name = "parentUuid", description = "The uuid of the parent collection")
+          @PathVariable
+          UUID parentUuid,
+      @RequestBody Collection collection)
+      throws IdentifiableServiceException {
+    return collectionService.saveWithParentCollection(collection, parentUuid);
+  }
+
   @ApiMethod(description = "Update an collection")
-  @RequestMapping(
+  @PutMapping(
       value = {"/latest/collections/{uuid}", "/v2/collections/{uuid}"},
-      produces = "application/json",
-      method = RequestMethod.PUT)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Collection update(
       @PathVariable UUID uuid, @RequestBody Collection collection, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, collection.getUuid());
     return collectionService.update(collection);
+  }
+
+  @ApiMethod(description = "Get count of collections")
+  @GetMapping(
+      value = {"/latest/collections/count", "/v2/collections/count"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public long count() {
+    return collectionService.count();
   }
 }

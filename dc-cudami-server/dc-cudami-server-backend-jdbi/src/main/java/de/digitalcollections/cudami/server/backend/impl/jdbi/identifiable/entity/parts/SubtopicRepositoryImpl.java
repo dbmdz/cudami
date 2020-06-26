@@ -215,7 +215,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
 
   @Override
   public List<Subtopic> getChildren(Subtopic subtopic) {
-    return getChildren(subtopic.getUuid());
+    return SubtopicRepository.super.getChildren(subtopic);
   }
 
   @Override
