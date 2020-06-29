@@ -55,7 +55,7 @@ const ImageRenderingHintsForm = ({attributes, isOpen, onChange, toggle}) => {
                 id="rendering-hits-no-alignment"
                 inline
                 label={t('noAlignment')}
-                onChange={(evt) => onChange('alignment', null)}
+                onChange={() => onChange('alignment', null)}
                 type="radio"
               />
             </div>
