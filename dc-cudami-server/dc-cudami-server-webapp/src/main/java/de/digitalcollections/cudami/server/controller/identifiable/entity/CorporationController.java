@@ -44,7 +44,8 @@ public class CorporationController {
   }
 
   @ApiMethod(description = "Get all corporations")
-  @GetMapping(value = {"/latest/corporations", "/v2/corporations"},
+  @GetMapping(
+      value = {"/latest/corporations", "/v2/corporations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Corporation> findAll(
@@ -62,8 +63,11 @@ public class CorporationController {
   }
 
   // Test-URL: http://localhost:9000/latest/corporations/599a120c-2dd5-11e8-b467-0ed5f89f718b
-  @ApiMethod(description = "Get an corporation as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
-  @GetMapping(value = {"/latest/corporations/{uuid}", "/v2/corporations/{uuid}"},
+  @ApiMethod(
+      description =
+          "Get an corporation as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @GetMapping(
+      value = {"/latest/corporations/{uuid}", "/v2/corporations/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   @ApiResponseObject
   public ResponseEntity<Corporation> getWebpage(
@@ -90,7 +94,8 @@ public class CorporationController {
   }
 
   @ApiMethod(description = "Save a newly created corporation")
-  @PostMapping(value = {"/latest/corporations", "/v2/corporations"},
+  @PostMapping(
+      value = {"/latest/corporations", "/v2/corporations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Corporation save(@RequestBody Corporation corporation, BindingResult errors)
@@ -99,7 +104,8 @@ public class CorporationController {
   }
 
   @ApiMethod(description = "Update an corporation")
-  @PutMapping(value = {"/latest/corporations/{uuid}", "/v2/corporations/{uuid}"},
+  @PutMapping(
+      value = {"/latest/corporations/{uuid}", "/v2/corporations/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Corporation update(

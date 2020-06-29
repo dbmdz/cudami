@@ -44,7 +44,8 @@ public class ProjectController {
   }
 
   @ApiMethod(description = "Get all projects")
-  @GetMapping(value = {"/latest/projects", "/v2/projects"},
+  @GetMapping(
+      value = {"/latest/projects", "/v2/projects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Project> findAll(
@@ -62,8 +63,11 @@ public class ProjectController {
   }
 
   // Test-URL: http://localhost:9000/latest/projects/599a120c-2dd5-11e8-b467-0ed5f89f718b
-  @ApiMethod(description = "Get an project as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
-  @GetMapping(value = {"/latest/projects/{uuid}", "/v2/projects/{uuid}"},
+  @ApiMethod(
+      description =
+          "Get an project as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @GetMapping(
+      value = {"/latest/projects/{uuid}", "/v2/projects/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   @ApiResponseObject
   public ResponseEntity<Project> getWebpage(
@@ -90,7 +94,8 @@ public class ProjectController {
   }
 
   @ApiMethod(description = "Save a newly created project")
-  @PostMapping(value = {"/latest/projects", "/v2/projects"},
+  @PostMapping(
+      value = {"/latest/projects", "/v2/projects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Project save(@RequestBody Project project, BindingResult errors)
@@ -99,7 +104,8 @@ public class ProjectController {
   }
 
   @ApiMethod(description = "Update an project")
-  @PutMapping(value = {"/latest/projects/{uuid}", "/v2/projects/{uuid}"},
+  @PutMapping(
+      value = {"/latest/projects/{uuid}", "/v2/projects/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Project update(@PathVariable UUID uuid, @RequestBody Project project, BindingResult errors)

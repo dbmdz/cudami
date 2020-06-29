@@ -45,7 +45,8 @@ public class V2WebpageController {
   @Autowired private WebpageService webpageService;
 
   @ApiMethod(description = "Get a webpage as JSON (Version 2)")
-  @GetMapping(value = {"/v2/webpages/{uuid}.json", "/v2/webpages/{uuid}"},
+  @GetMapping(
+      value = {"/v2/webpages/{uuid}.json", "/v2/webpages/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public ResponseEntity<String> getWebpageV2Json(
@@ -81,7 +82,8 @@ public class V2WebpageController {
   }
 
   @ApiMethod(description = "Get a webpage as XML (Version 2)")
-  @GetMapping(value = {"/v2/webpages/{uuid}.xml"},
+  @GetMapping(
+      value = {"/v2/webpages/{uuid}.xml"},
       produces = MediaType.APPLICATION_XML_VALUE)
   @ApiResponseObject
   public ResponseEntity<String> getWebpageV2Xml(

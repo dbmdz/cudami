@@ -36,7 +36,8 @@ public class WebsiteController {
   @Autowired private WebsiteService service;
 
   @ApiMethod(description = "Get all websites")
-  @GetMapping(value = {"/latest/websites", "/v2/websites"},
+  @GetMapping(
+      value = {"/latest/websites", "/v2/websites"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Website> findAll(
@@ -54,7 +55,8 @@ public class WebsiteController {
   }
 
   @ApiMethod(description = "Get website by uuid")
-  @GetMapping(value = {"/latest/websites/{uuid}", "/v2/websites/{uuid}"},
+  @GetMapping(
+      value = {"/latest/websites/{uuid}", "/v2/websites/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Website findById(@PathVariable UUID uuid) {
@@ -62,7 +64,8 @@ public class WebsiteController {
   }
 
   @ApiMethod(description = "Save a newly created website")
-  @PostMapping(value = {"/latest/websites", "/v2/websites"},
+  @PostMapping(
+      value = {"/latest/websites", "/v2/websites"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Website save(@RequestBody Website website, BindingResult errors)
@@ -71,7 +74,8 @@ public class WebsiteController {
   }
 
   @ApiMethod(description = "Update a website")
-  @PutMapping(value = {"/latest/websites/{uuid}", "/v2/websites/{uuid}"},
+  @PutMapping(
+      value = {"/latest/websites/{uuid}", "/v2/websites/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Website update(@PathVariable UUID uuid, @RequestBody Website website, BindingResult errors)
@@ -81,7 +85,8 @@ public class WebsiteController {
   }
 
   @ApiMethod(description = "Get count of content trees")
-  @GetMapping(value = {"/latest/websites/count", "/v2/websites/count"},
+  @GetMapping(
+      value = {"/latest/websites/count", "/v2/websites/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public long count() {
@@ -89,7 +94,8 @@ public class WebsiteController {
   }
 
   @ApiMethod(description = "Get root pages of website")
-  @GetMapping(value = {"/latest/websites/{uuid}/rootPages", "/v2/websites/{uuid}/rootPages"},
+  @GetMapping(
+      value = {"/latest/websites/{uuid}/rootPages", "/v2/websites/{uuid}/rootPages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   List<Webpage> getRootPages(@PathVariable UUID uuid) {

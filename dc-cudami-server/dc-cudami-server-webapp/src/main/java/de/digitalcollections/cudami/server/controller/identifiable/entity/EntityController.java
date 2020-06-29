@@ -37,7 +37,8 @@ public class EntityController<E extends Entity> {
   private EntityService<Entity> service;
 
   @ApiMethod(description = "Get count of entities")
-  @GetMapping(value = {"/latest/entities/count", "/v3/entities/count"},
+  @GetMapping(
+      value = {"/latest/entities/count", "/v3/entities/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public long count() {
@@ -45,7 +46,8 @@ public class EntityController<E extends Entity> {
   }
 
   @ApiMethod(description = "Get all entities")
-  @GetMapping(value = {"/latest/entities", "/v3/entities"},
+  @GetMapping(
+      value = {"/latest/entities", "/v3/entities"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Entity> findAll(
@@ -62,8 +64,10 @@ public class EntityController<E extends Entity> {
     return service.find(pageRequest);
   }
 
-  @ApiMethod(description = "Find limited amount of entities containing searchTerm in label or description")
-  @GetMapping(value = {"/latest/entities/search", "/v2/entities/search"},
+  @ApiMethod(
+      description = "Find limited amount of entities containing searchTerm in label or description")
+  @GetMapping(
+      value = {"/latest/entities/search", "/v2/entities/search"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public SearchPageResponse<Entity> find(
@@ -83,7 +87,8 @@ public class EntityController<E extends Entity> {
   }
 
   @ApiMethod(description = "Get entity by uuid")
-  @GetMapping(value = {
+  @GetMapping(
+      value = {
         "/latest/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v2/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
@@ -94,7 +99,8 @@ public class EntityController<E extends Entity> {
   }
 
   @ApiMethod(description = "Get entity by namespace and id")
-  @GetMapping(value = {"/latest/entities/identifier/{namespace}:{id}"},
+  @GetMapping(
+      value = {"/latest/entities/identifier/{namespace}:{id}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Entity findByIdentifier(@PathVariable String namespace, @PathVariable String id)
@@ -104,7 +110,8 @@ public class EntityController<E extends Entity> {
   }
 
   @ApiMethod(description = "Get entity by reference id")
-  @GetMapping(value = {"/latest/entities/{refId:[0-9]+}"},
+  @GetMapping(
+      value = {"/latest/entities/{refId:[0-9]+}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Entity findByRefId(@PathVariable long refId) {
@@ -123,7 +130,8 @@ public class EntityController<E extends Entity> {
   }
 
   @ApiMethod(description = "Get related file resources of entity")
-  @GetMapping(value = {
+  @GetMapping(
+      value = {
         "/latest/entities/{uuid}/related/fileresources",
         "/v2/entities/{uuid}/related/fileresources"
       },

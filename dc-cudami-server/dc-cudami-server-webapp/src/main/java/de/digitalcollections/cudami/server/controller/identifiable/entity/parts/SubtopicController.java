@@ -43,7 +43,8 @@ public class SubtopicController {
   @Autowired private SubtopicService service;
 
   @ApiMethod(description = "Get all subtopics")
-  @GetMapping(value = {"/latest/subtopics", "/v2/subtopics"},
+  @GetMapping(
+      value = {"/latest/subtopics", "/v2/subtopics"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Subtopic> findAll(
@@ -61,8 +62,11 @@ public class SubtopicController {
   }
 
   // Test-URL: http://localhost:9000/latest/subtopics/599a120c-2dd5-11e8-b467-0ed5f89f718b
-  @ApiMethod(description = "Get a subtopic as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
-  @GetMapping(value = {"/latest/subtopics/{uuid}", "/v2/subtopics/{uuid}"},
+  @ApiMethod(
+      description =
+          "Get a subtopic as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @GetMapping(
+      value = {"/latest/subtopics/{uuid}", "/v2/subtopics/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   @ApiResponseObject
   public ResponseEntity<Subtopic> getSubtopic(
@@ -107,7 +111,8 @@ public class SubtopicController {
   }
 
   @ApiMethod(description = "Add an existing subtopic to an existing topic")
-  @PostMapping(value = {
+  @PostMapping(
+      value = {
         "/latest/topics/{parentTopicUuid}/subtopic/{subtopicUuid}",
         "/v2/topics/{parentTopicUuid}/subtopic/{subtopicUuid}"
       },
@@ -124,7 +129,8 @@ public class SubtopicController {
   }
 
   @ApiMethod(description = "Save a newly created subtopic")
-  @PostMapping(value = {
+  @PostMapping(
+      value = {
         "/latest/subtopics/{parentSubtopicUuid}/subtopic",
         "/v2/subtopics/{parentSubtopicUuid}/subtopic"
       },
@@ -140,7 +146,8 @@ public class SubtopicController {
   }
 
   @ApiMethod(description = "Add an existing subtopic to an existing parent subtopic")
-  @PostMapping(value = {
+  @PostMapping(
+      value = {
         "/latest/subtopics/{parentSubtopicUuid}/subtopic/{subtopicUuid}",
         "/v2/subtopics/{parentSubtopicUuid}/subtopic/{subtopicUuid}"
       },
@@ -157,7 +164,8 @@ public class SubtopicController {
   }
 
   @ApiMethod(description = "Update a subtopic")
-  @PutMapping(value = {"/latest/subtopics/{uuid}", "/v2/subtopics/{uuid}"},
+  @PutMapping(
+      value = {"/latest/subtopics/{uuid}", "/v2/subtopics/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Subtopic update(
@@ -171,7 +179,8 @@ public class SubtopicController {
   }
 
   @ApiMethod(description = "Get count of subtopics")
-  @GetMapping(value = {"/latest/subtopics/count", "/v2/subtopics/count"},
+  @GetMapping(
+      value = {"/latest/subtopics/count", "/v2/subtopics/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public long count() {
@@ -179,7 +188,8 @@ public class SubtopicController {
   }
 
   @ApiMethod(description = "Get child subtopics of subtopic")
-  @GetMapping(value = {"/latest/subtopics/{uuid}/children", "/v2/subtopics/{uuid}/children"},
+  @GetMapping(
+      value = {"/latest/subtopics/{uuid}/children", "/v2/subtopics/{uuid}/children"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   List<Subtopic> getChildren(@PathVariable UUID uuid) {
@@ -187,7 +197,8 @@ public class SubtopicController {
   }
 
   @ApiMethod(description = "Get entities of subtopic")
-  @GetMapping(value = {"/latest/subtopics/{uuid}/entities", "/v2/subtopics/{uuid}/entities"},
+  @GetMapping(
+      value = {"/latest/subtopics/{uuid}/entities", "/v2/subtopics/{uuid}/entities"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<Entity> getEntities(
@@ -198,7 +209,8 @@ public class SubtopicController {
 
   // FIXME
   @ApiMethod(description = "Save entities of subtopic")
-  @PostMapping(value = {"/latest/subtopics/{uuid}/entities", "/v2/subtopics/{uuid}/entities"},
+  @PostMapping(
+      value = {"/latest/subtopics/{uuid}/entities", "/v2/subtopics/{uuid}/entities"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<Entity> saveEntities(@PathVariable UUID uuid, @RequestBody List<Entity> entities) {
@@ -206,7 +218,8 @@ public class SubtopicController {
   }
 
   @ApiMethod(description = "Get file resources of subtopic")
-  @GetMapping(value = {"/latest/subtopics/{uuid}/fileresources", "/v2/subtopics/{uuid}/fileresources"},
+  @GetMapping(
+      value = {"/latest/subtopics/{uuid}/fileresources", "/v2/subtopics/{uuid}/fileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<FileResource> getFileResources(@PathVariable UUID uuid) {
@@ -215,7 +228,8 @@ public class SubtopicController {
 
   // FIXME
   @ApiMethod(description = "Save fileresources of subtopic")
-  @PostMapping(value = {"/latest/subtopics/{uuid}/fileresources", "/v2/subtopics/{uuid}/fileresources"},
+  @PostMapping(
+      value = {"/latest/subtopics/{uuid}/fileresources", "/v2/subtopics/{uuid}/fileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<FileResource> saveFileresources(
@@ -224,7 +238,8 @@ public class SubtopicController {
   }
 
   @ApiMethod(description = "Get parent subtopic of subtopic")
-  @GetMapping(value = {"/latest/subtopics/{uuid}/parent", "/v2/subtopics/{uuid}/parent"},
+  @GetMapping(
+      value = {"/latest/subtopics/{uuid}/parent", "/v2/subtopics/{uuid}/parent"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   Subtopic getParent(@PathVariable UUID uuid) {
@@ -232,7 +247,8 @@ public class SubtopicController {
   }
 
   @ApiMethod(description = "Get subtopics an entity is linked to")
-  @GetMapping(value = {"/latest/subtopics/entity/{uuid}", "/v2/subtopics/entity/{uuid}"},
+  @GetMapping(
+      value = {"/latest/subtopics/entity/{uuid}", "/v2/subtopics/entity/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   List<Subtopic> getSubtopicsOfEntity(@PathVariable UUID uuid) {
@@ -240,15 +256,18 @@ public class SubtopicController {
   }
 
   @ApiMethod(description = "Get subtopics a fileresource is linked to")
-  @GetMapping(value = {"/latest/subtopics/fileresource/{uuid}", "/v2/subtopics/fileresource/{uuid}"},
+  @GetMapping(
+      value = {"/latest/subtopics/fileresource/{uuid}", "/v2/subtopics/fileresource/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   List<Subtopic> getSubtopicsOfFileResource(@PathVariable UUID uuid) {
     return service.getSubtopicsOfFileResource(uuid);
   }
 
-  @ApiMethod(description = "Delete child-relation of the given subtopic to the given parent subtopic")
-  @DeleteMapping(value = {
+  @ApiMethod(
+      description = "Delete child-relation of the given subtopic to the given parent subtopic")
+  @DeleteMapping(
+      value = {
         "/latest/subtopics/{parentSubtopicUuid}/subtopic/{subtopicUuid}",
         "/v2/subtopics/{parentSubtopicUuid}/subtopic/{subtopicUuid}"
       },
@@ -264,7 +283,8 @@ public class SubtopicController {
   }
 
   @ApiMethod(description = "Delete child-relation of the given subtopic to the given parent topic")
-  @DeleteMapping(value = {
+  @DeleteMapping(
+      value = {
         "/latest/topic/{topicUuid}/subtopic/{subtopicUuid}",
         "/v2/topic/{topicUuid}/subtopic/{subtopicUuid}"
       },

@@ -24,7 +24,8 @@ public class WebpageHtmlController {
   @Autowired private WebpageService webpageService;
 
   @ApiMethod(description = "Get a webpage as HTML")
-  @GetMapping(value = {
+  @GetMapping(
+      value = {
         "/latest/webpages/{uuid}.html",
         "/v3/webpages/{uuid}.html",
         "/v2/webpages/{uuid}.html",

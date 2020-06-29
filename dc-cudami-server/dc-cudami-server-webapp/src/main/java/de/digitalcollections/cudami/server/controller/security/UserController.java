@@ -35,7 +35,8 @@ public class UserController {
   @Autowired private UserService service;
 
   @ApiMethod(description = "Get all users with given role and enabled status")
-  @GetMapping(value = {"/latest/users", "/v2/users"},
+  @GetMapping(
+      value = {"/latest/users", "/v2/users"},
       params = {"role", "enabled"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
@@ -45,7 +46,8 @@ public class UserController {
   }
 
   @ApiMethod(description = "Get all users")
-  @GetMapping(value = {"/latest/users", "/v2/users"},
+  @GetMapping(
+      value = {"/latest/users", "/v2/users"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<User> findAll(
@@ -63,7 +65,8 @@ public class UserController {
   }
 
   @ApiMethod(description = "Get user by uuid")
-  @GetMapping(value = {"/latest/users/{uuid}", "/v2/users/{uuid}"},
+  @GetMapping(
+      value = {"/latest/users/{uuid}", "/v2/users/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public User findById(@PathVariable UUID uuid) {
@@ -71,7 +74,8 @@ public class UserController {
   }
 
   @ApiMethod(description = "Get user by email address")
-  @GetMapping(value = {"/latest/users", "/v2/users"},
+  @GetMapping(
+      value = {"/latest/users", "/v2/users"},
       params = {"email"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
@@ -80,7 +84,8 @@ public class UserController {
   }
 
   @ApiMethod(description = "Save a newly created user")
-  @PostMapping(value = {"/latest/users", "/v2/users"},
+  @PostMapping(
+      value = {"/latest/users", "/v2/users"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public User save(@RequestBody User user, BindingResult errors) {
@@ -88,7 +93,8 @@ public class UserController {
   }
 
   @ApiMethod(description = "Update a user")
-  @PutMapping(value = {"/latest/users/{uuid}", "/v2/users/{uuid}"},
+  @PutMapping(
+      value = {"/latest/users/{uuid}", "/v2/users/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public User update(@PathVariable UUID uuid, @RequestBody User user, BindingResult errors) {

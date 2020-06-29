@@ -33,7 +33,8 @@ public class IndentifierTypeController {
   @Autowired private IdentifierTypeService service;
 
   @ApiMethod(description = "Get all identifier types")
-  @GetMapping(value = {"/latest/identifiertypes", "/v2/identifiertypes"},
+  @GetMapping(
+      value = {"/latest/identifiertypes", "/v2/identifiertypes"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<IdentifierType> findAll(
@@ -51,7 +52,8 @@ public class IndentifierTypeController {
   }
 
   @ApiMethod(description = "get identifier type by uuid")
-  @GetMapping(value = {"/latest/identifiertypes/{uuid}", "/v2/identifiertypes/{uuid}"},
+  @GetMapping(
+      value = {"/latest/identifiertypes/{uuid}", "/v2/identifiertypes/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public IdentifierType findById(@PathVariable UUID uuid) {
@@ -59,7 +61,8 @@ public class IndentifierTypeController {
   }
 
   @ApiMethod(description = "save a newly created identifier type")
-  @PostMapping(value = {"/latest/identifiertypes", "/v2/identifiertypes"},
+  @PostMapping(
+      value = {"/latest/identifiertypes", "/v2/identifiertypes"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public IdentifierType save(@RequestBody IdentifierType identifierType, BindingResult errors) {
@@ -67,7 +70,8 @@ public class IndentifierTypeController {
   }
 
   @ApiMethod(description = "update an identifier type")
-  @PutMapping(value = {"/latest/identifiertypes/{uuid}", "/v2/identifiertypes/{uuid}"},
+  @PutMapping(
+      value = {"/latest/identifiertypes/{uuid}", "/v2/identifiertypes/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public IdentifierType update(

@@ -22,7 +22,8 @@ public class VersionController {
   @Autowired VersionService versionService;
 
   @ApiMethod(description = "Get version by uuid")
-  @GetMapping(value = {"/latest/versions/{uuid}", "/v2/versions/{uuid}"},
+  @GetMapping(
+      value = {"/latest/versions/{uuid}", "/v2/versions/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Version findById(@PathVariable UUID uuid) {
@@ -30,7 +31,8 @@ public class VersionController {
   }
 
   @ApiMethod(description = "Update the version status")
-  @PutMapping(value = {"/latest/versions/{uuid}", "/v2/versions/{uuid}"},
+  @PutMapping(
+      value = {"/latest/versions/{uuid}", "/v2/versions/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Version update(@PathVariable UUID uuid, @RequestBody Version version, BindingResult errors)
