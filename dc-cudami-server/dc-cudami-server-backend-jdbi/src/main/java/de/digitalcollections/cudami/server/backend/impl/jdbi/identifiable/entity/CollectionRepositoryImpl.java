@@ -434,7 +434,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public PageResponse<Collection> getRootCollections(PageRequest pageRequest) {
+  public PageResponse<Collection> getTopCollections(PageRequest pageRequest) {
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
     StringBuilder query = new StringBuilder(BASE_TOP_QUERY);
     addPageRequestParams(pageRequest, query);

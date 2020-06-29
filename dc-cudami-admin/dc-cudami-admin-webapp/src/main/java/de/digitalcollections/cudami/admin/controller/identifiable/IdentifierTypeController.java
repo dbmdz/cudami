@@ -25,8 +25,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -52,13 +51,13 @@ public class IdentifierTypeController extends AbstractController {
     return "identifiertypes";
   }
 
-  @RequestMapping(value = "/identifiertypes/new", method = RequestMethod.GET)
+  @GetMapping(value = "/identifiertypes/new")
   public String create(Model model) {
     model.addAttribute("identifierType", service.create());
     return "identifiertypes/create";
   }
 
-  @RequestMapping(value = "/identifiertypes/new", method = RequestMethod.POST)
+  @PostMapping(value = "/identifiertypes/new")
   public String create(
       @ModelAttribute @Valid IdentifierTypeImpl identifierType,
       BindingResult results,
@@ -88,13 +87,13 @@ public class IdentifierTypeController extends AbstractController {
     return "redirect:/identifiertypes";
   }
 
-  @RequestMapping(value = "/identifiertypes/{uuid}/edit", method = RequestMethod.GET)
+  @GetMapping(value = "/identifiertypes/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
     model.addAttribute("identifierType", service.get(uuid));
     return "identifiertypes/edit";
   }
 
-  @RequestMapping(value = "/identifiertypes/{pathUuid}/edit", method = RequestMethod.POST)
+  @PostMapping(value = "/identifiertypes/{pathUuid}/edit")
   public String edit(
       @PathVariable UUID pathUuid,
       @ModelAttribute @Valid IdentifierTypeImpl identifierType,

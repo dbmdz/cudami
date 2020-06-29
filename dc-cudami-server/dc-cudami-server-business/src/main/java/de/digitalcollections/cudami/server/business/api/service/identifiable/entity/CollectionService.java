@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface CollectionService extends NodeService<Collection>, EntityService<Collection> {
 
-  PageResponse<Collection> getRootCollections(PageRequest pageRequest);
+  PageResponse<Collection> getTopCollections(PageRequest pageRequest);
 
   Collection saveWithParentCollection(Collection collection, UUID parentUuid)
       throws IdentifiableServiceException;

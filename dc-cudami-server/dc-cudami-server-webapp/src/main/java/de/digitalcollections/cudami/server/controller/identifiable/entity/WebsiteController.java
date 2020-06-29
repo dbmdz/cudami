@@ -19,11 +19,13 @@ import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,10 +36,8 @@ public class WebsiteController {
   @Autowired private WebsiteService service;
 
   @ApiMethod(description = "Get all websites")
-  @RequestMapping(
-      value = {"/latest/websites", "/v2/websites"},
-      produces = "application/json",
-      method = RequestMethod.GET)
+  @GetMapping(value = {"/latest/websites", "/v2/websites"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Website> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -54,20 +54,16 @@ public class WebsiteController {
   }
 
   @ApiMethod(description = "Get website by uuid")
-  @RequestMapping(
-      value = {"/latest/websites/{uuid}", "/v2/websites/{uuid}"},
-      produces = "application/json",
-      method = RequestMethod.GET)
+  @GetMapping(value = {"/latest/websites/{uuid}", "/v2/websites/{uuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Website findById(@PathVariable UUID uuid) {
     return (Website) service.get(uuid);
   }
 
   @ApiMethod(description = "Save a newly created website")
-  @RequestMapping(
-      value = {"/latest/websites", "/v2/websites"},
-      produces = "application/json",
-      method = RequestMethod.POST)
+  @PostMapping(value = {"/latest/websites", "/v2/websites"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Website save(@RequestBody Website website, BindingResult errors)
       throws IdentifiableServiceException {
@@ -75,10 +71,8 @@ public class WebsiteController {
   }
 
   @ApiMethod(description = "Update a website")
-  @RequestMapping(
-      value = {"/latest/websites/{uuid}", "/v2/websites/{uuid}"},
-      produces = "application/json",
-      method = RequestMethod.PUT)
+  @PutMapping(value = {"/latest/websites/{uuid}", "/v2/websites/{uuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Website update(@PathVariable UUID uuid, @RequestBody Website website, BindingResult errors)
       throws IdentifiableServiceException {
@@ -87,20 +81,16 @@ public class WebsiteController {
   }
 
   @ApiMethod(description = "Get count of content trees")
-  @RequestMapping(
-      value = {"/latest/websites/count", "/v2/websites/count"},
-      produces = "application/json",
-      method = RequestMethod.GET)
+  @GetMapping(value = {"/latest/websites/count", "/v2/websites/count"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public long count() {
     return service.count();
   }
 
   @ApiMethod(description = "Get root pages of website")
-  @RequestMapping(
-      value = {"/latest/websites/{uuid}/rootPages", "/v2/websites/{uuid}/rootPages"},
-      produces = "application/json",
-      method = RequestMethod.GET)
+  @GetMapping(value = {"/latest/websites/{uuid}/rootPages", "/v2/websites/{uuid}/rootPages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   List<Webpage> getRootPages(@PathVariable UUID uuid) {
     return service.getRootPages(uuid);

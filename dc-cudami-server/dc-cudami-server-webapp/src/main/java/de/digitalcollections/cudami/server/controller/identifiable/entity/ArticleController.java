@@ -24,10 +24,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,10 +39,8 @@ public class ArticleController {
   @Autowired private ArticleService articleService;
 
   @ApiMethod(description = "Get all articles")
-  @RequestMapping(
-      value = {"/latest/articles", "/v2/articles"},
-      produces = "application/json",
-      method = RequestMethod.GET)
+  @GetMapping(value = {"/latest/articles", "/v2/articles"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Article> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -58,13 +57,9 @@ public class ArticleController {
   }
 
   // Test-URL: http://localhost:9000/latest/articles/599a120c-2dd5-11e8-b467-0ed5f89f718b
-  @ApiMethod(
-      description =
-          "Get an article as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
-  @RequestMapping(
-      value = {"/latest/articles/{uuid}", "/v2/articles/{uuid}"},
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
-      method = RequestMethod.GET)
+  @ApiMethod(description = "Get an article as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @GetMapping(value = {"/latest/articles/{uuid}", "/v2/articles/{uuid}"},
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   @ApiResponseObject
   public ResponseEntity<Article> getWebpage(
       @ApiPathParam(
@@ -90,10 +85,8 @@ public class ArticleController {
   }
 
   @ApiMethod(description = "Save a newly created article")
-  @RequestMapping(
-      value = {"/latest/articles", "/v2/articles"},
-      produces = "application/json",
-      method = RequestMethod.POST)
+  @PostMapping(value = {"/latest/articles", "/v2/articles"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Article save(@RequestBody Article article, BindingResult errors)
       throws IdentifiableServiceException {
@@ -101,10 +94,8 @@ public class ArticleController {
   }
 
   @ApiMethod(description = "Update an article")
-  @RequestMapping(
-      value = {"/latest/articles/{uuid}", "/v2/articles/{uuid}"},
-      produces = "application/json",
-      method = RequestMethod.PUT)
+  @PutMapping(value = {"/latest/articles/{uuid}", "/v2/articles/{uuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Article update(@PathVariable UUID uuid, @RequestBody Article article, BindingResult errors)
       throws IdentifiableServiceException {

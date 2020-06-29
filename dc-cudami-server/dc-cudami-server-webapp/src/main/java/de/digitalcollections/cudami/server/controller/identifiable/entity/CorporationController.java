@@ -24,10 +24,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -43,10 +44,8 @@ public class CorporationController {
   }
 
   @ApiMethod(description = "Get all corporations")
-  @RequestMapping(
-      value = {"/latest/corporations", "/v2/corporations"},
-      produces = "application/json",
-      method = RequestMethod.GET)
+  @GetMapping(value = {"/latest/corporations", "/v2/corporations"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Corporation> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -63,13 +62,9 @@ public class CorporationController {
   }
 
   // Test-URL: http://localhost:9000/latest/corporations/599a120c-2dd5-11e8-b467-0ed5f89f718b
-  @ApiMethod(
-      description =
-          "Get an corporation as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
-  @RequestMapping(
-      value = {"/latest/corporations/{uuid}", "/v2/corporations/{uuid}"},
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
-      method = RequestMethod.GET)
+  @ApiMethod(description = "Get an corporation as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @GetMapping(value = {"/latest/corporations/{uuid}", "/v2/corporations/{uuid}"},
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   @ApiResponseObject
   public ResponseEntity<Corporation> getWebpage(
       @ApiPathParam(
@@ -95,10 +90,8 @@ public class CorporationController {
   }
 
   @ApiMethod(description = "Save a newly created corporation")
-  @RequestMapping(
-      value = {"/latest/corporations", "/v2/corporations"},
-      produces = "application/json",
-      method = RequestMethod.POST)
+  @PostMapping(value = {"/latest/corporations", "/v2/corporations"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Corporation save(@RequestBody Corporation corporation, BindingResult errors)
       throws IdentifiableServiceException {
@@ -106,10 +99,8 @@ public class CorporationController {
   }
 
   @ApiMethod(description = "Update an corporation")
-  @RequestMapping(
-      value = {"/latest/corporations/{uuid}", "/v2/corporations/{uuid}"},
-      produces = "application/json",
-      method = RequestMethod.PUT)
+  @PutMapping(value = {"/latest/corporations/{uuid}", "/v2/corporations/{uuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Corporation update(
       @PathVariable UUID uuid, @RequestBody Corporation corporation, BindingResult errors)

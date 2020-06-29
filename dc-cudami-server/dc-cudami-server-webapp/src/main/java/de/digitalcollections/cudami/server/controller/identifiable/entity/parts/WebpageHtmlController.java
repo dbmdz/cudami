@@ -13,9 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
@@ -25,15 +24,13 @@ public class WebpageHtmlController {
   @Autowired private WebpageService webpageService;
 
   @ApiMethod(description = "Get a webpage as HTML")
-  @RequestMapping(
-      value = {
+  @GetMapping(value = {
         "/latest/webpages/{uuid}.html",
         "/v3/webpages/{uuid}.html",
         "/v2/webpages/{uuid}.html",
         "/v1/webpages/{uuid}.html"
       },
-      produces = {MediaType.TEXT_HTML_VALUE},
-      method = RequestMethod.GET)
+      produces = MediaType.TEXT_HTML_VALUE)
   public String getWebpageAsHtml(
       @ApiPathParam(
               description =

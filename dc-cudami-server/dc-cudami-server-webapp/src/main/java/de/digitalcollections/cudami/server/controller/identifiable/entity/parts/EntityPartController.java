@@ -11,9 +11,9 @@ import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -25,13 +25,11 @@ public class EntityPartController<P extends EntityPart, E extends Entity> {
   private EntityPartService<P, E> service;
 
   @ApiMethod(description = "Get related file resources of entity part")
-  @RequestMapping(
-      value = {
+  @GetMapping(value = {
         "/latest/entityparts/{uuid}/related/fileresources",
         "/v2/entityparts/{uuid}/related/fileresources"
       },
-      produces = "application/json",
-      method = RequestMethod.GET)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
     return service.getRelatedFileResources(uuid);

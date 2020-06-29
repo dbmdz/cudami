@@ -21,5 +21,5 @@ public interface CollectionRepository
 
   Collection saveWithParentCollection(Collection collection, UUID parentUuid);
 
-  PageResponse<Collection> getRootCollections(PageRequest pageRequest);
+  PageResponse<Collection> getTopCollections(PageRequest pageRequest);
 }

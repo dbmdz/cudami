@@ -62,7 +62,7 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public PageResponse<Collection> getRootCollections(PageRequest pageRequest) {
-    return ((CollectionRepository) repository).getRootCollections(pageRequest);
+  public PageResponse<Collection> getTopCollections(PageRequest pageRequest) {
+    return ((CollectionRepository) repository).getTopCollections(pageRequest);
   }
 }

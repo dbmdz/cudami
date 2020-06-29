@@ -18,27 +18,26 @@ import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-// @RequestMapping("/latest/users") // moved to each method (more readable)
 @Api(description = "The user controller", name = "User controller")
 public class UserController {
 
   @Autowired private UserService service;
 
   @ApiMethod(description = "Get all users with given role and enabled status")
-  @RequestMapping(
-      value = {"/latest/users", "/v2/users"},
+  @GetMapping(value = {"/latest/users", "/v2/users"},
       params = {"role", "enabled"},
-      produces = "application/json",
-      method = RequestMethod.GET)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<User> getByRoleAndStatus(
       @RequestParam(name = "role") Role role, @RequestParam(name = "enabled") boolean enabled) {
@@ -46,10 +45,8 @@ public class UserController {
   }
 
   @ApiMethod(description = "Get all users")
-  @RequestMapping(
-      value = {"/latest/users", "/v2/users"},
-      produces = "application/json",
-      method = RequestMethod.GET)
+  @GetMapping(value = {"/latest/users", "/v2/users"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<User> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -66,41 +63,33 @@ public class UserController {
   }
 
   @ApiMethod(description = "Get user by uuid")
-  @RequestMapping(
-      value = {"/latest/users/{uuid}", "/v2/users/{uuid}"},
-      produces = "application/json",
-      method = RequestMethod.GET)
+  @GetMapping(value = {"/latest/users/{uuid}", "/v2/users/{uuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public User findById(@PathVariable UUID uuid) {
     return service.get(uuid);
   }
 
   @ApiMethod(description = "Get user by email address")
-  @RequestMapping(
-      value = {"/latest/users", "/v2/users"},
+  @GetMapping(value = {"/latest/users", "/v2/users"},
       params = {"email"},
-      produces = "application/json",
-      method = RequestMethod.GET)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public User findByName(@RequestParam(name = "email") String email) {
     return service.loadUserByUsername(email);
   }
 
   @ApiMethod(description = "Save a newly created user")
-  @RequestMapping(
-      value = {"/latest/users", "/v2/users"},
-      produces = "application/json",
-      method = RequestMethod.POST)
+  @PostMapping(value = {"/latest/users", "/v2/users"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public User save(@RequestBody User user, BindingResult errors) {
     return service.save(user, errors);
   }
 
   @ApiMethod(description = "Update a user")
-  @RequestMapping(
-      value = {"/latest/users/{uuid}", "/v2/users/{uuid}"},
-      produces = "application/json",
-      method = RequestMethod.PUT)
+  @PutMapping(value = {"/latest/users/{uuid}", "/v2/users/{uuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public User update(@PathVariable UUID uuid, @RequestBody User user, BindingResult errors) {
     assert Objects.equals(uuid, user.getUuid());

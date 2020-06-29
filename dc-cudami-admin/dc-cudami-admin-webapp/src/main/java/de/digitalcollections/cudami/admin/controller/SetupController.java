@@ -11,8 +11,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -39,13 +40,13 @@ public class SetupController extends AbstractController {
     return true;
   }
 
-  @RequestMapping(value = "/setup/adminUser", method = RequestMethod.GET)
+  @GetMapping(value = "/setup/adminUser")
   public String adminUser(Model model) {
     model.addAttribute("user", userService.createAdminUser());
     return "users/create";
   }
 
-  @RequestMapping(value = "/setup/adminUser", method = RequestMethod.POST)
+  @PostMapping(value = "/setup/adminUser")
   public String adminUser(
       @RequestParam("pwd1") String password1,
       @RequestParam("pwd2") String password2,
