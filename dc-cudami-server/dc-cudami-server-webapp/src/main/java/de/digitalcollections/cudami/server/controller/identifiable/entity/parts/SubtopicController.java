@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.parts;
 
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.SubtopicService;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
@@ -10,6 +11,7 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.paging.enums.Direction;
 import de.digitalcollections.model.api.paging.enums.NullHandling;
+import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
@@ -41,6 +43,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class SubtopicController {
 
   @Autowired private SubtopicService service;
+  
+  @Autowired LocaleService localeService;
 
   @ApiMethod(description = "Get all subtopics")
   @GetMapping(
@@ -296,5 +300,40 @@ public class SubtopicController {
       @ApiPathParam(name = "subtopicUuid", description = "The uuid of the subtopic") @PathVariable
           UUID subtopicUuid) {
     return service.deleteFromParentTopic(subtopicUuid, topicUuid);
+  }
+  
+  @ApiMethod(description = "Get the breadcrumb for a subtopic")
+  @RequestMapping(
+      value = {"/latest/subtopics/{uuid}/breadcrumb", "/v3/subtopics/{uuid}/breadcrumb"},
+      produces = {MediaType.APPLICATION_JSON_VALUE},
+      method = RequestMethod.GET)
+  @ApiResponseObject
+  public ResponseEntity<BreadcrumbNavigation> getBreadcrumb(
+      @ApiPathParam(
+              description =
+                  "UUID of the subtopic, e.g. <tt>6119d8e9-9c92-4091-8dcb-bc4053385406</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @ApiQueryParam(
+              name = "pLocale",
+              description =
+                  "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+          @RequestParam(name = "pLocale", required = false)
+          Locale pLocale) {
+
+    BreadcrumbNavigation breadcrumbNavigation;
+
+    if (pLocale == null) {
+      breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
+    } else {
+      breadcrumbNavigation =
+          service.getBreadcrumbNavigation(uuid, pLocale, localeService.getDefaultLocale());
+    }
+
+    if (breadcrumbNavigation == null || breadcrumbNavigation.getNavigationItems().isEmpty()) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    return new ResponseEntity<>(breadcrumbNavigation, HttpStatus.OK);
   }
 }

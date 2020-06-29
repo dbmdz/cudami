@@ -3,10 +3,12 @@ package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.SubtopicRepository;
 import de.digitalcollections.model.api.http.exceptions.client.ResourceNotFoundException;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
+import de.digitalcollections.model.api.identifiable.entity.Topic;
 import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.entity.parts.SubtopicImpl;
 import java.util.List;
 import java.util.Locale;
@@ -162,5 +164,15 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
   @Override
   public Subtopic saveWithParentSubtopic(Subtopic subtopic, UUID parentSubtopicUUID) {
     return endpoint.saveWithParentSubtopic(subtopic, parentSubtopicUUID);
+  }
+  
+  @Override
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID subtopicUuid) {
+    return endpoint.getBreadcrumbNavigation(subtopicUuid);
+  }
+
+  @Override
+  public Topic getTopic(UUID subtopicUuid) {
+    return endpoint.getTopic(subtopicUuid);
   }
 }

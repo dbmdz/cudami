@@ -9,9 +9,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-/** Service for Subtopic. */
+/**
+ * Service for Subtopic.
+ */
 public interface SubtopicService
-    extends NodeService<Subtopic>, EntityPartService<Subtopic, Entity> {
+        extends NodeService<Subtopic>, EntityPartService<Subtopic, Entity> {
 
   @Override
   Subtopic get(UUID uuid, Locale locale) throws IdentifiableServiceException;
@@ -33,10 +35,10 @@ public interface SubtopicService
   List<FileResource> saveFileResources(UUID subtopicUuid, List<FileResource> fileResources);
 
   Subtopic saveWithParentTopic(Subtopic subtopic, UUID parentTopicUuid)
-      throws IdentifiableServiceException;
+          throws IdentifiableServiceException;
 
   Subtopic saveWithParentSubtopic(Subtopic subtopic, UUID parentSubtopicUuid)
-      throws IdentifiableServiceException;
+          throws IdentifiableServiceException;
 
   List<Subtopic> getSubtopicsOfEntity(UUID entityUuid);
 
@@ -51,8 +53,8 @@ public interface SubtopicService
   Integer deleteFromParentTopic(UUID subtopicUuid, UUID topicUuid);
 
   Subtopic addSubtopicToParentTopic(UUID subtopicUuid, UUID parentTopicUuid)
-      throws IdentifiableServiceException;
+          throws IdentifiableServiceException;
 
   Subtopic addSubtopicToParentSubtopic(UUID subtopicUuid, UUID parentSubtopicUuid)
-      throws IdentifiableServiceException;
+          throws IdentifiableServiceException;
 }

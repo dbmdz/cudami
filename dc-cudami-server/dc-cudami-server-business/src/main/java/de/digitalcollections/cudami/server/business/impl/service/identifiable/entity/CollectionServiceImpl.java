@@ -7,7 +7,9 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,5 +66,15 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   @Override
   public PageResponse<Collection> getTopCollections(PageRequest pageRequest) {
     return ((CollectionRepository) repository).getTopCollections(pageRequest);
+  }
+
+  @Override
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid, Locale pLocale, Locale defaultLocale) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 }

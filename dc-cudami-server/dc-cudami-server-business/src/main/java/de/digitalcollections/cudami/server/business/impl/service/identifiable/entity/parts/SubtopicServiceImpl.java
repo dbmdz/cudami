@@ -9,8 +9,10 @@ import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.entity.parts.SubtopicImpl;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,5 +163,15 @@ public class SubtopicServiceImpl extends EntityPartServiceImpl<Subtopic, Entity>
     SubtopicImpl subtopic = new SubtopicImpl();
     subtopic.setUuid(subtopicUuid);
     return saveWithParentSubtopic(subtopic, parentSubtopicUuid);
+  }
+
+  @Override
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid, Locale pLocale, Locale defaultLocale) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 }

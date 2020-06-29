@@ -3,13 +3,17 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CollectionRepository;
 import de.digitalcollections.model.api.identifiable.Identifier;
+import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
+import de.digitalcollections.model.impl.identifiable.NodeImpl;
 import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -17,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.slf4j.Logger;
@@ -62,6 +67,28 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
       REDUCED_FIND_ONE_BASE_SQL
           + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = c.uuid)";
 
+    private static final String BREADCRUMB_QUERY =
+      "WITH recursive breadcrumb (uuid,label,parent_uuid,depth)"
+          + " AS ("
+          + "        SELECT c.uuid as uuid, c.label as label, cc.parent_collection_uuid as parent_uuid,99 as depth"
+          + "        FROM collections c, collection_collections cc"
+          + "        WHERE uuid= :uuid and cc.child_collection_uuid = c.uuid"
+          + ""
+          + "        UNION ALL"
+          + "        SELECT c.uuid as uuid, c.label as label, cc.parent_collection_uuid as parent_uuid, depth-1 as depth"
+          + "        FROM collections c,"
+          + "             collection_collections cc,"
+          + "             breadcrumb b"
+          + "        WHERE b.uuid = cc.child_collection_uuid and cc.parent_collection_uuid = c.uuid AND cc.parent_collection_uuid is not null"
+          + "    )"
+          + " SELECT * from breadcrumb"
+          + " ORDER BY depth ASC";
+
+  private static final String BREADCRUMB_WITHOUT_PARENT_QUERY =
+      "SELECT c.uuid as uuid, c.label as label"
+          + "        FROM collections c"
+          + "        WHERE uuid= :uuid";
+  
   @Autowired
   public CollectionRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     super(dbi, identifierRepository);
@@ -468,5 +495,34 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     long total = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
+  }
+  
+  @Override
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
+
+    List<NodeImpl> result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(BREADCRUMB_QUERY)
+                    .bind("uuid", nodeUuid)
+                    .registerRowMapper(BeanMapper.factory(NodeImpl.class))
+                    .mapTo(NodeImpl.class)
+                    .list());
+
+    if (result.isEmpty()) {
+      // Special case: If we are on a top level subtopic, we have no parent, so
+      // we must construct a breadcrumb more or less manually
+      result =
+          dbi.withHandle(
+              h ->
+                  h.createQuery(BREADCRUMB_WITHOUT_PARENT_QUERY)
+                      .bind("uuid", nodeUuid)
+                      .registerRowMapper(BeanMapper.factory(NodeImpl.class))
+                      .mapTo(NodeImpl.class)
+                      .list());
+    }
+
+    List<Node> nodes = result.stream().map(s -> (Node) s).collect(Collectors.toList());
+    return new BreadcrumbNavigationImpl(nodes);
   }
 }

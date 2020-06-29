@@ -11,6 +11,21 @@
     <section layout:fragment="content" th:object="${subtopic}">
 
       <div class="row">
+        <div class="col-12">
+          <ol class="breadcrumb hidden-xs-down">
+            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/topics}" th:text="#{topics}">Topics</a></li>
+            <li class="breadcrumb-item"><a th:href="@{|/topics/${topic.uuid}|}"><th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${topic.label}, ${locale})">Topic x</th:block></a></li>
+            <th:block th:if="${not #lists.isEmpty(breadcrumbs)}">
+              <th:block th:each="breadcrumb,iterStat: ${breadcrumbs}">
+                <li class="breadcrumb-item"><a th:href="@{/subtopics/} + ${breadcrumb.uuid}"><th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${breadcrumb.label}, ${locale})">Node Label</th:block></a></li>
+              </th:block>
+            </th:block>
+          </ol>
+        </div>
+      </div>
+      
+      <div class="row">
         <div class="col-sm-6">
           <h1 th:text="#{subtopic}">Subtopic</h1>
         </div>

@@ -3,17 +3,21 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.SubtopicRepository;
 import de.digitalcollections.model.api.identifiable.Identifier;
+import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
+import de.digitalcollections.model.impl.identifiable.NodeImpl;
 import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.SubtopicImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -68,6 +72,32 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
           + " LEFT JOIN fileresources_image as file on s.previewfileresource = file.uuid"
           + " WHERE ss.parent_subtopic_uuid = :uuid";
 
+  private static final String BREADCRUMB_QUERY =
+      "WITH recursive breadcrumb (uuid,label,parent_uuid,depth)"
+          + " AS ("
+          + "        SELECT s.uuid as uuid, s.label as label, ss.parent_subtopic_uuid as parent_uuid,99 as depth"
+          + "        FROM subtopics s, subtopic_subtopics ss"
+          + "        WHERE uuid= :uuid and ss.child_subtopic_uuid = s.uuid"
+          + ""
+          + "        UNION ALL"
+          + "        SELECT s.uuid as uuid, s.label as label, ss.parent_subtopic_uuid as parent_uuid, depth-1 as depth"
+          + "        FROM subtopics s,"
+          + "             subtopic_subtopics ss,"
+          + "             breadcrumb b"
+          + "        WHERE b.uuid = ss.child_subtopic_uuid and ss.parent_subtopic_uuid = s.uuid AND ss.parent_subtopic_uuid is not null"
+          + "    )"
+          + " SELECT * from breadcrumb"
+          + " UNION"
+          + " SELECT null as uuid, s.label as label, null as parent_uuid, 0 as depth"
+          + " FROM topics t, topic_subtopics ts, breadcrumb b"
+          + " WHERE ts.subtopic_uuid = b.parent_uuid and t.uuid = ts.topic_uuid"
+          + " ORDER BY depth ASC";
+
+  private static final String BREADCRUMB_WITHOUT_PARENT_QUERY =
+      "SELECT s.uuid as uuid, s.label as label"
+          + "        FROM subtopics s"
+          + "        WHERE uuid= :uuid";
+  
   @Autowired
   public SubtopicRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     super(dbi, identifierRepository);
@@ -712,5 +742,34 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
       default:
         return null;
     }
+  }
+
+  @Override
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
+
+    List<NodeImpl> result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(BREADCRUMB_QUERY)
+                    .bind("uuid", nodeUuid)
+                    .registerRowMapper(BeanMapper.factory(NodeImpl.class))
+                    .mapTo(NodeImpl.class)
+                    .list());
+
+    if (result.isEmpty()) {
+      // Special case: If we are on a top level subtopic, we have no parent, so
+      // we must construct a breadcrumb more or less manually
+      result =
+          dbi.withHandle(
+              h ->
+                  h.createQuery(BREADCRUMB_WITHOUT_PARENT_QUERY)
+                      .bind("uuid", nodeUuid)
+                      .registerRowMapper(BeanMapper.factory(NodeImpl.class))
+                      .mapTo(NodeImpl.class)
+                      .list());
+    }
+
+    List<Node> nodes = result.stream().map(s -> (Node) s).collect(Collectors.toList());
+    return new BreadcrumbNavigationImpl(nodes);
   }
 }
