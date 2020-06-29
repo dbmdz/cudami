@@ -218,8 +218,7 @@ public class WebpageController {
   }
 
   @ApiMethod(description = "Get file resources related to webpage")
-  @GetMapping(
-      value = {
+  @GetMapping(value = {
         "/latest/webpages/{uuid}/related/fileresources",
         "/v2/webpages/{uuid}/related/fileresources"
       },
@@ -230,8 +229,7 @@ public class WebpageController {
   }
 
   @ApiMethod(description = "Add file resource related to webpage")
-  @PostMapping(
-      value = {
+  @PostMapping(value = {
         "/latest/webpages/{uuid}/related/fileresources/{fileResourceUuid}",
         "/v2/webpages/{uuid}/related/fileresources/{fileResourceUuid}"
       })

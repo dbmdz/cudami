@@ -43,8 +43,7 @@ public class SubtopicController {
   @Autowired private SubtopicService service;
 
   @ApiMethod(description = "Get all subtopics")
-  @GetMapping(
-      value = {"/latest/subtopics", "/v2/subtopics"},
+  @GetMapping(value = {"/latest/subtopics", "/v2/subtopics"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Subtopic> findAll(
@@ -62,11 +61,8 @@ public class SubtopicController {
   }
 
   // Test-URL: http://localhost:9000/latest/subtopics/599a120c-2dd5-11e8-b467-0ed5f89f718b
-  @ApiMethod(
-      description =
-          "Get a subtopic as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
-  @GetMapping(
-      value = {"/latest/subtopics/{uuid}", "/v2/subtopics/{uuid}"},
+  @ApiMethod(description = "Get a subtopic as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @GetMapping(value = {"/latest/subtopics/{uuid}", "/v2/subtopics/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   @ApiResponseObject
   public ResponseEntity<Subtopic> getSubtopic(
