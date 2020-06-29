@@ -87,7 +87,8 @@ public class EntityController<E extends Entity> {
   }
 
   @ApiMethod(description = "Get entity by uuid")
-  @GetMapping(value = {
+  @GetMapping(
+      value = {
         "/latest/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v2/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
