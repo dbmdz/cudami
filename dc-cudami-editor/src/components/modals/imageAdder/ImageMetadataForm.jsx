@@ -25,9 +25,11 @@ const InputTooltip = ({isOpen, target, text, toggle}) => {
 }
 
 const ImageMetadataForm = ({
-  attributes,
+  altText,
+  caption,
   isOpen,
   onChange,
+  title,
   toggle,
   toggleTooltip,
   tooltipsOpen,
@@ -36,11 +38,7 @@ const ImageMetadataForm = ({
   return (
     <Card>
       <CardHeader>
-        <Button
-          className="font-weight-bold ml-0 p-0"
-          color="link"
-          onClick={toggle}
-        >
+        <Button className="font-weight-bold p-0" color="link" onClick={toggle}>
           {t('enterMetadata')}
         </Button>
       </CardHeader>
@@ -53,7 +51,7 @@ const ImageMetadataForm = ({
                 onChange={(evt) => onChange('caption', evt.target.value)}
                 placeholder={t('caption')}
                 type="text"
-                value={attributes.caption}
+                value={caption}
               />
               <InputGroupAddon addonType="append">
                 <InputGroupText>
@@ -78,7 +76,7 @@ const ImageMetadataForm = ({
                 onChange={(evt) => onChange('title', evt.target.value)}
                 placeholder={t('tooltip')}
                 type="text"
-                value={attributes.title}
+                value={title}
               />
               <InputGroupAddon addonType="append">
                 <InputGroupText>
@@ -104,7 +102,7 @@ const ImageMetadataForm = ({
                 placeholder={t('altText')}
                 required
                 type="text"
-                value={attributes.altText}
+                value={altText}
               />
               <InputGroupAddon addonType="append">
                 <InputGroupText>

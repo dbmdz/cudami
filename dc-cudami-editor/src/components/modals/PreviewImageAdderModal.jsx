@@ -9,15 +9,13 @@ import ImageRenderingHintsForm from './imageAdder/ImageRenderingHintsForm'
 import ImageSelector from './imageAdder/ImageSelector'
 import {loadIdentifiable, saveFileResource, updateFileResource} from '../../api'
 
-class ImageAdderModal extends Component {
+class PreviewImageAdderModal extends Component {
   initialAttributes = {
-    alignment: 'left',
     altText: '',
     caption: '',
     linkNewTab: true,
     linkUrl: '',
     title: '',
-    width: '33%',
   }
 
   constructor(props) {
@@ -40,15 +38,22 @@ class ImageAdderModal extends Component {
         url: false,
       },
     }
-    subscribe('editor.show-image-modal', (_msg, data = {}) => {
+    subscribe('editor.show-preview-image-modal', (_msg, data = {}) => {
       const attributes = Object.fromEntries(
-        Object.entries(data).filter(([key, value]) => {
-          // alignment is allowed to be null and should not be filtered out in that case
-          if (key === 'alignment') {
-            return true
-          }
-          return key !== 'showImageSelector' && value !== null
-        })
+        Object.entries(data)
+          .filter(([key, value]) => {
+            return !['showImageSelector', 'uuid'].includes(key) && value
+          })
+          .map(([key, value]) => {
+            const keyMapping = {
+              openLinkInNewWindow: 'linkNewTab',
+              targetLink: 'linkUrl',
+            }
+            if (key in keyMapping) {
+              return [keyMapping[key], value]
+            }
+            return [key, value]
+          })
       )
       this.setState({
         attributes: {
@@ -57,8 +62,7 @@ class ImageAdderModal extends Component {
         },
         fileResource: {
           ...this.state.fileResource,
-          uri: attributes.url ?? '',
-          uuid: attributes.resourceId,
+          uuid: data.uuid,
         },
         showImageSelector: data.showImageSelector ?? true,
       })
@@ -77,26 +81,13 @@ class ImageAdderModal extends Component {
       ...newFileResource,
       fileResourceType: 'IMAGE',
       label: {[activeLanguage]: ''},
-      mimeType: 'image/*',
+      mimeType: 'image/png',
       uri: '',
     }
     this.setState({
       fileResource: initialFileResource,
       initialFileResource,
     })
-  }
-
-  addImageToEditor = (resourceId) => {
-    const filteredAttributes = Object.fromEntries(
-      Object.entries(this.state.attributes).filter(([_, value]) => value !== '')
-    )
-    const data = {
-      ...filteredAttributes,
-      resourceId,
-      url: this.state.fileResource.uri,
-    }
-    publish('editor.add-image', data)
-    this.destroy()
   }
 
   destroy = () => {
@@ -135,17 +126,19 @@ class ImageAdderModal extends Component {
   }
 
   submitFileResource = async () => {
-    let resourceId = this.state.fileResource.uuid
-    if (!resourceId) {
-      const {uuid} = await saveFileResource(
+    let fileResource = this.state.fileResource
+    if (!fileResource.uuid) {
+      fileResource = await saveFileResource(
         this.props.apiContextPath,
         this.state.fileResource
       )
-      resourceId = uuid
     } else if (this.state.doUpdateRequest) {
-      updateFileResource(this.props.apiContextPath, this.state.fileResource)
+      fileResource = await updateFileResource(
+        this.props.apiContextPath,
+        this.state.fileResource
+      )
     }
-    return resourceId
+    return fileResource
   }
 
   toggleTooltip = (name) => {
@@ -167,6 +160,27 @@ class ImageAdderModal extends Component {
     })
   }
 
+  updatePreviewImage = (fileResource) => {
+    const filteredAttributes = Object.fromEntries(
+      Object.entries(this.state.attributes).filter(([_, value]) => value !== '')
+    )
+    const {altText, caption, linkNewTab, linkUrl, title} = filteredAttributes
+    publish('editor.update-preview-image', {
+      previewImage: {
+        ...fileResource,
+        fileResourceType: 'IMAGE',
+      },
+      renderingHints: {
+        altText,
+        caption,
+        openLinkInNewWindow: linkNewTab,
+        targetLink: linkUrl,
+        title,
+      },
+    })
+    this.destroy()
+  }
+
   render() {
     const {
       activeLanguage,
@@ -176,24 +190,16 @@ class ImageAdderModal extends Component {
       isOpen,
       t,
     } = this.props
-    const {
-      alignment,
-      altText,
-      caption,
-      linkNewTab,
-      linkUrl,
-      title,
-      width,
-    } = this.state.attributes
+    const {altText, caption, linkNewTab, linkUrl, title} = this.state.attributes
     return (
       <Modal isOpen={isOpen} size="lg" toggle={this.destroy}>
-        <ModalHeader toggle={this.destroy}>{t('insert.image')}</ModalHeader>
+        <ModalHeader toggle={this.destroy}>Set preview image</ModalHeader>
         <ModalBody>
           <Form
             onSubmit={async (evt) => {
               evt.preventDefault()
-              const resourceId = await this.submitFileResource()
-              this.addImageToEditor(resourceId)
+              const fileResource = await this.submitFileResource()
+              this.updatePreviewImage(fileResource)
             }}
           >
             {this.state.showImageSelector && (
@@ -221,7 +227,6 @@ class ImageAdderModal extends Component {
               tooltipsOpen={this.state.tooltipsOpen}
             />
             <ImageRenderingHintsForm
-              alignment={alignment}
               isOpen={this.state.renderingHintsOpen}
               linkNewTab={linkNewTab}
               linkUrl={linkUrl}
@@ -231,7 +236,6 @@ class ImageAdderModal extends Component {
                   renderingHintsOpen: !this.state.renderingHintsOpen,
                 })
               }
-              width={width}
             />
             {debug && (
               <>
@@ -251,4 +255,4 @@ class ImageAdderModal extends Component {
   }
 }
 
-export default withTranslation()(ImageAdderModal)
+export default withTranslation()(PreviewImageAdderModal)

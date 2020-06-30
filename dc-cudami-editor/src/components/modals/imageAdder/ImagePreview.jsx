@@ -1,6 +1,6 @@
 import React from 'react'
 
-import {getImageUrl} from '../utils'
+import {getImageUrl} from '../../utils'
 
 const ImagePreview = ({iiifBaseUrl, filename, mimeType, uri}) => {
   const imageUrl = getImageUrl({iiifBaseUrl, mimeType, uri}, '250,')

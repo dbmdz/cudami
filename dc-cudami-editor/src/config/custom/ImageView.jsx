@@ -17,7 +17,7 @@ class IframeView {
       dom.classList.add(`alignment-${alignment}`)
     }
     const figure = document.createElement('figure')
-    figure.classList.add('m-0')
+    figure.classList.add('mb-0')
     const image = document.createElement('img')
     image.setAttribute('alt', altText)
     image.setAttribute('src', url)

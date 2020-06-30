@@ -15,12 +15,11 @@ body {
   padding-top: 4.5rem;
 }
 
-.btn {
-  margin-left: 5px;
+.card-deck > .card {
+  margin-top: 10px;
 }
 
 .card {
-  margin-top: 10px;
   /*max-width: 250px;*/
   min-width: 150px;
 }
