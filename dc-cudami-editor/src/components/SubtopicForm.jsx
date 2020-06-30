@@ -68,6 +68,11 @@ const SubtopicForm = ({
                       },
                     })
                   }
+                  previewImage={identifiable.previewImage}
+                  previewImageRenderingHints={
+                    identifiable.previewImageRenderingHints
+                  }
+                  updatePreviewImage={onUpdate}
                 />
               </TabPane>
             ))}

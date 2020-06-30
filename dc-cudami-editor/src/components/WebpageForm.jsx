@@ -86,6 +86,11 @@ const WebpageForm = ({
                       },
                     })
                   }
+                  previewImage={identifiable.previewImage}
+                  previewImageRenderingHints={
+                    identifiable.previewImageRenderingHints
+                  }
+                  updatePreviewImage={onUpdate}
                 />
                 <Card className="border-top-0">
                   <CardBody>

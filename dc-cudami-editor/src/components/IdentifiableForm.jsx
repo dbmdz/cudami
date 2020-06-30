@@ -25,6 +25,7 @@ import IframeAdderModal from './modals/IframeAdderModal'
 import ImageAdderModal from './modals/ImageAdderModal'
 import LanguageAdderModal from './modals/LanguageAdderModal'
 import LinkAdderModal from './modals/LinkAdderModal'
+import PreviewImageAdderModal from './modals/PreviewImageAdderModal'
 import TableAdderModal from './modals/TableAdderModal'
 import initI18n from '../i18n'
 import '../polyfills'
@@ -51,6 +52,7 @@ class IdentifiableForm extends Component {
         imageAdder: false,
         languageAdder: false,
         linkAdder: false,
+        previewImageAdder: false,
         tableAdder: false,
       },
     }
@@ -273,6 +275,14 @@ class IdentifiableForm extends Component {
         <LinkAdderModal
           isOpen={this.state.modalsOpen.linkAdder}
           onToggle={() => this.toggleModal('linkAdder')}
+        />
+        <PreviewImageAdderModal
+          activeLanguage={this.state.activeLanguage}
+          apiContextPath={this.props.apiContextPath}
+          debug={this.props.debug}
+          defaultLanguage={this.state.defaultLanguage}
+          isOpen={this.state.modalsOpen.previewImageAdder}
+          onToggle={() => this.toggleModal('previewImageAdder')}
         />
         <TableAdderModal
           isOpen={this.state.modalsOpen.tableAdder}
