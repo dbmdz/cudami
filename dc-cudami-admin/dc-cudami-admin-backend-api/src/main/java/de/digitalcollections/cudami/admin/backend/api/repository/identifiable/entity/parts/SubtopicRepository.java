@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.admin.backend.api.repository.identifiable.e
 
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
+import de.digitalcollections.model.api.identifiable.entity.Topic;
 import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import java.util.List;
@@ -38,4 +39,6 @@ public interface SubtopicRepository
   List<Subtopic> getSubtopicsOfFileResource(FileResource fileResource);
 
   List<Subtopic> getSubtopicsOfFileResource(UUID fileResourceUuid);
+
+  Topic getTopic(UUID subtopicUuid);
 }

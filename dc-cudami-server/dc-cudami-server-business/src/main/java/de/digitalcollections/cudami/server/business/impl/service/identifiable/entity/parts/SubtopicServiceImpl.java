@@ -5,10 +5,12 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.SubtopicService;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
+import de.digitalcollections.model.api.identifiable.entity.Topic;
 import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.entity.parts.SubtopicImpl;
 import java.util.List;
 import java.util.UUID;
@@ -161,5 +163,22 @@ public class SubtopicServiceImpl extends EntityPartServiceImpl<Subtopic, Entity>
     SubtopicImpl subtopic = new SubtopicImpl();
     subtopic.setUuid(subtopicUuid);
     return saveWithParentSubtopic(subtopic, parentSubtopicUuid);
+  }
+
+  @Override
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
+    return ((SubtopicRepository) repository).getBreadcrumbNavigation(nodeUuid);
+  }
+
+  @Override
+  public Topic getTopic(UUID subtopicUuid) {
+    UUID rootSubtopicUuid = subtopicUuid;
+    Subtopic parent = getParent(subtopicUuid);
+    while (parent != null) {
+      rootSubtopicUuid = parent.getUuid();
+      parent = getParent(parent);
+    }
+    // root subtopic under a topic
+    return ((SubtopicRepository) repository).getTopic(rootSubtopicUuid);
   }
 }

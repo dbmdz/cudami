@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.backend.api.repository.identifiable.
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
+import de.digitalcollections.model.api.identifiable.entity.Topic;
 import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import java.util.List;
@@ -95,4 +96,11 @@ public interface SubtopicRepository
   }
 
   Integer deleteFromParentTopic(UUID subtopicUuid, UUID topicUuid);
+
+  /**
+   * @param rootSubtopicUuid uuid of a subtopic (subtopic must be a top level subtopic under a
+   *     topic)
+   * @return the topic the given root-subtopic belongs to (subtopic is top level subtopic)
+   */
+  Topic getTopic(UUID rootSubtopicUuid);
 }

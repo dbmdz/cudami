@@ -7,6 +7,7 @@ import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.paging.FindParams;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
 import de.digitalcollections.model.impl.paging.FindParamsImpl;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
@@ -102,4 +103,7 @@ public interface CudamiCollectionsClient {
   @RequestLine("PUT /latest/collections/{uuid}")
   @Headers("Content-Type: application/json")
   Collection updateCollection(@Param("uuid") UUID uuid, Collection collection);
+
+  @RequestLine("GET /latest/collections/{uuid}/breadcrumb")
+  BreadcrumbNavigation getBreadcrumbNavigation(@Param("uuid") UUID collectionUuid);
 }

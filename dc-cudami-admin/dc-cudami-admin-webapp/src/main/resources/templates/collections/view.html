@@ -13,6 +13,20 @@
     <section layout:fragment="content" th:object="${collection}">
 
       <div class="row">
+        <div class="col-12">
+          <ol class="breadcrumb hidden-xs-down">
+            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/collections}" th:text="#{collections}">Collections</a></li>
+            <th:block th:if="${not #lists.isEmpty(breadcrumbs)}">
+              <th:block th:each="breadcrumb,iterStat: ${breadcrumbs}">
+                <li class="breadcrumb-item"><a th:href="@{/collections/} + ${breadcrumb.uuid}"><th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${breadcrumb.label}, ${locale})">Node Label</th:block></a></li>
+              </th:block>
+            </th:block>
+          </ol>
+        </div>
+      </div>
+      
+      <div class="row">
         <div class="col-sm-6">
           <h1 th:text="#{collection}">Collection</h1>
         </div>

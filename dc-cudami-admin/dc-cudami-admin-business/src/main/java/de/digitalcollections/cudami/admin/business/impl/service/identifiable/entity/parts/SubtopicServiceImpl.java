@@ -4,8 +4,11 @@ import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.en
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.SubtopicService;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
+import de.digitalcollections.model.api.identifiable.entity.Topic;
 import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import de.digitalcollections.model.api.view.BreadcrumbNavigation;
+import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -105,5 +108,20 @@ public class SubtopicServiceImpl extends EntityPartServiceImpl<Subtopic, Entity>
   @Override
   public List<FileResource> saveFileResources(UUID subtopicUuid, List<FileResource> fileResources) {
     return ((SubtopicRepository) repository).saveFileResources(subtopicUuid, fileResources);
+  }
+
+  @Override
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID subtopicUuid) {
+    try {
+      return ((SubtopicRepository) repository).getBreadcrumbNavigation(subtopicUuid);
+    } catch (Exception e) {
+      LOGGER.error("Found no breadcrumb for UUID={}: e", subtopicUuid, e, e);
+      return new BreadcrumbNavigationImpl();
+    }
+  }
+
+  @Override
+  public Topic getTopic(UUID subtopicUuid) {
+    return ((SubtopicRepository) repository).getTopic(subtopicUuid);
   }
 }

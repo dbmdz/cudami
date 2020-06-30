@@ -4,7 +4,6 @@ import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.No
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
-import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import java.util.UUID;
 
 /**
@@ -20,6 +19,4 @@ public interface WebpageRepository<E extends Entity>
   Webpage saveWithParentWebpage(Webpage webpage, UUID parentWebpageUUID);
 
   Website getWebsite(UUID rootWebpageUuid);
-
-  BreadcrumbNavigation getBreadcrumbNavigation(UUID webpageUuid);
 }

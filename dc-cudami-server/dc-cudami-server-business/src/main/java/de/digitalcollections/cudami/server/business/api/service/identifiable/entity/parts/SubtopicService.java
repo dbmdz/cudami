@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.business.api.service.identifiable.en
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.NodeService;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
+import de.digitalcollections.model.api.identifiable.entity.Topic;
 import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import java.util.List;
@@ -55,4 +56,6 @@ public interface SubtopicService
 
   Subtopic addSubtopicToParentSubtopic(UUID subtopicUuid, UUID parentSubtopicUuid)
       throws IdentifiableServiceException;
+
+  Topic getTopic(UUID subtopicUuid);
 }

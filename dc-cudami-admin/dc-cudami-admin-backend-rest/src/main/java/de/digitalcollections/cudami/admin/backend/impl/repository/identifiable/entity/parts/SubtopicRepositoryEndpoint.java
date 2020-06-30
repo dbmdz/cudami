@@ -2,9 +2,11 @@ package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.
 
 import de.digitalcollections.cudami.admin.backend.impl.repository.RepositoryEndpoint;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
+import de.digitalcollections.model.api.identifiable.entity.Topic;
 import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -77,4 +79,10 @@ public interface SubtopicRepositoryEndpoint extends RepositoryEndpoint {
 
   @RequestLine("GET /latest/subtopics/fileresource/{uuid}")
   List<Subtopic> getSubtopicsOfFileResource(@Param("uuid") UUID uuid);
+
+  @RequestLine("GET /latest/subtopics/{uuid}/breadcrumb")
+  BreadcrumbNavigation getBreadcrumbNavigation(@Param("uuid") UUID uuid);
+
+  @RequestLine("GET /latest/subtopics/{uuid}/topic")
+  Topic getTopic(@Param("uuid") UUID subtopicUuid);
 }

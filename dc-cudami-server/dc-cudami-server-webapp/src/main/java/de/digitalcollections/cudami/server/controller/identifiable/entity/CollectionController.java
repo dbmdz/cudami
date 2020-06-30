@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
@@ -8,6 +9,7 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.paging.enums.Direction;
 import de.digitalcollections.model.api.paging.enums.NullHandling;
+import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
@@ -37,6 +39,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class CollectionController {
 
   private CollectionService collectionService;
+
+  @Autowired private LocaleService localeService;
 
   @Autowired
   public CollectionController(CollectionService collectionService) {
@@ -158,5 +162,40 @@ public class CollectionController {
   @ApiResponseObject
   public long count() {
     return collectionService.count();
+  }
+
+  @ApiMethod(description = "Get the breadcrumb for a collection")
+  @GetMapping(
+      value = {"/latest/collections/{uuid}/breadcrumb", "/v3/collections/{uuid}/breadcrumb"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public ResponseEntity<BreadcrumbNavigation> getBreadcrumb(
+      @ApiPathParam(
+              description =
+                  "UUID of the collection, e.g. <tt>6119d8e9-9c92-4091-8dcb-bc4053385406</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @ApiQueryParam(
+              name = "pLocale",
+              description =
+                  "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+          @RequestParam(name = "pLocale", required = false)
+          Locale pLocale) {
+
+    BreadcrumbNavigation breadcrumbNavigation;
+
+    if (pLocale == null) {
+      breadcrumbNavigation = collectionService.getBreadcrumbNavigation(uuid);
+    } else {
+      breadcrumbNavigation =
+          collectionService.getBreadcrumbNavigation(
+              uuid, pLocale, localeService.getDefaultLocale());
+    }
+
+    if (breadcrumbNavigation == null || breadcrumbNavigation.getNavigationItems().isEmpty()) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    return new ResponseEntity<>(breadcrumbNavigation, HttpStatus.OK);
   }
 }

@@ -9,9 +9,11 @@ import de.digitalcollections.cudami.admin.business.api.service.exceptions.Identi
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiCollectionsClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
+import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -153,6 +155,11 @@ public class CollectionsController extends AbstractController {
 
     model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("collection", collection);
+
+    BreadcrumbNavigation breadcrumbNavigation =
+        cudamiCollectionsClient.getBreadcrumbNavigation(uuid);
+    List<Node> breadcrumbs = breadcrumbNavigation.getNavigationItems();
+    model.addAttribute("breadcrumbs", breadcrumbs);
 
     return "collections/view";
   }

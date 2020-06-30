@@ -5,9 +5,12 @@ import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepositor
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.SubtopicService;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
+import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
+import de.digitalcollections.model.api.identifiable.entity.Topic;
 import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -141,6 +144,16 @@ public class SubtopicsController extends AbstractController {
 
     List<Entity> relatedEntities = service.getEntities(subtopic);
     model.addAttribute("relatedEntities", relatedEntities);
+
+    BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
+    List<Node> breadcrumbs = breadcrumbNavigation.getNavigationItems();
+    // Cut out first breadcrumb node (the one with empty uuid), which identifies the topic, since
+    // it is handled individually
+    breadcrumbs.removeIf(n -> n.getUuid() == null);
+    model.addAttribute("breadcrumbs", breadcrumbs);
+
+    Topic topic = service.getTopic(uuid);
+    model.addAttribute("topic", topic);
 
     return "subtopics/view";
   }
