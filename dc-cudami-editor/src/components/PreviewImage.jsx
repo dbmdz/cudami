@@ -5,6 +5,36 @@ import {FaEdit, FaPlus, FaTrashAlt} from 'react-icons/fa'
 
 import {getImageUrl} from './utils'
 
+const handleClick = (fileResource, hints, language, onUpdate) => {
+  const token = subscribe(
+    'editor.update-preview-image',
+    (_msg, {previewImage, renderingHints}) => {
+      onUpdate({
+        ...(!fileResource && {previewImage}),
+        previewImageRenderingHints: updateRenderingHints(
+          hints,
+          renderingHints,
+          language
+        ),
+      })
+      unsubscribe(token)
+    }
+  )
+  if (hints) {
+    publish('editor.show-preview-image-modal', {
+      altText: hints.altText[language],
+      caption: hints.caption?.[language],
+      openLinkInNewWindow: hints.openLinkInNewWindow,
+      showImageSelector: false,
+      targetLink: hints.targetLink,
+      title: hints.title?.[language],
+      uuid: fileResource.uuid,
+    })
+  } else {
+    publish('editor.show-preview-image-modal')
+  }
+}
+
 const updateRenderingHints = (
   currentRenderingHints = {},
   {altText, caption, openLinkInNewWindow, targetLink, title},
@@ -50,21 +80,12 @@ const PreviewImage = ({
             className="stretched-link"
             color="link"
             onClick={() => {
-              const token = subscribe(
-                'editor.update-preview-image',
-                (_msg, {previewImage, renderingHints}) => {
-                  onUpdate({
-                    previewImage,
-                    previewImageRenderingHints: updateRenderingHints(
-                      previewImageRenderingHints,
-                      renderingHints,
-                      language
-                    ),
-                  })
-                  unsubscribe(token)
-                }
+              handleClick(
+                previewImage,
+                previewImageRenderingHints,
+                language,
+                onUpdate
               )
-              publish('editor.show-preview-image-modal')
             }}
             tag="a"
           >
@@ -74,13 +95,7 @@ const PreviewImage = ({
       </Card>
     )
   }
-  const {
-    altText,
-    caption,
-    openLinkInNewWindow,
-    targetLink,
-    title,
-  } = previewImageRenderingHints
+  const {altText, caption, title} = previewImageRenderingHints
   return (
     <Card className="rounded text-center">
       <CardBody className="p-1">
@@ -99,27 +114,12 @@ const PreviewImage = ({
           <Button
             color="light"
             onClick={() => {
-              const token = subscribe(
-                'editor.update-preview-image',
-                (_msg, {renderingHints}) => {
-                  onUpdate({
-                    previewImageRenderingHints: updateRenderingHints(
-                      previewImageRenderingHints,
-                      renderingHints,
-                      language
-                    ),
-                  })
-                  unsubscribe(token)
-                }
+              handleClick(
+                previewImage,
+                previewImageRenderingHints,
+                language,
+                onUpdate
               )
-              publish('editor.show-preview-image-modal', {
-                altText: altText[language],
-                caption: caption?.[language],
-                openLinkInNewWindow,
-                showImageSelector: false,
-                targetLink,
-                title: title?.[language],
-              })
             }}
             size="sm"
           >
