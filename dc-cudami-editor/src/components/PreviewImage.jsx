@@ -5,14 +5,19 @@ import {FaEdit, FaPlus, FaTrashAlt} from 'react-icons/fa'
 
 import {getImageUrl} from './utils'
 
-const handleClick = (fileResource, hints, language, onUpdate) => {
+const handleClick = (
+  currentPreviewImage,
+  currentRenderingHints,
+  language,
+  onUpdate
+) => {
   const token = subscribe(
     'editor.update-preview-image',
     (_msg, {previewImage, renderingHints}) => {
       onUpdate({
-        ...(!fileResource && {previewImage}),
+        ...(!currentPreviewImage && {previewImage}),
         previewImageRenderingHints: updateRenderingHints(
-          hints,
+          currentRenderingHints,
           renderingHints,
           language
         ),
@@ -20,15 +25,22 @@ const handleClick = (fileResource, hints, language, onUpdate) => {
       unsubscribe(token)
     }
   )
-  if (hints) {
+  if (currentRenderingHints) {
+    const {
+      altText,
+      caption,
+      openLinkInNewWindow,
+      targetLink,
+      title,
+    } = currentRenderingHints
     publish('editor.show-preview-image-modal', {
-      altText: hints.altText[language],
-      caption: hints.caption?.[language],
-      openLinkInNewWindow: hints.openLinkInNewWindow,
+      altText: altText[language],
+      caption: caption?.[language],
+      openLinkInNewWindow,
       showImageSelector: false,
-      targetLink: hints.targetLink,
-      title: hints.title?.[language],
-      uuid: fileResource.uuid,
+      targetLink: targetLink,
+      title: title?.[language],
+      uuid: currentPreviewImage.uuid,
     })
   } else {
     publish('editor.show-preview-image-modal')
