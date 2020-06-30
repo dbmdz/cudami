@@ -9,18 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-@RequestMapping(value = {"", "/"})
 public class MainController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MainController.class);
 
   @Autowired private LocaleService localeService;
 
-  @RequestMapping(method = RequestMethod.GET)
+  @GetMapping(value = {"", "/"})
   public String printWelcome(Model model) {
     LOGGER.info("Homepage requested");
 

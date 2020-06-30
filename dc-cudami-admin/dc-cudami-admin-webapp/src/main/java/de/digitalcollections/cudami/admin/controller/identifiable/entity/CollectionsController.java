@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /** Controller for collection management pages. */
@@ -60,8 +61,13 @@ public class CollectionsController extends AbstractController {
   }
 
   @GetMapping("/collections/new")
-  public String create(Model model) {
+  public String create(
+      Model model,
+      @RequestParam("parentType") String parentType,
+      @RequestParam("parentUuid") String parentUuid) {
     model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
+    model.addAttribute("parentType", parentType);
+    model.addAttribute("parentUuid", parentUuid);
     return "collections/create";
   }
 
@@ -99,17 +105,26 @@ public class CollectionsController extends AbstractController {
               size = 25)
           Pageable pageable) {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
-    final PageResponse pageResponse = cudamiCollectionsClient.findCollections(pageRequest);
+    final PageResponse pageResponse = cudamiCollectionsClient.findTopCollections(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
     model.addAttribute("page", new PageWrapper(page, "/collections"));
     return "collections/list";
   }
 
   @PostMapping("/api/collections/new")
-  public ResponseEntity save(@RequestBody Collection collection)
+  public ResponseEntity save(
+      @RequestBody Collection collection,
+      @RequestParam("parentType") String parentType,
+      @RequestParam("parentUuid") UUID parentUuid)
       throws IdentifiableServiceException {
     try {
-      Collection collectionDb = cudamiCollectionsClient.saveCollection(collection);
+      Collection collectionDb = null;
+      if (parentType.equals("collection")) {
+        collectionDb =
+            cudamiCollectionsClient.saveCollectionWithParentCollection(collection, parentUuid);
+      } else {
+        collectionDb = cudamiCollectionsClient.saveCollection(collection);
+      }
       return ResponseEntity.status(HttpStatus.CREATED).body(collectionDb);
     } catch (Exception e) {
       LOGGER.error("Cannot save collection: ", e);

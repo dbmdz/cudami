@@ -22,10 +22,9 @@ import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,7 +39,7 @@ public class EntityController<E extends Entity> {
   @ApiMethod(description = "Get count of entities")
   @GetMapping(
       value = {"/latest/entities/count", "/v3/entities/count"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public long count() {
     return service.count();
@@ -49,7 +48,7 @@ public class EntityController<E extends Entity> {
   @ApiMethod(description = "Get all entities")
   @GetMapping(
       value = {"/latest/entities", "/v3/entities"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Entity> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -69,7 +68,7 @@ public class EntityController<E extends Entity> {
       description = "Find limited amount of entities containing searchTerm in label or description")
   @GetMapping(
       value = {"/latest/entities/search", "/v2/entities/search"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public SearchPageResponse<Entity> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -93,7 +92,7 @@ public class EntityController<E extends Entity> {
         "/latest/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v2/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Entity findById(@PathVariable UUID uuid) {
     return service.get(uuid);
@@ -102,7 +101,7 @@ public class EntityController<E extends Entity> {
   @ApiMethod(description = "Get entity by namespace and id")
   @GetMapping(
       value = {"/latest/entities/identifier/{namespace}:{id}"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Entity findByIdentifier(@PathVariable String namespace, @PathVariable String id)
       throws IdentifiableServiceException {
@@ -113,7 +112,7 @@ public class EntityController<E extends Entity> {
   @ApiMethod(description = "Get entity by reference id")
   @GetMapping(
       value = {"/latest/entities/{refId:[0-9]+}"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Entity findByRefId(@PathVariable long refId) {
     Entity entity = service.getByRefId(refId);
@@ -131,13 +130,12 @@ public class EntityController<E extends Entity> {
   }
 
   @ApiMethod(description = "Get related file resources of entity")
-  @RequestMapping(
+  @GetMapping(
       value = {
         "/latest/entities/{uuid}/related/fileresources",
         "/v2/entities/{uuid}/related/fileresources"
       },
-      produces = "application/json",
-      method = RequestMethod.GET)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
     return service.getRelatedFileResources(uuid);

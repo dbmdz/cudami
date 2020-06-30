@@ -37,9 +37,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,15 +49,14 @@ public class WebpageController {
 
   @Autowired private WebpageService<Entity> webpageService;
 
-  @Autowired ConversionService conversionService;
+  @Autowired private ConversionService conversionService;
 
-  @Autowired LocaleService localeService;
+  @Autowired private LocaleService localeService;
 
   @ApiMethod(description = "Get all webpages")
-  @RequestMapping(
+  @GetMapping(
       value = {"/latest/webpages", "/v2/webpages"},
-      produces = "application/json",
-      method = RequestMethod.GET)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Webpage> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -88,10 +86,9 @@ public class WebpageController {
   @ApiMethod(
       description =
           "Get a webpage as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
-  @RequestMapping(
+  @GetMapping(
       value = {"/latest/webpages/{uuid}", "/v3/webpages/{uuid}"},
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
-      method = RequestMethod.GET)
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   @ApiResponseObject
   public ResponseEntity<Webpage> getWebpage(
       @ApiPathParam(
@@ -117,10 +114,9 @@ public class WebpageController {
   }
 
   @ApiMethod(description = "Get children of a webpage as JSON")
-  @RequestMapping(
+  @GetMapping(
       value = {"/latest/webpages/{uuid}/children", "/v3/webpages/{uuid}/children"},
-      produces = {MediaType.APPLICATION_JSON_VALUE},
-      method = RequestMethod.GET)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Webpage> getWebpageChildren(
       @ApiPathParam(
@@ -153,10 +149,9 @@ public class WebpageController {
   }
 
   @ApiMethod(description = "Get parent of a webpage as JSON")
-  @RequestMapping(
+  @GetMapping(
       value = {"/latest/webpages/{uuid}/parent", "/v3/webpages/{uuid}/parent"},
-      produces = {MediaType.APPLICATION_JSON_VALUE},
-      method = RequestMethod.GET)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Webpage getWebpageParent(
       @ApiPathParam(
@@ -169,10 +164,9 @@ public class WebpageController {
   }
 
   @ApiMethod(description = "Get website of a webpage as JSON")
-  @RequestMapping(
+  @GetMapping(
       value = {"/latest/webpages/{uuid}/website", "/v3/webpages/{uuid}/website"},
-      produces = {MediaType.APPLICATION_JSON_VALUE},
-      method = RequestMethod.GET)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Website getWebsite(
       @ApiPathParam(
@@ -185,13 +179,12 @@ public class WebpageController {
   }
 
   @ApiMethod(description = "Save a newly created top-level webpage")
-  @RequestMapping(
+  @PostMapping(
       value = {
         "/latest/websites/{parentWebsiteUuid}/webpage",
         "/v2/websites/{parentWebsiteUuid}/webpage"
       },
-      produces = "application/json",
-      method = RequestMethod.POST)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Webpage saveWithParentWebsite(
       @PathVariable UUID parentWebsiteUuid, @RequestBody Webpage webpage, BindingResult errors)
@@ -200,13 +193,12 @@ public class WebpageController {
   }
 
   @ApiMethod(description = "Save a newly created webpage")
-  @RequestMapping(
+  @PostMapping(
       value = {
         "/latest/webpages/{parentWebpageUuid}/webpage",
         "/v2/webpages/{parentWebpageUuid}/webpage"
       },
-      produces = "application/json",
-      method = RequestMethod.POST)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Webpage saveWithParentWebpage(
       @PathVariable UUID parentWebpageUuid, @RequestBody Webpage webpage, BindingResult errors)
@@ -215,10 +207,9 @@ public class WebpageController {
   }
 
   @ApiMethod(description = "Update a webpage")
-  @RequestMapping(
+  @PutMapping(
       value = {"/latest/webpages/{uuid}", "/v2/webpages/{uuid}"},
-      produces = "application/json",
-      method = RequestMethod.PUT)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Webpage update(@PathVariable UUID uuid, @RequestBody Webpage webpage, BindingResult errors)
       throws IdentifiableServiceException {
@@ -232,7 +223,7 @@ public class WebpageController {
         "/latest/webpages/{uuid}/related/fileresources",
         "/v2/webpages/{uuid}/related/fileresources"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
     return webpageService.getRelatedFileResources(uuid);
@@ -251,10 +242,9 @@ public class WebpageController {
   }
 
   @ApiMethod(description = "Get the breadcrumb for a webpage")
-  @RequestMapping(
+  @GetMapping(
       value = {"/latest/webpages/{uuid}/breadcrumb", "/v3/webpages/{uuid}/breadcrumb"},
-      produces = {MediaType.APPLICATION_JSON_VALUE},
-      method = RequestMethod.GET)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public ResponseEntity<BreadcrumbNavigation> getBreadcrumb(
       @ApiPathParam(

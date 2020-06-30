@@ -29,9 +29,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.oxm.XmlMappingException;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -46,10 +45,9 @@ public class V1WebpageController {
   @Autowired private WebpageService webpageService;
 
   @ApiMethod(description = "Get a webpage as JSON (Version 1)")
-  @RequestMapping(
+  @GetMapping(
       value = {"/v1/webpages/{uuid}.json", "/v1/webpages/{uuid}"},
-      produces = {MediaType.APPLICATION_JSON_VALUE},
-      method = RequestMethod.GET)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public ResponseEntity<String> getWebpageV1Json(
       @ApiPathParam(
@@ -84,10 +82,9 @@ public class V1WebpageController {
   }
 
   @ApiMethod(description = "Get a webpage as XML (Version 1)")
-  @RequestMapping(
+  @GetMapping(
       value = {"/v1/webpages/{uuid}.xml"},
-      produces = {MediaType.APPLICATION_XML_VALUE},
-      method = RequestMethod.GET)
+      produces = MediaType.APPLICATION_XML_VALUE)
   @ApiResponseObject
   public ResponseEntity<String> getWebpageV1Xml(
       @ApiPathParam(

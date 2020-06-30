@@ -214,11 +214,6 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
   }
 
   @Override
-  public List<Subtopic> getChildren(Subtopic subtopic) {
-    return getChildren(subtopic.getUuid());
-  }
-
-  @Override
   public List<Subtopic> getChildren(UUID uuid) {
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
     String query = BASE_CHILDREN_QUERY + " ORDER BY ss.sortIndex ASC";

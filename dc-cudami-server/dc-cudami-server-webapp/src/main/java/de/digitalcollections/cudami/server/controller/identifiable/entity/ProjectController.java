@@ -24,10 +24,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -43,10 +44,9 @@ public class ProjectController {
   }
 
   @ApiMethod(description = "Get all projects")
-  @RequestMapping(
+  @GetMapping(
       value = {"/latest/projects", "/v2/projects"},
-      produces = "application/json",
-      method = RequestMethod.GET)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Project> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -66,10 +66,9 @@ public class ProjectController {
   @ApiMethod(
       description =
           "Get an project as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
-  @RequestMapping(
+  @GetMapping(
       value = {"/latest/projects/{uuid}", "/v2/projects/{uuid}"},
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
-      method = RequestMethod.GET)
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   @ApiResponseObject
   public ResponseEntity<Project> getWebpage(
       @ApiPathParam(
@@ -95,10 +94,9 @@ public class ProjectController {
   }
 
   @ApiMethod(description = "Save a newly created project")
-  @RequestMapping(
+  @PostMapping(
       value = {"/latest/projects", "/v2/projects"},
-      produces = "application/json",
-      method = RequestMethod.POST)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Project save(@RequestBody Project project, BindingResult errors)
       throws IdentifiableServiceException {
@@ -106,10 +104,9 @@ public class ProjectController {
   }
 
   @ApiMethod(description = "Update an project")
-  @RequestMapping(
+  @PutMapping(
       value = {"/latest/projects/{uuid}", "/v2/projects/{uuid}"},
-      produces = "application/json",
-      method = RequestMethod.PUT)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Project update(@PathVariable UUID uuid, @RequestBody Project project, BindingResult errors)
       throws IdentifiableServiceException {

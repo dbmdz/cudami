@@ -53,6 +53,15 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
           + " FROM collections as c"
           + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid";
 
+  private static final String BASE_CHILDREN_QUERY =
+      REDUCED_FIND_ONE_BASE_SQL
+          + " INNER JOIN collection_collections cc ON c.uuid = cc.child_collection_uuid"
+          + " WHERE cc.parent_collection_uuid = :uuid";
+
+  private static final String BASE_TOP_QUERY =
+      REDUCED_FIND_ONE_BASE_SQL
+          + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = c.uuid)";
+
   @Autowired
   public CollectionRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     super(dbi, identifierRepository);
@@ -134,6 +143,11 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                               return map;
                             }))
             .get(uuid);
+
+    if (result != null) {
+      // TODO could be replaced with another join in above query...
+      result.setChildren(getChildren(result));
+    }
     return result;
   }
 
@@ -183,7 +197,13 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             .values()
             .stream()
             .findFirst();
-    return result.orElse(null);
+
+    Collection collection = result.orElse(null);
+    if (collection != null) {
+      // TODO could be replaced with another join in above query...
+      collection.setChildren(getChildren(collection));
+    }
+    return collection;
   }
 
   @Override
@@ -276,5 +296,177 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
       default:
         return null;
     }
+  }
+
+  @Override
+  public List<Collection> getChildren(Collection collection) {
+    return CollectionRepository.super.getChildren(collection);
+  }
+
+  @Override
+  public Collection saveWithParentCollection(Collection collection, UUID parentUuid) {
+    final UUID childUuid =
+        collection.getUuid() == null ? save(collection).getUuid() : collection.getUuid();
+    Integer sortindex =
+        selectNextSortIndexForParentChildren(
+            dbi, "collection_collections", "parent_collection_uuid", parentUuid);
+    dbi.withHandle(
+        h ->
+            h.createUpdate(
+                    "INSERT INTO collection_collections(parent_collection_uuid, child_collection_uuid, sortindex)"
+                        + " VALUES (:parent_collection_uuid, :child_collection_uuid, :sortindex)")
+                .bind("parent_collection_uuid", parentUuid)
+                .bind("child_collection_uuid", childUuid)
+                .bind("sortindex", sortindex)
+                .execute());
+
+    return findOne(childUuid);
+  }
+
+  @Override
+  public Collection getParent(UUID uuid) {
+    String query =
+        REDUCED_FIND_ONE_BASE_SQL
+            + " INNER JOIN collection_collections cc ON c.uuid = cc.parent_collection_uuid"
+            + " WHERE cc.child_collection_uuid = :uuid";
+
+    Optional<CollectionImpl> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, CollectionImpl>(),
+                            (map, rowView) -> {
+                              CollectionImpl parent =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("c_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(CollectionImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                parent.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            }))
+            .values()
+            .stream()
+            .findFirst();
+    return result.orElse(null);
+  }
+
+  @Override
+  public List<Collection> getChildren(UUID uuid) {
+    // minimal data required (= identifiable fields) for creating text links/teasers in a list
+    String query = BASE_CHILDREN_QUERY + " ORDER BY cc.sortIndex ASC";
+
+    List<Collection> result =
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, CollectionImpl>(),
+                            (map, rowView) -> {
+                              CollectionImpl collection =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("c_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(CollectionImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                collection.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
+    return result;
+  }
+
+  @Override
+  public PageResponse<Collection> getChildren(UUID uuid, PageRequest pageRequest) {
+    // minimal data required (= identifiable fields) for creating text links/teasers in a list
+    StringBuilder query = new StringBuilder(BASE_CHILDREN_QUERY);
+    addPageRequestParams(pageRequest, query);
+    List<Collection> result =
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, CollectionImpl>(),
+                            (map, rowView) -> {
+                              CollectionImpl collection =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("c_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(CollectionImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                collection.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
+    String sql =
+        "SELECT count(*) FROM collections as c"
+            + " INNER JOIN collection_collections cc ON c.uuid = cc.child_collection_uuid"
+            + " WHERE cc.parent_collection_uuid = :uuid";
+    long total =
+        dbi.withHandle(
+            h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Long.class).findOne().get());
+    PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
+    return pageResponse;
+  }
+
+  @Override
+  public PageResponse<Collection> getTopCollections(PageRequest pageRequest) {
+    // minimal data required (= identifiable fields) for creating text links/teasers in a list
+    StringBuilder query = new StringBuilder(BASE_TOP_QUERY);
+    addPageRequestParams(pageRequest, query);
+    List<Collection> result =
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, CollectionImpl>(),
+                            (map, rowView) -> {
+                              CollectionImpl collection =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("c_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(CollectionImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                collection.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
+    String sql =
+        "SELECT count(*) FROM collections as c"
+            + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = c.uuid)";
+    long total = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
+    PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
+    return pageResponse;
   }
 }

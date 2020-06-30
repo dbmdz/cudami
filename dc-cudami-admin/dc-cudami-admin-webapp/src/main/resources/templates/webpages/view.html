@@ -135,48 +135,6 @@
           </table>
         </div>
       </div>
-<!--
-      <div class="row main-content">
-        <div class="col-sm-6">
-          <h2 th:text="#{linked_data}">Linked Data</h2>
-        </div>
-        <div class="col-sm-6">
-          <div class="float-right">
-            <button type="button" class="btn btn-secondary new-button" data-toggle="modal" data-target="#select-item-dialog" th:text="#{add}">Add</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-sm-12">
-          <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
-            <thead>
-              <tr>
-                <th class="center" th:text="#{label}">Label</th>
-                 TODO
-                <th class="center" th:text="#{actions}">Actions</th>
-                
-              </tr>
-            </thead>
-            <tbody>
-              <tr th:each="relatedFileResource: ${relatedFileResources}">
-                <td>
-                   TODO
-                  <a th:href="@{'/fileresources/' + ${relatedFileResource.uuid}}" th:text="${relatedFileResource.label.text}">Label</a>
-                  
-                  <span th:text="${relatedFileResource.label.text}">Label</span>
-                </td>
-                 TODO
-                <td class="center">
-                  <a th:href="@{'/fileresources/' + ${relatedFileResource.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
-                  <a th:href="@{'/fileresources/' + ${relatedFileResource.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
-                </td>
-                
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>-->
     </section>
 
   <th:block layout:fragment="beforeBodyEnds">

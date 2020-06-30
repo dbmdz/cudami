@@ -16,11 +16,13 @@ import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,10 +33,9 @@ public class IndentifierTypeController {
   @Autowired private IdentifierTypeService service;
 
   @ApiMethod(description = "Get all identifier types")
-  @RequestMapping(
+  @GetMapping(
       value = {"/latest/identifiertypes", "/v2/identifiertypes"},
-      produces = "application/json",
-      method = RequestMethod.GET)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<IdentifierType> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -51,30 +52,27 @@ public class IndentifierTypeController {
   }
 
   @ApiMethod(description = "get identifier type by uuid")
-  @RequestMapping(
+  @GetMapping(
       value = {"/latest/identifiertypes/{uuid}", "/v2/identifiertypes/{uuid}"},
-      produces = "application/json",
-      method = RequestMethod.GET)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public IdentifierType findById(@PathVariable UUID uuid) {
     return (IdentifierType) service.get(uuid);
   }
 
   @ApiMethod(description = "save a newly created identifier type")
-  @RequestMapping(
+  @PostMapping(
       value = {"/latest/identifiertypes", "/v2/identifiertypes"},
-      produces = "application/json",
-      method = RequestMethod.POST)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public IdentifierType save(@RequestBody IdentifierType identifierType, BindingResult errors) {
     return service.save(identifierType);
   }
 
   @ApiMethod(description = "update an identifier type")
-  @RequestMapping(
+  @PutMapping(
       value = {"/latest/identifiertypes/{uuid}", "/v2/identifiertypes/{uuid}"},
-      produces = "application/json",
-      method = RequestMethod.PUT)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public IdentifierType update(
       @PathVariable UUID uuid, @RequestBody IdentifierType identifierType, BindingResult errors) {
