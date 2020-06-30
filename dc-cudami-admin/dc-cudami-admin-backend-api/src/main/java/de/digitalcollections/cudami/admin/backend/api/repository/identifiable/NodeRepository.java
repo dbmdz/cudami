@@ -12,6 +12,6 @@ public interface NodeRepository<N extends Node> extends IdentifiableRepository<N
   List<N> getChildren(N node);
 
   List<N> getChildren(UUID nodeUuid);
-  
+
   BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid);
 }

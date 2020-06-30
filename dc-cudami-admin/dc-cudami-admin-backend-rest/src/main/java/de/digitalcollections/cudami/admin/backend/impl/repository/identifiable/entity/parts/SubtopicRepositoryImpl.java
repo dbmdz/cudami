@@ -165,7 +165,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
   public Subtopic saveWithParentSubtopic(Subtopic subtopic, UUID parentSubtopicUUID) {
     return endpoint.saveWithParentSubtopic(subtopic, parentSubtopicUUID);
   }
-  
+
   @Override
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID subtopicUuid) {
     return endpoint.getBreadcrumbNavigation(subtopicUuid);

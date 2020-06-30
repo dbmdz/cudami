@@ -159,7 +159,7 @@ public class V2WebpageController {
     if (pLocale == null) {
       webpage = (Webpage) webpageService.get(uuid);
     } else {
-      webpage = webpageService.get(uuid, pLocale);
+      webpage = (Webpage) webpageService.get(uuid, pLocale);
     }
     return webpage;
   }

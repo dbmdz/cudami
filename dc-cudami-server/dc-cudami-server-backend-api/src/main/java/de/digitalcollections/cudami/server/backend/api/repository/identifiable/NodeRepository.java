@@ -16,8 +16,7 @@ public interface NodeRepository<N extends Node> extends IdentifiableRepository<N
   List<N> getChildren(UUID nodeUuid);
 
   PageResponse<N> getChildren(UUID nodeUuid, PageRequest pageRequest);
-  
-  
+
   /**
    * @param nodeUuid the uuid of the current node
    * @return the breadcrumb navigation

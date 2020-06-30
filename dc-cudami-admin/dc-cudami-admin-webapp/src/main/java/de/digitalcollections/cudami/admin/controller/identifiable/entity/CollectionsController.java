@@ -37,9 +37,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-/**
- * Controller for collection management pages.
- */
+/** Controller for collection management pages. */
 @Controller
 public class CollectionsController extends AbstractController {
 
@@ -51,9 +49,9 @@ public class CollectionsController extends AbstractController {
 
   @Autowired
   public CollectionsController(
-          LanguageSortingHelper languageSortingHelper,
-          LocaleRepository localeRepository,
-          CudamiCollectionsClient cudamiCollectionsClient) {
+      LanguageSortingHelper languageSortingHelper,
+      LocaleRepository localeRepository,
+      CudamiCollectionsClient cudamiCollectionsClient) {
     this.languageSortingHelper = languageSortingHelper;
     this.localeRepository = localeRepository;
     this.cudamiCollectionsClient = cudamiCollectionsClient;
@@ -66,9 +64,9 @@ public class CollectionsController extends AbstractController {
 
   @GetMapping("/collections/new")
   public String create(
-          Model model,
-          @RequestParam("parentType") String parentType,
-          @RequestParam("parentUuid") String parentUuid) {
+      Model model,
+      @RequestParam("parentType") String parentType,
+      @RequestParam("parentUuid") String parentUuid) {
     model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
@@ -85,8 +83,8 @@ public class CollectionsController extends AbstractController {
   public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Collection collection = cudamiCollectionsClient.getCollection(uuid);
-    List<Locale> existingLanguages
-            = languageSortingHelper.sortLanguages(displayLocale, collection.getLabel().getLocales());
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, collection.getLabel().getLocales());
 
     model.addAttribute("activeLanguage", existingLanguages.get(0));
     model.addAttribute("existingLanguages", existingLanguages);
@@ -103,9 +101,9 @@ public class CollectionsController extends AbstractController {
 
   @GetMapping("/collections")
   public String list(
-          Model model,
-          @PageableDefault(
-                  sort = {"label"},
+      Model model,
+      @PageableDefault(
+              sort = {"label"},
               size = 25)
           Pageable pageable) {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
@@ -117,10 +115,10 @@ public class CollectionsController extends AbstractController {
 
   @PostMapping("/api/collections/new")
   public ResponseEntity save(
-          @RequestBody Collection collection,
-          @RequestParam("parentType") String parentType,
-          @RequestParam("parentUuid") UUID parentUuid)
-          throws IdentifiableServiceException {
+      @RequestBody Collection collection,
+      @RequestParam("parentType") String parentType,
+      @RequestParam("parentUuid") UUID parentUuid)
+      throws IdentifiableServiceException {
     try {
       Collection collectionDb = null;
       if (parentType.equals("collection")) {
@@ -138,7 +136,7 @@ public class CollectionsController extends AbstractController {
 
   @PutMapping("/api/collections/{uuid}")
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Collection collection)
-          throws IdentifiableServiceException {
+      throws IdentifiableServiceException {
     try {
       Collection collectionDb = cudamiCollectionsClient.updateCollection(collection);
       return ResponseEntity.ok(collectionDb);
@@ -158,7 +156,8 @@ public class CollectionsController extends AbstractController {
     model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("collection", collection);
 
-    BreadcrumbNavigation breadcrumbNavigation = cudamiCollectionsClient.getBreadcrumbNavigation(uuid);
+    BreadcrumbNavigation breadcrumbNavigation =
+        cudamiCollectionsClient.getBreadcrumbNavigation(uuid);
     List<Node> breadcrumbs = breadcrumbNavigation.getNavigationItems();
     model.addAttribute("breadcrumbs", breadcrumbs);
 

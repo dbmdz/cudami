@@ -67,7 +67,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
       REDUCED_FIND_ONE_BASE_SQL
           + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = c.uuid)";
 
-    private static final String BREADCRUMB_QUERY =
+  private static final String BREADCRUMB_QUERY =
       "WITH recursive breadcrumb (uuid,label,parent_uuid,depth)"
           + " AS ("
           + "        SELECT c.uuid as uuid, c.label as label, cc.parent_collection_uuid as parent_uuid,99 as depth"
@@ -88,7 +88,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
       "SELECT c.uuid as uuid, c.label as label"
           + "        FROM collections c"
           + "        WHERE uuid= :uuid";
-  
+
   @Autowired
   public CollectionRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     super(dbi, identifierRepository);
@@ -496,7 +496,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
   }
-  
+
   @Override
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
 

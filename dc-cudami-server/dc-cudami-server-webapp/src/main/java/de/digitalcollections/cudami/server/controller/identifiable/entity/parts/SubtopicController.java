@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.SubtopicService;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
+import de.digitalcollections.model.api.identifiable.entity.Topic;
 import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -43,8 +44,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class SubtopicController {
 
   @Autowired private SubtopicService service;
-  
-  @Autowired LocaleService localeService;
+
+  @Autowired private LocaleService localeService;
 
   @ApiMethod(description = "Get all subtopics")
   @GetMapping(
@@ -301,12 +302,11 @@ public class SubtopicController {
           UUID subtopicUuid) {
     return service.deleteFromParentTopic(subtopicUuid, topicUuid);
   }
-  
+
   @ApiMethod(description = "Get the breadcrumb for a subtopic")
-  @RequestMapping(
+  @GetMapping(
       value = {"/latest/subtopics/{uuid}/breadcrumb", "/v3/subtopics/{uuid}/breadcrumb"},
-      produces = {MediaType.APPLICATION_JSON_VALUE},
-      method = RequestMethod.GET)
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public ResponseEntity<BreadcrumbNavigation> getBreadcrumb(
       @ApiPathParam(
@@ -335,5 +335,25 @@ public class SubtopicController {
     }
 
     return new ResponseEntity<>(breadcrumbNavigation, HttpStatus.OK);
+  }
+
+  @ApiMethod(description = "Get the topic of a subtopic")
+  @GetMapping(
+      value = {"/latest/subtopics/{uuid}/topic", "/v3/subtopics/{uuid}/topic"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public Topic getTopic(
+      @ApiPathParam(
+              description =
+                  "UUID of the subtopic, e.g. <tt>6119d8e9-9c92-4091-8dcb-bc4053385406</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @ApiQueryParam(
+              name = "pLocale",
+              description =
+                  "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+          @RequestParam(name = "pLocale", required = false)
+          Locale pLocale) {
+    return service.getTopic(uuid);
   }
 }

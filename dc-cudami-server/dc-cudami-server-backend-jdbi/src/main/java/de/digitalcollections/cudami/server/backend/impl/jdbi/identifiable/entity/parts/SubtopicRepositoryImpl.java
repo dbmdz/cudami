@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
+import de.digitalcollections.model.api.identifiable.entity.Topic;
 import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -13,6 +14,7 @@ import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.NodeImpl;
 import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
+import de.digitalcollections.model.impl.identifiable.entity.TopicImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.SubtopicImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
@@ -88,7 +90,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
           + "    )"
           + " SELECT * from breadcrumb"
           + " UNION"
-          + " SELECT null as uuid, s.label as label, null as parent_uuid, 0 as depth"
+          + " SELECT null as uuid, t.label as label, null as parent_uuid, 0 as depth"
           + " FROM topics t, topic_subtopics ts, breadcrumb b"
           + " WHERE ts.subtopic_uuid = b.parent_uuid and t.uuid = ts.topic_uuid"
           + " ORDER BY depth ASC";
@@ -97,7 +99,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
       "SELECT s.uuid as uuid, s.label as label"
           + "        FROM subtopics s"
           + "        WHERE uuid= :uuid";
-  
+
   @Autowired
   public SubtopicRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     super(dbi, identifierRepository);
@@ -771,5 +773,23 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
 
     List<Node> nodes = result.stream().map(s -> (Node) s).collect(Collectors.toList());
     return new BreadcrumbNavigationImpl(nodes);
+  }
+
+  @Override
+  public Topic getTopic(UUID rootSubtopicUuid) {
+    String query =
+        "SELECT uuid, refid, label"
+            + " FROM topics"
+            + " INNER JOIN topic_subtopics ts ON uuid = ts.topic_uuid"
+            + " WHERE ts.subtopic_uuid = :uuid";
+
+    TopicImpl result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(query)
+                    .bind("uuid", rootSubtopicUuid)
+                    .mapToBean(TopicImpl.class)
+                    .one());
+    return result;
   }
 }

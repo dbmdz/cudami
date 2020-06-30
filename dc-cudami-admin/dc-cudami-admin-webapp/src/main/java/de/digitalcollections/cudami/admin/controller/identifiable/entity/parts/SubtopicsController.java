@@ -144,7 +144,7 @@ public class SubtopicsController extends AbstractController {
 
     List<Entity> relatedEntities = service.getEntities(subtopic);
     model.addAttribute("relatedEntities", relatedEntities);
-    
+
     BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
     List<Node> breadcrumbs = breadcrumbNavigation.getNavigationItems();
     // Cut out first breadcrumb node (the one with empty uuid), which identifies the topic, since

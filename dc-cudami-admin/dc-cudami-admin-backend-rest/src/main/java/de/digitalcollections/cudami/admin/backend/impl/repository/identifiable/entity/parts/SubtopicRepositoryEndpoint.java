@@ -79,10 +79,10 @@ public interface SubtopicRepositoryEndpoint extends RepositoryEndpoint {
 
   @RequestLine("GET /latest/subtopics/fileresource/{uuid}")
   List<Subtopic> getSubtopicsOfFileResource(@Param("uuid") UUID uuid);
-  
+
   @RequestLine("GET /latest/subtopics/{uuid}/breadcrumb")
   BreadcrumbNavigation getBreadcrumbNavigation(@Param("uuid") UUID uuid);
 
   @RequestLine("GET /latest/subtopics/{uuid}/topic")
-  Topic getTopic(UUID subtopicUuid);
+  Topic getTopic(@Param("uuid") UUID subtopicUuid);
 }

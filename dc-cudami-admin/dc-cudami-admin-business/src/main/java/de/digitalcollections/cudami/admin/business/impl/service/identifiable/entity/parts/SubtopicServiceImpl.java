@@ -16,12 +16,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/**
- * Service for Subtopic handling.
- */
+/** Service for Subtopic handling. */
 @Service
 public class SubtopicServiceImpl extends EntityPartServiceImpl<Subtopic, Entity>
-        implements SubtopicService {
+    implements SubtopicService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SubtopicServiceImpl.class);
 
@@ -72,7 +70,7 @@ public class SubtopicServiceImpl extends EntityPartServiceImpl<Subtopic, Entity>
 
   @Override
   public Subtopic saveWithParentTopic(Subtopic subtopic, UUID parentTopicUuid)
-          throws IdentifiableServiceException {
+      throws IdentifiableServiceException {
     try {
       return ((SubtopicRepository) repository).saveWithParentTopic(subtopic, parentTopicUuid);
     } catch (Exception e) {
@@ -83,7 +81,7 @@ public class SubtopicServiceImpl extends EntityPartServiceImpl<Subtopic, Entity>
 
   @Override
   public Subtopic saveWithParentSubtopic(Subtopic subtopic, UUID parentSubtopicUuid)
-          throws IdentifiableServiceException {
+      throws IdentifiableServiceException {
     try {
       return ((SubtopicRepository) repository).saveWithParentSubtopic(subtopic, parentSubtopicUuid);
     } catch (Exception e) {
