@@ -93,7 +93,7 @@ public class IdentifierTypeController extends AbstractController {
     return "identifiertypes/edit";
   }
 
-  @PostMapping(value = "/identifiertypes/{pathUuid}/edit")
+  @PostMapping("/identifiertypes/{pathUuid}/edit")
   public String edit(
       @PathVariable UUID pathUuid,
       @ModelAttribute @Valid IdentifierTypeImpl identifierType,
