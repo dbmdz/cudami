@@ -51,7 +51,7 @@ public class IdentifierTypeController extends AbstractController {
     return "identifiertypes";
   }
 
-  @GetMapping(value = "/identifiertypes/new")
+  @GetMapping("/identifiertypes/new")
   public String create(Model model) {
     model.addAttribute("identifierType", service.create());
     return "identifiertypes/create";
