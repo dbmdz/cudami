@@ -87,7 +87,7 @@ public class IdentifierTypeController extends AbstractController {
     return "redirect:/identifiertypes";
   }
 
-  @GetMapping(value = "/identifiertypes/{uuid}/edit")
+  @GetMapping("/identifiertypes/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
     model.addAttribute("identifierType", service.get(uuid));
     return "identifiertypes/edit";
