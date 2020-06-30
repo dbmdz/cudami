@@ -45,7 +45,7 @@ public class SetupController extends AbstractController {
     return "users/create";
   }
 
-  @PostMapping(value = "/setup/adminUser")
+  @PostMapping("/setup/adminUser")
   public String adminUser(
       @RequestParam("pwd1") String password1,
       @RequestParam("pwd2") String password2,
