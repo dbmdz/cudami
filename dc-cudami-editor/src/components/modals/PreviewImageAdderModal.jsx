@@ -42,7 +42,7 @@ class PreviewImageAdderModal extends Component {
       const attributes = Object.fromEntries(
         Object.entries(data)
           .filter(([key, value]) => {
-            return key !== 'showImageSelector' && value
+            return !['showImageSelector', 'uuid'].includes(key) && value
           })
           .map(([key, value]) => {
             const keyMapping = {
@@ -59,6 +59,10 @@ class PreviewImageAdderModal extends Component {
         attributes: {
           ...this.initialAttributes,
           ...attributes,
+        },
+        fileResource: {
+          ...this.state.fileResource,
+          uuid: data.uuid,
         },
         showImageSelector: data.showImageSelector ?? true,
       })
