@@ -1,7 +1,7 @@
 import {publish, subscribe, unsubscribe} from 'pubsub-js'
 import React from 'react'
 import {Button, ButtonGroup, Card, CardBody} from 'reactstrap'
-import {FaPlus, FaTrashAlt} from 'react-icons/fa'
+import {FaEdit, FaPlus, FaTrashAlt} from 'react-icons/fa'
 
 import {getImageUrl} from './utils'
 
@@ -74,7 +74,13 @@ const PreviewImage = ({
       </Card>
     )
   }
-  const {altText, caption, title} = previewImageRenderingHints
+  const {
+    altText,
+    caption,
+    openLinkInNewWindow,
+    targetLink,
+    title,
+  } = previewImageRenderingHints
   return (
     <Card className="rounded text-center">
       <CardBody className="p-1">
@@ -90,6 +96,35 @@ const PreviewImage = ({
           )}
         </figure>
         <ButtonGroup className="mt-1">
+          <Button
+            color="light"
+            onClick={() => {
+              const token = subscribe(
+                'editor.update-preview-image',
+                (_msg, {renderingHints}) => {
+                  onUpdate({
+                    previewImageRenderingHints: updateRenderingHints(
+                      previewImageRenderingHints,
+                      renderingHints,
+                      language
+                    ),
+                  })
+                  unsubscribe(token)
+                }
+              )
+              publish('editor.show-preview-image-modal', {
+                altText: altText[language],
+                caption: caption?.[language],
+                openLinkInNewWindow,
+                showImageSelector: false,
+                targetLink,
+                title: title?.[language],
+              })
+            }}
+            size="sm"
+          >
+            <FaEdit />
+          </Button>
           <Button
             color="light"
             onClick={() =>

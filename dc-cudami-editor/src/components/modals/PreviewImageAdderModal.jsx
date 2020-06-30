@@ -10,22 +10,23 @@ import ImageSelector from './imageAdder/ImageSelector'
 import {loadIdentifiable, saveFileResource, updateFileResource} from '../../api'
 
 class PreviewImageAdderModal extends Component {
+  initialAttributes = {
+    altText: '',
+    caption: '',
+    linkNewTab: true,
+    linkUrl: '',
+    title: '',
+  }
+
   constructor(props) {
     super(props)
-    const initialAttributes = {
-      altText: '',
-      caption: '',
-      linkNewTab: true,
-      linkUrl: '',
-      title: '',
-    }
     this.state = {
-      attributes: initialAttributes,
+      attributes: this.initialAttributes,
       doUpdateRequest: false,
       fileResource: {},
-      initialAttributes,
       metadataOpen: true,
       renderingHintsOpen: false,
+      showImageSelector: true,
       tooltipsOpen: {
         altText: false,
         caption: false,
@@ -37,7 +38,30 @@ class PreviewImageAdderModal extends Component {
         url: false,
       },
     }
-    subscribe('editor.show-preview-image-modal', () => {
+    subscribe('editor.show-preview-image-modal', (_msg, data = {}) => {
+      const attributes = Object.fromEntries(
+        Object.entries(data)
+          .filter(([key, value]) => {
+            return key !== 'showImageSelector' && value
+          })
+          .map(([key, value]) => {
+            const keyMapping = {
+              openLinkInNewWindow: 'linkNewTab',
+              targetLink: 'linkUrl',
+            }
+            if (key in keyMapping) {
+              return [keyMapping[key], value]
+            }
+            return [key, value]
+          })
+      )
+      this.setState({
+        attributes: {
+          ...this.initialAttributes,
+          ...attributes,
+        },
+        showImageSelector: data.showImageSelector ?? true,
+      })
       this.props.onToggle()
     })
   }
@@ -65,7 +89,7 @@ class PreviewImageAdderModal extends Component {
   destroy = () => {
     this.props.onToggle()
     this.setState({
-      attributes: this.state.initialAttributes,
+      attributes: this.initialAttributes,
       doUpdateRequest: false,
       fileResource: this.state.initialFileResource,
       metadataOpen: true,
@@ -174,16 +198,18 @@ class PreviewImageAdderModal extends Component {
               this.updatePreviewImage(fileResource)
             }}
           >
-            <ImageSelector
-              activeLanguage={activeLanguage}
-              apiContextPath={apiContextPath}
-              defaultLanguage={defaultLanguage}
-              fileResource={this.state.fileResource}
-              onChange={this.updateFileResource}
-              onTabChanged={this.onTabChanged}
-              toggleTooltip={this.toggleTooltip}
-              tooltipsOpen={this.state.tooltipsOpen}
-            />
+            {this.state.showImageSelector && (
+              <ImageSelector
+                activeLanguage={activeLanguage}
+                apiContextPath={apiContextPath}
+                defaultLanguage={defaultLanguage}
+                fileResource={this.state.fileResource}
+                onChange={this.updateFileResource}
+                onTabChanged={this.onTabChanged}
+                toggleTooltip={this.toggleTooltip}
+                tooltipsOpen={this.state.tooltipsOpen}
+              />
+            )}
             <ImageMetadataForm
               altText={altText}
               caption={caption}
