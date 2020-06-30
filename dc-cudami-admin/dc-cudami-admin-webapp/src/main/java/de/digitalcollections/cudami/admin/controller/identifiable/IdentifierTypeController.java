@@ -57,7 +57,7 @@ public class IdentifierTypeController extends AbstractController {
     return "identifiertypes/create";
   }
 
-  @PostMapping(value = "/identifiertypes/new")
+  @PostMapping("/identifiertypes/new")
   public String create(
       @ModelAttribute @Valid IdentifierTypeImpl identifierType,
       BindingResult results,
