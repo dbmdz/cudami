@@ -78,7 +78,7 @@ public class DigitalObjectsController extends AbstractController {
     throw new UnsupportedOperationException();
   }
 
-  @GetMapping(value = "/digitalobjects")
+  @GetMapping("/digitalobjects")
   public String list(
       Model model,
       @PageableDefault(
