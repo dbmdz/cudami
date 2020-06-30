@@ -15,7 +15,7 @@ public class MainController {
     return "main";
   }
 
-  @GetMapping(value = {"/login"})
+  @GetMapping("/login")
   public String login(
       @RequestParam(value = "error", defaultValue = "false") boolean error, Model model) {
     model.addAttribute("error", error);
