@@ -52,7 +52,7 @@ public class DigitalObjectsController extends AbstractController {
     throw new UnsupportedOperationException();
   }
 
-  @PostMapping(value = "/digitalobjects/new")
+  @PostMapping("/digitalobjects/new")
   public String create(
       @ModelAttribute @Valid DigitalObjectImpl digitalObject,
       BindingResult results,
