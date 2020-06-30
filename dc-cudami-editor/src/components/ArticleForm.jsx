@@ -65,6 +65,7 @@ const ArticleForm = ({
           </Nav>
           <TabContent activeTab={activeLanguage}>
             {existingLanguages.map((language) => (
+              /* TODO: extract as component */
               <TabPane key={language} tabId={language}>
                 <Teaser
                   description={identifiable.description[language]}
