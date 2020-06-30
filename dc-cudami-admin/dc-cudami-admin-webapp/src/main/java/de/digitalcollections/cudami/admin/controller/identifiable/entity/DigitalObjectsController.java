@@ -62,7 +62,7 @@ public class DigitalObjectsController extends AbstractController {
     throw new UnsupportedOperationException();
   }
 
-  @GetMapping(value = "/digitalobjects/{uuid}/edit")
+  @GetMapping("/digitalobjects/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes) {
     throw new UnsupportedOperationException();
   }
