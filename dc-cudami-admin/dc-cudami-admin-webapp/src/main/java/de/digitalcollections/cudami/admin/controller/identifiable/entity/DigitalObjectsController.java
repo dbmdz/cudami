@@ -47,7 +47,7 @@ public class DigitalObjectsController extends AbstractController {
     return "digitalobjects";
   }
 
-  @GetMapping(value = "/digitalobjects/new")
+  @GetMapping("/digitalobjects/new")
   public String create(Model model) {
     throw new UnsupportedOperationException();
   }
