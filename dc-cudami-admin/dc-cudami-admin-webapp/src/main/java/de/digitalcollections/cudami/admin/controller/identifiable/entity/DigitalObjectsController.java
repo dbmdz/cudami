@@ -67,7 +67,7 @@ public class DigitalObjectsController extends AbstractController {
     throw new UnsupportedOperationException();
   }
 
-  @PostMapping(value = "/digitalobjects/{pathUuid}/edit")
+  @PostMapping("/digitalobjects/{pathUuid}/edit")
   public String edit(
       @PathVariable UUID pathUuid,
       @ModelAttribute @Valid DigitalObjectImpl digitalObject,
