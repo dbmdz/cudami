@@ -92,7 +92,7 @@ public class DigitalObjectsController extends AbstractController {
     return "digitalobjects/list";
   }
 
-  @GetMapping(value = "/digitalobjects/{uuid}")
+  @GetMapping("/digitalobjects/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) {
     DigitalObject digitalObject = (DigitalObject) service.get(uuid);
     model.addAttribute("availableLocales", digitalObject.getLabel().getLocales());
