@@ -39,7 +39,7 @@ public class SetupController extends AbstractController {
     return true;
   }
 
-  @GetMapping(value = "/setup/adminUser")
+  @GetMapping("/setup/adminUser")
   public String adminUser(Model model) {
     model.addAttribute("user", userService.createAdminUser());
     return "users/create";
