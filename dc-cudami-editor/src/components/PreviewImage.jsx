@@ -86,12 +86,12 @@ const PreviewImage = ({
 }) => {
   if (previewImageRenderingHints === undefined) {
     previewImageRenderingHints = {
-      altText: {[language]: ""},
-      caption: {[language]: ""},
-      title: {[language]: ""}
+      altText: {[language]: ''},
+      caption: {[language]: ''},
+      title: {[language]: ''},
     }
   }
-  
+
   if (!previewImage) {
     return (
       <Card className="rounded text-center">
