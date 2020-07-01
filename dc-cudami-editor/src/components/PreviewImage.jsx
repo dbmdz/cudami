@@ -25,7 +25,7 @@ const handleClick = (
       unsubscribe(token)
     }
   )
-  if (currentRenderingHints) {
+  if (currentRenderingHints && currentPreviewImage) {
     const {
       altText,
       caption,
