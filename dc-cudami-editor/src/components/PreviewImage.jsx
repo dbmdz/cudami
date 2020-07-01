@@ -84,24 +84,22 @@ const PreviewImage = ({
   previewImage,
   previewImageRenderingHints,
 }) => {
+  var emptyImageRenderingHints = {
+    altText: {[language]: ''},
+    caption: {[language]: ''},
+    title: {[language]: ''},
+  }
   if (previewImageRenderingHints === undefined) {
-    previewImageRenderingHints = {
-      altText: {[language]: ''},
-      caption: {[language]: ''},
-      title: {[language]: ''},
-    }
+    previewImageRenderingHints = emptyImageRenderingHints
   } else {
-    if (previewImageRenderingHints.altText === undefined) {
-      previewImageRenderingHints.altText = {[language]: ''}
-    }
-    if (previewImageRenderingHints.caption === undefined) {
-      previewImageRenderingHints.caption = {[language]: ''}
-    }
-    if (previewImageRenderingHints.title === undefined) {
-      previewImageRenderingHints.title = {[language]: ''}
+    // get existing rendering hints from previewImageRenderingHints and
+    // fill missing key/values from emptyImageRenderingHints
+    previewImageRenderingHints = {
+      ...emptyImageRenderingHints,
+      ...previewImageRenderingHints,
     }
   }
-
+  
   if (!previewImage) {
     return (
       <Card className="rounded text-center">
