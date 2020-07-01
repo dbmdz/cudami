@@ -99,7 +99,7 @@ const PreviewImage = ({
       ...previewImageRenderingHints,
     }
   }
-  
+
   if (!previewImage) {
     return (
       <Card className="rounded text-center">
