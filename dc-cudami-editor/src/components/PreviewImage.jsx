@@ -84,11 +84,19 @@ const PreviewImage = ({
   previewImage,
   previewImageRenderingHints,
 }) => {
+  var emptyImageRenderingHints = {
+    altText: {[language]: ''},
+    caption: {[language]: ''},
+    title: {[language]: ''},
+  }
   if (previewImageRenderingHints === undefined) {
+    previewImageRenderingHints = emptyImageRenderingHints
+  } else {
+    // get existing rendering hints from previewImageRenderingHints and
+    // fill missing key/values from emptyImageRenderingHints
     previewImageRenderingHints = {
-      altText: {[language]: ''},
-      caption: {[language]: ''},
-      title: {[language]: ''},
+      ...emptyImageRenderingHints,
+      ...previewImageRenderingHints,
     }
   }
 
