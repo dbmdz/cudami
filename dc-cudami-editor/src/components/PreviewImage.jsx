@@ -84,11 +84,21 @@ const PreviewImage = ({
   previewImage,
   previewImageRenderingHints,
 }) => {
-  if (previewImageRenderingHints === undefined) {
+  if (!previewImageRenderingHints || previewImageRenderingHints === undefined) {
     previewImageRenderingHints = {
       altText: {[language]: ''},
       caption: {[language]: ''},
       title: {[language]: ''},
+    }
+  } else {
+    if (previewImageRenderingHints.altText === undefined) {
+      previewImageRenderingHints.altText = {[language]: ''}
+    }
+    if (previewImageRenderingHints.caption === undefined) {
+      previewImageRenderingHints.caption = {[language]: ''}
+    }
+    if (previewImageRenderingHints.title === undefined) {
+      previewImageRenderingHints.title = {[language]: ''}
     }
   }
 
