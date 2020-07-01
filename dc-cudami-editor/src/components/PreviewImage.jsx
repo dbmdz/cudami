@@ -84,7 +84,7 @@ const PreviewImage = ({
   previewImage,
   previewImageRenderingHints,
 }) => {
-  if (!previewImageRenderingHints || previewImageRenderingHints === undefined) {
+  if (previewImageRenderingHints === undefined) {
     previewImageRenderingHints = {
       altText: {[language]: ''},
       caption: {[language]: ''},
