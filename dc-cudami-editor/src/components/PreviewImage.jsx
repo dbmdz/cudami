@@ -1,6 +1,7 @@
 import {publish, subscribe, unsubscribe} from 'pubsub-js'
 import React from 'react'
 import {Button, ButtonGroup, Card, CardBody} from 'reactstrap'
+import {useTranslation} from 'react-i18next'
 import {FaEdit, FaPlus, FaTrashAlt} from 'react-icons/fa'
 
 import {getImageUrl} from './utils'
@@ -84,6 +85,7 @@ const PreviewImage = ({
   previewImage,
   previewImageRenderingHints = {},
 }) => {
+  const {t} = useTranslation()
   if (!previewImage) {
     return (
       <Card className="rounded text-center">
@@ -100,6 +102,7 @@ const PreviewImage = ({
               )
             }}
             tag="a"
+            title={t('addPreviewImage')}
           >
             <FaPlus />
           </Button>
