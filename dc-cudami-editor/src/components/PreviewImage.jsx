@@ -25,7 +25,7 @@ const handleClick = (
       unsubscribe(token)
     }
   )
-  if (currentRenderingHints && currentPreviewImage) {
+  if (currentPreviewImage && currentRenderingHints) {
     const {
       altText,
       caption,
@@ -34,7 +34,7 @@ const handleClick = (
       title,
     } = currentRenderingHints
     publish('editor.show-preview-image-modal', {
-      altText: altText[language],
+      altText: altText?.[language],
       caption: caption?.[language],
       openLinkInNewWindow,
       showImageSelector: false,
@@ -82,24 +82,8 @@ const PreviewImage = ({
   language,
   onUpdate,
   previewImage,
-  previewImageRenderingHints,
+  previewImageRenderingHints = {},
 }) => {
-  var emptyImageRenderingHints = {
-    altText: {[language]: ''},
-    caption: {[language]: ''},
-    title: {[language]: ''},
-  }
-  if (previewImageRenderingHints === undefined) {
-    previewImageRenderingHints = emptyImageRenderingHints
-  } else {
-    // get existing rendering hints from previewImageRenderingHints and
-    // fill missing key/values from emptyImageRenderingHints
-    previewImageRenderingHints = {
-      ...emptyImageRenderingHints,
-      ...previewImageRenderingHints,
-    }
-  }
-
   if (!previewImage) {
     return (
       <Card className="rounded text-center">
@@ -129,14 +113,12 @@ const PreviewImage = ({
       <CardBody className="p-1">
         <figure className="mb-0">
           <img
-            alt={altText[language]}
+            alt={altText?.[language]}
             className="mw-100"
             src={getImageUrl(previewImage, '200,')}
-            title={title && title[language]}
+            title={title?.[language]}
           />
-          {caption && caption[language] && (
-            <figcaption>{caption[language]}</figcaption>
-          )}
+          {caption?.[language] && <figcaption>{caption[language]}</figcaption>}
         </figure>
         <ButtonGroup className="mt-1">
           <Button
