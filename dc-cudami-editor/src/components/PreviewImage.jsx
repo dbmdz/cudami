@@ -1,6 +1,13 @@
 import {publish, subscribe, unsubscribe} from 'pubsub-js'
-import React from 'react'
-import {Button, ButtonGroup, Card, CardBody} from 'reactstrap'
+import React, {useState} from 'react'
+import {
+  Alert,
+  Button,
+  ButtonGroup,
+  Card,
+  CardBody,
+  CardFooter,
+} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 import {FaEdit, FaPlus, FaTrashAlt} from 'react-icons/fa'
 
@@ -85,6 +92,7 @@ const PreviewImage = ({
   previewImage,
   previewImageRenderingHints = {},
 }) => {
+  const [showRemoveNotification, setShowRemoveNotification] = useState(false)
   const {t} = useTranslation()
   if (!previewImage) {
     return (
@@ -107,6 +115,13 @@ const PreviewImage = ({
             <FaPlus />
           </Button>
         </CardBody>
+        {showRemoveNotification && (
+          <CardFooter className="p-0">
+            <Alert className="mb-0" color="info">
+              {t('removePreviewImageAfterSaveNotification')}
+            </Alert>
+          </CardFooter>
+        )}
       </Card>
     )
   }
@@ -140,12 +155,14 @@ const PreviewImage = ({
           </Button>
           <Button
             color="light"
-            onClick={() =>
+            onClick={() => {
+              setShowRemoveNotification(true)
+              setTimeout(() => setShowRemoveNotification(false), 3000)
               onUpdate({
                 previewImage: undefined,
                 previewImageRenderingHints: undefined,
               })
-            }
+            }}
             size="sm"
           >
             <FaTrashAlt />

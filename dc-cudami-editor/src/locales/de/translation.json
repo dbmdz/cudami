@@ -86,6 +86,7 @@
     "numberOfRows": "Anzahl an Zeilen",
     "openLinkNewTab": "in einem neuen Tab öffnen",
     "openLinkSameTab": "im selben Tab öffnen",
+    "removePreviewImageAfterSaveNotification": "Klicken Sie auf \"$t(save)\", um die Löschung zu bestätigen.",
     "sameTab": "in gleichem Tab",
     "save": "Speichern",
     "selectImage": {
