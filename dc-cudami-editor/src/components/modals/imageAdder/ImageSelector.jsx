@@ -23,7 +23,7 @@ import ImageLabelInput from './ImageLabelInput'
 import ImagePreview from './ImagePreview'
 import FileUploadForm from '../../FileUploadForm'
 import {getImageUrl} from '../../utils'
-import {uploadFile} from '../../../api'
+import {ApiContext, uploadFile} from '../../../api'
 
 class ImageSelector extends Component {
   constructor(props) {
@@ -66,12 +66,11 @@ class ImageSelector extends Component {
   }
 
   uploadImage = async (image) => {
-    const {apiContextPath, onChange} = this.props
     this.setState({
       tabToggleEnabled: false,
     })
     const response = await uploadFile(
-      apiContextPath,
+      this.context.apiContextPath,
       image,
       this.updateProgress
     )
@@ -81,7 +80,7 @@ class ImageSelector extends Component {
       showUploadSuccess: true,
     })
     setTimeout(() => this.setState({showUploadSuccess: false}), 3000)
-    onChange({
+    this.props.onChange({
       ...responseJson,
       uri: getImageUrl(responseJson),
     })
@@ -90,7 +89,6 @@ class ImageSelector extends Component {
   render() {
     const {
       activeLanguage,
-      apiContextPath,
       defaultLanguage,
       fileResource,
       onChange,
@@ -238,7 +236,6 @@ class ImageSelector extends Component {
               )}
               <ImageAutocomplete
                 activeLanguage={activeLanguage}
-                apiContextPath={apiContextPath}
                 defaultLanguage={defaultLanguage}
                 onChange={onChange}
               />
@@ -249,5 +246,7 @@ class ImageSelector extends Component {
     )
   }
 }
+
+ImageSelector.contextType = ApiContext
 
 export default withTranslation()(ImageSelector)

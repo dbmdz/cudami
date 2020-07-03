@@ -12,7 +12,6 @@ import Teaser from './Teaser'
 
 const FileResourceForm = ({
   activeLanguage,
-  apiContextPath,
   canAddLanguage,
   existingLanguages,
   identifiable,
@@ -23,12 +22,7 @@ const FileResourceForm = ({
 }) => {
   const {t} = useTranslation()
   if (!identifiable.uuid) {
-    return (
-      <FileResourceUploadForm
-        apiContextPath={apiContextPath}
-        onUpdate={onUpdate}
-      />
-    )
+    return <FileResourceUploadForm onUpdate={onUpdate} />
   }
   return (
     <Form
