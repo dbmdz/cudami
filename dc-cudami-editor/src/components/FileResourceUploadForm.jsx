@@ -73,7 +73,7 @@ class FileResourceUploadForm extends Component {
                 id="filename"
                 readOnly
                 type="text"
-                value={this.state.file.name || ''}
+                value={this.state.file.name ?? ''}
               />
             </Card>
           </Col>
