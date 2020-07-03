@@ -43,7 +43,7 @@ class IdentifiableForm extends Component {
     this.state = {
       activeLanguage: props.activeLanguage,
       availableLanguages: [],
-      existingLanguages: props.existingLanguages || [props.activeLanguage],
+      existingLanguages: props.existingLanguages ?? [props.activeLanguage],
       identifiable: null,
       invalidLanguages: [],
       modalsOpen: {
