@@ -20,14 +20,14 @@ import {
   saveIdentifiable,
   updateIdentifiable,
 } from '../api'
+import initI18n from '../i18n'
+import '../polyfills'
 import IframeAdderModal from './modals/IframeAdderModal'
 import ImageAdderModal from './modals/ImageAdderModal'
 import LanguageAdderModal from './modals/LanguageAdderModal'
 import LinkAdderModal from './modals/LinkAdderModal'
 import PreviewImageAdderModal from './modals/PreviewImageAdderModal'
 import TableAdderModal from './modals/TableAdderModal'
-import initI18n from '../i18n'
-import '../polyfills'
 
 class IdentifiableForm extends Component {
   identifiablesWithLongText = [
