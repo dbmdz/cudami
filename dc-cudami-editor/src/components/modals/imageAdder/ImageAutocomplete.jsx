@@ -4,7 +4,7 @@ import Autosuggest from 'react-autosuggest'
 import {withTranslation} from 'react-i18next'
 
 import {getImageUrl} from '../../utils'
-import {searchImages} from '../../../api'
+import {ApiContext, searchImages} from '../../../api'
 
 class ImageAutocomplete extends Component {
   /* defines the number of suggestions to be fetched */
@@ -50,7 +50,7 @@ class ImageAutocomplete extends Component {
       return
     }
     const {suggestions, totalElements} = await searchImages(
-      this.props.apiContextPath,
+      this.context.apiContextPath,
       searchTerm,
       0,
       this.maxElements
@@ -132,5 +132,7 @@ class ImageAutocomplete extends Component {
     )
   }
 }
+
+ImageAutocomplete.contextType = ApiContext
 
 export default withTranslation()(ImageAutocomplete)

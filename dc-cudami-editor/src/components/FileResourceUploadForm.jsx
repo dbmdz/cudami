@@ -3,7 +3,7 @@ import {Button, ButtonGroup, Card, Col, Form, Input, Row} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
 import FileUploadForm from './FileUploadForm'
-import {uploadFile} from '../api'
+import {ApiContext, uploadFile} from '../api'
 
 class FileResourceUploadForm extends Component {
   constructor(props) {
@@ -22,13 +22,13 @@ class FileResourceUploadForm extends Component {
   }
 
   render() {
-    const {apiContextPath, onUpdate, t} = this.props
+    const {onUpdate, t} = this.props
     return (
       <Form
         onSubmit={async (evt) => {
           evt.preventDefault()
           const responseJson = await uploadFile(
-            apiContextPath,
+            this.context.apiContextPath,
             this.state.file,
             this.updateProgress
           )
@@ -82,5 +82,7 @@ class FileResourceUploadForm extends Component {
     )
   }
 }
+
+FileResourceUploadForm.contextType = ApiContext
 
 export default withTranslation()(FileResourceUploadForm)

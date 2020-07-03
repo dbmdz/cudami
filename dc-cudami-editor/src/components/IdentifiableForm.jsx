@@ -13,8 +13,7 @@ import TopicForm from './TopicForm'
 import WebpageForm from './WebpageForm'
 import WebsiteForm from './WebsiteForm'
 import {
-  getAvailableLanguages,
-  getDefaultLanguage,
+  ApiContext,
   loadAvailableLanguages,
   loadDefaultLanguage,
   loadIdentifiable,
@@ -61,16 +60,16 @@ class IdentifiableForm extends Component {
   async componentDidMount() {
     const {apiContextPath, mockApi, type, uiLocale, uuid} = this.props
     const i18n = initI18n(uiLocale)
-    const availableLanguages = mockApi
-      ? getAvailableLanguages()
-      : await loadAvailableLanguages(apiContextPath)
-    const defaultLanguage = mockApi
-      ? getDefaultLanguage()
-      : await loadDefaultLanguage(apiContextPath)
+    const availableLanguages = await loadAvailableLanguages(
+      apiContextPath,
+      mockApi
+    )
+    const defaultLanguage = await loadDefaultLanguage(apiContextPath, mockApi)
     let identifiable = await loadIdentifiable(
       apiContextPath,
+      mockApi,
       type,
-      uuid || 'new'
+      uuid
     )
     identifiable = {
       description: {},
@@ -154,7 +153,6 @@ class IdentifiableForm extends Component {
     return (
       <FormComponent
         activeLanguage={this.state.activeLanguage}
-        apiContextPath={this.props.apiContextPath}
         canAddLanguage={this.state.availableLanguages.length > 0}
         existingLanguages={this.state.existingLanguages}
         identifiable={this.state.identifiable}
@@ -240,55 +238,56 @@ class IdentifiableForm extends Component {
   }
 
   render() {
+    const {apiContextPath, debug, mockApi} = this.props
     return this.state.identifiable ? (
-      <Container className="cudami-editor">
-        {this.state.invalidLanguages.length > 0 && (
-          <FormErrors invalidLanguages={this.state.invalidLanguages} />
-        )}
-        {this.getFormComponent()}
-        {this.props.debug && (
-          <>
-            <Label className="font-weight-bold mt-3">JSON (debug)</Label>
-            <pre className="border">
-              <code>{JSON.stringify(this.state.identifiable, null, 4)}</code>
-            </pre>
-          </>
-        )}
-        <IframeAdderModal
-          isOpen={this.state.modalsOpen.iframeAdder}
-          onToggle={() => this.toggleModal('iframeAdder')}
-        />
-        <ImageAdderModal
-          activeLanguage={this.state.activeLanguage}
-          apiContextPath={this.props.apiContextPath}
-          debug={this.props.debug}
-          defaultLanguage={this.state.defaultLanguage}
-          isOpen={this.state.modalsOpen.imageAdder}
-          onToggle={() => this.toggleModal('imageAdder')}
-        />
-        <LanguageAdderModal
-          addLanguage={this.addLanguage}
-          availableLanguages={this.state.availableLanguages}
-          isOpen={this.state.modalsOpen.languageAdder}
-          onToggle={() => this.toggleModal('languageAdder')}
-        />
-        <LinkAdderModal
-          isOpen={this.state.modalsOpen.linkAdder}
-          onToggle={() => this.toggleModal('linkAdder')}
-        />
-        <PreviewImageAdderModal
-          activeLanguage={this.state.activeLanguage}
-          apiContextPath={this.props.apiContextPath}
-          debug={this.props.debug}
-          defaultLanguage={this.state.defaultLanguage}
-          isOpen={this.state.modalsOpen.previewImageAdder}
-          onToggle={() => this.toggleModal('previewImageAdder')}
-        />
-        <TableAdderModal
-          isOpen={this.state.modalsOpen.tableAdder}
-          onToggle={() => this.toggleModal('tableAdder')}
-        />
-      </Container>
+      <ApiContext.Provider value={{apiContextPath, mockApi}}>
+        <Container className="cudami-editor">
+          {this.state.invalidLanguages.length > 0 && (
+            <FormErrors invalidLanguages={this.state.invalidLanguages} />
+          )}
+          {this.getFormComponent()}
+          {debug && (
+            <>
+              <Label className="font-weight-bold mt-3">JSON (debug)</Label>
+              <pre className="border">
+                <code>{JSON.stringify(this.state.identifiable, null, 4)}</code>
+              </pre>
+            </>
+          )}
+          <IframeAdderModal
+            isOpen={this.state.modalsOpen.iframeAdder}
+            onToggle={() => this.toggleModal('iframeAdder')}
+          />
+          <ImageAdderModal
+            activeLanguage={this.state.activeLanguage}
+            debug={debug}
+            defaultLanguage={this.state.defaultLanguage}
+            isOpen={this.state.modalsOpen.imageAdder}
+            onToggle={() => this.toggleModal('imageAdder')}
+          />
+          <LanguageAdderModal
+            addLanguage={this.addLanguage}
+            availableLanguages={this.state.availableLanguages}
+            isOpen={this.state.modalsOpen.languageAdder}
+            onToggle={() => this.toggleModal('languageAdder')}
+          />
+          <LinkAdderModal
+            isOpen={this.state.modalsOpen.linkAdder}
+            onToggle={() => this.toggleModal('linkAdder')}
+          />
+          <PreviewImageAdderModal
+            activeLanguage={this.state.activeLanguage}
+            debug={debug}
+            defaultLanguage={this.state.defaultLanguage}
+            isOpen={this.state.modalsOpen.previewImageAdder}
+            onToggle={() => this.toggleModal('previewImageAdder')}
+          />
+          <TableAdderModal
+            isOpen={this.state.modalsOpen.tableAdder}
+            onToggle={() => this.toggleModal('tableAdder')}
+          />
+        </Container>
+      </ApiContext.Provider>
     ) : null
   }
 }

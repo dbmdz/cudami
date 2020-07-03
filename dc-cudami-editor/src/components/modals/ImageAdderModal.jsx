@@ -7,7 +7,12 @@ import './ImageAdderModal.css'
 import ImageMetadataForm from './imageAdder/ImageMetadataForm'
 import ImageRenderingHintsForm from './imageAdder/ImageRenderingHintsForm'
 import ImageSelector from './imageAdder/ImageSelector'
-import {loadIdentifiable, saveFileResource, updateFileResource} from '../../api'
+import {
+  ApiContext,
+  loadIdentifiable,
+  saveFileResource,
+  updateFileResource,
+} from '../../api'
 
 class ImageAdderModal extends Component {
   initialAttributes = {
@@ -67,16 +72,15 @@ class ImageAdderModal extends Component {
   }
 
   async componentDidMount() {
-    const {activeLanguage, apiContextPath} = this.props
     const newFileResource = await loadIdentifiable(
-      apiContextPath,
-      'fileResource',
-      'new'
+      this.context.apiContextPath,
+      this.context.mockApi,
+      'fileResource'
     )
     const initialFileResource = {
       ...newFileResource,
       fileResourceType: 'IMAGE',
-      label: {[activeLanguage]: ''},
+      label: {[this.props.activeLanguage]: ''},
       mimeType: 'image/*',
       uri: '',
     }
@@ -138,12 +142,12 @@ class ImageAdderModal extends Component {
     let resourceId = this.state.fileResource.uuid
     if (!resourceId) {
       const {uuid} = await saveFileResource(
-        this.props.apiContextPath,
+        this.context.apiContextPath,
         this.state.fileResource
       )
       resourceId = uuid
     } else if (this.state.doUpdateRequest) {
-      updateFileResource(this.props.apiContextPath, this.state.fileResource)
+      updateFileResource(this.context.apiContextPath, this.state.fileResource)
     }
     return resourceId
   }
@@ -168,14 +172,7 @@ class ImageAdderModal extends Component {
   }
 
   render() {
-    const {
-      activeLanguage,
-      apiContextPath,
-      debug,
-      defaultLanguage,
-      isOpen,
-      t,
-    } = this.props
+    const {activeLanguage, debug, defaultLanguage, isOpen, t} = this.props
     const {
       alignment,
       altText,
@@ -199,7 +196,6 @@ class ImageAdderModal extends Component {
             {this.state.showImageSelector && (
               <ImageSelector
                 activeLanguage={activeLanguage}
-                apiContextPath={apiContextPath}
                 defaultLanguage={defaultLanguage}
                 fileResource={this.state.fileResource}
                 onChange={this.updateFileResource}
@@ -250,5 +246,7 @@ class ImageAdderModal extends Component {
     )
   }
 }
+
+ImageAdderModal.contextType = ApiContext
 
 export default withTranslation()(ImageAdderModal)

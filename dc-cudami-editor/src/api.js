@@ -1,12 +1,11 @@
-export function getAvailableLanguages() {
-  return ['es', 'fr']
-}
+import React from 'react'
 
-export function getDefaultLanguage() {
-  return 'en'
-}
+export const ApiContext = React.createContext(null)
 
-export async function loadAvailableLanguages(contextPath) {
+export async function loadAvailableLanguages(contextPath, mock) {
+  if (mock) {
+    return ['es', 'fr']
+  }
   const url = `${contextPath}api/languages`
   try {
     const result = await fetch(url)
@@ -16,21 +15,25 @@ export async function loadAvailableLanguages(contextPath) {
   }
 }
 
-export async function loadDefaultLanguage(contextPath) {
+export async function loadDefaultLanguage(contextPath, mock) {
+  if (mock) {
+    return 'en'
+  }
   const url = `${contextPath}api/languages/default`
   try {
     const result = await fetch(url)
     return result.json()
   } catch (err) {
-    return getDefaultLanguage()
+    return 'en'
   }
 }
 
-export async function loadIdentifiable(contextPath, type, uuid) {
-  const url =
-    uuid === 'mock'
-      ? `__mock__/${type}.json`
-      : `${contextPath}api/${type.toLowerCase()}s/${uuid}`
+export async function loadIdentifiable(contextPath, mock, type, uuid = 'new') {
+  let url = `${contextPath}api/${type.toLowerCase()}s/${uuid}`
+  if (mock) {
+    url =
+      uuid === 'new' ? `/__mock__/new/${type}.json` : `/__mock__/${type}.json`
+  }
   try {
     const result = await fetch(url)
     return result.json()

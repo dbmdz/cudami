@@ -7,7 +7,12 @@ import './ImageAdderModal.css'
 import ImageMetadataForm from './imageAdder/ImageMetadataForm'
 import ImageRenderingHintsForm from './imageAdder/ImageRenderingHintsForm'
 import ImageSelector from './imageAdder/ImageSelector'
-import {loadIdentifiable, saveFileResource, updateFileResource} from '../../api'
+import {
+  ApiContext,
+  loadIdentifiable,
+  saveFileResource,
+  updateFileResource,
+} from '../../api'
 
 class PreviewImageAdderModal extends Component {
   initialAttributes = {
@@ -71,16 +76,15 @@ class PreviewImageAdderModal extends Component {
   }
 
   async componentDidMount() {
-    const {activeLanguage, apiContextPath} = this.props
     const newFileResource = await loadIdentifiable(
-      apiContextPath,
-      'fileResource',
-      'new'
+      this.context.apiContextPath,
+      this.context.mockApi,
+      'fileResource'
     )
     const initialFileResource = {
       ...newFileResource,
       fileResourceType: 'IMAGE',
-      label: {[activeLanguage]: ''},
+      label: {[this.props.activeLanguage]: ''},
       mimeType: 'image/png',
       uri: '',
     }
@@ -129,12 +133,12 @@ class PreviewImageAdderModal extends Component {
     let fileResource = this.state.fileResource
     if (!fileResource.uuid) {
       fileResource = await saveFileResource(
-        this.props.apiContextPath,
+        this.context.apiContextPath,
         this.state.fileResource
       )
     } else if (this.state.doUpdateRequest) {
       fileResource = await updateFileResource(
-        this.props.apiContextPath,
+        this.context.apiContextPath,
         this.state.fileResource
       )
     }
@@ -182,14 +186,7 @@ class PreviewImageAdderModal extends Component {
   }
 
   render() {
-    const {
-      activeLanguage,
-      apiContextPath,
-      debug,
-      defaultLanguage,
-      isOpen,
-      t,
-    } = this.props
+    const {activeLanguage, debug, defaultLanguage, isOpen, t} = this.props
     const {altText, caption, linkNewTab, linkUrl, title} = this.state.attributes
     return (
       <Modal isOpen={isOpen} size="lg" toggle={this.destroy}>
@@ -205,7 +202,6 @@ class PreviewImageAdderModal extends Component {
             {this.state.showImageSelector && (
               <ImageSelector
                 activeLanguage={activeLanguage}
-                apiContextPath={apiContextPath}
                 defaultLanguage={defaultLanguage}
                 fileResource={this.state.fileResource}
                 onChange={this.updateFileResource}
@@ -254,5 +250,7 @@ class PreviewImageAdderModal extends Component {
     )
   }
 }
+
+PreviewImageAdderModal.contextType = ApiContext
 
 export default withTranslation()(PreviewImageAdderModal)
