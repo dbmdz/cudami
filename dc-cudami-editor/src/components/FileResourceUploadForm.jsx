@@ -27,12 +27,13 @@ class FileResourceUploadForm extends Component {
       <Form
         onSubmit={async (evt) => {
           evt.preventDefault()
-          const responseJson = await uploadFile(
+          const response = await uploadFile(
             this.context.apiContextPath,
             this.state.file,
+            this.context.mockApi,
             this.updateProgress
           )
-          onUpdate(JSON.parse(responseJson))
+          onUpdate(response)
         }}
       >
         <Row>

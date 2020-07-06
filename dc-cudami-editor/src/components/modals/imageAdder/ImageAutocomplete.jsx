@@ -51,6 +51,7 @@ class ImageAutocomplete extends Component {
     }
     const {suggestions, totalElements} = await searchImages(
       this.context.apiContextPath,
+      this.context.mockApi,
       searchTerm,
       0,
       this.maxElements

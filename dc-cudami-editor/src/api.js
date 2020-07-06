@@ -42,7 +42,11 @@ export async function loadIdentifiable(contextPath, mock, type, uuid = 'new') {
   }
 }
 
-export async function saveFileResource(contextPath, fileResource) {
+export async function saveFileResource(contextPath, fileResource, mock) {
+  if (mock) {
+    const result = await fetch('/__mock__/fileResource.json')
+    return result.json()
+  }
   const savedFileResource = await saveIdentifiable(
     contextPath,
     fileResource,
@@ -89,11 +93,15 @@ export async function saveIdentifiable(
 
 export async function searchImages(
   contextPath,
+  mock,
   searchTerm,
   pageNumber = 0,
   pageSize = 10
 ) {
-  const url = `${contextPath}api/fileresources/images?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
+  let url = `${contextPath}api/fileresources/images?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
+  if (mock) {
+    url = '/__mock__/images.json'
+  }
   try {
     const result = await fetch(url)
     const json = await result.json()
@@ -109,7 +117,11 @@ export async function searchImages(
   }
 }
 
-export async function updateFileResource(contextPath, fileResource) {
+export async function updateFileResource(contextPath, fileResource, mock) {
+  if (mock) {
+    const result = await fetch('/__mock__/fileResource.json')
+    return result.json()
+  }
   const updatedFileResource = await updateIdentifiable(
     contextPath,
     fileResource,
@@ -147,13 +159,18 @@ export async function updateIdentifiable(
   }
 }
 
-export async function uploadFile(contextPath, file, updateProgress) {
+export async function uploadFile(contextPath, file, mock, updateProgress) {
+  if (mock) {
+    const result = await fetch('/__mock__/fileResource.json')
+    updateProgress(100)
+    return result.json()
+  }
   return new Promise((resolve, reject) => {
     const request = new XMLHttpRequest()
     request.onerror = () => reject(request.statusText)
     request.onload = () => {
       if (request.status >= 200 && request.status < 300) {
-        resolve(request.response)
+        resolve(JSON.parse(request.response))
       } else {
         reject(request.statusText)
       }
