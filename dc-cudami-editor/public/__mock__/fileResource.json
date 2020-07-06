@@ -1,5 +1,4 @@
 {
-  "children": [],
   "created": "2019-08-05T16:54:29.71132",
   "description": {
     "de": {
@@ -31,19 +30,46 @@
       ]
     }
   },
-  "filename": "my-first-file-resource.txt",
-  "filenameExtension": "txt",
-  "fileresourceType":"fileresource",
+  "fileResourceType": "IMAGE",
+  "filename": "my-first-image-file-resource.png",
+  "filenameExtension": "png",
+  "height": 100,
   "identifiers": [],
   "label": {
     "de": "Meine erste Datei",
     "en": "My first file resource"
   },
   "lastModified": "2019-08-05T16:54:29.711332",
-  "mimeType": "text/plain",
+  "mimeType": "image/png",
+  "previewImage": {
+    "created": "2019-08-05T16:54:29.71132",
+    "fileResourceType": "IMAGE",
+    "filename": "my-first-image-file-resource.png",
+    "filenameExtension": "png",
+    "height": 135,
+    "identifiers": [],
+    "label": {
+      "de": "Meine erste Datei",
+      "en": "My first file resource"
+    },
+    "lastModified": "2019-08-05T16:54:29.711332",
+    "mimeType": "image/png",
+    "readonly": false,
+    "sizeInBytes": 12345,
+    "type": "RESOURCE",
+    "uri": "/image.png",
+    "uuid": "c49e862e-b6cc-4540-a295-7bd5aea9025d",
+    "width": 1200
+  },
+  "previewImageRenderingHints": {
+    "altText": {
+        "en": "Alt text"
+    }
+  },
   "readonly": false,
   "sizeInBytes": 12345,
   "type": "RESOURCE",
+  "uri": "/image.png",
   "uuid": "c49e862e-b6cc-4540-a295-7bd5aea9025d",
-  "uri": "file:///foo/bar.txt"
+  "width": 246
 }
