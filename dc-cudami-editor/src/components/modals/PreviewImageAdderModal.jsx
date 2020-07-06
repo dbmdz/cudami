@@ -130,16 +130,19 @@ class PreviewImageAdderModal extends Component {
   }
 
   submitFileResource = async () => {
+    const {apiContextPath, mockApi} = this.context
     let fileResource = this.state.fileResource
     if (!fileResource.uuid) {
       fileResource = await saveFileResource(
-        this.context.apiContextPath,
-        this.state.fileResource
+        apiContextPath,
+        this.state.fileResource,
+        mockApi
       )
     } else if (this.state.doUpdateRequest) {
       fileResource = await updateFileResource(
-        this.context.apiContextPath,
-        this.state.fileResource
+        apiContextPath,
+        this.state.fileResource,
+        mockApi
       )
     }
     return fileResource

@@ -139,15 +139,17 @@ class ImageAdderModal extends Component {
   }
 
   submitFileResource = async () => {
+    const {apiContextPath, mockApi} = this.context
     let resourceId = this.state.fileResource.uuid
     if (!resourceId) {
       const {uuid} = await saveFileResource(
-        this.context.apiContextPath,
-        this.state.fileResource
+        apiContextPath,
+        this.state.fileResource,
+        mockApi
       )
       resourceId = uuid
     } else if (this.state.doUpdateRequest) {
-      updateFileResource(this.context.apiContextPath, this.state.fileResource)
+      updateFileResource(apiContextPath, this.state.fileResource, mockApi)
     }
     return resourceId
   }

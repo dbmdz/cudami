@@ -72,17 +72,17 @@ class ImageSelector extends Component {
     const response = await uploadFile(
       this.context.apiContextPath,
       image,
+      this.context.mockApi,
       this.updateProgress
     )
-    const responseJson = JSON.parse(response)
     this.setState({
       tabToggleEnabled: true,
       showUploadSuccess: true,
     })
     setTimeout(() => this.setState({showUploadSuccess: false}), 3000)
     this.props.onChange({
-      ...responseJson,
-      uri: getImageUrl(responseJson),
+      ...response,
+      uri: getImageUrl(response),
     })
   }
 
@@ -210,9 +210,10 @@ class ImageSelector extends Component {
                 <Input
                   name="url"
                   onChange={(evt) => onChange({uri: evt.target.value})}
+                  pattern="(https?://|/).+?"
                   placeholder="URL"
                   required
-                  type="url"
+                  type="text"
                   value={fileResource.uri}
                 />
               </FormGroup>
