@@ -85,7 +85,7 @@
     "numberOfRows": "Number of rows",
     "openLinkNewTab": "open in a new tab",
     "openLinkSameTab": "open in the same tab",
-    "removePreviewImageAfterSaveNotification": "Click \"$t(save)\" to confirm the deletion",
+    "removePreviewImageAfterSaveNotification": "Click \"$t(save)\" to confirm the deletion.",
     "save": "Save",
     "selectImage": {
       "moreElementsFound": "{{ maxElements }} out of {{ totalElements }} results, please refine your search.",
