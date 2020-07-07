@@ -65,8 +65,8 @@ public class CollectionsController extends AbstractController {
   @GetMapping("/collections/new")
   public String create(
       Model model,
-      @RequestParam("parentType") String parentType,
-      @RequestParam("parentUuid") String parentUuid) {
+      @RequestParam(name = "parentType", required = false) String parentType,
+      @RequestParam(name = "parentUuid", required = false) String parentUuid) {
     model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
     model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
@@ -116,12 +116,12 @@ public class CollectionsController extends AbstractController {
   @PostMapping("/api/collections/new")
   public ResponseEntity save(
       @RequestBody Collection collection,
-      @RequestParam("parentType") String parentType,
-      @RequestParam("parentUuid") UUID parentUuid)
+      @RequestParam(name = "parentType", required = false) String parentType,
+      @RequestParam(name = "parentUuid", required = false) UUID parentUuid)
       throws IdentifiableServiceException {
     try {
       Collection collectionDb = null;
-      if (parentType.equals("collection")) {
+      if ("collection".equals(parentType)) {
         collectionDb =
             cudamiCollectionsClient.saveCollectionWithParentCollection(collection, parentUuid);
       } else {
