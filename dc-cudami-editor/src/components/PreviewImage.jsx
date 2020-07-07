@@ -157,7 +157,6 @@ const PreviewImage = ({
             color="light"
             onClick={() => {
               setShowRemoveNotification(true)
-              setTimeout(() => setShowRemoveNotification(false), 3000)
               onUpdate({
                 previewImage: undefined,
                 previewImageRenderingHints: undefined,
