@@ -44,7 +44,7 @@
     "reactstrap": "^8.4.1"
   },
   "devDependencies": {
-    "@fisker/prettier-config": "^2.3.1",
+    "@fisker/prettier-config": "^3.0.0",
     "eslint-plugin-react": "^7.20.3",
     "prettier": "2.0.5",
     "react-router-dom": "^5.2.0",
