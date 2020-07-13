@@ -4,7 +4,8 @@ import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.DigitalObjectService;
+import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.CudamiDigitalObjectsClient;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -35,11 +36,11 @@ public class DigitalObjectsController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectsController.class);
 
-  DigitalObjectService service;
+  private CudamiDigitalObjectsClient client;
 
   @Autowired
-  public DigitalObjectsController(DigitalObjectService service) {
-    this.service = service;
+  public DigitalObjectsController(CudamiClient client) {
+    this.client = client.forDigitalObjects();
   }
 
   @ModelAttribute("menu")
@@ -86,7 +87,7 @@ public class DigitalObjectsController extends AbstractController {
               size = 25)
           Pageable pageable) {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
-    final PageResponse pageResponse = service.find(pageRequest);
+    final PageResponse pageResponse = client.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
     model.addAttribute("page", new PageWrapper(page, "/digitalobjects"));
     return "digitalobjects/list";
@@ -94,7 +95,7 @@ public class DigitalObjectsController extends AbstractController {
 
   @GetMapping("/digitalobjects/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) {
-    DigitalObject digitalObject = (DigitalObject) service.get(uuid);
+    DigitalObject digitalObject = (DigitalObject) client.findOne(uuid);
     model.addAttribute("availableLocales", digitalObject.getLabel().getLocales());
     model.addAttribute("digitalObject", digitalObject);
     return "digitalobjects/view";

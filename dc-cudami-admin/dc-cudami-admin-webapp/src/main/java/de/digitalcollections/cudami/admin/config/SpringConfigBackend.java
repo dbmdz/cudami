@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.admin.config;
 
+import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiCollectionsClient;
 import de.digitalcollections.cudami.client.CudamiCorporationsClient;
 import de.digitalcollections.cudami.client.CudamiProjectsClient;
@@ -11,7 +12,12 @@ import org.springframework.context.annotation.Configuration;
 public class SpringConfigBackend {
 
   @Value("${cudami.server.url}")
-  String serverUrl;
+  private String serverUrl;
+
+  @Bean
+  public CudamiClient cudamiClient() {
+    return new CudamiClient(serverUrl);
+  }
 
   @Bean
   public CudamiCollectionsClient cudamiCollectionsClient() {

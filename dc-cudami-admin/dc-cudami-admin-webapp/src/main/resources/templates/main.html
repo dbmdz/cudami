@@ -42,7 +42,7 @@
       </th:block>
 
       <th:block sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_CONTENT_MANAGER')">
-        <h3 th:text="#{objects}">Objects</h3>
+        <h3 th:text="#{presentation}">Presentation</h3>
 
         <div class="card-deck">
 
@@ -56,11 +56,42 @@
           </div>
 
           <div class="card">
+            <a class="btn" th:href="@{/collections}" th:title="#{collections}">
+              <div class="card-body">
+                <div class="icon"><i class="fas fa-list"></i></div>
+              </div>
+              <div class="card-footer" th:text="#{collections}">Collections</div>
+            </a>
+          </div>
+
+          <div class="card">
             <a class="btn" th:href="@{/topics}" th:title="#{topics}">
               <div class="card-body">
                 <div class="icon"><i class="fas fa-sitemap"></i></div>
               </div>
               <div class="card-footer" th:text="#{topics}">Topics</div>
+            </a>
+          </div>
+        </div>
+
+        <h3 th:text="#{production}">Production</h3>
+
+        <div class="card-deck">
+          <div class="card">
+            <a class="btn" th:href="@{/projects}" th:title="#{digitization_projects}">
+              <div class="card-body">
+                <div class="icon"><i class="fas fa-industry"></i></div>
+              </div>
+              <div class="card-footer"th:text="#{digitization_projects}">(Digitization-)Projects</div>
+            </a>
+          </div>
+          
+          <div class="card">
+            <a class="btn" th:href="@{/digitalobjects}" th:title="#{digital_objects}">
+              <div class="card-body">
+                <div class="icon"><i class="fas fa-cubes"></i></div>
+              </div>
+              <div class="card-footer" th:text="#{digital_objects}">Digital Objects</div>
             </a>
           </div>
 
@@ -72,7 +103,11 @@
               <div class="card-footer" th:text="#{articles}">Articles</div>
             </a>
           </div>
+        </div>
+        
+        <h3 th:text="#{objects}">Objects</h3>
 
+        <div class="card-deck">
           <div class="card">
             <a class="btn" th:href="@{/corporations}" th:title="#{corporations}">
               <div class="card-body">
@@ -81,36 +116,29 @@
               <div class="card-footer"th:text="#{corporations}">Corporations</div>
             </a>
           </div>
-
+          
           <div class="card">
-            <a class="btn" th:href="@{/projects}" th:title="#{digitization_projects}">
+            <a class="btn disabled" th:href="@{/persons}" th:title="#{persons}">
               <div class="card-body">
-                <div class="icon"><i class="fas fa-industry"></i></div>
+                <div class="icon"><i class="fas fa-users"></i></div>
               </div>
-              <div class="card-footer"th:text="#{digitization_projects}">(Digitization-)Projects</div>
+              <div class="card-footer"th:text="#{persons}">Persons</div>
+            </a>
+          </div>
+          
+          <div class="card">
+            <a class="btn disabled" th:href="@{/places}" th:title="#{places}">
+              <div class="card-body">
+                <div class="icon"><i class="fas fa-map-marker-alt"></i></div>
+              </div>
+              <div class="card-footer"th:text="#{places}">Places</div>
             </a>
           </div>
         </div>
 
+        <h3 th:text="#{resources}">Resources</h3>
+
         <div class="card-deck">
-          <div class="card">
-            <a class="btn" th:href="@{/collections}" th:title="#{collections}">
-              <div class="card-body">
-                <div class="icon"><i class="fas fa-list"></i></div>
-              </div>
-              <div class="card-footer" th:text="#{collections}">Collections</div>
-            </a>
-          </div>
-
-          <div class="card">
-            <a class="btn" th:href="@{/digitalobjects}" th:title="#{digital_objects}">
-              <div class="card-body">
-                <div class="icon"><i class="fas fa-cubes"></i></div>
-              </div>
-              <div class="card-footer" th:text="#{digital_objects}">Digital Objects</div>
-            </a>
-          </div>
-
           <div class="card">
             <a class="btn" th:href="@{/fileresources}" th:title="#{fileresources}">
               <div class="card-body">

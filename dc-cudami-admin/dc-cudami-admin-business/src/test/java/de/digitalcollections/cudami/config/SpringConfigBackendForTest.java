@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.config;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.IdentifierTypeRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.ArticleRepository;
-import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.TopicRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.WebsiteRepository;
@@ -38,12 +37,6 @@ public class SpringConfigBackendForTest {
   @Qualifier("topicRepositoryImpl")
   public TopicRepository topicRepositoryImpl() {
     return Mockito.mock(TopicRepository.class);
-  }
-
-  @Bean
-  @Qualifier("digitalObjectRepositoryImpl")
-  public DigitalObjectRepository digitalObjectRepositoryImpl() {
-    return Mockito.mock(DigitalObjectRepository.class);
   }
 
   @Bean

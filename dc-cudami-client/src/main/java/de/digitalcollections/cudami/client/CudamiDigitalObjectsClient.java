@@ -1,21 +1,58 @@
-package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.entity;
+package de.digitalcollections.cudami.client;
 
-import de.digitalcollections.cudami.admin.backend.impl.repository.RepositoryEndpoint;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.cudami.client.exceptions.CudamiRestErrorDecoder;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
+import de.digitalcollections.model.api.paging.FindParams;
+import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
+import de.digitalcollections.model.impl.paging.FindParamsImpl;
+import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import feign.Headers;
+import feign.Logger;
 import feign.Param;
+import feign.ReflectiveFeign;
 import feign.RequestLine;
+import feign.Retryer;
+import feign.jackson.JacksonDecoder;
+import feign.jackson.JacksonEncoder;
+import feign.slf4j.Slf4jLogger;
 import java.util.List;
 import java.util.UUID;
 
-public interface DigitalObjectRepositoryEndpoint extends RepositoryEndpoint {
+public interface CudamiDigitalObjectsClient {
+
+  public static CudamiDigitalObjectsClient build(String serverUrl) {
+    ObjectMapper mapper = new DigitalCollectionsObjectMapper();
+    CudamiDigitalObjectsClient backend =
+        ReflectiveFeign.builder()
+            .decoder(new JacksonDecoder(mapper))
+            .encoder(new JacksonEncoder(mapper))
+            .errorDecoder(new CudamiRestErrorDecoder())
+            .logger(new Slf4jLogger())
+            .logLevel(Logger.Level.BASIC)
+            .retryer(new Retryer.Default())
+            .target(CudamiDigitalObjectsClient.class, serverUrl);
+    return backend;
+  }
 
   @RequestLine("GET /latest/digitalobjects/count")
   long count();
+
+  default PageResponse<DigitalObject> find(PageRequest pageRequest) {
+    FindParams f = new FindParamsImpl(pageRequest);
+    PageResponse<DigitalObject> pageResponse =
+        find(
+            f.getPageNumber(),
+            f.getPageSize(),
+            f.getSortField(),
+            f.getSortDirection(),
+            f.getNullHandling());
+    return pageResponse;
+  }
 
   @RequestLine(
       "GET /latest/digitalobjects?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
