@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.admin.business.api.service.security;
 
+import de.digitalcollections.cudami.admin.business.api.service.exceptions.EntityServiceException;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.security.User;
@@ -17,28 +18,30 @@ public interface UserService<U extends User> extends UserDetailsService {
 
   long count();
 
-  U activate(UUID uuid);
+  U activate(UUID uuid) throws EntityServiceException;
 
   U create();
 
-  U create(U user, String password1, String password2, Errors results);
+  U create(U user, String password1, String password2, Errors results)
+      throws EntityServiceException;
 
   U createAdminUser();
 
-  U deactivate(UUID uuid);
+  U deactivate(UUID uuid) throws EntityServiceException;
 
-  boolean doesActiveAdminUserExist();
+  boolean doesActiveAdminUserExist() throws EntityServiceException;
 
-  PageResponse<U> find(PageRequest pageRequest);
+  PageResponse<U> find(PageRequest pageRequest) throws EntityServiceException;
 
   //  List<U> findActiveAdminUsers();
-  List<U> findAll();
+  List<U> findAll() throws EntityServiceException;
 
-  U findByEmail(String email);
+  U findByEmail(String email) throws EntityServiceException;
 
-  U findOne(UUID uuid);
+  U findOne(UUID uuid) throws EntityServiceException;
 
   //  U save(U user);
   //  U update(U user);
-  U update(U user, String password1, String password2, Errors results);
+  U update(U user, String password1, String password2, Errors results)
+      throws EntityServiceException;
 }

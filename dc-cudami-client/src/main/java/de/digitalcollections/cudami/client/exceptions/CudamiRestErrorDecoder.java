@@ -51,7 +51,7 @@ public class CudamiRestErrorDecoder implements ErrorDecoder {
   }
 
   private Exception genericHttpException(String methodKey, Response response) {
-    return new HttpException(methodKey, response);
+    return new HttpException(methodKey, response.status());
   }
 
   private HttpServerException serverException(String methodKey, Response response) {

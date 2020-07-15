@@ -4,11 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.CudamiRestErrorDecoder;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Corporation;
-import de.digitalcollections.model.api.paging.FindParams;
-import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.entity.CorporationImpl;
-import de.digitalcollections.model.impl.paging.FindParamsImpl;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import feign.Headers;
 import feign.Logger;
@@ -37,21 +33,21 @@ public interface CudamiCorporationsClient {
     return backend;
   }
 
-  default Corporation createCorporation() {
-    return new CorporationImpl();
-  }
-
-  default PageResponse findCorporations(PageRequest pageRequest) {
-    FindParams f = new FindParamsImpl(pageRequest);
-    PageResponse<Corporation> pageResponse =
-        findCorporations(
-            f.getPageNumber(),
-            f.getPageSize(),
-            f.getSortField(),
-            f.getSortDirection(),
-            f.getNullHandling());
-    return pageResponse;
-  }
+  //  default Corporation createCorporation() {
+  //    return new CorporationImpl();
+  //  }
+  //
+  //  default PageResponse findCorporations(PageRequest pageRequest) {
+  //    FindParams f = new FindParamsImpl(pageRequest);
+  //    PageResponse<Corporation> pageResponse =
+  //        findCorporations(
+  //            f.getPageNumber(),
+  //            f.getPageSize(),
+  //            f.getSortField(),
+  //            f.getSortDirection(),
+  //            f.getNullHandling());
+  //    return pageResponse;
+  //  }
 
   @RequestLine(
       "GET /latest/corporations?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")

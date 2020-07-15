@@ -4,11 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.CudamiRestErrorDecoder;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Project;
-import de.digitalcollections.model.api.paging.FindParams;
-import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.entity.ProjectImpl;
-import de.digitalcollections.model.impl.paging.FindParamsImpl;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import feign.Headers;
 import feign.Logger;
@@ -37,21 +33,21 @@ public interface CudamiProjectsClient {
     return backend;
   }
 
-  default Project createProject() {
-    return new ProjectImpl();
-  }
-
-  default PageResponse findProjects(PageRequest pageRequest) {
-    FindParams f = new FindParamsImpl(pageRequest);
-    PageResponse<Project> pageResponse =
-        findProjects(
-            f.getPageNumber(),
-            f.getPageSize(),
-            f.getSortField(),
-            f.getSortDirection(),
-            f.getNullHandling());
-    return pageResponse;
-  }
+  //  default Project createProject() {
+  //    return new ProjectImpl();
+  //  }
+  //
+  //  default PageResponse findProjects(PageRequest pageRequest) {
+  //    FindParams f = new FindParamsImpl(pageRequest);
+  //    PageResponse<Project> pageResponse =
+  //        findProjects(
+  //            f.getPageNumber(),
+  //            f.getPageSize(),
+  //            f.getSortField(),
+  //            f.getSortDirection(),
+  //            f.getNullHandling());
+  //    return pageResponse;
+  //  }
 
   @RequestLine(
       "GET /latest/projects?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
@@ -74,9 +70,9 @@ public interface CudamiProjectsClient {
   @Headers("Content-Type: application/json")
   Project saveProject(Project project);
 
-  default Project updateProject(Project project) {
-    return updateProject(project.getUuid(), project);
-  }
+  //  default Project updateProject(Project project) {
+  //    return updateProject(project.getUuid(), project);
+  //  }
 
   @RequestLine("PUT /latest/projects/{uuid}")
   @Headers("Content-Type: application/json")

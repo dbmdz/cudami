@@ -2,18 +2,19 @@ package de.digitalcollections.cudami.admin.business.impl.validator;
 
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import de.digitalcollections.model.api.security.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 /** Validates that username does not exist, yet. */
-@Component
 public class UniqueUsernameValidator implements Validator {
 
-  @Autowired UserService userService;
+  UserService userService;
+
+  public UniqueUsernameValidator(UserService userService) {
+    this.userService = userService;
+  }
 
   @Override
   public boolean supports(Class<?> clazz) {

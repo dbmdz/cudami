@@ -5,11 +5,8 @@ import de.digitalcollections.cudami.client.exceptions.CudamiRestErrorDecoder;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
-import de.digitalcollections.model.api.paging.FindParams;
-import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.impl.paging.FindParamsImpl;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import feign.Headers;
 import feign.Logger;
@@ -42,17 +39,21 @@ public interface CudamiDigitalObjectsClient {
   @RequestLine("GET /latest/digitalobjects/count")
   long count();
 
-  default PageResponse<DigitalObject> find(PageRequest pageRequest) {
-    FindParams f = new FindParamsImpl(pageRequest);
-    PageResponse<DigitalObject> pageResponse =
-        find(
-            f.getPageNumber(),
-            f.getPageSize(),
-            f.getSortField(),
-            f.getSortDirection(),
-            f.getNullHandling());
-    return pageResponse;
-  }
+  //  default DigitalObject create() {
+  //    return new DigitalObjectImpl();
+  //  }
+  //
+  //  default PageResponse<DigitalObject> find(PageRequest pageRequest) {
+  //    FindParams f = new FindParamsImpl(pageRequest);
+  //    PageResponse<DigitalObject> pageResponse =
+  //        find(
+  //            f.getPageNumber(),
+  //            f.getPageSize(),
+  //            f.getSortField(),
+  //            f.getSortDirection(),
+  //            f.getNullHandling());
+  //    return pageResponse;
+  //  }
 
   @RequestLine(
       "GET /latest/digitalobjects?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")

@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.controller;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
+import de.digitalcollections.cudami.admin.business.api.service.exceptions.EntityServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import de.digitalcollections.model.impl.security.UserImpl;
 import javax.validation.Valid;
@@ -53,7 +54,8 @@ public class SetupController extends AbstractController {
       BindingResult results,
       Model model,
       SessionStatus status,
-      RedirectAttributes redirectAttributes) {
+      RedirectAttributes redirectAttributes)
+      throws EntityServiceException {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "users/create";

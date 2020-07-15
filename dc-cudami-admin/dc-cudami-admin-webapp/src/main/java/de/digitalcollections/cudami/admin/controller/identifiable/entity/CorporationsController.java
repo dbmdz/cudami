@@ -1,8 +1,5 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
-import de.digitalcollections.commons.springdata.domain.PageConverter;
-import de.digitalcollections.commons.springdata.domain.PageWrapper;
-import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
@@ -10,8 +7,7 @@ import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiCorporationsClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Corporation;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.identifiable.entity.CorporationImpl;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -19,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -68,7 +63,7 @@ public class CorporationsController extends AbstractController {
   @GetMapping("/api/corporations/new")
   @ResponseBody
   public Corporation create() {
-    return cudamiCorporationsClient.createCorporation();
+    return new CorporationImpl();
   }
 
   @GetMapping("/corporations/{uuid}/edit")
@@ -98,10 +93,11 @@ public class CorporationsController extends AbstractController {
               sort = {"label"},
               size = 25)
           Pageable pageable) {
-    final PageRequest pageRequest = PageableConverter.convert(pageable);
-    final PageResponse pageResponse = cudamiCorporationsClient.findCorporations(pageRequest);
-    Page page = PageConverter.convert(pageResponse, pageRequest);
-    model.addAttribute("page", new PageWrapper(page, "/corporations"));
+    //    final PageRequest pageRequest = PageableConverter.convert(pageable);
+    // FIXME
+    //    final PageResponse pageResponse = cudamiCorporationsClient.findCorporations(pageRequest);
+    //    Page page = PageConverter.convert(pageResponse, pageRequest);
+    //    model.addAttribute("page", new PageWrapper(page, "/corporations"));
     return "corporations/list";
   }
 

@@ -1,16 +1,22 @@
 package de.digitalcollections.cudami.admin.business.impl.service.security;
 
-import de.digitalcollections.cudami.admin.backend.api.repository.security.UserRepository;
+import de.digitalcollections.cudami.admin.business.api.service.exceptions.EntityServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import de.digitalcollections.cudami.admin.business.impl.validator.PasswordsValidatorParams;
+import de.digitalcollections.cudami.admin.business.impl.validator.UniqueUsernameValidator;
+import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.CudamiUsersClient;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.security.User;
 import de.digitalcollections.model.api.security.enums.Role;
+import de.digitalcollections.model.impl.security.UserImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,25 +32,33 @@ import org.springframework.validation.Validator;
 /** Service for User handling. */
 @Service
 @Transactional(readOnly = true)
-public class UserServiceImpl implements UserService<User> {
+public class UserServiceImpl implements UserService<UserImpl>, InitializingBean {
 
-  @Autowired
-  @Qualifier("passwordsValidator")
+  private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+
   private Validator passwordsValidator;
 
-  @Autowired
-  @Qualifier("uniqueUsernameValidator")
   private Validator uniqueUsernameValidator;
 
-  @Autowired private UserRepository userRepository;
+  private CudamiUsersClient client;
+
+  public UserServiceImpl(
+      @Qualifier("passwordsValidator") Validator passwordsValidator, CudamiClient client) {
+    this.passwordsValidator = passwordsValidator;
+    this.client = client.forUsers();
+  }
 
   @Override
   @Transactional(readOnly = false)
-  public User activate(UUID uuid) {
-    User user = (User) userRepository.findOne(uuid);
-    user.setEnabled(true);
-    user = (User) userRepository.update(user);
-    return user;
+  public UserImpl activate(UUID uuid) throws EntityServiceException {
+    try {
+      User user = client.findOne(uuid);
+      user.setEnabled(true);
+      user = client.update(user.getUuid(), user);
+      return (UserImpl) user;
+    } catch (Exception ex) {
+      throw new EntityServiceException(ex.getMessage(), ex);
+    }
   }
 
   @Override
@@ -53,65 +67,94 @@ public class UserServiceImpl implements UserService<User> {
   }
 
   @Override
-  public User create() {
-    return (User) userRepository.create();
+  public UserImpl create() {
+    return (UserImpl) client.create();
   }
 
   @Override
   @Transactional(readOnly = false)
-  public User create(User user, String password1, String password2, Errors results) {
+  public UserImpl create(UserImpl user, String password1, String password2, Errors results)
+      throws EntityServiceException {
     uniqueUsernameValidator.validate(user, results);
     if (!results.hasErrors()) {
-      return save(password1, password2, user, results, false);
+      try {
+        return (UserImpl) save(password1, password2, user, results, false);
+      } catch (Exception ex) {
+        throw new EntityServiceException(ex.getMessage(), ex);
+      }
     }
     return null;
   }
 
   @Override
-  public User createAdminUser() {
+  public UserImpl createAdminUser() {
     User user = create();
     List<Role> roles = new ArrayList<>();
     roles.add(Role.ADMIN);
     user.setRoles(roles);
-    return user;
+    return (UserImpl) user;
   }
 
   @Override
   @Transactional(readOnly = false)
-  public User deactivate(UUID uuid) {
-    User user = (User) userRepository.findOne(uuid);
-    user.setEnabled(false);
-    user = (User) userRepository.update(user);
-    return user;
-  }
-
-  @Override
-  public boolean doesActiveAdminUserExist() {
-    List findActiveAdminUsers = userRepository.findActiveAdminUsers();
-    if (findActiveAdminUsers != null && !findActiveAdminUsers.isEmpty()) {
-      return true;
+  public UserImpl deactivate(UUID uuid) throws EntityServiceException {
+    try {
+      User user = client.findOne(uuid);
+      user.setEnabled(false);
+      user = client.update(user.getUuid(), user);
+      return (UserImpl) user;
+    } catch (Exception ex) {
+      throw new EntityServiceException(ex.getMessage(), ex);
     }
-    return false;
   }
 
   @Override
-  public PageResponse<User> find(PageRequest pageRequest) {
-    return userRepository.find(pageRequest);
+  public boolean doesActiveAdminUserExist() throws EntityServiceException {
+    try {
+      List<UserImpl> findActiveAdminUsers = client.findActiveAdminUsers();
+      if (findActiveAdminUsers != null && !findActiveAdminUsers.isEmpty()) {
+        return true;
+      }
+      return false;
+    } catch (Exception ex) {
+      throw new EntityServiceException(ex.getMessage(), ex);
+    }
   }
 
   @Override
-  public List<User> findAll() {
-    return userRepository.findAll();
+  public PageResponse<UserImpl> find(PageRequest pageRequest) throws EntityServiceException {
+    try {
+      return client.find(pageRequest);
+    } catch (Exception ex) {
+      throw new EntityServiceException(ex.getMessage(), ex);
+    }
   }
 
   @Override
-  public User findByEmail(String email) {
-    return userRepository.findByEmail(email);
+  public List<UserImpl> findAll() throws EntityServiceException {
+    try {
+      return client.findAll();
+    } catch (Exception ex) {
+      throw new EntityServiceException(ex.getMessage(), ex);
+    }
   }
 
   @Override
-  public User findOne(UUID uuid) {
-    return (User) userRepository.findOne(uuid);
+  public UserImpl findByEmail(String email) throws EntityServiceException {
+    try {
+      return (UserImpl) client.findOneByEmail(email);
+    } catch (Exception ex) {
+      throw new EntityServiceException(ex.getMessage(), ex);
+    }
+  }
+
+  @Override
+  public UserImpl findOne(UUID uuid) throws EntityServiceException {
+    try {
+      return (UserImpl) client.findOne(uuid);
+    } catch (Exception ex) {
+      throw new EntityServiceException(ex.getMessage(), ex);
+    }
   }
 
   /*
@@ -124,7 +167,13 @@ public class UserServiceImpl implements UserService<User> {
   @Override
   @Transactional(readOnly = true, noRollbackFor = UsernameNotFoundException.class)
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    User user = userRepository.findByEmail(username);
+    User user;
+    try {
+      user = client.findOneByEmail(username);
+    } catch (Exception ex) {
+      throw new UsernameNotFoundException(
+          String.format("User \"%s\" was not found.", username), ex);
+    }
     if (user == null || !user.isEnabled()) {
       throw new UsernameNotFoundException(String.format("User \"%s\" was not found.", username));
     }
@@ -142,13 +191,14 @@ public class UserServiceImpl implements UserService<User> {
   // TODO: Simplify user management
   @Override
   @Transactional(readOnly = false)
-  public User update(User user, String password1, String password2, Errors results) {
-    return save(password1, password2, user, results, true);
+  public UserImpl update(UserImpl user, String password1, String password2, Errors results)
+      throws EntityServiceException {
+    return (UserImpl) save(password1, password2, user, results, true);
   }
 
   // TODO: Simplify user management
-  private User save(
-      String password1, String password2, User user, Errors results, boolean isUpdate) {
+  private User save(String password1, String password2, User user, Errors results, boolean isUpdate)
+      throws EntityServiceException {
     final PasswordsValidatorParams passwordsValidatorParams =
         new PasswordsValidatorParams(password1, password2, user.getPasswordHash());
     String password = passwordsValidatorParams.getPassword1();
@@ -161,12 +211,21 @@ public class UserServiceImpl implements UserService<User> {
         String passwordHash = passwordEncoder.encode(password);
         user.setPasswordHash(passwordHash);
       }
-      if (isUpdate) {
-        user = (User) userRepository.update(user);
-      } else {
-        user = (User) userRepository.save(user);
+      try {
+        if (isUpdate) {
+          user = (User) client.update(user.getUuid(), user);
+        } else {
+          user = (User) client.save(user);
+        }
+      } catch (Exception ex) {
+        throw new EntityServiceException(ex.getMessage(), ex);
       }
     }
     return user;
+  }
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    this.uniqueUsernameValidator = new UniqueUsernameValidator(this);
   }
 }

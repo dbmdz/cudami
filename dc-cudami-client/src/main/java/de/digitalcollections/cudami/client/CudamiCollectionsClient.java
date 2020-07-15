@@ -4,12 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.CudamiRestErrorDecoder;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
-import de.digitalcollections.model.api.paging.FindParams;
-import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
-import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
-import de.digitalcollections.model.impl.paging.FindParamsImpl;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import feign.Headers;
 import feign.Logger;
@@ -38,33 +34,33 @@ public interface CudamiCollectionsClient {
     return backend;
   }
 
-  default Collection createCollection() {
-    return new CollectionImpl();
-  }
-
-  default PageResponse findTopCollections(PageRequest pageRequest) {
-    FindParams f = new FindParamsImpl(pageRequest);
-    PageResponse<Collection> pageResponse =
-        findTopCollections(
-            f.getPageNumber(),
-            f.getPageSize(),
-            f.getSortField(),
-            f.getSortDirection(),
-            f.getNullHandling());
-    return pageResponse;
-  }
-
-  default PageResponse findCollections(PageRequest pageRequest) {
-    FindParams f = new FindParamsImpl(pageRequest);
-    PageResponse<Collection> pageResponse =
-        findCollections(
-            f.getPageNumber(),
-            f.getPageSize(),
-            f.getSortField(),
-            f.getSortDirection(),
-            f.getNullHandling());
-    return pageResponse;
-  }
+  //  default Collection createCollection() {
+  //    return new CollectionImpl();
+  //  }
+  //
+  //  default PageResponse findTopCollections(PageRequest pageRequest) {
+  //    FindParams f = new FindParamsImpl(pageRequest);
+  //    PageResponse<Collection> pageResponse =
+  //        findTopCollections(
+  //            f.getPageNumber(),
+  //            f.getPageSize(),
+  //            f.getSortField(),
+  //            f.getSortDirection(),
+  //            f.getNullHandling());
+  //    return pageResponse;
+  //  }
+  //
+  //  default PageResponse findCollections(PageRequest pageRequest) {
+  //    FindParams f = new FindParamsImpl(pageRequest);
+  //    PageResponse<Collection> pageResponse =
+  //        findCollections(
+  //            f.getPageNumber(),
+  //            f.getPageSize(),
+  //            f.getSortField(),
+  //            f.getSortDirection(),
+  //            f.getNullHandling());
+  //    return pageResponse;
+  //  }
 
   @RequestLine(
       "GET /latest/collections?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
