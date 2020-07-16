@@ -1,5 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
+import de.digitalcollections.commons.springdata.domain.PageConverter;
+import de.digitalcollections.commons.springdata.domain.PageWrapper;
+import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
@@ -9,6 +12,8 @@ import de.digitalcollections.cudami.client.CudamiCollectionsClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
 import java.util.List;
@@ -18,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -76,9 +82,9 @@ public class CollectionsController extends AbstractController {
   }
 
   @GetMapping("/collections/{uuid}/edit")
-  public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
+  public String edit(@PathVariable UUID uuid, Model model) throws Exception {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Collection collection = service.getCollection(uuid);
+    Collection collection = service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, collection.getLabel().getLocales());
 
@@ -91,8 +97,8 @@ public class CollectionsController extends AbstractController {
 
   @GetMapping("/api/collections/{uuid}")
   @ResponseBody
-  public Collection get(@PathVariable UUID uuid) throws HttpException {
-    return service.getCollection(uuid);
+  public Collection get(@PathVariable UUID uuid) throws Exception {
+    return service.findOne(uuid);
   }
 
   @GetMapping("/collections")
@@ -101,12 +107,12 @@ public class CollectionsController extends AbstractController {
       @PageableDefault(
               sort = {"label"},
               size = 25)
-          Pageable pageable) {
-    //    final PageRequest pageRequest = PageableConverter.convert(pageable);
-    // FIXME
-    //    final PageResponse pageResponse = service.findTopCollections(pageRequest);
-    //    Page page = PageConverter.convert(pageResponse, pageRequest);
-    //    model.addAttribute("page", new PageWrapper(page, "/collections"));
+          Pageable pageable)
+      throws Exception {
+    final PageRequest pageRequest = PageableConverter.convert(pageable);
+    final PageResponse pageResponse = service.findTopCollections(pageRequest);
+    Page page = PageConverter.convert(pageResponse, pageRequest);
+    model.addAttribute("page", new PageWrapper(page, "/collections"));
     return "collections/list";
   }
 
@@ -119,9 +125,9 @@ public class CollectionsController extends AbstractController {
     try {
       Collection collectionDb = null;
       if ("collection".equals(parentType)) {
-        collectionDb = service.saveCollectionWithParentCollection(collection, parentUuid);
+        collectionDb = service.saveWithParentCollection(collection, parentUuid);
       } else {
-        collectionDb = service.saveCollection(collection);
+        collectionDb = service.save(collection);
       }
       return ResponseEntity.status(HttpStatus.CREATED).body(collectionDb);
     } catch (Exception e) {
@@ -134,7 +140,7 @@ public class CollectionsController extends AbstractController {
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Collection collection)
       throws IdentifiableServiceException {
     try {
-      Collection collectionDb = service.updateCollection(collection);
+      Collection collectionDb = service.update(uuid, collection);
       return ResponseEntity.ok(collectionDb);
     } catch (Exception e) {
       LOGGER.error("Cannot save collection with uuid={}", uuid, e);
@@ -143,9 +149,9 @@ public class CollectionsController extends AbstractController {
   }
 
   @GetMapping("/collections/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) throws HttpException {
+  public String view(@PathVariable UUID uuid, Model model) throws HttpException, Exception {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Collection collection = service.getCollection(uuid);
+    Collection collection = service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, collection.getLabel().getLocales());
 
