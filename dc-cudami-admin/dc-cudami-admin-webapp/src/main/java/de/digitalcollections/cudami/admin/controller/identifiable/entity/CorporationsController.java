@@ -1,5 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
+import de.digitalcollections.commons.springdata.domain.PageConverter;
+import de.digitalcollections.commons.springdata.domain.PageWrapper;
+import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
@@ -8,6 +11,8 @@ import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiCorporationsClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Corporation;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.CorporationImpl;
 import java.util.List;
 import java.util.Locale;
@@ -16,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -68,9 +74,9 @@ public class CorporationsController extends AbstractController {
   }
 
   @GetMapping("/corporations/{uuid}/edit")
-  public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
+  public String edit(@PathVariable UUID uuid, Model model) throws HttpException, Exception {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Corporation corporation = service.getCorporation(uuid);
+    Corporation corporation = service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, corporation.getLabel().getLocales());
 
@@ -83,8 +89,8 @@ public class CorporationsController extends AbstractController {
 
   @GetMapping("/api/corporations/{uuid}")
   @ResponseBody
-  public Corporation get(@PathVariable UUID uuid) throws HttpException {
-    return service.getCorporation(uuid);
+  public Corporation get(@PathVariable UUID uuid) throws HttpException, Exception {
+    return service.findOne(uuid);
   }
 
   @GetMapping("/corporations")
@@ -93,12 +99,12 @@ public class CorporationsController extends AbstractController {
       @PageableDefault(
               sort = {"label"},
               size = 25)
-          Pageable pageable) {
-    //    final PageRequest pageRequest = PageableConverter.convert(pageable);
-    // FIXME
-    //    final PageResponse pageResponse = service.findCorporations(pageRequest);
-    //    Page page = PageConverter.convert(pageResponse, pageRequest);
-    //    model.addAttribute("page", new PageWrapper(page, "/corporations"));
+          Pageable pageable)
+      throws Exception {
+    final PageRequest pageRequest = PageableConverter.convert(pageable);
+    final PageResponse pageResponse = service.find(pageRequest);
+    Page page = PageConverter.convert(pageResponse, pageRequest);
+    model.addAttribute("page", new PageWrapper(page, "/corporations"));
     return "corporations/list";
   }
 
@@ -106,7 +112,7 @@ public class CorporationsController extends AbstractController {
   public ResponseEntity save(@RequestBody Corporation corporation)
       throws IdentifiableServiceException {
     try {
-      Corporation corporationDb = service.saveCorporation(corporation);
+      Corporation corporationDb = service.save(corporation);
       return ResponseEntity.status(HttpStatus.CREATED).body(corporationDb);
     } catch (Exception e) {
       LOGGER.error("Cannot save corporation: ", e);
@@ -118,7 +124,7 @@ public class CorporationsController extends AbstractController {
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Corporation corporation)
       throws IdentifiableServiceException {
     try {
-      Corporation corporationDb = service.updateCorporation(corporation);
+      Corporation corporationDb = service.update(uuid, corporation);
       return ResponseEntity.ok(corporationDb);
     } catch (Exception e) {
       LOGGER.error("Cannot save corporation with uuid={}", uuid, e);
@@ -127,9 +133,9 @@ public class CorporationsController extends AbstractController {
   }
 
   @GetMapping("/corporations/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) throws HttpException {
+  public String view(@PathVariable UUID uuid, Model model) throws HttpException, Exception {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Corporation corporation = service.getCorporation(uuid);
+    Corporation corporation = service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, corporation.getLabel().getLocales());
 

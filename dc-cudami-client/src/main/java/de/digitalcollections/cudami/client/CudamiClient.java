@@ -19,8 +19,8 @@ public class CudamiClient {
   public CudamiClient(String cudamiServerUrl) {
     this.cudamiArticlesClient = new CudamiArticlesClient(cudamiServerUrl);
     this.cudamiCollectionsClient = new CudamiCollectionsClient(cudamiServerUrl);
-    this.cudamiCorporationsClient = CudamiCorporationsClient.build(cudamiServerUrl);
-    this.cudamiDigitalObjectsClient = CudamiDigitalObjectsClient.build(cudamiServerUrl);
+    this.cudamiCorporationsClient = new CudamiCorporationsClient(cudamiServerUrl);
+    this.cudamiDigitalObjectsClient = new CudamiDigitalObjectsClient(cudamiServerUrl);
     this.cudamiEntitiesClient = CudamiEntitiesClient.build(cudamiServerUrl);
     this.cudamiIdentifiablesClient = CudamiIdentifiablesClient.build(cudamiServerUrl);
     this.cudamiProjectsClient = CudamiProjectsClient.build(cudamiServerUrl);

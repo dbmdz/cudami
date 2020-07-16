@@ -1,108 +1,82 @@
 package de.digitalcollections.cudami.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.client.exceptions.CudamiRestErrorDecoder;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
+import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
-import feign.Headers;
-import feign.Logger;
-import feign.Param;
-import feign.ReflectiveFeign;
-import feign.RequestLine;
-import feign.Retryer;
-import feign.jackson.JacksonDecoder;
-import feign.jackson.JacksonEncoder;
-import feign.slf4j.Slf4jLogger;
+import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
+import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
+import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
+import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
 import java.util.List;
 import java.util.UUID;
 
-public interface CudamiDigitalObjectsClient {
+public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObjectImpl> {
 
-  public static CudamiDigitalObjectsClient build(String serverUrl) {
-    ObjectMapper mapper = new DigitalCollectionsObjectMapper();
-    CudamiDigitalObjectsClient backend =
-        ReflectiveFeign.builder()
-            .decoder(new JacksonDecoder(mapper))
-            .encoder(new JacksonEncoder(mapper))
-            .errorDecoder(new CudamiRestErrorDecoder())
-            .logger(new Slf4jLogger())
-            .logLevel(Logger.Level.BASIC)
-            .retryer(new Retryer.Default())
-            .target(CudamiDigitalObjectsClient.class, serverUrl);
-    return backend;
+  public CudamiDigitalObjectsClient(String serverUrl) {
+    super(serverUrl, DigitalObjectImpl.class);
   }
 
-  @RequestLine("GET /latest/digitalobjects/count")
-  long count();
+  public DigitalObject create() {
+    return new DigitalObjectImpl();
+  }
 
-  //  default DigitalObject create() {
-  //    return new DigitalObjectImpl();
-  //  }
-  //
-  //  default PageResponse<DigitalObject> find(PageRequest pageRequest) {
-  //    FindParams f = new FindParamsImpl(pageRequest);
-  //    PageResponse<DigitalObject> pageResponse =
-  //        find(
-  //            f.getPageNumber(),
-  //            f.getPageSize(),
-  //            f.getSortField(),
-  //            f.getSortDirection(),
-  //            f.getNullHandling());
-  //    return pageResponse;
-  //  }
+  public long count() throws Exception {
+    return Long.parseLong(doGetRequestForString("/latest/digitalobjects/count"));
+  }
 
-  @RequestLine(
-      "GET /latest/digitalobjects?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
-  PageResponse<DigitalObject> find(
-      @Param("pageNumber") int pageNumber,
-      @Param("pageSize") int pageSize,
-      @Param("sortField") String sortField,
-      @Param("sortDirection") String sortDirection,
-      @Param("nullHandling") String nullHandling);
+  public PageResponse<DigitalObjectImpl> find(PageRequest pageRequest) throws Exception {
+    return doGetRequestForPagedObjectList("/latest/digitalobjects", pageRequest);
+  }
 
-  @RequestLine("GET /latest/digitalobjects/search?searchTerm={searchTerm}&maxResults={maxResults}")
-  List<DigitalObject> find(
-      @Param("searchTerm") String searchTerm, @Param("maxResults") int maxResults);
+  public SearchPageResponse<DigitalObjectImpl> find(SearchPageRequest searchPageRequest)
+      throws Exception {
+    return doGetSearchRequestForPagedObjectList("/latest/digitalobjects/search", searchPageRequest);
+  }
 
-  @RequestLine(
-      "GET /latest/digitalobjects/search?searchTerm={searchTerm}&pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
-  SearchPageResponse<DigitalObject> find(
-      @Param("searchTerm") String searchTerm,
-      @Param("pageNumber") int pageNumber,
-      @Param("pageSize") int pageSize,
-      @Param("sortField") String sortField,
-      @Param("sortDirection") String sortDirection,
-      @Param("nullHandling") String nullHandling);
+  public List<DigitalObjectImpl> find(String searchTerm, int maxResults) throws Exception {
+    SearchPageRequest searchPageRequest =
+        new SearchPageRequestImpl(searchTerm, 0, maxResults, null);
+    SearchPageResponse<DigitalObjectImpl> response = find(searchPageRequest);
+    return response.getContent();
+  }
 
-  @RequestLine("GET /latest/digitalobjects/{uuid}")
-  DigitalObject findOne(@Param("uuid") UUID uuid);
+  public DigitalObject findOne(UUID uuid) throws Exception {
+    return doGetRequestForObject(String.format("/latest/digitalobjects/%s", uuid));
+  }
 
-  @RequestLine("GET /latest/digitalobjects/{uuid}?locale={locale}")
-  DigitalObject findOne(@Param("uuid") UUID uuid, @Param("locale") String locale);
+  public DigitalObject findOneByIdentifier(String namespace, String id) throws Exception {
+    return doGetRequestForObject(
+        String.format("/latest/digitalobjects/identifier/%s:%s.json", namespace, id));
+  }
 
-  @RequestLine("GET /latest/digitalobjects/identifier/{namespace}:{id}.json")
-  @Headers("Accept: application/json")
-  DigitalObject findOneByIdentifier(@Param("namespace") String namespace, @Param("id") String id);
+  public List<FileResource> getFileResources(UUID uuid) throws Exception {
+    return doGetRequestForObjectList(
+        String.format("/latest/digitalobjects/%s/fileresources", uuid), FileResourceImpl.class);
+  }
 
-  @RequestLine("GET /latest/digitalobjects/{uuid}/fileresources")
-  List<FileResource> getFileResources(@Param("uuid") UUID uuid);
+  public List<ImageFileResource> getImageFileResources(UUID uuid) throws Exception {
+    return doGetRequestForObjectList(
+        String.format("/latest/digitalobjects/%s/fileresources/images", uuid),
+        ImageFileResourceImpl.class);
+  }
 
-  // http://localhost:9000/latest/digitalobjects/8f543eca-da48-4d21-854a-0c0158110f9b/fileresources/images
-  @RequestLine("GET /latest/digitalobjects/{uuid}/fileresources/images")
-  List<ImageFileResource> getImageFileResources(@Param("uuid") UUID uuid);
+  public DigitalObject save(DigitalObject digitalObject) throws Exception {
+    return doPostRequestForObject("/latest/digitalobjects", (DigitalObjectImpl) digitalObject);
+  }
 
-  @RequestLine("POST /latest/digitalobjects")
-  @Headers("Content-Type: application/json")
-  DigitalObject save(DigitalObject digitalObject);
+  public List<FileResource> saveFileResources(UUID uuid, List fileResources) throws Exception {
+    return doPostRequestForObjectList(
+        String.format("/latest/digitalobjects/%s/fileresources", uuid),
+        fileResources,
+        FileResourceImpl.class);
+  }
 
-  @RequestLine("POST /latest/digitalobjects/{uuid}/fileresources")
-  List<FileResource> saveFileResources(@Param("uuid") UUID uuid, List<FileResource> fileResources);
-
-  @RequestLine("PUT /latest/digitalobjects/{uuid}")
-  @Headers("Content-Type: application/json")
-  DigitalObject update(@Param("uuid") UUID uuid, DigitalObject digitalObject);
+  public DigitalObject update(UUID uuid, DigitalObject digitalObject) throws Exception {
+    return doPutRequestForObject(
+        String.format("/latest/digitalobjects/%s", uuid), (DigitalObjectImpl) digitalObject);
+  }
 }

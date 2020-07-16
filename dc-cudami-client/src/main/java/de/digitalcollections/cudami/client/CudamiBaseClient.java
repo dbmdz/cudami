@@ -4,16 +4,22 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
+import de.digitalcollections.model.api.paging.FindParams;
 import de.digitalcollections.model.api.paging.Order;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
+import de.digitalcollections.model.impl.paging.FindParamsImpl;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Iterator;
 import java.util.List;
@@ -122,28 +128,17 @@ public class CudamiBaseClient<T extends Object> {
 
   protected PageResponse<T> doGetRequestForPagedObjectList(
       String requestUrl, PageRequest pageRequest) throws HttpException, Exception {
-    int pageNumber = pageRequest.getPageNumber();
-    int pageSize = pageRequest.getPageSize();
-
-    Sorting sorting = pageRequest.getSorting();
-    Iterator<Order> iterator = sorting.iterator();
-
-    String sortField = "";
-    String sortDirection = "";
-    String nullHandling = "";
-    //    while (iterator.hasNext()) {
-    if (iterator.hasNext()) {
-      Order order = iterator.next();
-      sortField = order.getProperty() == null ? "" : order.getProperty();
-      sortDirection = order.getDirection() == null ? "" : order.getDirection().name();
-      nullHandling = order.getNullHandling() == null ? "" : order.getNullHandling().name();
-    }
+    FindParams findParams = getFindParams(pageRequest);
     requestUrl =
         requestUrl
             + "?"
             + String.format(
                 "pageNumber=%d&pageSize=%d&sortField=%s&sortDirection=%s&nullHandling=%s",
-                pageNumber, pageSize, sortField, sortDirection, nullHandling);
+                findParams.getPageNumber(),
+                findParams.getPageSize(),
+                findParams.getSortField(),
+                findParams.getSortDirection(),
+                findParams.getNullHandling());
     HttpRequest req = createGetRequest(requestUrl);
     try {
       // This is the most performant approach for Jackson
@@ -152,6 +147,37 @@ public class CudamiBaseClient<T extends Object> {
         throw new HttpException("doGetRequestForPagedObjectList", resp.statusCode());
       }
       PageResponse<T> result = mapper.readerFor(PageResponse.class).readValue(resp.body());
+      return result;
+    } catch (IOException | InterruptedException e) {
+      throw new Exception("Failed to retrieve response due to connection error", e);
+    }
+  }
+
+  protected SearchPageResponse<T> doGetSearchRequestForPagedObjectList(
+      String requestUrl, SearchPageRequest searchPageRequest) throws HttpException, Exception {
+    FindParams findParams = getFindParams(searchPageRequest);
+    String searchTerm = searchPageRequest.getQuery();
+    requestUrl =
+        requestUrl
+            + "?"
+            + String.format(
+                "pageNumber=%d&pageSize=%d&sortField=%s&sortDirection=%s&nullHandling=%s&searchTerm=%s",
+                findParams.getPageNumber(),
+                findParams.getPageSize(),
+                findParams.getSortField(),
+                findParams.getSortDirection(),
+                findParams.getNullHandling(),
+                URLEncoder.encode(searchTerm, StandardCharsets.UTF_8));
+    HttpRequest req = createGetRequest(requestUrl);
+    try {
+      // This is the most performant approach for Jackson
+      HttpResponse<byte[]> resp = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
+      if (resp.statusCode() != 200) {
+        throw new HttpException("doGetRequestForPagedObjectList", resp.statusCode());
+      }
+      SearchPageResponse<T> result =
+          mapper.readerFor(SearchPageResponse.class).readValue(resp.body());
+      result.setQuery(searchTerm);
       return result;
     } catch (IOException | InterruptedException e) {
       throw new Exception("Failed to retrieve response due to connection error", e);
@@ -222,83 +248,30 @@ public class CudamiBaseClient<T extends Object> {
     }
   }
 
-  //  default PageResponse<I> find(PageRequest pageRequest) {
-  //    FindParams f = getFindParams(pageRequest);
-  //    PageResponse<I> pageResponse
-  //            = find(
-  //                    f.getPageNumber(),
-  //                    f.getPageSize(),
-  //                    f.getSortField(),
-  //                    f.getSortDirection(),
-  //                    f.getNullHandling());
-  //    return getGenericPageResponse(pageResponse);
-  //  }
-  //
-  //  default SearchPageResponse<I> find(SearchPageRequest searchPageRequest) {
-  //    FindParams f = getFindParams(searchPageRequest);
-  //    SearchPageResponse<I> pageResponse
-  //            = find(
-  //                    searchPageRequest.getQuery(),
-  //                    f.getPageNumber(),
-  //                    f.getPageSize(),
-  //                    f.getSortField(),
-  //                    f.getSortDirection(),
-  //                    f.getNullHandling());
-  //    SearchPageResponse<I> response = (SearchPageResponse<I>)
-  // getGenericPageResponse(pageResponse);
-  //    response.setQuery(searchPageRequest.getQuery());
-  //    return response;
-  //  }
-  //
-  //  /**
-  //   * Wrapper for find params
-  //   *
-  //   * @param pageRequest source for find params
-  //   * @return wrapped find params
-  //   */
-  //  default FindParams getFindParams(PageRequest pageRequest) {
-  //    int pageNumber = pageRequest.getPageNumber();
-  //    int pageSize = pageRequest.getPageSize();
-  //
-  //    Sorting sorting = pageRequest.getSorting();
-  //    Iterator<Order> iterator = sorting.iterator();
-  //
-  //    String sortField = "";
-  //    String sortDirection = "";
-  //    String nullHandling = "";
-  //
-  //    if (iterator.hasNext()) {
-  //      Order order = iterator.next();
-  //      sortField = order.getProperty() == null ? "" : order.getProperty();
-  //      sortDirection = order.getDirection() == null ? "" : order.getDirection().name();
-  //      nullHandling = order.getNullHandling() == null ? "" : order.getNullHandling().name();
-  //    }
-  //
-  //    return new FindParamsImpl(pageNumber, pageSize, sortField, sortDirection, nullHandling);
-  //  }
-  //
-  //  default PageResponse<I> getGenericPageResponse(PageResponse pageResponse) {
-  //    PageResponse<I> genericPageResponse;
-  //    if (pageResponse.hasContent()) {
-  //      List<I> content = pageResponse.getContent();
-  //      List<I> genericContent = content.stream().map(i -> (I) i).collect(Collectors.toList());
-  //      genericPageResponse = (PageResponse<I>) pageResponse;
-  //      genericPageResponse.setContent(genericContent);
-  //    } else {
-  //      genericPageResponse = (PageResponse<I>) pageResponse;
-  //    }
-  //    return genericPageResponse;
-  //  }
-  //
-  //  public SearchPageResponse<I> find(
-  //          String query,
-  //          int pageNumber,
-  //          int pageSize,
-  //          String sortField,
-  //          String sortDirection,
-  //          String nullHandling);
-  //
-  //  public PageResponse<I> find(
-  //          int pageNumber, int pageSize, String sortField, String sortDirection, String
-  // nullHandling);
+  /**
+   * Wrapper for find params
+   *
+   * @param pageRequest source for find params
+   * @return wrapped find params
+   */
+  private FindParams getFindParams(PageRequest pageRequest) {
+    int pageNumber = pageRequest.getPageNumber();
+    int pageSize = pageRequest.getPageSize();
+
+    Sorting sorting = pageRequest.getSorting();
+    Iterator<Order> iterator = sorting.iterator();
+
+    String sortField = "";
+    String sortDirection = "";
+    String nullHandling = "";
+
+    if (iterator.hasNext()) {
+      Order order = iterator.next();
+      sortField = order.getProperty() == null ? "" : order.getProperty();
+      sortDirection = order.getDirection() == null ? "" : order.getDirection().name();
+      nullHandling = order.getNullHandling() == null ? "" : order.getNullHandling().name();
+    }
+
+    return new FindParamsImpl(pageNumber, pageSize, sortField, sortDirection, nullHandling);
+  }
 }
