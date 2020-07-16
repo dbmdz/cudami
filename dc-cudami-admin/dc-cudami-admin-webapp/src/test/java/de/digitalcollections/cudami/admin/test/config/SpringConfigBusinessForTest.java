@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.admin.test.config;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.TopicService;
-import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.SubtopicService;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import org.mockito.Mockito;
@@ -23,12 +22,6 @@ public class SpringConfigBusinessForTest {
     //    User user = new User("admin", "secret", true, true, true, true, null);
     //    Mockito.when(userservice.loadUserByUsername(Mockito.anyString())).thenReturn(user);
     return userservice;
-  }
-
-  @Primary
-  @Bean
-  public SubtopicService subtopicService() {
-    return Mockito.mock(SubtopicService.class);
   }
 
   @Primary

@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.Id
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.TopicRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.EntityPartRepository;
-import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.SubtopicRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.FileResourceBinaryRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import org.mockito.Mockito;
@@ -16,12 +15,6 @@ import org.springframework.context.annotation.Configuration;
 /** Mock the backend. */
 @Configuration
 public class SpringConfigBackendForTest {
-
-  @Bean
-  @Qualifier("subtopicRepositoryImpl")
-  public SubtopicRepository subtopicRepositoryImpl() {
-    return Mockito.mock(SubtopicRepository.class);
-  }
 
   @Bean
   @Qualifier("topicRepositoryImpl")

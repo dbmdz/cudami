@@ -50,7 +50,7 @@ public class CudamiBaseClient<T extends Object> {
     return req;
   }
 
-  private HttpRequest createPostRequest(String requestUrl, T bodyObject)
+  private HttpRequest createPostRequest(String requestUrl, Object bodyObject)
       throws JsonProcessingException {
     HttpRequest req =
         HttpRequest.newBuilder()
@@ -180,6 +180,27 @@ public class CudamiBaseClient<T extends Object> {
         throw new HttpException("doPostRequestForObject", resp.statusCode());
       }
       T result = mapper.readerFor(targetType).readValue(resp.body());
+      return result;
+    } catch (IOException | InterruptedException e) {
+      throw new Exception("Failed to retrieve response due to connection error", e);
+    }
+  }
+
+  protected List<T> doPostRequestForObjectList(String requestUrl, List<T> list)
+      throws HttpException, Exception {
+    return (List<T>) doPostRequestForObjectList(requestUrl, (List<Class<?>>) list, targetType);
+  }
+
+  protected List<Class<?>> doPostRequestForObjectList(
+      String requestUrl, List<Class<?>> list, Class<?> targetType) throws HttpException, Exception {
+    HttpRequest req = createPostRequest(requestUrl, list);
+    try {
+      // This is the most performant approach for Jackson
+      HttpResponse<byte[]> resp = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
+      if (resp.statusCode() != 200) {
+        throw new HttpException("doPostRequestForObject", resp.statusCode());
+      }
+      List<Class<?>> result = mapper.readerForListOf(targetType).readValue(resp.body());
       return result;
     } catch (IOException | InterruptedException e) {
       throw new Exception("Failed to retrieve response due to connection error", e);

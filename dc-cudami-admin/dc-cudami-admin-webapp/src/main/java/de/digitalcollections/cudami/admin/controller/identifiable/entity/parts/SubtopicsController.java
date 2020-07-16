@@ -3,8 +3,9 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity.parts;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
-import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.SubtopicService;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
+import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.CudamiSubtopicsClient;
 import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.Topic;
@@ -39,16 +40,16 @@ public class SubtopicsController extends AbstractController {
 
   LanguageSortingHelper languageSortingHelper;
   LocaleRepository localeRepository;
-  SubtopicService service;
+  CudamiSubtopicsClient service;
 
   @Autowired
   public SubtopicsController(
       LanguageSortingHelper languageSortingHelper,
       LocaleRepository localeRepository,
-      SubtopicService service) {
+      CudamiClient cudamiClient) {
     this.languageSortingHelper = languageSortingHelper;
     this.localeRepository = localeRepository;
-    this.service = service;
+    this.service = cudamiClient.forSubtopics();
   }
 
   @ModelAttribute("menu")
@@ -74,9 +75,9 @@ public class SubtopicsController extends AbstractController {
   }
 
   @GetMapping("/subtopics/{uuid}/edit")
-  public String edit(@PathVariable UUID uuid, Model model) {
+  public String edit(@PathVariable UUID uuid, Model model) throws Exception {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Subtopic subtopic = (Subtopic) service.get(uuid);
+    Subtopic subtopic = (Subtopic) service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, subtopic.getLabel().getLocales());
 
@@ -89,8 +90,8 @@ public class SubtopicsController extends AbstractController {
 
   @GetMapping("/api/subtopics/{uuid}")
   @ResponseBody
-  public Subtopic get(@PathVariable UUID uuid) {
-    return (Subtopic) service.get(uuid);
+  public Subtopic get(@PathVariable UUID uuid) throws Exception {
+    return (Subtopic) service.findOne(uuid);
   }
 
   @PostMapping("/api/subtopics/new")
@@ -121,7 +122,7 @@ public class SubtopicsController extends AbstractController {
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Subtopic subtopic)
       throws IdentifiableServiceException {
     try {
-      Subtopic subtopicDb = (Subtopic) service.update(subtopic);
+      Subtopic subtopicDb = (Subtopic) service.update(uuid, subtopic);
       return ResponseEntity.ok(subtopicDb);
     } catch (Exception e) {
       LOGGER.error("Cannot save subtopic with uuid={}", uuid, e);
@@ -130,19 +131,19 @@ public class SubtopicsController extends AbstractController {
   }
 
   @GetMapping("/subtopics/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) {
+  public String view(@PathVariable UUID uuid, Model model) throws Exception {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Subtopic subtopic = (Subtopic) service.get(uuid);
+    Subtopic subtopic = (Subtopic) service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, subtopic.getLabel().getLocales());
 
     model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("subtopic", subtopic);
 
-    List<FileResource> relatedFileResources = service.getFileResources(subtopic);
+    List<FileResource> relatedFileResources = service.getFileResources(uuid);
     model.addAttribute("relatedFileResources", relatedFileResources);
 
-    List<Entity> relatedEntities = service.getEntities(subtopic);
+    List<Entity> relatedEntities = service.getEntities(uuid);
     model.addAttribute("relatedEntities", relatedEntities);
 
     BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
