@@ -4,6 +4,7 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
+import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiCollectionsClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.Node;
@@ -38,18 +39,18 @@ public class CollectionsController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionsController.class);
 
-  LanguageSortingHelper languageSortingHelper;
-  LocaleRepository localeRepository;
-  CudamiCollectionsClient cudamiCollectionsClient;
+  private final LanguageSortingHelper languageSortingHelper;
+  private final LocaleRepository localeRepository;
+  private final CudamiCollectionsClient service;
 
   @Autowired
   public CollectionsController(
       LanguageSortingHelper languageSortingHelper,
       LocaleRepository localeRepository,
-      CudamiCollectionsClient cudamiCollectionsClient) {
+      CudamiClient cudamiClient) {
     this.languageSortingHelper = languageSortingHelper;
     this.localeRepository = localeRepository;
-    this.cudamiCollectionsClient = cudamiCollectionsClient;
+    this.service = cudamiClient.forCollections();
   }
 
   @ModelAttribute("menu")
@@ -77,7 +78,7 @@ public class CollectionsController extends AbstractController {
   @GetMapping("/collections/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Collection collection = cudamiCollectionsClient.getCollection(uuid);
+    Collection collection = service.getCollection(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, collection.getLabel().getLocales());
 
@@ -91,7 +92,7 @@ public class CollectionsController extends AbstractController {
   @GetMapping("/api/collections/{uuid}")
   @ResponseBody
   public Collection get(@PathVariable UUID uuid) throws HttpException {
-    return cudamiCollectionsClient.getCollection(uuid);
+    return service.getCollection(uuid);
   }
 
   @GetMapping("/collections")
@@ -103,7 +104,7 @@ public class CollectionsController extends AbstractController {
           Pageable pageable) {
     //    final PageRequest pageRequest = PageableConverter.convert(pageable);
     // FIXME
-    //    final PageResponse pageResponse = cudamiCollectionsClient.findTopCollections(pageRequest);
+    //    final PageResponse pageResponse = service.findTopCollections(pageRequest);
     //    Page page = PageConverter.convert(pageResponse, pageRequest);
     //    model.addAttribute("page", new PageWrapper(page, "/collections"));
     return "collections/list";
@@ -118,10 +119,9 @@ public class CollectionsController extends AbstractController {
     try {
       Collection collectionDb = null;
       if ("collection".equals(parentType)) {
-        collectionDb =
-            cudamiCollectionsClient.saveCollectionWithParentCollection(collection, parentUuid);
+        collectionDb = service.saveCollectionWithParentCollection(collection, parentUuid);
       } else {
-        collectionDb = cudamiCollectionsClient.saveCollection(collection);
+        collectionDb = service.saveCollection(collection);
       }
       return ResponseEntity.status(HttpStatus.CREATED).body(collectionDb);
     } catch (Exception e) {
@@ -134,7 +134,7 @@ public class CollectionsController extends AbstractController {
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Collection collection)
       throws IdentifiableServiceException {
     try {
-      Collection collectionDb = cudamiCollectionsClient.updateCollection(collection);
+      Collection collectionDb = service.updateCollection(collection);
       return ResponseEntity.ok(collectionDb);
     } catch (Exception e) {
       LOGGER.error("Cannot save collection with uuid={}", uuid, e);
@@ -145,15 +145,14 @@ public class CollectionsController extends AbstractController {
   @GetMapping("/collections/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Collection collection = cudamiCollectionsClient.getCollection(uuid);
+    Collection collection = service.getCollection(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, collection.getLabel().getLocales());
 
     model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("collection", collection);
 
-    BreadcrumbNavigation breadcrumbNavigation =
-        cudamiCollectionsClient.getBreadcrumbNavigation(uuid);
+    BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
     List<Node> breadcrumbs = breadcrumbNavigation.getNavigationItems();
     model.addAttribute("breadcrumbs", breadcrumbs);
 

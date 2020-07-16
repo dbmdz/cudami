@@ -4,6 +4,7 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
+import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiProjectsClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Project;
@@ -35,18 +36,18 @@ public class ProjectsController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProjectsController.class);
 
-  LanguageSortingHelper languageSortingHelper;
-  LocaleRepository localeRepository;
-  CudamiProjectsClient cudamiProjectsClient;
+  private final LanguageSortingHelper languageSortingHelper;
+  private final LocaleRepository localeRepository;
+  private final CudamiProjectsClient service;
 
   @Autowired
   public ProjectsController(
       LanguageSortingHelper languageSortingHelper,
       LocaleRepository localeRepository,
-      CudamiProjectsClient cudamiProjectsClient) {
+      CudamiClient cudamiClient) {
     this.languageSortingHelper = languageSortingHelper;
     this.localeRepository = localeRepository;
-    this.cudamiProjectsClient = cudamiProjectsClient;
+    this.service = cudamiClient.forProjects();
   }
 
   @ModelAttribute("menu")
@@ -69,7 +70,7 @@ public class ProjectsController extends AbstractController {
   @GetMapping("/projects/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Project project = cudamiProjectsClient.getProject(uuid);
+    Project project = service.getProject(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, project.getLabel().getLocales());
 
@@ -83,7 +84,7 @@ public class ProjectsController extends AbstractController {
   @GetMapping("/api/projects/{uuid}")
   @ResponseBody
   public Project get(@PathVariable UUID uuid) throws HttpException {
-    return cudamiProjectsClient.getProject(uuid);
+    return service.getProject(uuid);
   }
 
   @GetMapping("/projects")
@@ -104,7 +105,7 @@ public class ProjectsController extends AbstractController {
   @PostMapping("/api/projects/new")
   public ResponseEntity save(@RequestBody Project project) throws IdentifiableServiceException {
     try {
-      Project projectDb = cudamiProjectsClient.saveProject(project);
+      Project projectDb = service.saveProject(project);
       return ResponseEntity.status(HttpStatus.CREATED).body(projectDb);
     } catch (Exception e) {
       LOGGER.error("Cannot save project: ", e);
@@ -129,7 +130,7 @@ public class ProjectsController extends AbstractController {
   @GetMapping("/projects/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Project project = cudamiProjectsClient.getProject(uuid);
+    Project project = service.getProject(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, project.getLabel().getLocales());
 

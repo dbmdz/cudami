@@ -11,6 +11,7 @@ public class CudamiClient {
   private final CudamiProjectsClient cudamiProjectsClient;
   private final CudamiSubtopicsClient cudamiSubtopicsClient;
   private final CudamiSystemClient cudamiSystemClient;
+  private final CudamiTopicsClient cudamiTopicsClient;
   private final CudamiUsersClient cudamiUsersClient;
   private final CudamiWebpagesClient cudamiWebpagesClient;
   private final CudamiWebsitesClient cudamiWebsitesClient;
@@ -25,6 +26,7 @@ public class CudamiClient {
     this.cudamiProjectsClient = CudamiProjectsClient.build(cudamiServerUrl);
     this.cudamiSubtopicsClient = new CudamiSubtopicsClient(cudamiServerUrl);
     this.cudamiSystemClient = CudamiSystemClient.build(cudamiServerUrl);
+    this.cudamiTopicsClient = new CudamiTopicsClient(cudamiServerUrl);
     this.cudamiUsersClient = new CudamiUsersClient(cudamiServerUrl);
     this.cudamiWebpagesClient = new CudamiWebpagesClient(cudamiServerUrl);
     this.cudamiWebsitesClient = new CudamiWebsitesClient(cudamiServerUrl);
@@ -64,6 +66,10 @@ public class CudamiClient {
 
   public CudamiSystemClient forSystem() {
     return cudamiSystemClient;
+  }
+
+  public CudamiTopicsClient forTopics() {
+    return cudamiTopicsClient;
   }
 
   public CudamiUsersClient forUsers() {

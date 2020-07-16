@@ -40,9 +40,9 @@ public class WebsitesController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsitesController.class);
 
-  LanguageSortingHelper languageSortingHelper;
-  LocaleRepository localeRepository;
-  CudamiWebsitesClient service;
+  private final LanguageSortingHelper languageSortingHelper;
+  private final LocaleRepository localeRepository;
+  private final CudamiWebsitesClient service;
 
   @Autowired
   public WebsitesController(

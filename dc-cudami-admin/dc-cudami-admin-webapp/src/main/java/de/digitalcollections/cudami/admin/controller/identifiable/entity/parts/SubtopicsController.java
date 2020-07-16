@@ -38,9 +38,9 @@ public class SubtopicsController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SubtopicsController.class);
 
-  LanguageSortingHelper languageSortingHelper;
-  LocaleRepository localeRepository;
-  CudamiSubtopicsClient service;
+  private final LanguageSortingHelper languageSortingHelper;
+  private final LocaleRepository localeRepository;
+  private final CudamiSubtopicsClient service;
 
   @Autowired
   public SubtopicsController(

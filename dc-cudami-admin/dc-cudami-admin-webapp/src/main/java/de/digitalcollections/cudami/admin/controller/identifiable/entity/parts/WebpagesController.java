@@ -37,9 +37,9 @@ public class WebpagesController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpagesController.class);
 
-  LanguageSortingHelper languageSortingHelper;
-  LocaleRepository localeRepository;
-  CudamiWebpagesClient service;
+  private final LanguageSortingHelper languageSortingHelper;
+  private final LocaleRepository localeRepository;
+  private final CudamiWebpagesClient service;
 
   @Autowired
   public WebpagesController(

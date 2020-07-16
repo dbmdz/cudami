@@ -6,8 +6,9 @@ import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
-import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.TopicService;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
+import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.CudamiTopicsClient;
 import de.digitalcollections.model.api.identifiable.entity.Topic;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -41,16 +42,16 @@ public class TopicsController extends AbstractController {
 
   LanguageSortingHelper languageSortingHelper;
   LocaleRepository localeRepository;
-  TopicService service;
+  CudamiTopicsClient service;
 
   @Autowired
   public TopicsController(
       LanguageSortingHelper languageSortingHelper,
       LocaleRepository localeRepository,
-      TopicService service) {
+      CudamiClient cudamiClient) {
     this.languageSortingHelper = languageSortingHelper;
     this.localeRepository = localeRepository;
-    this.service = service;
+    this.service = cudamiClient.forTopics();
   }
 
   @ModelAttribute("menu")
@@ -71,9 +72,9 @@ public class TopicsController extends AbstractController {
   }
 
   @GetMapping("/topics/{uuid}/edit")
-  public String edit(@PathVariable UUID uuid, Model model) {
+  public String edit(@PathVariable UUID uuid, Model model) throws Exception {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Topic topic = service.get(uuid);
+    Topic topic = service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, topic.getLabel().getLocales());
 
@@ -86,8 +87,8 @@ public class TopicsController extends AbstractController {
 
   @GetMapping("/api/topics/{uuid}")
   @ResponseBody
-  public Topic get(@PathVariable UUID uuid) {
-    return service.get(uuid);
+  public Topic get(@PathVariable UUID uuid) throws Exception {
+    return service.findOne(uuid);
   }
 
   @GetMapping("/topics")
@@ -96,7 +97,8 @@ public class TopicsController extends AbstractController {
       @PageableDefault(
               sort = {"lastModified"},
               size = 25)
-          Pageable pageable) {
+          Pageable pageable)
+      throws Exception {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
@@ -119,7 +121,7 @@ public class TopicsController extends AbstractController {
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Topic topic)
       throws IdentifiableServiceException {
     try {
-      Topic topicDb = service.update(topic);
+      Topic topicDb = service.update(uuid, topic);
       return ResponseEntity.ok(topicDb);
     } catch (Exception e) {
       LOGGER.error("Cannot save topic with uuid={}", uuid, e);
@@ -128,9 +130,9 @@ public class TopicsController extends AbstractController {
   }
 
   @GetMapping("/topics/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) {
+  public String view(@PathVariable UUID uuid, Model model) throws Exception {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Topic topic = (Topic) service.get(uuid);
+    Topic topic = (Topic) service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, topic.getLabel().getLocales());
 

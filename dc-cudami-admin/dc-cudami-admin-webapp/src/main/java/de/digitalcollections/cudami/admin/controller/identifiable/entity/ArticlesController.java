@@ -31,9 +31,9 @@ public class ArticlesController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticlesController.class);
 
-  LanguageSortingHelper languageSortingHelper;
-  LocaleRepository localeRepository;
-  CudamiArticlesClient client;
+  private final LanguageSortingHelper languageSortingHelper;
+  private final LocaleRepository localeRepository;
+  private final CudamiArticlesClient client;
 
   @Autowired
   public ArticlesController(

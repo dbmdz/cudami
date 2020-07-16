@@ -30,11 +30,11 @@ public class DigitalObjectsController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectsController.class);
 
-  private final CudamiDigitalObjectsClient client;
+  private final CudamiDigitalObjectsClient service;
 
   @Autowired
   public DigitalObjectsController(CudamiClient client) {
-    this.client = client.forDigitalObjects();
+    this.service = client.forDigitalObjects();
   }
 
   @ModelAttribute("menu")
@@ -90,7 +90,7 @@ public class DigitalObjectsController extends AbstractController {
 
   @GetMapping("/digitalobjects/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) {
-    DigitalObject digitalObject = (DigitalObject) client.findOne(uuid);
+    DigitalObject digitalObject = (DigitalObject) service.findOne(uuid);
     model.addAttribute("availableLocales", digitalObject.getLabel().getLocales());
     model.addAttribute("digitalObject", digitalObject);
     return "digitalobjects/view";
