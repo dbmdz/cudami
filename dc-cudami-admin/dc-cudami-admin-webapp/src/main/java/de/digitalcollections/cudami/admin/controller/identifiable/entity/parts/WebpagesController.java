@@ -3,8 +3,9 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity.parts;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
-import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.WebpageService;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
+import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.CudamiWebpagesClient;
 import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
@@ -38,16 +39,16 @@ public class WebpagesController extends AbstractController {
 
   LanguageSortingHelper languageSortingHelper;
   LocaleRepository localeRepository;
-  WebpageService service;
+  CudamiWebpagesClient service;
 
   @Autowired
   public WebpagesController(
       LanguageSortingHelper languageSortingHelper,
       LocaleRepository localeRepository,
-      WebpageService service) {
+      CudamiClient cudamiClient) {
     this.languageSortingHelper = languageSortingHelper;
     this.localeRepository = localeRepository;
-    this.service = service;
+    this.service = cudamiClient.forWebpages();
   }
 
   @ModelAttribute("menu")
@@ -73,9 +74,9 @@ public class WebpagesController extends AbstractController {
   }
 
   @GetMapping("/webpages/{uuid}/edit")
-  public String edit(@PathVariable UUID uuid, Model model) {
+  public String edit(@PathVariable UUID uuid, Model model) throws Exception {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Webpage webpage = (Webpage) service.get(uuid);
+    Webpage webpage = (Webpage) service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, webpage.getLabel().getLocales());
 
@@ -88,8 +89,8 @@ public class WebpagesController extends AbstractController {
 
   @GetMapping("/api/webpages/{uuid}")
   @ResponseBody
-  public Webpage get(@PathVariable UUID uuid) {
-    return (Webpage) service.get(uuid);
+  public Webpage get(@PathVariable UUID uuid) throws Exception {
+    return (Webpage) service.findOne(uuid);
   }
 
   @PostMapping("/api/webpages/new")
@@ -120,7 +121,7 @@ public class WebpagesController extends AbstractController {
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Webpage webpage)
       throws IdentifiableServiceException {
     try {
-      Webpage webpageDb = (Webpage) service.update(webpage);
+      Webpage webpageDb = (Webpage) service.update(uuid, webpage);
       return ResponseEntity.ok(webpageDb);
     } catch (Exception e) {
       LOGGER.error("Cannot save webpage with uuid={}", uuid, e);
@@ -129,16 +130,16 @@ public class WebpagesController extends AbstractController {
   }
 
   @GetMapping("/webpages/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) {
+  public String view(@PathVariable UUID uuid, Model model) throws Exception {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Webpage webpage = (Webpage) service.get(uuid);
+    Webpage webpage = (Webpage) service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, webpage.getLabel().getLocales());
 
     model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("webpage", webpage);
 
-    List<FileResource> relatedFileResources = service.getRelatedFileResources(webpage);
+    List<FileResource> relatedFileResources = service.getRelatedFileResources(uuid);
     model.addAttribute("relatedFileResources", relatedFileResources);
 
     BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);

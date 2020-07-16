@@ -4,7 +4,6 @@ import de.digitalcollections.cudami.admin.business.api.service.identifiable.Iden
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.TopicService;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.SubtopicService;
-import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.parts.WebpageService;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import org.mockito.Mockito;
@@ -54,11 +53,5 @@ public class SpringConfigBusinessForTest {
   @Bean
   public FileResourceMetadataService resourceService() {
     return Mockito.mock(FileResourceMetadataService.class);
-  }
-
-  @Primary
-  @Bean
-  public WebpageService webpageService() {
-    return Mockito.mock(WebpageService.class);
   }
 }

@@ -24,7 +24,7 @@ public class CudamiClient {
     this.cudamiProjectsClient = CudamiProjectsClient.build(cudamiServerUrl);
     this.cudamiSystemClient = CudamiSystemClient.build(cudamiServerUrl);
     this.cudamiUsersClient = new CudamiUsersClient(cudamiServerUrl);
-    this.cudamiWebpagesClient = CudamiWebpagesClient.build(cudamiServerUrl);
+    this.cudamiWebpagesClient = new CudamiWebpagesClient(cudamiServerUrl);
     this.cudamiWebsitesClient = new CudamiWebsitesClient(cudamiServerUrl);
   }
 

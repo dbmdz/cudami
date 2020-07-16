@@ -79,6 +79,11 @@ public class CudamiBaseClient<T extends Object> {
   }
 
   protected T doGetRequestForObject(String requestUrl) throws HttpException, Exception {
+    return (T) doGetRequestForObject(requestUrl, targetType);
+  }
+
+  protected Object doGetRequestForObject(String requestUrl, Class<?> targetType)
+      throws HttpException, Exception {
     HttpRequest req = createGetRequest(requestUrl);
     try {
       // This is the most performant approach for Jackson

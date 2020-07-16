@@ -6,7 +6,6 @@ import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.en
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.TopicRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.EntityPartRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.SubtopicRepository;
-import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.entity.parts.WebpageRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.FileResourceBinaryRepository;
 import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import org.mockito.Mockito;
@@ -62,11 +61,5 @@ public class SpringConfigBackendForTest {
   @Bean
   public FileResourceMetadataRepository fileResourceMetadataRepository() {
     return Mockito.mock(FileResourceMetadataRepository.class);
-  }
-
-  @Bean
-  @Qualifier("webpageRepositoryImpl")
-  public WebpageRepository webpageRepositoryImpl() {
-    return Mockito.mock(WebpageRepository.class);
   }
 }
