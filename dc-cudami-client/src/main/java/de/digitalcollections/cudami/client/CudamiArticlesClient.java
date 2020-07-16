@@ -2,9 +2,15 @@ package de.digitalcollections.cudami.client;
 
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Article;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.ArticleImpl;
+import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 
-public class CudamiArticlesClient extends CudamiBaseClient {
+public class CudamiArticlesClient extends CudamiBaseClient<ArticleImpl> {
 
   public CudamiArticlesClient(String serverUrl) {
     super(serverUrl, ArticleImpl.class);
@@ -18,38 +24,37 @@ public class CudamiArticlesClient extends CudamiBaseClient {
     return Long.parseLong(doGetRequestForString("/latest/articles/count"));
   }
 
-  //  @RequestLine(
-  //          "GET
-  // /latest/articles?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
-  //  PageResponse<Article> find(
-  //          @Param("pageNumber") int pageNumber,
-  //          @Param("pageSize") int pageSize,
-  //          @Param("sortField") String sortField,
-  //          @Param("sortDirection") String sortDirection,
-  //          @Param("nullHandling") String nullHandling);
-  //
-  //  @RequestLine("GET /latest/articles/{uuid}")
-  //  Article findOne(@Param("uuid") UUID uuid);
-  //
-  //  @RequestLine("GET /latest/articles/{uuid}?locale={locale}")
-  //  Article findOne(@Param("uuid") UUID uuid, @Param("locale") String locale);
-  //
-  //  @RequestLine("GET /latest/articles/identifier/{namespace}:{id}.json")
-  //  @Headers("Accept: application/json")
-  //  Article findOneByIdentifier(@Param("namespace") String namespace, @Param("id") String id);
-  //
-  //  @RequestLine("GET /latest/articles/{uuid}/children")
-  //  List<Article> getChildren(@Param("uuid") UUID uuid);
-  //
-  //  // TODO: move to EntityClient and extends ...
-  //  @RequestLine("GET /latest/entities/{uuid}/related/fileresources")
-  //  List<FileResource> getRelatedFileResources(@Param("uuid") UUID uuid);
-  //
-  //  @RequestLine("POST /latest/articles")
-  //  @Headers("Content-Type: application/json")
-  //  Article save(Article article);
-  //
-  //  @RequestLine("PUT /latest/articles/{uuid}")
-  //  @Headers("Content-Type: application/json")
-  //  Article update(@Param("uuid") UUID uuid, Article article);
+  public PageResponse<ArticleImpl> find(PageRequest pageRequest) throws Exception {
+    return doGetRequestForPagedObjectList("/latest/articles", pageRequest);
+  }
+
+  public Article findOne(UUID uuid) throws Exception {
+    return doGetRequestForObject(String.format("/latest/articles/%s", uuid));
+  }
+
+  public Article findOne(UUID uuid, Locale locale) throws Exception {
+    return findOne(uuid, locale.toString());
+  }
+
+  public Article findOne(UUID uuid, String locale) throws Exception {
+    return doGetRequestForObject(String.format("/latest/articles/%s?locale=%s", uuid, locale));
+  }
+
+  public Article findOneByIdentifier(String namespace, String id) throws Exception {
+    return doGetRequestForObject(
+        String.format("/latest/articles/identifier/%s:%s.json", namespace, id));
+  }
+
+  public List getRelatedFileResources(UUID uuid) throws Exception {
+    return doGetRequestForObjectList(
+        String.format("/latest/entities/%s/related/fileresources", uuid), FileResourceImpl.class);
+  }
+
+  public Article save(Article article) throws Exception {
+    return doPostRequestForObject("/latest/articles", (ArticleImpl) article);
+  }
+
+  public Article update(UUID uuid, Article article) throws Exception {
+    return doPutRequestForObject(String.format("/latest/articles/%s", uuid), (ArticleImpl) article);
+  }
 }
