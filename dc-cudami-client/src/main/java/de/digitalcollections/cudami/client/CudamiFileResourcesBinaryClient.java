@@ -1,39 +1,31 @@
-package de.digitalcollections.cudami.admin.backend.impl.repository.identifiable.resource;
+package de.digitalcollections.cudami.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.admin.backend.api.repository.identifiable.resource.FileResourceBinaryRepository;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.exceptions.ResourceIOException;
+import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepository {
+public class CudamiFileResourcesBinaryClient extends CudamiBaseClient<FileResourceImpl> {
 
-  private static final Logger LOGGER =
-      LoggerFactory.getLogger(FileResourceBinaryRepositoryImpl.class);
+  public CudamiFileResourcesBinaryClient(String serverUrl) {
+    super(serverUrl, FileResourceImpl.class);
+  }
 
-  @Value(value = "${cudami.server.address}")
-  private String cudamiServerAddress;
+  public FileResource create() {
+    return new FileResourceImpl();
+  }
 
-  @Autowired ObjectMapper objectMapper;
-
-  @Override
   public FileResource upload(InputStream inputStream, String filename, String contentType)
       throws ResourceIOException {
     try {
@@ -51,7 +43,6 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
     }
   }
 
-  @Override
   public FileResource upload(byte[] bytes, String filename, String contentType)
       throws ResourceIOException {
     try {
@@ -71,14 +62,14 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
 
   private FileResource doPost(HttpEntity entity)
       throws UnsupportedOperationException, IOException, ResourceIOException {
-    HttpPost post = new HttpPost(cudamiServerAddress + "/latest/files");
+    HttpPost post = new HttpPost(serverUri + "/latest/files");
     post.setEntity(entity);
     HttpClient client = HttpClientBuilder.create().build();
     HttpResponse response = client.execute(post);
 
-    if (response.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
+    if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
       FileResource fileResource =
-          objectMapper.readValue(response.getEntity().getContent(), FileResource.class);
+          mapper.readValue(response.getEntity().getContent(), FileResource.class);
       return fileResource;
     }
     throw new ResourceIOException("Error saving uploaded file data");

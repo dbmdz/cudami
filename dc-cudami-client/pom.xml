@@ -43,5 +43,13 @@
       <groupId>io.github.openfeign</groupId>
       <artifactId>feign-slf4j</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpmime</artifactId>
+    </dependency>
   </dependencies>
 </project>

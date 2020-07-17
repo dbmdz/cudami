@@ -1,7 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.resource;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.FileResourceBinaryService;
+import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.CudamiFileResourcesBinaryClient;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,11 +26,11 @@ public class FileResourcesBinaryController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FileResourcesBinaryController.class);
 
-  FileResourceBinaryService service;
+  CudamiFileResourcesBinaryClient service;
 
   @Autowired
-  public FileResourcesBinaryController(FileResourceBinaryService service) {
-    this.service = service;
+  public FileResourcesBinaryController(CudamiClient cudamiClient) {
+    this.service = cudamiClient.forFileResourcesBinary();
   }
 
   @ModelAttribute("menu")
