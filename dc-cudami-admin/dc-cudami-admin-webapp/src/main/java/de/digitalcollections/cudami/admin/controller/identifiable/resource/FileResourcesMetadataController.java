@@ -5,9 +5,9 @@ import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
-import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.CudamiFileResourcesMetadataClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.Order;
@@ -17,6 +17,7 @@ import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.paging.enums.Direction;
+import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
@@ -52,16 +53,14 @@ public class FileResourcesMetadataController extends AbstractController {
 
   private final LanguageSortingHelper languageSortingHelper;
   private final CudamiLocalesClient localeService;
-  private final FileResourceMetadataService service;
+  private final CudamiFileResourcesMetadataClient service;
 
   @Autowired
   public FileResourcesMetadataController(
-      LanguageSortingHelper languageSortingHelper,
-      CudamiClient cudamiClient,
-      FileResourceMetadataService service) {
+      LanguageSortingHelper languageSortingHelper, CudamiClient cudamiClient) {
     this.languageSortingHelper = languageSortingHelper;
     this.localeService = cudamiClient.forLocales();
-    this.service = service;
+    this.service = cudamiClient.forFileResourcesMetadata();
   }
 
   @ModelAttribute("menu")
@@ -82,9 +81,9 @@ public class FileResourcesMetadataController extends AbstractController {
   }
 
   @GetMapping("/fileresources/{uuid}/edit")
-  public String edit(@PathVariable UUID uuid, Model model) {
+  public String edit(@PathVariable UUID uuid, Model model) throws Exception {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    FileResource fileResource = service.get(uuid);
+    FileResource fileResource = service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, fileResource.getLabel().getLocales());
 
@@ -98,8 +97,8 @@ public class FileResourcesMetadataController extends AbstractController {
 
   @GetMapping("/api/fileresources/{uuid}")
   @ResponseBody
-  public FileResource get(@PathVariable UUID uuid) {
-    return service.get(uuid);
+  public FileResource get(@PathVariable UUID uuid) throws Exception {
+    return service.findOne(uuid);
   }
 
   @GetMapping("/fileresources")
@@ -108,7 +107,8 @@ public class FileResourcesMetadataController extends AbstractController {
       @PageableDefault(
               sort = {"label"},
               size = 25)
-          Pageable pageable) {
+          Pageable pageable)
+      throws Exception {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
@@ -130,14 +130,15 @@ public class FileResourcesMetadataController extends AbstractController {
 
   @GetMapping("/api/fileresources/images")
   @ResponseBody
-  public SearchPageResponse<FileResource> searchImages(
+  public SearchPageResponse<FileResourceImpl> searchImages(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortField", required = false, defaultValue = "lastModified")
           String sortField,
       @RequestParam(name = "sortDirection", required = false, defaultValue = "DESC")
           Direction sortDirection,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      throws Exception {
     Order order = new OrderImpl(sortDirection, sortField);
     Sorting sorting = new SortingImpl(order);
     SearchPageRequest pageRequest =
@@ -149,7 +150,7 @@ public class FileResourcesMetadataController extends AbstractController {
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody FileResource fileResource)
       throws IdentifiableServiceException {
     try {
-      FileResource fileResourceDb = service.update(fileResource);
+      FileResource fileResourceDb = service.update(uuid, fileResource);
       return ResponseEntity.ok(fileResourceDb);
     } catch (Exception e) {
       LOGGER.error("Cannot save fileresource with uuid={}", uuid, e);
@@ -158,9 +159,9 @@ public class FileResourcesMetadataController extends AbstractController {
   }
 
   @GetMapping(value = "/fileresources/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) {
+  public String view(@PathVariable UUID uuid, Model model) throws Exception {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    FileResource resource = service.get(uuid);
+    FileResource resource = service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, resource.getLabel().getLocales());
 

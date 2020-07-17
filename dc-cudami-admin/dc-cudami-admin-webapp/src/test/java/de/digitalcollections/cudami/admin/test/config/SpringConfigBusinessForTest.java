@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.admin.test.config;
 
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.entity.EntityService;
-import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
@@ -33,11 +32,5 @@ public class SpringConfigBusinessForTest {
   @Bean
   public IdentifiableService identifiableService() {
     return Mockito.mock(IdentifiableService.class);
-  }
-
-  @Primary
-  @Bean
-  public FileResourceMetadataService resourceService() {
-    return Mockito.mock(FileResourceMetadataService.class);
   }
 }
