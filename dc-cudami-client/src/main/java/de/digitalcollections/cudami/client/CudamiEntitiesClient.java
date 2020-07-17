@@ -1,163 +1,113 @@
 package de.digitalcollections.cudami.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.client.exceptions.CudamiRestErrorDecoder;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
-import feign.Headers;
-import feign.Logger;
-import feign.Param;
-import feign.ReflectiveFeign;
-import feign.RequestLine;
-import feign.Retryer;
-import feign.jackson.JacksonDecoder;
-import feign.jackson.JacksonEncoder;
-import feign.slf4j.Slf4jLogger;
+import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
+import de.digitalcollections.model.impl.identifiable.entity.EntityRelationImpl;
+import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
+import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
-public interface CudamiEntitiesClient {
+public class CudamiEntitiesClient extends CudamiBaseClient<EntityImpl> {
 
-  public static CudamiEntitiesClient build(String serverUrl) {
-    ObjectMapper mapper = new DigitalCollectionsObjectMapper();
-    CudamiEntitiesClient backend =
-        ReflectiveFeign.builder()
-            .decoder(new JacksonDecoder(mapper))
-            .encoder(new JacksonEncoder(mapper))
-            .errorDecoder(new CudamiRestErrorDecoder())
-            .logger(new Slf4jLogger())
-            .logLevel(Logger.Level.BASIC)
-            .retryer(new Retryer.Default())
-            .target(CudamiEntitiesClient.class, serverUrl);
-    return backend;
+  public CudamiEntitiesClient(String serverUrl) {
+    super(serverUrl, EntityImpl.class);
   }
 
-  //  default PageResponse<Entity> find(PageRequest pageRequest) {
-  //    FindParams f = new FindParamsImpl(pageRequest);
-  //    PageResponse<Entity> pageResponse =
-  //        find(
-  //            f.getPageNumber(),
-  //            f.getPageSize(),
-  //            f.getSortField(),
-  //            f.getSortDirection(),
-  //            f.getNullHandling());
-  //    return pageResponse;
-  //  }
-  //
-  //  default SearchPageResponse<Entity> find(SearchPageRequest searchPageRequest) {
-  //    FindParams f = getFindParams(searchPageRequest);
-  //    SearchPageResponse<Entity> pageResponse =
-  //        find(
-  //            searchPageRequest.getQuery(),
-  //            f.getPageNumber(),
-  //            f.getPageSize(),
-  //            f.getSortField(),
-  //            f.getSortDirection(),
-  //            f.getNullHandling());
-  //    SearchPageResponse<Entity> response =
-  //        (SearchPageResponse<Entity>) getGenericPageResponse(pageResponse);
-  //    response.setQuery(searchPageRequest.getQuery());
-  //    return response;
-  //  }
+  public Entity create() {
+    return new EntityImpl();
+  }
 
-  //  default void addRelatedFileresource(Entity entity, FileResource fileResource) {
-  //    addRelatedFileresource(entity.getUuid(), fileResource.getUuid());
-  //  }
-  //
-  //  default void addRelation(EntityRelation<Entity> relation) {
-  //    addRelation(
-  //        relation.getSubject().getUuid(), relation.getPredicate(),
-  // relation.getObject().getUuid());
-  //  }
-  //
-  //  default List<FileResource> getRelatedFileResources(Entity entity) {
-  //    return getRelatedFileResources(entity.getUuid());
-  //  }
-  //
-  //  default List<EntityRelation> getRelations(Entity subjectEntity) {
-  //    return getRelations(subjectEntity.getUuid());
-  //  }
-  //
-  //  default List<FileResource> saveRelatedFileResources(
-  //      Entity entity, List<FileResource> fileResources) {
-  //    return saveRelatedFileResources(entity.getUuid(), fileResources);
-  //  }
-  //
-  //  default Entity create() {
-  //    return new EntityImpl();
-  //  }
+  public long count() throws Exception {
+    return Long.parseLong(doGetRequestForString("/latest/entities/count"));
+  }
 
-  @RequestLine("GET /latest/entities/count")
-  long count();
+  public void addRelatedFileresource(UUID uuid, UUID fileResourceUuid) throws Exception {
+    doPostRequestForObject(
+        String.format("/latest/entities/%s/related/fileresources/%s", uuid, fileResourceUuid),
+        null);
+  }
 
-  @RequestLine("POST /latest/entities/{uuid}/related/fileresources/{fileResourceUuid}")
-  void addRelatedFileresource(
-      @Param("uuid") UUID uuid, @Param("fileResourceUuid") UUID fileResourceUuid);
+  public void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid)
+      throws Exception {
+    doPostRequestForObject(
+        String.format(
+            "/latest/entities/relations/%s/%s/%s", subjectEntityUuid, predicate, objectEntityUuid),
+        null);
+  }
 
-  @RequestLine("POST /latest/entities/relations/{subjectEntityUuid}/{predicate}/{objectEntityUuid}")
-  public void addRelation(
-      @Param("subjectEntityUuid") UUID subjectEntityUuid,
-      @Param("predicate") String predicate,
-      @Param("objectEntityUuid") UUID objectEntityUuid);
+  public PageResponse<EntityImpl> find(PageRequest pageRequest) throws Exception {
+    return doGetRequestForPagedObjectList("/latest/entities", pageRequest);
+  }
 
-  @RequestLine(
-      "GET /latest/entities?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
-  PageResponse<Entity> find(
-      @Param("pageNumber") int pageNumber,
-      @Param("pageSize") int pageSize,
-      @Param("sortField") String sortField,
-      @Param("sortDirection") String sortDirection,
-      @Param("nullHandling") String nullHandling);
+  public SearchPageResponse<EntityImpl> find(SearchPageRequest searchPageRequest) throws Exception {
+    return doGetSearchRequestForPagedObjectList("/latest/entities", searchPageRequest);
+  }
 
-  @RequestLine("GET /latest/entities?searchTerm={searchTerm}&maxResults={maxResults}")
-  List<Entity> find(@Param("searchTerm") String searchTerm, @Param("maxResults") int maxResults);
+  public List<EntityImpl> find(String searchTerm, int maxResults) throws Exception {
+    SearchPageRequest searchPageRequest =
+        new SearchPageRequestImpl(searchTerm, 0, maxResults, null);
+    SearchPageResponse<EntityImpl> response = find(searchPageRequest);
+    return response.getContent();
+  }
 
-  @RequestLine(
-      "GET /latest/entities?searchTerm={searchTerm}&pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
-  SearchPageResponse<Entity> find(
-      @Param("searchTerm") String searchTerm,
-      @Param("pageNumber") int pageNumber,
-      @Param("pageSize") int pageSize,
-      @Param("sortField") String sortField,
-      @Param("sortDirection") String sortDirection,
-      @Param("nullHandling") String nullHandling);
+  public Entity findOne(UUID uuid) throws Exception {
+    return doGetRequestForObject(String.format("/latest/entities/%s", uuid));
+  }
 
-  @RequestLine("GET /latest/entities/{uuid}")
-  Entity findOne(@Param("uuid") UUID uuid);
+  public Entity findOne(UUID uuid, Locale locale) throws Exception {
+    return findOne(uuid, locale.toString());
+  }
 
-  @RequestLine("GET /latest/entities/{uuid}?locale={locale}")
-  Entity findOne(@Param("uuid") UUID uuid, @Param("locale") String locale);
+  public Entity findOne(UUID uuid, String locale) throws Exception {
+    return doGetRequestForObject(String.format("/latest/entities/%s?locale=%s", uuid, locale));
+  }
 
-  @RequestLine("GET /latest/entities/identifier/{namespace}:{id}.json")
-  @Headers("Accept: application/json")
-  Entity findOneByIdentifier(@Param("namespace") String namespace, @Param("id") String id);
+  public Entity findOneByIdentifier(String namespace, String id) throws Exception {
+    return doGetRequestForObject(
+        String.format("/latest/entities/identifier/%s:%s.json", namespace, id));
+  }
 
-  @RequestLine("GET /latest/entities/{refId}")
-  @Headers("Accept: application/json")
-  Entity findOneByRefId(@Param("refId") long refId);
+  public Entity findOneByRefId(long refId) throws Exception {
+    return doGetRequestForObject(String.format("/latest/entities/%d", refId));
+  }
 
-  @RequestLine("GET /latest/entities/{uuid}/related/fileresources")
-  List<FileResource> getRelatedFileResources(@Param("uuid") UUID uuid);
+  public List getRelatedFileResources(UUID uuid) throws Exception {
+    return doGetRequestForObjectList(
+        String.format("/latest/entities/%s/related/fileresources", uuid), FileResourceImpl.class);
+  }
 
-  @RequestLine("GET /latest/entities/relations/{subjectEntityUuid}")
-  List<EntityRelation> getRelations(@Param("subjectEntityUuid") UUID subjectEntityUuid);
+  public List<EntityRelation> getRelations(UUID subjectEntityUuid) throws Exception {
+    return doGetRequestForObjectList(
+        String.format("/latest/entities/relations/%s", subjectEntityUuid),
+        EntityRelationImpl.class);
+  }
 
-  @RequestLine("POST /latest/entities")
-  @Headers("Content-Type: application/json")
-  Entity save(Entity entity);
+  public Entity save(Entity entity) throws Exception {
+    return doPostRequestForObject("/latest/entities", (EntityImpl) entity);
+  }
 
-  @RequestLine("POST /latest/entities/{uuid}/related/fileresources")
-  List<FileResource> saveRelatedFileResources(
-      @Param("uuid") UUID uuid, List<FileResource> fileResources);
+  public List<FileResource> saveRelatedFileResources(UUID uuid, List fileResources)
+      throws Exception {
+    return doPostRequestForObjectList(
+        String.format("/latest/entities/%s/related/fileresources", uuid),
+        fileResources,
+        FileResourceImpl.class);
+  }
 
-  @RequestLine("POST /latest/entities/relations")
-  List<EntityRelation> saveRelations(List<EntityRelation> relations);
+  public List<EntityRelation> saveRelations(List relations) throws Exception {
+    return doPostRequestForObjectList(
+        "/latest/entities/relations", relations, EntityRelationImpl.class);
+  }
 
-  @RequestLine("PUT /latest/entities/{uuid}")
-  @Headers("Content-Type: application/json")
-  Entity update(@Param("uuid") UUID uuid, Entity entity);
+  public Entity update(UUID uuid, Entity entity) throws Exception {
+    return doPutRequestForObject(String.format("/latest/entities/%s", uuid), (EntityImpl) entity);
+  }
 }

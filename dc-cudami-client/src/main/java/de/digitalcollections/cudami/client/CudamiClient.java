@@ -7,9 +7,11 @@ public class CudamiClient {
   private final CudamiCorporationsClient cudamiCorporationsClient;
   private final CudamiDigitalObjectsClient cudamiDigitalObjectsClient;
   private final CudamiEntitiesClient cudamiEntitiesClient;
+  private final CudamiEntityPartsClient cudamiEntityPartsClient;
   private final CudamiFileResourcesBinaryClient cudamiFileResourcesBinaryClient;
   private final CudamiFileResourcesMetadataClient cudamiFileResourcesMetadataClient;
   private final CudamiIdentifiablesClient cudamiIdentifiablesClient;
+  private final CudamiIdentifierTypesClient cudamiIdentifierTypesClient;
   private final CudamiLocalesClient cudamiLocalesClient;
   private final CudamiProjectsClient cudamiProjectsClient;
   private final CudamiSubtopicsClient cudamiSubtopicsClient;
@@ -23,10 +25,12 @@ public class CudamiClient {
     this.cudamiCollectionsClient = new CudamiCollectionsClient(cudamiServerUrl);
     this.cudamiCorporationsClient = new CudamiCorporationsClient(cudamiServerUrl);
     this.cudamiDigitalObjectsClient = new CudamiDigitalObjectsClient(cudamiServerUrl);
-    this.cudamiEntitiesClient = CudamiEntitiesClient.build(cudamiServerUrl);
+    this.cudamiEntitiesClient = new CudamiEntitiesClient(cudamiServerUrl);
+    this.cudamiEntityPartsClient = new CudamiEntityPartsClient(cudamiServerUrl);
     this.cudamiFileResourcesBinaryClient = new CudamiFileResourcesBinaryClient(cudamiServerUrl);
     this.cudamiFileResourcesMetadataClient = new CudamiFileResourcesMetadataClient(cudamiServerUrl);
-    this.cudamiIdentifiablesClient = CudamiIdentifiablesClient.build(cudamiServerUrl);
+    this.cudamiIdentifiablesClient = new CudamiIdentifiablesClient(cudamiServerUrl);
+    this.cudamiIdentifierTypesClient = new CudamiIdentifierTypesClient(cudamiServerUrl);
     this.cudamiLocalesClient = new CudamiLocalesClient(cudamiServerUrl);
     this.cudamiProjectsClient = new CudamiProjectsClient(cudamiServerUrl);
     this.cudamiSubtopicsClient = new CudamiSubtopicsClient(cudamiServerUrl);
@@ -56,6 +60,10 @@ public class CudamiClient {
     return cudamiEntitiesClient;
   }
 
+  public CudamiEntityPartsClient forEntityParts() {
+    return cudamiEntityPartsClient;
+  }
+
   public CudamiFileResourcesBinaryClient forFileResourcesBinary() {
     return cudamiFileResourcesBinaryClient;
   }
@@ -66,6 +74,10 @@ public class CudamiClient {
 
   public CudamiIdentifiablesClient forIdentifiables() {
     return cudamiIdentifiablesClient;
+  }
+
+  public CudamiIdentifierTypesClient forIdentifierTypes() {
+    return cudamiIdentifierTypesClient;
   }
 
   public CudamiLocalesClient forLocales() {

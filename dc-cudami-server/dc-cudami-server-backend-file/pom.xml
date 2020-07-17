@@ -8,7 +8,7 @@
     <version>3.5.0-SNAPSHOT</version>
   </parent>
 
-  <name>DigitalCollections: cudami Server (Backend IMPL File)</name>
+  <name>DigitalCollections: cudami Repository Server (Backend IMPL File)</name>
   <artifactId>dc-cudami-server-backend-file</artifactId>
   <packaging>jar</packaging>
 

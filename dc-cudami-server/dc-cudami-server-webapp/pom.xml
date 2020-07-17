@@ -9,7 +9,7 @@
     <version>3.5.0-SNAPSHOT</version>
   </parent>
 
-  <name>DigitalCollections: cudami Server (Webapp)</name>
+  <name>DigitalCollections: cudami Repository Server (Webapp)</name>
   <artifactId>dc-cudami-server-webapp</artifactId>
   <packaging>jar</packaging>
 
