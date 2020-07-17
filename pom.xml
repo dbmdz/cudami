@@ -78,7 +78,7 @@
     <version.assertj-core>3.16.1</version.assertj-core>
     <version.commons-beanutils>1.9.4</version.commons-beanutils>
     <version.commons-dbcp2>2.7.0</version.commons-dbcp2>
-    <version.commons-lang3>3.10</version.commons-lang3>
+    <version.commons-lang3>3.11</version.commons-lang3>
     <version.dc-model>6.2.0</version.dc-model>
     <version.feign>11.0</version.feign>
     <version.feign-form-spring>3.8.0</version.feign-form-spring>
