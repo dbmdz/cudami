@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import {Container, Label} from 'reactstrap'
+import {withTranslation} from 'react-i18next'
 
 import './IdentifiableForm.css'
 import ArticleForm from './ArticleForm'
@@ -20,7 +21,6 @@ import {
   saveIdentifiable,
   updateIdentifiable,
 } from '../api'
-import initI18n from '../i18n'
 import '../polyfills'
 import IframeAdderModal from './modals/IframeAdderModal'
 import ImageAdderModal from './modals/ImageAdderModal'
@@ -58,8 +58,7 @@ class IdentifiableForm extends Component {
   }
 
   async componentDidMount() {
-    const {apiContextPath, mockApi, type, uiLocale, uuid} = this.props
-    const i18n = initI18n(uiLocale)
+    const {apiContextPath, mockApi, t, type, uuid} = this.props
     const availableLanguages = await loadAvailableLanguages(
       apiContextPath,
       mockApi
@@ -84,7 +83,7 @@ class IdentifiableForm extends Component {
         .reduce((languages, language) => {
           if (!(language in identifiable.label)) {
             languages.push({
-              displayName: i18n.t(`languageNames:${language}`),
+              displayName: t(`languageNames:${language}`),
               name: language,
             })
           }
@@ -298,4 +297,4 @@ IdentifiableForm.defaultProps = {
   mockApi: false,
 }
 
-export default IdentifiableForm
+export default withTranslation()(IdentifiableForm)
