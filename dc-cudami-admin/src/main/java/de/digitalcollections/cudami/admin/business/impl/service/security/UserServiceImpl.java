@@ -24,14 +24,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-/** Service for User handling. */
+/**
+ * Service for User handling.
+ */
 @Service
-@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService<UserImpl>, InitializingBean {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
@@ -43,13 +43,12 @@ public class UserServiceImpl implements UserService<UserImpl>, InitializingBean 
   private CudamiUsersClient client;
 
   public UserServiceImpl(
-      @Qualifier("passwordsValidator") Validator passwordsValidator, CudamiClient client) {
+          @Qualifier("passwordsValidator") Validator passwordsValidator, CudamiClient client) {
     this.passwordsValidator = passwordsValidator;
     this.client = client.forUsers();
   }
 
   @Override
-  @Transactional(readOnly = false)
   public UserImpl activate(UUID uuid) throws EntityServiceException {
     try {
       User user = client.findOne(uuid);
@@ -72,9 +71,8 @@ public class UserServiceImpl implements UserService<UserImpl>, InitializingBean 
   }
 
   @Override
-  @Transactional(readOnly = false)
   public UserImpl create(UserImpl user, String password1, String password2, Errors results)
-      throws EntityServiceException {
+          throws EntityServiceException {
     uniqueUsernameValidator.validate(user, results);
     if (!results.hasErrors()) {
       try {
@@ -96,7 +94,6 @@ public class UserServiceImpl implements UserService<UserImpl>, InitializingBean 
   }
 
   @Override
-  @Transactional(readOnly = false)
   public UserImpl deactivate(UUID uuid) throws EntityServiceException {
     try {
       User user = client.findOne(uuid);
@@ -165,14 +162,13 @@ public class UserServiceImpl implements UserService<UserImpl>, InitializingBean 
    * @Transactional(rollbackFor=MyException.class, noRollbackFor=MyException2.class)
    */
   @Override
-  @Transactional(readOnly = true, noRollbackFor = UsernameNotFoundException.class)
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     User user;
     try {
       user = client.findOneByEmail(username);
     } catch (Exception ex) {
       throw new UsernameNotFoundException(
-          String.format("User \"%s\" was not found.", username), ex);
+              String.format("User \"%s\" was not found.", username), ex);
     }
     if (user == null || !user.isEnabled()) {
       throw new UsernameNotFoundException(String.format("User \"%s\" was not found.", username));
@@ -183,24 +179,23 @@ public class UserServiceImpl implements UserService<UserImpl>, InitializingBean 
   }
 
   private org.springframework.security.core.userdetails.User buildUserForAuthentication(
-      User user, List<? extends GrantedAuthority> authorities) {
+          User user, List<? extends GrantedAuthority> authorities) {
     return new org.springframework.security.core.userdetails.User(
-        user.getEmail(), user.getPasswordHash(), user.isEnabled(), true, true, true, authorities);
+            user.getEmail(), user.getPasswordHash(), user.isEnabled(), true, true, true, authorities);
   }
 
   // TODO: Simplify user management
   @Override
-  @Transactional(readOnly = false)
   public UserImpl update(UserImpl user, String password1, String password2, Errors results)
-      throws EntityServiceException {
+          throws EntityServiceException {
     return (UserImpl) save(password1, password2, user, results, true);
   }
 
   // TODO: Simplify user management
   private User save(String password1, String password2, User user, Errors results, boolean isUpdate)
-      throws EntityServiceException {
-    final PasswordsValidatorParams passwordsValidatorParams =
-        new PasswordsValidatorParams(password1, password2, user.getPasswordHash());
+          throws EntityServiceException {
+    final PasswordsValidatorParams passwordsValidatorParams
+            = new PasswordsValidatorParams(password1, password2, user.getPasswordHash());
     String password = passwordsValidatorParams.getPassword1();
     if (!StringUtils.isEmpty(password)) {
       passwordsValidator.validate(passwordsValidatorParams, results);
