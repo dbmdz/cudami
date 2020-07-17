@@ -1,10 +1,10 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.parts;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.CudamiWebpagesClient;
 import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Website;
@@ -38,16 +38,14 @@ public class WebpagesController extends AbstractController {
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpagesController.class);
 
   private final LanguageSortingHelper languageSortingHelper;
-  private final LocaleRepository localeRepository;
+  private final CudamiLocalesClient localeService;
   private final CudamiWebpagesClient service;
 
   @Autowired
   public WebpagesController(
-      LanguageSortingHelper languageSortingHelper,
-      LocaleRepository localeRepository,
-      CudamiClient cudamiClient) {
+      LanguageSortingHelper languageSortingHelper, CudamiClient cudamiClient) {
     this.languageSortingHelper = languageSortingHelper;
-    this.localeRepository = localeRepository;
+    this.localeService = cudamiClient.forLocales();
     this.service = cudamiClient.forWebpages();
   }
 
@@ -60,8 +58,9 @@ public class WebpagesController extends AbstractController {
   public String create(
       Model model,
       @RequestParam("parentType") String parentType,
-      @RequestParam("parentUuid") String parentUuid) {
-    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
+      @RequestParam("parentUuid") String parentUuid)
+      throws Exception {
+    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
     return "webpages/create";

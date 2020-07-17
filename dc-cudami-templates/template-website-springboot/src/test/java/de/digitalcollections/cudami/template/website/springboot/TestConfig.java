@@ -1,22 +1,43 @@
 package de.digitalcollections.cudami.template.website.springboot;
 
-import de.digitalcollections.cudami.template.website.springboot.repository.LocaleRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.cudami.client.CudamiLocalesClient;
+import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import java.util.Locale;
-import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 @Configuration
+@ComponentScan(
+    basePackages = {
+      "de.digitalcollections.cudami.template.website.springboot.controller",
+      "de.digitalcollections.cudami.template.website.springboot.business",
+      "de.digitalcollections.cudami.template.website.springboot.repository"
+    })
 public class TestConfig {
 
   @Bean
   @Primary
-  public LocaleRepository localeRepository() {
-    final LocaleRepository dummy = Mockito.mock(LocaleRepository.class);
-    Locale defaultLanguage = Locale.ENGLISH;
+  public ObjectMapper objectMapper() {
+    return new DigitalCollectionsObjectMapper();
+  }
 
-    Mockito.when(dummy.getDefault()).thenReturn(defaultLanguage);
-    return dummy;
+  @Bean
+  public CudamiLocalesClient cudamiLocalesClient() {
+    return new TestCudamiLocalesClient("http://localhost");
+  }
+
+  public class TestCudamiLocalesClient extends CudamiLocalesClient {
+
+    public TestCudamiLocalesClient(String serverUrl) {
+      super(serverUrl);
+    }
+
+    @Override
+    public Locale getDefaultLanguage() throws Exception {
+      return Locale.ENGLISH;
+    }
   }
 }

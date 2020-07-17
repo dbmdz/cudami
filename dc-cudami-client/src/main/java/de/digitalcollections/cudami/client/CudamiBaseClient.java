@@ -105,7 +105,7 @@ public class CudamiBaseClient<T extends Object> {
   }
 
   protected List<T> doGetRequestForObjectList(String requestUrl) throws HttpException, Exception {
-    return doGetRequestForObjectList(requestUrl, targetType);
+    return (List<T>) doGetRequestForObjectList(requestUrl, targetType);
   }
 
   protected List doGetRequestForObjectList(String requestUrl, Class<?> targetType)

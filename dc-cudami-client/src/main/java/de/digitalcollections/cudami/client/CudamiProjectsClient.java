@@ -1,80 +1,47 @@
 package de.digitalcollections.cudami.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.client.exceptions.CudamiRestErrorDecoder;
-import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Project;
+import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
-import feign.Headers;
-import feign.Logger;
-import feign.Param;
-import feign.ReflectiveFeign;
-import feign.RequestLine;
-import feign.Retryer;
-import feign.jackson.JacksonDecoder;
-import feign.jackson.JacksonEncoder;
-import feign.slf4j.Slf4jLogger;
+import de.digitalcollections.model.impl.identifiable.entity.ProjectImpl;
 import java.util.UUID;
 
-public interface CudamiProjectsClient {
+public class CudamiProjectsClient extends CudamiBaseClient<ProjectImpl> {
 
-  public static CudamiProjectsClient build(String serverUrl) {
-    ObjectMapper mapper = new DigitalCollectionsObjectMapper();
-    CudamiProjectsClient backend =
-        ReflectiveFeign.builder()
-            .decoder(new JacksonDecoder(mapper))
-            .encoder(new JacksonEncoder(mapper))
-            .errorDecoder(new CudamiRestErrorDecoder())
-            .logger(new Slf4jLogger())
-            .logLevel(Logger.Level.BASIC)
-            .retryer(new Retryer.Default())
-            .target(CudamiProjectsClient.class, serverUrl);
-    return backend;
+  public CudamiProjectsClient(String serverUrl) {
+    super(serverUrl, ProjectImpl.class);
   }
 
-  //  default Project createProject() {
-  //    return new ProjectImpl();
-  //  }
-  //
-  //  default PageResponse findProjects(PageRequest pageRequest) {
-  //    FindParams f = new FindParamsImpl(pageRequest);
-  //    PageResponse<Project> pageResponse =
-  //        findProjects(
-  //            f.getPageNumber(),
-  //            f.getPageSize(),
-  //            f.getSortField(),
-  //            f.getSortDirection(),
-  //            f.getNullHandling());
-  //    return pageResponse;
-  //  }
+  public Project create() {
+    return new ProjectImpl();
+  }
 
-  @RequestLine(
-      "GET /latest/projects?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
-  PageResponse<Project> findProjects(
-      @Param("pageNumber") int pageNumber,
-      @Param("pageSize") int pageSize,
-      @Param("sortField") String sortField,
-      @Param("sortDirection") String sortDirection,
-      @Param("nullHandling") String nullHandling);
+  public long count() throws Exception {
+    return Long.parseLong(doGetRequestForString("/latest/projects/count"));
+  }
 
-  @RequestLine("GET /latest/projects/{uuid}")
-  Project getProject(@Param("uuid") UUID uuid) throws HttpException;
+  public PageResponse<ProjectImpl> find(PageRequest pageRequest) throws Exception {
+    return doGetRequestForPagedObjectList("/latest/projects", pageRequest);
+  }
 
-  @RequestLine("POST /latest/projects/{parentProjectUuid}/project")
-  @Headers("Content-Type: application/json")
-  Project saveProjectWithParentProject(
-      Project project, @Param("parentProjectUuid") UUID parentProjectUuid);
+  public Project findOne(UUID uuid) throws Exception {
+    return doGetRequestForObject(String.format("/latest/projects/%s", uuid));
+  }
 
-  @RequestLine("POST /latest/projects")
-  @Headers("Content-Type: application/json")
-  Project saveProject(Project project);
+  public Project findOne(UUID uuid, String locale) throws Exception {
+    return doGetRequestForObject(String.format("/latest/projects/%s?locale=%s", uuid, locale));
+  }
 
-  //  default Project updateProject(Project project) {
-  //    return updateProject(project.getUuid(), project);
-  //  }
+  public Project findOneByIdentifier(String namespace, String id) throws Exception {
+    return doGetRequestForObject(
+        String.format("/latest/projects/identifier/%s:%s.json", namespace, id));
+  }
 
-  @RequestLine("PUT /latest/projects/{uuid}")
-  @Headers("Content-Type: application/json")
-  Project updateProject(@Param("uuid") UUID uuid, Project project);
+  public Project save(Project project) throws Exception {
+    return doPostRequestForObject("/latest/projects", (ProjectImpl) project);
+  }
+
+  public Project update(UUID uuid, Project project) throws Exception {
+    return doPutRequestForObject(String.format("/latest/projects/%s", uuid), (ProjectImpl) project);
+  }
 }

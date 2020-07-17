@@ -4,10 +4,11 @@ import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
+import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.Order;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -49,17 +50,17 @@ public class FileResourcesMetadataController extends AbstractController {
   private static final Logger LOGGER =
       LoggerFactory.getLogger(FileResourcesMetadataController.class);
 
-  LanguageSortingHelper languageSortingHelper;
-  LocaleRepository localeRepository;
-  FileResourceMetadataService service;
+  private final LanguageSortingHelper languageSortingHelper;
+  private final CudamiLocalesClient localeService;
+  private final FileResourceMetadataService service;
 
   @Autowired
   public FileResourcesMetadataController(
       LanguageSortingHelper languageSortingHelper,
-      LocaleRepository localeRepository,
+      CudamiClient cudamiClient,
       FileResourceMetadataService service) {
     this.languageSortingHelper = languageSortingHelper;
-    this.localeRepository = localeRepository;
+    this.localeService = cudamiClient.forLocales();
     this.service = service;
   }
 
@@ -69,8 +70,8 @@ public class FileResourcesMetadataController extends AbstractController {
   }
 
   @GetMapping(value = "/fileresources/new")
-  public String create(Model model) {
-    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
+  public String create(Model model) throws Exception {
+    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     return "fileresources/create";
   }
 

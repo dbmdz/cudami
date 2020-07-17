@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import javax.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -43,10 +42,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class UserController extends AbstractController {
 
   private final MessageSource messageSource;
+  private final UserService service;
 
-  UserService service;
-
-  @Autowired
   public UserController(MessageSource messageSource, UserService service) {
     this.messageSource = messageSource;
     this.service = service;

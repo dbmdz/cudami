@@ -4,11 +4,11 @@ import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiArticlesClient;
 import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.model.api.identifiable.entity.Article;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -42,17 +42,14 @@ public class ArticlesController extends AbstractController {
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticlesController.class);
 
   private final LanguageSortingHelper languageSortingHelper;
-  private final LocaleRepository localeRepository;
-  private final CudamiArticlesClient client;
+  private final CudamiLocalesClient localeService;
+  private final CudamiArticlesClient service;
 
   @Autowired
-  public ArticlesController(
-      LanguageSortingHelper languageSortingHelper,
-      LocaleRepository localeRepository,
-      CudamiClient client) {
+  public ArticlesController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
     this.languageSortingHelper = languageSortingHelper;
-    this.localeRepository = localeRepository;
-    this.client = client.forArticles();
+    this.localeService = client.forLocales();
+    this.service = client.forArticles();
   }
 
   @ModelAttribute("menu")
@@ -61,21 +58,21 @@ public class ArticlesController extends AbstractController {
   }
 
   @GetMapping("/articles/new")
-  public String create(Model model) {
-    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
+  public String create(Model model) throws Exception {
+    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     return "articles/create";
   }
 
   @GetMapping("/api/articles/new")
   @ResponseBody
   public Article create() {
-    return client.create();
+    return service.create();
   }
 
   @GetMapping("/articles/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) throws Exception {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Article article = client.findOne(uuid);
+    Article article = service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, article.getLabel().getLocales());
 
@@ -89,7 +86,7 @@ public class ArticlesController extends AbstractController {
   @GetMapping("/api/articles/{uuid}")
   @ResponseBody
   public Article get(@PathVariable UUID uuid) throws Exception {
-    return client.findOne(uuid);
+    return service.findOne(uuid);
   }
 
   @GetMapping("/articles")
@@ -101,7 +98,7 @@ public class ArticlesController extends AbstractController {
           Pageable pageable)
       throws Exception {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
-    final PageResponse pageResponse = client.find(pageRequest);
+    final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
     model.addAttribute("page", new PageWrapper(page, "/articles"));
     return "articles/list";
@@ -110,7 +107,7 @@ public class ArticlesController extends AbstractController {
   @PostMapping("/api/articles/new")
   public ResponseEntity save(@RequestBody Article article) throws IdentifiableServiceException {
     try {
-      Article articleDb = client.save(article);
+      Article articleDb = service.save(article);
       return ResponseEntity.status(HttpStatus.CREATED).body(articleDb);
     } catch (Exception e) {
       LOGGER.error("Cannot save article: ", e);
@@ -122,7 +119,7 @@ public class ArticlesController extends AbstractController {
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Article article)
       throws IdentifiableServiceException {
     try {
-      Article articleDb = client.update(uuid, article);
+      Article articleDb = service.update(uuid, article);
       return ResponseEntity.ok(articleDb);
     } catch (Exception e) {
       LOGGER.error("Cannot save article with uuid={}", uuid, e);
@@ -133,14 +130,14 @@ public class ArticlesController extends AbstractController {
   @GetMapping("/articles/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) throws Exception {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Article article = (Article) client.findOne(uuid);
+    Article article = (Article) service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, article.getLabel().getLocales());
 
     model.addAttribute("article", article);
     model.addAttribute("existingLanguages", existingLanguages);
 
-    List<FileResource> relatedFileResources = client.getRelatedFileResources(article.getUuid());
+    List<FileResource> relatedFileResources = service.getRelatedFileResources(article.getUuid());
     model.addAttribute("relatedFileResources", relatedFileResources);
     return "articles/view";
   }

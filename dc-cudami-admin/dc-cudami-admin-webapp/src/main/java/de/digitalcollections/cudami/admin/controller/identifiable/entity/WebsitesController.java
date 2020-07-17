@@ -4,10 +4,10 @@ import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.CudamiWebsitesClient;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -41,16 +41,14 @@ public class WebsitesController extends AbstractController {
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsitesController.class);
 
   private final LanguageSortingHelper languageSortingHelper;
-  private final LocaleRepository localeRepository;
+  private final CudamiLocalesClient localeService;
   private final CudamiWebsitesClient service;
 
   @Autowired
   public WebsitesController(
-      LanguageSortingHelper languageSortingHelper,
-      LocaleRepository localeRepository,
-      CudamiClient cudamiClient) {
+      LanguageSortingHelper languageSortingHelper, CudamiClient cudamiClient) {
     this.languageSortingHelper = languageSortingHelper;
-    this.localeRepository = localeRepository;
+    this.localeService = cudamiClient.forLocales();
     this.service = cudamiClient.forWebsites();
   }
 
@@ -60,8 +58,8 @@ public class WebsitesController extends AbstractController {
   }
 
   @GetMapping("/websites/new")
-  public String create(Model model) {
-    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
+  public String create(Model model) throws Exception {
+    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     return "websites/create";
   }
 

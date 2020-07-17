@@ -67,7 +67,7 @@ public class CudamiSubtopicsClient extends CudamiBaseClient<SubtopicImpl> {
         String.format("/latest/subtopics/%s/children", uuid), pageRequest);
   }
 
-  public List<Entity> getEntities(UUID uuid) throws Exception {
+  public List getEntities(UUID uuid) throws Exception {
     return doGetRequestForObjectList(
         String.format("/latest/subtopics/%s/entities", uuid), EntityImpl.class);
   }

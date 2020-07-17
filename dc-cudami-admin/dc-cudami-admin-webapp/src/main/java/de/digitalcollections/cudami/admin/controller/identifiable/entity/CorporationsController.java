@@ -4,11 +4,11 @@ import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiCorporationsClient;
+import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Corporation;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -43,16 +43,14 @@ public class CorporationsController extends AbstractController {
   private static final Logger LOGGER = LoggerFactory.getLogger(CorporationsController.class);
 
   private final LanguageSortingHelper languageSortingHelper;
-  private final LocaleRepository localeRepository;
+  private final CudamiLocalesClient localeService;
   private final CudamiCorporationsClient service;
 
   @Autowired
   public CorporationsController(
-      LanguageSortingHelper languageSortingHelper,
-      LocaleRepository localeRepository,
-      CudamiClient cudamiClient) {
+      LanguageSortingHelper languageSortingHelper, CudamiClient cudamiClient) {
     this.languageSortingHelper = languageSortingHelper;
-    this.localeRepository = localeRepository;
+    this.localeService = cudamiClient.forLocales();
     this.service = cudamiClient.forCorporations();
   }
 
@@ -62,8 +60,8 @@ public class CorporationsController extends AbstractController {
   }
 
   @GetMapping("/corporations/new")
-  public String create(Model model) {
-    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
+  public String create(Model model) throws Exception {
+    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     return "corporations/create";
   }
 

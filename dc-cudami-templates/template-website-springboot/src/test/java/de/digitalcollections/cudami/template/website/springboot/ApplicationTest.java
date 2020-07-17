@@ -2,6 +2,8 @@ package de.digitalcollections.cudami.template.website.springboot;
 
 import static org.assertj.core.api.BDDAssertions.then;
 
+import de.digitalcollections.cudami.template.website.springboot.config.SpringConfigWeb;
+import de.digitalcollections.cudami.template.website.springboot.test.TestApplication;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +20,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 /** Basic integration tests for service application. */
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
-    classes = {Application.class, TestConfig.class},
+    classes = {TestApplication.class, TestConfig.class, SpringConfigWeb.class},
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {"management.server.port=0"})
 public class ApplicationTest {

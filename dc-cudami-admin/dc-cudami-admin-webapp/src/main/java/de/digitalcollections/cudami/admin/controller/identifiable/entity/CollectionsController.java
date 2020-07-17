@@ -4,11 +4,11 @@ import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiCollectionsClient;
+import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
@@ -46,16 +46,14 @@ public class CollectionsController extends AbstractController {
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionsController.class);
 
   private final LanguageSortingHelper languageSortingHelper;
-  private final LocaleRepository localeRepository;
+  private final CudamiLocalesClient localeService;
   private final CudamiCollectionsClient service;
 
   @Autowired
   public CollectionsController(
-      LanguageSortingHelper languageSortingHelper,
-      LocaleRepository localeRepository,
-      CudamiClient cudamiClient) {
+      LanguageSortingHelper languageSortingHelper, CudamiClient cudamiClient) {
     this.languageSortingHelper = languageSortingHelper;
-    this.localeRepository = localeRepository;
+    this.localeService = cudamiClient.forLocales();
     this.service = cudamiClient.forCollections();
   }
 
@@ -68,8 +66,9 @@ public class CollectionsController extends AbstractController {
   public String create(
       Model model,
       @RequestParam(name = "parentType", required = false) String parentType,
-      @RequestParam(name = "parentUuid", required = false) String parentUuid) {
-    model.addAttribute("activeLanguage", localeRepository.getDefaultLanguage());
+      @RequestParam(name = "parentUuid", required = false) String parentUuid)
+      throws Exception {
+    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
     return "collections/create";

@@ -1,29 +1,28 @@
 package de.digitalcollections.cudami.admin.controller;
 
-import de.digitalcollections.cudami.admin.backend.api.repository.LocaleRepository;
+import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import java.util.List;
 import java.util.Locale;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class LanguageController {
 
-  LocaleRepository repository;
+  private final CudamiLocalesClient service;
 
-  @Autowired
-  public LanguageController(LocaleRepository repository) {
-    this.repository = repository;
+  public LanguageController(CudamiClient cudamiClient) {
+    this.service = cudamiClient.forLocales();
   }
 
   @GetMapping("/api/languages")
-  public List<String> getLanguages() {
-    return repository.findAllLanguages();
+  public List<String> getLanguages() throws Exception {
+    return service.findAllLanguages();
   }
 
   @GetMapping("/api/languages/default")
-  public Locale getDefaultLanguages() {
-    return repository.getDefaultLanguage();
+  public Locale getDefaultLanguages() throws Exception {
+    return service.getDefaultLanguage();
   }
 }
