@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.client;
 
+import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.Topic;
 import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
@@ -26,109 +27,110 @@ public class CudamiSubtopicsClient extends CudamiBaseClient<SubtopicImpl> {
     return new SubtopicImpl();
   }
 
-  public long count() throws Exception {
+  public long count() throws HttpException {
     return Long.parseLong(doGetRequestForString("/latest/subtopics/count"));
   }
 
-  public PageResponse<SubtopicImpl> find(PageRequest pageRequest) throws Exception {
+  public PageResponse<SubtopicImpl> find(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/subtopics", pageRequest);
   }
 
-  public Subtopic findOne(UUID uuid) throws Exception {
+  public Subtopic findOne(UUID uuid) throws HttpException {
     return doGetRequestForObject(String.format("/latest/subtopics/%s", uuid));
   }
 
-  public Subtopic findOne(UUID uuid, Locale locale) throws Exception {
+  public Subtopic findOne(UUID uuid, Locale locale) throws HttpException {
     return findOne(uuid, locale.toString());
   }
 
-  public Subtopic findOne(UUID uuid, String locale) throws Exception {
+  public Subtopic findOne(UUID uuid, String locale) throws HttpException {
     return doGetRequestForObject(String.format("/latest/subtopics/%s?locale=%s", uuid, locale));
   }
 
-  public Subtopic findOneByIdentifier(String namespace, String id) throws Exception {
+  public Subtopic findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
         String.format("/latest/subtopics/identifier/%s:%s.json", namespace, id));
   }
 
-  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws Exception {
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws HttpException {
     return (BreadcrumbNavigation)
         doGetRequestForObject(
             String.format("/latest/subtopics/%s/breadcrumb", uuid), BreadcrumbNavigationImpl.class);
   }
 
-  public List<SubtopicImpl> getChildren(UUID uuid) throws Exception {
+  public List<SubtopicImpl> getChildren(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(String.format("/latest/subtopics/%s/children", uuid));
   }
 
   public PageResponse<SubtopicImpl> getChildren(UUID uuid, PageRequest pageRequest)
-      throws Exception {
+      throws HttpException {
     return doGetRequestForPagedObjectList(
         String.format("/latest/subtopics/%s/children", uuid), pageRequest);
   }
 
-  public List getEntities(UUID uuid) throws Exception {
+  public List getEntities(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
         String.format("/latest/subtopics/%s/entities", uuid), EntityImpl.class);
   }
 
-  public List getFileResources(UUID uuid) throws Exception {
+  public List getFileResources(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
         String.format("/latest/subtopics/%s/fileresources", uuid), FileResourceImpl.class);
   }
 
-  public Subtopic getParent(UUID uuid) throws Exception {
+  public Subtopic getParent(UUID uuid) throws HttpException {
     return doGetRequestForObject(String.format("/latest/subtopics/%s/parent", uuid));
   }
 
-  public List getRelatedFileResources(UUID uuid) throws Exception {
+  public List getRelatedFileResources(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
         String.format("/latest/entities/%s/related/fileresources", uuid), FileResourceImpl.class);
   }
 
-  public List<SubtopicImpl> getSubtopicsOfEntity(UUID uuid) throws Exception {
+  public List<SubtopicImpl> getSubtopicsOfEntity(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(String.format("/latest/subtopics/entity/%s", uuid));
   }
 
-  public List<SubtopicImpl> getSubtopicsOfFileResource(UUID uuid) throws Exception {
+  public List<SubtopicImpl> getSubtopicsOfFileResource(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(String.format("/latest/subtopics/fileresource/%s", uuid));
   }
 
-  public Topic getTopic(UUID rootWebpageUuid) throws Exception {
+  public Topic getTopic(UUID rootWebpageUuid) throws HttpException {
     return (Topic)
         doGetRequestForObject(
             String.format("/latest/subtopics/%s/topic", rootWebpageUuid), TopicImpl.class);
   }
 
-  public Subtopic save(Subtopic subtopic) throws Exception {
+  public Subtopic save(Subtopic subtopic) throws HttpException {
     return doPostRequestForObject("/latest/subtopics", (SubtopicImpl) subtopic);
   }
 
-  public List<Entity> saveEntities(UUID uuid, List entities) throws Exception {
+  public List<Entity> saveEntities(UUID uuid, List entities) throws HttpException {
     return doPostRequestForObjectList(
         String.format("/latest/subtopics/%s/entities", uuid), entities, EntityImpl.class);
   }
 
-  public List<FileResource> saveFileResources(UUID uuid, List fileResources) throws Exception {
+  public List<FileResource> saveFileResources(UUID uuid, List fileResources) throws HttpException {
     return doPostRequestForObjectList(
         String.format("/latest/subtopics/%s/fileresources", uuid),
         fileResources,
         FileResourceImpl.class);
   }
 
-  public Subtopic saveWithParentTopic(Subtopic subtopic, UUID parentTopicUuid) throws Exception {
+  public Subtopic saveWithParentTopic(Subtopic subtopic, UUID parentTopicUuid)
+      throws HttpException {
     return doPostRequestForObject(
         String.format("/latest/topics/%s/subtopic", parentTopicUuid), (SubtopicImpl) subtopic);
   }
 
   public Subtopic saveWithParentSubtopic(Subtopic subtopic, UUID parentSubtopicUuid)
-      throws Exception {
+      throws HttpException {
     return doPostRequestForObject(
         String.format("/latest/subtopics/%s/subtopic", parentSubtopicUuid),
         (SubtopicImpl) subtopic);
   }
 
-  public Subtopic update(UUID uuid, Subtopic subtopic) throws Exception {
+  public Subtopic update(UUID uuid, Subtopic subtopic) throws HttpException {
     return doPutRequestForObject(
         String.format("/latest/subtopics/%s", uuid), (SubtopicImpl) subtopic);
   }

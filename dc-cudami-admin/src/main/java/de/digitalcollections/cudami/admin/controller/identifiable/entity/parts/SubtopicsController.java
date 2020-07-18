@@ -1,11 +1,11 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.parts;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.CudamiSubtopicsClient;
+import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.Topic;
@@ -60,7 +60,7 @@ public class SubtopicsController extends AbstractController {
       Model model,
       @RequestParam("parentType") String parentType,
       @RequestParam("parentUuid") String parentUuid)
-      throws Exception {
+      throws HttpException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
@@ -70,11 +70,11 @@ public class SubtopicsController extends AbstractController {
   @GetMapping("/api/subtopics/new")
   @ResponseBody
   public Subtopic create() {
-    return (Subtopic) service.create();
+    return service.create();
   }
 
   @GetMapping("/subtopics/{uuid}/edit")
-  public String edit(@PathVariable UUID uuid, Model model) throws Exception {
+  public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Subtopic subtopic = (Subtopic) service.findOne(uuid);
     List<Locale> existingLanguages =
@@ -89,16 +89,15 @@ public class SubtopicsController extends AbstractController {
 
   @GetMapping("/api/subtopics/{uuid}")
   @ResponseBody
-  public Subtopic get(@PathVariable UUID uuid) throws Exception {
-    return (Subtopic) service.findOne(uuid);
+  public Subtopic get(@PathVariable UUID uuid) throws HttpException {
+    return service.findOne(uuid);
   }
 
   @PostMapping("/api/subtopics/new")
   public ResponseEntity save(
       @RequestBody Subtopic subtopic,
       @RequestParam("parentType") String parentType,
-      @RequestParam("parentUuid") UUID parentUuid)
-      throws IdentifiableServiceException {
+      @RequestParam("parentUuid") UUID parentUuid) {
     try {
       Subtopic subtopicDb = null;
       if (parentType.equals("topic")) {
@@ -107,7 +106,7 @@ public class SubtopicsController extends AbstractController {
         subtopicDb = service.saveWithParentSubtopic(subtopic, parentUuid);
       }
       return ResponseEntity.status(HttpStatus.CREATED).body(subtopicDb);
-    } catch (Exception e) {
+    } catch (HttpException e) {
       if (parentType.equals("topic")) {
         LOGGER.error("Cannot save top-level subtopic: ", e);
       } else if (parentType.equals("subtopic")) {
@@ -118,21 +117,20 @@ public class SubtopicsController extends AbstractController {
   }
 
   @PutMapping("/api/subtopics/{uuid}")
-  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Subtopic subtopic)
-      throws IdentifiableServiceException {
+  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Subtopic subtopic) {
     try {
       Subtopic subtopicDb = (Subtopic) service.update(uuid, subtopic);
       return ResponseEntity.ok(subtopicDb);
-    } catch (Exception e) {
+    } catch (HttpException e) {
       LOGGER.error("Cannot save subtopic with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
 
   @GetMapping("/subtopics/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) throws Exception {
+  public String view(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Subtopic subtopic = (Subtopic) service.findOne(uuid);
+    Subtopic subtopic = service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, subtopic.getLabel().getLocales());
 

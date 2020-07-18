@@ -1,10 +1,8 @@
 package de.digitalcollections.cudami.client.exceptions.server;
 
-import feign.Response;
-
 public class NotImplementedException extends HttpServerException {
 
-  public NotImplementedException(String methodKey, Response response) {
-    super(methodKey, response);
+  public NotImplementedException(String methodKey, int statusCode) {
+    super(methodKey, statusCode);
   }
 }

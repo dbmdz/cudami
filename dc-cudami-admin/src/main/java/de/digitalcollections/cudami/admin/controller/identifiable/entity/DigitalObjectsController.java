@@ -6,6 +6,7 @@ import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiDigitalObjectsClient;
+import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -86,7 +87,7 @@ public class DigitalObjectsController extends AbstractController {
               sort = {"lastModified"},
               size = 25)
           Pageable pageable)
-      throws Exception {
+      throws HttpException {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
@@ -95,7 +96,7 @@ public class DigitalObjectsController extends AbstractController {
   }
 
   @GetMapping("/digitalobjects/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) throws Exception {
+  public String view(@PathVariable UUID uuid, Model model) throws HttpException {
     DigitalObject digitalObject = (DigitalObject) service.findOne(uuid);
     model.addAttribute("availableLocales", digitalObject.getLabel().getLocales());
     model.addAttribute("digitalObject", digitalObject);

@@ -1,11 +1,11 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.parts;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.CudamiWebpagesClient;
+import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
@@ -59,7 +59,7 @@ public class WebpagesController extends AbstractController {
       Model model,
       @RequestParam("parentType") String parentType,
       @RequestParam("parentUuid") String parentUuid)
-      throws Exception {
+      throws HttpException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
@@ -69,13 +69,13 @@ public class WebpagesController extends AbstractController {
   @GetMapping("/api/webpages/new")
   @ResponseBody
   public Webpage create() {
-    return (Webpage) service.create();
+    return service.create();
   }
 
   @GetMapping("/webpages/{uuid}/edit")
-  public String edit(@PathVariable UUID uuid, Model model) throws Exception {
+  public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Webpage webpage = (Webpage) service.findOne(uuid);
+    Webpage webpage = service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, webpage.getLabel().getLocales());
 
@@ -88,16 +88,15 @@ public class WebpagesController extends AbstractController {
 
   @GetMapping("/api/webpages/{uuid}")
   @ResponseBody
-  public Webpage get(@PathVariable UUID uuid) throws Exception {
-    return (Webpage) service.findOne(uuid);
+  public Webpage get(@PathVariable UUID uuid) throws HttpException {
+    return service.findOne(uuid);
   }
 
   @PostMapping("/api/webpages/new")
   public ResponseEntity save(
       @RequestBody Webpage webpage,
       @RequestParam("parentType") String parentType,
-      @RequestParam("parentUuid") UUID parentUuid)
-      throws IdentifiableServiceException {
+      @RequestParam("parentUuid") UUID parentUuid) {
     try {
       Webpage webpageDb = null;
       if (parentType.equals("website")) {
@@ -106,7 +105,7 @@ public class WebpagesController extends AbstractController {
         webpageDb = service.saveWithParentWebpage(webpage, parentUuid);
       }
       return ResponseEntity.status(HttpStatus.CREATED).body(webpageDb);
-    } catch (Exception e) {
+    } catch (HttpException e) {
       if (parentType.equals("website")) {
         LOGGER.error("Cannot save top-level webpage: ", e);
       } else if (parentType.equals("webpage")) {
@@ -117,21 +116,20 @@ public class WebpagesController extends AbstractController {
   }
 
   @PutMapping("/api/webpages/{uuid}")
-  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Webpage webpage)
-      throws IdentifiableServiceException {
+  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Webpage webpage) {
     try {
       Webpage webpageDb = (Webpage) service.update(uuid, webpage);
       return ResponseEntity.ok(webpageDb);
-    } catch (Exception e) {
+    } catch (HttpException e) {
       LOGGER.error("Cannot save webpage with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
 
   @GetMapping("/webpages/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) throws Exception {
+  public String view(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Webpage webpage = (Webpage) service.findOne(uuid);
+    Webpage webpage = service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, webpage.getLabel().getLocales());
 

@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.client;
 
+import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.IdentifierType;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -20,46 +21,46 @@ public class CudamiIdentifierTypesClient extends CudamiBaseClient<IdentifierType
     return new IdentifierTypeImpl();
   }
 
-  public long count() throws Exception {
+  public long count() throws HttpException {
     return Long.parseLong(doGetRequestForString("/latest/identifiertypes/count"));
   }
 
-  public PageResponse<IdentifierTypeImpl> find(PageRequest pageRequest) throws Exception {
+  public PageResponse<IdentifierTypeImpl> find(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/identifiertypes", pageRequest);
   }
 
   public SearchPageResponse<IdentifierTypeImpl> find(SearchPageRequest searchPageRequest)
-      throws Exception {
+      throws HttpException {
     return doGetSearchRequestForPagedObjectList(
         "/latest/identifiertypes/search", searchPageRequest);
   }
 
-  public List<IdentifierTypeImpl> find(String searchTerm, int maxResults) throws Exception {
+  public List<IdentifierTypeImpl> find(String searchTerm, int maxResults) throws HttpException {
     SearchPageRequest searchPageRequest =
         new SearchPageRequestImpl(searchTerm, 0, maxResults, null);
     SearchPageResponse<IdentifierTypeImpl> response = find(searchPageRequest);
     return response.getContent();
   }
 
-  public IdentifierType findOne(UUID uuid) throws Exception {
+  public IdentifierType findOne(UUID uuid) throws HttpException {
     return doGetRequestForObject(String.format("/latest/identifiertypes/%s", uuid));
   }
 
-  public IdentifierType findOne(UUID uuid, String locale) throws Exception {
+  public IdentifierType findOne(UUID uuid, String locale) throws HttpException {
     return doGetRequestForObject(
         String.format("/latest/identifiertypes/%s?locale=%s", uuid, locale));
   }
 
-  public IdentifierType findOneByIdentifier(String namespace, String id) throws Exception {
+  public IdentifierType findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
         String.format("/latest/identifiertypes/identifier/%s:%s.json", namespace, id));
   }
 
-  public IdentifierType save(IdentifierType identifierType) throws Exception {
+  public IdentifierType save(IdentifierType identifierType) throws HttpException {
     return doPostRequestForObject("/latest/identifiertypes", (IdentifierTypeImpl) identifierType);
   }
 
-  public IdentifierType update(UUID uuid, IdentifierType identifierType) throws Exception {
+  public IdentifierType update(UUID uuid, IdentifierType identifierType) throws HttpException {
     return doPutRequestForObject(
         String.format("/latest/identifiertypes/%s", uuid), (IdentifierTypeImpl) identifierType);
   }

@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.client;
 
+import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.security.User;
@@ -17,31 +18,31 @@ public class CudamiUsersClient extends CudamiBaseClient<UserImpl> {
     return new UserImpl();
   }
 
-  public PageResponse<UserImpl> find(PageRequest pageRequest) throws Exception {
+  public PageResponse<UserImpl> find(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/users", pageRequest);
   }
 
-  public List<UserImpl> findActiveAdminUsers() throws Exception {
+  public List<UserImpl> findActiveAdminUsers() throws HttpException {
     return doGetRequestForObjectList("/latest/users?role=ADMIN&enabled=true");
   }
 
-  public List<UserImpl> findAll() throws Exception {
+  public List<UserImpl> findAll() throws HttpException {
     return doGetRequestForObjectList("/latest/users");
   }
 
-  public User findOne(UUID uuid) throws Exception {
+  public User findOne(UUID uuid) throws HttpException {
     return doGetRequestForObject(String.format("/latest/users/%s", uuid));
   }
 
-  public User findOneByEmail(String email) throws Exception {
+  public User findOneByEmail(String email) throws HttpException {
     return doGetRequestForObject(String.format("/latest/users?email=%s", email));
   }
 
-  public User save(User user) throws Exception {
+  public User save(User user) throws HttpException {
     return doPostRequestForObject("/latest/users", (UserImpl) user);
   }
 
-  public User update(UUID uuid, User user) throws Exception {
+  public User update(UUID uuid, User user) throws HttpException {
     return doPutRequestForObject(String.format("/latest/users/%s", uuid), (UserImpl) user);
   }
 }

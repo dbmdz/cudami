@@ -4,11 +4,11 @@ import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiFileResourcesMetadataClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
+import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.Order;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -69,7 +69,7 @@ public class FileResourcesMetadataController extends AbstractController {
   }
 
   @GetMapping(value = "/fileresources/new")
-  public String create(Model model) throws Exception {
+  public String create(Model model) throws HttpException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     return "fileresources/create";
   }
@@ -81,7 +81,7 @@ public class FileResourcesMetadataController extends AbstractController {
   }
 
   @GetMapping("/fileresources/{uuid}/edit")
-  public String edit(@PathVariable UUID uuid, Model model) throws Exception {
+  public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     FileResource fileResource = service.findOne(uuid);
     List<Locale> existingLanguages =
@@ -97,7 +97,7 @@ public class FileResourcesMetadataController extends AbstractController {
 
   @GetMapping("/api/fileresources/{uuid}")
   @ResponseBody
-  public FileResource get(@PathVariable UUID uuid) throws Exception {
+  public FileResource get(@PathVariable UUID uuid) throws HttpException {
     return service.findOne(uuid);
   }
 
@@ -108,7 +108,7 @@ public class FileResourcesMetadataController extends AbstractController {
               sort = {"label"},
               size = 25)
           Pageable pageable)
-      throws Exception {
+      throws HttpException {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
@@ -117,12 +117,11 @@ public class FileResourcesMetadataController extends AbstractController {
   }
 
   @PostMapping("/api/fileresources/new")
-  public ResponseEntity save(@RequestBody FileResource fileResource)
-      throws IdentifiableServiceException {
+  public ResponseEntity save(@RequestBody FileResource fileResource) {
     try {
       FileResource fileResourceDb = service.save(fileResource);
       return ResponseEntity.status(HttpStatus.CREATED).body(fileResourceDb);
-    } catch (Exception e) {
+    } catch (HttpException e) {
       LOGGER.error("Cannot save fileresource: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
@@ -138,7 +137,7 @@ public class FileResourcesMetadataController extends AbstractController {
       @RequestParam(name = "sortDirection", required = false, defaultValue = "DESC")
           Direction sortDirection,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws Exception {
+      throws HttpException {
     Order order = new OrderImpl(sortDirection, sortField);
     Sorting sorting = new SortingImpl(order);
     SearchPageRequest pageRequest =
@@ -147,19 +146,18 @@ public class FileResourcesMetadataController extends AbstractController {
   }
 
   @PutMapping("/api/fileresources/{uuid}")
-  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody FileResource fileResource)
-      throws IdentifiableServiceException {
+  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody FileResource fileResource) {
     try {
       FileResource fileResourceDb = service.update(uuid, fileResource);
       return ResponseEntity.ok(fileResourceDb);
-    } catch (Exception e) {
+    } catch (HttpException e) {
       LOGGER.error("Cannot save fileresource with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
 
   @GetMapping(value = "/fileresources/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) throws Exception {
+  public String view(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     FileResource resource = service.findOne(uuid);
     List<Locale> existingLanguages =

@@ -20,41 +20,41 @@ public class CudamiArticlesClient extends CudamiBaseClient<ArticleImpl> {
     return new ArticleImpl();
   }
 
-  long count() throws HttpException, Exception {
+  long count() throws HttpException {
     return Long.parseLong(doGetRequestForString("/latest/articles/count"));
   }
 
-  public PageResponse<ArticleImpl> find(PageRequest pageRequest) throws Exception {
+  public PageResponse<ArticleImpl> find(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/articles", pageRequest);
   }
 
-  public Article findOne(UUID uuid) throws Exception {
+  public Article findOne(UUID uuid) throws HttpException {
     return doGetRequestForObject(String.format("/latest/articles/%s", uuid));
   }
 
-  public Article findOne(UUID uuid, Locale locale) throws Exception {
+  public Article findOne(UUID uuid, Locale locale) throws HttpException {
     return findOne(uuid, locale.toString());
   }
 
-  public Article findOne(UUID uuid, String locale) throws Exception {
+  public Article findOne(UUID uuid, String locale) throws HttpException {
     return doGetRequestForObject(String.format("/latest/articles/%s?locale=%s", uuid, locale));
   }
 
-  public Article findOneByIdentifier(String namespace, String id) throws Exception {
+  public Article findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
         String.format("/latest/articles/identifier/%s:%s.json", namespace, id));
   }
 
-  public List getRelatedFileResources(UUID uuid) throws Exception {
+  public List getRelatedFileResources(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
         String.format("/latest/entities/%s/related/fileresources", uuid), FileResourceImpl.class);
   }
 
-  public Article save(Article article) throws Exception {
+  public Article save(Article article) throws HttpException {
     return doPostRequestForObject("/latest/articles", (ArticleImpl) article);
   }
 
-  public Article update(UUID uuid, Article article) throws Exception {
+  public Article update(UUID uuid, Article article) throws HttpException {
     return doPutRequestForObject(String.format("/latest/articles/%s", uuid), (ArticleImpl) article);
   }
 }

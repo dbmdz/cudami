@@ -4,11 +4,11 @@ import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.CudamiWebsitesClient;
+import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -58,7 +58,7 @@ public class WebsitesController extends AbstractController {
   }
 
   @GetMapping("/websites/new")
-  public String create(Model model) throws Exception {
+  public String create(Model model) throws HttpException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     return "websites/create";
   }
@@ -70,7 +70,7 @@ public class WebsitesController extends AbstractController {
   }
 
   @GetMapping("/websites/{uuid}/edit")
-  public String edit(@PathVariable UUID uuid, Model model) throws Exception {
+  public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Website website = service.findOne(uuid);
     List<Locale> existingLanguages =
@@ -86,7 +86,7 @@ public class WebsitesController extends AbstractController {
 
   @GetMapping("/api/websites/{uuid}")
   @ResponseBody
-  public Website get(@PathVariable UUID uuid) throws Exception {
+  public Website get(@PathVariable UUID uuid) throws HttpException {
     return service.findOne(uuid);
   }
 
@@ -97,7 +97,7 @@ public class WebsitesController extends AbstractController {
               sort = {"email"},
               size = 25)
           Pageable pageable)
-      throws Exception {
+      throws HttpException {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
@@ -106,30 +106,29 @@ public class WebsitesController extends AbstractController {
   }
 
   @PostMapping("/api/websites/new")
-  public ResponseEntity save(@RequestBody Website website) throws IdentifiableServiceException {
+  public ResponseEntity save(@RequestBody Website website) {
     try {
       Website websiteDb = service.save(website);
       return ResponseEntity.status(HttpStatus.CREATED).body(websiteDb);
-    } catch (Exception e) {
+    } catch (HttpException e) {
       LOGGER.error("Cannot save website: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
 
   @PutMapping("/api/websites/{uuid}")
-  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Website website)
-      throws IdentifiableServiceException {
+  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Website website) {
     try {
       Website websiteDb = service.update(uuid, website);
       return ResponseEntity.ok(websiteDb);
-    } catch (Exception e) {
+    } catch (HttpException e) {
       LOGGER.error("Cannot save website with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
 
   @GetMapping("/websites/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) throws Exception {
+  public String view(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Website website = (Website) service.findOne(uuid);
     List<Locale> existingLanguages =

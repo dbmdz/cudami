@@ -4,11 +4,11 @@ import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.CudamiTopicsClient;
+import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Topic;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -69,7 +69,7 @@ public class TopicsController extends AbstractController {
   }
 
   @GetMapping("/topics/{uuid}/edit")
-  public String edit(@PathVariable UUID uuid, Model model) throws Exception {
+  public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Topic topic = service.findOne(uuid);
     List<Locale> existingLanguages =
@@ -84,7 +84,7 @@ public class TopicsController extends AbstractController {
 
   @GetMapping("/api/topics/{uuid}")
   @ResponseBody
-  public Topic get(@PathVariable UUID uuid) throws Exception {
+  public Topic get(@PathVariable UUID uuid) throws HttpException {
     return service.findOne(uuid);
   }
 
@@ -95,7 +95,7 @@ public class TopicsController extends AbstractController {
               sort = {"lastModified"},
               size = 25)
           Pageable pageable)
-      throws Exception {
+      throws HttpException {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
@@ -104,30 +104,29 @@ public class TopicsController extends AbstractController {
   }
 
   @PostMapping("/api/topics/new")
-  public ResponseEntity save(@RequestBody Topic topic) throws IdentifiableServiceException {
+  public ResponseEntity save(@RequestBody Topic topic) {
     try {
       Topic topicDb = service.save(topic);
       return ResponseEntity.status(HttpStatus.CREATED).body(topicDb);
-    } catch (Exception e) {
+    } catch (HttpException e) {
       LOGGER.error("Cannot save topic: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
 
   @PutMapping("/api/topics/{uuid}")
-  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Topic topic)
-      throws IdentifiableServiceException {
+  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Topic topic) {
     try {
       Topic topicDb = service.update(uuid, topic);
       return ResponseEntity.ok(topicDb);
-    } catch (Exception e) {
+    } catch (HttpException e) {
       LOGGER.error("Cannot save topic with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
 
   @GetMapping("/topics/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) throws Exception {
+  public String view(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Topic topic = (Topic) service.findOne(uuid);
     List<Locale> existingLanguages =

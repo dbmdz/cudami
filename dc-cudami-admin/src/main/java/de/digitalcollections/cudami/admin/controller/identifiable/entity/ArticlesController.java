@@ -8,6 +8,7 @@ import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiArticlesClient;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
+import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Article;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -57,7 +58,7 @@ public class ArticlesController extends AbstractController {
   }
 
   @GetMapping("/articles/new")
-  public String create(Model model) throws Exception {
+  public String create(Model model) throws HttpException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     return "articles/create";
   }
@@ -69,7 +70,7 @@ public class ArticlesController extends AbstractController {
   }
 
   @GetMapping("/articles/{uuid}/edit")
-  public String edit(@PathVariable UUID uuid, Model model) throws Exception {
+  public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Article article = service.findOne(uuid);
     List<Locale> existingLanguages =
@@ -84,7 +85,7 @@ public class ArticlesController extends AbstractController {
 
   @GetMapping("/api/articles/{uuid}")
   @ResponseBody
-  public Article get(@PathVariable UUID uuid) throws Exception {
+  public Article get(@PathVariable UUID uuid) throws HttpException {
     return service.findOne(uuid);
   }
 
@@ -95,7 +96,7 @@ public class ArticlesController extends AbstractController {
               sort = {"lastModified"},
               size = 25)
           Pageable pageable)
-      throws Exception {
+      throws HttpException {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
@@ -108,7 +109,7 @@ public class ArticlesController extends AbstractController {
     try {
       Article articleDb = service.save(article);
       return ResponseEntity.status(HttpStatus.CREATED).body(articleDb);
-    } catch (Exception e) {
+    } catch (HttpException e) {
       LOGGER.error("Cannot save article: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
@@ -119,14 +120,14 @@ public class ArticlesController extends AbstractController {
     try {
       Article articleDb = service.update(uuid, article);
       return ResponseEntity.ok(articleDb);
-    } catch (Exception e) {
+    } catch (HttpException e) {
       LOGGER.error("Cannot save article with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
 
   @GetMapping("/articles/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) throws Exception {
+  public String view(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Article article = (Article) service.findOne(uuid);
     List<Locale> existingLanguages =

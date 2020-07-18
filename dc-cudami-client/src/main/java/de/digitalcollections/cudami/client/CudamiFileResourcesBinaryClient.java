@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.client;
 
+import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.exceptions.ResourceIOException;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
@@ -27,7 +28,7 @@ public class CudamiFileResourcesBinaryClient extends CudamiBaseClient<FileResour
   }
 
   public FileResource upload(InputStream inputStream, String filename, String contentType)
-      throws ResourceIOException {
+      throws HttpException {
     try {
       filename =
           URLEncoder.encode(
@@ -39,12 +40,12 @@ public class CudamiFileResourcesBinaryClient extends CudamiBaseClient<FileResour
               .build();
       return doPost(entity);
     } catch (Exception ex) {
-      throw new ResourceIOException("Error saving uploaded file data", ex);
+      throw new HttpException("Error saving uploaded file data", ex);
     }
   }
 
   public FileResource upload(byte[] bytes, String filename, String contentType)
-      throws ResourceIOException {
+      throws HttpException {
     try {
       filename =
           URLEncoder.encode(
@@ -56,22 +57,25 @@ public class CudamiFileResourcesBinaryClient extends CudamiBaseClient<FileResour
               .build();
       return doPost(entity);
     } catch (Exception ex) {
-      throw new ResourceIOException("Error saving uploaded file data", ex);
+      throw new HttpException("Error saving uploaded file data", ex);
     }
   }
 
-  private FileResource doPost(HttpEntity entity)
-      throws UnsupportedOperationException, IOException, ResourceIOException {
-    HttpPost post = new HttpPost(serverUri + "/latest/files");
-    post.setEntity(entity);
-    HttpClient client = HttpClientBuilder.create().build();
-    HttpResponse response = client.execute(post);
+  private FileResource doPost(HttpEntity entity) throws HttpException {
+    try {
+      HttpPost post = new HttpPost(serverUri + "/latest/files");
+      post.setEntity(entity);
+      HttpClient client = HttpClientBuilder.create().build();
+      HttpResponse response = client.execute(post);
 
-    if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-      FileResource fileResource =
-          mapper.readValue(response.getEntity().getContent(), FileResource.class);
-      return fileResource;
+      if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+        FileResource fileResource =
+            mapper.readValue(response.getEntity().getContent(), FileResource.class);
+        return fileResource;
+      }
+      throw new ResourceIOException("Error saving uploaded file data");
+    } catch (IOException ex) {
+      throw new HttpException("Error posting data to server", ex);
     }
-    throw new ResourceIOException("Error saving uploaded file data");
   }
 }

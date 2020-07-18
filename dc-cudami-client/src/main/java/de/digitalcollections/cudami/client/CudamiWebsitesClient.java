@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.client;
 
+import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -19,37 +20,37 @@ public class CudamiWebsitesClient extends CudamiBaseClient<WebsiteImpl> {
     return new WebsiteImpl();
   }
 
-  public long count() throws Exception {
+  public long count() throws HttpException {
     return Long.parseLong(doGetRequestForString("/latest/websites/count"));
   }
 
-  public PageResponse<WebsiteImpl> find(PageRequest pageRequest) throws Exception {
+  public PageResponse<WebsiteImpl> find(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/websites", pageRequest);
   }
 
-  public Website findOne(UUID uuid) throws Exception {
+  public Website findOne(UUID uuid) throws HttpException {
     return doGetRequestForObject(String.format("/latest/websites/%s", uuid));
   }
 
-  public Website findOne(UUID uuid, String locale) throws Exception {
+  public Website findOne(UUID uuid, String locale) throws HttpException {
     return doGetRequestForObject(String.format("/latest/websites/%s?locale=%s", uuid, locale));
   }
 
-  public Website findOneByIdentifier(String namespace, String id) throws Exception {
+  public Website findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
         String.format("/latest/websites/identifier/%s:%s.json", namespace, id));
   }
 
-  public List<Webpage> getRootPages(UUID uuid) throws Exception {
+  public List<Webpage> getRootPages(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
         String.format("/latest/websites/%s/rootPages", uuid), WebpageImpl.class);
   }
 
-  public Website save(Website website) throws Exception {
+  public Website save(Website website) throws HttpException {
     return doPostRequestForObject("/latest/websites", (WebsiteImpl) website);
   }
 
-  public Website update(UUID uuid, Website website) throws Exception {
+  public Website update(UUID uuid, Website website) throws HttpException {
     return doPutRequestForObject(String.format("/latest/websites/%s", uuid), (WebsiteImpl) website);
   }
 }

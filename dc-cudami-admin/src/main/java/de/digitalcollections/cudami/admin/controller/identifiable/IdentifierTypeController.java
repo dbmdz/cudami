@@ -6,6 +6,7 @@ import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiIdentifierTypesClient;
+import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.IdentifierType;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -72,7 +73,7 @@ public class IdentifierTypeController extends AbstractController {
     try {
       service.save(identifierType);
       LOGGER.info("Successfully saved identifier type");
-    } catch (Exception e) {
+    } catch (HttpException e) {
       LOGGER.error("Cannot save identifier type: ", e);
       String message = messageSource.getMessage("msg.error", null, LocaleContextHolder.getLocale());
       redirectAttributes.addFlashAttribute("error_message", message);
@@ -90,7 +91,7 @@ public class IdentifierTypeController extends AbstractController {
 
   @GetMapping("/identifiertypes/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes)
-      throws Exception {
+      throws HttpException {
     model.addAttribute("identifierType", service.findOne(uuid));
     return "identifiertypes/edit";
   }
@@ -117,7 +118,7 @@ public class IdentifierTypeController extends AbstractController {
       identifierTypeDb.setPattern(identifierType.getPattern());
 
       service.update(pathUuid, identifierTypeDb);
-    } catch (Exception e) {
+    } catch (HttpException e) {
       String message = "Cannot save identifier type with uuid=" + pathUuid + ": " + e;
       LOGGER.error(message, e);
       redirectAttributes.addFlashAttribute("error_message", message);
@@ -142,7 +143,7 @@ public class IdentifierTypeController extends AbstractController {
               sort = {"lastModified"},
               size = 25)
           Pageable pageable)
-      throws Exception {
+      throws HttpException {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);

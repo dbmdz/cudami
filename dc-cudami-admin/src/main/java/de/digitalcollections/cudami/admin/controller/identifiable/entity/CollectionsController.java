@@ -4,7 +4,6 @@ import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiCollectionsClient;
@@ -15,7 +14,6 @@ import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
-import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -67,7 +65,7 @@ public class CollectionsController extends AbstractController {
       Model model,
       @RequestParam(name = "parentType", required = false) String parentType,
       @RequestParam(name = "parentUuid", required = false) String parentUuid)
-      throws Exception {
+      throws HttpException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
@@ -77,11 +75,11 @@ public class CollectionsController extends AbstractController {
   @GetMapping("/api/collections/new")
   @ResponseBody
   public Collection create() {
-    return new CollectionImpl();
+    return service.create();
   }
 
   @GetMapping("/collections/{uuid}/edit")
-  public String edit(@PathVariable UUID uuid, Model model) throws Exception {
+  public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Collection collection = service.findOne(uuid);
     List<Locale> existingLanguages =
@@ -96,7 +94,7 @@ public class CollectionsController extends AbstractController {
 
   @GetMapping("/api/collections/{uuid}")
   @ResponseBody
-  public Collection get(@PathVariable UUID uuid) throws Exception {
+  public Collection get(@PathVariable UUID uuid) throws HttpException {
     return service.findOne(uuid);
   }
 
@@ -107,7 +105,7 @@ public class CollectionsController extends AbstractController {
               sort = {"label"},
               size = 25)
           Pageable pageable)
-      throws Exception {
+      throws HttpException {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.findTopCollections(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
@@ -119,8 +117,7 @@ public class CollectionsController extends AbstractController {
   public ResponseEntity save(
       @RequestBody Collection collection,
       @RequestParam(name = "parentType", required = false) String parentType,
-      @RequestParam(name = "parentUuid", required = false) UUID parentUuid)
-      throws IdentifiableServiceException {
+      @RequestParam(name = "parentUuid", required = false) UUID parentUuid) {
     try {
       Collection collectionDb = null;
       if ("collection".equals(parentType)) {
@@ -129,26 +126,25 @@ public class CollectionsController extends AbstractController {
         collectionDb = service.save(collection);
       }
       return ResponseEntity.status(HttpStatus.CREATED).body(collectionDb);
-    } catch (Exception e) {
+    } catch (HttpException e) {
       LOGGER.error("Cannot save collection: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
 
   @PutMapping("/api/collections/{uuid}")
-  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Collection collection)
-      throws IdentifiableServiceException {
+  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Collection collection) {
     try {
       Collection collectionDb = service.update(uuid, collection);
       return ResponseEntity.ok(collectionDb);
-    } catch (Exception e) {
+    } catch (HttpException e) {
       LOGGER.error("Cannot save collection with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
 
   @GetMapping("/collections/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) throws HttpException, Exception {
+  public String view(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Collection collection = service.findOne(uuid);
     List<Locale> existingLanguages =

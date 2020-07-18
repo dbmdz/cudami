@@ -1,7 +1,5 @@
 package de.digitalcollections.cudami.client.exceptions.client;
 
-import feign.Response;
-
 /**
  * HttpStatusCode 413 denoting the client is wrongfully using a teapot for making coffee as
  * specified in the Hyper Text Coffee Pot Control Protocoll (see <a
@@ -9,7 +7,7 @@ import feign.Response;
  */
 public class ImATeapotException extends HttpClientException {
 
-  public ImATeapotException(String methodKey, Response response) {
-    super(methodKey, response);
+  public ImATeapotException(String methodKey, int statusCode) {
+    super(methodKey, statusCode);
   }
 }

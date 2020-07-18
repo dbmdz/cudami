@@ -128,7 +128,6 @@ public class UserController extends AbstractController {
     return "users/edit";
   }
 
-  // TODO: Simplify user management
   @PostMapping("/users/{uuid}/edit")
   public String edit(
       @PathVariable UUID uuid,
@@ -164,8 +163,6 @@ public class UserController extends AbstractController {
               size = 25)
           Pageable pageable)
       throws EntityServiceException {
-    //    List<User> users = userService.getAll();
-    //    model.addAttribute("users", users);
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);

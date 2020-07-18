@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.template.website.springboot;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
+import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import java.util.Locale;
 import org.springframework.context.annotation.Bean;
@@ -36,7 +37,7 @@ public class TestConfig {
     }
 
     @Override
-    public Locale getDefaultLanguage() throws Exception {
+    public Locale getDefaultLanguage() throws HttpException {
       return Locale.ENGLISH;
     }
   }
