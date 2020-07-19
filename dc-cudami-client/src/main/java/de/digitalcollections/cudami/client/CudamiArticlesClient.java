@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Article;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -12,8 +13,8 @@ import java.util.UUID;
 
 public class CudamiArticlesClient extends CudamiBaseClient<ArticleImpl> {
 
-  public CudamiArticlesClient(String serverUrl) {
-    super(serverUrl, ArticleImpl.class);
+  public CudamiArticlesClient(String serverUrl, ObjectMapper mapper) {
+    super(serverUrl, ArticleImpl.class, mapper);
   }
 
   public Article create() {

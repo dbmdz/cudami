@@ -13,7 +13,6 @@ import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.impl.paging.FindParamsImpl;
-import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -33,13 +32,13 @@ public class CudamiBaseClient<T extends Object> {
   protected final URI serverUri;
   protected final Class<T> targetType;
 
-  public CudamiBaseClient(String serverUrl, Class<T> targetType) {
+  public CudamiBaseClient(String serverUrl, Class<T> targetType, ObjectMapper mapper) {
     http =
         HttpClient.newBuilder()
             .followRedirects(HttpClient.Redirect.ALWAYS)
             .connectTimeout(Duration.ofSeconds(10))
             .build();
-    this.mapper = new DigitalCollectionsObjectMapper();
+    this.mapper = mapper;
     this.reader = mapper.reader().forType(targetType);
     this.serverUri = URI.create(serverUrl);
     this.targetType = targetType;
@@ -50,6 +49,19 @@ public class CudamiBaseClient<T extends Object> {
         HttpRequest.newBuilder()
             .GET()
             .uri(serverUri.resolve(requestUrl))
+            .header("Accept", "application/json")
+            // TODO add creation of a request id if needed
+            //            .header("X-Request-Id", request.getRequestId())
+            .build();
+    return req;
+  }
+
+  private HttpRequest createPostRequest(String requestUrl) throws JsonProcessingException {
+    HttpRequest req =
+        HttpRequest.newBuilder()
+            .POST(HttpRequest.BodyPublishers.noBody())
+            .uri(serverUri.resolve(requestUrl))
+            .header("Content-Type", "application/json")
             .header("Accept", "application/json")
             // TODO add creation of a request id if needed
             //            .header("X-Request-Id", request.getRequestId())
@@ -130,9 +142,15 @@ public class CudamiBaseClient<T extends Object> {
   protected PageResponse<T> doGetRequestForPagedObjectList(
       String requestUrl, PageRequest pageRequest) throws HttpException {
     FindParams findParams = getFindParams(pageRequest);
+    if (!requestUrl.contains("?")) {
+      requestUrl = requestUrl + "?";
+    } else {
+      if (!requestUrl.endsWith("&")) {
+        requestUrl = requestUrl + "&";
+      }
+    }
     requestUrl =
         requestUrl
-            + "?"
             + String.format(
                 "pageNumber=%d&pageSize=%d&sortField=%s&sortDirection=%s&nullHandling=%s",
                 findParams.getPageNumber(),
@@ -207,6 +225,22 @@ public class CudamiBaseClient<T extends Object> {
         throw CudamiRestErrorDecoder.decode("doPostRequestForObject", resp.statusCode());
       }
       T result = mapper.readerFor(targetType).readValue(resp.body());
+      return result;
+    } catch (IOException | InterruptedException e) {
+      throw new HttpException("Failed to retrieve response due to error", e);
+    }
+  }
+
+  protected Object doPostRequestForObject(String requestUrl, Class<?> targetType)
+      throws HttpException {
+    try {
+      HttpRequest req = createPostRequest(requestUrl);
+      // This is the most performant approach for Jackson
+      HttpResponse<byte[]> resp = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
+      if (resp.statusCode() != 200) {
+        throw CudamiRestErrorDecoder.decode("doPostRequestForObject", resp.statusCode());
+      }
+      Object result = mapper.readerFor(targetType).readValue(resp.body());
       return result;
     } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to error", e);

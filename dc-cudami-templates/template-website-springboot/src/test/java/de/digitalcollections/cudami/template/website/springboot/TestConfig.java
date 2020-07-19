@@ -26,14 +26,14 @@ public class TestConfig {
   }
 
   @Bean
-  public CudamiLocalesClient cudamiLocalesClient() {
-    return new TestCudamiLocalesClient("http://localhost");
+  public CudamiLocalesClient cudamiLocalesClient(ObjectMapper objectMapper) {
+    return new TestCudamiLocalesClient("http://localhost", objectMapper);
   }
 
   public class TestCudamiLocalesClient extends CudamiLocalesClient {
 
-    public TestCudamiLocalesClient(String serverUrl) {
-      super(serverUrl);
+    public TestCudamiLocalesClient(String serverUrl, ObjectMapper objectMapper) {
+      super(serverUrl, objectMapper);
     }
 
     @Override

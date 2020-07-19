@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
@@ -12,8 +13,8 @@ import java.util.UUID;
 
 public class CudamiWebsitesClient extends CudamiBaseClient<WebsiteImpl> {
 
-  public CudamiWebsitesClient(String serverUrl) {
-    super(serverUrl, WebsiteImpl.class);
+  public CudamiWebsitesClient(String serverUrl, ObjectMapper mapper) {
+    super(serverUrl, WebsiteImpl.class, mapper);
   }
 
   public Website create() {

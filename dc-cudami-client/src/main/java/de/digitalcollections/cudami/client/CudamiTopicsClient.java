@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Topic;
 import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
@@ -12,8 +13,8 @@ import java.util.UUID;
 
 public class CudamiTopicsClient extends CudamiBaseClient<TopicImpl> {
 
-  public CudamiTopicsClient(String serverUrl) {
-    super(serverUrl, TopicImpl.class);
+  public CudamiTopicsClient(String serverUrl, ObjectMapper mapper) {
+    super(serverUrl, TopicImpl.class, mapper);
   }
 
   public Topic create() {

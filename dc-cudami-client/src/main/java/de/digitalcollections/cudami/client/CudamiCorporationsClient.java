@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Corporation;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -9,8 +10,8 @@ import java.util.UUID;
 
 public class CudamiCorporationsClient extends CudamiBaseClient<CorporationImpl> {
 
-  public CudamiCorporationsClient(String serverUrl) {
-    super(serverUrl, CorporationImpl.class);
+  public CudamiCorporationsClient(String serverUrl, ObjectMapper mapper) {
+    super(serverUrl, CorporationImpl.class, mapper);
   }
 
   public Corporation create() {

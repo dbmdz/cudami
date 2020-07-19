@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
@@ -17,8 +18,8 @@ import java.util.UUID;
 
 public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObjectImpl> {
 
-  public CudamiDigitalObjectsClient(String serverUrl) {
-    super(serverUrl, DigitalObjectImpl.class);
+  public CudamiDigitalObjectsClient(String serverUrl, ObjectMapper mapper) {
+    super(serverUrl, DigitalObjectImpl.class, mapper);
   }
 
   public DigitalObject create() {

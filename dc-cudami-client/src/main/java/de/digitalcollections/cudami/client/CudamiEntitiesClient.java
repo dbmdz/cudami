@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
@@ -18,8 +19,8 @@ import java.util.UUID;
 
 public class CudamiEntitiesClient extends CudamiBaseClient<EntityImpl> {
 
-  public CudamiEntitiesClient(String serverUrl) {
-    super(serverUrl, EntityImpl.class);
+  public CudamiEntitiesClient(String serverUrl, ObjectMapper mapper) {
+    super(serverUrl, EntityImpl.class, mapper);
   }
 
   public Entity create() {
@@ -33,7 +34,7 @@ public class CudamiEntitiesClient extends CudamiBaseClient<EntityImpl> {
   public void addRelatedFileresource(UUID uuid, UUID fileResourceUuid) throws HttpException {
     doPostRequestForObject(
         String.format("/latest/entities/%s/related/fileresources/%s", uuid, fileResourceUuid),
-        null);
+        (EntityImpl) null);
   }
 
   public void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid)
@@ -41,7 +42,7 @@ public class CudamiEntitiesClient extends CudamiBaseClient<EntityImpl> {
     doPostRequestForObject(
         String.format(
             "/latest/entities/relations/%s/%s/%s", subjectEntityUuid, predicate, objectEntityUuid),
-        null);
+        (EntityImpl) null);
   }
 
   public PageResponse<EntityImpl> find(PageRequest pageRequest) throws HttpException {

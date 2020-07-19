@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -13,8 +14,8 @@ import java.util.UUID;
 
 public class CudamiFileResourcesMetadataClient extends CudamiBaseClient<FileResourceImpl> {
 
-  public CudamiFileResourcesMetadataClient(String serverUrl) {
-    super(serverUrl, FileResourceImpl.class);
+  public CudamiFileResourcesMetadataClient(String serverUrl, ObjectMapper mapper) {
+    super(serverUrl, FileResourceImpl.class, mapper);
   }
 
   public FileResource create() {

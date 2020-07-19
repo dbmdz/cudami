@@ -21,7 +21,7 @@ public class SpringConfigBackend {
   }
 
   @Bean
-  public CudamiLocalesClient cudamiLocalesClient() {
-    return new CudamiLocalesClient(serverUrl);
+  public CudamiLocalesClient cudamiLocalesClient(ObjectMapper objectMapper) {
+    return new CudamiLocalesClient(serverUrl, objectMapper);
   }
 }

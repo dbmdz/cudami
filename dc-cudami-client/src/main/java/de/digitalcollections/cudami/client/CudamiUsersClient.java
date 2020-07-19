@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -10,8 +11,8 @@ import java.util.UUID;
 
 public class CudamiUsersClient extends CudamiBaseClient<UserImpl> {
 
-  public CudamiUsersClient(String serverUrl) {
-    super(serverUrl, UserImpl.class);
+  public CudamiUsersClient(String serverUrl, ObjectMapper mapper) {
+    super(serverUrl, UserImpl.class, mapper);
   }
 
   public User create() {

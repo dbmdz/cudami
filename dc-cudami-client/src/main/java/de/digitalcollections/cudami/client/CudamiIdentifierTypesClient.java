@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.IdentifierType;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -13,8 +14,8 @@ import java.util.UUID;
 
 public class CudamiIdentifierTypesClient extends CudamiBaseClient<IdentifierTypeImpl> {
 
-  public CudamiIdentifierTypesClient(String serverUrl) {
-    super(serverUrl, IdentifierTypeImpl.class);
+  public CudamiIdentifierTypesClient(String serverUrl, ObjectMapper mapper) {
+    super(serverUrl, IdentifierTypeImpl.class, mapper);
   }
 
   public IdentifierType create() {
