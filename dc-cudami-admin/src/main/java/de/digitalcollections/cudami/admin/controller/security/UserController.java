@@ -4,7 +4,7 @@ import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
 import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.business.api.service.exceptions.EntityServiceException;
+import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -68,7 +68,7 @@ public class UserController extends AbstractController {
   @GetMapping("/users/{uuid}/activate")
   public String activate(
       @PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes)
-      throws EntityServiceException {
+      throws ServiceException {
     User user = service.activate(uuid);
     String message =
         messageSource.getMessage(
@@ -92,7 +92,7 @@ public class UserController extends AbstractController {
       Model model,
       SessionStatus status,
       RedirectAttributes redirectAttributes)
-      throws EntityServiceException {
+      throws ServiceException {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "users/create";
@@ -111,7 +111,7 @@ public class UserController extends AbstractController {
   @GetMapping("/users/{uuid}/deactivate")
   public String deactivate(
       @PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes)
-      throws EntityServiceException {
+      throws ServiceException {
     User user = service.deactivate(uuid);
     String message =
         messageSource.getMessage(
@@ -123,7 +123,7 @@ public class UserController extends AbstractController {
   }
 
   @GetMapping("/users/{uuid}/edit")
-  public String edit(@PathVariable UUID uuid, Model model) throws EntityServiceException {
+  public String edit(@PathVariable UUID uuid, Model model) throws ServiceException {
     model.addAttribute("user", service.findOne(uuid));
     return "users/edit";
   }
@@ -138,7 +138,7 @@ public class UserController extends AbstractController {
       Model model,
       SessionStatus status,
       RedirectAttributes redirectAttributes)
-      throws EntityServiceException {
+      throws ServiceException {
     verifyBinding(results);
     if (results.hasErrors()) {
       return "users/edit";
@@ -162,7 +162,7 @@ public class UserController extends AbstractController {
               sort = {"email"},
               size = 25)
           Pageable pageable)
-      throws EntityServiceException {
+      throws ServiceException {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
@@ -171,7 +171,7 @@ public class UserController extends AbstractController {
   }
 
   @GetMapping("/users/updatePassword")
-  public String updatePassword(Model model) throws EntityServiceException {
+  public String updatePassword(Model model) throws ServiceException {
     User currentUser =
         service.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
     model.addAttribute("user", currentUser);
@@ -188,7 +188,7 @@ public class UserController extends AbstractController {
       Model model,
       SessionStatus status,
       RedirectAttributes redirectAttributes)
-      throws EntityServiceException {
+      throws ServiceException {
     verifyBinding(results);
     String errorMessage =
         messageSource.getMessage(
@@ -211,7 +211,7 @@ public class UserController extends AbstractController {
   }
 
   @GetMapping("/users/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) throws EntityServiceException {
+  public String view(@PathVariable UUID uuid, Model model) throws ServiceException {
     model.addAttribute("user", service.findOne(uuid));
     return "users/view";
   }

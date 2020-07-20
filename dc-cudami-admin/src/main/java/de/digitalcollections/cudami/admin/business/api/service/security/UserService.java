@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.admin.business.api.service.security;
 
-import de.digitalcollections.cudami.admin.business.api.service.exceptions.EntityServiceException;
+import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.security.User;
@@ -18,30 +18,28 @@ public interface UserService<U extends User> extends UserDetailsService {
 
   long count();
 
-  U activate(UUID uuid) throws EntityServiceException;
+  U activate(UUID uuid) throws ServiceException;
 
   U create();
 
-  U create(U user, String password1, String password2, Errors results)
-      throws EntityServiceException;
+  U create(U user, String password1, String password2, Errors results) throws ServiceException;
 
   U createAdminUser();
 
-  U deactivate(UUID uuid) throws EntityServiceException;
+  U deactivate(UUID uuid) throws ServiceException;
 
-  boolean doesActiveAdminUserExist() throws EntityServiceException;
+  boolean doesActiveAdminUserExist() throws ServiceException;
 
-  PageResponse<U> find(PageRequest pageRequest) throws EntityServiceException;
+  PageResponse<U> find(PageRequest pageRequest) throws ServiceException;
 
   //  List<U> findActiveAdminUsers();
-  List<U> findAll() throws EntityServiceException;
+  List<U> findAll() throws ServiceException;
 
-  U findByEmail(String email) throws EntityServiceException;
+  U findByEmail(String email) throws ServiceException;
 
-  U findOne(UUID uuid) throws EntityServiceException;
+  U findOne(UUID uuid) throws ServiceException;
 
   //  U save(U user);
   //  U update(U user);
-  U update(U user, String password1, String password2, Errors results)
-      throws EntityServiceException;
+  U update(U user, String password1, String password2, Errors results) throws ServiceException;
 }

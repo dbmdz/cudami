@@ -1,11 +1,12 @@
 package de.digitalcollections.cudami.admin.business.impl.service.security;
 
-import de.digitalcollections.cudami.admin.business.api.service.exceptions.EntityServiceException;
+import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import de.digitalcollections.cudami.admin.business.impl.validator.PasswordsValidatorParams;
 import de.digitalcollections.cudami.admin.business.impl.validator.UniqueUsernameValidator;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiUsersClient;
+import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.security.User;
@@ -34,11 +35,11 @@ public class UserServiceImpl implements UserService<UserImpl>, InitializingBean 
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
-  private Validator passwordsValidator;
+  private final Validator passwordsValidator;
 
   private Validator uniqueUsernameValidator;
 
-  private CudamiUsersClient client;
+  private final CudamiUsersClient client;
 
   public UserServiceImpl(
       @Qualifier("passwordsValidator") Validator passwordsValidator, CudamiClient client) {
@@ -47,14 +48,14 @@ public class UserServiceImpl implements UserService<UserImpl>, InitializingBean 
   }
 
   @Override
-  public UserImpl activate(UUID uuid) throws EntityServiceException {
+  public UserImpl activate(UUID uuid) throws ServiceException {
     try {
       User user = client.findOne(uuid);
       user.setEnabled(true);
       user = client.update(user.getUuid(), user);
       return (UserImpl) user;
-    } catch (Exception ex) {
-      throw new EntityServiceException(ex.getMessage(), ex);
+    } catch (HttpException ex) {
+      throw new ServiceException(ex.getMessage(), ex);
     }
   }
 
@@ -70,14 +71,10 @@ public class UserServiceImpl implements UserService<UserImpl>, InitializingBean 
 
   @Override
   public UserImpl create(UserImpl user, String password1, String password2, Errors results)
-      throws EntityServiceException {
+      throws ServiceException {
     uniqueUsernameValidator.validate(user, results);
     if (!results.hasErrors()) {
-      try {
-        return (UserImpl) save(password1, password2, user, results, false);
-      } catch (Exception ex) {
-        throw new EntityServiceException(ex.getMessage(), ex);
-      }
+      return (UserImpl) save(password1, password2, user, results, false);
     }
     return null;
   }
@@ -92,63 +89,63 @@ public class UserServiceImpl implements UserService<UserImpl>, InitializingBean 
   }
 
   @Override
-  public UserImpl deactivate(UUID uuid) throws EntityServiceException {
+  public UserImpl deactivate(UUID uuid) throws ServiceException {
     try {
       User user = client.findOne(uuid);
       user.setEnabled(false);
       user = client.update(user.getUuid(), user);
       return (UserImpl) user;
-    } catch (Exception ex) {
-      throw new EntityServiceException(ex.getMessage(), ex);
+    } catch (HttpException ex) {
+      throw new ServiceException(ex.getMessage(), ex);
     }
   }
 
   @Override
-  public boolean doesActiveAdminUserExist() throws EntityServiceException {
+  public boolean doesActiveAdminUserExist() throws ServiceException {
     try {
       List<UserImpl> findActiveAdminUsers = client.findActiveAdminUsers();
       if (findActiveAdminUsers != null && !findActiveAdminUsers.isEmpty()) {
         return true;
       }
       return false;
-    } catch (Exception ex) {
-      throw new EntityServiceException(ex.getMessage(), ex);
+    } catch (HttpException ex) {
+      throw new ServiceException(ex.getMessage(), ex);
     }
   }
 
   @Override
-  public PageResponse<UserImpl> find(PageRequest pageRequest) throws EntityServiceException {
+  public PageResponse<UserImpl> find(PageRequest pageRequest) throws ServiceException {
     try {
       return client.find(pageRequest);
-    } catch (Exception ex) {
-      throw new EntityServiceException(ex.getMessage(), ex);
+    } catch (HttpException ex) {
+      throw new ServiceException(ex.getMessage(), ex);
     }
   }
 
   @Override
-  public List<UserImpl> findAll() throws EntityServiceException {
+  public List<UserImpl> findAll() throws ServiceException {
     try {
       return client.findAll();
-    } catch (Exception ex) {
-      throw new EntityServiceException(ex.getMessage(), ex);
+    } catch (HttpException ex) {
+      throw new ServiceException(ex.getMessage(), ex);
     }
   }
 
   @Override
-  public UserImpl findByEmail(String email) throws EntityServiceException {
+  public UserImpl findByEmail(String email) throws ServiceException {
     try {
       return (UserImpl) client.findOneByEmail(email);
-    } catch (Exception ex) {
-      throw new EntityServiceException(ex.getMessage(), ex);
+    } catch (HttpException ex) {
+      throw new ServiceException(ex.getMessage(), ex);
     }
   }
 
   @Override
-  public UserImpl findOne(UUID uuid) throws EntityServiceException {
+  public UserImpl findOne(UUID uuid) throws ServiceException {
     try {
       return (UserImpl) client.findOne(uuid);
-    } catch (Exception ex) {
-      throw new EntityServiceException(ex.getMessage(), ex);
+    } catch (HttpException ex) {
+      throw new ServiceException(ex.getMessage(), ex);
     }
   }
 
@@ -164,7 +161,7 @@ public class UserServiceImpl implements UserService<UserImpl>, InitializingBean 
     User user;
     try {
       user = client.findOneByEmail(username);
-    } catch (Exception ex) {
+    } catch (HttpException ex) {
       throw new UsernameNotFoundException(
           String.format("User \"%s\" was not found.", username), ex);
     }
@@ -185,13 +182,13 @@ public class UserServiceImpl implements UserService<UserImpl>, InitializingBean 
   // TODO: Simplify user management
   @Override
   public UserImpl update(UserImpl user, String password1, String password2, Errors results)
-      throws EntityServiceException {
+      throws ServiceException {
     return (UserImpl) save(password1, password2, user, results, true);
   }
 
   // TODO: Simplify user management
   private User save(String password1, String password2, User user, Errors results, boolean isUpdate)
-      throws EntityServiceException {
+      throws ServiceException {
     final PasswordsValidatorParams passwordsValidatorParams =
         new PasswordsValidatorParams(password1, password2, user.getPasswordHash());
     String password = passwordsValidatorParams.getPassword1();
@@ -206,12 +203,12 @@ public class UserServiceImpl implements UserService<UserImpl>, InitializingBean 
       }
       try {
         if (isUpdate) {
-          user = (User) client.update(user.getUuid(), user);
+          user = client.update(user.getUuid(), user);
         } else {
-          user = (User) client.save(user);
+          user = client.save(user);
         }
-      } catch (Exception ex) {
-        throw new EntityServiceException(ex.getMessage(), ex);
+      } catch (HttpException ex) {
+        throw new ServiceException(ex.getMessage(), ex);
       }
     }
     return user;
