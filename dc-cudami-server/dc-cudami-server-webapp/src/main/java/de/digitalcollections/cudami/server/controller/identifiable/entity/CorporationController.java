@@ -70,7 +70,7 @@ public class CorporationController {
       value = {"/latest/corporations/{uuid}", "/v2/corporations/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   @ApiResponseObject
-  public ResponseEntity<Corporation> getWebpage(
+  public ResponseEntity<Corporation> get(
       @ApiPathParam(
               description =
                   "UUID of the corporation, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")

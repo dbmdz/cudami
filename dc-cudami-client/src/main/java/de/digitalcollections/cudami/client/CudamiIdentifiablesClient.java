@@ -1,39 +1,71 @@
 package de.digitalcollections.cudami.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.client.exceptions.CudamiRestErrorDecoder;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.Identifiable;
-import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
-import feign.Logger;
-import feign.Param;
-import feign.ReflectiveFeign;
-import feign.RequestLine;
-import feign.Retryer;
-import feign.jackson.JacksonDecoder;
-import feign.jackson.JacksonEncoder;
-import feign.slf4j.Slf4jLogger;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
+import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
+import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 
-public interface CudamiIdentifiablesClient {
+public class CudamiIdentifiablesClient extends CudamiBaseClient<IdentifiableImpl> {
 
-  public static CudamiIdentifiablesClient build(String serverUrl) {
-    ObjectMapper mapper = new DigitalCollectionsObjectMapper();
-    CudamiIdentifiablesClient backend =
-        ReflectiveFeign.builder()
-            .decoder(new JacksonDecoder(mapper))
-            .encoder(new JacksonEncoder(mapper))
-            .errorDecoder(new CudamiRestErrorDecoder())
-            .logger(new Slf4jLogger())
-            .logLevel(Logger.Level.BASIC)
-            .retryer(new Retryer.Default())
-            .target(CudamiIdentifiablesClient.class, serverUrl);
-    return backend;
+  public CudamiIdentifiablesClient(String serverUrl, ObjectMapper mapper) {
+    super(serverUrl, IdentifiableImpl.class, mapper);
   }
 
-  @RequestLine("GET /v2/identifiables/{uuid}")
-  Identifiable getIdentifiable(@Param("uuid") String uuid) throws HttpException;
+  public Identifiable create() {
+    return new IdentifiableImpl();
+  }
 
-  @RequestLine("GET /V2/identifiables/identifier/{namespace}:{id}")
-  Identifiable getByIdentifier(@Param("namespace") String namespace, @Param("id") String id)
-      throws HttpException;
+  public long count() throws HttpException {
+    return Long.parseLong(doGetRequestForString("/latest/identifiables/count"));
+  }
+
+  public PageResponse<IdentifiableImpl> find(PageRequest pageRequest) throws HttpException {
+    return doGetRequestForPagedObjectList("/latest/identifiables", pageRequest);
+  }
+
+  public SearchPageResponse<IdentifiableImpl> find(SearchPageRequest searchPageRequest)
+      throws HttpException {
+    return doGetSearchRequestForPagedObjectList("/latest/identifiables/search", searchPageRequest);
+  }
+
+  public List<IdentifiableImpl> find(String searchTerm, int maxResults) throws HttpException {
+    SearchPageRequest searchPageRequest =
+        new SearchPageRequestImpl(searchTerm, 0, maxResults, null);
+    SearchPageResponse<IdentifiableImpl> response = find(searchPageRequest);
+    return response.getContent();
+  }
+
+  public Identifiable findOne(UUID uuid) throws HttpException {
+    return doGetRequestForObject(String.format("/latest/identifiables/%s", uuid));
+  }
+
+  public Identifiable findOneByIdentifier(String namespace, String id) throws HttpException {
+    return doGetRequestForObject(
+        String.format("/latest/identifiables/identifier/%s:%s.json", namespace, id));
+  }
+
+  public Identifiable findOne(UUID uuid, Locale locale) throws HttpException {
+    return findOne(uuid, locale.toString());
+  }
+
+  public Identifiable findOne(UUID uuid, String locale) throws HttpException {
+    return doGetRequestForObject(String.format("/latest/identifiables/%s?locale=%s", uuid, locale));
+  }
+
+  public Identifiable save(Identifiable identifiable) throws HttpException {
+    return doPostRequestForObject("/latest/identifiables", (IdentifiableImpl) identifiable);
+  }
+
+  public Identifiable update(UUID uuid, Identifiable identifiable) throws HttpException {
+    return doPutRequestForObject(
+        String.format("/latest/identifiables/%s", uuid), (IdentifiableImpl) identifiable);
+  }
 }

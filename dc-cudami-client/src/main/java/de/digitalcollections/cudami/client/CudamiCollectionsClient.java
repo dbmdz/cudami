@@ -1,109 +1,76 @@
 package de.digitalcollections.cudami.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.client.exceptions.CudamiRestErrorDecoder;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
-import de.digitalcollections.model.api.paging.FindParams;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
-import de.digitalcollections.model.impl.paging.FindParamsImpl;
-import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
-import feign.Headers;
-import feign.Logger;
-import feign.Param;
-import feign.ReflectiveFeign;
-import feign.RequestLine;
-import feign.Retryer;
-import feign.jackson.JacksonDecoder;
-import feign.jackson.JacksonEncoder;
-import feign.slf4j.Slf4jLogger;
+import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
+import java.util.Locale;
 import java.util.UUID;
 
-public interface CudamiCollectionsClient {
+public class CudamiCollectionsClient extends CudamiBaseClient<CollectionImpl> {
 
-  public static CudamiCollectionsClient build(String serverUrl) {
-    ObjectMapper mapper = new DigitalCollectionsObjectMapper();
-    CudamiCollectionsClient backend =
-        ReflectiveFeign.builder()
-            .decoder(new JacksonDecoder(mapper))
-            .encoder(new JacksonEncoder(mapper))
-            .errorDecoder(new CudamiRestErrorDecoder())
-            .logger(new Slf4jLogger())
-            .logLevel(Logger.Level.BASIC)
-            .retryer(new Retryer.Default())
-            .target(CudamiCollectionsClient.class, serverUrl);
-    return backend;
+  public CudamiCollectionsClient(String serverUrl, ObjectMapper mapper) {
+    super(serverUrl, CollectionImpl.class, mapper);
   }
 
-  default Collection createCollection() {
+  public Collection create() {
     return new CollectionImpl();
   }
 
-  default PageResponse findTopCollections(PageRequest pageRequest) {
-    FindParams f = new FindParamsImpl(pageRequest);
-    PageResponse<Collection> pageResponse =
-        findTopCollections(
-            f.getPageNumber(),
-            f.getPageSize(),
-            f.getSortField(),
-            f.getSortDirection(),
-            f.getNullHandling());
-    return pageResponse;
+  public long count() throws HttpException {
+    return Long.parseLong(doGetRequestForString("/latest/collections/count"));
   }
 
-  default PageResponse findCollections(PageRequest pageRequest) {
-    FindParams f = new FindParamsImpl(pageRequest);
-    PageResponse<Collection> pageResponse =
-        findCollections(
-            f.getPageNumber(),
-            f.getPageSize(),
-            f.getSortField(),
-            f.getSortDirection(),
-            f.getNullHandling());
-    return pageResponse;
+  public PageResponse<CollectionImpl> find(PageRequest pageRequest) throws HttpException {
+    return doGetRequestForPagedObjectList("/latest/collections", pageRequest);
   }
 
-  @RequestLine(
-      "GET /latest/collections?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
-  PageResponse<Collection> findCollections(
-      @Param("pageNumber") int pageNumber,
-      @Param("pageSize") int pageSize,
-      @Param("sortField") String sortField,
-      @Param("sortDirection") String sortDirection,
-      @Param("nullHandling") String nullHandling);
-
-  @RequestLine(
-      "GET /latest/collections/top?pageNumber={pageNumber}&pageSize={pageSize}&sortField={sortField}&sortDirection={sortDirection}&nullHandling={nullHandling}")
-  PageResponse<Collection> findTopCollections(
-      @Param("pageNumber") int pageNumber,
-      @Param("pageSize") int pageSize,
-      @Param("sortField") String sortField,
-      @Param("sortDirection") String sortDirection,
-      @Param("nullHandling") String nullHandling);
-
-  @RequestLine("GET /latest/collections/{uuid}")
-  Collection getCollection(@Param("uuid") UUID uuid) throws HttpException;
-
-  @RequestLine("POST /latest/collections/{parentCollectionUuid}/collection")
-  @Headers("Content-Type: application/json")
-  Collection saveCollectionWithParentCollection(
-      Collection collection, @Param("parentCollectionUuid") UUID parentCollectionUuid);
-
-  @RequestLine("POST /latest/collections")
-  @Headers("Content-Type: application/json")
-  Collection saveCollection(Collection collection);
-
-  default Collection updateCollection(Collection collection) {
-    return updateCollection(collection.getUuid(), collection);
+  public Collection findOne(UUID uuid) throws HttpException {
+    return doGetRequestForObject(String.format("/latest/collections/%s", uuid));
   }
 
-  @RequestLine("PUT /latest/collections/{uuid}")
-  @Headers("Content-Type: application/json")
-  Collection updateCollection(@Param("uuid") UUID uuid, Collection collection);
+  public Collection findOne(UUID uuid, Locale locale) throws HttpException {
+    return findOne(uuid, locale.toString());
+  }
 
-  @RequestLine("GET /latest/collections/{uuid}/breadcrumb")
-  BreadcrumbNavigation getBreadcrumbNavigation(@Param("uuid") UUID collectionUuid);
+  public Collection findOne(UUID uuid, String locale) throws HttpException {
+    return doGetRequestForObject(String.format("/latest/collections/%s?pLocale=%s", uuid, locale));
+  }
+
+  public Collection findOneByIdentifier(String namespace, String id) throws HttpException {
+    return doGetRequestForObject(
+        String.format("/latest/collections/identifier/%s:%s.json", namespace, id));
+  }
+
+  public PageResponse<CollectionImpl> findTopCollections(PageRequest pageRequest)
+      throws HttpException {
+    return doGetRequestForPagedObjectList("/latest/collections/top", pageRequest);
+  }
+
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws HttpException {
+    return (BreadcrumbNavigation)
+        doGetRequestForObject(
+            String.format("/latest/collections/%s/breadcrumb", uuid),
+            BreadcrumbNavigationImpl.class);
+  }
+
+  public Collection saveWithParentCollection(Collection collection, UUID parentCollectionUuid)
+      throws HttpException {
+    return doPostRequestForObject(
+        String.format("/latest/collections/%s/collection", parentCollectionUuid),
+        (CollectionImpl) collection);
+  }
+
+  public Collection save(Collection collection) throws HttpException {
+    return doPostRequestForObject("/latest/collections", (CollectionImpl) collection);
+  }
+
+  public Collection update(UUID uuid, Collection collection) throws HttpException {
+    return doPutRequestForObject(
+        String.format("/latest/collections/%s", uuid), (CollectionImpl) collection);
+  }
 }

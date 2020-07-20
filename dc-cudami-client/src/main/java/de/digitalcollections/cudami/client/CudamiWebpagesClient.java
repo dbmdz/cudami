@@ -1,51 +1,103 @@
 package de.digitalcollections.cudami.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.client.exceptions.CudamiRestErrorDecoder;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
+import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
-import feign.Logger;
-import feign.Param;
-import feign.QueryMap;
-import feign.ReflectiveFeign;
-import feign.RequestLine;
-import feign.Retryer;
-import feign.jackson.JacksonDecoder;
-import feign.jackson.JacksonEncoder;
-import feign.slf4j.Slf4jLogger;
+import de.digitalcollections.model.api.view.BreadcrumbNavigation;
+import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
+import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
+import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
+import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
+import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.UUID;
 
-public interface CudamiWebpagesClient {
+public class CudamiWebpagesClient extends CudamiBaseClient<WebpageImpl> {
 
-  public static CudamiWebpagesClient build(String serverUrl) {
-    ObjectMapper mapper = new DigitalCollectionsObjectMapper();
-    CudamiWebpagesClient backend =
-        ReflectiveFeign.builder()
-            .decoder(new JacksonDecoder(mapper))
-            .encoder(new JacksonEncoder(mapper))
-            .errorDecoder(new CudamiRestErrorDecoder())
-            .logger(new Slf4jLogger())
-            .logLevel(Logger.Level.BASIC)
-            .retryer(new Retryer.Default())
-            .target(CudamiWebpagesClient.class, serverUrl);
-    return backend;
+  public CudamiWebpagesClient(String serverUrl, ObjectMapper mapper) {
+    super(serverUrl, WebpageImpl.class, mapper);
   }
 
-  @RequestLine("GET /v3/webpages/{uuid}")
-  Webpage getWebpage(@Param("uuid") String uuid) throws HttpException;
+  public Webpage create() {
+    return new WebpageImpl();
+  }
 
-  @RequestLine("GET /v3/webpages/{uuid}?pLocale={locale}")
-  Webpage getWebpage(@Param("locale") Locale locale, @Param("uuid") String uuid)
-      throws HttpException;
+  public long count() throws HttpException {
+    return Long.parseLong(doGetRequestForString("/latest/webpages/count"));
+  }
 
-  @RequestLine("GET /v3/webpages/{uuid}/children")
-  PageResponse<Webpage> getChildren(@Param("uuid") UUID uuid, @QueryMap Map queryMap);
+  public PageResponse<WebpageImpl> find(PageRequest pageRequest) throws HttpException {
+    return doGetRequestForPagedObjectList("/latest/webpages", pageRequest);
+  }
 
-  @RequestLine("GET /V2/websites/{uuid}")
-  Website getWebsite(@Param("uuid") String uuid) throws HttpException;
+  public Webpage findOne(UUID uuid) throws HttpException {
+    return doGetRequestForObject(String.format("/latest/webpages/%s", uuid));
+  }
+
+  public Webpage findOne(UUID uuid, Locale locale) throws HttpException {
+    return findOne(uuid, locale.toString());
+  }
+
+  public Webpage findOne(UUID uuid, String locale) throws HttpException {
+    return doGetRequestForObject(String.format("/latest/webpages/%s?pLocale=%s", uuid, locale));
+  }
+
+  public Webpage findOneByIdentifier(String namespace, String id) throws HttpException {
+    return doGetRequestForObject(
+        String.format("/latest/webpages/identifier/%s:%s.json", namespace, id));
+  }
+
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws HttpException {
+    return (BreadcrumbNavigation)
+        doGetRequestForObject(
+            String.format("/latest/webpages/%s/breadcrumb", uuid), BreadcrumbNavigationImpl.class);
+  }
+
+  public List<WebpageImpl> getChildren(UUID uuid) throws HttpException {
+    return doGetRequestForObjectList(String.format("/latest/webpages/%s/children", uuid));
+  }
+
+  public PageResponse<WebpageImpl> getChildren(UUID uuid, PageRequest pageRequest)
+      throws HttpException {
+    return doGetRequestForPagedObjectList(
+        String.format("/latest/webpages/%s/children", uuid), pageRequest);
+  }
+
+  public Webpage getParent(UUID uuid) throws HttpException {
+    return doGetRequestForObject(String.format("/latest/webpages/%s/parent", uuid));
+  }
+
+  public List getRelatedFileResources(UUID uuid) throws HttpException {
+    return doGetRequestForObjectList(
+        String.format("/latest/entities/%s/related/fileresources", uuid), FileResourceImpl.class);
+  }
+
+  public Website getWebsite(UUID rootWebpageUuid) throws HttpException {
+    return (Website)
+        doGetRequestForObject(
+            String.format("/latest/webpages/%s/website", rootWebpageUuid), WebsiteImpl.class);
+  }
+
+  public Webpage save(Webpage webpage) throws HttpException {
+    return doPostRequestForObject("/latest/webpages", (WebpageImpl) webpage);
+  }
+
+  public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid)
+      throws HttpException {
+    return doPostRequestForObject(
+        String.format("/latest/websites/%s/webpage", parentWebsiteUuid), (WebpageImpl) webpage);
+  }
+
+  public Webpage saveWithParentWebpage(Webpage webpage, UUID parentWebpageUuid)
+      throws HttpException {
+    return doPostRequestForObject(
+        String.format("/latest/webpages/%s/webpage", parentWebpageUuid), (WebpageImpl) webpage);
+  }
+
+  public Webpage update(UUID uuid, Webpage webpage) throws HttpException {
+    return doPutRequestForObject(String.format("/latest/webpages/%s", uuid), (WebpageImpl) webpage);
+  }
 }

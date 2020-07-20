@@ -13,62 +13,56 @@ import de.digitalcollections.cudami.client.exceptions.server.HttpServerException
 import de.digitalcollections.cudami.client.exceptions.server.HttpVersionNotSupportedException;
 import de.digitalcollections.cudami.client.exceptions.server.NotImplementedException;
 import de.digitalcollections.cudami.client.exceptions.server.ServiceUnavailableException;
-import feign.Response;
-import feign.codec.ErrorDecoder;
 
-public class CudamiRestErrorDecoder implements ErrorDecoder {
+public class CudamiRestErrorDecoder {
 
-  @Override
-  public Exception decode(String methodKey, Response response) {
-    final int status = response.status();
-    if (400 <= status && status < 500) {
-      return clientException(methodKey, response);
-    } else if (500 <= status && status < 600) {
-      return serverException(methodKey, response);
+  public static HttpException decode(String methodKey, int statusCode) {
+    if (400 <= statusCode && statusCode < 500) {
+      return clientException(methodKey, statusCode);
+    } else if (500 <= statusCode && statusCode < 600) {
+      return serverException(methodKey, statusCode);
     } else {
-      return genericHttpException(methodKey, response);
+      return genericHttpException(methodKey, statusCode);
     }
   }
 
-  private Exception clientException(String methodKey, Response response) {
-    final int status = response.status();
-    switch (status) {
+  private static HttpException clientException(String methodKey, int statusCode) {
+    switch (statusCode) {
       case 401:
-        return new UnauthorizedException(methodKey, response);
+        return new UnauthorizedException(methodKey, statusCode);
       case 403:
-        return new ForbiddenException(methodKey, response);
+        return new ForbiddenException(methodKey, statusCode);
       case 404:
-        return new ResourceNotFoundException(methodKey, response);
+        return new ResourceNotFoundException(methodKey, statusCode);
       case 413:
-        return new ImATeapotException(methodKey, response);
+        return new ImATeapotException(methodKey, statusCode);
       case 422:
-        return new ResourceException(methodKey, response);
+        return new ResourceException(methodKey, statusCode);
       case 451:
-        return new UnavailableForLegalReasonsException(methodKey, response);
+        return new UnavailableForLegalReasonsException(methodKey, statusCode);
       default:
-        return new HttpClientException(methodKey, response);
+        return new HttpClientException(methodKey, statusCode);
     }
   }
 
-  private Exception genericHttpException(String methodKey, Response response) {
-    return new HttpException(methodKey, response);
+  private static HttpException genericHttpException(String methodKey, int statusCode) {
+    return new HttpException(methodKey, statusCode);
   }
 
-  private HttpServerException serverException(String methodKey, Response response) {
-    final int status = response.status();
-    switch (status) {
+  private static HttpServerException serverException(String methodKey, int statusCode) {
+    switch (statusCode) {
       case 501:
-        return new NotImplementedException(methodKey, response);
+        return new NotImplementedException(methodKey, statusCode);
       case 502:
-        return new BadGatewayException(methodKey, response);
+        return new BadGatewayException(methodKey, statusCode);
       case 503:
-        return new ServiceUnavailableException(methodKey, response);
+        return new ServiceUnavailableException(methodKey, statusCode);
       case 504:
-        return new GatewayTimeOutException(methodKey, response);
+        return new GatewayTimeOutException(methodKey, statusCode);
       case 505:
-        return new HttpVersionNotSupportedException(methodKey, response);
+        return new HttpVersionNotSupportedException(methodKey, statusCode);
       default:
-        return new HttpServerException(methodKey, response);
+        return new HttpServerException(methodKey, statusCode);
     }
   }
 }
