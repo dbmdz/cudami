@@ -44,11 +44,15 @@ public class CudamiBaseClient<T extends Object> {
     this.targetType = targetType;
   }
 
+  protected URI createFullUri(String requestUrl) {
+    return serverUri.resolve(serverUri.getPath() + requestUrl);
+  }
+
   private HttpRequest createGetRequest(String requestUrl) {
     HttpRequest req =
         HttpRequest.newBuilder()
             .GET()
-            .uri(serverUri.resolve(requestUrl))
+            .uri(createFullUri(requestUrl))
             .header("Accept", "application/json")
             // TODO add creation of a request id if needed
             //            .header("X-Request-Id", request.getRequestId())
@@ -60,7 +64,7 @@ public class CudamiBaseClient<T extends Object> {
     HttpRequest req =
         HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.noBody())
-            .uri(serverUri.resolve(requestUrl))
+            .uri(createFullUri(requestUrl))
             .header("Content-Type", "application/json")
             .header("Accept", "application/json")
             // TODO add creation of a request id if needed
@@ -74,7 +78,7 @@ public class CudamiBaseClient<T extends Object> {
     HttpRequest req =
         HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(bodyObject)))
-            .uri(serverUri.resolve(requestUrl))
+            .uri(createFullUri(requestUrl))
             .header("Content-Type", "application/json")
             .header("Accept", "application/json")
             // TODO add creation of a request id if needed
@@ -88,7 +92,7 @@ public class CudamiBaseClient<T extends Object> {
     HttpRequest req =
         HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(bodyObject)))
-            .uri(serverUri.resolve(requestUrl))
+            .uri(createFullUri(requestUrl))
             .header("Content-Type", "application/json")
             .header("Accept", "application/json")
             // TODO add creation of a request id if needed
