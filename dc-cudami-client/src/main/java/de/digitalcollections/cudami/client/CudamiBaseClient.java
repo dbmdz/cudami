@@ -114,7 +114,11 @@ public class CudamiBaseClient<T extends Object> {
       if (resp.statusCode() != 200) {
         throw CudamiRestErrorDecoder.decode("doGetRequestForObject", resp.statusCode());
       }
-      T result = mapper.readerFor(targetType).readValue(resp.body());
+      final byte[] body = resp.body();
+      if (body == null) {
+        return null;
+      }
+      T result = mapper.readerFor(targetType).readValue(body);
       return result;
     } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to connection error", e);
@@ -136,7 +140,11 @@ public class CudamiBaseClient<T extends Object> {
       if (resp.statusCode() != 200) {
         throw CudamiRestErrorDecoder.decode("doGetRequestForObjectList", resp.statusCode());
       }
-      List result = mapper.readerForListOf(targetType).readValue(resp.body());
+      final byte[] body = resp.body();
+      if (body == null) {
+        return null;
+      }
+      List result = mapper.readerForListOf(targetType).readValue(body);
       return result;
     } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to connection error", e);
@@ -169,7 +177,11 @@ public class CudamiBaseClient<T extends Object> {
       if (resp.statusCode() != 200) {
         throw CudamiRestErrorDecoder.decode("doGetRequestForPagedObjectList", resp.statusCode());
       }
-      PageResponse<T> result = mapper.readerFor(PageResponse.class).readValue(resp.body());
+      final byte[] body = resp.body();
+      if (body == null) {
+        return null;
+      }
+      PageResponse<T> result = mapper.readerFor(PageResponse.class).readValue(body);
       return result;
     } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to connection error", e);
@@ -198,8 +210,11 @@ public class CudamiBaseClient<T extends Object> {
       if (resp.statusCode() != 200) {
         throw CudamiRestErrorDecoder.decode("doGetRequestForPagedObjectList", resp.statusCode());
       }
-      SearchPageResponse<T> result =
-          mapper.readerFor(SearchPageResponse.class).readValue(resp.body());
+      final byte[] body = resp.body();
+      if (body == null) {
+        return null;
+      }
+      SearchPageResponse<T> result = mapper.readerFor(SearchPageResponse.class).readValue(body);
       result.setQuery(searchTerm);
       return result;
     } catch (IOException | InterruptedException e) {
@@ -228,7 +243,11 @@ public class CudamiBaseClient<T extends Object> {
       if (resp.statusCode() != 200) {
         throw CudamiRestErrorDecoder.decode("doPostRequestForObject", resp.statusCode());
       }
-      T result = mapper.readerFor(targetType).readValue(resp.body());
+      final byte[] body = resp.body();
+      if (body == null) {
+        return null;
+      }
+      T result = mapper.readerFor(targetType).readValue(body);
       return result;
     } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to error", e);
@@ -244,7 +263,11 @@ public class CudamiBaseClient<T extends Object> {
       if (resp.statusCode() != 200) {
         throw CudamiRestErrorDecoder.decode("doPostRequestForObject", resp.statusCode());
       }
-      Object result = mapper.readerFor(targetType).readValue(resp.body());
+      final byte[] body = resp.body();
+      if (body == null) {
+        return null;
+      }
+      Object result = mapper.readerFor(targetType).readValue(body);
       return result;
     } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to error", e);
@@ -265,7 +288,11 @@ public class CudamiBaseClient<T extends Object> {
       if (resp.statusCode() != 200) {
         throw CudamiRestErrorDecoder.decode("doPostRequestForObject", resp.statusCode());
       }
-      List<Class<?>> result = mapper.readerForListOf(targetType).readValue(resp.body());
+      final byte[] body = resp.body();
+      if (body == null) {
+        return null;
+      }
+      List<Class<?>> result = mapper.readerForListOf(targetType).readValue(body);
       return result;
     } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to error", e);
@@ -280,7 +307,11 @@ public class CudamiBaseClient<T extends Object> {
       if (resp.statusCode() != 200) {
         throw CudamiRestErrorDecoder.decode("doPutRequestForObject", resp.statusCode());
       }
-      T result = mapper.readerFor(targetType).readValue(resp.body());
+      final byte[] body = resp.body();
+      if (body == null) {
+        return null;
+      }
+      T result = mapper.readerFor(targetType).readValue(body);
       return result;
     } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to connection error", e);
