@@ -115,7 +115,7 @@ public class CudamiBaseClient<T extends Object> {
         throw CudamiRestErrorDecoder.decode("doGetRequestForObject", resp.statusCode());
       }
       final byte[] body = resp.body();
-      if (body == null) {
+      if (body == null || body.length == 0) {
         return null;
       }
       T result = mapper.readerFor(targetType).readValue(body);
@@ -141,7 +141,7 @@ public class CudamiBaseClient<T extends Object> {
         throw CudamiRestErrorDecoder.decode("doGetRequestForObjectList", resp.statusCode());
       }
       final byte[] body = resp.body();
-      if (body == null) {
+      if (body == null || body.length == 0) {
         return null;
       }
       List result = mapper.readerForListOf(targetType).readValue(body);
@@ -178,7 +178,7 @@ public class CudamiBaseClient<T extends Object> {
         throw CudamiRestErrorDecoder.decode("doGetRequestForPagedObjectList", resp.statusCode());
       }
       final byte[] body = resp.body();
-      if (body == null) {
+      if (body == null || body.length == 0) {
         return null;
       }
       PageResponse<T> result = mapper.readerFor(PageResponse.class).readValue(body);
@@ -211,7 +211,7 @@ public class CudamiBaseClient<T extends Object> {
         throw CudamiRestErrorDecoder.decode("doGetRequestForPagedObjectList", resp.statusCode());
       }
       final byte[] body = resp.body();
-      if (body == null) {
+      if (body == null || body.length == 0) {
         return null;
       }
       SearchPageResponse<T> result = mapper.readerFor(SearchPageResponse.class).readValue(body);
@@ -244,7 +244,7 @@ public class CudamiBaseClient<T extends Object> {
         throw CudamiRestErrorDecoder.decode("doPostRequestForObject", resp.statusCode());
       }
       final byte[] body = resp.body();
-      if (body == null) {
+      if (body == null || body.length == 0) {
         return null;
       }
       T result = mapper.readerFor(targetType).readValue(body);
@@ -264,7 +264,7 @@ public class CudamiBaseClient<T extends Object> {
         throw CudamiRestErrorDecoder.decode("doPostRequestForObject", resp.statusCode());
       }
       final byte[] body = resp.body();
-      if (body == null) {
+      if (body == null || body.length == 0) {
         return null;
       }
       Object result = mapper.readerFor(targetType).readValue(body);
@@ -289,7 +289,7 @@ public class CudamiBaseClient<T extends Object> {
         throw CudamiRestErrorDecoder.decode("doPostRequestForObject", resp.statusCode());
       }
       final byte[] body = resp.body();
-      if (body == null) {
+      if (body == null || body.length == 0) {
         return null;
       }
       List<Class<?>> result = mapper.readerForListOf(targetType).readValue(body);
@@ -308,7 +308,7 @@ public class CudamiBaseClient<T extends Object> {
         throw CudamiRestErrorDecoder.decode("doPutRequestForObject", resp.statusCode());
       }
       final byte[] body = resp.body();
-      if (body == null) {
+      if (body == null || body.length == 0) {
         return null;
       }
       T result = mapper.readerFor(targetType).readValue(body);
