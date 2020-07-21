@@ -3,11 +3,14 @@ package de.digitalcollections.cudami.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
+import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
+import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
 import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -15,6 +18,21 @@ public class CudamiCollectionsClient extends CudamiBaseClient<CollectionImpl> {
 
   public CudamiCollectionsClient(String serverUrl, ObjectMapper mapper) {
     super(serverUrl, CollectionImpl.class, mapper);
+  }
+
+  public boolean addDigitalObject(UUID collectionUuid, UUID digitalObjectUuid)
+      throws HttpException {
+    return Boolean.parseBoolean(
+        doPatchRequestForString(
+            String.format(
+                "/latest/collections/%s/digitalobject/%s", collectionUuid, digitalObjectUuid)));
+  }
+
+  public boolean addDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects)
+      throws HttpException {
+    return Boolean.parseBoolean(
+        doPatchRequestForString(
+            String.format("/latest/collections/%s/digitalobject", collectionUuid), digitalObjects));
   }
 
   public Collection create() {
@@ -58,6 +76,14 @@ public class CudamiCollectionsClient extends CudamiBaseClient<CollectionImpl> {
             BreadcrumbNavigationImpl.class);
   }
 
+  public PageResponse<DigitalObject> getDigitalObjects(UUID collectionUuid, PageRequest pageRequest)
+      throws HttpException {
+    return doGetRequestForPagedObjectList(
+        String.format("/latest/collections/%s/digitalobjects", collectionUuid),
+        pageRequest,
+        DigitalObjectImpl.class);
+  }
+
   public Collection saveWithParentCollection(Collection collection, UUID parentCollectionUuid)
       throws HttpException {
     return doPostRequestForObject(
@@ -67,6 +93,16 @@ public class CudamiCollectionsClient extends CudamiBaseClient<CollectionImpl> {
 
   public Collection save(Collection collection) throws HttpException {
     return doPostRequestForObject("/latest/collections", (CollectionImpl) collection);
+  }
+
+  public boolean saveDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects)
+      throws HttpException {
+    return Boolean.parseBoolean(
+        (String)
+            doPostRequestForObject(
+                String.format("/latest/collections/%s/digitalobjects", collectionUuid),
+                digitalObjects,
+                String.class));
   }
 
   public Collection update(UUID uuid, Collection collection) throws HttpException {

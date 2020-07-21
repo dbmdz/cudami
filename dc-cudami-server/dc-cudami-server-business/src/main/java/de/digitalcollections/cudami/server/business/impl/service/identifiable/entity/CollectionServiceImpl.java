@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
+import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
@@ -70,5 +71,26 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   @Override
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
     return ((NodeRepository<Collection>) repository).getBreadcrumbNavigation(nodeUuid);
+  }
+
+  @Override
+  public boolean addDigitalObject(Collection collection, DigitalObject digitalObject) {
+    return ((CollectionRepository) repository).addDigitalObject(collection, digitalObject);
+  }
+
+  @Override
+  public boolean addDigitalObjects(Collection collection, List<DigitalObject> digitalObjects) {
+    return ((CollectionRepository) repository).addDigitalObjects(collection, digitalObjects);
+  }
+
+  @Override
+  public PageResponse<DigitalObject> getDigitalObjects(
+      Collection collection, PageRequest pageRequest) {
+    return ((CollectionRepository) repository).getDigitalObjects(collection, pageRequest);
+  }
+
+  @Override
+  public boolean saveDigitalObjects(Collection collection, List<DigitalObject> digitalObjects) {
+    return ((CollectionRepository) repository).saveDigitalObjects(collection, digitalObjects);
   }
 }
