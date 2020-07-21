@@ -2,16 +2,32 @@ package de.digitalcollections.cudami.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
+import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.Project;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
 import de.digitalcollections.model.impl.identifiable.entity.ProjectImpl;
+import java.util.List;
 import java.util.UUID;
 
 public class CudamiProjectsClient extends CudamiBaseClient<ProjectImpl> {
 
   public CudamiProjectsClient(String serverUrl, ObjectMapper mapper) {
     super(serverUrl, ProjectImpl.class, mapper);
+  }
+
+  public boolean addDigitalObject(UUID projectUuid, UUID digitalObjectUuid) throws HttpException {
+    return Boolean.parseBoolean(
+        doPatchRequestForString(
+            String.format("/latest/projects/%s/digitalobject/%s", projectUuid, digitalObjectUuid)));
+  }
+
+  public boolean addDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects)
+      throws HttpException {
+    return Boolean.parseBoolean(
+        doPatchRequestForString(
+            String.format("/latest/projects/%s/digitalobject", projectUuid), digitalObjects));
   }
 
   public Project create() {
@@ -39,8 +55,26 @@ public class CudamiProjectsClient extends CudamiBaseClient<ProjectImpl> {
         String.format("/latest/projects/identifier/%s:%s.json", namespace, id));
   }
 
+  public PageResponse<DigitalObject> getDigitalObjects(UUID projectUuid, PageRequest pageRequest)
+      throws HttpException {
+    return doGetRequestForPagedObjectList(
+        String.format("/latest/projects/%s/digitalobjects", projectUuid),
+        pageRequest,
+        DigitalObjectImpl.class);
+  }
+
   public Project save(Project project) throws HttpException {
     return doPostRequestForObject("/latest/projects", (ProjectImpl) project);
+  }
+
+  public boolean saveDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects)
+      throws HttpException {
+    return Boolean.parseBoolean(
+        (String)
+            doPostRequestForObject(
+                String.format("/latest/projects/%s/digitalobjects", projectUuid),
+                digitalObjects,
+                String.class));
   }
 
   public Project update(UUID uuid, Project project) throws HttpException {

@@ -2,15 +2,19 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
+import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.Project;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.paging.enums.Direction;
 import de.digitalcollections.model.api.paging.enums.NullHandling;
+import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
+import de.digitalcollections.model.impl.identifiable.entity.ProjectImpl;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
@@ -25,6 +29,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -70,7 +75,7 @@ public class ProjectController {
       value = {"/latest/projects/{uuid}", "/v2/projects/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   @ApiResponseObject
-  public ResponseEntity<Project> getWebpage(
+  public ResponseEntity<Project> findByUuid(
       @ApiPathParam(
               description =
                   "UUID of the project, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
@@ -112,5 +117,95 @@ public class ProjectController {
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, project.getUuid());
     return projectService.update(project);
+  }
+
+  @ApiMethod(description = "Add an existing digital object to an existing project")
+  @PatchMapping(
+      value = {
+        "/latest/project/{uuid}/digitalobject/{digitalObjectUuid}",
+        "/v3/projects/{uuid}/digitalobject/{digitalObjectUuid}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public ResponseEntity addDigitalObject(
+      @ApiPathParam(description = "UUID of the project") @PathVariable("uuid") UUID projectUuid,
+      @ApiPathParam(description = "UUID of the digital object") @PathVariable("digitalObjectUuid")
+          UUID digitalObjectUuid) {
+    ProjectImpl project = new ProjectImpl();
+    project.setUuid(projectUuid);
+
+    DigitalObjectImpl digitalObject = new DigitalObjectImpl();
+    digitalObject.setUuid(digitalObjectUuid);
+
+    boolean successful = projectService.addDigitalObject(project, digitalObject);
+
+    if (successful) {
+      return new ResponseEntity<>(HttpStatus.OK);
+    }
+    return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+  }
+
+  @ApiMethod(description = "Add existing digital objects to an existing project")
+  @PatchMapping(
+      value = {"/latest/projects/{uuid}/digitalobjects", "/v3/projects/{uuid}/digitalobjects"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public ResponseEntity addDigitalObjects(
+      @ApiPathParam(description = "UUID of the project") @PathVariable("uuid") UUID projectUuid,
+      @ApiPathParam(description = "List of the digital objects") @RequestBody
+          List<DigitalObject> digitalObjects) {
+    ProjectImpl project = new ProjectImpl();
+    project.setUuid(projectUuid);
+
+    boolean successful = projectService.addDigitalObjects(project, digitalObjects);
+
+    if (successful) {
+      return new ResponseEntity<>(HttpStatus.OK);
+    }
+    return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+  }
+
+  @ApiMethod(description = "Get paged digital objects of a project")
+  @GetMapping(
+      value = {"/latest/projects/{uuid}/digitalobjects", "/v3/projects/{uuid}/digitalobjects"},
+      produces = "application/json")
+  @ApiResponseObject
+  public PageResponse<DigitalObject> getDigitalObjects(
+      @ApiPathParam(description = "UUID of the project") @PathVariable("uuid") UUID projectUuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortField", required = false, defaultValue = "lastModified")
+          String sortField,
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
+          Direction sortDirection,
+      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
+          NullHandling nullHandling) {
+    ProjectImpl project = new ProjectImpl();
+    project.setUuid(projectUuid);
+
+    OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
+    Sorting sorting = new SortingImpl(order);
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
+    return projectService.getDigitalObjects(project, pageRequest);
+  }
+
+  @ApiMethod(description = "Save existing digital objects into an existing project")
+  @PostMapping(
+      value = {"/latest/projects/{uuid}/digitalobjects", "/v3/projects/{uuid}/digitalobjects"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public ResponseEntity saveDigitalObjects(
+      @ApiPathParam(description = "UUID of the project") @PathVariable("uuid") UUID projectUuid,
+      @ApiPathParam(description = "List of the digital objects") @RequestBody
+          List<DigitalObject> digitalObjects) {
+    ProjectImpl project = new ProjectImpl();
+    project.setUuid(projectUuid);
+
+    boolean successful = projectService.saveDigitalObjects(project, digitalObjects);
+
+    if (successful) {
+      return new ResponseEntity<>(HttpStatus.OK);
+    }
+    return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
   }
 }

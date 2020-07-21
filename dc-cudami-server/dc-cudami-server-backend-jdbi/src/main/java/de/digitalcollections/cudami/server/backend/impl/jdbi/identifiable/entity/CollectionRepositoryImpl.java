@@ -5,12 +5,14 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
+import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.NodeImpl;
 import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
+import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
@@ -24,6 +26,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
+import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -234,6 +237,73 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
+  public PageResponse<DigitalObject> getDigitalObjects(
+      UUID collectionUuid, PageRequest pageRequest) {
+    final String baseQuery =
+        "SELECT d.uuid d_uuid, d.label d_label,"
+            + " d.created d_created, d.last_modified d_lastModified,"
+            + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
+            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.iiif_base_url pf_iiifBaseUrl"
+            + " FROM digitalobjects as d"
+            + " LEFT JOIN identifiers as id on d.uuid = id.identifiable"
+            + " LEFT JOIN fileresources_image as file on d.previewfileresource = file.uuid"
+            + " LEFT JOIN collection_digitalobjects as cd on d.uuid = cd.digitalobject_uuid"
+            + " WHERE cd.collection_uuid = :uuid"
+            + " ORDER BY cd.sortIndex ASC";
+    StringBuilder query = new StringBuilder(baseQuery);
+    addPageRequestParams(pageRequest, query);
+
+    List<DigitalObject> result =
+        dbi.withHandle(
+            h ->
+                h
+                    .createQuery(query.toString())
+                    .bind("uuid", collectionUuid)
+                    .registerRowMapper(BeanMapper.factory(DigitalObjectImpl.class, "d"))
+                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
+                    .reduceRows(
+                        new LinkedHashMap<UUID, DigitalObjectImpl>(),
+                        (map, rowView) -> {
+                          DigitalObjectImpl digitalObject =
+                              map.computeIfAbsent(
+                                  rowView.getColumn("d_uuid", UUID.class),
+                                  fn -> {
+                                    return rowView.getRow(DigitalObjectImpl.class);
+                                  });
+
+                          if (rowView.getColumn("pf_uuid", UUID.class) != null) {
+                            digitalObject.setPreviewImage(
+                                rowView.getRow(ImageFileResourceImpl.class));
+                          }
+
+                          if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                            IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                            digitalObject.addIdentifier(dbIdentifier);
+                          }
+                          return map;
+                        })
+                    .values()
+                    .stream()
+                    .map(DigitalObject.class::cast)
+                    .collect(Collectors.toList()));
+    String countQuery =
+        "SELECT count(*) FROM digitalobjects as d"
+            + " LEFT JOIN collection_digitalobjects as cd on d.uuid = cd.digitalobject_uuid"
+            + " WHERE cd.collection_uuid = :uuid";
+    long total =
+        dbi.withHandle(
+            h ->
+                h.createQuery(countQuery)
+                    .bind("uuid", collectionUuid)
+                    .mapTo(Long.class)
+                    .findOne()
+                    .get());
+    PageResponse<DigitalObject> pageResponse = new PageResponseImpl<>(result, pageRequest, total);
+    return pageResponse;
+  }
+
+  @Override
   public Collection save(Collection collection) {
     collection.setUuid(UUID.randomUUID());
     collection.setCreated(LocalDateTime.now());
@@ -268,6 +338,64 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
     Collection result = findOne(collection.getUuid());
     return result;
+  }
+
+  @Override
+  public boolean saveDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects) {
+    // as we store the whole list new: delete old entries
+    dbi.withHandle(
+        h ->
+            h.createUpdate("DELETE FROM collection_digitalobjects WHERE collection_uuid = :uuid")
+                .bind("uuid", collectionUuid)
+                .execute());
+
+    if (digitalObjects != null) {
+      // save relation to collection
+      dbi.useHandle(
+          handle -> {
+            PreparedBatch preparedBatch =
+                handle.prepareBatch(
+                    "INSERT INTO collection_digitalobjects(collection_uuid, digitalobject_uuid, sortIndex) VALUES (:uuid, :digitalObjectUuid, :sortIndex)");
+            for (DigitalObject digitalObject : digitalObjects) {
+              preparedBatch
+                  .bind("uuid", collectionUuid)
+                  .bind("digitalObjectUuid", digitalObject.getUuid())
+                  .bind("sortIndex", getIndex(digitalObjects, digitalObject))
+                  .add();
+            }
+            preparedBatch.execute();
+          });
+      return true;
+    }
+    return false;
+  }
+
+  @Override
+  public boolean addDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects) {
+    if (collectionUuid != null && digitalObjects != null) {
+      // get max sortIndex of existing
+      Integer nextSortIndex =
+          selectNextSortIndexForParentChildren(
+              dbi, "collection_digitalobjects", "collection_uuid", collectionUuid);
+
+      // save relation to collection
+      dbi.useHandle(
+          handle -> {
+            PreparedBatch preparedBatch =
+                handle.prepareBatch(
+                    "INSERT INTO collection_digitalobjects(collection_uuid, digitalobject_uuid, sortIndex) VALUES (:uuid, :digitalObjectUuid, :sortIndex)");
+            for (DigitalObject digitalObject : digitalObjects) {
+              preparedBatch
+                  .bind("uuid", collectionUuid)
+                  .bind("digitalObjectUuid", digitalObject.getUuid())
+                  .bind("sortIndex", nextSortIndex + getIndex(digitalObjects, digitalObject))
+                  .add();
+            }
+            preparedBatch.execute();
+          });
+      return true;
+    }
+    return false;
   }
 
   @Override

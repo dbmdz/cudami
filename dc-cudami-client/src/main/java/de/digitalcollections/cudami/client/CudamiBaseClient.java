@@ -60,6 +60,33 @@ public class CudamiBaseClient<T extends Object> {
     return req;
   }
 
+  private HttpRequest createPatchRequest(String requestUrl) {
+    HttpRequest req =
+        HttpRequest.newBuilder()
+            .method("PATCH", null)
+            .uri(createFullUri(requestUrl))
+            .header("Accept", "application/json")
+            // TODO add creation of a request id if needed
+            //            .header("X-Request-Id", request.getRequestId())
+            .build();
+    return req;
+  }
+
+  private HttpRequest createPatchRequest(String requestUrl, Object bodyObject)
+      throws JsonProcessingException {
+    HttpRequest req =
+        HttpRequest.newBuilder()
+            .method(
+                "PATCH", HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(bodyObject)))
+            .uri(createFullUri(requestUrl))
+            .header("Content-Type", "application/json")
+            .header("Accept", "application/json")
+            // TODO add creation of a request id if needed
+            //            .header("X-Request-Id", request.getRequestId())
+            .build();
+    return req;
+  }
+
   private HttpRequest createPostRequest(String requestUrl) throws JsonProcessingException {
     HttpRequest req =
         HttpRequest.newBuilder()
@@ -222,12 +249,75 @@ public class CudamiBaseClient<T extends Object> {
     }
   }
 
+  protected PageResponse doGetRequestForPagedObjectList(
+      String requestUrl, PageRequest pageRequest, Class<?> targetType) throws HttpException {
+    FindParams findParams = getFindParams(pageRequest);
+    if (!requestUrl.contains("?")) {
+      requestUrl = requestUrl + "?";
+    } else {
+      if (!requestUrl.endsWith("&")) {
+        requestUrl = requestUrl + "&";
+      }
+    }
+    requestUrl =
+        requestUrl
+            + String.format(
+                "pageNumber=%d&pageSize=%d&sortField=%s&sortDirection=%s&nullHandling=%s",
+                findParams.getPageNumber(),
+                findParams.getPageSize(),
+                findParams.getSortField(),
+                findParams.getSortDirection(),
+                findParams.getNullHandling());
+    HttpRequest req = createGetRequest(requestUrl);
+    try {
+      // This is the most performant approach for Jackson
+      HttpResponse<byte[]> resp = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
+      if (resp.statusCode() != 200) {
+        throw CudamiRestErrorDecoder.decode("doGetRequestForPagedObjectList", resp.statusCode());
+      }
+      final byte[] body = resp.body();
+      if (body == null) {
+        return null;
+      }
+      PageResponse result = mapper.readerFor(PageResponse.class).readValue(body);
+      return result;
+    } catch (IOException | InterruptedException e) {
+      throw new HttpException("Failed to retrieve response due to connection error", e);
+    }
+  }
+
   protected String doGetRequestForString(String requestUrl) throws HttpException {
     HttpRequest req = createGetRequest(requestUrl);
     try {
       HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString());
       if (resp.statusCode() != 200) {
         throw CudamiRestErrorDecoder.decode("doGetRequestForString", resp.statusCode());
+      }
+      return resp.body();
+    } catch (IOException | InterruptedException e) {
+      throw new HttpException("Failed to retrieve response due to connection error", e);
+    }
+  }
+
+  protected String doPatchRequestForString(String requestUrl) throws HttpException {
+    HttpRequest req = createPatchRequest(requestUrl);
+    try {
+      HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString());
+      if (resp.statusCode() != 200) {
+        throw CudamiRestErrorDecoder.decode("doPatchRequestForString", resp.statusCode());
+      }
+      return resp.body();
+    } catch (IOException | InterruptedException e) {
+      throw new HttpException("Failed to retrieve response due to connection error", e);
+    }
+  }
+
+  protected String doPatchRequestForString(String requestUrl, Object object) throws HttpException {
+    try {
+      HttpRequest req = createPatchRequest(requestUrl, object);
+      HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString());
+      if (resp.statusCode() != 200) {
+        throw CudamiRestErrorDecoder.decode("doPatchRequestForString", resp.statusCode());
       }
       return resp.body();
     } catch (IOException | InterruptedException e) {
@@ -248,6 +338,26 @@ public class CudamiBaseClient<T extends Object> {
         return null;
       }
       T result = mapper.readerFor(targetType).readValue(body);
+      return result;
+    } catch (IOException | InterruptedException e) {
+      throw new HttpException("Failed to retrieve response due to error", e);
+    }
+  }
+
+  protected Object doPostRequestForObject(String requestUrl, Object bodyObject, Class<?> targetType)
+      throws HttpException {
+    try {
+      HttpRequest req = createPostRequest(requestUrl, bodyObject);
+      // This is the most performant approach for Jackson
+      HttpResponse<byte[]> resp = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
+      if (resp.statusCode() != 200) {
+        throw CudamiRestErrorDecoder.decode("doPostRequestForObject", resp.statusCode());
+      }
+      final byte[] body = resp.body();
+      if (body == null) {
+        return null;
+      }
+      Object result = mapper.readerFor(targetType).readValue(body);
       return result;
     } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to error", e);

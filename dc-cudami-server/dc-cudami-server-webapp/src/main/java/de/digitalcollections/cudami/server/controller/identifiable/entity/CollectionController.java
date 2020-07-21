@@ -4,15 +4,19 @@ import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
+import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.paging.enums.Direction;
 import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
+import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
+import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
@@ -27,6 +31,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -197,5 +202,108 @@ public class CollectionController {
     }
 
     return new ResponseEntity<>(breadcrumbNavigation, HttpStatus.OK);
+  }
+
+  @ApiMethod(description = "Add an existing digital object to an existing collection")
+  @PatchMapping(
+      value = {
+        "/latest/collections/{uuid}/digitalobject/{digitalObjectUuid}",
+        "/v3/collections/{uuid}/digitalobject/{digitalObjectUuid}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public ResponseEntity addDigitalObject(
+      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
+          UUID collectionUuid,
+      @ApiPathParam(description = "UUID of the digital object") @PathVariable("digitalObjectUuid")
+          UUID digitalObjectUuid) {
+    CollectionImpl collection = new CollectionImpl();
+    collection.setUuid(collectionUuid);
+
+    DigitalObjectImpl digitalObject = new DigitalObjectImpl();
+    digitalObject.setUuid(digitalObjectUuid);
+
+    boolean successful = collectionService.addDigitalObject(collection, digitalObject);
+
+    if (successful) {
+      return new ResponseEntity<>(HttpStatus.OK);
+    }
+    return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+  }
+
+  @ApiMethod(description = "Add existing digital objects to an existing collection")
+  @PatchMapping(
+      value = {
+        "/latest/collections/{uuid}/digitalobjects",
+        "/v3/collections/{uuid}/digitalobjects"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public ResponseEntity addDigitalObjects(
+      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
+          UUID collectionUuid,
+      @ApiPathParam(description = "List of the digital objects") @RequestBody
+          List<DigitalObject> digitalObjects) {
+    CollectionImpl collection = new CollectionImpl();
+    collection.setUuid(collectionUuid);
+
+    boolean successful = collectionService.addDigitalObjects(collection, digitalObjects);
+
+    if (successful) {
+      return new ResponseEntity<>(HttpStatus.OK);
+    }
+    return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+  }
+
+  @ApiMethod(description = "Get paged digital objects of a collection")
+  @GetMapping(
+      value = {
+        "/latest/collections/{uuid}/digitalobjects",
+        "/v3/collections/{uuid}/digitalobjects"
+      },
+      produces = "application/json")
+  @ApiResponseObject
+  public PageResponse<DigitalObject> getDigitalObjects(
+      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
+          UUID collectionUuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortField", required = false, defaultValue = "lastModified")
+          String sortField,
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
+          Direction sortDirection,
+      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
+          NullHandling nullHandling) {
+    CollectionImpl collection = new CollectionImpl();
+    collection.setUuid(collectionUuid);
+
+    OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
+    Sorting sorting = new SortingImpl(order);
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
+    return collectionService.getDigitalObjects(collection, pageRequest);
+  }
+
+  @ApiMethod(description = "Save existing digital objects into an existing collection")
+  @PostMapping(
+      value = {
+        "/latest/collections/{uuid}/digitalobjects",
+        "/v3/collections/{uuid}/digitalobjects"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public ResponseEntity saveDigitalObjects(
+      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
+          UUID collectionUuid,
+      @ApiPathParam(description = "List of the digital objects") @RequestBody
+          List<DigitalObject> digitalObjects) {
+    CollectionImpl collection = new CollectionImpl();
+    collection.setUuid(collectionUuid);
+
+    boolean successful = collectionService.saveDigitalObjects(collection, digitalObjects);
+
+    if (successful) {
+      return new ResponseEntity<>(HttpStatus.OK);
+    }
+    return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
   }
 }
