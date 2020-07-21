@@ -11,8 +11,6 @@ import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,14 +20,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
 /** Controller for digital objects management pages. */
 @Controller
-@SessionAttributes(value = {"digitalobject"})
 public class DigitalObjectsController extends AbstractController {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectsController.class);
 
   private final CudamiDigitalObjectsClient service;
 
@@ -60,8 +54,7 @@ public class DigitalObjectsController extends AbstractController {
 
   @GetMapping("/digitalobjects/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) throws HttpException {
-    DigitalObject digitalObject = (DigitalObject) service.findOne(uuid);
-    model.addAttribute("availableLocales", digitalObject.getLabel().getLocales());
+    DigitalObject digitalObject = service.findOne(uuid);
     model.addAttribute("digitalObject", digitalObject);
     return "digitalobjects/view";
   }

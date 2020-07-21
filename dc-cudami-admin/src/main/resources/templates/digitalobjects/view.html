@@ -1,0 +1,63 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+
+  <head>
+    <title th:text="|#{digital_objects}: #{digital_object}|">...</title>
+  </head>
+  <body>
+    <section layout:fragment="content" th:object="${digitalObject}">
+      <div class="row">
+        <div class="col-12">
+          <ol class="breadcrumb hidden-xs-down">
+            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/digitalobjects}" th:text="#{digital_objects}">...</a></li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12">
+          <h1 th:text="|#{digital_object}|">...</h1>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12">
+          <hr/>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="container-fluid rows-striped">
+            <div class="row">
+              <div class="col-md-3"><label class="font-weight-bold" th:text="#{id}">ID</label></div>
+              <div class="col-md-9"><span th:text="*{uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
+            </div>
+            <div class="row">
+              <div class="col-md-3"><label class="font-weight-bold" th:text="#{identifiers}">...</label></div>
+              <div class="col-md-9">
+                <ul class="list-inline">
+                  <li class="list-inline-item" th:each="identifier: *{identifiers}" th:text="|${identifier.namespace}:${identifier.id}|">Namespace:ID</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row main-content">
+        <div class="col-sm-12">
+          <div class="card">
+            <div class="card-body bg-light">
+              <div th:replace="fragments/identifiable::renderTeaser(${digitalObject}, ${language})"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
