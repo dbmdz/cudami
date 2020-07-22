@@ -12,7 +12,9 @@ public interface ProjectService extends EntityService<Project> {
 
   boolean addDigitalObjects(Project project, List<DigitalObject> digitalObjects);
 
-  boolean saveDigitalObjects(Project project, List<DigitalObject> digitalObjects);
-
   PageResponse<DigitalObject> getDigitalObjects(Project project, PageRequest pageRequest);
+
+  boolean removeDigitalObject(Project project, DigitalObject digitalObject);
+
+  boolean saveDigitalObjects(Project project, List<DigitalObject> digitalObjects);
 }

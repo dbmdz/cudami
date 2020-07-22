@@ -38,6 +38,11 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
   }
 
   @Override
+  public boolean removeDigitalObject(Project project, DigitalObject digitalObject) {
+    return ((ProjectRepository) repository).removeDigitalObject(project, digitalObject);
+  }
+
+  @Override
   public boolean saveDigitalObjects(Project project, List<DigitalObject> digitalObjects) {
     return ((ProjectRepository) repository).saveDigitalObjects(project, digitalObjects);
   }

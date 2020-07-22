@@ -44,6 +44,18 @@ public class CudamiBaseClient<T extends Object> {
     this.targetType = targetType;
   }
 
+  private HttpRequest createDeleteRequest(String requestUrl) {
+    HttpRequest req =
+        HttpRequest.newBuilder()
+            .DELETE()
+            .uri(createFullUri(requestUrl))
+            .header("Accept", "application/json")
+            // TODO add creation of a request id if needed
+            //            .header("X-Request-Id", request.getRequestId())
+            .build();
+    return req;
+  }
+
   protected URI createFullUri(String requestUrl) {
     return serverUri.resolve(serverUri.getPath() + requestUrl);
   }
@@ -126,6 +138,19 @@ public class CudamiBaseClient<T extends Object> {
             //            .header("X-Request-Id", request.getRequestId())
             .build();
     return req;
+  }
+
+  protected String doDeleteRequestForString(String requestUrl) throws HttpException {
+    HttpRequest req = createDeleteRequest(requestUrl);
+    try {
+      HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString());
+      if (resp.statusCode() != 200) {
+        throw CudamiRestErrorDecoder.decode("doDeleteRequestForString", resp.statusCode());
+      }
+      return resp.body();
+    } catch (IOException | InterruptedException e) {
+      throw new HttpException("Failed to retrieve response due to connection error", e);
+    }
   }
 
   protected T doGetRequestForObject(String requestUrl) throws HttpException {

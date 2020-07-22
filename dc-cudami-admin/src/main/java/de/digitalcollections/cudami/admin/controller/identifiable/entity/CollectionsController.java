@@ -98,6 +98,14 @@ public class CollectionsController extends AbstractController {
     return service.findOne(uuid);
   }
 
+  @GetMapping("/collections/{collectionUuid}/digitalobjects/{digitalobjectUuid}/remove")
+  public String removeDigitalObjectFromCollection(
+      @PathVariable UUID collectionUuid, @PathVariable UUID digitalobjectUuid)
+      throws HttpException {
+    service.removeDigitalObject(collectionUuid, digitalobjectUuid);
+    return "redirect:/collections/" + collectionUuid;
+  }
+
   @GetMapping("/collections")
   public String list(
       Model model,

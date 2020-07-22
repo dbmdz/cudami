@@ -146,6 +146,15 @@
                 </td>
                 <td class="center">
                   <a th:href="@{'/digitalobjects/' + ${digitalobject.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
+                  <a href="#"
+                    th:title="#{tooltip_remove_digitalobject_from_collection}"
+                    data:href="@{'/collections/' + ${collection.uuid} + '/digitalobjects/' + ${digitalobject.uuid} + '/remove'}"
+                    data:message="#{msg.confirm_remove_digitalobject_from_collection}"
+                    data:title="#{title_warning}"
+                    data-target="#confirmYesNoDialog"
+                    data-toggle="modal">
+                    <span class="fa fa-trash actionButton"></span>
+                  </a>
                 </td>
               </tr>
             </tbody>
