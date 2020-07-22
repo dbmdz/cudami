@@ -142,7 +142,7 @@ public class ProjectController {
     if (successful) {
       return new ResponseEntity<>(HttpStatus.OK);
     }
-    return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @ApiMethod(description = "Add existing digital objects to an existing project")
@@ -162,7 +162,7 @@ public class ProjectController {
     if (successful) {
       return new ResponseEntity<>(HttpStatus.OK);
     }
-    return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @ApiMethod(description = "Get paged digital objects of a project")
@@ -173,24 +173,16 @@ public class ProjectController {
   public PageResponse<DigitalObject> getDigitalObjects(
       @ApiPathParam(description = "UUID of the project") @PathVariable("uuid") UUID projectUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortField", required = false, defaultValue = "lastModified")
-          String sortField,
-      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
-          Direction sortDirection,
-      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
-          NullHandling nullHandling) {
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, new SortingImpl());
+
     ProjectImpl project = new ProjectImpl();
     project.setUuid(projectUuid);
-
-    OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
-    Sorting sorting = new SortingImpl(order);
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
     return projectService.getDigitalObjects(project, pageRequest);
   }
 
   @ApiMethod(description = "Save existing digital objects into an existing project")
-  @PostMapping(
+  @PutMapping(
       value = {"/latest/projects/{uuid}/digitalobjects", "/v3/projects/{uuid}/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
@@ -206,6 +198,6 @@ public class ProjectController {
     if (successful) {
       return new ResponseEntity<>(HttpStatus.OK);
     }
-    return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 }
