@@ -228,7 +228,7 @@ public class CollectionController {
     if (successful) {
       return new ResponseEntity<>(HttpStatus.OK);
     }
-    return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @ApiMethod(description = "Add existing digital objects to an existing collection")
@@ -252,7 +252,7 @@ public class CollectionController {
     if (successful) {
       return new ResponseEntity<>(HttpStatus.OK);
     }
-    return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @ApiMethod(description = "Get paged digital objects of a collection")
@@ -267,24 +267,16 @@ public class CollectionController {
       @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortField", required = false, defaultValue = "lastModified")
-          String sortField,
-      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
-          Direction sortDirection,
-      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
-          NullHandling nullHandling) {
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, new SortingImpl());
+
     CollectionImpl collection = new CollectionImpl();
     collection.setUuid(collectionUuid);
-
-    OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
-    Sorting sorting = new SortingImpl(order);
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
     return collectionService.getDigitalObjects(collection, pageRequest);
   }
 
   @ApiMethod(description = "Save existing digital objects into an existing collection")
-  @PostMapping(
+  @PutMapping(
       value = {
         "/latest/collections/{uuid}/digitalobjects",
         "/v3/collections/{uuid}/digitalobjects"
@@ -304,6 +296,6 @@ public class CollectionController {
     if (successful) {
       return new ResponseEntity<>(HttpStatus.OK);
     }
-    return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 }
