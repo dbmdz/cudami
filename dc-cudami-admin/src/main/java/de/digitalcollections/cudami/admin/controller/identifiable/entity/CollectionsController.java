@@ -144,10 +144,9 @@ public class CollectionsController extends AbstractController {
   }
 
   @GetMapping("/collections/{uuid}")
-  public String view(@PathVariable UUID uuid, @PageableDefault(
-              sort = {"lastModified"},
-              size = 25)
-          Pageable pageable, Model model) throws HttpException {
+  public String view(
+      @PathVariable UUID uuid, @PageableDefault(size = 25) Pageable pageable, Model model)
+      throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Collection collection = service.findOne(uuid);
     List<Locale> existingLanguages =
@@ -155,12 +154,12 @@ public class CollectionsController extends AbstractController {
 
     model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("collection", collection);
-    
+
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.getDigitalObjects(uuid, pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
     model.addAttribute("page", new PageWrapper(page, "/collections/" + uuid));
-    
+
     BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
     List<Node> breadcrumbs = breadcrumbNavigation.getNavigationItems();
     model.addAttribute("breadcrumbs", breadcrumbs);
