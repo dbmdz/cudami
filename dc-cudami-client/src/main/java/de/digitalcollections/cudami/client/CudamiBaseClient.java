@@ -438,20 +438,19 @@ public class CudamiBaseClient<T extends Object> {
     int pageNumber = pageRequest.getPageNumber();
     int pageSize = pageRequest.getPageSize();
 
-    Sorting sorting = pageRequest.getSorting();
-    Iterator<Order> iterator = sorting.iterator();
-
     String sortField = "";
     String sortDirection = "";
     String nullHandling = "";
-
-    if (iterator.hasNext()) {
-      Order order = iterator.next();
-      sortField = order.getProperty() == null ? "" : order.getProperty();
-      sortDirection = order.getDirection() == null ? "" : order.getDirection().name();
-      nullHandling = order.getNullHandling() == null ? "" : order.getNullHandling().name();
+    Sorting sorting = pageRequest.getSorting();
+    if (sorting != null) {
+      Iterator<Order> iterator = sorting.iterator();
+      if (iterator.hasNext()) {
+        Order order = iterator.next();
+        sortField = order.getProperty() == null ? "" : order.getProperty();
+        sortDirection = order.getDirection() == null ? "" : order.getDirection().name();
+        nullHandling = order.getNullHandling() == null ? "" : order.getNullHandling().name();
+      }
     }
-
     return new FindParamsImpl(pageNumber, pageSize, sortField, sortDirection, nullHandling);
   }
 }
