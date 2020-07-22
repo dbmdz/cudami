@@ -35,12 +35,16 @@
           <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
             <thead>
               <tr sd:page-object="${page.page}">
+                <th></th>
                 <th class="center" th:text="#{label}">Label</th>
                 <th class="center" th:text="#{actions}">Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr th:each="digitalobject: ${page.content}">
+                <td>
+                  <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${digitalobject.previewImage}, ${digitalobject.previewImageRenderingHints}, ${#locale}, 50)"></th:block>
+                </td>
                 <td>
                   <a th:href="@{'/digitalobjects/' + ${digitalobject.uuid}}" th:if="${digitalobject.label}" th:text="${digitalobject.label.text}">bsb10001000</a>
                 </td>
