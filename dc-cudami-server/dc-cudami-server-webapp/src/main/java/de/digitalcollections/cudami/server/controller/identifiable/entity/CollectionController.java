@@ -30,6 +30,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -217,10 +218,10 @@ public class CollectionController {
           UUID collectionUuid,
       @ApiPathParam(description = "UUID of the digital object") @PathVariable("digitalObjectUuid")
           UUID digitalObjectUuid) {
-    CollectionImpl collection = new CollectionImpl();
+    Collection collection = new CollectionImpl();
     collection.setUuid(collectionUuid);
 
-    DigitalObjectImpl digitalObject = new DigitalObjectImpl();
+    DigitalObject digitalObject = new DigitalObjectImpl();
     digitalObject.setUuid(digitalObjectUuid);
 
     boolean successful = collectionService.addDigitalObject(collection, digitalObject);
@@ -244,7 +245,7 @@ public class CollectionController {
           UUID collectionUuid,
       @ApiPathParam(description = "List of the digital objects") @RequestBody
           List<DigitalObject> digitalObjects) {
-    CollectionImpl collection = new CollectionImpl();
+    Collection collection = new CollectionImpl();
     collection.setUuid(collectionUuid);
 
     boolean successful = collectionService.addDigitalObjects(collection, digitalObjects);
@@ -270,9 +271,36 @@ public class CollectionController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, new SortingImpl());
 
-    CollectionImpl collection = new CollectionImpl();
+    Collection collection = new CollectionImpl();
     collection.setUuid(collectionUuid);
     return collectionService.getDigitalObjects(collection, pageRequest);
+  }
+
+  @ApiMethod(description = "Remove an existing digital object from an existing collection")
+  @DeleteMapping(
+      value = {
+        "/latest/collections/{uuid}/digitalobject/{digitalObjectUuid}",
+        "/v3/collections/{uuid}/digitalobject/{digitalObjectUuid}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public ResponseEntity removeDigitalObject(
+      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
+          UUID collectionUuid,
+      @ApiPathParam(description = "UUID of the digital object") @PathVariable("digitalObjectUuid")
+          UUID digitalObjectUuid) {
+    Collection collection = new CollectionImpl();
+    collection.setUuid(collectionUuid);
+
+    DigitalObject digitalObject = new DigitalObjectImpl();
+    digitalObject.setUuid(digitalObjectUuid);
+
+    boolean successful = collectionService.removeDigitalObject(collection, digitalObject);
+
+    if (successful) {
+      return new ResponseEntity<>(HttpStatus.OK);
+    }
+    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @ApiMethod(description = "Save existing digital objects into an existing collection")
@@ -288,7 +316,7 @@ public class CollectionController {
           UUID collectionUuid,
       @ApiPathParam(description = "List of the digital objects") @RequestBody
           List<DigitalObject> digitalObjects) {
-    CollectionImpl collection = new CollectionImpl();
+    Collection collection = new CollectionImpl();
     collection.setUuid(collectionUuid);
 
     boolean successful = collectionService.saveDigitalObjects(collection, digitalObjects);

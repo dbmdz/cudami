@@ -43,6 +43,14 @@ public class CudamiCollectionsClient extends CudamiBaseClient<CollectionImpl> {
     return Long.parseLong(doGetRequestForString("/latest/collections/count"));
   }
 
+  public boolean removeDigitalObject(UUID collectionUuid, UUID digitalObjectUuid)
+      throws HttpException {
+    return Boolean.parseBoolean(
+        doDeleteRequestForString(
+            String.format(
+                "/latest/collections/%s/digitalobject/%s", collectionUuid, digitalObjectUuid)));
+  }
+
   public PageResponse<CollectionImpl> find(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/collections", pageRequest);
   }

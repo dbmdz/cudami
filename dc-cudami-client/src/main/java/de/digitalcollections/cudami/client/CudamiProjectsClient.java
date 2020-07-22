@@ -63,6 +63,13 @@ public class CudamiProjectsClient extends CudamiBaseClient<ProjectImpl> {
         DigitalObjectImpl.class);
   }
 
+  public boolean removeDigitalObject(UUID projectUuid, UUID digitalObjectUuid)
+      throws HttpException {
+    return Boolean.parseBoolean(
+        doDeleteRequestForString(
+            String.format("/latest/projects/%s/digitalobject/%s", projectUuid, digitalObjectUuid)));
+  }
+
   public Project save(Project project) throws HttpException {
     return doPostRequestForObject("/latest/projects", (ProjectImpl) project);
   }

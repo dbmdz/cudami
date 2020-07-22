@@ -28,6 +28,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -122,7 +123,7 @@ public class ProjectController {
   @ApiMethod(description = "Add an existing digital object to an existing project")
   @PatchMapping(
       value = {
-        "/latest/project/{uuid}/digitalobject/{digitalObjectUuid}",
+        "/latest/projects/{uuid}/digitalobject/{digitalObjectUuid}",
         "/v3/projects/{uuid}/digitalobject/{digitalObjectUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -131,10 +132,10 @@ public class ProjectController {
       @ApiPathParam(description = "UUID of the project") @PathVariable("uuid") UUID projectUuid,
       @ApiPathParam(description = "UUID of the digital object") @PathVariable("digitalObjectUuid")
           UUID digitalObjectUuid) {
-    ProjectImpl project = new ProjectImpl();
+    Project project = new ProjectImpl();
     project.setUuid(projectUuid);
 
-    DigitalObjectImpl digitalObject = new DigitalObjectImpl();
+    DigitalObject digitalObject = new DigitalObjectImpl();
     digitalObject.setUuid(digitalObjectUuid);
 
     boolean successful = projectService.addDigitalObject(project, digitalObject);
@@ -154,7 +155,7 @@ public class ProjectController {
       @ApiPathParam(description = "UUID of the project") @PathVariable("uuid") UUID projectUuid,
       @ApiPathParam(description = "List of the digital objects") @RequestBody
           List<DigitalObject> digitalObjects) {
-    ProjectImpl project = new ProjectImpl();
+    Project project = new ProjectImpl();
     project.setUuid(projectUuid);
 
     boolean successful = projectService.addDigitalObjects(project, digitalObjects);
@@ -176,9 +177,35 @@ public class ProjectController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, new SortingImpl());
 
-    ProjectImpl project = new ProjectImpl();
+    Project project = new ProjectImpl();
     project.setUuid(projectUuid);
     return projectService.getDigitalObjects(project, pageRequest);
+  }
+
+  @ApiMethod(description = "Remove an existing digital object from an existing project")
+  @DeleteMapping(
+      value = {
+        "/latest/projects/{uuid}/digitalobject/{digitalObjectUuid}",
+        "/v3/projects/{uuid}/digitalobject/{digitalObjectUuid}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public ResponseEntity removeDigitalObject(
+      @ApiPathParam(description = "UUID of the project") @PathVariable("uuid") UUID projectUuid,
+      @ApiPathParam(description = "UUID of the digital object") @PathVariable("digitalObjectUuid")
+          UUID digitalObjectUuid) {
+    Project project = new ProjectImpl();
+    project.setUuid(projectUuid);
+
+    DigitalObject digitalObject = new DigitalObjectImpl();
+    digitalObject.setUuid(digitalObjectUuid);
+
+    boolean successful = projectService.removeDigitalObject(project, digitalObject);
+
+    if (successful) {
+      return new ResponseEntity<>(HttpStatus.OK);
+    }
+    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @ApiMethod(description = "Save existing digital objects into an existing project")
@@ -190,7 +217,7 @@ public class ProjectController {
       @ApiPathParam(description = "UUID of the project") @PathVariable("uuid") UUID projectUuid,
       @ApiPathParam(description = "List of the digital objects") @RequestBody
           List<DigitalObject> digitalObjects) {
-    ProjectImpl project = new ProjectImpl();
+    Project project = new ProjectImpl();
     project.setUuid(projectUuid);
 
     boolean successful = projectService.saveDigitalObjects(project, digitalObjects);

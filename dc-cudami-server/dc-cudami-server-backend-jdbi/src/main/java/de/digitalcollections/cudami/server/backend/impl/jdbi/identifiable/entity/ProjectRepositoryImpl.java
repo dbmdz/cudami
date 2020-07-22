@@ -206,6 +206,11 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
             + " WHERE pd.project_uuid = :uuid"
             + " ORDER BY pd.sortIndex ASC";
     StringBuilder query = new StringBuilder(baseQuery);
+    
+    // we add fix sorting in above query; otherwise we get in conflict with allowed sorting
+    // and column names of this repository (it is for collections, not sublists of
+    // digitalobjects...)
+    pageRequest.setSorting(null);
     addPageRequestParams(pageRequest, query);
 
     List<DigitalObject> result =
@@ -406,5 +411,23 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
       default:
         return null;
     }
+  }
+
+  @Override
+  public boolean removeDigitalObject(UUID projectUuid, UUID digitalObjectUuid) {
+    if (projectUuid != null && digitalObjectUuid != null) {
+      // delete relation to project
+      String query =
+          "DELETE FROM project_digitalobjects WHERE project_uuid=:projectUuid AND digitalobject_uuid=:digitalObjectUuid";
+
+      dbi.withHandle(
+          h ->
+              h.createUpdate(query)
+                  .bind("projectUuid", projectUuid)
+                  .bind("digitalObjectUuid", digitalObjectUuid)
+                  .execute());
+      return true;
+    }
+    return false;
   }
 }

@@ -51,6 +51,15 @@ public interface CollectionRepository
 
   PageResponse<DigitalObject> getDigitalObjects(UUID collectionUuid, PageRequest pageRequest);
 
+  default boolean removeDigitalObject(Collection collection, DigitalObject digitalObject) {
+    if (collection == null || digitalObject == null) {
+      return false;
+    }
+    return removeDigitalObject(collection.getUuid(), digitalObject.getUuid());
+  }
+
+  boolean removeDigitalObject(UUID collectionUuid, UUID digitalObjectUuid);
+
   default boolean saveDigitalObjects(Collection collection, List<DigitalObject> digitalObjects) {
     if (collection == null || digitalObjects == null) {
       return false;

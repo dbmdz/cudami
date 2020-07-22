@@ -658,4 +658,23 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     List<Node> nodes = result.stream().map(s -> (Node) s).collect(Collectors.toList());
     return new BreadcrumbNavigationImpl(nodes);
   }
+
+  @Override
+  public boolean removeDigitalObject(UUID collectionUuid, UUID digitalObjectUuid) {
+    if (collectionUuid != null && digitalObjectUuid != null) {
+      // delete relation to collection
+
+      String query =
+          "DELETE FROM collection_digitalobjects WHERE collection_uuid=:collectionUuid AND digitalobject_uuid=:digitalObjectUuid";
+
+      dbi.withHandle(
+          h ->
+              h.createUpdate(query)
+                  .bind("collectionUuid", collectionUuid)
+                  .bind("digitalObjectUuid", digitalObjectUuid)
+                  .execute());
+      return true;
+    }
+    return false;
+  }
 }

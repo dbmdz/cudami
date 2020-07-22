@@ -36,6 +36,15 @@ public interface ProjectRepository extends EntityRepository<Project> {
 
   PageResponse<DigitalObject> getDigitalObjects(UUID projectUuid, PageRequest pageRequest);
 
+  default boolean removeDigitalObject(Project project, DigitalObject digitalObject) {
+    if (project == null || digitalObject == null) {
+      return false;
+    }
+    return removeDigitalObject(project.getUuid(), digitalObject.getUuid());
+  }
+
+  boolean removeDigitalObject(UUID projectUuid, UUID digitalObjectUuid);
+
   default boolean saveDigitalObjects(Project project, List<DigitalObject> digitalObjects) {
     if (project == null || digitalObjects == null) {
       return false;

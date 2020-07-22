@@ -104,6 +104,13 @@ public class ProjectsController extends AbstractController {
     return "projects/list";
   }
 
+  @GetMapping("/projects/{projectUuid}/digitalobjects/{digitalobjectUuid}/remove")
+  public String removeDigitalObjectFromProject(
+      @PathVariable UUID projectUuid, @PathVariable UUID digitalobjectUuid) throws HttpException {
+    service.removeDigitalObject(projectUuid, digitalobjectUuid);
+    return "redirect:/projects/" + projectUuid;
+  }
+
   @PostMapping("/api/projects/new")
   public ResponseEntity save(@RequestBody Project project) {
     try {
@@ -127,7 +134,9 @@ public class ProjectsController extends AbstractController {
   }
 
   @GetMapping("/projects/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) throws HttpException {
+  public String view(
+      @PathVariable UUID uuid, @PageableDefault(size = 25) Pageable pageable, Model model)
+      throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Project project = service.findOne(uuid);
     List<Locale> existingLanguages =
@@ -135,6 +144,11 @@ public class ProjectsController extends AbstractController {
 
     model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("project", project);
+
+    final PageRequest pageRequest = PageableConverter.convert(pageable);
+    final PageResponse pageResponse = service.getDigitalObjects(uuid, pageRequest);
+    Page page = PageConverter.convert(pageResponse, pageRequest);
+    model.addAttribute("page", new PageWrapper(page, "/projects/" + uuid));
 
     return "projects/view";
   }
