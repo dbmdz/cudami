@@ -206,7 +206,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
             + " WHERE pd.project_uuid = :uuid"
             + " ORDER BY pd.sortIndex ASC";
     StringBuilder query = new StringBuilder(baseQuery);
-    
+
     // we add fix sorting in above query; otherwise we get in conflict with allowed sorting
     // and column names of this repository (it is for collections, not sublists of
     // digitalobjects...)
