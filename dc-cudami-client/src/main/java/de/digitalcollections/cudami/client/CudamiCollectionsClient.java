@@ -99,7 +99,7 @@ public class CudamiCollectionsClient extends CudamiBaseClient<CollectionImpl> {
       throws HttpException {
     return Boolean.parseBoolean(
         (String)
-            doPostRequestForObject(
+            doPutRequestForObject(
                 String.format("/latest/collections/%s/digitalobjects", collectionUuid),
                 digitalObjects,
                 String.class));

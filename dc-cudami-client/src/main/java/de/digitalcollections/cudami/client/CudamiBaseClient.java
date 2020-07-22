@@ -114,7 +114,7 @@ public class CudamiBaseClient<T extends Object> {
     return req;
   }
 
-  private HttpRequest createPutRequest(String requestUrl, T bodyObject)
+  private HttpRequest createPutRequest(String requestUrl, Object bodyObject)
       throws JsonProcessingException {
     HttpRequest req =
         HttpRequest.newBuilder()
@@ -425,6 +425,26 @@ public class CudamiBaseClient<T extends Object> {
       return result;
     } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to connection error", e);
+    }
+  }
+
+  protected Object doPutRequestForObject(String requestUrl, Object bodyObject, Class<?> targetType)
+      throws HttpException {
+    try {
+      HttpRequest req = createPutRequest(requestUrl, bodyObject);
+      // This is the most performant approach for Jackson
+      HttpResponse<byte[]> resp = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
+      if (resp.statusCode() != 200) {
+        throw CudamiRestErrorDecoder.decode("doPostRequestForObject", resp.statusCode());
+      }
+      final byte[] body = resp.body();
+      if (body == null) {
+        return null;
+      }
+      Object result = mapper.readerFor(targetType).readValue(body);
+      return result;
+    } catch (IOException | InterruptedException e) {
+      throw new HttpException("Failed to retrieve response due to error", e);
     }
   }
 
