@@ -108,6 +108,7 @@
             <thead>
               <tr>
                 <th class="center" th:text="#{status}">Status</th>
+                <th></th>
                 <th class="center" th:text="#{label}">Label</th>
                 <th class="center" th:text="#{publicationStart}">Publication start</th>
                 <th class="center" th:text="#{publicationEnd}">Publication end</th>
@@ -120,6 +121,9 @@
                   <th:block th:if="${subpage.publicationStart}  == null OR  ${subpage.publicationStart.compareTo(now)} > 0"><span class="badge badge-pill badge-warning">&nbsp;</span></th:block>
                   <th:block th:if="(${subpage.publicationStart} != null AND ${subpage.publicationStart.compareTo(now)} <= 0) AND (${subpage.publicationEnd} == null OR ${subpage.publicationEnd.compareTo(now)} >= 0)"><span class="badge badge-pill badge-success">&nbsp;</span></th:block>
                   <th:block th:if="(${subpage.publicationStart} != null AND ${subpage.publicationStart.compareTo(now)} <= 0) AND (${subpage.publicationEnd} != null AND ${subpage.publicationEnd.compareTo(now)} < 0)"><span class="badge badge-pill badge-danger">&nbsp;</span></th:block>
+                </td>
+                <td class="center">
+                  <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${subpage.previewImage}, ${subpage.previewImageRenderingHints}, ${#locale}, 50)"></th:block>
                 </td>
                 <td>
                   <a th:href="@{'/webpages/' + ${subpage.uuid}}" th:text="${subpage.label.text}">Label</a>

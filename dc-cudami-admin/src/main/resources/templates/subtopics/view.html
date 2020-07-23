@@ -88,12 +88,16 @@
           <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
             <thead>
               <tr>
+                <th></th>
                 <th class="center" th:text="#{label}">Label</th>
                 <th class="center" th:text="#{actions}">Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr th:each="subSubtopic: *{children}">
+              <tr th:each="subSubtopic : *{children}">
+                <td class="center">
+                  <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${subSubtopic.previewImage}, ${subSubtopic.previewImageRenderingHints}, ${#locale}, 30)"></th:block>
+                </td>
                 <td>
                   <a th:href="@{'/subtopics/' + ${subSubtopic.uuid}}" th:text="${subSubtopic.label.text}">Label</a>
                 </td>

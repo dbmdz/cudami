@@ -42,8 +42,8 @@
             </thead>
             <tbody>
               <tr th:each="digitalobject: ${page.content}">
-                <td>
-                  <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${digitalobject.previewImage}, ${digitalobject.previewImageRenderingHints}, ${#locale}, 50)"></th:block>
+                <td class="center">
+                  <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${digitalobject.previewImage}, ${digitalobject.previewImageRenderingHints}, ${#locale}, 30)"></th:block>
                 </td>
                 <td>
                   <a th:href="@{'/digitalobjects/' + ${digitalobject.uuid}}" th:if="${digitalobject.label}" th:text="${digitalobject.label.text}">bsb10001000</a>
