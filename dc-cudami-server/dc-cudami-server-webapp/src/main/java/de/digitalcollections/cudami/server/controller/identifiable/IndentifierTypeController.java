@@ -40,7 +40,7 @@ public class IndentifierTypeController {
   public PageResponse<IdentifierType> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "sortField", required = false, defaultValue = "namesapce")
+      @RequestParam(name = "sortField", required = false, defaultValue = "namespace")
           String sortField,
       @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
           Direction sortDirection,
