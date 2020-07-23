@@ -4,7 +4,9 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.model.api.identifiable.Identifier;
+import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.api.identifiable.entity.Project;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -12,7 +14,9 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
+import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
 import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
+import de.digitalcollections.model.impl.identifiable.entity.ProjectImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
@@ -287,6 +291,76 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
+  public PageResponse<Collection> getCollections(UUID digitalObjectUuid, PageRequest pageRequest) {
+    final String baseQuery =
+        "SELECT c.uuid c_uuid, c.label c_label,"
+            + " c.created c_created, c.last_modified c_lastModified,"
+            + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
+            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.iiif_base_url pf_iiifBaseUrl"
+            + " FROM collections as c"
+            + " LEFT JOIN identifiers as id on c.uuid = id.identifiable"
+            + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid"
+            + " LEFT JOIN collection_digitalobjects as cd on c.uuid = cd.collection_uuid"
+            + " WHERE cd.digitalobject_uuid = :uuid"
+            + " ORDER BY c.label";
+    StringBuilder query = new StringBuilder(baseQuery);
+
+    // we add fix sorting in above query; otherwise we get in conflict with allowed sorting
+    // and column names of this repository (it is for digitalobjects, not sublists of
+    // collections...)
+    pageRequest.setSorting(null);
+    addPageRequestParams(pageRequest, query);
+
+    List<Collection> result =
+        dbi.withHandle(
+            h ->
+                h
+                    .createQuery(query.toString())
+                    .bind("uuid", digitalObjectUuid)
+                    .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
+                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
+                    .reduceRows(
+                        new LinkedHashMap<UUID, CollectionImpl>(),
+                        (map, rowView) -> {
+                          CollectionImpl collection =
+                              map.computeIfAbsent(
+                                  rowView.getColumn("c_uuid", UUID.class),
+                                  fn -> {
+                                    return rowView.getRow(CollectionImpl.class);
+                                  });
+
+                          if (rowView.getColumn("pf_uuid", UUID.class) != null) {
+                            collection.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+
+                          if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                            IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                            collection.addIdentifier(dbIdentifier);
+                          }
+                          return map;
+                        })
+                    .values()
+                    .stream()
+                    .map(Collection.class::cast)
+                    .collect(Collectors.toList()));
+    String countQuery =
+        "SELECT count(*) FROM collections as c"
+            + " LEFT JOIN collection_digitalobjects as cd on c.uuid = cd.collection_uuid"
+            + " WHERE cd.digitalobject_uuid = :uuid";
+    long total =
+        dbi.withHandle(
+            h ->
+                h.createQuery(countQuery)
+                    .bind("uuid", digitalObjectUuid)
+                    .mapTo(Long.class)
+                    .findOne()
+                    .get());
+    PageResponse<Collection> pageResponse = new PageResponseImpl<>(result, pageRequest, total);
+    return pageResponse;
+  }
+
+  @Override
   public List<FileResource> getFileResources(UUID digitalObjectUuid) {
     String query =
         "SELECT f.uuid f_uuid, f.label f_label,"
@@ -391,6 +465,76 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                     .map(ImageFileResource.class::cast)
                     .collect(Collectors.toList()));
     return result;
+  }
+
+  @Override
+  public PageResponse<Project> getProjects(UUID digitalObjectUuid, PageRequest pageRequest) {
+    final String baseQuery =
+        "SELECT p.uuid p_uuid, p.label p_label,"
+            + " p.created p_created, p.last_modified p_lastModified,"
+            + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
+            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.iiif_base_url pf_iiifBaseUrl"
+            + " FROM projects as p"
+            + " LEFT JOIN identifiers as id on p.uuid = id.identifiable"
+            + " LEFT JOIN fileresources_image as file on p.previewfileresource = file.uuid"
+            + " LEFT JOIN project_digitalobjects as pd on p.uuid = pd.project_uuid"
+            + " WHERE pd.digitalobject_uuid = :uuid"
+            + " ORDER BY p.label";
+    StringBuilder query = new StringBuilder(baseQuery);
+
+    // we add fix sorting in above query; otherwise we get in conflict with allowed sorting
+    // and column names of this repository (it is for digitalobjects, not sublists of
+    // projects...)
+    pageRequest.setSorting(null);
+    addPageRequestParams(pageRequest, query);
+
+    List<Project> result =
+        dbi.withHandle(
+            h ->
+                h
+                    .createQuery(query.toString())
+                    .bind("uuid", digitalObjectUuid)
+                    .registerRowMapper(BeanMapper.factory(ProjectImpl.class, "p"))
+                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
+                    .reduceRows(
+                        new LinkedHashMap<UUID, ProjectImpl>(),
+                        (map, rowView) -> {
+                          ProjectImpl project =
+                              map.computeIfAbsent(
+                                  rowView.getColumn("p_uuid", UUID.class),
+                                  fn -> {
+                                    return rowView.getRow(ProjectImpl.class);
+                                  });
+
+                          if (rowView.getColumn("pf_uuid", UUID.class) != null) {
+                            project.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+
+                          if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                            IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                            project.addIdentifier(dbIdentifier);
+                          }
+                          return map;
+                        })
+                    .values()
+                    .stream()
+                    .map(Project.class::cast)
+                    .collect(Collectors.toList()));
+    String countQuery =
+        "SELECT count(*) FROM projects as p"
+            + " LEFT JOIN project_digitalobjects as pd on p.uuid = pd.project_uuid"
+            + " WHERE pd.digitalobject_uuid = :uuid";
+    long total =
+        dbi.withHandle(
+            h ->
+                h.createQuery(countQuery)
+                    .bind("uuid", digitalObjectUuid)
+                    .mapTo(Long.class)
+                    .findOne()
+                    .get());
+    PageResponse<Project> pageResponse = new PageResponseImpl<>(result, pageRequest, total);
+    return pageResponse;
   }
 
   @Override

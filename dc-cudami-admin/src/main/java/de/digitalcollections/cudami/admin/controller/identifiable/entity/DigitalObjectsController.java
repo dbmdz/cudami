@@ -7,9 +7,13 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiDigitalObjectsClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
+import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.api.identifiable.entity.Project;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.paging.PageRequestImpl;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -56,6 +60,17 @@ public class DigitalObjectsController extends AbstractController {
   public String view(@PathVariable UUID uuid, Model model) throws HttpException {
     DigitalObject digitalObject = service.findOne(uuid);
     model.addAttribute("digitalObject", digitalObject);
+
+    final PageResponse<Collection> pageResponseCollections =
+        service.getCollections(uuid, new PageRequestImpl(0, 100));
+    List<Collection> collections = pageResponseCollections.getContent();
+    model.addAttribute("collections", collections);
+
+    final PageResponse<Project> pageResponseProjects =
+        service.getProjects(uuid, new PageRequestImpl(0, 100));
+    List<Project> projects = pageResponseProjects.getContent();
+    model.addAttribute("projects", projects);
+
     return "digitalobjects/view";
   }
 }
