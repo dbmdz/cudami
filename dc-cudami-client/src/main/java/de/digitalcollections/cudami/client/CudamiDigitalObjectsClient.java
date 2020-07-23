@@ -2,14 +2,18 @@ package de.digitalcollections.cudami.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
+import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.api.identifiable.entity.Project;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
+import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
 import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
+import de.digitalcollections.model.impl.identifiable.entity.ProjectImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
@@ -55,6 +59,14 @@ public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObjectIm
         String.format("/latest/digitalobjects/identifier/%s:%s.json", namespace, id));
   }
 
+  public PageResponse<Collection> getCollections(UUID uuid, PageRequest pageRequest)
+      throws HttpException {
+    return doGetRequestForPagedObjectList(
+        String.format("/latest/digitalobjects/%s/collections", uuid),
+        pageRequest,
+        CollectionImpl.class);
+  }
+
   public List<FileResource> getFileResources(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
         String.format("/latest/digitalobjects/%s/fileresources", uuid), FileResourceImpl.class);
@@ -64,6 +76,12 @@ public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObjectIm
     return doGetRequestForObjectList(
         String.format("/latest/digitalobjects/%s/fileresources/images", uuid),
         ImageFileResourceImpl.class);
+  }
+
+  public PageResponse<Project> getProjects(UUID uuid, PageRequest pageRequest)
+      throws HttpException {
+    return doGetRequestForPagedObjectList(
+        String.format("/latest/digitalobjects/%s/projects", uuid), pageRequest, ProjectImpl.class);
   }
 
   public DigitalObject save(DigitalObject digitalObject) throws HttpException {

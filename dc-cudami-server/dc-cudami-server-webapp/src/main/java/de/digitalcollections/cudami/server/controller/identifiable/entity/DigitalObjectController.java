@@ -2,7 +2,9 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
+import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.api.identifiable.entity.Project;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -12,6 +14,7 @@ import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.paging.enums.Direction;
 import de.digitalcollections.model.api.paging.enums.NullHandling;
+import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
@@ -21,6 +24,7 @@ import java.util.Objects;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
+import org.jsondoc.core.annotation.ApiPathParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -117,6 +121,25 @@ public class DigitalObjectController {
     //    return digitalObject;
   }
 
+  @ApiMethod(description = "Get paged collections of a digital objects")
+  @GetMapping(
+      value = {
+        "/latest/digitalobjects/{uuid}/collections",
+        "/v3/digitalobjects/{uuid}/collections"
+      },
+      produces = "application/json")
+  @ApiResponseObject
+  public PageResponse<Collection> getCollections(
+      @ApiPathParam(description = "UUID of the digital object") @PathVariable("uuid") UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, new SortingImpl());
+
+    DigitalObject digitalObject = new DigitalObjectImpl();
+    digitalObject.setUuid(uuid);
+    return service.getCollections(digitalObject, pageRequest);
+  }
+
   @ApiMethod(description = "Get image file resources of a digital object")
   @GetMapping(
       value = {
@@ -139,6 +162,22 @@ public class DigitalObjectController {
   @ApiResponseObject
   public List<FileResource> getFileResources(@PathVariable UUID uuid) {
     return service.getFileResources(uuid);
+  }
+
+  @ApiMethod(description = "Get paged projects of a digital objects")
+  @GetMapping(
+      value = {"/latest/digitalobjects/{uuid}/projects", "/v3/digitalobjects/{uuid}/projects"},
+      produces = "application/json")
+  @ApiResponseObject
+  public PageResponse<Project> getProjects(
+      @ApiPathParam(description = "UUID of the digital object") @PathVariable("uuid") UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, new SortingImpl());
+
+    DigitalObject digitalObject = new DigitalObjectImpl();
+    digitalObject.setUuid(uuid);
+    return service.getProjects(digitalObject, pageRequest);
   }
 
   @ApiMethod(description = "Save a newly created digital object")

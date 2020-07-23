@@ -3,9 +3,13 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.model.api.identifiable.Identifier;
+import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.api.identifiable.entity.Project;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -36,6 +40,12 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
+  public PageResponse<Collection> getCollections(
+      DigitalObject digitalObject, PageRequest pageRequest) {
+    return ((DigitalObjectRepository) repository).getCollections(digitalObject, pageRequest);
+  }
+
+  @Override
   public List<FileResource> getFileResources(DigitalObject digitalObject) {
     return getFileResources(digitalObject.getUuid());
   }
@@ -62,6 +72,11 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
       }
     }
     return null;
+  }
+
+  @Override
+  public PageResponse<Project> getProjects(DigitalObject digitalObject, PageRequest pageRequest) {
+    return ((DigitalObjectRepository) repository).getProjects(digitalObject, pageRequest);
   }
 
   @Override
