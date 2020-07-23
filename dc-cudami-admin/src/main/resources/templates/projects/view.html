@@ -83,6 +83,7 @@
               <tr sd:page-object="${page.page}">
                 <th></th>
                 <th class="center" th:text="#{label}">Label</th>
+                <th class="center" th:text="#{last_modified}">last modified</th>
                 <th class="center" th:text="#{actions}">Actions</th>
               </tr>
             </thead>
@@ -93,6 +94,9 @@
                 </td>
                 <td>
                   <a th:href="@{'/digitalobjects/' + ${digitalobject.uuid}}" th:if="${digitalobject.label}" th:text="${digitalobject.label.text}">bsb10001000</a>
+                </td>
+                <td>
+                  <span class="float-right" th:with="df=#{dateTime.format},dateTime=${digitalobject.lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
                 </td>
                 <td class="center">
                   <a th:href="@{'/digitalobjects/' + ${digitalobject.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>

@@ -47,6 +47,7 @@
                 <th class="center" th:text="#{label}">Label</th>
                 <th class="center"><a class="sorted" sd:pagination-sort="url" th:text="#{url}">Url</a></th>
                 <!--<th class="center" th:text="#{registration_date}">Registration Date</th>-->
+                <th class="center" th:text="#{last_modified}">last modified</th>
                 <th class="center" th:text="#{actions}">Actions</th>
               </tr>
             </thead>
@@ -60,6 +61,9 @@
                 </td>
                 <td><a th:href="${website.url}" th:text="${website.url}" target="_blank">http://www.bavarikon.de/</a></td>
                 <!--<td><a th:href="@{'/websites/' + ${website.uuid}}" th:text="${website.registrationDate}">23.01.1999</a></td>-->
+                <td>
+                  <span class="float-right" th:with="df=#{dateTime.format},dateTime=${website.lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
+                </td>
                 <td class="center">
                   <a th:href="@{'/websites/' + ${website.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
                   <a th:href="@{'/websites/' + ${website.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>

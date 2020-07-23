@@ -60,7 +60,7 @@ public class WebpageController {
   @ApiResponseObject
   public PageResponse<Webpage> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortField", required = false, defaultValue = "lastModified")
           String sortField,
       @RequestParam(name = "sortDirection", required = false, defaultValue = "DESC")
@@ -125,26 +125,18 @@ public class WebpageController {
           @PathVariable("uuid")
           UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortField", required = false, defaultValue = "lastModified")
-          String sortField,
-      @RequestParam(name = "sortDirection", required = false, defaultValue = "DESC")
-          Direction sortDirection,
-      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
-          NullHandling nullHandling,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "publicationStart", required = false)
           FilterCriterion<LocalDate> publicationStart,
       @RequestParam(name = "publicationEnd", required = false)
           FilterCriterion<LocalDate> publicationEnd)
       throws IdentifiableServiceException {
-    OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
-    Sorting sorting = new SortingImpl(order);
     Filtering filtering =
         Filtering.defaultBuilder()
             .add("publicationStart", publicationStart)
             .add("publicationEnd", publicationEnd)
             .build();
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting, filtering);
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, null, filtering);
     return webpageService.getChildren(uuid, pageRequest);
   }
 

@@ -77,6 +77,7 @@
               <tr>
                 <th></th>
                 <th class="center" th:text="#{label}">Label</th>
+                <th class="center" th:text="#{last_modified}">last modified</th>
                 <th class="center" th:text="#{actions}">Actions</th>
               </tr>
             </thead>
@@ -87,6 +88,9 @@
                 </td>
                 <td>
                   <a th:href="@{'/collections/' + ${collection.uuid}}" th:if="${collection.label}" th:text="${collection.label.text}">Collection X</a>
+                </td>
+                <td>
+                  <span class="float-right" th:with="df=#{dateTime.format},dateTime=${collection.lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
                 </td>
                 <td class="center">
                   <a th:href="@{'/collections/' + ${collection.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
@@ -115,6 +119,7 @@
               <tr>
                 <th></th>
                 <th class="center" th:text="#{label}">Label</th>
+                <th class="center" th:text="#{last_modified}">last modified</th>
                 <th class="center" th:text="#{actions}">Actions</th>
               </tr>
             </thead>
@@ -125,6 +130,9 @@
                 </td>
                 <td>
                   <a th:href="@{'/projects/' + ${project.uuid}}" th:if="${project.label}" th:text="${project.label.text}">Project X</a>
+                </td>
+                <td>
+                  <span class="float-right" th:with="df=#{dateTime.format},dateTime=${project.lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
                 </td>
                 <td class="center">
                   <a th:href="@{'/projects/' + ${project.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
