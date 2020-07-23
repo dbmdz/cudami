@@ -94,12 +94,16 @@
           <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
             <thead>
               <tr>
+                <th></th>
                 <th class="center" th:text="#{label}">Label</th>
                 <th class="center" th:text="#{actions}">Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr th:each="subcollection :*{children}">
+                <td class="center">
+                  <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${subcollection.previewImage}, ${subcollection.previewImageRenderingHints}, ${#locale}, 30)"></th:block>
+                </td>
                 <td>
                   <a th:href="@{'/collections/' + ${subcollection.uuid}}" th:text="${subcollection.label.text}">Label</a>
                 </td>
@@ -138,7 +142,7 @@
             </thead>
             <tbody>
               <tr th:each="digitalobject: ${page.content}">
-                <td>
+                <td class="center">
                   <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${digitalobject.previewImage}, ${digitalobject.previewImageRenderingHints}, ${#locale}, 50)"></th:block>
                 </td>
                 <td>

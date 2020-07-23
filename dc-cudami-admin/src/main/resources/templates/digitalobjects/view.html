@@ -82,7 +82,7 @@
             </thead>
             <tbody>
               <tr th:each="collection : ${collections}">
-                <td>
+                <td class="center">
                   <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${collection.previewImage}, ${collection.previewImageRenderingHints}, ${#locale}, 50)"></th:block>
                 </td>
                 <td>
@@ -120,7 +120,7 @@
             </thead>
             <tbody>
               <tr th:each="project : ${projects}">
-                <td>
+                <td class="center">
                   <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${project.previewImage}, ${project.previewImageRenderingHints}, ${#locale}, 50)"></th:block>
                 </td>
                 <td>

@@ -35,12 +35,16 @@
           <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
             <thead>
               <tr sd:page-object="${page.page}">
+                <th></th>
                 <th class="center" th:text="#{label}">Label</th>
                 <th class="center" th:text="#{actions}">Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr th:each="topic: ${page.content}">
+                <td class="center">
+                  <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${topic.previewImage}, ${topic.previewImageRenderingHints}, ${#locale}, 30)"></th:block>
+                </td>
                 <td>
                   <a th:href="@{'/topics/' + ${topic.uuid}}" th:if="${topic.label}" th:text="${topic.label.text}">King Ludwig II.</a>
                 </td>

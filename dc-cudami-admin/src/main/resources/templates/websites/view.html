@@ -86,12 +86,16 @@
           <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
             <thead>
               <tr>
+                <th></th>
                 <th class="center" th:text="#{label}">Label</th>
                 <th class="center" th:text="#{actions}">Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr th:each="rootPage: *{rootPages}">
+              <tr th:each="rootPage : *{rootPages}">
+                <td class="center">
+                  <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${rootPage.previewImage}, ${rootPage.previewImageRenderingHints}, ${#locale}, 50)"></th:block>
+                </td>
                 <td>
                   <a th:href="@{'/webpages/' + ${rootPage.uuid}}" th:text="${rootPage.label.text}">Label</a>
                 </td>
