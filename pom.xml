@@ -74,7 +74,7 @@
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <version.aspectjweaver>1.9.5</version.aspectjweaver>
+    <version.aspectjweaver>1.9.6</version.aspectjweaver>
     <version.assertj-core>3.16.1</version.assertj-core>
     <version.commons-beanutils>1.9.4</version.commons-beanutils>
     <version.commons-dbcp2>2.7.0</version.commons-dbcp2>
