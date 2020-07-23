@@ -112,6 +112,7 @@
                 <th class="center" th:text="#{label}">Label</th>
                 <th class="center" th:text="#{publicationStart}">Publication start</th>
                 <th class="center" th:text="#{publicationEnd}">Publication end</th>
+                <th class="center" th:text="#{last_modified}">last modified</th>
                 <th class="center" th:text="#{actions}">Actions</th>
               </tr>
             </thead>
@@ -130,6 +131,9 @@
                 </td>
                 <td><span th:with="df=#{date.format},pubStart=${subpage.publicationStart}" th:text="${#temporals.format(pubStart,df)}">01.01.2000</span></td>
                 <td><span th:with="df=#{date.format},pubEnd=${subpage.publicationEnd}" th:text="${#temporals.format(pubEnd,df)}">01.01.2000</span></td>
+                <td>
+                  <span class="float-right" th:with="df=#{dateTime.format},dateTime=${subpage.lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
+                </td>
                 <td class="center">
                   <a th:href="@{'/webpages/' + ${subpage.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
                   <a th:href="@{'/webpages/' + ${subpage.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>

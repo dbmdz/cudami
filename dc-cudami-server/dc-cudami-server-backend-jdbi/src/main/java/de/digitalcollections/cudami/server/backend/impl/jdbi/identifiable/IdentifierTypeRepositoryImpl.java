@@ -113,7 +113,7 @@ public class IdentifierTypeRepositoryImpl extends AbstractPagingAndSortingReposi
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[] {"namespace"};
+    return new String[] {"label", "namespace"};
   }
 
   @Override
@@ -122,6 +122,8 @@ public class IdentifierTypeRepositoryImpl extends AbstractPagingAndSortingReposi
       return null;
     }
     switch (modelProperty) {
+      case "label":
+        return "label";
       case "namespace":
         return "namespace";
       default:

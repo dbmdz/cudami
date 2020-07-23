@@ -19,6 +19,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -160,6 +161,7 @@ public class UserController extends AbstractController {
       Model model,
       @PageableDefault(
               sort = {"email"},
+              direction = Sort.Direction.ASC,
               size = 25)
           Pageable pageable)
       throws ServiceException {
