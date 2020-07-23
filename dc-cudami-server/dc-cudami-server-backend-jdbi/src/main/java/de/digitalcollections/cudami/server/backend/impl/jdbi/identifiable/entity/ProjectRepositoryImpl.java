@@ -208,7 +208,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
     StringBuilder query = new StringBuilder(baseQuery);
 
     // we add fix sorting in above query; otherwise we get in conflict with allowed sorting
-    // and column names of this repository (it is for collections, not sublists of
+    // and column names of this repository (it is for projects, not sublists of
     // digitalobjects...)
     pageRequest.setSorting(null);
     addPageRequestParams(pageRequest, query);
