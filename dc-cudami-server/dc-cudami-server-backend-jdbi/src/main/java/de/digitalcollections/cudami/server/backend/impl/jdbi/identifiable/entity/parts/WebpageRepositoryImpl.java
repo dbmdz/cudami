@@ -287,7 +287,7 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
   @Override
   public PageResponse<Webpage> getChildren(UUID uuid, PageRequest pageRequest) {
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
-    StringBuilder query = new StringBuilder(BASE_CHILDREN_QUERY + " ORDER BY ww.sortIndex ASC");
+    StringBuilder query = new StringBuilder(BASE_CHILDREN_QUERY);
 
     // handle optional filtering params
     Filtering filtering = pageRequest.getFiltering();
@@ -315,6 +315,7 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
         }
       }
     }
+    query.append(" ORDER BY ww.sortIndex ASC");
     pageRequest.setSorting(null);
     addPageRequestParams(pageRequest, query);
     List<Webpage> result =
