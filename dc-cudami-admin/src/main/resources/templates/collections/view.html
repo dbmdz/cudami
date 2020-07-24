@@ -102,7 +102,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr th:each="subcollection, stats :*{children}">
+              <tr th:each="subcollection, stats : *{children}">
                 <td class="text-right" th:text="${stats.index + 1}">1</td>
                 <td class="center">
                   <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${subcollection.previewImage}, ${subcollection.previewImageRenderingHints}, ${#locale}, 30)"></th:block>
