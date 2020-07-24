@@ -107,6 +107,7 @@
           <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
             <thead>
               <tr>
+                <th class="text-right" th:text="#{abbr_number}">Nr.</th>
                 <th class="center" th:text="#{status}">Status</th>
                 <th></th>
                 <th class="center" th:text="#{label}">Label</th>
@@ -117,7 +118,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr th:each="subpage :*{children}">
+              <tr th:each="subpage, stats :*{children}">
+                <td class="text-right" th:text="${stats.index + 1}">1</td>
                 <td class="center" th:with="now=${T(java.time.LocalDate).now()}">
                   <th:block th:if="${subpage.publicationStart}  == null OR  ${subpage.publicationStart.compareTo(now)} > 0"><span class="badge badge-pill badge-warning">&nbsp;</span></th:block>
                   <th:block th:if="(${subpage.publicationStart} != null AND ${subpage.publicationStart.compareTo(now)} <= 0) AND (${subpage.publicationEnd} == null OR ${subpage.publicationEnd.compareTo(now)} >= 0)"><span class="badge badge-pill badge-success">&nbsp;</span></th:block>
