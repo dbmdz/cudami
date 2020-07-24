@@ -88,7 +88,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr th:each="digitalobject, stats: ${page.content}">
+              <tr th:each="digitalobject, stats : ${page.content}">
                 <td class="text-right" th:text="(${page.number - 1} * ${page.size}) + ${stats.index + 1}">1</td>
                 <td>
                   <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${digitalobject.previewImage}, ${digitalobject.previewImageRenderingHints}, ${#locale}, 50)"></th:block>
