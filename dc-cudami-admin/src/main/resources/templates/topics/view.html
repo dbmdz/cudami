@@ -73,6 +73,7 @@
           <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
             <thead>
               <tr>
+                <th class="text-right" th:text="#{abbr_number}">Nr.</th>
                 <th></th>
                 <th class="center" th:text="#{label}">Label</th>
                 <th class="center" th:text="#{last_modified}">last modified</th>
@@ -80,7 +81,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr th:each="subtopic : *{subtopics}">
+              <tr th:each="subtopic, stats : *{subtopics}">
+                <td class="text-right" th:text="${stats.index + 1}">1</td>
                 <td class="center">
                   <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${subtopic.previewImage}, ${subtopic.previewImageRenderingHints}, ${#locale}, 30)"></th:block>
                 </td>

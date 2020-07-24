@@ -43,6 +43,7 @@
           <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
             <thead>
               <tr sd:page-object="${page.page}">
+                <th class="text-right" th:text="#{abbr_number}">Nr.</th>
                 <th></th>
                 <th class="center" th:text="#{label}">Label</th>
                 <th class="center"><a class="sorted" sd:pagination-sort="url" th:text="#{url}">Url</a></th>
@@ -52,7 +53,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr th:each="website : ${page.content}">
+              <tr th:each="website, stats : ${page.content}">
+                <td class="text-right" th:text="(${page.number - 1} * ${page.size}) + ${stats.index + 1}">1</td>
                 <td class="center">
                   <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${website.previewImage}, ${website.previewImageRenderingHints}, ${#locale}, 50)"></th:block>
                 </td>
