@@ -118,7 +118,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr th:each="subpage, stats :*{children}">
+              <tr th:each="subpage, stats : *{children}">
                 <td class="text-right" th:text="${stats.index + 1}">1</td>
                 <td class="center" th:with="now=${T(java.time.LocalDate).now()}">
                   <th:block th:if="${subpage.publicationStart}  == null OR  ${subpage.publicationStart.compareTo(now)} > 0"><span class="badge badge-pill badge-warning">&nbsp;</span></th:block>
