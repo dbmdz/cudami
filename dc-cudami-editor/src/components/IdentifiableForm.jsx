@@ -240,7 +240,7 @@ class IdentifiableForm extends Component {
     const {apiContextPath, debug, mockApi} = this.props
     return this.state.identifiable ? (
       <ApiContext.Provider value={{apiContextPath, mockApi}}>
-        <Container className="cudami-editor">
+        <Container className="identifiable-editor">
           {this.state.invalidLanguages.length > 0 && (
             <FormErrors invalidLanguages={this.state.invalidLanguages} />
           )}

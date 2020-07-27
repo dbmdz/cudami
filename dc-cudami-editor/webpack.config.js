@@ -1,9 +1,12 @@
 const path = require('path');
+const _ = require('lodash');
 
 const config = {
   cache: true,
   devtool: 'sourcemaps',
-  entry: './src/lib/CudamiEditor.jsx',
+  entry: {
+    IdentifiableEditor: './src/lib/IdentifiableEditor.jsx',
+  },
   mode: 'production',
   module: {
     rules: [
@@ -32,8 +35,10 @@ const config = {
     ],
   },
   output: {
-    filename: 'cudami-editor.bundle.js',
-    library: 'CudamiEditor',
+    filename: (pathData) => {
+      return `${_.kebabCase(pathData.chunk.name)}.bundle.js`
+    },
+    library: '[name]',
     libraryExport: 'default',
     libraryTarget: 'umd',
     path: null

@@ -10,9 +10,9 @@
   <body>
     <section layout:fragment="content">
       <div id="editor"></div>
-      <script th:src="@{/js/cudami-editor.bundle.js}"></script>
+      <script th:src="@{/js/identifiable-editor.bundle.js}"></script>
       <script th:inline="javascript">
-        CudamiEditor({
+        IdentifiableEditor({
           activeLanguage: /*[[${activeLanguage}]]*/,
           apiContextPath: /*[[@{/}]]*/ '',
           id: "editor",
