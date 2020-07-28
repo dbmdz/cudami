@@ -22,8 +22,6 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,15 +157,14 @@ public class CudamiBaseClient<T extends Object> {
   protected String doDeleteRequestForString(String requestUrl) throws HttpException {
     HttpRequest req = createDeleteRequest(requestUrl);
     try {
-      CompletableFuture<HttpResponse<String>> response =
-          http.sendAsync(req, HttpResponse.BodyHandlers.ofString());
-      Integer statusCode = response.thenApply(HttpResponse::statusCode).get();
+      HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
+      Integer statusCode = response.statusCode();
       if (statusCode != 200) {
         throw CudamiRestErrorDecoder.decode("DELETE " + requestUrl, statusCode);
       }
-      final String body = response.thenApply(HttpResponse::body).get();
+      final String body = response.body();
       return body;
-    } catch (InterruptedException | ExecutionException e) {
+    } catch (InterruptedException | IOException e) {
       throw new HttpException("Failed to retrieve response due to connection error", e);
     }
   }
@@ -180,20 +177,19 @@ public class CudamiBaseClient<T extends Object> {
       throws HttpException {
     HttpRequest req = createGetRequest(requestUrl);
     try {
-      CompletableFuture<HttpResponse<byte[]>> response =
-          http.sendAsync(req, HttpResponse.BodyHandlers.ofByteArray());
-      Integer statusCode = response.thenApply(HttpResponse::statusCode).get();
+      HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
+      Integer statusCode = response.statusCode();
       if (statusCode != 200) {
         throw CudamiRestErrorDecoder.decode("GET " + requestUrl, statusCode);
       }
       // This is the most performant approach for Jackson
-      final byte[] body = response.thenApply(HttpResponse::body).get();
+      final byte[] body = response.body();
       if (body == null || body.length == 0) {
         return null;
       }
       T result = mapper.readerFor(targetType).readValue(body);
       return result;
-    } catch (IOException | InterruptedException | ExecutionException e) {
+    } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to connection error", e);
     }
   }
@@ -208,20 +204,19 @@ public class CudamiBaseClient<T extends Object> {
     // TODO add creation of a request id if needed
     //            .header("X-Request-Id", request.getRequestId())
     try {
-      CompletableFuture<HttpResponse<byte[]>> response =
-          http.sendAsync(req, HttpResponse.BodyHandlers.ofByteArray());
-      Integer statusCode = response.thenApply(HttpResponse::statusCode).get();
+      HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
+      Integer statusCode = response.statusCode();
       if (statusCode != 200) {
         throw CudamiRestErrorDecoder.decode("GET " + requestUrl, statusCode);
       }
       // This is the most performant approach for Jackson
-      final byte[] body = response.thenApply(HttpResponse::body).get();
+      final byte[] body = response.body();
       if (body == null || body.length == 0) {
         return null;
       }
       List result = mapper.readerForListOf(targetType).readValue(body);
       return result;
-    } catch (IOException | InterruptedException | ExecutionException e) {
+    } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to connection error", e);
     }
   }
@@ -247,20 +242,19 @@ public class CudamiBaseClient<T extends Object> {
                 findParams.getNullHandling());
     HttpRequest req = createGetRequest(requestUrl);
     try {
-      CompletableFuture<HttpResponse<byte[]>> response =
-          http.sendAsync(req, HttpResponse.BodyHandlers.ofByteArray());
-      Integer statusCode = response.thenApply(HttpResponse::statusCode).get();
+      HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
+      Integer statusCode = response.statusCode();
       if (statusCode != 200) {
         throw CudamiRestErrorDecoder.decode("GET " + requestUrl, statusCode);
       }
       // This is the most performant approach for Jackson
-      final byte[] body = response.thenApply(HttpResponse::body).get();
+      final byte[] body = response.body();
       if (body == null || body.length == 0) {
         return null;
       }
       PageResponse<T> result = mapper.readerFor(PageResponse.class).readValue(body);
       return result;
-    } catch (IOException | InterruptedException | ExecutionException e) {
+    } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to connection error", e);
     }
   }
@@ -282,21 +276,20 @@ public class CudamiBaseClient<T extends Object> {
                 URLEncoder.encode(searchTerm, StandardCharsets.UTF_8));
     HttpRequest req = createGetRequest(requestUrl);
     try {
-      CompletableFuture<HttpResponse<byte[]>> response =
-          http.sendAsync(req, HttpResponse.BodyHandlers.ofByteArray());
-      Integer statusCode = response.thenApply(HttpResponse::statusCode).get();
+      HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
+      Integer statusCode = response.statusCode();
       if (statusCode != 200) {
         throw CudamiRestErrorDecoder.decode("GET " + requestUrl, statusCode);
       }
       // This is the most performant approach for Jackson
-      final byte[] body = response.thenApply(HttpResponse::body).get();
+      final byte[] body = response.body();
       if (body == null || body.length == 0) {
         return null;
       }
       SearchPageResponse<T> result = mapper.readerFor(SearchPageResponse.class).readValue(body);
       result.setQuery(searchTerm);
       return result;
-    } catch (IOException | InterruptedException | ExecutionException e) {
+    } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to connection error", e);
     }
   }
@@ -322,20 +315,19 @@ public class CudamiBaseClient<T extends Object> {
                 findParams.getNullHandling());
     HttpRequest req = createGetRequest(requestUrl);
     try {
-      CompletableFuture<HttpResponse<byte[]>> response =
-          http.sendAsync(req, HttpResponse.BodyHandlers.ofByteArray());
-      Integer statusCode = response.thenApply(HttpResponse::statusCode).get();
+      HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
+      Integer statusCode = response.statusCode();
       if (statusCode != 200) {
         throw CudamiRestErrorDecoder.decode("GET " + requestUrl, statusCode);
       }
       // This is the most performant approach for Jackson
-      final byte[] body = response.thenApply(HttpResponse::body).get();
+      final byte[] body = response.body();
       if (body == null) {
         return null;
       }
       PageResponse result = mapper.readerFor(PageResponse.class).readValue(body);
       return result;
-    } catch (IOException | InterruptedException | ExecutionException e) {
+    } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to connection error", e);
     }
   }
@@ -343,15 +335,14 @@ public class CudamiBaseClient<T extends Object> {
   protected String doGetRequestForString(String requestUrl) throws HttpException {
     HttpRequest req = createGetRequest(requestUrl);
     try {
-      CompletableFuture<HttpResponse<String>> response =
-          http.sendAsync(req, HttpResponse.BodyHandlers.ofString());
-      Integer statusCode = response.thenApply(HttpResponse::statusCode).get();
+      HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
+      Integer statusCode = response.statusCode();
       if (statusCode != 200) {
         throw CudamiRestErrorDecoder.decode("GET " + requestUrl, statusCode);
       }
-      final String body = response.thenApply(HttpResponse::body).get();
+      final String body = response.body();
       return body;
-    } catch (InterruptedException | ExecutionException e) {
+    } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to connection error", e);
     }
   }
@@ -359,15 +350,14 @@ public class CudamiBaseClient<T extends Object> {
   protected String doPatchRequestForString(String requestUrl) throws HttpException {
     HttpRequest req = createPatchRequest(requestUrl);
     try {
-      CompletableFuture<HttpResponse<String>> response =
-          http.sendAsync(req, HttpResponse.BodyHandlers.ofString());
-      Integer statusCode = response.thenApply(HttpResponse::statusCode).get();
+      HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
+      Integer statusCode = response.statusCode();
       if (statusCode != 200) {
         throw CudamiRestErrorDecoder.decode("PATCH " + requestUrl, statusCode);
       }
-      final String body = response.thenApply(HttpResponse::body).get();
+      final String body = response.body();
       return body;
-    } catch (InterruptedException | ExecutionException e) {
+    } catch (InterruptedException | IOException e) {
       throw new HttpException("Failed to retrieve response due to connection error", e);
     }
   }
@@ -375,15 +365,14 @@ public class CudamiBaseClient<T extends Object> {
   protected String doPatchRequestForString(String requestUrl, Object object) throws HttpException {
     try {
       HttpRequest req = createPatchRequest(requestUrl, object);
-      CompletableFuture<HttpResponse<String>> response =
-          http.sendAsync(req, HttpResponse.BodyHandlers.ofString());
-      Integer statusCode = response.thenApply(HttpResponse::statusCode).get();
+      HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
+      Integer statusCode = response.statusCode();
       if (statusCode != 200) {
         throw CudamiRestErrorDecoder.decode("PATCH " + requestUrl, statusCode);
       }
-      final String body = response.thenApply(HttpResponse::body).get();
+      final String body = response.body();
       return body;
-    } catch (IOException | InterruptedException | ExecutionException e) {
+    } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to connection error", e);
     }
   }
@@ -391,20 +380,19 @@ public class CudamiBaseClient<T extends Object> {
   protected T doPostRequestForObject(String requestUrl, T object) throws HttpException {
     try {
       HttpRequest req = createPostRequest(requestUrl, object);
-      CompletableFuture<HttpResponse<byte[]>> response =
-          http.sendAsync(req, HttpResponse.BodyHandlers.ofByteArray());
-      Integer statusCode = response.thenApply(HttpResponse::statusCode).get();
+      HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
+      Integer statusCode = response.statusCode();
       if (statusCode != 200) {
         throw CudamiRestErrorDecoder.decode("POST " + requestUrl, statusCode);
       }
       // This is the most performant approach for Jackson
-      final byte[] body = response.thenApply(HttpResponse::body).get();
+      final byte[] body = response.body();
       if (body == null || body.length == 0) {
         return null;
       }
       T result = mapper.readerFor(targetType).readValue(body);
       return result;
-    } catch (IOException | InterruptedException | ExecutionException e) {
+    } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to error", e);
     }
   }
@@ -413,20 +401,19 @@ public class CudamiBaseClient<T extends Object> {
       throws HttpException {
     try {
       HttpRequest req = createPostRequest(requestUrl, bodyObject);
-      CompletableFuture<HttpResponse<byte[]>> response =
-          http.sendAsync(req, HttpResponse.BodyHandlers.ofByteArray());
-      Integer statusCode = response.thenApply(HttpResponse::statusCode).get();
+      HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
+      Integer statusCode = response.statusCode();
       if (statusCode != 200) {
         throw CudamiRestErrorDecoder.decode("POST " + requestUrl, statusCode);
       }
       // This is the most performant approach for Jackson
-      final byte[] body = response.thenApply(HttpResponse::body).get();
+      final byte[] body = response.body();
       if (body == null) {
         return null;
       }
       Object result = mapper.readerFor(targetType).readValue(body);
       return result;
-    } catch (IOException | InterruptedException | ExecutionException e) {
+    } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to error", e);
     }
   }
@@ -435,20 +422,19 @@ public class CudamiBaseClient<T extends Object> {
       throws HttpException {
     try {
       HttpRequest req = createPostRequest(requestUrl);
-      CompletableFuture<HttpResponse<byte[]>> response =
-          http.sendAsync(req, HttpResponse.BodyHandlers.ofByteArray());
-      Integer statusCode = response.thenApply(HttpResponse::statusCode).get();
+      HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
+      Integer statusCode = response.statusCode();
       if (statusCode != 200) {
         throw CudamiRestErrorDecoder.decode("POST " + requestUrl, statusCode);
       }
       // This is the most performant approach for Jackson
-      final byte[] body = response.thenApply(HttpResponse::body).get();
+      final byte[] body = response.body();
       if (body == null || body.length == 0) {
         return null;
       }
       Object result = mapper.readerFor(targetType).readValue(body);
       return result;
-    } catch (IOException | InterruptedException | ExecutionException e) {
+    } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to error", e);
     }
   }
@@ -462,20 +448,19 @@ public class CudamiBaseClient<T extends Object> {
       String requestUrl, List<Class<?>> list, Class<?> targetType) throws HttpException {
     try {
       HttpRequest req = createPostRequest(requestUrl, list);
-      CompletableFuture<HttpResponse<byte[]>> response =
-          http.sendAsync(req, HttpResponse.BodyHandlers.ofByteArray());
-      Integer statusCode = response.thenApply(HttpResponse::statusCode).get();
+      HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
+      Integer statusCode = response.statusCode();
       if (statusCode != 200) {
         throw CudamiRestErrorDecoder.decode("POST " + requestUrl, statusCode);
       }
       // This is the most performant approach for Jackson
-      final byte[] body = response.thenApply(HttpResponse::body).get();
+      final byte[] body = response.body();
       if (body == null || body.length == 0) {
         return null;
       }
       List<Class<?>> result = mapper.readerForListOf(targetType).readValue(body);
       return result;
-    } catch (IOException | InterruptedException | ExecutionException e) {
+    } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to error", e);
     }
   }
@@ -483,20 +468,19 @@ public class CudamiBaseClient<T extends Object> {
   protected T doPutRequestForObject(String requestUrl, T object) throws HttpException {
     try {
       HttpRequest req = createPutRequest(requestUrl, object);
-      CompletableFuture<HttpResponse<byte[]>> response =
-          http.sendAsync(req, HttpResponse.BodyHandlers.ofByteArray());
-      Integer statusCode = response.thenApply(HttpResponse::statusCode).get();
+      HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
+      Integer statusCode = response.statusCode();
       if (statusCode != 200) {
         throw CudamiRestErrorDecoder.decode("PUT " + requestUrl, statusCode);
       }
       // This is the most performant approach for Jackson
-      final byte[] body = response.thenApply(HttpResponse::body).get();
+      final byte[] body = response.body();
       if (body == null || body.length == 0) {
         return null;
       }
       T result = mapper.readerFor(targetType).readValue(body);
       return result;
-    } catch (IOException | InterruptedException | ExecutionException e) {
+    } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to connection error", e);
     }
   }
@@ -505,20 +489,19 @@ public class CudamiBaseClient<T extends Object> {
       throws HttpException {
     try {
       HttpRequest req = createPutRequest(requestUrl, bodyObject);
-      CompletableFuture<HttpResponse<byte[]>> response =
-          http.sendAsync(req, HttpResponse.BodyHandlers.ofByteArray());
-      Integer statusCode = response.thenApply(HttpResponse::statusCode).get();
+      HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
+      Integer statusCode = response.statusCode();
       if (statusCode != 200) {
         throw CudamiRestErrorDecoder.decode("PUT " + requestUrl, statusCode);
       }
       // This is the most performant approach for Jackson
-      final byte[] body = response.thenApply(HttpResponse::body).get();
+      final byte[] body = response.body();
       if (body == null) {
         return null;
       }
       Object result = mapper.readerFor(targetType).readValue(body);
       return result;
-    } catch (IOException | InterruptedException | ExecutionException e) {
+    } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to error", e);
     }
   }
