@@ -167,11 +167,6 @@ public class CudamiBaseClient<T extends Object> {
       }
       final String body = response.thenApply(HttpResponse::body).get();
       return body;
-      //      HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString());
-      //      if (resp.statusCode() != 200) {
-      //        throw CudamiRestErrorDecoder.decode("doDeleteRequestForString", resp.statusCode());
-      //      }
-      //      return resp.body();
     } catch (InterruptedException | ExecutionException e) {
       throw new HttpException("Failed to retrieve response due to connection error", e);
     }
@@ -193,11 +188,6 @@ public class CudamiBaseClient<T extends Object> {
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.thenApply(HttpResponse::body).get();
-      //      HttpResponse<byte[]> resp = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
-      //      if (resp.statusCode() != 200) {
-      //        throw CudamiRestErrorDecoder.decode("doGetRequestForObject", resp.statusCode());
-      //      }
-      //      final byte[] body = resp.body();
       if (body == null || body.length == 0) {
         return null;
       }
@@ -226,11 +216,6 @@ public class CudamiBaseClient<T extends Object> {
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.thenApply(HttpResponse::body).get();
-      //      HttpResponse<byte[]> resp = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
-      //      if (resp.statusCode() != 200) {
-      //        throw CudamiRestErrorDecoder.decode("doGetRequestForObjectList", resp.statusCode());
-      //      }
-      //      final byte[] body = resp.body();
       if (body == null || body.length == 0) {
         return null;
       }
@@ -270,11 +255,6 @@ public class CudamiBaseClient<T extends Object> {
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.thenApply(HttpResponse::body).get();
-      //      HttpResponse<byte[]> resp = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
-      //      if (resp.statusCode() != 200) {
-      //        throw CudamiRestErrorDecoder.decode("GET " + requestUrl, resp.statusCode());
-      //      }
-      //      final byte[] body = resp.body();
       if (body == null || body.length == 0) {
         return null;
       }
@@ -310,11 +290,6 @@ public class CudamiBaseClient<T extends Object> {
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.thenApply(HttpResponse::body).get();
-      //      HttpResponse<byte[]> resp = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
-      //      if (resp.statusCode() != 200) {
-      //        throw CudamiRestErrorDecoder.decode("GET " + requestUrl, resp.statusCode());
-      //      }
-      //      final byte[] body = resp.body();
       if (body == null || body.length == 0) {
         return null;
       }
@@ -355,11 +330,6 @@ public class CudamiBaseClient<T extends Object> {
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.thenApply(HttpResponse::body).get();
-      //      HttpResponse<byte[]> resp = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
-      //      if (resp.statusCode() != 200) {
-      //        throw CudamiRestErrorDecoder.decode("GET " + requestUrl, resp.statusCode());
-      //      }
-      //      final byte[] body = resp.body();
       if (body == null) {
         return null;
       }
@@ -381,11 +351,6 @@ public class CudamiBaseClient<T extends Object> {
       }
       final String body = response.thenApply(HttpResponse::body).get();
       return body;
-      //      HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString());
-      //      if (resp.statusCode() != 200) {
-      //        throw CudamiRestErrorDecoder.decode("GET " + requestUrl, resp.statusCode());
-      //      }
-      //      return resp.body();
     } catch (InterruptedException | ExecutionException e) {
       throw new HttpException("Failed to retrieve response due to connection error", e);
     }
@@ -402,11 +367,6 @@ public class CudamiBaseClient<T extends Object> {
       }
       final String body = response.thenApply(HttpResponse::body).get();
       return body;
-      //      HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString());
-      //      if (resp.statusCode() != 200) {
-      //        throw CudamiRestErrorDecoder.decode("PATCH " + requestUrl, resp.statusCode());
-      //      }
-      //      return resp.body();
     } catch (InterruptedException | ExecutionException e) {
       throw new HttpException("Failed to retrieve response due to connection error", e);
     }
@@ -423,11 +383,6 @@ public class CudamiBaseClient<T extends Object> {
       }
       final String body = response.thenApply(HttpResponse::body).get();
       return body;
-      //      HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString());
-      //      if (resp.statusCode() != 200) {
-      //        throw CudamiRestErrorDecoder.decode("PATCH " + requestUrl, resp.statusCode());
-      //      }
-      //      return resp.body();
     } catch (IOException | InterruptedException | ExecutionException e) {
       throw new HttpException("Failed to retrieve response due to connection error", e);
     }
@@ -444,11 +399,6 @@ public class CudamiBaseClient<T extends Object> {
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.thenApply(HttpResponse::body).get();
-      //      HttpResponse<byte[]> resp = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
-      //      if (resp.statusCode() != 200) {
-      //        throw CudamiRestErrorDecoder.decode("POST " + requestUrl, resp.statusCode());
-      //      }
-      //      final byte[] body = resp.body();
       if (body == null || body.length == 0) {
         return null;
       }
@@ -471,11 +421,6 @@ public class CudamiBaseClient<T extends Object> {
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.thenApply(HttpResponse::body).get();
-      //      HttpResponse<byte[]> resp = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
-      //      if (resp.statusCode() != 200) {
-      //        throw CudamiRestErrorDecoder.decode("POST " + requestUrl, resp.statusCode());
-      //      }
-      //      final byte[] body = resp.body();
       if (body == null) {
         return null;
       }
@@ -498,11 +443,6 @@ public class CudamiBaseClient<T extends Object> {
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.thenApply(HttpResponse::body).get();
-      //      HttpResponse<byte[]> resp = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
-      //      if (resp.statusCode() != 200) {
-      //        throw CudamiRestErrorDecoder.decode("POST " + requestUrl, resp.statusCode());
-      //      }
-      //      final byte[] body = resp.body();
       if (body == null || body.length == 0) {
         return null;
       }
@@ -530,11 +470,6 @@ public class CudamiBaseClient<T extends Object> {
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.thenApply(HttpResponse::body).get();
-      //      HttpResponse<byte[]> resp = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
-      //      if (resp.statusCode() != 200) {
-      //        throw CudamiRestErrorDecoder.decode("POST " + requestUrl, resp.statusCode());
-      //      }
-      //      final byte[] body = resp.body();
       if (body == null || body.length == 0) {
         return null;
       }
@@ -556,11 +491,6 @@ public class CudamiBaseClient<T extends Object> {
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.thenApply(HttpResponse::body).get();
-      //      HttpResponse<byte[]> resp = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
-      //      if (resp.statusCode() != 200) {
-      //        throw CudamiRestErrorDecoder.decode("PUT " + requestUrl, resp.statusCode());
-      //      }
-      //      final byte[] body = resp.body();
       if (body == null || body.length == 0) {
         return null;
       }
@@ -583,11 +513,6 @@ public class CudamiBaseClient<T extends Object> {
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.thenApply(HttpResponse::body).get();
-      //      HttpResponse<byte[]> resp = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
-      //      if (resp.statusCode() != 200) {
-      //        throw CudamiRestErrorDecoder.decode("PUT " + requestUrl, resp.statusCode());
-      //      }
-      //      final byte[] body = resp.body();
       if (body == null) {
         return null;
       }
