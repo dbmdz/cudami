@@ -6,13 +6,14 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.security.User;
 import de.digitalcollections.model.impl.security.UserImpl;
+import java.net.http.HttpClient;
 import java.util.List;
 import java.util.UUID;
 
 public class CudamiUsersClient extends CudamiBaseClient<UserImpl> {
 
-  public CudamiUsersClient(String serverUrl, ObjectMapper mapper) {
-    super(serverUrl, UserImpl.class, mapper);
+  public CudamiUsersClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
+    super(http, serverUrl, UserImpl.class, mapper);
   }
 
   public User create() {

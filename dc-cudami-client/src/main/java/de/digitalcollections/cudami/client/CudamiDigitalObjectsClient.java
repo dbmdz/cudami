@@ -17,13 +17,14 @@ import de.digitalcollections.model.impl.identifiable.entity.ProjectImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
+import java.net.http.HttpClient;
 import java.util.List;
 import java.util.UUID;
 
 public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObjectImpl> {
 
-  public CudamiDigitalObjectsClient(String serverUrl, ObjectMapper mapper) {
-    super(serverUrl, DigitalObjectImpl.class, mapper);
+  public CudamiDigitalObjectsClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
+    super(http, serverUrl, DigitalObjectImpl.class, mapper);
   }
 
   public DigitalObject create() {

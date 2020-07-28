@@ -9,14 +9,15 @@ import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
+import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
 public class CudamiIdentifiablesClient extends CudamiBaseClient<IdentifiableImpl> {
 
-  public CudamiIdentifiablesClient(String serverUrl, ObjectMapper mapper) {
-    super(serverUrl, IdentifiableImpl.class, mapper);
+  public CudamiIdentifiablesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
+    super(http, serverUrl, IdentifiableImpl.class, mapper);
   }
 
   public Identifiable create() {

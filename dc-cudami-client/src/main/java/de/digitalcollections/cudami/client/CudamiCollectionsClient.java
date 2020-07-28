@@ -10,14 +10,15 @@ import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
 import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
 import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
+import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
 public class CudamiCollectionsClient extends CudamiBaseClient<CollectionImpl> {
 
-  public CudamiCollectionsClient(String serverUrl, ObjectMapper mapper) {
-    super(serverUrl, CollectionImpl.class, mapper);
+  public CudamiCollectionsClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
+    super(http, serverUrl, CollectionImpl.class, mapper);
   }
 
   public boolean addDigitalObject(UUID collectionUuid, UUID digitalObjectUuid)

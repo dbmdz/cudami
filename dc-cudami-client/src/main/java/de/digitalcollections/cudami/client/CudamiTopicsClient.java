@@ -8,13 +8,14 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.TopicImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.SubtopicImpl;
+import java.net.http.HttpClient;
 import java.util.List;
 import java.util.UUID;
 
 public class CudamiTopicsClient extends CudamiBaseClient<TopicImpl> {
 
-  public CudamiTopicsClient(String serverUrl, ObjectMapper mapper) {
-    super(serverUrl, TopicImpl.class, mapper);
+  public CudamiTopicsClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
+    super(http, serverUrl, TopicImpl.class, mapper);
   }
 
   public Topic create() {
