@@ -33,7 +33,7 @@ public class TestConfig {
   public class TestCudamiLocalesClient extends CudamiLocalesClient {
 
     public TestCudamiLocalesClient(String serverUrl, ObjectMapper objectMapper) {
-      super(serverUrl, objectMapper);
+      super(null, serverUrl, objectMapper);
     }
 
     @Override

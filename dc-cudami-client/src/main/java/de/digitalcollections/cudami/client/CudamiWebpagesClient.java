@@ -11,14 +11,15 @@ import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
+import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
 public class CudamiWebpagesClient extends CudamiBaseClient<WebpageImpl> {
 
-  public CudamiWebpagesClient(String serverUrl, ObjectMapper mapper) {
-    super(serverUrl, WebpageImpl.class, mapper);
+  public CudamiWebpagesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
+    super(http, serverUrl, WebpageImpl.class, mapper);
   }
 
   public Webpage create() {

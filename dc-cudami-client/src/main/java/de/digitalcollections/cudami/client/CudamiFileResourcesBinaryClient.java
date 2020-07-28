@@ -21,7 +21,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 public class CudamiFileResourcesBinaryClient extends CudamiBaseClient<FileResourceImpl> {
 
   public CudamiFileResourcesBinaryClient(String serverUrl, ObjectMapper mapper) {
-    super(serverUrl, FileResourceImpl.class, mapper);
+    super(null, serverUrl, FileResourceImpl.class, mapper);
   }
 
   public FileResource create() {

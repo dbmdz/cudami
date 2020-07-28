@@ -14,14 +14,15 @@ import de.digitalcollections.model.impl.identifiable.entity.TopicImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.SubtopicImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
+import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
 public class CudamiSubtopicsClient extends CudamiBaseClient<SubtopicImpl> {
 
-  public CudamiSubtopicsClient(String serverUrl, ObjectMapper mapper) {
-    super(serverUrl, SubtopicImpl.class, mapper);
+  public CudamiSubtopicsClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
+    super(http, serverUrl, SubtopicImpl.class, mapper);
   }
 
   public Subtopic create() {

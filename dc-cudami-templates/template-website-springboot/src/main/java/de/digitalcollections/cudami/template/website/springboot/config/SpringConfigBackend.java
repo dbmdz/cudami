@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.template.website.springboot.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +23,7 @@ public class SpringConfigBackend {
 
   @Bean
   public CudamiLocalesClient cudamiLocalesClient(ObjectMapper objectMapper) {
-    return new CudamiLocalesClient(serverUrl, objectMapper);
+    CudamiClient cudamiClient = new CudamiClient(serverUrl, objectMapper);
+    return cudamiClient.forLocales();
   }
 }

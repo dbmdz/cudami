@@ -9,13 +9,14 @@ import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.IdentifierTypeImpl;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
+import java.net.http.HttpClient;
 import java.util.List;
 import java.util.UUID;
 
 public class CudamiIdentifierTypesClient extends CudamiBaseClient<IdentifierTypeImpl> {
 
-  public CudamiIdentifierTypesClient(String serverUrl, ObjectMapper mapper) {
-    super(serverUrl, IdentifierTypeImpl.class, mapper);
+  public CudamiIdentifierTypesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
+    super(http, serverUrl, IdentifierTypeImpl.class, mapper);
   }
 
   public IdentifierType create() {

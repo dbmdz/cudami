@@ -6,12 +6,13 @@ import de.digitalcollections.model.api.identifiable.entity.Corporation;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.CorporationImpl;
+import java.net.http.HttpClient;
 import java.util.UUID;
 
 public class CudamiCorporationsClient extends CudamiBaseClient<CorporationImpl> {
 
-  public CudamiCorporationsClient(String serverUrl, ObjectMapper mapper) {
-    super(serverUrl, CorporationImpl.class, mapper);
+  public CudamiCorporationsClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
+    super(http, serverUrl, CorporationImpl.class, mapper);
   }
 
   public Corporation create() {

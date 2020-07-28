@@ -9,13 +9,14 @@ import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
+import java.net.http.HttpClient;
 import java.util.List;
 import java.util.UUID;
 
 public class CudamiFileResourcesMetadataClient extends CudamiBaseClient<FileResourceImpl> {
 
-  public CudamiFileResourcesMetadataClient(String serverUrl, ObjectMapper mapper) {
-    super(serverUrl, FileResourceImpl.class, mapper);
+  public CudamiFileResourcesMetadataClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
+    super(http, serverUrl, FileResourceImpl.class, mapper);
   }
 
   public FileResource create() {

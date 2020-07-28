@@ -1,9 +1,12 @@
 package de.digitalcollections.cudami.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.http.HttpClient;
+import java.time.Duration;
 
 public class CudamiClient {
 
+  protected final HttpClient http;
   private final CudamiArticlesClient cudamiArticlesClient;
   private final CudamiCollectionsClient cudamiCollectionsClient;
   private final CudamiCorporationsClient cudamiCorporationsClient;
@@ -23,25 +26,37 @@ public class CudamiClient {
   private final CudamiWebsitesClient cudamiWebsitesClient;
 
   public CudamiClient(String cudamiServerUrl, ObjectMapper mapper) {
-    this.cudamiArticlesClient = new CudamiArticlesClient(cudamiServerUrl, mapper);
-    this.cudamiCollectionsClient = new CudamiCollectionsClient(cudamiServerUrl, mapper);
-    this.cudamiCorporationsClient = new CudamiCorporationsClient(cudamiServerUrl, mapper);
-    this.cudamiDigitalObjectsClient = new CudamiDigitalObjectsClient(cudamiServerUrl, mapper);
-    this.cudamiEntitiesClient = new CudamiEntitiesClient(cudamiServerUrl, mapper);
-    this.cudamiEntityPartsClient = new CudamiEntityPartsClient(cudamiServerUrl, mapper);
+    this(
+        HttpClient.newBuilder()
+            .followRedirects(HttpClient.Redirect.ALWAYS)
+            .connectTimeout(Duration.ofSeconds(10))
+            .build(),
+        cudamiServerUrl,
+        mapper);
+  }
+
+  public CudamiClient(HttpClient http, String cudamiServerUrl, ObjectMapper mapper) {
+    this.http = http;
+    this.cudamiArticlesClient = new CudamiArticlesClient(http, cudamiServerUrl, mapper);
+    this.cudamiCollectionsClient = new CudamiCollectionsClient(http, cudamiServerUrl, mapper);
+    this.cudamiCorporationsClient = new CudamiCorporationsClient(http, cudamiServerUrl, mapper);
+    this.cudamiDigitalObjectsClient = new CudamiDigitalObjectsClient(http, cudamiServerUrl, mapper);
+    this.cudamiEntitiesClient = new CudamiEntitiesClient(http, cudamiServerUrl, mapper);
+    this.cudamiEntityPartsClient = new CudamiEntityPartsClient(http, cudamiServerUrl, mapper);
     this.cudamiFileResourcesBinaryClient =
         new CudamiFileResourcesBinaryClient(cudamiServerUrl, mapper);
     this.cudamiFileResourcesMetadataClient =
-        new CudamiFileResourcesMetadataClient(cudamiServerUrl, mapper);
-    this.cudamiIdentifiablesClient = new CudamiIdentifiablesClient(cudamiServerUrl, mapper);
-    this.cudamiIdentifierTypesClient = new CudamiIdentifierTypesClient(cudamiServerUrl, mapper);
-    this.cudamiLocalesClient = new CudamiLocalesClient(cudamiServerUrl, mapper);
-    this.cudamiProjectsClient = new CudamiProjectsClient(cudamiServerUrl, mapper);
-    this.cudamiSubtopicsClient = new CudamiSubtopicsClient(cudamiServerUrl, mapper);
-    this.cudamiTopicsClient = new CudamiTopicsClient(cudamiServerUrl, mapper);
-    this.cudamiUsersClient = new CudamiUsersClient(cudamiServerUrl, mapper);
-    this.cudamiWebpagesClient = new CudamiWebpagesClient(cudamiServerUrl, mapper);
-    this.cudamiWebsitesClient = new CudamiWebsitesClient(cudamiServerUrl, mapper);
+        new CudamiFileResourcesMetadataClient(http, cudamiServerUrl, mapper);
+    this.cudamiIdentifiablesClient = new CudamiIdentifiablesClient(http, cudamiServerUrl, mapper);
+    this.cudamiIdentifierTypesClient =
+        new CudamiIdentifierTypesClient(http, cudamiServerUrl, mapper);
+    this.cudamiLocalesClient = new CudamiLocalesClient(http, cudamiServerUrl, mapper);
+    this.cudamiProjectsClient = new CudamiProjectsClient(http, cudamiServerUrl, mapper);
+    this.cudamiSubtopicsClient = new CudamiSubtopicsClient(http, cudamiServerUrl, mapper);
+    this.cudamiTopicsClient = new CudamiTopicsClient(http, cudamiServerUrl, mapper);
+    this.cudamiUsersClient = new CudamiUsersClient(http, cudamiServerUrl, mapper);
+    this.cudamiWebpagesClient = new CudamiWebpagesClient(http, cudamiServerUrl, mapper);
+    this.cudamiWebsitesClient = new CudamiWebsitesClient(http, cudamiServerUrl, mapper);
   }
 
   public CudamiArticlesClient forArticles() {

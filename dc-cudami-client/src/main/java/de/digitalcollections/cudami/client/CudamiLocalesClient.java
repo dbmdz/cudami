@@ -2,13 +2,14 @@ package de.digitalcollections.cudami.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
+import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
 
 public class CudamiLocalesClient extends CudamiBaseClient<Locale> {
 
-  public CudamiLocalesClient(String serverUrl, ObjectMapper mapper) {
-    super(serverUrl, Locale.class, mapper);
+  public CudamiLocalesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
+    super(http, serverUrl, Locale.class, mapper);
   }
 
   public List<String> findAllLanguages() throws HttpException {

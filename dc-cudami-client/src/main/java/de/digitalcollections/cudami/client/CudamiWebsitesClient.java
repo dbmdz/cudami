@@ -8,13 +8,14 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
+import java.net.http.HttpClient;
 import java.util.List;
 import java.util.UUID;
 
 public class CudamiWebsitesClient extends CudamiBaseClient<WebsiteImpl> {
 
-  public CudamiWebsitesClient(String serverUrl, ObjectMapper mapper) {
-    super(serverUrl, WebsiteImpl.class, mapper);
+  public CudamiWebsitesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
+    super(http, serverUrl, WebsiteImpl.class, mapper);
   }
 
   public Website create() {

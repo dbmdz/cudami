@@ -14,7 +14,8 @@ public class CudamiBaseClientTest {
     String serverUrl = "http://localhost:1234";
     String requestUrl = "/foo/bar";
     CudamiBaseClient base =
-        new CudamiBaseClient(serverUrl, Identifiable.class, new DigitalCollectionsObjectMapper());
+        new CudamiBaseClient(
+            null, serverUrl, Identifiable.class, new DigitalCollectionsObjectMapper());
     URI result = base.createFullUri(requestUrl);
     URI expectedResult = URI.create(serverUrl + requestUrl);
     assertThat(result).isEqualTo(expectedResult);
@@ -25,7 +26,8 @@ public class CudamiBaseClientTest {
     String serverUrl = "http://localhost:1234/cudami";
     String requestUrl = "/foo/bar";
     CudamiBaseClient base =
-        new CudamiBaseClient(serverUrl, Identifiable.class, new DigitalCollectionsObjectMapper());
+        new CudamiBaseClient(
+            null, serverUrl, Identifiable.class, new DigitalCollectionsObjectMapper());
     URI result = base.createFullUri(requestUrl);
     URI expectedResult = URI.create(serverUrl + requestUrl);
     assertThat(result).isEqualTo(expectedResult);

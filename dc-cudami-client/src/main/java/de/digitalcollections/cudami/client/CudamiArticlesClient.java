@@ -7,14 +7,15 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.ArticleImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
+import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
 public class CudamiArticlesClient extends CudamiBaseClient<ArticleImpl> {
 
-  public CudamiArticlesClient(String serverUrl, ObjectMapper mapper) {
-    super(serverUrl, ArticleImpl.class, mapper);
+  public CudamiArticlesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
+    super(http, serverUrl, ArticleImpl.class, mapper);
   }
 
   public Article create() {

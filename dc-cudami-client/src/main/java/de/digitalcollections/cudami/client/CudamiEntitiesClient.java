@@ -13,14 +13,15 @@ import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
 import de.digitalcollections.model.impl.identifiable.entity.EntityRelationImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
+import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
 public class CudamiEntitiesClient extends CudamiBaseClient<EntityImpl> {
 
-  public CudamiEntitiesClient(String serverUrl, ObjectMapper mapper) {
-    super(serverUrl, EntityImpl.class, mapper);
+  public CudamiEntitiesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
+    super(http, serverUrl, EntityImpl.class, mapper);
   }
 
   public Entity create() {
