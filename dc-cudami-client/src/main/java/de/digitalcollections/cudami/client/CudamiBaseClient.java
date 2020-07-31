@@ -129,7 +129,7 @@ public class CudamiBaseClient<T extends Object> {
     HttpRequest req =
         HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(bodyObject)))
-            .uri(createFullUri(requestUrl))
+            .uri(url)
             .header("Content-Type", "application/json")
             .header("Accept", "application/json")
             // TODO add creation of a request id if needed
