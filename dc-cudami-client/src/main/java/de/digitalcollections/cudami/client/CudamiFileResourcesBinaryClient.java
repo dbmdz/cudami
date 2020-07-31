@@ -7,6 +7,7 @@ import de.digitalcollections.model.api.identifiable.resource.exceptions.Resource
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import org.apache.http.HttpEntity;
@@ -18,10 +19,14 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.HttpClientBuilder;
 
-public class CudamiFileResourcesBinaryClient extends CudamiBaseClient<FileResourceImpl> {
+public class CudamiFileResourcesBinaryClient {
+
+  protected final ObjectMapper mapper;
+  protected final URI serverUri;
 
   public CudamiFileResourcesBinaryClient(String serverUrl, ObjectMapper mapper) {
-    super(null, serverUrl, FileResourceImpl.class, mapper);
+    this.mapper = mapper;
+    this.serverUri = URI.create(serverUrl);
   }
 
   public FileResource create() {
