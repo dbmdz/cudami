@@ -200,7 +200,8 @@ public class DigitalObjectController {
       produces = "application/json")
   @ApiResponseObject
   public List<FileResource> saveFileResources(
-      @PathVariable UUID uuid, @RequestBody List<FileResource> fileResources) {
+      @ApiPathParam(description = "UUID of the digital object") @PathVariable("uuid") UUID uuid,
+      @RequestBody List<FileResource> fileResources) {
     return service.saveFileResources(uuid, fileResources);
   }
 
@@ -210,7 +211,9 @@ public class DigitalObjectController {
       produces = "application/json")
   @ApiResponseObject
   public DigitalObject update(
-      @PathVariable UUID uuid, @RequestBody DigitalObject digitalObject, BindingResult errors)
+      @ApiPathParam(description = "UUID of the digital object") @PathVariable("uuid") UUID uuid,
+      @RequestBody DigitalObject digitalObject,
+      BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, digitalObject.getUuid());
     return service.update(digitalObject);
