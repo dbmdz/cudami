@@ -240,7 +240,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   public PageResponse<DigitalObject> getDigitalObjects(
       UUID collectionUuid, PageRequest pageRequest) {
     final String baseQuery =
-        "SELECT d.uuid d_uuid, d.label d_label,"
+        "SELECT d.uuid d_uuid, d.label d_label, d.refid d_refId,"
             + " d.created d_created, d.last_modified d_lastModified,"
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
             + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.iiif_base_url pf_iiifBaseUrl"
