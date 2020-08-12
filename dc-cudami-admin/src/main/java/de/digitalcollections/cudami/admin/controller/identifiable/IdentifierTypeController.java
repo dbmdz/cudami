@@ -11,6 +11,7 @@ import de.digitalcollections.model.api.identifiable.IdentifierType;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.IdentifierTypeImpl;
+import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import java.util.UUID;
 import javax.validation.Valid;
 import org.slf4j.Logger;
@@ -29,6 +30,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -135,6 +138,18 @@ public class IdentifierTypeController extends AbstractController {
             "msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
     return "redirect:/identifiertypes";
+  }
+
+  @GetMapping("/api/identifiertypes")
+  @ResponseBody
+  public PageResponse<IdentifierTypeImpl> find(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      throws HttpException {
+    PageRequest pageRequest = new PageRequestImpl();
+    pageRequest.setPageNumber(pageNumber);
+    pageRequest.setPageSize(pageSize);
+    return service.find(pageRequest);
   }
 
   @GetMapping(value = "/identifiertypes")
