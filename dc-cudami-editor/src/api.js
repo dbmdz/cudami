@@ -23,10 +23,7 @@ export async function addAttachedIdentifiables(
       },
       method: 'PATCH',
     })
-    if (!response.ok) {
-      return false
-    }
-    return true
+    return response.ok
   } catch (err) {
     return false
   }
@@ -152,10 +149,7 @@ export async function removeAttachedIdentifiable(
       },
       method: 'DELETE',
     })
-    if (!response.ok) {
-      return false
-    }
-    return true
+    return response.ok
   } catch (err) {
     return false
   }
