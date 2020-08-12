@@ -76,7 +76,7 @@ const updateRenderingHints = (
       [language]: title,
     },
   }
-  for (let key of ['caption', 'title']) {
+  for (let key of ['altText', 'caption', 'title']) {
     if (
       Object.values(renderingHints[key]).every((value) => value === undefined)
     ) {
