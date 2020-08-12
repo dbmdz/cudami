@@ -1,5 +1,4 @@
 import startCase from 'lodash/startCase'
-import uniqBy from 'lodash/uniqBy'
 import React, {Component} from 'react'
 import {
   Alert,
