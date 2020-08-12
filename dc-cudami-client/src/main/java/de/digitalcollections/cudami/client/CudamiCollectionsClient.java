@@ -33,7 +33,8 @@ public class CudamiCollectionsClient extends CudamiBaseClient<CollectionImpl> {
       throws HttpException {
     return Boolean.parseBoolean(
         doPatchRequestForString(
-            String.format("/latest/collections/%s/digitalobject", collectionUuid), digitalObjects));
+            String.format("/latest/collections/%s/digitalobjects", collectionUuid),
+            digitalObjects));
   }
 
   public Collection create() {
