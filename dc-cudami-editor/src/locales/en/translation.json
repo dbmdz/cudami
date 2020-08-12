@@ -1,12 +1,18 @@
 {
   "translation": {
+    "actions": "Actions",
     "add": "Add",
+    "addDigitalObjects": "Add digital objects",
     "addLanguage": "Add language",
     "addPreviewImage": "Add preview image",
     "alignment": "Alignment",
     "alignmentLeft": "left (with text wrapping)",
     "alignmentRight": "right (with text wrapping)",
     "altText": "Alt text",
+    "autocomplete": {
+      "moreElementsFound": "{{ maxElements }} out of {{ totalElements }} results, please refine your search.",
+      "searchTerm": "Search term"
+    },
     "blocks": {
       "blockquote": "Add block quote",
       "bulletList": "Change to bulleted list",
@@ -21,6 +27,10 @@
     "caption": "Caption",
     "chooseFile": "Choose file",
     "chooseLanguage": "Choose a language",
+    "confirmRemove": {
+      "digitalObjectFromCollection": "Are you sure, that you want to remove this digital object from the collection?",
+      "digitalObjectFromProject": "Are you sure, that you want to remove this digital object from the project?"
+    },
     "createArticle": "Create a new article",
     "createCollection": "Create a new collection",
     "createCorporation": "Create a new corporation",
@@ -39,7 +49,9 @@
     },
     "defineRenderingHints": "Define rendering hints",
     "description": "Abstract",
+    "digitalObjects": "Digital objects",
     "dragAndDropImage": "Drag and drop file to upload here",
+    "duplicateInformation": "Duplicates in the list below are automatically filtered out when you click \"$t(add)\".",
     "editArticle": "Edit article",
     "editCollection": "Edit collection",
     "editCorporation": "Edit corporation",
@@ -69,6 +81,7 @@
     "insertLink": "Insert hyperlink",
     "invalidLabels": "Please fill in the field \"$t(label)\" in the following languages:",
     "label": "Label",
+    "lastModified": "last modified",
     "marks": {
       "code": "Code style",
       "em": "Italic",
@@ -80,6 +93,7 @@
       "underline": "Underline"
     },
     "next": "Next",
+    "no": "No",
     "noAlignment": "without text wrapping",
     "numberOfColumns": "Number of columns",
     "numberOfRows": "Number of rows",
@@ -88,8 +102,7 @@
     "removePreviewImageAfterSaveNotification": "Click \"$t(save)\" to confirm the deletion.",
     "save": "Save",
     "selectImage": {
-      "moreElementsFound": "{{ maxElements }} out of {{ totalElements }} results, please refine your search.",
-      "searchTerm": "Search term (from label, file name, description)",
+      "searchTerm": "$t(autocomplete.searchTerm) (from label, file name, description)",
       "uploadSuccessful": "Image uploaded successfully",
       "useSearch": "Use existing image",
       "useUpload": "Upload image",
@@ -109,6 +122,8 @@
       "url": "embedding an image from the internet by using a valid URL"
     },
     "uploadFileResource": "Upload a new file",
-    "width": "Width"
+    "warning": "Warning",
+    "width": "Width",
+    "yes": "Yes"
   }
 }

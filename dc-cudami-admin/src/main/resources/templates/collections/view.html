@@ -123,59 +123,21 @@
         </div>
       </div>
       
-      
-      <div class="row main-content">
-        <div class="col-sm-6">
-          <h2 th:text="#{digital_objects}">Digital objects</h2>
-        </div>
-        <div class="col-sm-6">
-          <div class="float-right">
-          </div>
-        </div>
-      </div>
-      
       <div class="row">
         <div class="col-sm-12">
-          <div th:replace="fragments/pagination-navigation :: pagination-bootstrap4"></div>
-
-          <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
-            <thead>
-              <tr sd:page-object="${page.page}">
-                <th class="text-right" th:text="#{abbr_number}">Nr.</th>
-                <th></th>
-                <th class="center" th:text="#{label}">Label</th>
-                <th class="center" th:text="#{last_modified}">last modified</th>
-                <th class="center" th:text="#{actions}">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr th:each="digitalobject, stats : ${page.content}">
-                <td class="text-right" th:text="(${page.number - 1} * ${page.size}) + ${stats.index + 1}">1</td>
-                <td class="center">
-                  <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${digitalobject.previewImage}, ${digitalobject.previewImageRenderingHints}, ${#locale}, 50)"></th:block>
-                </td>
-                <td>
-                  <a th:href="@{'/digitalobjects/' + ${digitalobject.uuid}}" th:if="${digitalobject.label}" th:text="${digitalobject.label.text}">bsb10001000</a>
-                </td>
-                <td>
-                  <span class="float-right" th:with="df=#{dateTime.format},dateTime=${digitalobject.lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
-                </td>
-                <td class="center">
-                  <a th:href="@{'/digitalobjects/' + ${digitalobject.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
-                  <a href="#"
-                    th:title="#{tooltip_remove_digitalobject_from_collection}"
-                    data:href="@{'/collections/' + ${collection.uuid} + '/digitalobjects/' + ${digitalobject.uuid} + '/remove'}"
-                    data:message="#{msg.confirm_remove_digitalobject_from_collection}"
-                    data:title="#{title_warning}"
-                    data-target="#confirmYesNoDialog"
-                    data-toggle="modal">
-                    <span class="fa fa-trash actionButton"></span>
-                  </a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div th:replace="fragments/pagination-navigation :: pagination-bootstrap4"></div>
+           <div id="list"></div>
+            <script th:src="@{/js/identifiable-list.bundle.js}"></script>
+            <script th:inline="javascript">
+              IdentifiableList({
+                apiContextPath: /*[[@{/}]]*/ '',
+                debug: true,
+                id: "list",
+                parentType: "collection",
+                parentUuid: /*[[*{uuid}]]*/,
+                type: "digitalObject",
+                uiLocale: /*[[${#locale.language}]]*/
+              });
+            </script>
         </div>
       </div>
     </section>

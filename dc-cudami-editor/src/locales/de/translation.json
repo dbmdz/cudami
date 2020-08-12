@@ -1,12 +1,18 @@
 {
   "translation": {
+    "actions": "Aktionen",
     "add": "Hinzufügen",
+    "addDigitalObjects": "Digitalisate hinzufügen",
     "addLanguage": "Sprache hinzufügen",
     "addPreviewImage": "Vorschaubild hinzufügen",
     "alignment": "Ausrichtung",
     "alignmentLeft": "links (mit Textumlauf)",
     "alignmentRight": "rechts (mit Textumlauf)",
     "altText": "Alt-Text",
+    "autocomplete": {
+      "moreElementsFound": "{{ maxElements }} von {{ totalElements }} Treffern, bitte verfeinern Sie Ihre Suche.",
+      "searchTerm": "Suchbegriff"
+    },
     "blocks": {
       "blockquote": "Zitat einfügen",
       "bulletList": "In Aufzählungsliste umwandeln",
@@ -21,6 +27,10 @@
     "caption": "Bildunterschrift",
     "chooseFile": "Datei auswählen",
     "chooseLanguage": "Sprache auswählen",
+    "confirmRemove": {
+      "digitalObjectFromCollection": "Sind Sie sicher, dass Sie das Digitalisat aus der Sammlung entfernen wollen?",
+      "digitalObjectFromProject": "Sind Sie sicher, dass Sie das Digitalisat aus dem Projekt entfernen wollen?"
+    },
     "createArticle": "Neuen Artikel anlegen",
     "createCollection": "Neue Sammlung anlegen",
     "createCorporation": "Neue Institution anlegen",
@@ -39,7 +49,9 @@
     },
     "defineRenderingHints": "Darstellungshinweise festlegen",
     "description": "Kurzbeschreibung",
+    "digitalObjects": "Digitalisate (Digitale Objekte)",
     "dragAndDropImage": "Datei zum Hochladen hier hereinziehen und ablegen",
+    "duplicateInformation": "Duplikate in der Liste unten werden beim Klick auf \"$t(add)\" automatisch herausgefiltert.",
     "editArticle": "Artikel bearbeiten",
     "editCollection": "Sammlung bearbeiten",
     "editCorporation": "Institution bearbeiten",
@@ -69,6 +81,7 @@
     "insertLink": "Verlinkung einfügen",
     "invalidLabels": "Bitte füllen Sie in den folgenden Sprachen das Feld \"$t(label)\" noch aus):",
     "label": "Titel",
+    "lastModified": "letzte Änderung",
     "marks": {
       "code": "Code-Stil",
       "em": "Kursiv",
@@ -81,6 +94,7 @@
     },
     "newTab": "in neuem Tab",
     "next": "Weiter",
+    "no": "Nein",
     "noAlignment": "ohne Textumlauf",
     "numberOfColumns": "Anzahl an Spalten",
     "numberOfRows": "Anzahl an Zeilen",
@@ -90,8 +104,7 @@
     "sameTab": "in gleichem Tab",
     "save": "Speichern",
     "selectImage": {
-      "moreElementsFound": "{{ maxElements }} von {{ totalElements }} Treffern, bitte verfeinern Sie Ihre Suche.",
-      "searchTerm": "Suchbegriff (aus Bild-Titel, Dateiname, Kurzbeschreibung)",
+      "searchTerm": "$t(autocomplete.searchTerm) (aus Bild-Titel, Dateiname, Kurzbeschreibung)",
       "uploadSuccessful": "Bild erfolgreich hochgeladen",
       "useSearch": "Vorhandenes Bild verwenden",
       "useUpload": "Bild hochladen",
@@ -111,6 +124,8 @@
       "url": "Einbinden eines Bildes aus dem Internet durch Eingabe einer gültigen URL"
     },
     "uploadFileResource": "Neue Datei hochladen",
-    "width": "Breite"
+    "warning": "Warnung",
+    "width": "Breite",
+    "yes": "Ja"
   }
 }

@@ -18,12 +18,12 @@ import {
 import {withTranslation} from 'react-i18next'
 import {FaQuestionCircle} from 'react-icons/fa'
 
-import ImageAutocomplete from './ImageAutocomplete'
+import Autocomplete from '../../Autocomplete'
 import ImageLabelInput from './ImageLabelInput'
 import ImagePreview from './ImagePreview'
 import FileUploadForm from '../../FileUploadForm'
 import {getImageUrl} from '../../utils'
-import {ApiContext, uploadFile} from '../../../api'
+import {ApiContext, searchImages, uploadFile} from '../../../api'
 
 class ImageSelector extends Component {
   constructor(props) {
@@ -235,10 +235,18 @@ class ImageSelector extends Component {
                   uri={fileResource.uri}
                 />
               )}
-              <ImageAutocomplete
+              <Autocomplete
                 activeLanguage={activeLanguage}
                 defaultLanguage={defaultLanguage}
-                onChange={onChange}
+                onSelect={(suggestion) => {
+                  onChange({
+                    ...suggestion.previewImage,
+                    ...suggestion,
+                    uri: getImageUrl(suggestion.previewImage),
+                  })
+                }}
+                placeholder={t('selectImage.searchTerm')}
+                search={searchImages}
               />
             </TabPane>
           </TabContent>

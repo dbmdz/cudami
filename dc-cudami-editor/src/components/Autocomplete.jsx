@@ -1,12 +1,13 @@
 import React, {Component} from 'react'
-import {Alert, FormGroup, Input} from 'reactstrap'
+import {Alert, Col, FormGroup, Input, Row} from 'reactstrap'
 import Autosuggest from 'react-autosuggest'
 import {withTranslation} from 'react-i18next'
 
-import {getImageUrl} from '../../utils'
-import {ApiContext, searchImages} from '../../../api'
+import './Autocomplete.css'
+import {getImageUrl} from './utils'
+import {ApiContext} from '../api'
 
-class ImageAutocomplete extends Component {
+class Autocomplete extends Component {
   /* defines the number of suggestions to be fetched */
   maxElements = 25
 
@@ -49,7 +50,7 @@ class ImageAutocomplete extends Component {
     if (searchTerm.length < 2) {
       return
     }
-    const {suggestions, totalElements} = await searchImages(
+    const {suggestions, totalElements} = await this.props.search(
       this.context.apiContextPath,
       this.context.mockApi,
       searchTerm,
@@ -62,6 +63,13 @@ class ImageAutocomplete extends Component {
     })
   }
 
+  onSuggestionSelected = (_, {suggestion}) => {
+    this.setState({
+      searchTerm: '',
+    })
+    this.props.onSelect(suggestion)
+  }
+
   renderInputComponent = (inputProps) => {
     return (
       <FormGroup className="mb-0">
@@ -72,12 +80,12 @@ class ImageAutocomplete extends Component {
 
   renderSuggestion = ({label, previewImage}) => {
     return (
-      <>
-        <div className="mr-3 suggestion-image">
+      <Row>
+        <Col md="1">
           <img className="img-fluid" src={getImageUrl(previewImage, '50,')} />
-        </div>
-        {this.getLabelValue(label)}
-      </>
+        </Col>
+        <Col md="11">{this.getLabelValue(label)}</Col>
+      </Row>
     )
   }
 
@@ -86,7 +94,7 @@ class ImageAutocomplete extends Component {
       <div {...containerProps}>
         {this.state.totalElements > this.maxElements && (
           <Alert className="mb-0" color="info">
-            {this.props.t('selectImage.moreElementsFound', {
+            {this.props.t('autocomplete.moreElementsFound', {
               maxElements: this.maxElements,
               totalElements: this.state.totalElements,
             })}
@@ -97,19 +105,11 @@ class ImageAutocomplete extends Component {
     )
   }
 
-  selectFileResource = (_, {suggestion}) => {
-    this.props.onChange({
-      ...suggestion.previewImage,
-      ...suggestion,
-      uri: getImageUrl(suggestion.previewImage),
-    })
-  }
-
   render() {
     const {searchTerm, suggestions} = this.state
     const inputProps = {
       onChange: this.onChange,
-      placeholder: this.props.t('selectImage.searchTerm'),
+      placeholder: this.props.placeholder,
       value: searchTerm,
     }
     return (
@@ -118,22 +118,22 @@ class ImageAutocomplete extends Component {
         inputProps={inputProps}
         onSuggestionsClearRequested={this.onSuggestionsClearRequested}
         onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-        onSuggestionSelected={this.selectFileResource}
+        onSuggestionSelected={this.onSuggestionSelected}
         renderInputComponent={this.renderInputComponent}
         renderSuggestion={this.renderSuggestion}
         renderSuggestionsContainer={this.renderSuggestionsContainer}
         suggestions={suggestions}
         theme={{
-          suggestion: 'align-items-center d-flex list-group-item',
+          suggestion: 'list-group-item',
           suggestionHighlighted: 'active',
           suggestionsContainer: 'suggestion-container',
-          suggestionsList: 'list-group suggestion-list',
+          suggestionsList: 'list-group',
         }}
       />
     )
   }
 }
 
-ImageAutocomplete.contextType = ApiContext
+Autocomplete.contextType = ApiContext
 
-export default withTranslation()(ImageAutocomplete)
+export default withTranslation()(Autocomplete)

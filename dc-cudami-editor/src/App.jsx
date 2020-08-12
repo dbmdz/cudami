@@ -25,6 +25,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 
 import initI18n from './i18n'
 import IdentifiableForm from './components/IdentifiableForm'
+import PagedIdentifiableList from './components/PagedIdentifiableList'
 
 const availableTypes = [
   'article',
@@ -89,7 +90,8 @@ const StartPage = () => {
 }
 
 const App = () => {
-  initI18n(getUiLocale(window.location.search))
+  const uiLocale = getUiLocale(window.location.search)
+  initI18n(uiLocale)
   return (
     <Router>
       <Route component={StartPage} exact={true} path="/" />
@@ -115,6 +117,20 @@ const App = () => {
             type={match.params.type}
             uuid="mock"
           />
+        )}
+      />
+      <Route
+        path="/collection/digitalObject"
+        render={() => (
+          <Container className="mt-3">
+            <PagedIdentifiableList
+              debug={true}
+              mockApi={true}
+              parentType="collection"
+              type="digitalObject"
+              uiLocale={uiLocale}
+            />
+          </Container>
         )}
       />
     </Router>
