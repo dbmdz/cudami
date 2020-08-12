@@ -228,9 +228,9 @@ public class CollectionController {
     boolean successful = collectionService.addDigitalObject(collection, digitalObject);
 
     if (successful) {
-      return new ResponseEntity<>(HttpStatus.OK);
+      return new ResponseEntity<>(successful, HttpStatus.OK);
     }
-    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
   @ApiMethod(description = "Add existing digital objects to an existing collection")
@@ -252,9 +252,9 @@ public class CollectionController {
     boolean successful = collectionService.addDigitalObjects(collection, digitalObjects);
 
     if (successful) {
-      return new ResponseEntity<>(HttpStatus.OK);
+      return new ResponseEntity<>(successful, HttpStatus.OK);
     }
-    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
   @ApiMethod(description = "Get paged digital objects of a collection")
@@ -299,9 +299,9 @@ public class CollectionController {
     boolean successful = collectionService.removeDigitalObject(collection, digitalObject);
 
     if (successful) {
-      return new ResponseEntity<>(HttpStatus.OK);
+      return new ResponseEntity<>(successful, HttpStatus.OK);
     }
-    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
   @ApiMethod(description = "Save existing digital objects into an existing collection")
@@ -323,8 +323,8 @@ public class CollectionController {
     boolean successful = collectionService.saveDigitalObjects(collection, digitalObjects);
 
     if (successful) {
-      return new ResponseEntity<>(HttpStatus.OK);
+      return new ResponseEntity<>(successful, HttpStatus.OK);
     }
-    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 }
