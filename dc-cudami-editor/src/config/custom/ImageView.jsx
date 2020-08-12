@@ -19,8 +19,10 @@ class IframeView {
     const figure = document.createElement('figure')
     figure.classList.add('mb-0')
     const image = document.createElement('img')
-    image.setAttribute('alt', altText)
     image.setAttribute('src', url)
+    if (altText) {
+      image.setAttribute('alt', altText)
+    }
     if (title) {
       image.setAttribute('title', title)
     }
