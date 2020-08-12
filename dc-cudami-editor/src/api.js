@@ -2,6 +2,66 @@ import React from 'react'
 
 export const ApiContext = React.createContext(null)
 
+export async function addAttachedIdentifiables(
+  contextPath,
+  mock,
+  identifiables,
+  parentType,
+  parentUuid,
+  type
+) {
+  if (mock) {
+    return true
+  }
+  const url = `${contextPath}api/${parentType.toLowerCase()}s/${parentUuid}/${type.toLowerCase()}s`
+  try {
+    const response = await fetch(url, {
+      body: JSON.stringify(identifiables),
+      headers: {
+        'Content-Type': 'application/json',
+        credentials: 'same-origin',
+      },
+      method: 'PATCH',
+    })
+    if (!response.ok) {
+      return false
+    }
+    return true
+  } catch (err) {
+    return false
+  }
+}
+
+export async function findByIdentifier(contextPath, mock, id, namespace, type) {
+  let url = `${contextPath}api/${type.toLowerCase()}s/identifier/${namespace}:${id}`
+  if (mock) {
+    url = `/__mock__/${type}.json`
+  }
+  try {
+    const response = await fetch(url)
+    if (!response.ok) {
+      return null
+    }
+    return response.json()
+  } catch (err) {
+    return null
+  }
+}
+
+export async function getIdentifierTypes(contextPath, mock) {
+  let url = `${contextPath}api/identifiertypes`
+  if (mock) {
+    url = '/__mock__/identifierTypes.json'
+  }
+  try {
+    const response = await fetch(url)
+    const json = await response.json()
+    return json.content
+  } catch (err) {
+    return []
+  }
+}
+
 export async function loadAvailableLanguages(contextPath, mock) {
   if (mock) {
     return ['es', 'fr']
@@ -39,6 +99,65 @@ export async function loadIdentifiable(contextPath, mock, type, uuid = 'new') {
     return result.json()
   } catch (err) {
     return {}
+  }
+}
+
+export async function loadAttachedIdentifiables(
+  contextPath,
+  mock,
+  parentType,
+  parentUuid,
+  type,
+  pageNumber,
+  pageSize
+) {
+  let url = `${contextPath}api/${parentType.toLowerCase()}s/${parentUuid}/${type.toLowerCase()}s?pageNumber=${pageNumber}&pageSize=${pageSize}`
+  if (mock) {
+    url = `/__mock__/${type}s.json`
+  }
+  try {
+    const response = await fetch(url)
+    const json = await response.json()
+    const {content, pageRequest, totalElements} = json
+    return {
+      content,
+      pageSize: pageRequest.pageSize,
+      totalElements,
+    }
+  } catch (err) {
+    return {
+      content: [],
+      pageSize: 0,
+      totalElements: 0,
+    }
+  }
+}
+
+export async function removeAttachedIdentifiable(
+  contextPath,
+  mock,
+  parentType,
+  parentUuid,
+  type,
+  uuid
+) {
+  if (mock) {
+    return true
+  }
+  const url = `${contextPath}api/${parentType.toLowerCase()}s/${parentUuid}/${type.toLowerCase()}s/${uuid}`
+  try {
+    const response = await fetch(url, {
+      headers: {
+        credentials: 'same-origin',
+      },
+      method: 'DELETE',
+    })
+    if (!response.ok) {
+      return false
+    }
+    return true
+  } catch (err) {
+    return false
   }
 }
 
@@ -88,6 +207,33 @@ export async function saveIdentifiable(
     }
   } catch (err) {
     console.log('An error occured')
+  }
+}
+
+export async function searchIdentifiables(
+  contextPath,
+  mock,
+  searchTerm,
+  type,
+  pageNumber = 0,
+  pageSize = 10
+) {
+  let url = `${contextPath}api/${type.toLowerCase()}s/search?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
+  if (mock) {
+    url = `/__mock__/${type}s.json`
+  }
+  try {
+    const response = await fetch(url)
+    const json = await response.json()
+    return {
+      suggestions: json.content,
+      totalElements: json.totalElements,
+    }
+  } catch (err) {
+    return {
+      suggestions: [],
+      totalElements: 0,
+    }
   }
 }
 
