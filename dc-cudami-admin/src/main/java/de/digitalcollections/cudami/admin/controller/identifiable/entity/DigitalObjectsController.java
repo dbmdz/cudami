@@ -10,9 +10,18 @@ import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.Project;
+import de.digitalcollections.model.api.paging.Order;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
+import de.digitalcollections.model.api.paging.Sorting;
+import de.digitalcollections.model.api.paging.enums.Direction;
+import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
+import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
+import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
+import de.digitalcollections.model.impl.paging.SortingImpl;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +34,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /** Controller for digital objects management pages. */
 @Controller
@@ -42,6 +53,13 @@ public class DigitalObjectsController extends AbstractController {
     return "digitalobjects";
   }
 
+  @GetMapping("/api/digitalobjects/identifier/{namespace}:{id}")
+  @ResponseBody
+  public DigitalObject findOneByIdentifier(@PathVariable String namespace, @PathVariable String id)
+      throws HttpException {
+    return service.findOneByIdentifier(namespace, id);
+  }
+
   @GetMapping("/digitalobjects")
   public String list(
       Model model,
@@ -56,6 +74,24 @@ public class DigitalObjectsController extends AbstractController {
     Page page = PageConverter.convert(pageResponse, pageRequest);
     model.addAttribute("page", new PageWrapper(page, "/digitalobjects"));
     return "digitalobjects/list";
+  }
+
+  @GetMapping("/api/digitalobjects/search")
+  @ResponseBody
+  public SearchPageResponse<DigitalObjectImpl> search(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortField", required = false, defaultValue = "lastModified")
+          String sortField,
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "DESC")
+          Direction sortDirection,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      throws HttpException {
+    Order order = new OrderImpl(sortDirection, sortField);
+    Sorting sorting = new SortingImpl(order);
+    SearchPageRequest pageRequest =
+        new SearchPageRequestImpl(searchTerm, pageNumber, pageSize, sorting);
+    return service.find(pageRequest);
   }
 
   @GetMapping("/digitalobjects/{uuid}")

@@ -11,9 +11,11 @@ import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
+import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
+import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -29,8 +31,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -59,6 +63,17 @@ public class CollectionsController extends AbstractController {
   @ModelAttribute("menu")
   protected String module() {
     return "collections";
+  }
+
+  @PatchMapping("/api/collections/{uuid}/digitalobjects")
+  public ResponseEntity addDigitalObjects(
+      @PathVariable UUID uuid, @RequestBody List<DigitalObject> digitalObjects)
+      throws HttpException {
+    boolean successful = service.addDigitalObjects(uuid, digitalObjects);
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
   @GetMapping("/collections/new")
@@ -99,12 +114,17 @@ public class CollectionsController extends AbstractController {
     return service.findOne(uuid);
   }
 
-  @GetMapping("/collections/{collectionUuid}/digitalobjects/{digitalobjectUuid}/remove")
-  public String removeDigitalObjectFromCollection(
-      @PathVariable UUID collectionUuid, @PathVariable UUID digitalobjectUuid)
+  @GetMapping("/api/collections/{uuid}/digitalobjects")
+  @ResponseBody
+  public PageResponse<DigitalObject> getDigitalObjects(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws HttpException {
-    service.removeDigitalObject(collectionUuid, digitalobjectUuid);
-    return "redirect:/collections/" + collectionUuid;
+    PageRequest pageRequest = new PageRequestImpl();
+    pageRequest.setPageNumber(pageNumber);
+    pageRequest.setPageSize(pageSize);
+    return service.getDigitalObjects(uuid, pageRequest);
   }
 
   @GetMapping("/collections")
@@ -121,6 +141,18 @@ public class CollectionsController extends AbstractController {
     Page page = PageConverter.convert(pageResponse, pageRequest);
     model.addAttribute("page", new PageWrapper(page, "/collections"));
     return "collections/list";
+  }
+
+  @DeleteMapping("/api/collections/{collectionUuid}/digitalobjects/{digitalobjectUuid}")
+  @ResponseBody
+  public ResponseEntity removeDigitalObject(
+      @PathVariable UUID collectionUuid, @PathVariable UUID digitalobjectUuid)
+      throws HttpException {
+    boolean successful = service.removeDigitalObject(collectionUuid, digitalobjectUuid);
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
   @PostMapping("/api/collections/new")
@@ -164,11 +196,6 @@ public class CollectionsController extends AbstractController {
 
     model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("collection", collection);
-
-    final PageRequest pageRequest = PageableConverter.convert(pageable);
-    final PageResponse pageResponse = service.getDigitalObjects(uuid, pageRequest);
-    Page page = PageConverter.convert(pageResponse, pageRequest);
-    model.addAttribute("page", new PageWrapper(page, "/collections/" + uuid));
 
     BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
     List<Node> breadcrumbs = breadcrumbNavigation.getNavigationItems();
