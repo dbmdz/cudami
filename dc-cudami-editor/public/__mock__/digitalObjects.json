@@ -1,0 +1,86 @@
+{
+  "content": [
+    {
+      "created": "2020-07-27T16:39:46.130817",
+      "entityType": "DIGITAL_OBJECT",
+      "fileResources": [],
+      "identifiers": [],
+      "label": {
+        "en": "My first digital object"
+      },
+      "lastModified": "2020-07-27T16:39:46.130817",
+      "previewImage": {
+        "fileResourceType": "IMAGE",
+        "filename": "my-first-image-file-resource.png",
+        "filenameExtension": "png",
+        "height": 135,
+        "identifiers": [],
+        "mimeType": "image/png",
+        "readonly": false,
+        "sizeInBytes": 12345,
+        "type": "RESOURCE",
+        "uri": "/image.png",
+        "uuid": "6af49346-632a-44e6-bc7e-cee05ed975a2",
+        "width": 246
+      },
+      "type": "ENTITY",
+      "uuid": "baf59346-632a-44e6-bc7e-cee05ed975a2"
+    },
+    {
+      "created": "2020-07-27T16:39:46.130817",
+      "entityType": "DIGITAL_OBJECT",
+      "fileResources": [],
+      "identifiers": [],
+      "label": {
+        "en": "My second digital object"
+      },
+      "lastModified": "2020-07-27T16:39:46.130817",
+      "previewImage": {
+        "fileResourceType": "IMAGE",
+        "filename": "my-first-image-file-resource.png",
+        "filenameExtension": "png",
+        "height": 135,
+        "identifiers": [],
+        "mimeType": "image/png",
+        "readonly": false,
+        "sizeInBytes": 12345,
+        "type": "RESOURCE",
+        "uri": "/image.png",
+        "uuid": "6af49346-632a-44e6-bc7e-cee05ed975a2",
+        "width": 246
+      },
+      "type": "ENTITY",
+      "uuid": "6af49346-632a-44e6-bc7e-cee05ed975a2"
+    },
+    {
+      "created": "2020-07-27T16:39:46.130817",
+      "entityType": "DIGITAL_OBJECT",
+      "fileResources": [],
+      "identifiers": [],
+      "label": {
+        "en": "My third digital object"
+      },
+      "lastModified": "2020-07-27T16:39:46.130817",
+      "previewImage": {
+        "fileResourceType": "IMAGE",
+        "filename": "my-first-image-file-resource.png",
+        "filenameExtension": "png",
+        "height": 135,
+        "identifiers": [],
+        "mimeType": "image/png",
+        "readonly": false,
+        "sizeInBytes": 12345,
+        "type": "RESOURCE",
+        "uri": "/image.png",
+        "uuid": "6af49346-632a-44e6-bc7e-cee05ed975a2",
+        "width": 246
+      },
+      "type": "ENTITY",
+      "uuid": "2cf48dd1-632a-44e6-bc7e-cee05ed975a2"
+    }
+  ],
+  "pageRequest": {
+    "pageSize": 1
+  },
+  "totalElements": 3
+}

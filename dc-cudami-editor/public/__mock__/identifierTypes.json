@@ -1,0 +1,10 @@
+{
+  "content": [
+    {
+      "label": "Mock-ID",
+      "namespace": "mock",
+      "pattern": "[0-9]{3}",
+      "uuid": "a2406a74-b348-4c90-b30a-6933a1b85212"
+    }
+  ]
+}
