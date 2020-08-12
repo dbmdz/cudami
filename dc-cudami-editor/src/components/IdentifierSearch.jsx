@@ -9,7 +9,6 @@ import {
   ListGroupItem,
   Row,
 } from 'reactstrap'
-import {withTranslation} from 'react-i18next'
 import {FaSearch} from 'react-icons/fa'
 
 import {getImageUrl} from './utils'
@@ -80,4 +79,4 @@ class IdentifierSearch extends Component {
 
 IdentifierSearch.contextType = ApiContext
 
-export default withTranslation()(IdentifierSearch)
+export default IdentifierSearch
