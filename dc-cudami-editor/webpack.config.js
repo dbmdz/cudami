@@ -6,6 +6,7 @@ const config = {
   devtool: 'sourcemaps',
   entry: {
     IdentifiableEditor: './src/lib/IdentifiableEditor.jsx',
+    IdentifiableList: './src/lib/IdentifiableList.jsx',
   },
   mode: 'production',
   module: {
