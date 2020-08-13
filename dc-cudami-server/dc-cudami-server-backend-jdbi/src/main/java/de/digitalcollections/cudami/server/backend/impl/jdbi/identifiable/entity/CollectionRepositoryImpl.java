@@ -388,7 +388,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
           handle -> {
             PreparedBatch preparedBatch =
                 handle.prepareBatch(
-                    "INSERT INTO collection_digitalobjects(collection_uuid, digitalobject_uuid, sortIndex) VALUES (:uuid, :digitalObjectUuid, :sortIndex)");
+                    "INSERT INTO collection_digitalobjects(collection_uuid, digitalobject_uuid, sortIndex) VALUES (:uuid, :digitalObjectUuid, :sortIndex) ON CONFLICT (collection_uuid, digitalobject_uuid) DO NOTHING");
             for (DigitalObject digitalObject : digitalObjects) {
               preparedBatch
                   .bind("uuid", collectionUuid)
