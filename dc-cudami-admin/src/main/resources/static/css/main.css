@@ -1,7 +1,3 @@
-/*#editor {
-  max-height: 400px;
-  overflow-y: auto;
-}*/
 a[href^="http"]:not(.no-external):after {
   content: "\f35d";
   font-family: "Font Awesome 5 Free";
@@ -115,19 +111,6 @@ div.editor {
 
 iframe.editable {
   border: 5px dashed;
-}
-
-li.locale-switcher.unsaved > a {
-  color: #aaa !important;
-}
-
-li.locale-switcher.unsaved > a::after {
-  content: '*';
-  padding-left: 3px;
-}
-
-li.locale-switcher.invalid > a {
-  color: red !important;
 }
 
 li > p {
