@@ -121,3 +121,8 @@ blockquote {
   border-left: 3px solid #ccc;
   padding-left: 1em;
 }
+
+.long-text {
+  max-height: 500px;
+  overflow-y: auto;
+}
