@@ -86,7 +86,7 @@
                   <div th:replace="fragments/identifiable::renderTeaser(${webpage}, ${language})"></div>
                 </div>
                 <th:block th:if="*{text} and ${webpage.text.containsKey(language)}">
-                  <div class="card-body">
+                  <div class="card-body long-text">
                     <div th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(*{text}, ${language})"></div>
                   </div>
                 </th:block>

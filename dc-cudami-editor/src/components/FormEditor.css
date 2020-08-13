@@ -1,14 +1,14 @@
-.ProseMirror {
-  max-height: 500px;
-  overflow-y: scroll;
-}
-
 .identifiable-editor iframe.editable {
   border: 5px dashed;
 }
 
 .identifiable-editor .text-editor {
   border: 1px solid #ccc;
+}
+
+.identifiable-editor .text-editor > .text-area {
+  max-height: 500px;
+  overflow-y: auto;
 }
 
 .identifiable-editor .text-editor prosemirror-image.alignment-left {
