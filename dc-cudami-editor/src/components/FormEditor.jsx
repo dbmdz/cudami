@@ -38,7 +38,9 @@ class FormEditor extends Component {
             render={({editor, view}) => (
               <>
                 <FormEditorMenu menu={translatedMenu} view={view} />
-                {editor}
+                <div className="text-area">
+                  {editor}
+                </div>
               </>
             )}
           />
