@@ -52,7 +52,12 @@
               <div class="col-md-9"><span th:text="*{uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
             </div>
             <div class="row">
-              <div class="col-md-3"><label class="font-weight-bold" th:text="#{publicationStatus}">Publication status</label></div>
+              <div class="col-md-3">
+                <label class="font-weight-bold" th:text="#{publicationStatus}">Publication status</label>
+                <button class="btn btn-link" data-html="true" data-placement="bottom" data-toggle="popover" data-trigger="focus" th:attr="data-content=#{tooltip_publication_status}" id="publication_status_tooltip" type="button">
+                  <i class="fas fa-question-circle"></i>
+                </button>
+              </div>
               <div class="col-md-9" th:with="now=${T(java.time.LocalDate).now()}">
                 <th:block th:if="${webpage.publicationStart}  == null OR  ${webpage.publicationStart.compareTo(now)} > 0"><span class="badge badge-pill badge-warning">&nbsp;</span></th:block>
                 <th:block th:if="(${webpage.publicationStart} != null AND ${webpage.publicationStart.compareTo(now)} <= 0) AND (${webpage.publicationEnd} == null OR ${webpage.publicationEnd.compareTo(now)} >= 0)"><span class="badge badge-pill badge-success">&nbsp;</span></th:block>
@@ -121,9 +126,9 @@
               <tr th:each="subpage, stats : *{children}">
                 <td class="text-right" th:text="${stats.index + 1}">1</td>
                 <td class="center" th:with="now=${T(java.time.LocalDate).now()}">
-                  <th:block th:if="${subpage.publicationStart}  == null OR  ${subpage.publicationStart.compareTo(now)} > 0"><span class="badge badge-pill badge-warning">&nbsp;</span></th:block>
-                  <th:block th:if="(${subpage.publicationStart} != null AND ${subpage.publicationStart.compareTo(now)} <= 0) AND (${subpage.publicationEnd} == null OR ${subpage.publicationEnd.compareTo(now)} >= 0)"><span class="badge badge-pill badge-success">&nbsp;</span></th:block>
-                  <th:block th:if="(${subpage.publicationStart} != null AND ${subpage.publicationStart.compareTo(now)} <= 0) AND (${subpage.publicationEnd} != null AND ${subpage.publicationEnd.compareTo(now)} < 0)"><span class="badge badge-pill badge-danger">&nbsp;</span></th:block>
+                  <th:block th:if="${subpage.publicationStart}  == null OR  ${subpage.publicationStart.compareTo(now)} > 0"><span class="badge badge-pill badge-warning" th:title="#{tooltip_not_yet_published}">&nbsp;</span></th:block>
+                  <th:block th:if="(${subpage.publicationStart} != null AND ${subpage.publicationStart.compareTo(now)} <= 0) AND (${subpage.publicationEnd} == null OR ${subpage.publicationEnd.compareTo(now)} >= 0)"><span class="badge badge-pill badge-success" th:title="#{tooltip_currently_published}">&nbsp;</span></th:block>
+                  <th:block th:if="(${subpage.publicationStart} != null AND ${subpage.publicationStart.compareTo(now)} <= 0) AND (${subpage.publicationEnd} != null AND ${subpage.publicationEnd.compareTo(now)} < 0)"><span class="badge badge-pill badge-danger" th:title="#{tooltip_no_longer_published}">&nbsp;</span></th:block>
                 </td>
                 <td class="center">
                   <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${subpage.previewImage}, ${subpage.previewImageRenderingHints}, ${#locale}, 50)"></th:block>
@@ -149,6 +154,9 @@
 
   <th:block layout:fragment="beforeBodyEnds">
     <div th:replace="fragments/modals :: selectItemDialog"></div>
+    <script type="text/javascript" th:inline="javascript">
+      $('#publication_status_tooltip').popover();
+    </script>
   </th:block>
 </body>
 </html>
