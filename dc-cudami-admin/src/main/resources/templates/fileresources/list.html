@@ -55,10 +55,7 @@
                 </td>
                 <td><span th:text="${fileresource.filename}">image001.jpg</span></td>
                 <td><span th:text="${fileresource.mimeType.getTypeName()}">image/jpeg</span></td>
-                <td><span style="white-space: nowrap;float:right;"><script type="text/javascript" th:inline="javascript">document.write(bytesToSize([[${
-                    fileresource.sizeInBytes
-                  }
-                  ]], " "));</script></span>
+                <td><span style="white-space: nowrap;float:right;" th:text="${@fileHelper.bytesToSize(fileresource.sizeInBytes)}"></span>
                 </td>
                 <td>
                   <span class="float-right" th:with="df=#{dateTime.format},dateTime=${fileresource.lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
