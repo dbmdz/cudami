@@ -3,7 +3,6 @@
       xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
-
   <head>
     <title th:text="|#{users}: #{user_edit(${user.email})}|">Users: Edit user admin@unknown.org</title>
   </head>
@@ -106,10 +105,5 @@
         </div>
       </form>
     </section>
-
-  <th:block layout:fragment="beforeBodyEnds">
-    <div th:replace="fragments/modals-confirmation :: confirmYesNoDialog-bootstrap4"></div>
-  </th:block>
-</body>
-
+  </body>
 </html>
