@@ -4,7 +4,6 @@
       xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
-
   <head>
     <title th:text="#{websites}">Websites</title>
   </head>
@@ -77,11 +76,5 @@
         </div>
       </div>
     </section>
-
-  <th:block layout:fragment="beforeBodyEnds">
-    <div th:replace="fragments/modals-confirmation :: confirmYesNoDialog-bootstrap4"></div>
-  </th:block>
-</body>
+  </body>
 </html>
-
-
