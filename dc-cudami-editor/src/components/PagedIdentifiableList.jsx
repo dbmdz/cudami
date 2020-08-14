@@ -60,7 +60,7 @@ class PagedIdentifiableList extends Component {
 
   handleAdd = async (identifiablesToAdd) => {
     const {identifiables, pageNumber} = this.state
-    const uniqueIdentifiables = this.makeUniqueList(identifiablesToAdd)
+    const uniqueIdentifiables = uniqBy(identifiablesToAdd, 'uuid')
     const successful = await this.addIdentifiables(uniqueIdentifiables)
     if (!successful) {
       return console.error('an error occured')
@@ -96,14 +96,6 @@ class PagedIdentifiableList extends Component {
       this.pageSize
     )
     return identifiables
-  }
-
-  makeUniqueList = (identifiables) => {
-    const existingUuids = this.state.identifiables.map(({uuid}) => uuid)
-    const uniqueIdentifiables = uniqBy(identifiables, 'uuid')
-    return uniqueIdentifiables.filter(({uuid}) => {
-      return !existingUuids.includes(uuid)
-    })
   }
 
   removeIdentifiable = async (uuid) => {
