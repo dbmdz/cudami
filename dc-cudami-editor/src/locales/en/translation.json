@@ -28,8 +28,8 @@
     "chooseFile": "Choose file",
     "chooseLanguage": "Choose a language",
     "confirmRemove": {
-      "digitalObjectFromCollection": "Are you sure, that you want to remove this digital object from the collection?",
-      "digitalObjectFromProject": "Are you sure, that you want to remove this digital object from the project?"
+      "digitalObjectFromCollection": "Are you sure that you want to remove this digital object from the collection?",
+      "digitalObjectFromProject": "Are you sure that you want to remove this digital object from the project?"
     },
     "createArticle": "Create a new article",
     "createCollection": "Create a new collection",
