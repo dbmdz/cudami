@@ -20,7 +20,6 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
@@ -43,7 +42,6 @@ import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect;
     excludeFilters = {
       @ComponentScan.Filter(value = ErrorController.class, type = FilterType.ASSIGNABLE_TYPE)
     })
-@EnableAspectJAutoProxy
 @EnableSpringDataWebSupport // for getting support for sorting and paging params
 @Import(SpringConfigCommonsMvc.class)
 public class SpringConfigWeb implements WebMvcConfigurer {

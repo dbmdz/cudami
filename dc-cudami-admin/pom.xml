@@ -21,7 +21,6 @@
     <versionName>${project.version} manually built by ${user.name} at ${maven.build.timestamp}</versionName>
 
     <version.dc-commons-server>4.1.1</version.dc-commons-server>
-    <version.dc-commons-springaop>4.1.1</version.dc-commons-springaop>
     <version.dc-commons-springboot>4.1.1</version.dc-commons-springboot>
     <version.dc-commons-springdata>4.1.2</version.dc-commons-springdata>
     <version.dc-commons-springmvc>4.1.2</version.dc-commons-springmvc>
@@ -50,11 +49,6 @@
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-server</artifactId>
       <version>${version.dc-commons-server}</version>
-    </dependency>
-    <dependency>
-      <groupId>de.digitalcollections.commons</groupId>
-      <artifactId>dc-commons-springaop</artifactId>
-      <version>${version.dc-commons-springaop}</version>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
