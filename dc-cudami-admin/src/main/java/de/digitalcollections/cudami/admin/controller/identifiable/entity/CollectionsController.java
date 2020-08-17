@@ -95,13 +95,21 @@ public class CollectionsController extends AbstractController {
   }
 
   @GetMapping("/collections/{uuid}/edit")
-  public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
+  public String edit(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
+      Model model)
+      throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Collection collection = service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, collection.getLabel().getLocales());
 
-    model.addAttribute("activeLanguage", existingLanguages.get(0));
+    if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
+      model.addAttribute("activeLanguage", activeLanguage);
+    } else {
+      model.addAttribute("activeLanguage", existingLanguages.get(0));
+    }
     model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("uuid", collection.getUuid());
 

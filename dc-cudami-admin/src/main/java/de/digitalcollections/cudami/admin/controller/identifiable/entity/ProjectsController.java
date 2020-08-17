@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /** Controller for project management pages. */
@@ -71,13 +72,21 @@ public class ProjectsController extends AbstractController {
   }
 
   @GetMapping("/projects/{uuid}/edit")
-  public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
+  public String edit(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
+      Model model)
+      throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Project project = service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, project.getLabel().getLocales());
 
-    model.addAttribute("activeLanguage", existingLanguages.get(0));
+    if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
+      model.addAttribute("activeLanguage", activeLanguage);
+    } else {
+      model.addAttribute("activeLanguage", existingLanguages.get(0));
+    }
     model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("uuid", project.getUuid());
 
