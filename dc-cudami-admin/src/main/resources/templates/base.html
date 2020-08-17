@@ -86,10 +86,9 @@
     <script th:src="@{|/webjars/ie10-viewport-bug-workaround/${webjarVersions['ie10-viewport-bug-workaround']}/dist/ie10-viewport-bug-workaround.min.js|}"></script>
     <div th:replace="fragments/modals-confirmation :: confirmYesNoDialog-bootstrap4"></div>
 
+    <script th:src="@{/js/index.js}"></script>
     <script>
-      $(function () {
-        $('[data-toggle="popover"]').popover()
-      })
+      activatePopovers()
     </script>
 
     <th:block layout:fragment="beforeBodyEnds"></th:block>
