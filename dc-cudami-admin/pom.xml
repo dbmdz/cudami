@@ -33,6 +33,7 @@
     <version.webjar-jquery>3.5.1</version.webjar-jquery>
     <version.webjar-jquery-ui>1.12.1</version.webjar-jquery-ui>
     <version.webjar-respond>1.4.2</version.webjar-respond>
+    <version.webjar-url-search-params-polyfill>8.1.0</version.webjar-url-search-params-polyfill>
 
     <!-- plugins -->
     <version.frontend-maven-plugin>1.10.0</version.frontend-maven-plugin>
@@ -226,6 +227,11 @@
       <groupId>org.webjars.npm</groupId>
       <artifactId>respond.js</artifactId>
       <version>${version.webjar-respond}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>url-search-params-polyfill</artifactId>
+      <version>${version.webjar-url-search-params-polyfill}</version>
     </dependency>
   </dependencies>
 
