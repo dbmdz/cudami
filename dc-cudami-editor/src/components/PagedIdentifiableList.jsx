@@ -157,7 +157,7 @@ class PagedIdentifiableList extends Component {
         </Row>
         <ListGroup className="identifiable-list">
           <ListGroupItem className="pb-0 pt-0">
-            <Row className="text-center">
+            <Row className="font-weight-bold text-center">
               <Col className="border-right pb-2 pt-2 text-right" md="1">
                 <FaHashtag />
               </Col>
