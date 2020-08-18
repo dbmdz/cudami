@@ -4,11 +4,69 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.3.0]
+## [3.5.0](https://github.com/dbmdz/cudami/releases/tag/3.5.0) - 2020-08-18
+
+### Added
+
+- Added a view for digital objects
+- Added item numbers to all lists for better referenceability and sorting impression
+- Added functionality to add and remove digital objects from a collection
+- Added functionality to remove digital objects from a project
+- Added a legend for the publication status
+
+### Changed
+
+- Moved admin rest to cudami client and remove admin webapp layers/modules
+- Fixed uri concatenation in the client
+- Fixed memory leak: each client created a `HttpClient`
+- Made alt text input not required anymore
+
+## [3.4.1](https://github.com/dbmdz/cudami/releases/tag/3.4.1) - 2020-07-08
+
+### Added
+
+- Added a title for the button to add a preview image
+- Added a notification when removing the preview image
+- Added mocking of api calls for an easier development of the react parts
+
+## [3.4.0](https://github.com/dbmdz/cudami/releases/tag/3.4.0) - 2020-07-01
+
+### Added
+
+- Added image preview for uploaded and selected images
+- Added providing the breadcrumb via REST
+- Added functionality to edit iframe and image content blocks
+- Added functionality to add images without alignment/text wrapping
+- Added functionality to create subcollections
+- Added a dialog to add and edit a preview image
+
+### Changed
+
+- Fixed issues with changing the password
+
+## [3.3.0](https://github.com/dbmdz/cudami/releases/tag/3.3.0) - 2020-05-29
+
+### Added
+
+- Added possibility to set start/end date of publication
+- Added breadcrumbs for webpages and websites
+- Added fileresource default preview image
+- Added configuration properties for webjar versions
+- Added the possibility to define the `title` attribute for iframes
+- Added the possibility to add images in the editor
+- Added a restriction for the editor, which is used for the short description: only the marks (bold, italic, etc.) can be applied
+- Added the possibility to change the own password
+- Added rendering of horizontal rule
 
 ### Changed
 
 - Renamed `ContentTree` to `Topic` and `ContentNode` to `Subtopic`
+- Fixed language tab sorting (by prioritised languages, if defined, and alphabetically)
+
+### Removed
+
+- Removed the floating toolbar
+- Removed the abort button from forms
 
 ## [3.2.2](https://github.com/dbmdz/cudami/releases/tag/3.2.2) - 2019-11-25
 
