@@ -12,7 +12,12 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
+import de.digitalcollections.model.api.paging.enums.Direction;
+import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.impl.paging.FindParamsImpl;
+import de.digitalcollections.model.impl.paging.OrderImpl;
+import de.digitalcollections.model.impl.paging.PageRequestImpl;
+import de.digitalcollections.model.impl.paging.SortingImpl;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -560,5 +565,30 @@ public class CudamiBaseClient<T extends Object> {
       }
     }
     return new FindParamsImpl(pageNumber, pageSize, sortField, sortDirection, nullHandling);
+  }
+
+  public PageResponse<T> findByLanguageAndInitial(
+      String baseUrl, PageRequest pageRequest, String language, String initial)
+      throws HttpException {
+    return doGetRequestForPagedObjectList(
+        String.format(baseUrl + "?language=%s&initial=%s", language, initial), pageRequest);
+  }
+
+  public PageResponse<T> findByLanguageAndInitial(
+      String baseUrl,
+      int pageNumber,
+      int pageSize,
+      String sortField,
+      String sortDirection,
+      String nullHandling,
+      String language,
+      String initial)
+      throws HttpException {
+    OrderImpl order =
+        new OrderImpl(
+            Direction.fromString(sortDirection), sortField, NullHandling.valueOf(nullHandling));
+    Sorting sorting = new SortingImpl(order);
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
+    return findByLanguageAndInitial(baseUrl, pageRequest, language, initial);
   }
 }
