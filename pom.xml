@@ -79,7 +79,7 @@
     <version.commons-dbcp2>2.7.0</version.commons-dbcp2>
     <version.commons-lang3>3.11</version.commons-lang3>
     <version.dc-model>6.2.0</version.dc-model>
-    <version.flyway>6.5.4</version.flyway>
+    <version.flyway>6.5.5</version.flyway>
     <version.javax.servlet-api>4.0.1</version.javax.servlet-api>
     <version.json>20200518</version.json>
     <version.junit>5.6.2</version.junit>
