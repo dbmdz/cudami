@@ -74,13 +74,21 @@ public class SubtopicsController extends AbstractController {
   }
 
   @GetMapping("/subtopics/{uuid}/edit")
-  public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
+  public String edit(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
+      Model model)
+      throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Subtopic subtopic = (Subtopic) service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, subtopic.getLabel().getLocales());
 
-    model.addAttribute("activeLanguage", existingLanguages.get(0));
+    if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
+      model.addAttribute("activeLanguage", activeLanguage);
+    } else {
+      model.addAttribute("activeLanguage", existingLanguages.get(0));
+    }
     model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("uuid", subtopic.getUuid());
 

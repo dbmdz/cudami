@@ -74,6 +74,7 @@ webjars:
     jquery: '@version.webjar-jquery@'
     jquery-ui: '@version.webjar-jquery-ui@'
     respond: '@version.webjar-respond@'
+    url-search-params-polyfill: '@version.webjar-url-search-params-polyfill@'
 
 ---
 
