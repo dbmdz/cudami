@@ -17,9 +17,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 ### Changed
 
 - Moved admin rest to cudami client and remove admin webapp layers/modules
-- Fixed uri concatenation in the client
-- Fixed memory leak: each client created a `HttpClient`
+- Replaced `feign` with Java `HttpClient`
 - Made alt text input not required anymore
+- Fixed sorting fields
 
 ## [3.4.1](https://github.com/dbmdz/cudami/releases/tag/3.4.1) - 2020-07-08
 
