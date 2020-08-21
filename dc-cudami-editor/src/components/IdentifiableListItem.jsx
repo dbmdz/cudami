@@ -31,7 +31,7 @@ const IdentifiableListItem = ({
               className="mw-100"
               src={
                 previewImage
-                  ? getImageUrl(previewImage, '50,')
+                  ? getImageUrl(previewImage, '30,')
                   : `${apiContextPath}images/no-image.png`
               }
               title={title?.[uiLocale]}
