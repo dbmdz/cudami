@@ -28,7 +28,7 @@ public class CudamiProjectsClient extends CudamiBaseClient<ProjectImpl> {
       throws HttpException {
     return Boolean.parseBoolean(
         doPatchRequestForString(
-            String.format("/latest/projects/%s/digitalobject", projectUuid), digitalObjects));
+            String.format("/latest/projects/%s/digitalobjects", projectUuid), digitalObjects));
   }
 
   public Project create() {
