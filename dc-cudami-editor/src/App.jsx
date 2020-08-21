@@ -10,9 +10,11 @@ import {
   Row,
 } from 'reactstrap'
 import {
+  FaCubes,
   FaFile,
   FaFolderPlus,
   FaGlobe,
+  FaHome,
   FaIndustry,
   FaList,
   FaNewspaper,
@@ -26,6 +28,8 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import initI18n from './i18n'
 import IdentifiableForm from './components/IdentifiableForm'
 import PagedIdentifiableList from './components/PagedIdentifiableList'
+
+const availableListTypes = ['collection', 'project']
 
 const availableTypes = [
   'article',
@@ -57,7 +61,8 @@ const StartPage = () => {
     website: FaGlobe,
   }
   return (
-    <Container className="mt-5">
+    <Container>
+      <h1>Editor</h1>
       <Row>
         {availableTypes.map((type) => {
           const Icon = iconMapping[type]
@@ -85,6 +90,22 @@ const StartPage = () => {
           )
         })}
       </Row>
+      <h1>List</h1>
+      <Row>
+        {availableListTypes.map((type) => (
+          <Col key={type} md="3">
+            <Card className="mb-3 text-center">
+              <Link
+                className="stretched-link"
+                to={`/${type}/digitalObject/list`}
+              >
+                <FaCubes className="card-img-top mt-3" size="65" />
+                <CardBody>{type} / digitalObject</CardBody>
+              </Link>
+            </Card>
+          </Col>
+        ))}
+      </Row>
     </Container>
   )
 }
@@ -93,47 +114,54 @@ const App = () => {
   const uiLocale = getUiLocale(window.location.search)
   initI18n(uiLocale)
   return (
-    <Router>
-      <Route component={StartPage} exact={true} path="/" />
-      <Route
-        path={`/:type(${availableTypes.join('|')})/new`}
-        render={({match}) => (
-          <IdentifiableForm
-            activeLanguage="en"
-            debug={true}
-            mockApi={true}
-            type={match.params.type}
-          />
-        )}
-      />
-      <Route
-        path={`/:type(${availableTypes.join('|')})/edit`}
-        render={({match}) => (
-          <IdentifiableForm
-            activeLanguage="en"
-            debug={true}
-            existingLanguages={['en', 'de']}
-            mockApi={true}
-            type={match.params.type}
-            uuid="mock"
-          />
-        )}
-      />
-      <Route
-        path="/collection/digitalObject"
-        render={() => (
-          <Container className="mt-3">
-            <PagedIdentifiableList
+    <>
+      <Container className="mt-3">
+        <a href="/">
+          <FaHome size="25" />
+        </a>
+      </Container>
+      <Router>
+        <Route component={StartPage} exact={true} path="/" />
+        <Route
+          path={`/:type(${availableTypes.join('|')})/new`}
+          render={({match}) => (
+            <IdentifiableForm
+              activeLanguage="en"
               debug={true}
               mockApi={true}
-              parentType="collection"
-              type="digitalObject"
-              uiLocale={uiLocale}
+              type={match.params.type}
             />
-          </Container>
-        )}
-      />
-    </Router>
+          )}
+        />
+        <Route
+          path={`/:type(${availableTypes.join('|')})/edit`}
+          render={({match}) => (
+            <IdentifiableForm
+              activeLanguage="en"
+              debug={true}
+              existingLanguages={['en', 'de']}
+              mockApi={true}
+              type={match.params.type}
+              uuid="mock"
+            />
+          )}
+        />
+        <Route
+          path={`/:type(${availableListTypes.join('|')})/digitalObject/list`}
+          render={({match}) => (
+            <Container>
+              <PagedIdentifiableList
+                debug={true}
+                mockApi={true}
+                parentType={match.params.type}
+                type="digitalObject"
+                uiLocale={uiLocale}
+              />
+            </Container>
+          )}
+        />
+      </Router>
+    </>
   )
 }
 
