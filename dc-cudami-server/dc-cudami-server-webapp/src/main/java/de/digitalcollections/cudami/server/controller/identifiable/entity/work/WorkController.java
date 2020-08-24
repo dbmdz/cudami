@@ -16,7 +16,6 @@ import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
@@ -145,7 +144,10 @@ public class WorkController {
   @ApiResponseObject
   public Work update(@PathVariable("uuid") UUID uuid, @RequestBody Work work, BindingResult errors)
       throws IdentifiableServiceException {
-    assert Objects.equals(uuid, work.getUuid());
+    if (uuid == null || work == null || !uuid.equals(work.getUuid())) {
+      throw new IllegalArgumentException("UUID mismatch of new and existing work");
+    }
+
     return service.update(work);
   }
 

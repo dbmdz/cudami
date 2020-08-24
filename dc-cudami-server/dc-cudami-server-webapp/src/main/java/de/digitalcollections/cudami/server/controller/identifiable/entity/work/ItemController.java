@@ -15,7 +15,6 @@ import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
@@ -143,7 +142,10 @@ public class ItemController {
   @ApiResponseObject
   public Item update(@PathVariable("uuid") UUID uuid, @RequestBody Item item, BindingResult errors)
       throws IdentifiableServiceException {
-    assert Objects.equals(uuid, item.getUuid());
+    if (uuid == null || item == null || !uuid.equals(item.getUuid())) {
+      throw new IllegalArgumentException("UUID mismatch of new and existing item");
+    }
+
     return service.update(item);
   }
 
