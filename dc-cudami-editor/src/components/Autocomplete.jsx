@@ -79,12 +79,23 @@ class Autocomplete extends Component {
   }
 
   renderSuggestion = ({label, previewImage}) => {
+    const previewImageWidth = 50
     return (
       <Row>
         <Col md="1">
-          <img className="img-fluid" src={getImageUrl(previewImage, '50,')} />
+          <img
+            className="img-fluid"
+            src={
+              previewImage
+                ? getImageUrl(previewImage, `${previewImageWidth},`)
+                : `${this.context.apiContextPath}images/no-image.png`
+            }
+            style={{maxWidth: `${previewImageWidth}px`}}
+          />
         </Col>
-        <Col md="11">{this.getLabelValue(label)}</Col>
+        <Col className="text-left" md="11">
+          {this.getLabelValue(label)}
+        </Col>
       </Row>
     )
   }
