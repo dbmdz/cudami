@@ -12,10 +12,19 @@ import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.api.paging.Order;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
+import de.digitalcollections.model.api.paging.Sorting;
+import de.digitalcollections.model.api.paging.enums.Direction;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
+import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
+import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
+import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
+import de.digitalcollections.model.impl.paging.SortingImpl;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -76,7 +85,29 @@ public class CollectionsController extends AbstractController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @GetMapping("/collections/new")
+  @PatchMapping("/api/collections/{collectionUuid}/subcollections/{subcollectionUuid}")
+  public ResponseEntity addSubcollection(
+      @PathVariable UUID collectionUuid, @PathVariable UUID subcollectionUuid)
+      throws HttpException {
+    boolean successful = service.addChild(collectionUuid, subcollectionUuid);
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+  }
+
+  @PatchMapping("/api/collections/{collectionUuid}/subcollections")
+  public ResponseEntity addSubcollections(
+      @PathVariable UUID collectionUuid, @RequestBody List<Collection> subcollections)
+      throws HttpException {
+    boolean successful = service.addChildren(collectionUuid, subcollections);
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+  }
+
+  @GetMapping({"/collections/new", "/subcollections/new"})
   public String create(
       Model model,
       @RequestParam(name = "parentType", required = false) String parentType,
@@ -94,7 +125,7 @@ public class CollectionsController extends AbstractController {
     return service.create();
   }
 
-  @GetMapping("/collections/{uuid}/edit")
+  @GetMapping({"/collections/{uuid}/edit", "/subcollections/{uuid}/edit"})
   public String edit(
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
@@ -122,6 +153,16 @@ public class CollectionsController extends AbstractController {
     return service.findOne(uuid);
   }
 
+  @GetMapping({
+    "/api/collections/identifier/{namespace}:{id}",
+    "/api/subcollections/identifier/{namespace}:{id}"
+  })
+  @ResponseBody
+  public Collection findOneByIdentifier(@PathVariable String namespace, @PathVariable String id)
+      throws HttpException {
+    return service.findOneByIdentifier(namespace, id);
+  }
+
   @GetMapping("/api/collections/{uuid}/digitalobjects")
   @ResponseBody
   public PageResponse<DigitalObject> getDigitalObjects(
@@ -133,6 +174,19 @@ public class CollectionsController extends AbstractController {
     pageRequest.setPageNumber(pageNumber);
     pageRequest.setPageSize(pageSize);
     return service.getDigitalObjects(uuid, pageRequest);
+  }
+
+  @GetMapping("/api/collections/{uuid}/subcollections")
+  @ResponseBody
+  public PageResponse<Collection> getSubcollections(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      throws HttpException {
+    PageRequest pageRequest = new PageRequestImpl();
+    pageRequest.setPageNumber(pageNumber);
+    pageRequest.setPageSize(pageSize);
+    return service.getChildren(uuid, pageRequest);
   }
 
   @GetMapping("/collections")
@@ -163,6 +217,17 @@ public class CollectionsController extends AbstractController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
+  @DeleteMapping("/api/collections/{collectionUuid}/subcollections/{subcollectionUuid}")
+  public ResponseEntity removeSubcollection(
+      @PathVariable UUID collectionUuid, @PathVariable UUID subcollectionUuid)
+      throws HttpException {
+    boolean successful = service.removeChild(collectionUuid, subcollectionUuid);
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+  }
+
   @PostMapping("/api/collections/new")
   public ResponseEntity save(
       @RequestBody Collection collection,
@@ -180,6 +245,24 @@ public class CollectionsController extends AbstractController {
       LOGGER.error("Cannot save collection: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
+  }
+
+  @GetMapping({"/api/collections/search", "/api/subcollections/search"})
+  @ResponseBody
+  public SearchPageResponse<CollectionImpl> search(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortField", required = false, defaultValue = "lastModified")
+          String sortField,
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "DESC")
+          Direction sortDirection,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      throws HttpException {
+    Order order = new OrderImpl(sortDirection, sortField);
+    Sorting sorting = new SortingImpl(order);
+    SearchPageRequest pageRequest =
+        new SearchPageRequestImpl(searchTerm, pageNumber, pageSize, sorting);
+    return service.find(pageRequest);
   }
 
   @PutMapping("/api/collections/{uuid}")
