@@ -81,7 +81,7 @@ public class CudamiBaseClient<T extends Object> {
     LOGGER.debug("PATCH " + url);
     HttpRequest req =
         HttpRequest.newBuilder()
-            .method("PATCH", null)
+            .method("PATCH", HttpRequest.BodyPublishers.noBody())
             .uri(url)
             .header("Accept", "application/json")
             // TODO add creation of a request id if needed
