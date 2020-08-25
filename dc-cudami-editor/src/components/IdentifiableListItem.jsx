@@ -17,6 +17,7 @@ const IdentifiableListItem = ({
   uuid,
 }) => {
   const {altText, title, caption} = previewImageRenderingHints
+  const previewImageWidth = 30
   const viewUrl = `${apiContextPath}${type.toLowerCase()}s/${uuid}`
   return (
     <ListGroupItem className="list-item pb-0 pt-0">
@@ -28,12 +29,12 @@ const IdentifiableListItem = ({
           <figure className="mb-0">
             <img
               alt={altText?.[uiLocale]}
-              className="mw-100"
               src={
                 previewImage
-                  ? getImageUrl(previewImage, '30,')
+                  ? getImageUrl(previewImage, `${previewImageWidth},`)
                   : `${apiContextPath}images/no-image.png`
               }
+              style={{maxWidth: `${previewImageWidth}px`}}
               title={title?.[uiLocale]}
             />
             {caption?.[uiLocale] && (
