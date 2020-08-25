@@ -225,7 +225,7 @@ export async function saveIdentifiable(
       return json
     }
   } catch (err) {
-    console.log('An error occured')
+    console.log('An error occured while saving the identifiable')
   }
 }
 
@@ -320,7 +320,7 @@ export async function updateIdentifiable(
       return json
     }
   } catch (err) {
-    console.log('An error occured')
+    console.log('An error occured while updating the identifiable')
   }
 }
 
