@@ -29,7 +29,10 @@ import initI18n from './i18n'
 import IdentifiableForm from './components/IdentifiableForm'
 import PagedIdentifiableList from './components/PagedIdentifiableList'
 
-const availableListTypes = ['collection', 'project']
+const availableListTypes = {
+  collection: ['subcollection', 'digitalObject'],
+  project: ['digitalObject'],
+}
 
 const availableTypes = [
   'article',
@@ -53,8 +56,10 @@ const StartPage = () => {
     article: FaNewspaper,
     collection: FaList,
     corporation: FaUniversity,
+    digitalObject: FaCubes,
     fileResource: FaFile,
     project: FaIndustry,
+    subcollection: FaList,
     subtopic: FaSitemap,
     topic: FaSitemap,
     webpage: FaGlobe,
@@ -92,19 +97,26 @@ const StartPage = () => {
       </Row>
       <h1>List</h1>
       <Row>
-        {availableListTypes.map((type) => (
-          <Col key={type} md="3">
-            <Card className="mb-3 text-center">
-              <Link
-                className="stretched-link"
-                to={`/${type}/digitalObject/list`}
-              >
-                <FaCubes className="card-img-top mt-3" size="65" />
-                <CardBody>{type} / digitalObject</CardBody>
-              </Link>
-            </Card>
-          </Col>
-        ))}
+        {Object.keys(availableListTypes).map((parentType) => {
+          return availableListTypes[parentType].map((type) => {
+            const Icon = iconMapping[type]
+            return (
+              <Col key={type} md="3">
+                <Card className="mb-3 text-center">
+                  <Link
+                    className="stretched-link"
+                    to={`/${parentType}/${type}/list`}
+                  >
+                    <Icon className="card-img-top mt-3" size="65" />
+                    <CardBody>
+                      {parentType} / {type}
+                    </CardBody>
+                  </Link>
+                </Card>
+              </Col>
+            )
+          })
+        })}
       </Row>
     </Container>
   )
@@ -147,14 +159,14 @@ const App = () => {
           )}
         />
         <Route
-          path={`/:type(${availableListTypes.join('|')})/digitalObject/list`}
+          path={`/:parentType/:type/list`}
           render={({match}) => (
             <Container>
               <PagedIdentifiableList
                 debug={true}
                 mockApi={true}
-                parentType={match.params.type}
-                type="digitalObject"
+                parentType={match.params.parentType}
+                type={match.params.type}
                 uiLocale={uiLocale}
               />
             </Container>
