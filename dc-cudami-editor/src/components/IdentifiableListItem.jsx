@@ -1,17 +1,21 @@
 import React from 'react'
 import {Button, ButtonGroup, Col, ListGroupItem, Row} from 'reactstrap'
-import {FaEye, FaTrash} from 'react-icons/fa'
+import {FaExchangeAlt, FaEye, FaPencilAlt, FaTrash} from 'react-icons/fa'
 
 import {getImageUrl} from './utils'
 
 const IdentifiableListItem = ({
   apiContextPath,
+  enableMove,
+  enableRemove,
   index,
   label,
   lastModified,
+  onMove,
   onRemove,
   previewImage,
   previewImageRenderingHints = {},
+  showEdit,
   type,
   uiLocale,
   uuid,
@@ -53,9 +57,27 @@ const IdentifiableListItem = ({
             <Button className="p-0" color="link" href={viewUrl}>
               <FaEye />
             </Button>
-            <Button className="p-0 ml-1" color="link" onClick={onRemove}>
-              <FaTrash />
-            </Button>
+            {showEdit && (
+              <Button
+                className="ml-1 p-0"
+                color="link"
+                href={`${viewUrl}/edit`}
+              >
+                <FaPencilAlt />
+              </Button>
+            )}
+          </ButtonGroup>
+          <ButtonGroup>
+            {enableMove && (
+              <Button className="ml-1 p-0" color="link" onClick={onMove}>
+                <FaExchangeAlt />
+              </Button>
+            )}
+            {enableRemove && (
+              <Button className="ml-1 p-0" color="link" onClick={onRemove}>
+                <FaTrash />
+              </Button>
+            )}
           </ButtonGroup>
         </Col>
       </Row>
