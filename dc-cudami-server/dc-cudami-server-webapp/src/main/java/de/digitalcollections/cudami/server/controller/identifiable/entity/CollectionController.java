@@ -7,6 +7,8 @@ import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.paging.enums.Direction;
 import de.digitalcollections.model.api.paging.enums.NullHandling;
@@ -15,6 +17,7 @@ import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
 import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
+import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
 import java.util.List;
 import java.util.Locale;
@@ -44,7 +47,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The collection controller", name = "Collection controller")
 public class CollectionController {
 
-  private CollectionService collectionService;
+  private final CollectionService collectionService;
 
   @Autowired private LocaleService localeService;
 
@@ -92,6 +95,19 @@ public class CollectionController {
     return collectionService.getTopCollections(pageRequest);
   }
 
+  @ApiMethod(description = "Get collection by namespace and id")
+  @GetMapping(
+      value = {
+        "/latest/collections/identifier/{namespace}:{id}",
+        "/v2/collections/identifier/{namespace}:{id}"
+      },
+      produces = "application/json")
+  @ApiResponseObject
+  public Collection findByIdentifier(@PathVariable String namespace, @PathVariable String id)
+      throws IdentifiableServiceException {
+    return collectionService.getByIdentifier(namespace, id);
+  }
+
   // Test-URL: http://localhost:9000/latest/collections/599a120c-2dd5-11e8-b467-0ed5f89f718b
   @ApiMethod(
       description =
@@ -121,6 +137,29 @@ public class CollectionController {
       collection = collectionService.get(uuid, pLocale);
     }
     return new ResponseEntity<>(collection, HttpStatus.OK);
+  }
+
+  @ApiMethod(
+      description =
+          "Find limited amount of collections containing searchTerm in label or description")
+  @GetMapping(
+      value = {"/latest/collections/search", "/v3/collections/search"},
+      produces = "application/json")
+  @ApiResponseObject
+  public SearchPageResponse<Collection> findCollections(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
+          Direction sortDirection,
+      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
+          NullHandling nullHandling,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+    OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
+    Sorting sorting = new SortingImpl(order);
+    SearchPageRequest pageRequest =
+        new SearchPageRequestImpl(searchTerm, pageNumber, pageSize, sorting);
+    return collectionService.find(pageRequest);
   }
 
   @ApiMethod(description = "Save a newly created collection")
@@ -321,6 +360,103 @@ public class CollectionController {
     collection.setUuid(collectionUuid);
 
     boolean successful = collectionService.saveDigitalObjects(collection, digitalObjects);
+
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+  }
+
+  @ApiMethod(description = "Add an existing collection to an existing collection")
+  @PatchMapping(
+      value = {
+        "/latest/collections/{parentUuid}/child/{childUuid}",
+        "/v3/collections/{parentUuid}/child/{childUuid}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public ResponseEntity addChild(
+      @ApiPathParam(description = "UUID of the parent collection") @PathVariable("parentUuid")
+          UUID parentUuid,
+      @ApiPathParam(description = "UUID of the child collection") @PathVariable("childUuid")
+          UUID childUuid) {
+    Collection parent = new CollectionImpl();
+    parent.setUuid(parentUuid);
+
+    Collection child = new CollectionImpl();
+    child.setUuid(childUuid);
+
+    boolean successful = collectionService.addChild(parent, child);
+
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+  }
+
+  @ApiMethod(description = "Add existing collections to an existing collection")
+  @PatchMapping(
+      value = {"/latest/collections/{uuid}/children", "/v3/collections/{uuid}/children"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public ResponseEntity addChildren(
+      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
+          UUID collectionUuid,
+      @ApiPathParam(description = "List of the digital objects") @RequestBody
+          List<Collection> children) {
+    Collection collection = new CollectionImpl();
+    collection.setUuid(collectionUuid);
+
+    boolean successful = collectionService.addChildren(collection, children);
+
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+  }
+
+  @ApiMethod(description = "Get paged children of a collection")
+  @GetMapping(
+      value = {"/latest/collections/{uuid}/children", "/v3/collections/{uuid}/children"},
+      produces = "application/json")
+  @ApiResponseObject
+  public PageResponse<Collection> getChildren(
+      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
+          UUID collectionUuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortField", required = false, defaultValue = "lastModified")
+          String sortField,
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "DESC")
+          Direction sortDirection,
+      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
+          NullHandling nullHandling) {
+    OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
+    Sorting sorting = new SortingImpl(order);
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
+    return collectionService.getChildren(collectionUuid, pageRequest);
+  }
+
+  @ApiMethod(description = "Remove an existing collection from an existing collection")
+  @DeleteMapping(
+      value = {
+        "/latest/collections/{parentUuid}/child/{childUuid}",
+        "/v3/collections/{parentUuid}/child/{childUuid}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public ResponseEntity removeChild(
+      @ApiPathParam(description = "UUID of the parent collection") @PathVariable("parentUuid")
+          UUID parentUuid,
+      @ApiPathParam(description = "UUID of the child collection") @PathVariable("childUuid")
+          UUID childUuid) {
+    Collection parent = new CollectionImpl();
+    parent.setUuid(parentUuid);
+
+    Collection child = new CollectionImpl();
+    child.setUuid(childUuid);
+
+    boolean successful = collectionService.removeChild(parent, child);
 
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);

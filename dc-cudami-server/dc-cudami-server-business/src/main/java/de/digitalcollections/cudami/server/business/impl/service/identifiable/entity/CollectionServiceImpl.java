@@ -28,6 +28,21 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
+  public boolean addChild(Collection parent, Collection child) {
+    return ((CollectionRepository) repository).addChild(parent, child);
+  }
+
+  @Override
+  public boolean addChildren(Collection parent, List<Collection> children) {
+    return ((CollectionRepository) repository).addChildren(parent, children);
+  }
+
+  @Override
+  public boolean removeChild(Collection parent, Collection child) {
+    return ((CollectionRepository) repository).removeChild(parent, child);
+  }
+
+  @Override
   public Collection saveWithParentCollection(Collection collection, UUID parentUuid)
       throws IdentifiableServiceException {
     try {

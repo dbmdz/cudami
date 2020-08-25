@@ -13,14 +13,6 @@ import java.util.UUID;
 public interface CollectionRepository
     extends NodeRepository<Collection>, EntityRepository<Collection> {
 
-  @Override
-  default List<Collection> getChildren(Collection collection) {
-    if (collection == null) {
-      return null;
-    }
-    return getChildren(collection.getUuid());
-  }
-
   Collection saveWithParentCollection(Collection collection, UUID parentUuid);
 
   PageResponse<Collection> getTopCollections(PageRequest pageRequest);
@@ -68,4 +60,37 @@ public interface CollectionRepository
   }
 
   boolean saveDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects);
+
+  default boolean addChild(Collection parent, Collection child) {
+    if (parent == null || child == null) {
+      return false;
+    }
+    return addChildren(parent.getUuid(), Arrays.asList(child));
+  }
+
+  default boolean addChildren(Collection parent, List<Collection> children) {
+    if (parent == null || children == null) {
+      return false;
+    }
+    return addChildren(parent.getUuid(), children);
+  }
+
+  boolean addChildren(UUID parentUuid, List<Collection> collections);
+
+  @Override
+  default List<Collection> getChildren(Collection collection) {
+    if (collection == null) {
+      return null;
+    }
+    return getChildren(collection.getUuid());
+  }
+
+  default boolean removeChild(Collection parent, Collection child) {
+    if (parent == null || child == null) {
+      return false;
+    }
+    return removeChild(parent.getUuid(), child.getUuid());
+  }
+
+  boolean removeChild(UUID parentUuid, UUID childUuid);
 }
