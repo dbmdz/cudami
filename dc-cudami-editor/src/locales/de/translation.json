@@ -5,6 +5,7 @@
     "addDigitalObjects": "Digitalisate hinzufügen",
     "addLanguage": "Sprache hinzufügen",
     "addPreviewImage": "Vorschaubild hinzufügen",
+    "addSubcollections": "Untergeordnete Sammlungen hinzufügen",
     "alignment": "Ausrichtung",
     "alignmentLeft": "links (mit Textumlauf)",
     "alignmentRight": "rechts (mit Textumlauf)",
@@ -29,7 +30,8 @@
     "chooseLanguage": "Sprache auswählen",
     "confirmRemove": {
       "digitalObjectFromCollection": "Sind Sie sicher, dass Sie das Digitalisat aus der Sammlung entfernen wollen?",
-      "digitalObjectFromProject": "Sind Sie sicher, dass Sie das Digitalisat aus dem Projekt entfernen wollen?"
+      "digitalObjectFromProject": "Sind Sie sicher, dass Sie das Digitalisat aus dem Projekt entfernen wollen?",
+      "subcollectionFromCollection": "Sind Sie sicher, dass Sie die untergeordnete Sammlung aus der Sammlung entfernen wollen?"
     },
     "createArticle": "Neuen Artikel anlegen",
     "createCollection": "Neue Sammlung anlegen",
@@ -92,6 +94,9 @@
       "superscript": "Hochgestellt",
       "underline": "Unterstrichen"
     },
+    "move": "Verschieben",
+    "moveSubcollections": "Untergeordnete Sammlung verschieben",
+    "new": "Neu",
     "next": "Weiter",
     "no": "Nein",
     "noAlignment": "ohne Textumlauf",
@@ -109,6 +114,7 @@
       "useUrl": "Bild per Weblink einbinden"
     },
     "startPublicationDate": "Start-Publikationsdatum",
+    "subcollections": "Untergeordnete Sammlungen",
     "text": "Langtext",
     "title": "Titel",
     "tooltip": "Tooltip",
