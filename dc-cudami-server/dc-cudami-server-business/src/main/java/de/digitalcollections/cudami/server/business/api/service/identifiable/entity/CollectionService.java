@@ -11,6 +11,10 @@ import java.util.UUID;
 
 public interface CollectionService extends NodeService<Collection>, EntityService<Collection> {
 
+  boolean addChild(Collection parent, Collection child);
+
+  boolean addChildren(Collection parent, List<Collection> children);
+
   boolean addDigitalObject(Collection collection, DigitalObject digitalObject);
 
   boolean addDigitalObjects(Collection collection, List<DigitalObject> digitalObjects);
@@ -18,6 +22,8 @@ public interface CollectionService extends NodeService<Collection>, EntityServic
   PageResponse<DigitalObject> getDigitalObjects(Collection collection, PageRequest pageRequest);
 
   PageResponse<Collection> getTopCollections(PageRequest pageRequest);
+
+  boolean removeChild(Collection parent, Collection child);
 
   boolean removeDigitalObject(Collection collection, DigitalObject digitalObject);
 

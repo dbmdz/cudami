@@ -8,6 +8,8 @@ import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.NodeImpl;
@@ -15,6 +17,7 @@ import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
 import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import de.digitalcollections.model.impl.paging.SearchPageResponseImpl;
 import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -98,6 +101,54 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
+  public boolean addChildren(UUID parentUuid, List<Collection> children) {
+    if (parentUuid != null && children != null) {
+      Integer nextSortIndex =
+          selectNextSortIndexForParentChildren(
+              dbi, "collection_collections", "parent_collection_uuid", parentUuid);
+      dbi.useHandle(
+          handle -> {
+            PreparedBatch preparedBatch =
+                handle.prepareBatch(
+                    "INSERT INTO collection_collections(parent_collection_uuid, child_collection_uuid, sortIndex)"
+                        + " VALUES (:parentCollectionUuid, :childCollectionUuid, :sortIndex) ON CONFLICT (parent_collection_uuid, child_collection_uuid) DO NOTHING");
+            for (Collection child : children) {
+              preparedBatch
+                  .bind("parentCollectionUuid", parentUuid)
+                  .bind("childCollectionUuid", child.getUuid())
+                  .bind("sortIndex", nextSortIndex + getIndex(children, child))
+                  .add();
+            }
+            preparedBatch.execute();
+          });
+      return true;
+    }
+    return false;
+  }
+
+  @Override
+  public List<Collection> getChildren(Collection collection) {
+    return CollectionRepository.super.getChildren(collection);
+  }
+
+  @Override
+  public boolean removeChild(UUID parentUuid, UUID childUuid) {
+    if (parentUuid != null && childUuid != null) {
+      String query =
+          "DELETE FROM collection_collections WHERE parent_collection_uuid=:parentCollectionUuid AND child_collection_uuid=:childCollectionUuid";
+
+      dbi.withHandle(
+          h ->
+              h.createUpdate(query)
+                  .bind("parentCollectionUuid", parentUuid)
+                  .bind("childCollectionUuid", childUuid)
+                  .execute());
+      return true;
+    }
+    return false;
+  }
+
+  @Override
   public long count() {
     String sql = "SELECT count(*) FROM collections";
     long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
@@ -135,6 +186,64 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                         .values()));
     long total = count();
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
+    return pageResponse;
+  }
+
+  @Override
+  public SearchPageResponse<Collection> find(SearchPageRequest searchPageRequest) {
+    // select only what is shown/needed in paged result list:
+    StringBuilder query =
+        new StringBuilder(
+            "SELECT c.uuid c_uuid, c.refid c_refId, c.label c_label, c.description c_description,"
+                + " c.entity_type c_entityType,"
+                + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
+                + " FROM collections as c"
+                + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid"
+                + " LEFT JOIN LATERAL jsonb_object_keys(c.label) l(keys) on c.label is not null"
+                + " LEFT JOIN LATERAL jsonb_object_keys(c.description) n(keys) on c.description is not null"
+                + " WHERE (c.label->>l.keys ilike '%' || :searchTerm || '%'"
+                + " OR c.description->>n.keys ilike '%' || :searchTerm || '%')");
+    addPageRequestParams(searchPageRequest, query);
+
+    List<Collection> result =
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .bind("searchTerm", searchPageRequest.getQuery())
+                        .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, Collection>(),
+                            (map, rowView) -> {
+                              Collection collection =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("c_uuid", UUID.class),
+                                      uuid -> rowView.getRow(CollectionImpl.class));
+                              if (rowView.getColumn("f_uuid", String.class) != null) {
+                                collection.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
+
+    String countQuery =
+        "SELECT count(*) FROM collections as c"
+            + " LEFT JOIN LATERAL jsonb_object_keys(c.label) l(keys) on c.label is not null"
+            + " LEFT JOIN LATERAL jsonb_object_keys(c.description) n(keys) on c.description is not null"
+            + " WHERE (c.label->>l.keys ilike '%' || :searchTerm || '%'"
+            + " OR c.description->>n.keys ilike '%' || :searchTerm || '%')";
+    long total =
+        dbi.withHandle(
+            h ->
+                h.createQuery(countQuery)
+                    .bind("searchTerm", searchPageRequest.getQuery())
+                    .mapTo(Long.class)
+                    .findOne()
+                    .get());
+
+    SearchPageResponse pageResponse = new SearchPageResponseImpl(result, searchPageRequest, total);
     return pageResponse;
   }
 
@@ -456,11 +565,6 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
       default:
         return null;
     }
-  }
-
-  @Override
-  public List<Collection> getChildren(Collection collection) {
-    return CollectionRepository.super.getChildren(collection);
   }
 
   @Override
