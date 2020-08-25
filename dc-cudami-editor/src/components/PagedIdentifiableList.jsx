@@ -11,6 +11,7 @@ import RemoveAttachedIdentifiableModal from './modals/RemoveAttachedIdentifiable
 import IdentifiableListItem from './IdentifiableListItem'
 import {
   ApiContext,
+  addAttachedIdentifiable,
   addAttachedIdentifiables,
   loadAttachedIdentifiables,
   loadDefaultLanguage,
@@ -27,6 +28,7 @@ class PagedIdentifiableList extends Component {
       identifiables: [],
       modalsOpen: {
         addAttachedIdentifiables: false,
+        moveAttachedIdentifiable: false,
         removeAttachedIdentifiable: false,
       },
       numberOfPages: 0,
@@ -43,6 +45,19 @@ class PagedIdentifiableList extends Component {
       identifiables: content,
       numberOfPages: Math.ceil(totalElements / pageSize),
     })
+  }
+
+  addIdentifiable = async (parentUuid, uuid) => {
+    const {apiContextPath, mockApi, parentType, type} = this.props
+    const successful = await addAttachedIdentifiable(
+      apiContextPath,
+      mockApi,
+      parentType,
+      parentUuid,
+      type,
+      uuid
+    )
+    return successful
   }
 
   addIdentifiables = async (identifiables) => {
@@ -63,7 +78,7 @@ class PagedIdentifiableList extends Component {
     const uniqueIdentifiables = uniqBy(identifiablesToAdd, 'uuid')
     const successful = await this.addIdentifiables(uniqueIdentifiables)
     if (!successful) {
-      return console.error('an error occured')
+      return console.error('an error occured while adding the identifiables')
     }
     if (identifiables.length === this.pageSize) {
       return this.updatePage({selected: pageNumber + 1})
@@ -71,12 +86,27 @@ class PagedIdentifiableList extends Component {
     this.updatePage({selected: pageNumber})
   }
 
+  handleMove = async ({uuid}) => {
+    const {identifiables, moveIndex} = this.state
+    const uuidToMove = identifiables[moveIndex].uuid
+    if (uuid === uuidToMove) {
+      return console.error('an identifiable cannot be moved to itself')
+    }
+    const successful = await this.addIdentifiable(uuid, uuidToMove)
+    if (successful) {
+      return this.removeIdentifiable(this.props.parentUuid, uuidToMove)
+    }
+  }
+
   handleRemove = async () => {
     const {identifiables, pageNumber, removeIndex} = this.state
-    const uuid = identifiables[removeIndex].uuid
-    const successful = await this.removeIdentifiable(uuid)
+    const uuidToRemove = identifiables[removeIndex].uuid
+    const successful = await this.removeIdentifiable(
+      this.props.parentUuid,
+      uuidToRemove
+    )
     if (!successful) {
-      return console.error('an error occured')
+      return console.error('an error occured while removing the identifiable')
     }
     if (pageNumber > 0 && identifiables.length === 1) {
       return this.updatePage({selected: pageNumber - 1})
@@ -98,8 +128,8 @@ class PagedIdentifiableList extends Component {
     return identifiables
   }
 
-  removeIdentifiable = async (uuid) => {
-    const {apiContextPath, mockApi, parentType, parentUuid, type} = this.props
+  removeIdentifiable = async (parentUuid, uuid) => {
+    const {apiContextPath, mockApi, parentType, type} = this.props
     const successful = await removeAttachedIdentifiable(
       apiContextPath,
       mockApi,
@@ -135,8 +165,14 @@ class PagedIdentifiableList extends Component {
     const {
       apiContextPath,
       debug,
+      enableAdd,
+      enableMove,
+      enableRemove,
       mockApi,
       parentType,
+      parentUuid,
+      showEdit,
+      showNew,
       t,
       type,
       uiLocale,
@@ -148,11 +184,21 @@ class PagedIdentifiableList extends Component {
             <h2>{t(`${type}s`)}</h2>
           </Col>
           <Col className="text-right">
-            <Button
-              onClick={() => this.toggleModal('addAttachedIdentifiables')}
-            >
-              {t('add')}
-            </Button>
+            {enableAdd && (
+              <Button
+                className={showNew ? 'mr-1' : ''}
+                onClick={() => this.toggleModal('addAttachedIdentifiables')}
+              >
+                {t('add')}
+              </Button>
+            )}
+            {showNew && (
+              <Button
+                href={`${apiContextPath}${type.toLowerCase()}s/new?parentType=${parentType}&parentUuid=${parentUuid}`}
+              >
+                {t('new')}
+              </Button>
+            )}
           </Col>
         </Row>
         <ListGroup className="identifiable-list">
@@ -178,6 +224,8 @@ class PagedIdentifiableList extends Component {
           {this.state.identifiables.map((identifiable, index) => (
             <IdentifiableListItem
               apiContextPath={apiContextPath}
+              enableMove={enableMove}
+              enableRemove={enableRemove}
               index={index + 1 + this.state.pageNumber * this.pageSize}
               key={index}
               label={
@@ -185,6 +233,10 @@ class PagedIdentifiableList extends Component {
                 Object.values(identifiable.label)[0]
               }
               lastModified={identifiable.lastModified}
+              onMove={() => {
+                this.toggleModal('moveAttachedIdentifiable')
+                this.setState({moveIndex: index})
+              }}
               onRemove={() => {
                 this.toggleModal('removeAttachedIdentifiable')
                 this.setState({removeIndex: index})
@@ -193,6 +245,7 @@ class PagedIdentifiableList extends Component {
               previewImageRenderingHints={
                 identifiable.previewImageRenderingHints
               }
+              showEdit={showEdit}
               type={type}
               uiLocale={uiLocale}
               uuid={identifiable.uuid}
@@ -230,20 +283,36 @@ class PagedIdentifiableList extends Component {
             </pre>
           </>
         )}
-        <AddAttachedIdentifiablesModal
-          defaultLanguage={this.state.defaultLanguage}
-          isOpen={this.state.modalsOpen.addAttachedIdentifiables}
-          onAdd={this.handleAdd}
-          onToggle={() => this.toggleModal('addAttachedIdentifiables')}
-          type={type}
-        />
-        <RemoveAttachedIdentifiableModal
-          isOpen={this.state.modalsOpen.removeAttachedIdentifiable}
-          onConfirm={this.handleRemove}
-          onToggle={() => this.toggleModal('removeAttachedIdentifiable')}
-          parentType={parentType}
-          type={type}
-        />
+        {enableAdd && (
+          <AddAttachedIdentifiablesModal
+            action="add"
+            defaultLanguage={this.state.defaultLanguage}
+            isOpen={this.state.modalsOpen.addAttachedIdentifiables}
+            onSubmit={this.handleAdd}
+            onToggle={() => this.toggleModal('addAttachedIdentifiables')}
+            type={type}
+          />
+        )}
+        {enableMove && (
+          <AddAttachedIdentifiablesModal
+            action="move"
+            defaultLanguage={this.state.defaultLanguage}
+            isOpen={this.state.modalsOpen.moveAttachedIdentifiable}
+            maxElements={1}
+            onSubmit={(identifiables) => this.handleMove(identifiables[0])}
+            onToggle={() => this.toggleModal('moveAttachedIdentifiable')}
+            type={type}
+          />
+        )}
+        {enableRemove && (
+          <RemoveAttachedIdentifiableModal
+            isOpen={this.state.modalsOpen.removeAttachedIdentifiable}
+            onConfirm={this.handleRemove}
+            onToggle={() => this.toggleModal('removeAttachedIdentifiable')}
+            parentType={parentType}
+            type={type}
+          />
+        )}
       </ApiContext.Provider>
     )
   }
@@ -252,7 +321,12 @@ class PagedIdentifiableList extends Component {
 PagedIdentifiableList.defaultProps = {
   apiContextPath: '/',
   debug: false,
+  enableAdd: false,
+  enableMove: false,
+  enableRemove: false,
   mockApi: false,
+  showEdit: false,
+  showNew: false,
 }
 
 export default withTranslation()(PagedIdentifiableList)

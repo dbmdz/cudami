@@ -66,91 +66,119 @@ class AddAttachedIdentifiablesModal extends Component {
   }
 
   render() {
-    const {defaultLanguage, isOpen, onAdd, t, type} = this.props
+    const {
+      action,
+      defaultLanguage,
+      isOpen,
+      maxElements,
+      onSubmit,
+      t,
+      type,
+    } = this.props
     const {identifiables, identifierTypes, selectedOption} = this.state
+    const previewImageWidth = 50
     const showAutocomplete = selectedOption < this.fixedOptions.length
+    const showInputFields =
+      maxElements === undefined || identifiables.length < maxElements
     return (
       <Modal isOpen={isOpen} size="lg" toggle={this.destroy}>
         <ModalHeader toggle={this.destroy}>
-          {t(`add${startCase(type).replace(' ', '')}s`)}
+          {t(`${action}${startCase(type).replace(' ', '')}s`)}
         </ModalHeader>
         <ModalBody>
           <Form
             onSubmit={(evt) => {
               evt.preventDefault()
-              onAdd(identifiables)
+              onSubmit(identifiables)
               this.destroy()
             }}
           >
-            <FormGroup className="d-inline-block w-25">
-              <Input
-                onChange={(evt) => {
-                  this.setState({selectedOption: parseInt(evt.target.value)})
-                }}
-                type="select"
-              >
-                {this.fixedOptions.map((option, index) => (
-                  <option key={option} value={index}>
-                    {t(option)}
-                  </option>
-                ))}
-                {identifierTypes.map((identifierType, index) => (
-                  <option
-                    key={identifierType.uuid}
-                    value={index + this.fixedOptions.length}
+            {showInputFields && (
+              <>
+                <FormGroup className="d-inline-block w-25">
+                  <Input
+                    onChange={(evt) => {
+                      this.setState({
+                        selectedOption: parseInt(evt.target.value),
+                      })
+                    }}
+                    type="select"
                   >
-                    {identifierType.label}
-                  </option>
-                ))}
-              </Input>
-            </FormGroup>
-            <FormGroup className="d-inline-block pl-1 w-75">
-              {showAutocomplete ? (
-                <Autocomplete
-                  defaultLanguage={defaultLanguage}
-                  onSelect={this.addIdentifiableToList}
-                  placeholder={t('autocomplete.searchTerm')}
-                  search={(
-                    contextPath,
-                    mock,
-                    searchTerm,
-                    pageNumber,
-                    pageSize
-                  ) =>
-                    searchIdentifiables(
-                      contextPath,
-                      mock,
-                      searchTerm,
-                      type,
-                      pageNumber,
-                      pageSize
-                    )
-                  }
-                />
-              ) : (
-                <IdentifierSearch
-                  defaultLanguage={defaultLanguage}
-                  namespace={
-                    identifierTypes[selectedOption - this.fixedOptions.length]
-                      .namespace
-                  }
-                  onSelect={this.addIdentifiableToList}
-                  type={type}
-                />
-              )}
-            </FormGroup>
+                    {this.fixedOptions.map((option, index) => (
+                      <option key={option} value={index}>
+                        {t(option)}
+                      </option>
+                    ))}
+                    {identifierTypes.map((identifierType, index) => (
+                      <option
+                        key={identifierType.uuid}
+                        value={index + this.fixedOptions.length}
+                      >
+                        {identifierType.label}
+                      </option>
+                    ))}
+                  </Input>
+                </FormGroup>
+                <FormGroup className="d-inline-block pl-1 w-75">
+                  {showAutocomplete ? (
+                    <Autocomplete
+                      defaultLanguage={defaultLanguage}
+                      onSelect={this.addIdentifiableToList}
+                      placeholder={t('autocomplete.searchTerm')}
+                      search={(
+                        contextPath,
+                        mock,
+                        searchTerm,
+                        pageNumber,
+                        pageSize
+                      ) =>
+                        searchIdentifiables(
+                          contextPath,
+                          mock,
+                          searchTerm,
+                          type,
+                          pageNumber,
+                          pageSize
+                        )
+                      }
+                    />
+                  ) : (
+                    <IdentifierSearch
+                      defaultLanguage={defaultLanguage}
+                      namespace={
+                        identifierTypes[
+                          selectedOption - this.fixedOptions.length
+                        ].namespace
+                      }
+                      onSelect={this.addIdentifiableToList}
+                      type={type}
+                    />
+                  )}
+                </FormGroup>
+              </>
+            )}
             {identifiables.length > 0 && (
               <ListGroup className="mb-3">
-                <Alert className="mb-0" color="info">
-                  {t('duplicateInformation')}
-                </Alert>
+                {maxElements !== 1 && (
+                  <Alert className="mb-0" color="info">
+                    {t('duplicateInformation')}
+                  </Alert>
+                )}
                 {identifiables.map(({label, previewImage}, index) => (
                   <ListGroupItem key={index}>
                     <Row>
                       <Col className="text-center" md="2">
                         <img
                           className="img-fluid"
-                          src={getImageUrl(previewImage, '50,')}
+                          src={
+                            previewImage
+                              ? getImageUrl(
+                                  previewImage,
+                                  `${previewImageWidth},`
+                                )
+                              : `${this.context.apiContextPath}images/no-image.png`
+                          }
+                          style={{maxWidth: `${previewImageWidth}px`}}
                         />
                       </Col>
                       <Col md="9">
@@ -182,7 +210,7 @@ class AddAttachedIdentifiablesModal extends Component {
               disabled={identifiables.length === 0}
               type="submit"
             >
-              {t('add')}
+              {t(action)}
             </Button>
           </Form>
         </ModalBody>

@@ -5,6 +5,7 @@
     "addDigitalObjects": "Add digital objects",
     "addLanguage": "Add language",
     "addPreviewImage": "Add preview image",
+    "addSubcollections": "Add sub collections",
     "alignment": "Alignment",
     "alignmentLeft": "left (with text wrapping)",
     "alignmentRight": "right (with text wrapping)",
@@ -29,7 +30,8 @@
     "chooseLanguage": "Choose a language",
     "confirmRemove": {
       "digitalObjectFromCollection": "Are you sure that you want to remove this digital object from the collection?",
-      "digitalObjectFromProject": "Are you sure that you want to remove this digital object from the project?"
+      "digitalObjectFromProject": "Are you sure that you want to remove this digital object from the project?",
+      "subcollectionFromCollection": "Are you sure that you want to remove this sub collection from the collection?"
     },
     "createArticle": "Create a new article",
     "createCollection": "Create a new collection",
@@ -92,6 +94,9 @@
       "superscript": "Superscript",
       "underline": "Underline"
     },
+    "move": "Move",
+    "moveSubcollections": "Move sub collection",
+    "new": "New",
     "next": "Next",
     "no": "No",
     "noAlignment": "without text wrapping",
@@ -109,6 +114,7 @@
       "useUrl": "Integrate image via web link"
     },
     "startPublicationDate": "Start of publication",
+    "subcollections": "Sub collections",
     "text": "Long text",
     "title": "Title",
     "tooltip": "Tooltip",

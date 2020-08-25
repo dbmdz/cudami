@@ -10,8 +10,13 @@ export default function (config) {
     <PagedIdentifiableList
       apiContextPath={config.apiContextPath}
       debug={config.debug}
+      enableAdd={config.enableAdd}
+      enableMove={config.enableMove}
+      enableRemove={config.enableRemove}
       parentType={config.parentType}
       parentUuid={config.parentUuid}
+      showEdit={config.showEdit}
+      showNew={config.showNew}
       type={config.type}
       uiLocale={config.uiLocale}
     />,
