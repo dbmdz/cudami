@@ -184,19 +184,19 @@ class PagedIdentifiableList extends Component {
             <h2>{t(`${type}s`)}</h2>
           </Col>
           <Col className="text-right">
-            {enableAdd && (
-              <Button
-                className={showNew ? 'mr-1' : ''}
-                onClick={() => this.toggleModal('addAttachedIdentifiables')}
-              >
-                {t('add')}
-              </Button>
-            )}
             {showNew && (
               <Button
                 href={`${apiContextPath}${type.toLowerCase()}s/new?parentType=${parentType}&parentUuid=${parentUuid}`}
               >
                 {t('new')}
+              </Button>
+            )}
+            {enableAdd && (
+              <Button
+                className={showNew ? 'ml-1' : ''}
+                onClick={() => this.toggleModal('addAttachedIdentifiables')}
+              >
+                {t('add')}
               </Button>
             )}
           </Col>
