@@ -19,7 +19,7 @@ export async function addAttachedIdentifiable(
       headers: {
         credentials: 'same-origin',
       },
-      method: 'PATCH',
+      method: 'POST',
     })
     return response.ok
   } catch (err) {
@@ -46,7 +46,7 @@ export async function addAttachedIdentifiables(
         'Content-Type': 'application/json',
         credentials: 'same-origin',
       },
-      method: 'PATCH',
+      method: 'POST',
     })
     return response.ok
   } catch (err) {
