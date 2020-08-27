@@ -35,7 +35,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -246,10 +245,10 @@ public class CollectionController {
   }
 
   @ApiMethod(description = "Add an existing digital object to an existing collection")
-  @PatchMapping(
+  @PostMapping(
       value = {
-        "/latest/collections/{uuid}/digitalobject/{digitalObjectUuid}",
-        "/v3/collections/{uuid}/digitalobject/{digitalObjectUuid}"
+        "/latest/collections/{uuid}/digitalobjects/{digitalObjectUuid}",
+        "/v3/collections/{uuid}/digitalobjects/{digitalObjectUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
@@ -273,7 +272,7 @@ public class CollectionController {
   }
 
   @ApiMethod(description = "Add existing digital objects to an existing collection")
-  @PatchMapping(
+  @PostMapping(
       value = {
         "/latest/collections/{uuid}/digitalobjects",
         "/v3/collections/{uuid}/digitalobjects"
@@ -319,8 +318,8 @@ public class CollectionController {
   @ApiMethod(description = "Remove an existing digital object from an existing collection")
   @DeleteMapping(
       value = {
-        "/latest/collections/{uuid}/digitalobject/{digitalObjectUuid}",
-        "/v3/collections/{uuid}/digitalobject/{digitalObjectUuid}"
+        "/latest/collections/{uuid}/digitalobjects/{digitalObjectUuid}",
+        "/v3/collections/{uuid}/digitalobjects/{digitalObjectUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
