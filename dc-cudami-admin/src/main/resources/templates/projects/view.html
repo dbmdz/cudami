@@ -66,23 +66,25 @@
       <div class="row main-content">
         <div class="col-sm-12">
           <div id="digitalobject-list"></div>
-          <script th:src="@{/js/identifiable-list.bundle.js}"></script>
-          <script th:inline="javascript">
-            IdentifiableList({
-              apiContextPath: /*[[@{/}]]*/ '',
-              id: "digitalobject-list",
-              parentType: "project",
-              parentUuid: /*[[*{uuid}]]*/,
-              type: "digitalObject",
-              uiLocale: /*[[${#locale.language}]]*/
-            });
-          </script>
         </div>
       </div>
     </section>
     <section layout:fragment="beforeBodyEnds">
       <script>
         addLanguageChangeHandler()
+      </script>
+      <script th:src="@{/js/identifiable-list.bundle.js}"></script>
+      <script th:inline="javascript">
+        IdentifiableList({
+          apiContextPath: /*[[@{/}]]*/ '',
+          enableAdd: true,
+          enableRemove: true,
+          id: "digitalobject-list",
+          parentType: "project",
+          parentUuid: /*[[*{uuid}]]*/,
+          type: "digitalObject",
+          uiLocale: /*[[${#locale.language}]]*/
+        });
       </script>
     </section>
   </body>
