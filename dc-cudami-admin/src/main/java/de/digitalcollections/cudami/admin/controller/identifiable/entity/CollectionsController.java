@@ -275,7 +275,7 @@ public class CollectionsController extends AbstractController {
     }
   }
 
-  @GetMapping("/collections/{uuid}")
+  @GetMapping({"/collections/{uuid}", "/subcollections/{uuid}"})
   public String view(
       @PathVariable UUID uuid, @PageableDefault(size = 25) Pageable pageable, Model model)
       throws HttpException {
