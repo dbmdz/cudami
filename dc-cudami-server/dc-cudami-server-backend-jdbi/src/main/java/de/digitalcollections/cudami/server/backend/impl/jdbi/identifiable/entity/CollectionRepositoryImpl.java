@@ -102,28 +102,28 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
   @Override
   public boolean addChildren(UUID parentUuid, List<Collection> children) {
-    if (parentUuid != null && children != null) {
-      Integer nextSortIndex =
-          selectNextSortIndexForParentChildren(
-              dbi, "collection_collections", "parent_collection_uuid", parentUuid);
-      dbi.useHandle(
-          handle -> {
-            PreparedBatch preparedBatch =
-                handle.prepareBatch(
-                    "INSERT INTO collection_collections(parent_collection_uuid, child_collection_uuid, sortIndex)"
-                        + " VALUES (:parentCollectionUuid, :childCollectionUuid, :sortIndex) ON CONFLICT (parent_collection_uuid, child_collection_uuid) DO NOTHING");
-            for (Collection child : children) {
-              preparedBatch
-                  .bind("parentCollectionUuid", parentUuid)
-                  .bind("childCollectionUuid", child.getUuid())
-                  .bind("sortIndex", nextSortIndex + getIndex(children, child))
-                  .add();
-            }
-            preparedBatch.execute();
-          });
-      return true;
+    if (parentUuid == null || children == null) {
+      return false;
     }
-    return false;
+    Integer nextSortIndex =
+        selectNextSortIndexForParentChildren(
+            dbi, "collection_collections", "parent_collection_uuid", parentUuid);
+    dbi.useHandle(
+        handle -> {
+          PreparedBatch preparedBatch =
+              handle.prepareBatch(
+                  "INSERT INTO collection_collections(parent_collection_uuid, child_collection_uuid, sortIndex)"
+                      + " VALUES (:parentCollectionUuid, :childCollectionUuid, :sortIndex) ON CONFLICT (parent_collection_uuid, child_collection_uuid) DO NOTHING");
+          for (Collection child : children) {
+            preparedBatch
+                .bind("parentCollectionUuid", parentUuid)
+                .bind("childCollectionUuid", child.getUuid())
+                .bind("sortIndex", nextSortIndex + getIndex(children, child))
+                .add();
+          }
+          preparedBatch.execute();
+        });
+    return true;
   }
 
   @Override
@@ -133,19 +133,19 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
   @Override
   public boolean removeChild(UUID parentUuid, UUID childUuid) {
-    if (parentUuid != null && childUuid != null) {
-      String query =
-          "DELETE FROM collection_collections WHERE parent_collection_uuid=:parentCollectionUuid AND child_collection_uuid=:childCollectionUuid";
-
-      dbi.withHandle(
-          h ->
-              h.createUpdate(query)
-                  .bind("parentCollectionUuid", parentUuid)
-                  .bind("childCollectionUuid", childUuid)
-                  .execute());
-      return true;
+    if (parentUuid == null || childUuid == null) {
+      return false;
     }
-    return false;
+    String query =
+        "DELETE FROM collection_collections WHERE parent_collection_uuid=:parentCollectionUuid AND child_collection_uuid=:childCollectionUuid";
+
+    dbi.withHandle(
+        h ->
+            h.createUpdate(query)
+                .bind("parentCollectionUuid", parentUuid)
+                .bind("childCollectionUuid", childUuid)
+                .execute());
+    return true;
   }
 
   @Override
