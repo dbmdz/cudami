@@ -43,7 +43,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -74,7 +73,7 @@ public class CollectionsController extends AbstractController {
     return "collections";
   }
 
-  @PatchMapping("/api/collections/{uuid}/digitalobjects")
+  @PostMapping("/api/collections/{uuid}/digitalobjects")
   public ResponseEntity addDigitalObjects(
       @PathVariable UUID uuid, @RequestBody List<DigitalObject> digitalObjects)
       throws HttpException {
@@ -85,7 +84,7 @@ public class CollectionsController extends AbstractController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @PatchMapping("/api/collections/{collectionUuid}/subcollections/{subcollectionUuid}")
+  @PostMapping("/api/collections/{collectionUuid}/subcollections/{subcollectionUuid}")
   public ResponseEntity addSubcollection(
       @PathVariable UUID collectionUuid, @PathVariable UUID subcollectionUuid)
       throws HttpException {
@@ -96,7 +95,7 @@ public class CollectionsController extends AbstractController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @PatchMapping("/api/collections/{collectionUuid}/subcollections")
+  @PostMapping("/api/collections/{collectionUuid}/subcollections")
   public ResponseEntity addSubcollections(
       @PathVariable UUID collectionUuid, @RequestBody List<Collection> subcollections)
       throws HttpException {
