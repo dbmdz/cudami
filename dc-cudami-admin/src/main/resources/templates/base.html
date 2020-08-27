@@ -89,7 +89,10 @@
 
     <script th:src="@{/js/index.js}"></script>
     <script>
-      activatePopovers()
+      $(function () {
+        activateExternalLinks()
+        activatePopovers()
+      })
     </script>
 
     <th:block layout:fragment="beforeBodyEnds"></th:block>
