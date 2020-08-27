@@ -368,10 +368,10 @@ public class CollectionController {
   }
 
   @ApiMethod(description = "Add an existing collection to an existing collection")
-  @PatchMapping(
+  @PostMapping(
       value = {
-        "/latest/collections/{parentUuid}/child/{childUuid}",
-        "/v3/collections/{parentUuid}/child/{childUuid}"
+        "/latest/collections/{parentUuid}/subcollections/{childUuid}",
+        "/v3/collections/{parentUuid}/subcollections/{childUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
@@ -395,8 +395,11 @@ public class CollectionController {
   }
 
   @ApiMethod(description = "Add existing collections to an existing collection")
-  @PatchMapping(
-      value = {"/latest/collections/{uuid}/children", "/v3/collections/{uuid}/children"},
+  @PostMapping(
+      value = {
+        "/latest/collections/{uuid}/subcollections",
+        "/v3/collections/{uuid}/subcollections"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public ResponseEntity addChildren(
@@ -414,9 +417,12 @@ public class CollectionController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @ApiMethod(description = "Get paged children of a collection")
+  @ApiMethod(description = "Get paged subcollections of a collection")
   @GetMapping(
-      value = {"/latest/collections/{uuid}/children", "/v3/collections/{uuid}/children"},
+      value = {
+        "/latest/collections/{uuid}/subcollections",
+        "/v3/collections/{uuid}/subcollections"
+      },
       produces = "application/json")
   @ApiResponseObject
   public PageResponse<Collection> getChildren(
@@ -439,8 +445,8 @@ public class CollectionController {
   @ApiMethod(description = "Remove an existing collection from an existing collection")
   @DeleteMapping(
       value = {
-        "/latest/collections/{parentUuid}/child/{childUuid}",
-        "/v3/collections/{parentUuid}/child/{childUuid}"
+        "/latest/collections/{parentUuid}/subcollections/{childUuid}",
+        "/v3/collections/{parentUuid}/subcollections/{childUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
