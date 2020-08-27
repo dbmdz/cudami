@@ -370,23 +370,22 @@ public class CollectionController {
   @ApiMethod(description = "Add an existing collection to an existing collection")
   @PostMapping(
       value = {
-        "/latest/collections/{parentUuid}/subcollections/{childUuid}",
-        "/v3/collections/{parentUuid}/subcollections/{childUuid}"
+        "/latest/collections/{uuid}/subcollections/{subcollectionUuid}",
+        "/v3/collections/{uuid}/subcollections/{subcollectionUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
-  public ResponseEntity addChild(
-      @ApiPathParam(description = "UUID of the parent collection") @PathVariable("parentUuid")
-          UUID parentUuid,
-      @ApiPathParam(description = "UUID of the child collection") @PathVariable("childUuid")
-          UUID childUuid) {
-    Collection parent = new CollectionImpl();
-    parent.setUuid(parentUuid);
+  public ResponseEntity addSubcollection(
+      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid") UUID uuid,
+      @ApiPathParam(description = "UUID of the subcollection") @PathVariable("subcollectionUuid")
+          UUID subcollectionUuid) {
+    Collection collection = new CollectionImpl();
+    collection.setUuid(uuid);
 
-    Collection child = new CollectionImpl();
-    child.setUuid(childUuid);
+    Collection subcollection = new CollectionImpl();
+    subcollection.setUuid(subcollectionUuid);
 
-    boolean successful = collectionService.addChild(parent, child);
+    boolean successful = collectionService.addChild(collection, subcollection);
 
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -402,14 +401,14 @@ public class CollectionController {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
-  public ResponseEntity addChildren(
-      @ApiPathParam(description = "UUID of the parent collection") @PathVariable("uuid")
-          UUID collectionUuid,
-      @ApiPathParam(description = "List of the children") @RequestBody List<Collection> children) {
+  public ResponseEntity addSubcollections(
+      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid") UUID uuid,
+      @ApiPathParam(description = "List of the subcollections") @RequestBody
+          List<Collection> subcollections) {
     Collection collection = new CollectionImpl();
-    collection.setUuid(collectionUuid);
+    collection.setUuid(uuid);
 
-    boolean successful = collectionService.addChildren(collection, children);
+    boolean successful = collectionService.addChildren(collection, subcollections);
 
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -425,7 +424,7 @@ public class CollectionController {
       },
       produces = "application/json")
   @ApiResponseObject
-  public PageResponse<Collection> getChildren(
+  public PageResponse<Collection> getSubcollections(
       @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -445,23 +444,22 @@ public class CollectionController {
   @ApiMethod(description = "Remove an existing collection from an existing collection")
   @DeleteMapping(
       value = {
-        "/latest/collections/{parentUuid}/subcollections/{childUuid}",
-        "/v3/collections/{parentUuid}/subcollections/{childUuid}"
+        "/latest/collections/{uuid}/subcollections/{subcollectionUuid}",
+        "/v3/collections/{uuid}/subcollections/{subcollectionUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
-  public ResponseEntity removeChild(
-      @ApiPathParam(description = "UUID of the parent collection") @PathVariable("parentUuid")
-          UUID parentUuid,
-      @ApiPathParam(description = "UUID of the child collection") @PathVariable("childUuid")
-          UUID childUuid) {
-    Collection parent = new CollectionImpl();
-    parent.setUuid(parentUuid);
+  public ResponseEntity removeSubcollection(
+      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid") UUID uuid,
+      @ApiPathParam(description = "UUID of the subcollection") @PathVariable("subcollectionUuid")
+          UUID subcollectionUuid) {
+    Collection collection = new CollectionImpl();
+    collection.setUuid(uuid);
 
-    Collection child = new CollectionImpl();
-    child.setUuid(childUuid);
+    Collection subcollection = new CollectionImpl();
+    subcollection.setUuid(subcollectionUuid);
 
-    boolean successful = collectionService.removeChild(parent, child);
+    boolean successful = collectionService.removeChild(collection, subcollection);
 
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
