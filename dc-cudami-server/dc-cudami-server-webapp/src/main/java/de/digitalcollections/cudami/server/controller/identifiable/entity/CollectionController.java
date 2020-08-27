@@ -400,10 +400,9 @@ public class CollectionController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public ResponseEntity addChildren(
-      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
+      @ApiPathParam(description = "UUID of the parent collection") @PathVariable("uuid")
           UUID collectionUuid,
-      @ApiPathParam(description = "List of the digital objects") @RequestBody
-          List<Collection> children) {
+      @ApiPathParam(description = "List of the children") @RequestBody List<Collection> children) {
     Collection collection = new CollectionImpl();
     collection.setUuid(collectionUuid);
 
