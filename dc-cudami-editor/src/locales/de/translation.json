@@ -53,7 +53,7 @@
     "description": "Kurzbeschreibung",
     "digitalObjects": "Digitalisate (Digitale Objekte)",
     "dragAndDropImage": "Datei zum Hochladen hier hereinziehen und ablegen",
-    "duplicateInformation": "Duplikate in der Liste unten werden beim Klick auf \"$t(add)\" automatisch herausgefiltert.",
+    "duplicateInformation": "Werden Einträge mehrfach ausgewählt, so werden die Duplikate beim Klick auf \"$t(add)\" automatisch entfernt.",
     "editArticle": "Artikel bearbeiten",
     "editCollection": "Sammlung bearbeiten",
     "editCorporation": "Institution bearbeiten",

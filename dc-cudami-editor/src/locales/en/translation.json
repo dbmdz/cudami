@@ -53,7 +53,7 @@
     "description": "Abstract",
     "digitalObjects": "Digital objects",
     "dragAndDropImage": "Drag and drop file to upload here",
-    "duplicateInformation": "Duplicates in the list below are automatically filtered out when you click \"$t(add)\".",
+    "duplicateInformation": "If entries are selected multiple times, the duplicates are automatically removed when you click on \"$t(add)\".",
     "editArticle": "Edit article",
     "editCollection": "Edit collection",
     "editCorporation": "Edit corporation",
