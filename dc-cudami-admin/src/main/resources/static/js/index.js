@@ -1,7 +1,18 @@
+function activateExternalLinks() {
+  $('a[href]')
+    .filter(function () {
+      var linkTarget = $(this).attr('href')
+      var isExternalLink = false
+      if (/^https?:\/\//.test(linkTarget)) {
+        isExternalLink = true
+      }
+      return isExternalLink
+    })
+    .attr('target', '_blank')
+}
+
 function activatePopovers() {
-  $(function () {
-    $('[data-toggle="popover"]').popover()
-  })
+  $('[data-toggle="popover"]').popover()
 }
 
 function addLanguageChangeHandler() {
