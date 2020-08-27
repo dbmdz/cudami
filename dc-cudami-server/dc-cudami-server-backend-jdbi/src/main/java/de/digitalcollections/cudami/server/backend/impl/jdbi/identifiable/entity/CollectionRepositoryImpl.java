@@ -243,8 +243,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                     .findOne()
                     .get());
 
-    SearchPageResponse pageResponse = new SearchPageResponseImpl(result, searchPageRequest, total);
-    return pageResponse;
+    return new SearchPageResponseImpl(result, searchPageRequest, total);
   }
 
   @Override
