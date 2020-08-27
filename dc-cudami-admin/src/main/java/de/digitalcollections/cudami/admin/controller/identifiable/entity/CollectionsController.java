@@ -89,7 +89,7 @@ public class CollectionsController extends AbstractController {
   public ResponseEntity addSubcollection(
       @PathVariable UUID collectionUuid, @PathVariable UUID subcollectionUuid)
       throws HttpException {
-    boolean successful = service.addChild(collectionUuid, subcollectionUuid);
+    boolean successful = service.addSubcollection(collectionUuid, subcollectionUuid);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
     }
@@ -100,7 +100,7 @@ public class CollectionsController extends AbstractController {
   public ResponseEntity addSubcollections(
       @PathVariable UUID collectionUuid, @RequestBody List<Collection> subcollections)
       throws HttpException {
-    boolean successful = service.addChildren(collectionUuid, subcollections);
+    boolean successful = service.addSubcollections(collectionUuid, subcollections);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
     }
@@ -186,7 +186,7 @@ public class CollectionsController extends AbstractController {
     PageRequest pageRequest = new PageRequestImpl();
     pageRequest.setPageNumber(pageNumber);
     pageRequest.setPageSize(pageSize);
-    return service.getChildren(uuid, pageRequest);
+    return service.getSubcollections(uuid, pageRequest);
   }
 
   @GetMapping("/collections")
@@ -221,7 +221,7 @@ public class CollectionsController extends AbstractController {
   public ResponseEntity removeSubcollection(
       @PathVariable UUID collectionUuid, @PathVariable UUID subcollectionUuid)
       throws HttpException {
-    boolean successful = service.removeChild(collectionUuid, subcollectionUuid);
+    boolean successful = service.removeSubcollection(collectionUuid, subcollectionUuid);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
     }
