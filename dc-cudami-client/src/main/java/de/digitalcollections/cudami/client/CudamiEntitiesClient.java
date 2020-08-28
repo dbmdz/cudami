@@ -107,7 +107,7 @@ public class CudamiEntitiesClient extends CudamiBaseClient<EntityImpl> {
   }
 
   public List<EntityRelation> saveRelations(List relations) throws HttpException {
-    return doPostRequestForObjectList(
+    return doPutRequestForObjectList(
         "/latest/entities/relations", relations, EntityRelationImpl.class);
   }
 

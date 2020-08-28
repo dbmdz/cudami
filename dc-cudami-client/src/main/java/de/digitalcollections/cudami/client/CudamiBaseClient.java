@@ -541,6 +541,27 @@ public class CudamiBaseClient<T extends Object> {
     }
   }
 
+  protected List<Class<?>> doPutRequestForObjectList(
+      String requestUrl, List<Class<?>> list, Class<?> targetType) throws HttpException {
+    try {
+      HttpRequest req = createPutRequest(requestUrl, list);
+      HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
+      Integer statusCode = response.statusCode();
+      if (statusCode != 200) {
+        throw CudamiRestErrorDecoder.decode("PUT " + requestUrl, statusCode);
+      }
+      // This is the most performant approach for Jackson
+      final byte[] body = response.body();
+      if (body == null || body.length == 0) {
+        return null;
+      }
+      List<Class<?>> result = mapper.readerForListOf(targetType).readValue(body);
+      return result;
+    } catch (IOException | InterruptedException e) {
+      throw new HttpException("Failed to retrieve response due to error", e);
+    }
+  }
+
   /**
    * Wrapper for find params
    *

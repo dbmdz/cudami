@@ -59,7 +59,7 @@ public class PredicatesRepositoryImpl implements PredicatesRepository {
       String updateQuery =
           "UPDATE predicates SET"
               + " label=:label::JSONB, description=:description::JSONB,"
-              + " created=:created, last_modified=:lastModified"
+              + " last_modified=:lastModified"
               + " WHERE value=:value";
 
       dbi.withHandle(h -> h.createUpdate(updateQuery).bindBean(predicate).execute());
@@ -79,6 +79,6 @@ public class PredicatesRepositoryImpl implements PredicatesRepository {
       dbi.withHandle(h -> h.createUpdate(createQuery).bindBean(predicate).execute());
     }
 
-    return predicate;
+    return findOne(predicate.getValue());
   }
 }
