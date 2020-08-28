@@ -39,7 +39,7 @@
     "react-date-picker": "^8.0.1",
     "react-dom": "^16.13.1",
     "react-file-drop": "^3.0.7",
-    "react-i18next": "^11.7.1",
+    "react-i18next": "^11.7.2",
     "react-icons": "^3.11.0",
     "react-paginate": "^6.3.2",
     "react-scripts": "3.4.3",
