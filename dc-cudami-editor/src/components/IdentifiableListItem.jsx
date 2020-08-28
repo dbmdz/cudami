@@ -1,5 +1,6 @@
 import React from 'react'
 import {Button, ButtonGroup, Col, ListGroupItem, Row} from 'reactstrap'
+import {useTranslation} from 'react-i18next'
 import {FaExchangeAlt, FaEye, FaPencilAlt, FaTrash} from 'react-icons/fa'
 
 import {getImageUrl} from './utils'
@@ -13,6 +14,7 @@ const IdentifiableListItem = ({
   lastModified,
   onMove,
   onRemove,
+  parentType,
   previewImage,
   previewImageRenderingHints = {},
   showEdit,
@@ -22,6 +24,7 @@ const IdentifiableListItem = ({
 }) => {
   const {altText, title, caption} = previewImageRenderingHints
   const previewImageWidth = 30
+  const {t} = useTranslation()
   const viewUrl = `${apiContextPath}${type.toLowerCase()}s/${uuid}`
   return (
     <ListGroupItem className="list-item pb-0 pt-0">
@@ -54,7 +57,12 @@ const IdentifiableListItem = ({
         </Col>
         <Col className="pb-1 pt-1 text-center" md="1">
           <ButtonGroup>
-            <Button className="p-0" color="link" href={viewUrl}>
+            <Button
+              className="p-0"
+              color="link"
+              href={viewUrl}
+              title={t('view')}
+            >
               <FaEye />
             </Button>
             {showEdit && (
@@ -62,6 +70,7 @@ const IdentifiableListItem = ({
                 className="ml-1 p-0"
                 color="link"
                 href={`${viewUrl}/edit`}
+                title={t('edit')}
               >
                 <FaPencilAlt />
               </Button>
@@ -69,12 +78,22 @@ const IdentifiableListItem = ({
           </ButtonGroup>
           <ButtonGroup>
             {enableMove && (
-              <Button className="ml-1 p-0" color="link" onClick={onMove}>
+              <Button
+                className="ml-1 p-0"
+                color="link"
+                onClick={onMove}
+                title={t(`moveTo.${parentType}`)}
+              >
                 <FaExchangeAlt />
               </Button>
             )}
             {enableRemove && (
-              <Button className="ml-1 p-0" color="link" onClick={onRemove}>
+              <Button
+                className="ml-1 p-0"
+                color="link"
+                onClick={onRemove}
+                title={t(`removeFrom.${parentType}`)}
+              >
                 <FaTrash />
               </Button>
             )}
