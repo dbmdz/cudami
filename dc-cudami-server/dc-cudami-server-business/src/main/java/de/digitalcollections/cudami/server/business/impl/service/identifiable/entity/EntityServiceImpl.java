@@ -33,7 +33,7 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
   }
 
   @Override
-  public void addRelation(EntityRelation<E> relation) {
+  public void addRelation(EntityRelation relation) {
     ((EntityRepository) repository).addRelation(relation);
   }
 
