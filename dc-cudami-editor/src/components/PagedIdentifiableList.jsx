@@ -1,6 +1,14 @@
 import uniqBy from 'lodash/uniqBy'
 import React, {Component} from 'react'
-import {Button, Col, Label, ListGroup, ListGroupItem, Row} from 'reactstrap'
+import {
+  Alert,
+  Button,
+  Col,
+  Label,
+  ListGroup,
+  ListGroupItem,
+  Row,
+} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 import {FaHashtag, FaImage} from 'react-icons/fa'
 import ReactPaginate from 'react-paginate'
@@ -33,6 +41,7 @@ class PagedIdentifiableList extends Component {
       },
       numberOfPages: 0,
       pageNumber: 0,
+      showSuccessfullyMoved: false,
     }
   }
 
@@ -87,14 +96,25 @@ class PagedIdentifiableList extends Component {
   }
 
   handleMove = async ({uuid}) => {
-    const {identifiables, moveIndex} = this.state
+    const {identifiables, moveIndex, pageNumber} = this.state
     const uuidToMove = identifiables[moveIndex].uuid
     if (uuid === uuidToMove) {
       return console.error('an identifiable cannot be moved to itself')
     }
-    const successful = await this.addIdentifiable(uuid, uuidToMove)
-    if (successful) {
-      return this.removeIdentifiable(this.props.parentUuid, uuidToMove)
+    const addedSuccessfully = await this.addIdentifiable(uuid, uuidToMove)
+    if (addedSuccessfully) {
+      const removedSuccessfully = await this.removeIdentifiable(
+        this.props.parentUuid,
+        uuidToMove
+      )
+      if (removedSuccessfully) {
+        this.setState({showSuccessfullyMoved: true})
+        setTimeout(() => this.setState({showSuccessfullyMoved: false}), 3000)
+        if (pageNumber > 0 && identifiables.length === 1) {
+          return this.updatePage({selected: pageNumber - 1})
+        }
+        this.updatePage({selected: pageNumber})
+      }
     }
   }
 
@@ -201,6 +221,11 @@ class PagedIdentifiableList extends Component {
             )}
           </Col>
         </Row>
+        {this.state.showSuccessfullyMoved && (
+          <Alert className="mb-2" color="info">
+            {t(`${type}SuccessfullyMoved`)}
+          </Alert>
+        )}
         <ListGroup className="identifiable-list">
           <ListGroupItem className="pb-0 pt-0">
             <Row className="font-weight-bold text-center">

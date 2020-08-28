@@ -122,6 +122,7 @@
     },
     "startPublicationDate": "Start-Publikationsdatum",
     "subcollections": "Untergeordnete Sammlungen",
+    "subcollectionSuccessfullyMoved": "Die untergeordnete Sammlung wurde erfolgreich in die gewählte Sammlung verschoben.",
     "text": "Langtext",
     "title": "Titel",
     "tooltip": "Tooltip",

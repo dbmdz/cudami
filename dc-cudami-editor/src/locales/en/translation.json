@@ -122,6 +122,7 @@
     },
     "startPublicationDate": "Start of publication",
     "subcollections": "Sub collections",
+    "subcollectionSuccessfullyMoved": "The subcollection has been moved successfully to the selected collection.",
     "text": "Long text",
     "title": "Title",
     "tooltip": "Tooltip",
