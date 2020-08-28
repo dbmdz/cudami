@@ -1,19 +1,11 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi;
 
 import de.digitalcollections.cudami.server.backend.api.repository.PredicatesRepository;
-import de.digitalcollections.model.api.identifiable.Identifier;
-import de.digitalcollections.model.api.identifiable.Version;
-import de.digitalcollections.model.api.identifiable.entity.agent.Agent;
-import de.digitalcollections.model.api.identifiable.entity.work.Work;
 import de.digitalcollections.model.api.relations.Predicate;
-import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
-import de.digitalcollections.model.impl.identifiable.VersionImpl;
 import de.digitalcollections.model.impl.relations.PredicateImpl;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,11 +27,7 @@ public class PredicatesRepositoryImpl implements PredicatesRepository {
     Optional<Predicate> result =
         dbi.withHandle(
             h ->
-                h
-                    .createQuery(query)
-                    .bind("value", value)
-                    .mapToBean(PredicateImpl.class)
-                    .stream()
+                h.createQuery(query).bind("value", value).mapToBean(PredicateImpl.class).stream()
                     .map(Predicate.class::cast)
                     .findFirst());
     return result.orElse(null);
@@ -51,10 +39,7 @@ public class PredicatesRepositoryImpl implements PredicatesRepository {
     List<Predicate> result =
         dbi.withHandle(
             h ->
-                h
-                    .createQuery(query)
-                    .mapToBean(PredicateImpl.class)
-                    .stream()
+                h.createQuery(query).mapToBean(PredicateImpl.class).stream()
                     .map(Predicate.class::cast)
                     .collect(Collectors.toList()));
     return result;
@@ -71,16 +56,13 @@ public class PredicatesRepositoryImpl implements PredicatesRepository {
 
     if (existingPredicate != null) {
       // Update
-      String updateQuery = "UPDATE predicates SET"
-          + " label=:label::JSONB, description=:description::JSONB,"
-          + " created=:created, last_modified=:lastModified"
-          + " WHERE value=:value";
+      String updateQuery =
+          "UPDATE predicates SET"
+              + " label=:label::JSONB, description=:description::JSONB,"
+              + " created=:created, last_modified=:lastModified"
+              + " WHERE value=:value";
 
-      dbi.withHandle(
-          h ->
-              h.createUpdate(updateQuery)
-                  .bindBean(predicate)
-                  .execute());
+      dbi.withHandle(h -> h.createUpdate(updateQuery).bindBean(predicate).execute());
     } else {
       // Creation
       predicate.setCreated(predicate.getLastModified());
@@ -94,11 +76,7 @@ public class PredicatesRepositoryImpl implements PredicatesRepository {
               + " :created, :lastModified"
               + ")";
 
-      dbi.withHandle(
-          h ->
-              h.createUpdate(createQuery)
-                  .bindBean(predicate)
-                  .execute());
+      dbi.withHandle(h -> h.createUpdate(createQuery).bindBean(predicate).execute());
     }
 
     return predicate;
