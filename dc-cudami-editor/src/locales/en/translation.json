@@ -54,6 +54,7 @@
     "digitalObjects": "Digital objects",
     "dragAndDropImage": "Drag and drop file to upload here",
     "duplicateInformation": "If entries are selected multiple times, the duplicates are automatically removed when you click on \"$t(add)\".",
+    "edit": "edit",
     "editArticle": "Edit article",
     "editCollection": "Edit collection",
     "editCorporation": "Edit corporation",
@@ -96,6 +97,9 @@
     },
     "move": "Move",
     "moveSubcollections": "Move sub collection",
+    "moveTo": {
+      "collection": "move to another collection"
+    },
     "new": "New",
     "next": "Next",
     "no": "No",
@@ -104,6 +108,9 @@
     "numberOfRows": "Number of rows",
     "openLinkNewTab": "open in a new tab",
     "openLinkSameTab": "open in the same tab",
+    "removeFrom": {
+      "collection": "remove from collection"
+    },
     "removePreviewImageAfterSaveNotification": "Click \"$t(save)\" to confirm the deletion.",
     "save": "Save",
     "selectImage": {
@@ -128,6 +135,7 @@
       "url": "embedding an image from the internet by using a valid URL"
     },
     "uploadFileResource": "Upload a new file",
+    "view": "view",
     "warning": "Warning",
     "width": "Width",
     "yes": "Yes"

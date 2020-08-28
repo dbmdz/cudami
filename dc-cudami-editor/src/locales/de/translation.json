@@ -54,6 +54,7 @@
     "digitalObjects": "Digitalisate (Digitale Objekte)",
     "dragAndDropImage": "Datei zum Hochladen hier hereinziehen und ablegen",
     "duplicateInformation": "Werden Einträge mehrfach ausgewählt, so werden die Duplikate beim Klick auf \"$t(add)\" automatisch entfernt.",
+    "edit": "bearbeiten",
     "editArticle": "Artikel bearbeiten",
     "editCollection": "Sammlung bearbeiten",
     "editCorporation": "Institution bearbeiten",
@@ -96,6 +97,9 @@
     },
     "move": "Verschieben",
     "moveSubcollections": "Untergeordnete Sammlung verschieben",
+    "moveTo": {
+      "collection": "in andere Sammlung verschieben"
+    },
     "new": "Neu",
     "next": "Weiter",
     "no": "Nein",
@@ -104,6 +108,9 @@
     "numberOfRows": "Anzahl an Zeilen",
     "openLinkNewTab": "in einem neuen Tab öffnen",
     "openLinkSameTab": "im selben Tab öffnen",
+    "removeFrom": {
+      "collection": "aus Sammlung entfernen"
+    },
     "removePreviewImageAfterSaveNotification": "Klicken Sie auf \"$t(save)\", um die Löschung zu bestätigen.",
     "save": "Speichern",
     "selectImage": {
@@ -128,6 +135,7 @@
       "url": "Einbinden eines Bildes aus dem Internet durch Eingabe einer gültigen URL"
     },
     "uploadFileResource": "Neue Datei hochladen",
+    "view": "anzeigen",
     "warning": "Warnung",
     "width": "Breite",
     "yes": "Ja"

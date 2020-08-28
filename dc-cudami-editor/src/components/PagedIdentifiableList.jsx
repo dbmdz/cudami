@@ -241,6 +241,7 @@ class PagedIdentifiableList extends Component {
                 this.toggleModal('removeAttachedIdentifiable')
                 this.setState({removeIndex: index})
               }}
+              parentType={parentType}
               previewImage={identifiable.previewImage}
               previewImageRenderingHints={
                 identifiable.previewImageRenderingHints
