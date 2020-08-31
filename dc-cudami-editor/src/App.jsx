@@ -168,8 +168,13 @@ const App = () => {
             <Container>
               <PagedIdentifiableList
                 debug={true}
+                enableAdd={true}
+                enableMove={true}
+                enableRemove={true}
                 mockApi={true}
                 parentType={match.params.parentType}
+                showEdit={true}
+                showNew={true}
                 type={match.params.type}
                 uiLocale={uiLocale}
               />
