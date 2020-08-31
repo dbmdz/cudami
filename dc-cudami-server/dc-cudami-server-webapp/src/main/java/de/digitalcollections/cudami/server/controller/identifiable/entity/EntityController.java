@@ -150,7 +150,7 @@ public class EntityController<E extends Entity> {
       value = {"/latest/entities/relations", "/v3/entities/relations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
-  EntityRelation saveEntityRelation(@RequestBody EntityRelation entityRelation) {
-    return service.saveRelations(List.of(entityRelation)).get(0);
+  List<EntityRelation> saveEntityRelations(@RequestBody List<EntityRelation> entityRelations) {
+    return service.saveRelations(entityRelations);
   }
 }
