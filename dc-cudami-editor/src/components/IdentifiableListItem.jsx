@@ -1,7 +1,7 @@
 import React from 'react'
 import {Button, ButtonGroup, Col, ListGroupItem, Row} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
-import {FaExchangeAlt, FaEye, FaPencilAlt, FaTrash} from 'react-icons/fa'
+import {FaExchangeAlt, FaEye, FaPencilAlt, FaUnlink} from 'react-icons/fa'
 
 import {getImageUrl} from './utils'
 
@@ -94,7 +94,7 @@ const IdentifiableListItem = ({
                 onClick={onRemove}
                 title={t(`removeFrom.${parentType}`)}
               >
-                <FaTrash />
+                <FaUnlink />
               </Button>
             )}
           </ButtonGroup>
