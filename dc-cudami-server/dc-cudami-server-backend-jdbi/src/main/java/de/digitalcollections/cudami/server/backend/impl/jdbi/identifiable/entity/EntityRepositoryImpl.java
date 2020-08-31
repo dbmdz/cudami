@@ -53,7 +53,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   // select only what is shown/needed in paged list (to avoid unnecessary payload/traffic):
   private static final String REDUCED_FIND_ONE_BASE_SQL =
       "SELECT e.uuid e_uuid, e.refid e_refId, e.label e_label, e.description e_description,"
-          + " e.identifiable_type e_type, , e.entity_type e_entityType,"
+          + " e.identifiable_type e_type, e.entity_type e_entityType,"
           + " e.created e_created, e.last_modified e_lastModified,"
           + " e.preview_hints e_previewImageRenderingHints,"
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
@@ -493,7 +493,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     // as we store the whole list new: delete old entries
     dbi.withHandle(
         h ->
-            h.createUpdate("DELETE FROM rel_entity_entities WHERE entity_uuid = :uuid")
+            h.createUpdate("DELETE FROM rel_entity_entities WHERE subject_uuid = :uuid")
                 .bind("uuid", subjectUuid)
                 .execute());
 
