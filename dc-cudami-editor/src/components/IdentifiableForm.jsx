@@ -240,7 +240,7 @@ class IdentifiableForm extends Component {
     const {apiContextPath, debug, mockApi} = this.props
     return this.state.identifiable ? (
       <ApiContext.Provider value={{apiContextPath, mockApi}}>
-        <Container className="identifiable-editor">
+        <div className="identifiable-editor">
           {this.state.invalidLanguages.length > 0 && (
             <FormErrors invalidLanguages={this.state.invalidLanguages} />
           )}
@@ -285,7 +285,7 @@ class IdentifiableForm extends Component {
             isOpen={this.state.modalsOpen.tableAdder}
             onToggle={() => this.toggleModal('tableAdder')}
           />
-        </Container>
+        </div>
       </ApiContext.Provider>
     ) : null
   }

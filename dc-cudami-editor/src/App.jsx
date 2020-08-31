@@ -137,25 +137,29 @@ const App = () => {
         <Route
           path={`/:type(${availableTypes.join('|')})/new`}
           render={({match}) => (
-            <IdentifiableForm
-              activeLanguage="en"
-              debug={true}
-              mockApi={true}
-              type={match.params.type}
-            />
+            <Container>
+              <IdentifiableForm
+                activeLanguage="en"
+                debug={true}
+                mockApi={true}
+                type={match.params.type}
+              />
+            </Container>
           )}
         />
         <Route
           path={`/:type(${availableTypes.join('|')})/edit`}
           render={({match}) => (
-            <IdentifiableForm
-              activeLanguage="en"
-              debug={true}
-              existingLanguages={['en', 'de']}
-              mockApi={true}
-              type={match.params.type}
-              uuid="mock"
-            />
+            <Container>
+              <IdentifiableForm
+                activeLanguage="en"
+                debug={true}
+                existingLanguages={['en', 'de']}
+                mockApi={true}
+                type={match.params.type}
+                uuid="mock"
+              />
+            </Container>
           )}
         />
         <Route
