@@ -135,6 +135,10 @@
       "upload": "Auswählen und Hochladen eines Bildes von der lokalen Festplatte",
       "url": "Einbinden eines Bildes aus dem Internet durch Eingabe einer gültigen URL"
     },
+    "totalElements": {
+      "digitalObjects": "{{count}} Digitalisate gefunden",
+      "subcollections": "{{count}} Sammlungen gefunden"
+    },
     "uploadFileResource": "Neue Datei hochladen",
     "view": "anzeigen",
     "warning": "Warnung",

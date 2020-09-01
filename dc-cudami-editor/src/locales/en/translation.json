@@ -135,6 +135,10 @@
       "upload": "selecting and uploading an image from the local hard disk",
       "url": "embedding an image from the internet by using a valid URL"
     },
+    "totalElements": {
+      "digitalObjects": "found {{count}} digital objects",
+      "subcollections": "found {{count}} collections"
+    },
     "uploadFileResource": "Upload a new file",
     "view": "view",
     "warning": "Warning",
