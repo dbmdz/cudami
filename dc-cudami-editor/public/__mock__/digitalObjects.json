@@ -4,7 +4,20 @@
       "created": "2020-07-27T16:39:46.130817",
       "entityType": "DIGITAL_OBJECT",
       "fileResources": [],
-      "identifiers": [],
+      "identifiers": [
+        {
+          "id": "id1",
+          "identifiable": "2cae36aa-90b6-4001-b328-02d9acfb57ad",
+          "namespace": "ns1",
+          "uuid": "a5b00bf3-6462-4697-a7b7-99701859252b"
+        },
+        {
+          "id": "id2",
+          "identifiable": "2cae36aa-90b6-4001-b328-02d9acfb57ad",
+          "namespace": "ns2",
+          "uuid": "a5b00bf3-6462-4697-a7b7-99701859252b"
+        }
+      ],
       "label": {
         "en": "My first digital object"
       },
