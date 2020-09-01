@@ -42,6 +42,7 @@ class PagedIdentifiableList extends Component {
       numberOfPages: 0,
       pageNumber: 0,
       showSuccessfullyMoved: false,
+      totalElements: 0,
     }
   }
 
@@ -53,6 +54,7 @@ class PagedIdentifiableList extends Component {
       defaultLanguage,
       identifiables: content,
       numberOfPages: Math.ceil(totalElements / pageSize),
+      totalElements,
     })
   }
 
@@ -178,6 +180,7 @@ class PagedIdentifiableList extends Component {
       identifiables: content,
       numberOfPages: Math.ceil(totalElements / pageSize),
       pageNumber: selected,
+      totalElements,
     })
   }
 
@@ -232,7 +235,7 @@ class PagedIdentifiableList extends Component {
             breakClassName="page-item"
             breakLabel="&hellip;"
             breakLinkClassName="page-link"
-            containerClassName="pagination mb-2"
+            containerClassName="d-inline-flex mb-2 pagination"
             disabledClassName="disabled"
             forcePage={this.state.pageNumber}
             marginPagesDisplayed={1}
@@ -249,6 +252,9 @@ class PagedIdentifiableList extends Component {
             previousLinkClassName="page-link"
           />
         )}
+        <span className="ml-2">
+          {t(`totalElements.${type}s`, {count: this.state.totalElements})}
+        </span>
         <ListGroup className="identifiable-list">
           <ListGroupItem className="pb-0 pt-0">
             <Row className="font-weight-bold text-center">
@@ -307,7 +313,7 @@ class PagedIdentifiableList extends Component {
             breakClassName="page-item"
             breakLabel="&hellip;"
             breakLinkClassName="page-link"
-            containerClassName="pagination mt-2"
+            containerClassName="mt-2 pagination"
             disabledClassName="disabled"
             forcePage={this.state.pageNumber}
             marginPagesDisplayed={1}
