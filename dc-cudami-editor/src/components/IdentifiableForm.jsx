@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Container, Label} from 'reactstrap'
+import {Label} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
 import './IdentifiableForm.css'
