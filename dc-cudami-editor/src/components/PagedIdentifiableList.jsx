@@ -13,6 +13,7 @@ import {
   ApiContext,
   addAttachedIdentifiable,
   addAttachedIdentifiables,
+  getIdentifierTypes,
   loadAttachedIdentifiables,
   loadDefaultLanguage,
   removeAttachedIdentifiable,
@@ -26,6 +27,7 @@ class PagedIdentifiableList extends Component {
     super(props)
     this.state = {
       identifiables: [],
+      identifierTypes: [],
       modalsOpen: {
         addAttachedIdentifiables: false,
         moveAttachedIdentifiable: false,
@@ -40,11 +42,13 @@ class PagedIdentifiableList extends Component {
 
   async componentDidMount() {
     const {apiContextPath, mockApi} = this.props
+    const identifierTypes = await getIdentifierTypes(apiContextPath, mockApi)
     const {content, pageSize, totalElements} = await this.loadIdentifiables()
     const defaultLanguage = await loadDefaultLanguage(apiContextPath, mockApi)
     this.setState({
       defaultLanguage,
       identifiables: content,
+      identifierTypes,
       numberOfPages: Math.ceil(totalElements / pageSize),
       totalElements,
     })
@@ -195,6 +199,7 @@ class PagedIdentifiableList extends Component {
     const {
       defaultLanguage,
       identifiables,
+      identifierTypes,
       modalsOpen,
       numberOfPages,
       pageNumber,
@@ -340,6 +345,7 @@ class PagedIdentifiableList extends Component {
           <AddAttachedIdentifiablesModal
             action="add"
             defaultLanguage={defaultLanguage}
+            identifierTypes={identifierTypes}
             isOpen={modalsOpen.addAttachedIdentifiables}
             onSubmit={this.handleAdd}
             onToggle={() => this.toggleModal('addAttachedIdentifiables')}
@@ -350,6 +356,7 @@ class PagedIdentifiableList extends Component {
           <AddAttachedIdentifiablesModal
             action="move"
             defaultLanguage={defaultLanguage}
+            identifierTypes={identifierTypes}
             isOpen={modalsOpen.moveAttachedIdentifiable}
             maxElements={1}
             onSubmit={(identifiables) => this.handleMove(identifiables[0])}
