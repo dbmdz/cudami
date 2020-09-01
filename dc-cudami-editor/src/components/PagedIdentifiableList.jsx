@@ -282,6 +282,7 @@ class PagedIdentifiableList extends Component {
                 enableMove={enableMove}
                 enableRemove={enableRemove}
                 identifiers={identifiable.identifiers}
+                identifierTypes={identifierTypes}
                 index={index + 1 + pageNumber * this.pageSize}
                 key={index}
                 label={

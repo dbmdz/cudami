@@ -10,6 +10,7 @@ const IdentifiableListItem = ({
   enableMove,
   enableRemove,
   identifiers,
+  identifierTypes,
   index,
   label,
   lastModified,
@@ -53,10 +54,11 @@ const IdentifiableListItem = ({
       <td>
         <ul className="list-inline">
           {identifiers.map(({id, namespace}) => (
-            <li
-              className="list-inline-item"
-              key={`${namespace}:${id}`}
-            >{`${namespace}:${id}`}</li>
+            <li className="list-inline-item" key={`${namespace}:${id}`}>{`${
+              identifierTypes.find(
+                (identifierType) => identifierType.namespace === namespace
+              )?.label ?? namespace
+            }: ${id}`}</li>
           ))}
         </ul>
       </td>
