@@ -60,6 +60,7 @@ class IdentifierSearch extends Component {
               <Row>
                 <Col md="1">
                   <img
+                    alt=""
                     className="img-fluid"
                     src={getImageUrl(result.previewImage, '50,')}
                   />

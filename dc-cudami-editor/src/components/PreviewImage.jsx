@@ -131,7 +131,7 @@ const PreviewImage = ({
       <CardBody className="p-1">
         <figure className="mb-0">
           <img
-            alt={altText?.[language]}
+            alt={altText?.[language] ?? ''}
             className="mw-100"
             src={getImageUrl(previewImage, '200,')}
             title={title?.[language]}

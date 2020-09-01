@@ -35,7 +35,7 @@ const IdentifiableListItem = ({
         <Col className="border-right pb-1 pt-1 text-center" md="1">
           <figure className="mb-0">
             <img
-              alt={altText?.[uiLocale]}
+              alt={altText?.[uiLocale] ?? ''}
               src={
                 previewImage
                   ? getImageUrl(previewImage, `${previewImageWidth},`)

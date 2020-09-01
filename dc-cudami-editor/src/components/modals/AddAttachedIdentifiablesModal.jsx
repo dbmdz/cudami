@@ -169,6 +169,7 @@ class AddAttachedIdentifiablesModal extends Component {
                     <Row>
                       <Col className="text-center" md="2">
                         <img
+                          alt=""
                           className="img-fluid"
                           src={
                             previewImage
