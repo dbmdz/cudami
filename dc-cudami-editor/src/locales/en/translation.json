@@ -73,6 +73,7 @@
       "redo": "Redo last undone change",
       "undo": "Undo last change"
     },
+    "identifiers": "Identifiers",
     "imageLink": "Image link",
     "insert": {
       "footnote": "Insert footnote",

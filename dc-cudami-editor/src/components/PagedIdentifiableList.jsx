@@ -265,6 +265,7 @@ class PagedIdentifiableList extends Component {
                 <FaImage />
               </th>
               <th>{t('label')}</th>
+              <th>{t('identifiers')}</th>
               <th className="text-center">{t('lastModified')}</th>
               <th className="text-center">{t('actions')}</th>
             </tr>
@@ -275,6 +276,7 @@ class PagedIdentifiableList extends Component {
                 apiContextPath={apiContextPath}
                 enableMove={enableMove}
                 enableRemove={enableRemove}
+                identifiers={identifiable.identifiers}
                 index={index + 1 + pageNumber * this.pageSize}
                 key={index}
                 label={
