@@ -28,7 +28,7 @@ import {
 import '../polyfills'
 
 class PagedIdentifiableList extends Component {
-  pageSize = 5
+  pageSize = 20
 
   constructor(props) {
     super(props)
