@@ -4,7 +4,7 @@ import {render} from 'react-dom'
 
 import EditButton from '../../components/EditButton'
 
-class IframeView {
+class ImageView {
   constructor(node, view, getPos) {
     const {alignment, altText, caption, title, url, width} = node.attrs
     const dom = document.createElement('prosemirror-image')
@@ -75,4 +75,4 @@ class IframeView {
   }
 }
 
-export default IframeView
+export default ImageView
