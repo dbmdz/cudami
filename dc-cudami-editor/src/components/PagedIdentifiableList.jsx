@@ -226,6 +226,29 @@ class PagedIdentifiableList extends Component {
             {t(`${type}SuccessfullyMoved`)}
           </Alert>
         )}
+        {this.state.identifiables.length > 0 && (
+          <ReactPaginate
+            activeClassName="active"
+            breakClassName="page-item"
+            breakLabel="&hellip;"
+            breakLinkClassName="page-link"
+            containerClassName="pagination mb-2"
+            disabledClassName="disabled"
+            forcePage={this.state.pageNumber}
+            marginPagesDisplayed={1}
+            nextClassName="page-item"
+            nextLabel="&raquo;"
+            nextLinkClassName="page-link"
+            onPageChange={this.updatePage}
+            pageClassName="page-item"
+            pageCount={this.state.numberOfPages}
+            pageLinkClassName="page-link"
+            pageRangeDisplayed={5}
+            previousClassName="page-item"
+            previousLabel="&laquo;"
+            previousLinkClassName="page-link"
+          />
+        )}
         <ListGroup className="identifiable-list">
           <ListGroupItem className="pb-0 pt-0">
             <Row className="font-weight-bold text-center">
