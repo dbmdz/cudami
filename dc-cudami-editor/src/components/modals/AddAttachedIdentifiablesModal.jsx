@@ -20,7 +20,7 @@ import {FaTrash} from 'react-icons/fa'
 import Autocomplete from '../Autocomplete'
 import IdentifierSearch from '../IdentifierSearch'
 import {getImageUrl} from '../utils'
-import {ApiContext, getIdentifierTypes, searchIdentifiables} from '../../api'
+import {ApiContext, searchIdentifiables} from '../../api'
 
 class AddAttachedIdentifiablesModal extends Component {
   fixedOptions = ['label']
@@ -29,19 +29,8 @@ class AddAttachedIdentifiablesModal extends Component {
     super(props)
     this.state = {
       identifiables: [],
-      identifierTypes: [],
       selectedOption: 0,
     }
-  }
-
-  async componentDidMount() {
-    const identifierTypes = await getIdentifierTypes(
-      this.context.apiContextPath,
-      this.context.mockApi
-    )
-    this.setState({
-      identifierTypes,
-    })
   }
 
   addIdentifiableToList = (identifiable) => {
@@ -69,13 +58,14 @@ class AddAttachedIdentifiablesModal extends Component {
     const {
       action,
       defaultLanguage,
+      identifierTypes,
       isOpen,
       maxElements,
       onSubmit,
       t,
       type,
     } = this.props
-    const {identifiables, identifierTypes, selectedOption} = this.state
+    const {identifiables, selectedOption} = this.state
     const previewImageWidth = 50
     const showAutocomplete = selectedOption < this.fixedOptions.length
     const showInputFields =
