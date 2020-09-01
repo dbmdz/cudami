@@ -9,6 +9,7 @@ const IdentifiableListItem = ({
   apiContextPath,
   enableMove,
   enableRemove,
+  identifiers,
   index,
   label,
   lastModified,
@@ -48,6 +49,16 @@ const IdentifiableListItem = ({
       </td>
       <td>
         <a href={viewUrl}>{label}</a>
+      </td>
+      <td>
+        <ul className="list-inline">
+          {identifiers.map(({id, namespace}) => (
+            <li
+              className="list-inline-item"
+              key={`${namespace}:${id}`}
+            >{`${namespace}:${id}`}</li>
+          ))}
+        </ul>
       </td>
       <td className="text-center">
         {new Date(lastModified).toLocaleString(uiLocale, {hour12: false})}
