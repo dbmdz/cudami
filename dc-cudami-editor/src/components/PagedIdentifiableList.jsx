@@ -1,14 +1,6 @@
 import uniqBy from 'lodash/uniqBy'
 import React, {Component} from 'react'
-import {
-  Alert,
-  Button,
-  Col,
-  Label,
-  ListGroup,
-  ListGroupItem,
-  Row,
-} from 'reactstrap'
+import {Alert, Button, Col, Label, Row, Table} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 import {FaHashtag, FaImage} from 'react-icons/fa'
 import ReactPaginate from 'react-paginate'
@@ -200,6 +192,14 @@ class PagedIdentifiableList extends Component {
       type,
       uiLocale,
     } = this.props
+    const {
+      defaultLanguage,
+      identifiables,
+      modalsOpen,
+      numberOfPages,
+      pageNumber,
+      showSuccessfullyMoved,
+    } = this.state
     return (
       <ApiContext.Provider value={{apiContextPath, mockApi}}>
         <Row>
@@ -224,7 +224,7 @@ class PagedIdentifiableList extends Component {
             )}
           </Col>
         </Row>
-        {this.state.showSuccessfullyMoved && (
+        {showSuccessfullyMoved && (
           <Alert className="mb-2" color="info">
             {t(`${type}SuccessfullyMoved`)}
           </Alert>
@@ -255,59 +255,55 @@ class PagedIdentifiableList extends Component {
         <span className="ml-2">
           {t(`totalElements.${type}s`, {count: this.state.totalElements})}
         </span>
-        <ListGroup className="identifiable-list">
-          <ListGroupItem className="pb-0 pt-0">
-            <Row className="font-weight-bold text-center">
-              <Col className="border-right pb-2 pt-2 text-right" md="1">
+        <Table bordered hover responsive size="sm" striped>
+          <thead>
+            <tr>
+              <th className="text-right">
                 <FaHashtag />
-              </Col>
-              <Col className="border-right pb-2 pt-2" md="1">
+              </th>
+              <th className="text-center">
                 <FaImage />
-              </Col>
-              <Col className="border-right pb-2 pt-2" md="7">
-                {t('label')}
-              </Col>
-              <Col className="border-right pb-2 pt-2" md="2">
-                {t('lastModified')}
-              </Col>
-              <Col className="pb-2 pt-2" md="1">
-                {t('actions')}
-              </Col>
-            </Row>
-          </ListGroupItem>
-          {this.state.identifiables.map((identifiable, index) => (
-            <IdentifiableListItem
-              apiContextPath={apiContextPath}
-              enableMove={enableMove}
-              enableRemove={enableRemove}
-              index={index + 1 + this.state.pageNumber * this.pageSize}
-              key={index}
-              label={
-                identifiable.label[this.state.defaultLanguage] ??
-                Object.values(identifiable.label)[0]
-              }
-              lastModified={identifiable.lastModified}
-              onMove={() => {
-                this.toggleModal('moveAttachedIdentifiable')
-                this.setState({moveIndex: index})
-              }}
-              onRemove={() => {
-                this.toggleModal('removeAttachedIdentifiable')
-                this.setState({removeIndex: index})
-              }}
-              parentType={parentType}
-              previewImage={identifiable.previewImage}
-              previewImageRenderingHints={
-                identifiable.previewImageRenderingHints
-              }
-              showEdit={showEdit}
-              type={type}
-              uiLocale={uiLocale}
-              uuid={identifiable.uuid}
-            />
-          ))}
-        </ListGroup>
-        {this.state.identifiables.length > 0 && (
+              </th>
+              <th>{t('label')}</th>
+              <th className="text-center">{t('lastModified')}</th>
+              <th className="text-center">{t('actions')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {identifiables.map((identifiable, index) => (
+              <IdentifiableListItem
+                apiContextPath={apiContextPath}
+                enableMove={enableMove}
+                enableRemove={enableRemove}
+                index={index + 1 + pageNumber * this.pageSize}
+                key={index}
+                label={
+                  identifiable.label[defaultLanguage] ??
+                  Object.values(identifiable.label)[0]
+                }
+                lastModified={identifiable.lastModified}
+                onMove={() => {
+                  this.toggleModal('moveAttachedIdentifiable')
+                  this.setState({moveIndex: index})
+                }}
+                onRemove={() => {
+                  this.toggleModal('removeAttachedIdentifiable')
+                  this.setState({removeIndex: index})
+                }}
+                parentType={parentType}
+                previewImage={identifiable.previewImage}
+                previewImageRenderingHints={
+                  identifiable.previewImageRenderingHints
+                }
+                showEdit={showEdit}
+                type={type}
+                uiLocale={uiLocale}
+                uuid={identifiable.uuid}
+              />
+            ))}
+          </tbody>
+        </Table>
+        {identifiables.length > 0 && (
           <ReactPaginate
             activeClassName="active"
             breakClassName="page-item"
@@ -315,14 +311,14 @@ class PagedIdentifiableList extends Component {
             breakLinkClassName="page-link"
             containerClassName="mt-2 pagination"
             disabledClassName="disabled"
-            forcePage={this.state.pageNumber}
+            forcePage={pageNumber}
             marginPagesDisplayed={1}
             nextClassName="page-item"
             nextLabel="&raquo;"
             nextLinkClassName="page-link"
             onPageChange={this.updatePage}
             pageClassName="page-item"
-            pageCount={this.state.numberOfPages}
+            pageCount={numberOfPages}
             pageLinkClassName="page-link"
             pageRangeDisplayed={5}
             previousClassName="page-item"
@@ -334,15 +330,15 @@ class PagedIdentifiableList extends Component {
           <>
             <Label className="font-weight-bold mt-3">JSON (debug)</Label>
             <pre className="border">
-              <code>{JSON.stringify(this.state.identifiables, null, 4)}</code>
+              <code>{JSON.stringify(identifiables, null, 4)}</code>
             </pre>
           </>
         )}
         {enableAdd && (
           <AddAttachedIdentifiablesModal
             action="add"
-            defaultLanguage={this.state.defaultLanguage}
-            isOpen={this.state.modalsOpen.addAttachedIdentifiables}
+            defaultLanguage={defaultLanguage}
+            isOpen={modalsOpen.addAttachedIdentifiables}
             onSubmit={this.handleAdd}
             onToggle={() => this.toggleModal('addAttachedIdentifiables')}
             type={type}
@@ -351,8 +347,8 @@ class PagedIdentifiableList extends Component {
         {enableMove && (
           <AddAttachedIdentifiablesModal
             action="move"
-            defaultLanguage={this.state.defaultLanguage}
-            isOpen={this.state.modalsOpen.moveAttachedIdentifiable}
+            defaultLanguage={defaultLanguage}
+            isOpen={modalsOpen.moveAttachedIdentifiable}
             maxElements={1}
             onSubmit={(identifiables) => this.handleMove(identifiables[0])}
             onToggle={() => this.toggleModal('moveAttachedIdentifiable')}
@@ -361,7 +357,7 @@ class PagedIdentifiableList extends Component {
         )}
         {enableRemove && (
           <RemoveAttachedIdentifiableModal
-            isOpen={this.state.modalsOpen.removeAttachedIdentifiable}
+            isOpen={modalsOpen.removeAttachedIdentifiable}
             onConfirm={this.handleRemove}
             onToggle={() => this.toggleModal('removeAttachedIdentifiable')}
             parentType={parentType}
