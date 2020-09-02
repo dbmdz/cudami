@@ -228,4 +228,18 @@ public class ProjectController {
     }
     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
+
+  @ApiMethod(
+      description = "Remove an existing project and the identifiers, which belong to this project")
+  @DeleteMapping(
+      value = {"/latest/projects/{uuid}", "/v3/projects/{uuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public ResponseEntity removeProject(
+      @ApiPathParam(description = "UUID of the project") @PathVariable("uuid") UUID uuid) {
+
+    projectService.delete(uuid);
+
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
 }
