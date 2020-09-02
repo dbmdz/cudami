@@ -4,7 +4,7 @@ import Autosuggest from 'react-autosuggest'
 import {withTranslation} from 'react-i18next'
 
 import './Autocomplete.css'
-import {getImageUrl} from './utils'
+import PreviewImage from './PreviewImage'
 import {ApiContext} from '../api'
 
 class Autocomplete extends Component {
@@ -78,20 +78,15 @@ class Autocomplete extends Component {
     )
   }
 
-  renderSuggestion = ({label, previewImage}) => {
-    const previewImageWidth = 50
+  renderSuggestion = ({label, previewImage, previewImageRenderingHints}) => {
     return (
       <Row>
         <Col md="1">
-          <img
-            alt=""
-            className="img-fluid"
-            src={
-              previewImage
-                ? getImageUrl(previewImage, `${previewImageWidth},`)
-                : `${this.context.apiContextPath}images/no-image.png`
-            }
-            style={{maxWidth: `${previewImageWidth}px`}}
+          <PreviewImage
+            image={previewImage}
+            language={this.props.defaultLanguage}
+            renderingHints={previewImageRenderingHints}
+            width={50}
           />
         </Col>
         <Col className="text-left" md="11">

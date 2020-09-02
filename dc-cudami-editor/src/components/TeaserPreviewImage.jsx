@@ -11,7 +11,7 @@ import {
 import {useTranslation} from 'react-i18next'
 import {FaEdit, FaPlus, FaTrashAlt} from 'react-icons/fa'
 
-import {getImageUrl} from './utils'
+import PreviewImage from './PreviewImage'
 
 const handleClick = (
   currentPreviewImage,
@@ -125,19 +125,16 @@ const TeaserPreviewImage = ({
       </Card>
     )
   }
-  const {altText, caption, title} = previewImageRenderingHints
   return (
     <Card className="rounded text-center">
       <CardBody className="p-1">
-        <figure className="mb-0">
-          <img
-            alt={altText?.[language] ?? ''}
-            className="mw-100"
-            src={getImageUrl(previewImage, '200,')}
-            title={title?.[language]}
-          />
-          {caption?.[language] && <figcaption>{caption[language]}</figcaption>}
-        </figure>
+        <PreviewImage
+          image={previewImage}
+          language={language}
+          renderingHints={previewImageRenderingHints}
+          showCaption={true}
+          width={200}
+        />
         <ButtonGroup className="mt-1">
           <Button
             color="light"

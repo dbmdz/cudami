@@ -279,6 +279,7 @@ class PagedIdentifiableList extends Component {
             {identifiables.map((identifiable, index) => (
               <IdentifiableListItem
                 apiContextPath={apiContextPath}
+                defaultLanguage={defaultLanguage}
                 enableMove={enableMove}
                 enableRemove={enableRemove}
                 identifiers={identifiable.identifiers}
