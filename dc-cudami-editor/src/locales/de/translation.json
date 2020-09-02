@@ -4,7 +4,6 @@
     "add": "Hinzufügen",
     "addDigitalObjects": "Digitalisate hinzufügen",
     "addLanguage": "Sprache hinzufügen",
-    "addPreviewImage": "Vorschaubild hinzufügen",
     "addSubcollections": "Untergeordnete Sammlungen hinzufügen",
     "alignment": "Ausrichtung",
     "alignmentLeft": "links (mit Textumlauf)",
@@ -59,6 +58,7 @@
     "editCollection": "Sammlung bearbeiten",
     "editCorporation": "Institution bearbeiten",
     "editFileResource": "Datei \"{{ name }}\" bearbeiten",
+    "editPreviewImage": "Vorschaubild bearbeiten",
     "editProject": "Projekt bearbeiten",
     "editSubtopic": "Unterthema bearbeiten",
     "editTopic": "Thema bearbeiten",
@@ -78,7 +78,10 @@
       "footnote": "Fußnote einfügen",
       "hr": "Horizontale Linie einfügen",
       "iframe": "Iframe einfügen",
-      "image": "Bild einfügen",
+      "image": {
+        "edit": "Bild bearbeiten",
+        "new": "Bild einfügen"
+      },
       "table": "Tabelle einfügen"
     },
     "insertLink": "Verlinkung einfügen",
@@ -120,6 +123,7 @@
       "useUpload": "Bild hochladen",
       "useUrl": "Bild per Weblink einbinden"
     },
+    "setPreviewImage": "Vorschaubild festlegen",
     "startPublicationDate": "Start-Publikationsdatum",
     "subcollections": "Untergeordnete Sammlungen",
     "subcollectionSuccessfullyMoved": "Die untergeordnete Sammlung wurde erfolgreich in die gewählte Sammlung verschoben.",

@@ -4,7 +4,6 @@
     "add": "Add",
     "addDigitalObjects": "Add digital objects",
     "addLanguage": "Add language",
-    "addPreviewImage": "Add preview image",
     "addSubcollections": "Add sub collections",
     "alignment": "Alignment",
     "alignmentLeft": "left (with text wrapping)",
@@ -59,6 +58,7 @@
     "editCollection": "Edit collection",
     "editCorporation": "Edit corporation",
     "editFileResource": "Edit file \"{{ name }}\"",
+    "editPreviewImage": "Edit preview image",
     "editProject": "Edit project",
     "editSubtopic": "Edit subtopic",
     "editTopic": "Edit topic",
@@ -78,7 +78,10 @@
       "footnote": "Insert footnote",
       "hr": "Insert horizontal rule",
       "iframe": "Insert iframe",
-      "image": "Insert image",
+      "image": {
+        "edit": "Edit image",
+        "new": "Insert image"
+      },
       "table": "Insert table"
     },
     "insertLink": "Insert hyperlink",
@@ -120,6 +123,7 @@
       "useUpload": "Upload image",
       "useUrl": "Integrate image via web link"
     },
+    "setPreviewImage": "Set preview image",
     "startPublicationDate": "Start of publication",
     "subcollections": "Sub collections",
     "subcollectionSuccessfullyMoved": "The subcollection has been moved successfully to the selected collection.",

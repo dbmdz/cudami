@@ -186,7 +186,11 @@ class ImageAdderModal extends Component {
     } = this.state.attributes
     return (
       <Modal isOpen={isOpen} size="lg" toggle={this.destroy}>
-        <ModalHeader toggle={this.destroy}>{t('insert.image')}</ModalHeader>
+        <ModalHeader toggle={this.destroy}>
+          {this.state.showImageSelector
+            ? t('insert.image.new')
+            : t('insert.image.edit')}
+        </ModalHeader>
         <ModalBody>
           <Form
             onSubmit={async (evt) => {
