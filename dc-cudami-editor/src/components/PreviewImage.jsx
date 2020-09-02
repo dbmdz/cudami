@@ -110,7 +110,7 @@ const PreviewImage = ({
               )
             }}
             tag="a"
-            title={t('addPreviewImage')}
+            title={t('setPreviewImage')}
           >
             <FaPlus />
           </Button>

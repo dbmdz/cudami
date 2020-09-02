@@ -193,7 +193,11 @@ class PreviewImageAdderModal extends Component {
     const {altText, caption, linkNewTab, linkUrl, title} = this.state.attributes
     return (
       <Modal isOpen={isOpen} size="lg" toggle={this.destroy}>
-        <ModalHeader toggle={this.destroy}>Set preview image</ModalHeader>
+        <ModalHeader toggle={this.destroy}>
+          {this.state.showImageSelector
+            ? t('setPreviewImage')
+            : t('editPreviewImage')}
+        </ModalHeader>
         <ModalBody>
           <Form
             onSubmit={async (evt) => {
