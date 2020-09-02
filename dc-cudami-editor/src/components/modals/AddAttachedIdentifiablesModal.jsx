@@ -19,7 +19,7 @@ import {FaTrash} from 'react-icons/fa'
 
 import Autocomplete from '../Autocomplete'
 import IdentifierSearch from '../IdentifierSearch'
-import {getImageUrl} from '../utils'
+import PreviewImage from '../PreviewImage'
 import {ApiContext, searchIdentifiables} from '../../api'
 
 class AddAttachedIdentifiablesModal extends Component {
@@ -66,7 +66,6 @@ class AddAttachedIdentifiablesModal extends Component {
       type,
     } = this.props
     const {identifiables, selectedOption} = this.state
-    const previewImageWidth = 50
     const showAutocomplete = selectedOption < this.fixedOptions.length
     const showInputFields =
       maxElements === undefined || identifiables.length < maxElements
@@ -154,45 +153,43 @@ class AddAttachedIdentifiablesModal extends Component {
                     {t('duplicateInformation')}
                   </Alert>
                 )}
-                {identifiables.map(({label, previewImage, uuid}, index) => (
-                  <ListGroupItem key={uuid}>
-                    <Row>
-                      <Col className="text-center" md="2">
-                        <img
-                          alt=""
-                          className="img-fluid"
-                          src={
-                            previewImage
-                              ? getImageUrl(
-                                  previewImage,
-                                  `${previewImageWidth},`
-                                )
-                              : `${this.context.apiContextPath}images/no-image.png`
-                          }
-                          style={{maxWidth: `${previewImageWidth}px`}}
-                        />
-                      </Col>
-                      <Col md="9">
-                        {label[defaultLanguage] ?? Object.values(label)[0]}
-                      </Col>
-                      <Col className="text-right" md="1">
-                        <Button
-                          className="p-0"
-                          color="link"
-                          onClick={() =>
-                            this.setState({
-                              identifiables: this.removeIdentifiableFromList(
-                                index
-                              ),
-                            })
-                          }
-                        >
-                          <FaTrash />
-                        </Button>
-                      </Col>
-                    </Row>
-                  </ListGroupItem>
-                ))}
+                {identifiables.map(
+                  (
+                    {label, previewImage, previewImageRenderingHints, uuid},
+                    index
+                  ) => (
+                    <ListGroupItem key={uuid}>
+                      <Row>
+                        <Col className="text-center" md="2">
+                          <PreviewImage
+                            image={previewImage}
+                            language={defaultLanguage}
+                            renderingHints={previewImageRenderingHints}
+                            width={50}
+                          />
+                        </Col>
+                        <Col md="9">
+                          {label[defaultLanguage] ?? Object.values(label)[0]}
+                        </Col>
+                        <Col className="text-right" md="1">
+                          <Button
+                            className="p-0"
+                            color="link"
+                            onClick={() =>
+                              this.setState({
+                                identifiables: this.removeIdentifiableFromList(
+                                  index
+                                ),
+                              })
+                            }
+                          >
+                            <FaTrash />
+                          </Button>
+                        </Col>
+                      </Row>
+                    </ListGroupItem>
+                  )
+                )}
               </ListGroup>
             )}
             <Button

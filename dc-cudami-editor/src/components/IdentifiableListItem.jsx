@@ -3,10 +3,11 @@ import {Button, ButtonGroup} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 import {FaExchangeAlt, FaEye, FaPencilAlt, FaUnlink} from 'react-icons/fa'
 
-import {getImageUrl} from './utils'
+import PreviewImage from './PreviewImage'
 
 const IdentifiableListItem = ({
   apiContextPath,
+  defaultLanguage,
   enableMove,
   enableRemove,
   identifiers,
@@ -24,27 +25,18 @@ const IdentifiableListItem = ({
   uiLocale,
   uuid,
 }) => {
-  const {altText, title, caption} = previewImageRenderingHints
-  const previewImageWidth = 30
   const {t} = useTranslation()
   const viewUrl = `${apiContextPath}${type.toLowerCase()}s/${uuid}`
   return (
     <tr>
       <td className="text-right">{index}</td>
       <td className="text-center">
-        <figure className="mb-0">
-          <img
-            alt={altText?.[uiLocale] ?? ''}
-            src={
-              previewImage
-                ? getImageUrl(previewImage, `${previewImageWidth},`)
-                : `${apiContextPath}images/no-image.png`
-            }
-            style={{maxWidth: `${previewImageWidth}px`}}
-            title={title?.[uiLocale]}
-          />
-          {caption?.[uiLocale] && <figcaption>{caption[uiLocale]}</figcaption>}
-        </figure>
+        <PreviewImage
+          image={previewImage}
+          language={defaultLanguage}
+          renderingHints={previewImageRenderingHints}
+          width={30}
+        />
       </td>
       <td>
         <a href={viewUrl}>{label}</a>
