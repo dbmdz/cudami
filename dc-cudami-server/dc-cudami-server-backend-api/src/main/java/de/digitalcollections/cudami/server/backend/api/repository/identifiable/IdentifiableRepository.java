@@ -28,4 +28,6 @@ public interface IdentifiableRepository<I extends Identifiable> {
   I save(I identifiable);
 
   I update(I identifiable);
+
+  void delete(UUID uuid);
 }

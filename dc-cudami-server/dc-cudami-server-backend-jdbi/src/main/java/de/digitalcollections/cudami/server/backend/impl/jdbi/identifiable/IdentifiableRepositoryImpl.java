@@ -356,6 +356,15 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   @Override
+  public void delete(UUID uuid) {
+    dbi.withHandle(
+        h ->
+            h.createUpdate("DELETE FROM identifiables WHERE uuid = :uuid")
+                .bind("uuid", uuid)
+                .execute());
+  }
+
+  @Override
   protected String[] getAllowedOrderByFields() {
     return new String[] {"created", "lastModified", "type"};
   }

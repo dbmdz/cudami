@@ -21,4 +21,6 @@ public interface IdentifierRepository {
   Identifier save(Identifier identifier);
 
   Identifier update(Identifier identifier);
+
+  void delete(UUID uuid);
 }

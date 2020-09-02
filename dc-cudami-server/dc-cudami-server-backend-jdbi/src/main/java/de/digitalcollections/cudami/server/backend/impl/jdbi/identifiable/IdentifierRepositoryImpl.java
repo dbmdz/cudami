@@ -124,6 +124,15 @@ public class IdentifierRepositoryImpl extends AbstractPagingAndSortingRepository
   }
 
   @Override
+  public void delete(UUID uuid) {
+    dbi.withHandle(
+        h ->
+            h.createUpdate("DELETE FROM identifiers WHERE uuid = :uuid")
+                .bind("uuid", uuid)
+                .execute());
+  }
+
+  @Override
   protected String[] getAllowedOrderByFields() {
     return new String[] {"identifiable", "namespace", "id"};
   }

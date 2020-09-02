@@ -5,6 +5,7 @@ import de.digitalcollections.model.api.identifiable.entity.Project;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.List;
+import java.util.UUID;
 
 public interface ProjectService extends EntityService<Project> {
 
@@ -17,4 +18,6 @@ public interface ProjectService extends EntityService<Project> {
   boolean removeDigitalObject(Project project, DigitalObject digitalObject);
 
   boolean saveDigitalObjects(Project project, List<DigitalObject> digitalObjects);
+
+  void delete(UUID uuid);
 }
