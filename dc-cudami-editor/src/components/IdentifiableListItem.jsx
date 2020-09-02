@@ -30,9 +30,7 @@ const IdentifiableListItem = ({
   const viewUrl = `${apiContextPath}${type.toLowerCase()}s/${uuid}`
   return (
     <tr>
-      <td className="text-right">
-        {index}
-      </td>
+      <td className="text-right">{index}</td>
       <td className="text-center">
         <figure className="mb-0">
           <img
