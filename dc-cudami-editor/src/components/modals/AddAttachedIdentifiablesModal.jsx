@@ -154,8 +154,8 @@ class AddAttachedIdentifiablesModal extends Component {
                     {t('duplicateInformation')}
                   </Alert>
                 )}
-                {identifiables.map(({label, previewImage}, index) => (
-                  <ListGroupItem key={index}>
+                {identifiables.map(({label, previewImage, uuid}, index) => (
+                  <ListGroupItem key={uuid}>
                     <Row>
                       <Col className="text-center" md="2">
                         <img

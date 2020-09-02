@@ -51,8 +51,8 @@ const IdentifiableListItem = ({
       </td>
       <td>
         <ul className="list-inline mb-0">
-          {identifiers.map(({id, namespace}, index) => (
-            <li className="list-inline-item" key={index}>{`${
+          {identifiers.map(({id, namespace}) => (
+            <li className="list-inline-item" key={`${namespace}:${id}`}>{`${
               identifierTypes.find(
                 (identifierType) => identifierType.namespace === namespace
               )?.label ?? namespace
