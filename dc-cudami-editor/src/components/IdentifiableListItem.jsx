@@ -30,7 +30,7 @@ const IdentifiableListItem = ({
   const viewUrl = `${apiContextPath}${type.toLowerCase()}s/${uuid}`
   return (
     <tr>
-      <td className="text-right" scope="row">
+      <td className="text-right">
         {index}
       </td>
       <td className="text-center">
@@ -52,9 +52,9 @@ const IdentifiableListItem = ({
         <a href={viewUrl}>{label}</a>
       </td>
       <td>
-        <ul className="list-inline">
-          {identifiers.map(({id, namespace}) => (
-            <li className="list-inline-item" key={`${namespace}:${id}`}>{`${
+        <ul className="list-inline mb-0">
+          {identifiers.map(({id, namespace}, index) => (
+            <li className="list-inline-item" key={index}>{`${
               identifierTypes.find(
                 (identifierType) => identifierType.namespace === namespace
               )?.label ?? namespace
