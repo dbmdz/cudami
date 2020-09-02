@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import {Label} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
+import './common.css'
 import './IdentifiableForm.css'
 import ArticleForm from './ArticleForm'
 import CollectionForm from './CollectionForm'

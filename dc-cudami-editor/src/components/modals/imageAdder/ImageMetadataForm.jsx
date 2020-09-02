@@ -49,10 +49,10 @@ const ImageMetadataForm = ({
               <Input
                 name="caption"
                 onChange={(evt) => onChange('caption', evt.target.value)}
-                placeholder={t('caption')}
                 type="text"
                 value={caption}
               />
+              <span className="floating-label">{t('caption')}</span>
               <InputGroupAddon addonType="append">
                 <InputGroupText>
                   <FaQuestionCircle
@@ -74,10 +74,10 @@ const ImageMetadataForm = ({
               <Input
                 name="title"
                 onChange={(evt) => onChange('title', evt.target.value)}
-                placeholder={t('tooltip')}
                 type="text"
                 value={title}
               />
+              <span className="floating-label">{t('tooltip')}</span>
               <InputGroupAddon addonType="append">
                 <InputGroupText>
                   <FaQuestionCircle
@@ -99,10 +99,10 @@ const ImageMetadataForm = ({
               <Input
                 name="altText"
                 onChange={(evt) => onChange('altText', evt.target.value)}
-                placeholder={t('altText')}
                 type="text"
                 value={altText}
               />
+              <span className="floating-label">{t('altText')}</span>
               <InputGroupAddon addonType="append">
                 <InputGroupText>
                   <FaQuestionCircle
