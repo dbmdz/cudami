@@ -86,7 +86,7 @@ const updateRenderingHints = (
   return renderingHints
 }
 
-const PreviewImage = ({
+const TeaserPreviewImage = ({
   language,
   onUpdate,
   previewImage,
@@ -172,4 +172,4 @@ const PreviewImage = ({
   )
 }
 
-export default PreviewImage
+export default TeaserPreviewImage
