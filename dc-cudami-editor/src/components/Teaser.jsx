@@ -3,7 +3,7 @@ import {Card, CardBody, Col, Row} from 'reactstrap'
 
 import FormEditor from './FormEditor'
 import FormLabelInput from './FormLabelInput'
-import PreviewImage from './PreviewImage'
+import TeaserPreviewImage from './TeaserPreviewImage'
 
 const Teaser = ({
   description,
@@ -19,7 +19,7 @@ const Teaser = ({
       <CardBody>
         <Row>
           <Col sm="2">
-            <PreviewImage
+            <TeaserPreviewImage
               language={language}
               previewImage={previewImage}
               previewImageRenderingHints={previewImageRenderingHints}
