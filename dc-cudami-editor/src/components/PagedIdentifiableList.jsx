@@ -284,7 +284,7 @@ class PagedIdentifiableList extends Component {
                 identifiers={identifiable.identifiers}
                 identifierTypes={identifierTypes}
                 index={index + 1 + pageNumber * this.pageSize}
-                key={index}
+                key={identifiable.uuid}
                 label={
                   identifiable.label[defaultLanguage] ??
                   Object.values(identifiable.label)[0]
