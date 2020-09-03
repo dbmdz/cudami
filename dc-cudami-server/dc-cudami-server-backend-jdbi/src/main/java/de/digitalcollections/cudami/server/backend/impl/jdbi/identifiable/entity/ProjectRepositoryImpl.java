@@ -58,6 +58,9 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
           + " FROM projects as p"
           + " LEFT JOIN fileresources_image as file on p.previewfileresource = file.uuid";
 
+  // select to retrieve the whole table including referenced identifiers. Use this with caution!
+  private static final String FIND_ALL_SQL = FIND_ONE_BASE_SQL;
+
   @Autowired
   public ProjectRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     super(dbi, identifierRepository);
@@ -68,6 +71,46 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
     String sql = "SELECT count(*) FROM projects";
     long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
     return count;
+  }
+
+  @Override
+  public List<Project> getAll() {
+    List<Project> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(FIND_ALL_SQL)
+                        .registerRowMapper(BeanMapper.factory(ProjectImpl.class, "p"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, ProjectImpl>(),
+                            (map, rowView) -> {
+                              ProjectImpl project =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("p_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(ProjectImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                project.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                                project.addIdentifier(identifier);
+                              }
+
+                              return map;
+                            }))
+            .values()
+            .stream()
+            .map(Project.class::cast)
+            .collect(Collectors.toList());
+
+    return result;
   }
 
   @Override

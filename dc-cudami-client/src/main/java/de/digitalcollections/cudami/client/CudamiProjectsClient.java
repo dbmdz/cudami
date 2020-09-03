@@ -92,4 +92,8 @@ public class CudamiProjectsClient extends CudamiBaseClient<ProjectImpl> {
   public void delete(UUID uuid) throws HttpException {
     doDeleteRequestForString(String.format("/latest/projects/%s", uuid));
   }
+
+  public List<ProjectImpl> getAll() throws HttpException {
+    return doGetRequestForObjectList(String.format("/latest/projectlist", ProjectImpl.class));
+  }
 }

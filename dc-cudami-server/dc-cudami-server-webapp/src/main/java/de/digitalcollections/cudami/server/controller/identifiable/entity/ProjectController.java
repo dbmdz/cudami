@@ -49,7 +49,7 @@ public class ProjectController {
     this.projectService = projectService;
   }
 
-  @ApiMethod(description = "Get all projects")
+  @ApiMethod(description = "Get all projects in reduced form (no identifiers)")
   @GetMapping(
       value = {"/latest/projects", "/v2/projects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -67,6 +67,15 @@ public class ProjectController {
     Sorting sorting = new SortingImpl(order);
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
     return projectService.find(pageRequest);
+  }
+
+  @ApiMethod(description = "Get all projects as list")
+  @GetMapping(
+      value = {"/latest/projectlist", "/v2/projectlist"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public List<Project> findAllAsList() {
+    return projectService.getAll();
   }
 
   // Test-URL: http://localhost:9000/latest/projects/599a120c-2dd5-11e8-b467-0ed5f89f718b
