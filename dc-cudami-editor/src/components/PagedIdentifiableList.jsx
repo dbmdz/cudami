@@ -258,7 +258,7 @@ class PagedIdentifiableList extends Component {
         <span className="ml-2">
           {t(`totalElements.${type}s`, {count: this.state.totalElements})}
         </span>
-        <Table bordered hover responsive size="sm" striped>
+        <Table bordered className="mb-0" hover responsive size="sm" striped>
           <thead>
             <tr>
               <th className="text-right">
