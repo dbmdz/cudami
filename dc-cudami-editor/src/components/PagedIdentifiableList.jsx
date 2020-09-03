@@ -5,7 +5,6 @@ import {withTranslation} from 'react-i18next'
 import {FaHashtag, FaImage} from 'react-icons/fa'
 import ReactPaginate from 'react-paginate'
 
-import './PagedIdentifiableList.css'
 import AppContext from './AppContext'
 import AddAttachedIdentifiablesModal from './modals/AddAttachedIdentifiablesModal'
 import RemoveAttachedIdentifiableModal from './modals/RemoveAttachedIdentifiableModal'

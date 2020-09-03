@@ -2,7 +2,6 @@ import React, {Component} from 'react'
 import {withTranslation} from 'react-i18next'
 
 import './common.css'
-import './IdentifiableForm.css'
 import AppContext from './AppContext'
 import ArticleForm from './ArticleForm'
 import CollectionForm from './CollectionForm'
