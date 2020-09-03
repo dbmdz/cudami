@@ -7,7 +7,6 @@ import PreviewImage from './PreviewImage'
 
 const IdentifiableListItem = ({
   apiContextPath,
-  defaultLanguage,
   enableMove,
   enableRemove,
   identifiers,
@@ -33,7 +32,6 @@ const IdentifiableListItem = ({
       <td className="text-center">
         <PreviewImage
           image={previewImage}
-          language={defaultLanguage}
           renderingHints={previewImageRenderingHints}
           width={30}
         />

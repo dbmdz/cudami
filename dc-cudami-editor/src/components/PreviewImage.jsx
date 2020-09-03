@@ -1,7 +1,7 @@
 import React, {useContext} from 'react'
 
+import AppContext from './AppContext'
 import {getImageUrl} from './utils'
-import {ApiContext} from '../api'
 
 const PreviewImage = ({
   image,
@@ -10,7 +10,10 @@ const PreviewImage = ({
   showCaption = false,
   width,
 }) => {
-  const {apiContextPath} = useContext(ApiContext)
+  const {apiContextPath, defaultLanguage} = useContext(AppContext)
+  if (!language) {
+    language = defaultLanguage
+  }
   const {altText, caption, title} = renderingHints
   return (
     <figure className="mb-0 mx-auto" style={{maxWidth: `${width}px`}}>

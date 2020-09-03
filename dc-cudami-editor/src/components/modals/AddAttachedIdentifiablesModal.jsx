@@ -17,10 +17,11 @@ import {
 import {withTranslation} from 'react-i18next'
 import {FaTrash} from 'react-icons/fa'
 
+import AppContext from '../AppContext'
 import Autocomplete from '../Autocomplete'
 import IdentifierSearch from '../IdentifierSearch'
 import PreviewImage from '../PreviewImage'
-import {ApiContext, searchIdentifiables} from '../../api'
+import {searchIdentifiables} from '../../api'
 
 class AddAttachedIdentifiablesModal extends Component {
   fixedOptions = ['label']
@@ -57,7 +58,6 @@ class AddAttachedIdentifiablesModal extends Component {
   render() {
     const {
       action,
-      defaultLanguage,
       identifierTypes,
       isOpen,
       maxElements,
@@ -111,7 +111,6 @@ class AddAttachedIdentifiablesModal extends Component {
                 <FormGroup className="d-inline-block pl-1 w-75">
                   {showAutocomplete ? (
                     <Autocomplete
-                      defaultLanguage={defaultLanguage}
                       onSelect={this.addIdentifiableToList}
                       placeholder={t('autocomplete.searchTerm')}
                       search={(
@@ -133,7 +132,6 @@ class AddAttachedIdentifiablesModal extends Component {
                     />
                   ) : (
                     <IdentifierSearch
-                      defaultLanguage={defaultLanguage}
                       namespace={
                         identifierTypes[
                           selectedOption - this.fixedOptions.length
@@ -163,13 +161,13 @@ class AddAttachedIdentifiablesModal extends Component {
                         <Col className="text-center" md="2">
                           <PreviewImage
                             image={previewImage}
-                            language={defaultLanguage}
                             renderingHints={previewImageRenderingHints}
                             width={50}
                           />
                         </Col>
                         <Col md="9">
-                          {label[defaultLanguage] ?? Object.values(label)[0]}
+                          {label[this.context.defaultLanguage] ??
+                            Object.values(label)[0]}
                         </Col>
                         <Col className="text-right" md="1">
                           <Button
@@ -207,6 +205,6 @@ class AddAttachedIdentifiablesModal extends Component {
   }
 }
 
-AddAttachedIdentifiablesModal.contextType = ApiContext
+AddAttachedIdentifiablesModal.contextType = AppContext
 
 export default withTranslation()(AddAttachedIdentifiablesModal)
