@@ -21,9 +21,10 @@ import {FaQuestionCircle} from 'react-icons/fa'
 import Autocomplete from '../../Autocomplete'
 import ImageLabelInput from './ImageLabelInput'
 import ImagePreview from './ImagePreview'
+import AppContext from '../../AppContext'
 import FileUploadForm from '../../FileUploadForm'
 import {getImageUrl} from '../../utils'
-import {ApiContext, searchImages, uploadFile} from '../../../api'
+import {searchImages, uploadFile} from '../../../api'
 
 class ImageSelector extends Component {
   constructor(props) {
@@ -89,7 +90,6 @@ class ImageSelector extends Component {
   render() {
     const {
       activeLanguage,
-      defaultLanguage,
       fileResource,
       onChange,
       t,
@@ -237,7 +237,6 @@ class ImageSelector extends Component {
               )}
               <Autocomplete
                 activeLanguage={activeLanguage}
-                defaultLanguage={defaultLanguage}
                 onSelect={(suggestion) => {
                   onChange({
                     ...suggestion.previewImage,
@@ -256,6 +255,6 @@ class ImageSelector extends Component {
   }
 }
 
-ImageSelector.contextType = ApiContext
+ImageSelector.contextType = AppContext
 
 export default withTranslation()(ImageSelector)

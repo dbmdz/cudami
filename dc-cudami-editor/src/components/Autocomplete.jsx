@@ -4,8 +4,8 @@ import Autosuggest from 'react-autosuggest'
 import {withTranslation} from 'react-i18next'
 
 import './Autocomplete.css'
+import AppContext from './AppContext'
 import PreviewImage from './PreviewImage'
-import {ApiContext} from '../api'
 
 class Autocomplete extends Component {
   /* defines the number of suggestions to be fetched */
@@ -21,11 +21,10 @@ class Autocomplete extends Component {
   }
 
   getLabelValue = (label) => {
-    const {activeLanguage, defaultLanguage} = this.props
-    if (label[activeLanguage]) {
-      return label[activeLanguage]
-    } else if (label[defaultLanguage]) {
-      return label[defaultLanguage]
+    if (label[this.props.activeLanguage]) {
+      return label[this.props.activeLanguage]
+    } else if (label[this.context.defaultLanguage]) {
+      return label[this.context.defaultLanguage]
     }
     return Object.values(label)[0]
   }
@@ -84,7 +83,6 @@ class Autocomplete extends Component {
         <Col md="1">
           <PreviewImage
             image={previewImage}
-            language={this.props.defaultLanguage}
             renderingHints={previewImageRenderingHints}
             width={50}
           />
@@ -141,6 +139,6 @@ class Autocomplete extends Component {
   }
 }
 
-Autocomplete.contextType = ApiContext
+Autocomplete.contextType = AppContext
 
 export default withTranslation()(Autocomplete)

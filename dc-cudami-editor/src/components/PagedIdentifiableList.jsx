@@ -6,11 +6,11 @@ import {FaHashtag, FaImage} from 'react-icons/fa'
 import ReactPaginate from 'react-paginate'
 
 import './PagedIdentifiableList.css'
+import AppContext from './AppContext'
 import AddAttachedIdentifiablesModal from './modals/AddAttachedIdentifiablesModal'
 import RemoveAttachedIdentifiableModal from './modals/RemoveAttachedIdentifiableModal'
 import IdentifiableListItem from './IdentifiableListItem'
 import {
-  ApiContext,
   addAttachedIdentifiable,
   addAttachedIdentifiables,
   getIdentifierTypes,
@@ -206,7 +206,7 @@ class PagedIdentifiableList extends Component {
       showSuccessfullyMoved,
     } = this.state
     return (
-      <ApiContext.Provider value={{apiContextPath, mockApi}}>
+      <AppContext.Provider value={{apiContextPath, defaultLanguage, mockApi}}>
         <Row>
           <Col>
             <h2>{t(`${type}s`)}</h2>
@@ -279,7 +279,6 @@ class PagedIdentifiableList extends Component {
             {identifiables.map((identifiable, index) => (
               <IdentifiableListItem
                 apiContextPath={apiContextPath}
-                defaultLanguage={defaultLanguage}
                 enableMove={enableMove}
                 enableRemove={enableRemove}
                 identifiers={identifiable.identifiers}
@@ -346,7 +345,6 @@ class PagedIdentifiableList extends Component {
         {enableAdd && (
           <AddAttachedIdentifiablesModal
             action="add"
-            defaultLanguage={defaultLanguage}
             identifierTypes={identifierTypes}
             isOpen={modalsOpen.addAttachedIdentifiables}
             onSubmit={this.handleAdd}
@@ -357,7 +355,6 @@ class PagedIdentifiableList extends Component {
         {enableMove && (
           <AddAttachedIdentifiablesModal
             action="move"
-            defaultLanguage={defaultLanguage}
             identifierTypes={identifierTypes}
             isOpen={modalsOpen.moveAttachedIdentifiable}
             maxElements={1}
@@ -375,7 +372,7 @@ class PagedIdentifiableList extends Component {
             type={type}
           />
         )}
-      </ApiContext.Provider>
+      </AppContext.Provider>
     )
   }
 }

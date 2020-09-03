@@ -2,8 +2,9 @@ import React, {Component} from 'react'
 import {Button, ButtonGroup, Card, Col, Form, Input, Row} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
+import AppContext from './AppContext'
 import FileUploadForm from './FileUploadForm'
-import {ApiContext, uploadFile} from '../api'
+import {uploadFile} from '../api'
 
 class FileResourceUploadForm extends Component {
   constructor(props) {
@@ -84,6 +85,6 @@ class FileResourceUploadForm extends Component {
   }
 }
 
-FileResourceUploadForm.contextType = ApiContext
+FileResourceUploadForm.contextType = AppContext
 
 export default withTranslation()(FileResourceUploadForm)

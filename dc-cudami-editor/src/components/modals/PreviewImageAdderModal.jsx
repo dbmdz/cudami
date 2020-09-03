@@ -7,12 +7,8 @@ import './ImageAdderModal.css'
 import ImageMetadataForm from './imageAdder/ImageMetadataForm'
 import ImageRenderingHintsForm from './imageAdder/ImageRenderingHintsForm'
 import ImageSelector from './imageAdder/ImageSelector'
-import {
-  ApiContext,
-  loadIdentifiable,
-  saveFileResource,
-  updateFileResource,
-} from '../../api'
+import AppContext from '../AppContext'
+import {loadIdentifiable, saveFileResource, updateFileResource} from '../../api'
 
 class PreviewImageAdderModal extends Component {
   initialAttributes = {
@@ -189,7 +185,7 @@ class PreviewImageAdderModal extends Component {
   }
 
   render() {
-    const {activeLanguage, debug, defaultLanguage, isOpen, t} = this.props
+    const {activeLanguage, debug, isOpen, t} = this.props
     const {altText, caption, linkNewTab, linkUrl, title} = this.state.attributes
     return (
       <Modal isOpen={isOpen} size="lg" toggle={this.destroy}>
@@ -209,7 +205,6 @@ class PreviewImageAdderModal extends Component {
             {this.state.showImageSelector && (
               <ImageSelector
                 activeLanguage={activeLanguage}
-                defaultLanguage={defaultLanguage}
                 fileResource={this.state.fileResource}
                 onChange={this.updateFileResource}
                 onTabChanged={this.onTabChanged}
@@ -258,6 +253,6 @@ class PreviewImageAdderModal extends Component {
   }
 }
 
-PreviewImageAdderModal.contextType = ApiContext
+PreviewImageAdderModal.contextType = AppContext
 
 export default withTranslation()(PreviewImageAdderModal)

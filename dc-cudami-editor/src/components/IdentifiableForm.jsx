@@ -4,6 +4,7 @@ import {withTranslation} from 'react-i18next'
 
 import './common.css'
 import './IdentifiableForm.css'
+import AppContext from './AppContext'
 import ArticleForm from './ArticleForm'
 import CollectionForm from './CollectionForm'
 import CorporationForm from './CorporationForm'
@@ -15,7 +16,6 @@ import TopicForm from './TopicForm'
 import WebpageForm from './WebpageForm'
 import WebsiteForm from './WebsiteForm'
 import {
-  ApiContext,
   loadAvailableLanguages,
   loadDefaultLanguage,
   loadIdentifiable,
@@ -240,7 +240,13 @@ class IdentifiableForm extends Component {
   render() {
     const {apiContextPath, debug, mockApi} = this.props
     return this.state.identifiable ? (
-      <ApiContext.Provider value={{apiContextPath, mockApi}}>
+      <AppContext.Provider
+        value={{
+          apiContextPath,
+          defaultLanguage: this.state.defaultLanguage,
+          mockApi,
+        }}
+      >
         <div className="identifiable-editor">
           {this.state.invalidLanguages.length > 0 && (
             <FormErrors invalidLanguages={this.state.invalidLanguages} />
@@ -261,7 +267,6 @@ class IdentifiableForm extends Component {
           <ImageAdderModal
             activeLanguage={this.state.activeLanguage}
             debug={debug}
-            defaultLanguage={this.state.defaultLanguage}
             isOpen={this.state.modalsOpen.imageAdder}
             onToggle={() => this.toggleModal('imageAdder')}
           />
@@ -278,7 +283,6 @@ class IdentifiableForm extends Component {
           <PreviewImageAdderModal
             activeLanguage={this.state.activeLanguage}
             debug={debug}
-            defaultLanguage={this.state.defaultLanguage}
             isOpen={this.state.modalsOpen.previewImageAdder}
             onToggle={() => this.toggleModal('previewImageAdder')}
           />
@@ -287,7 +291,7 @@ class IdentifiableForm extends Component {
             onToggle={() => this.toggleModal('tableAdder')}
           />
         </div>
-      </ApiContext.Provider>
+      </AppContext.Provider>
     ) : null
   }
 }

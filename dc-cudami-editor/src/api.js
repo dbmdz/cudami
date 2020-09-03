@@ -1,7 +1,3 @@
-import React from 'react'
-
-export const ApiContext = React.createContext(null)
-
 export async function addAttachedIdentifiable(
   contextPath,
   mock,

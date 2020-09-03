@@ -7,12 +7,8 @@ import './ImageAdderModal.css'
 import ImageMetadataForm from './imageAdder/ImageMetadataForm'
 import ImageRenderingHintsForm from './imageAdder/ImageRenderingHintsForm'
 import ImageSelector from './imageAdder/ImageSelector'
-import {
-  ApiContext,
-  loadIdentifiable,
-  saveFileResource,
-  updateFileResource,
-} from '../../api'
+import AppContext from '../AppContext'
+import {loadIdentifiable, saveFileResource, updateFileResource} from '../../api'
 
 class ImageAdderModal extends Component {
   initialAttributes = {
@@ -174,7 +170,7 @@ class ImageAdderModal extends Component {
   }
 
   render() {
-    const {activeLanguage, debug, defaultLanguage, isOpen, t} = this.props
+    const {activeLanguage, debug, isOpen, t} = this.props
     const {
       alignment,
       altText,
@@ -202,7 +198,6 @@ class ImageAdderModal extends Component {
             {this.state.showImageSelector && (
               <ImageSelector
                 activeLanguage={activeLanguage}
-                defaultLanguage={defaultLanguage}
                 fileResource={this.state.fileResource}
                 onChange={this.updateFileResource}
                 onTabChanged={this.onTabChanged}
@@ -253,6 +248,6 @@ class ImageAdderModal extends Component {
   }
 }
 
-ImageAdderModal.contextType = ApiContext
+ImageAdderModal.contextType = AppContext
 
 export default withTranslation()(ImageAdderModal)
