@@ -1,6 +1,6 @@
 import {publish, subscribe} from 'pubsub-js'
 import React, {Component} from 'react'
-import {Button, Form, Label, Modal, ModalBody, ModalHeader} from 'reactstrap'
+import {Button, Form, Modal, ModalBody, ModalHeader} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
 import './ImageAdderModal.css'

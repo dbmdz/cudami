@@ -1,6 +1,6 @@
 import uniqBy from 'lodash/uniqBy'
 import React, {Component} from 'react'
-import {Alert, Button, Col, Label, Row, Table} from 'reactstrap'
+import {Alert, Button, Col, Row, Table} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 import {FaHashtag, FaImage} from 'react-icons/fa'
 import ReactPaginate from 'react-paginate'
