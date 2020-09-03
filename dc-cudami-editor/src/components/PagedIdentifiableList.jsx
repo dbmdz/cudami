@@ -183,7 +183,6 @@ class PagedIdentifiableList extends Component {
   render() {
     const {
       apiContextPath,
-      debug,
       enableAdd,
       enableMove,
       enableRemove,
@@ -334,14 +333,6 @@ class PagedIdentifiableList extends Component {
             previousLinkClassName="page-link"
           />
         )}
-        {debug && (
-          <>
-            <Label className="font-weight-bold mt-3">JSON (debug)</Label>
-            <pre className="border">
-              <code>{JSON.stringify(identifiables, null, 4)}</code>
-            </pre>
-          </>
-        )}
         {enableAdd && (
           <AddAttachedIdentifiablesModal
             action="add"
@@ -379,7 +370,6 @@ class PagedIdentifiableList extends Component {
 
 PagedIdentifiableList.defaultProps = {
   apiContextPath: '/',
-  debug: false,
   enableAdd: false,
   enableMove: false,
   enableRemove: false,

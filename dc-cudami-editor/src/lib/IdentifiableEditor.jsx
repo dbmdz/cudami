@@ -10,7 +10,6 @@ export default function (config) {
     <IdentifiableForm
       activeLanguage={config.activeLanguage}
       apiContextPath={config.apiContextPath}
-      debug={config.debug}
       existingLanguages={config.existingLanguages}
       parentType={config.parentType}
       parentUuid={config.parentUuid}

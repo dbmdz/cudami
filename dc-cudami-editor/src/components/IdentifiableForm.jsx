@@ -238,7 +238,7 @@ class IdentifiableForm extends Component {
   }
 
   render() {
-    const {apiContextPath, debug, mockApi} = this.props
+    const {apiContextPath, mockApi} = this.props
     return this.state.identifiable ? (
       <AppContext.Provider
         value={{
@@ -252,21 +252,12 @@ class IdentifiableForm extends Component {
             <FormErrors invalidLanguages={this.state.invalidLanguages} />
           )}
           {this.getFormComponent()}
-          {debug && (
-            <>
-              <Label className="font-weight-bold mt-3">JSON (debug)</Label>
-              <pre className="border">
-                <code>{JSON.stringify(this.state.identifiable, null, 4)}</code>
-              </pre>
-            </>
-          )}
           <IframeAdderModal
             isOpen={this.state.modalsOpen.iframeAdder}
             onToggle={() => this.toggleModal('iframeAdder')}
           />
           <ImageAdderModal
             activeLanguage={this.state.activeLanguage}
-            debug={debug}
             isOpen={this.state.modalsOpen.imageAdder}
             onToggle={() => this.toggleModal('imageAdder')}
           />
@@ -282,7 +273,6 @@ class IdentifiableForm extends Component {
           />
           <PreviewImageAdderModal
             activeLanguage={this.state.activeLanguage}
-            debug={debug}
             isOpen={this.state.modalsOpen.previewImageAdder}
             onToggle={() => this.toggleModal('previewImageAdder')}
           />
@@ -298,7 +288,6 @@ class IdentifiableForm extends Component {
 
 IdentifiableForm.defaultProps = {
   apiContextPath: '/',
-  debug: false,
   mockApi: false,
 }
 

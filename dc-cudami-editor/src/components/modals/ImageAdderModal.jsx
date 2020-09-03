@@ -170,7 +170,7 @@ class ImageAdderModal extends Component {
   }
 
   render() {
-    const {activeLanguage, debug, isOpen, t} = this.props
+    const {activeLanguage, isOpen, t} = this.props
     const {
       alignment,
       altText,
@@ -230,14 +230,6 @@ class ImageAdderModal extends Component {
               }
               width={width}
             />
-            {debug && (
-              <>
-                <Label className="font-weight-bold mt-3">JSON (debug)</Label>
-                <pre className="border">
-                  <code>{JSON.stringify(this.state, null, 4)}</code>
-                </pre>
-              </>
-            )}
             <Button className="float-right mt-2" color="primary" type="submit">
               {t('save')}
             </Button>
