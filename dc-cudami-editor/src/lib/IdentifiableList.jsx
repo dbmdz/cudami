@@ -9,7 +9,6 @@ export default function (config) {
   ReactDOM.render(
     <PagedIdentifiableList
       apiContextPath={config.apiContextPath}
-      debug={config.debug}
       enableAdd={config.enableAdd}
       enableMove={config.enableMove}
       enableRemove={config.enableRemove}

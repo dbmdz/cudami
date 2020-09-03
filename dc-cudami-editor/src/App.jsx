@@ -140,7 +140,6 @@ const App = () => {
             <Container>
               <IdentifiableForm
                 activeLanguage="en"
-                debug={true}
                 mockApi={true}
                 type={match.params.type}
               />
@@ -153,7 +152,6 @@ const App = () => {
             <Container>
               <IdentifiableForm
                 activeLanguage="en"
-                debug={true}
                 existingLanguages={['en', 'de']}
                 mockApi={true}
                 type={match.params.type}
@@ -167,7 +165,6 @@ const App = () => {
           render={({match}) => (
             <Container>
               <PagedIdentifiableList
-                debug={true}
                 enableAdd={true}
                 enableMove={true}
                 enableRemove={true}
