@@ -21,11 +21,11 @@ class Autocomplete extends Component {
   }
 
   getLabelValue = (label) => {
-    return label[this.props.activeLanguage]
-      ?? label[this.context.defaultLanguage] 
-      ?? Object.values(label)[0]
-    }
-    return Object.values(label)[0]
+    return (
+      label[this.props.activeLanguage] ??
+      label[this.context.defaultLanguage] ??
+      Object.values(label)[0]
+    )
   }
 
   getSuggestionAsString = (suggestion) =>
