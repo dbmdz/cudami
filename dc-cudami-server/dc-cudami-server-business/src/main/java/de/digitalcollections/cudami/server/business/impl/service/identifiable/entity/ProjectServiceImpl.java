@@ -75,4 +75,9 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
       identifierRepository.delete(identifier.getUuid());
     }
   }
+
+  @Override
+  public List<Project> getAll() {
+    return ((ProjectRepository) repository).getAll();
+  }
 }

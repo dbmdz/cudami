@@ -20,4 +20,6 @@ public interface ProjectService extends EntityService<Project> {
   boolean saveDigitalObjects(Project project, List<DigitalObject> digitalObjects);
 
   void delete(UUID uuid);
+
+  List<Project> getAll();
 }
