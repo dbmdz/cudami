@@ -1,16 +1,9 @@
 import React from 'react'
 import classNames from 'classnames'
-import {
-  Button,
-  FormGroup,
-  Input,
-  InputGroup,
-  InputGroupAddon,
-  Popover,
-  PopoverBody,
-} from 'reactstrap'
+import {FormGroup, Input, InputGroup, InputGroupAddon} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
-import {FaQuestionCircle} from 'react-icons/fa'
+
+import InfoTooltip from '../../InfoTooltip'
 
 const ImageLabelInput = ({
   className,
@@ -34,22 +27,12 @@ const ImageLabelInput = ({
           value={label ? Object.values(label)[0] : ''}
         />
         <InputGroupAddon addonType="append">
-          <Button
-            className="border"
-            color="light"
-            id={`${name}-tooltip`}
-            type="button"
-          >
-            <FaQuestionCircle />
-          </Button>
-          <Popover
+          <InfoTooltip
             isOpen={tooltipsOpen[tooltipName]}
-            placement="left"
-            target={`${name}-tooltip`}
+            name={name}
+            text={t('tooltips.label')}
             toggle={() => toggleTooltip(tooltipName)}
-          >
-            <PopoverBody>{t('tooltips.label')}</PopoverBody>
-          </Popover>
+          />
         </InputGroupAddon>
       </InputGroup>
     </FormGroup>

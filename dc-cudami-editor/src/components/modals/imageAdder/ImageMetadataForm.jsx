@@ -9,19 +9,10 @@ import {
   Input,
   InputGroup,
   InputGroupAddon,
-  Popover,
-  PopoverBody,
 } from 'reactstrap'
 import {useTranslation} from 'react-i18next'
-import {FaQuestionCircle} from 'react-icons/fa'
 
-const InputTooltip = ({isOpen, target, text, toggle}) => {
-  return (
-    <Popover isOpen={isOpen} placement="left" target={target} toggle={toggle}>
-      <PopoverBody>{text}</PopoverBody>
-    </Popover>
-  )
-}
+import InfoTooltip from '../../InfoTooltip'
 
 const ImageMetadataForm = ({
   altText,
@@ -53,17 +44,9 @@ const ImageMetadataForm = ({
               />
               <span className="floating-label">{t('caption')}</span>
               <InputGroupAddon addonType="append">
-                <Button
-                  className="border"
-                  color="light"
-                  id="caption-tooltip"
-                  type="button"
-                >
-                  <FaQuestionCircle />
-                </Button>
-                <InputTooltip
+                <InfoTooltip
                   isOpen={tooltipsOpen.caption}
-                  target="caption-tooltip"
+                  name="caption"
                   text={t('tooltips.caption')}
                   toggle={() => toggleTooltip('caption')}
                 />
@@ -80,17 +63,9 @@ const ImageMetadataForm = ({
               />
               <span className="floating-label">{t('tooltip')}</span>
               <InputGroupAddon addonType="append">
-                <Button
-                  className="border"
-                  color="light"
-                  id="title-tooltip"
-                  type="button"
-                >
-                  <FaQuestionCircle />
-                </Button>
-                <InputTooltip
+                <InfoTooltip
                   isOpen={tooltipsOpen.title}
-                  target="title-tooltip"
+                  name="title"
                   text={t('tooltips.title')}
                   toggle={() => toggleTooltip('title')}
                 />
@@ -107,17 +82,9 @@ const ImageMetadataForm = ({
               />
               <span className="floating-label">{t('altText')}</span>
               <InputGroupAddon addonType="append">
-                <Button
-                  className="border"
-                  color="light"
-                  id="alttext-tooltip"
-                  type="button"
-                >
-                  <FaQuestionCircle />
-                </Button>
-                <InputTooltip
+                <InfoTooltip
                   isOpen={tooltipsOpen.altText}
-                  target="alttext-tooltip"
+                  name="alttext"
                   text={t('tooltips.altText')}
                   toggle={() => toggleTooltip('altText')}
                 />
