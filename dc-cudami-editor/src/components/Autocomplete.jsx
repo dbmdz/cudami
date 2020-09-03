@@ -21,10 +21,9 @@ class Autocomplete extends Component {
   }
 
   getLabelValue = (label) => {
-    if (label[this.props.activeLanguage]) {
-      return label[this.props.activeLanguage]
-    } else if (label[this.context.defaultLanguage]) {
-      return label[this.context.defaultLanguage]
+    return label[this.props.activeLanguage]
+      ?? label[this.context.defaultLanguage] 
+      ?? Object.values(label)[0]
     }
     return Object.values(label)[0]
   }
