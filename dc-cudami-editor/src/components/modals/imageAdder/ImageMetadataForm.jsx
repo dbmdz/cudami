@@ -6,12 +6,12 @@ import {
   CardHeader,
   Collapse,
   FormGroup,
-  Input,
   InputGroup,
   InputGroupAddon,
 } from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
+import FloatingLabelInput from './FloatingLabelInput'
 import InfoTooltip from '../../InfoTooltip'
 
 const ImageMetadataForm = ({
@@ -36,13 +36,12 @@ const ImageMetadataForm = ({
         <CardBody>
           <FormGroup>
             <InputGroup>
-              <Input
+              <FloatingLabelInput
+                label={t('caption')}
                 name="caption"
-                onChange={(evt) => onChange('caption', evt.target.value)}
-                type="text"
+                onChange={(value) => onChange('caption', value)}
                 value={caption}
               />
-              <span className="floating-label">{t('caption')}</span>
               <InputGroupAddon addonType="append">
                 <InfoTooltip
                   isOpen={tooltipsOpen.caption}
@@ -55,13 +54,12 @@ const ImageMetadataForm = ({
           </FormGroup>
           <FormGroup>
             <InputGroup>
-              <Input
+              <FloatingLabelInput
+                label={t('tooltip')}
                 name="title"
-                onChange={(evt) => onChange('title', evt.target.value)}
-                type="text"
+                onChange={(value) => onChange('title', value)}
                 value={title}
               />
-              <span className="floating-label">{t('tooltip')}</span>
               <InputGroupAddon addonType="append">
                 <InfoTooltip
                   isOpen={tooltipsOpen.title}
@@ -74,13 +72,12 @@ const ImageMetadataForm = ({
           </FormGroup>
           <FormGroup className="mb-0">
             <InputGroup>
-              <Input
+              <FloatingLabelInput
+                label={t('altText')}
                 name="altText"
-                onChange={(evt) => onChange('altText', evt.target.value)}
-                type="text"
+                onChange={(value) => onChange('altText', value)}
                 value={altText}
               />
-              <span className="floating-label">{t('altText')}</span>
               <InputGroupAddon addonType="append">
                 <InfoTooltip
                   isOpen={tooltipsOpen.altText}
