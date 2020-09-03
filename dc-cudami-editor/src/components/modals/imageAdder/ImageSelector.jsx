@@ -110,10 +110,7 @@ class ImageSelector extends Component {
                 onClick={(evt) => this.toggleTab('upload', evt)}
               >
                 {t('selectImage.useUpload')}
-                <FaQuestionCircle
-                  className="ml-1 tooltip-icon"
-                  id="upload-tooltip"
-                />
+                <FaQuestionCircle className="ml-1" id="upload-tooltip" />
                 <Popover
                   isOpen={tooltipsOpen.upload}
                   placement="top"
@@ -132,10 +129,7 @@ class ImageSelector extends Component {
                 onClick={(evt) => this.toggleTab('url', evt)}
               >
                 {t('selectImage.useUrl')}
-                <FaQuestionCircle
-                  className="ml-1 tooltip-icon"
-                  id="url-tooltip"
-                />
+                <FaQuestionCircle className="ml-1" id="url-tooltip" />
                 <Popover
                   isOpen={tooltipsOpen.url}
                   placement="top"
@@ -156,10 +150,7 @@ class ImageSelector extends Component {
                 onClick={(evt) => this.toggleTab('search', evt)}
               >
                 {t('selectImage.useSearch')}
-                <FaQuestionCircle
-                  className="ml-1 tooltip-icon"
-                  id="search-tooltip"
-                />
+                <FaQuestionCircle className="ml-1" id="search-tooltip" />
                 <Popover
                   isOpen={tooltipsOpen.search}
                   placement="top"

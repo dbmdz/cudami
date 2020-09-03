@@ -2,7 +2,6 @@ import React from 'react'
 import {Col, Form, Nav, Row, TabContent, TabPane} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-import './FileResourceForm.css'
 import FileResourceUploadForm from './FileResourceUploadForm'
 import FormIdInput from './FormIdInput'
 import FormButtons from './FormButtons'

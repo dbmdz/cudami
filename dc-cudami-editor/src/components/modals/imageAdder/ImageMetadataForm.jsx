@@ -9,7 +9,6 @@ import {
   Input,
   InputGroup,
   InputGroupAddon,
-  InputGroupText,
   Popover,
   PopoverBody,
 } from 'reactstrap'
@@ -54,18 +53,20 @@ const ImageMetadataForm = ({
               />
               <span className="floating-label">{t('caption')}</span>
               <InputGroupAddon addonType="append">
-                <InputGroupText>
-                  <FaQuestionCircle
-                    className="tooltip-icon"
-                    id="caption-tooltip"
-                  />
-                  <InputTooltip
-                    isOpen={tooltipsOpen.caption}
-                    target="caption-tooltip"
-                    text={t('tooltips.caption')}
-                    toggle={() => toggleTooltip('caption')}
-                  />
-                </InputGroupText>
+                <Button
+                  className="border"
+                  color="light"
+                  id="caption-tooltip"
+                  type="button"
+                >
+                  <FaQuestionCircle />
+                </Button>
+                <InputTooltip
+                  isOpen={tooltipsOpen.caption}
+                  target="caption-tooltip"
+                  text={t('tooltips.caption')}
+                  toggle={() => toggleTooltip('caption')}
+                />
               </InputGroupAddon>
             </InputGroup>
           </FormGroup>
@@ -79,18 +80,20 @@ const ImageMetadataForm = ({
               />
               <span className="floating-label">{t('tooltip')}</span>
               <InputGroupAddon addonType="append">
-                <InputGroupText>
-                  <FaQuestionCircle
-                    className="tooltip-icon"
-                    id="title-tooltip"
-                  />
-                  <InputTooltip
-                    isOpen={tooltipsOpen.title}
-                    target="title-tooltip"
-                    text={t('tooltips.title')}
-                    toggle={() => toggleTooltip('title')}
-                  />
-                </InputGroupText>
+                <Button
+                  className="border"
+                  color="light"
+                  id="title-tooltip"
+                  type="button"
+                >
+                  <FaQuestionCircle />
+                </Button>
+                <InputTooltip
+                  isOpen={tooltipsOpen.title}
+                  target="title-tooltip"
+                  text={t('tooltips.title')}
+                  toggle={() => toggleTooltip('title')}
+                />
               </InputGroupAddon>
             </InputGroup>
           </FormGroup>
@@ -104,18 +107,20 @@ const ImageMetadataForm = ({
               />
               <span className="floating-label">{t('altText')}</span>
               <InputGroupAddon addonType="append">
-                <InputGroupText>
-                  <FaQuestionCircle
-                    className="tooltip-icon"
-                    id="altText-tooltip"
-                  />
-                  <InputTooltip
-                    isOpen={tooltipsOpen.altText}
-                    target="altText-tooltip"
-                    text={t('tooltips.altText')}
-                    toggle={() => toggleTooltip('altText')}
-                  />
-                </InputGroupText>
+                <Button
+                  className="border"
+                  color="light"
+                  id="alttext-tooltip"
+                  type="button"
+                >
+                  <FaQuestionCircle />
+                </Button>
+                <InputTooltip
+                  isOpen={tooltipsOpen.altText}
+                  target="alttext-tooltip"
+                  text={t('tooltips.altText')}
+                  toggle={() => toggleTooltip('altText')}
+                />
               </InputGroupAddon>
             </InputGroup>
           </FormGroup>
