@@ -21,6 +21,7 @@ public class LanguageSortingHelper {
     languagesToSort.stream()
         .filter(l -> !prioritisedSortedLanguages.contains(l))
         .sorted(Comparator.comparing(l -> l.getDisplayLanguage(displayLocale)))
+        .distinct()
         .forEach(sortedLanguages::add);
     return sortedLanguages;
   }

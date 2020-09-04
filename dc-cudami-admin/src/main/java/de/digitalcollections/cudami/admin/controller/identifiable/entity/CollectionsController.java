@@ -25,10 +25,8 @@ import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -286,17 +284,16 @@ public class CollectionsController extends AbstractController {
     Collection collection = service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, collection.getLabel().getLocales());
-    Set<Locale> existingSubcollectionLanguages =
+    List<Locale> existingSubcollectionLanguages =
         collection.getChildren().stream()
             .map(child -> child.getLabel().getLocales())
             .flatMap(l -> l.stream())
-            .collect(Collectors.toSet());
-    existingSubcollectionLanguages =
-        new HashSet<>(
-            languageSortingHelper.sortLanguages(displayLocale, existingSubcollectionLanguages));
+            .collect(Collectors.toList());
 
     model.addAttribute("existingLanguages", existingLanguages);
-    model.addAttribute("existingSubcollectionLanguages", existingSubcollectionLanguages);
+    model.addAttribute(
+        "existingSubcollectionLanguages",
+        languageSortingHelper.sortLanguages(displayLocale, existingSubcollectionLanguages));
     model.addAttribute("collection", collection);
 
     BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
