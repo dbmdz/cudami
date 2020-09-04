@@ -54,7 +54,7 @@
                 <span id="currentUserName" sec:authentication="name"></span> <span class="caret"></span>
                 <span style="display:none;" sec:authentication="principal.authorities">[ROLE_USER, ROLE_ADMIN]</span>
               </a>
-              <ul class="dropdown-menu" aria-labelledby="userMenuDropdownButton" role="menu">
+              <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="userMenuDropdownButton" role="menu">
                 <li class="dropdown-item">
                   <a th:href="@{/users/updatePassword}" th:text="#{change_password}">Change password</a>
                 </li>
