@@ -1,14 +1,16 @@
 import uniqBy from 'lodash/uniqBy'
 import React, {Component} from 'react'
-import {Alert, Button, Col, Row, Table} from 'reactstrap'
+import {Alert, Button, Card, CardBody, Col, Nav, Row, Table} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 import {FaHashtag, FaImage} from 'react-icons/fa'
 import ReactPaginate from 'react-paginate'
 
+import './common.css'
 import AppContext from './AppContext'
+import IdentifiableListItem from './IdentifiableListItem'
+import LanguageTab from './LanguageTab'
 import AddAttachedIdentifiablesModal from './modals/AddAttachedIdentifiablesModal'
 import RemoveAttachedIdentifiableModal from './modals/RemoveAttachedIdentifiableModal'
-import IdentifiableListItem from './IdentifiableListItem'
 import {
   addAttachedIdentifiable,
   addAttachedIdentifiables,
@@ -24,7 +26,10 @@ class PagedIdentifiableList extends Component {
 
   constructor(props) {
     super(props)
+    const {existingLanguages} = this.props
     this.state = {
+      activeLanguage: existingLanguages ? existingLanguages[0] : '',
+      existingLanguages: existingLanguages ?? [],
       identifiables: [],
       identifierTypes: [],
       modalsOpen: {
@@ -158,6 +163,12 @@ class PagedIdentifiableList extends Component {
     return successful
   }
 
+  toggleLanguage = (activeLanguage) => {
+    this.setState({
+      activeLanguage,
+    })
+  }
+
   toggleModal = (name) => {
     this.setState({
       modalsOpen: {
@@ -195,7 +206,9 @@ class PagedIdentifiableList extends Component {
       uiLocale,
     } = this.props
     const {
+      activeLanguage,
       defaultLanguage,
+      existingLanguages,
       identifiables,
       identifierTypes,
       modalsOpen,
@@ -232,106 +245,118 @@ class PagedIdentifiableList extends Component {
             {t(`${type}SuccessfullyMoved`)}
           </Alert>
         )}
-        {this.state.identifiables.length > 0 && (
-          <ReactPaginate
-            activeClassName="active"
-            breakClassName="page-item"
-            breakLabel="&hellip;"
-            breakLinkClassName="page-link"
-            containerClassName="d-inline-flex mb-2 pagination"
-            disabledClassName="disabled"
-            forcePage={this.state.pageNumber}
-            marginPagesDisplayed={1}
-            nextClassName="page-item"
-            nextLabel="&raquo;"
-            nextLinkClassName="page-link"
-            onPageChange={this.updatePage}
-            pageClassName="page-item"
-            pageCount={this.state.numberOfPages}
-            pageLinkClassName="page-link"
-            pageRangeDisplayed={5}
-            previousClassName="page-item"
-            previousLabel="&laquo;"
-            previousLinkClassName="page-link"
-          />
-        )}
-        <span className="ml-2">
-          {t(`totalElements.${type}s`, {count: this.state.totalElements})}
-        </span>
-        <Table bordered className="mb-0" hover responsive size="sm" striped>
-          <thead>
-            <tr>
-              <th className="text-right">
-                <FaHashtag />
-              </th>
-              <th className="text-center">
-                <FaImage />
-              </th>
-              <th>{t('label')}</th>
-              <th>{t('identifiers')}</th>
-              <th className="text-center">{t('lastModified')}</th>
-              <th className="text-center">{t('actions')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {identifiables.map((identifiable, index) => (
-              <IdentifiableListItem
-                apiContextPath={apiContextPath}
-                enableMove={enableMove}
-                enableRemove={enableRemove}
-                identifiers={identifiable.identifiers}
-                identifierTypes={identifierTypes}
-                index={index + 1 + pageNumber * this.pageSize}
-                key={identifiable.uuid}
-                label={
-                  identifiable.label[defaultLanguage] ??
-                  Object.values(identifiable.label)[0]
-                }
-                lastModified={identifiable.lastModified}
-                onMove={() => {
-                  this.toggleModal('moveAttachedIdentifiable')
-                  this.setState({moveIndex: index})
-                }}
-                onRemove={() => {
-                  this.toggleModal('removeAttachedIdentifiable')
-                  this.setState({removeIndex: index})
-                }}
-                parentType={parentType}
-                previewImage={identifiable.previewImage}
-                previewImageRenderingHints={
-                  identifiable.previewImageRenderingHints
-                }
-                showEdit={showEdit}
-                type={type}
-                uiLocale={uiLocale}
-                uuid={identifiable.uuid}
+        <Nav tabs>
+          {existingLanguages.length > 1 &&
+            existingLanguages.map((language) => (
+              <LanguageTab
+                activeLanguage={activeLanguage}
+                key={language}
+                language={language}
+                toggle={this.toggleLanguage}
               />
             ))}
-          </tbody>
-        </Table>
-        {identifiables.length > 0 && (
-          <ReactPaginate
-            activeClassName="active"
-            breakClassName="page-item"
-            breakLabel="&hellip;"
-            breakLinkClassName="page-link"
-            containerClassName="mt-2 pagination"
-            disabledClassName="disabled"
-            forcePage={pageNumber}
-            marginPagesDisplayed={1}
-            nextClassName="page-item"
-            nextLabel="&raquo;"
-            nextLinkClassName="page-link"
-            onPageChange={this.updatePage}
-            pageClassName="page-item"
-            pageCount={numberOfPages}
-            pageLinkClassName="page-link"
-            pageRangeDisplayed={5}
-            previousClassName="page-item"
-            previousLabel="&laquo;"
-            previousLinkClassName="page-link"
-          />
-        )}
+        </Nav>
+        <Card className="border-top-0">
+          <CardBody>
+            {this.state.identifiables.length > 0 && (
+              <ReactPaginate
+                activeClassName="active"
+                breakClassName="page-item"
+                breakLabel="&hellip;"
+                breakLinkClassName="page-link"
+                containerClassName="d-inline-flex mb-2 pagination"
+                disabledClassName="disabled"
+                forcePage={this.state.pageNumber}
+                marginPagesDisplayed={1}
+                nextClassName="page-item"
+                nextLabel="&raquo;"
+                nextLinkClassName="page-link"
+                onPageChange={this.updatePage}
+                pageClassName="page-item"
+                pageCount={this.state.numberOfPages}
+                pageLinkClassName="page-link"
+                pageRangeDisplayed={5}
+                previousClassName="page-item"
+                previousLabel="&laquo;"
+                previousLinkClassName="page-link"
+              />
+            )}
+            <span className="ml-2">
+              {t(`totalElements.${type}s`, {count: this.state.totalElements})}
+            </span>
+            <Table bordered className="mb-0" hover responsive size="sm" striped>
+              <thead>
+                <tr>
+                  <th className="text-right">
+                    <FaHashtag />
+                  </th>
+                  <th className="text-center">
+                    <FaImage />
+                  </th>
+                  <th>{t('label')}</th>
+                  <th>{t('identifiers')}</th>
+                  <th className="text-center">{t('lastModified')}</th>
+                  <th className="text-center">{t('actions')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {identifiables.map((identifiable, index) => (
+                  <IdentifiableListItem
+                    apiContextPath={apiContextPath}
+                    enableMove={enableMove}
+                    enableRemove={enableRemove}
+                    identifiers={identifiable.identifiers}
+                    identifierTypes={identifierTypes}
+                    index={index + 1 + pageNumber * this.pageSize}
+                    key={identifiable.uuid}
+                    label={identifiable.label[activeLanguage]}
+                    lastModified={identifiable.lastModified}
+                    onMove={() => {
+                      this.toggleModal('moveAttachedIdentifiable')
+                      this.setState({moveIndex: index})
+                    }}
+                    onRemove={() => {
+                      this.toggleModal('removeAttachedIdentifiable')
+                      this.setState({removeIndex: index})
+                    }}
+                    parentType={parentType}
+                    previewImage={identifiable.previewImage}
+                    previewImageRenderingHints={
+                      identifiable.previewImageRenderingHints
+                    }
+                    showEdit={showEdit}
+                    type={type}
+                    uiLocale={uiLocale}
+                    uuid={identifiable.uuid}
+                  />
+                ))}
+              </tbody>
+            </Table>
+            {identifiables.length > 0 && (
+              <ReactPaginate
+                activeClassName="active"
+                breakClassName="page-item"
+                breakLabel="&hellip;"
+                breakLinkClassName="page-link"
+                containerClassName="mb-0 mt-2 pagination"
+                disabledClassName="disabled"
+                forcePage={pageNumber}
+                marginPagesDisplayed={1}
+                nextClassName="page-item"
+                nextLabel="&raquo;"
+                nextLinkClassName="page-link"
+                onPageChange={this.updatePage}
+                pageClassName="page-item"
+                pageCount={numberOfPages}
+                pageLinkClassName="page-link"
+                pageRangeDisplayed={5}
+                previousClassName="page-item"
+                previousLabel="&laquo;"
+                previousLinkClassName="page-link"
+              />
+            )}
+          </CardBody>
+        </Card>
         {enableAdd && (
           <AddAttachedIdentifiablesModal
             action="add"
