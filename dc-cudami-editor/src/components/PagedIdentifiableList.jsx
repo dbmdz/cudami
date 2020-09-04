@@ -163,12 +163,6 @@ class PagedIdentifiableList extends Component {
     return successful
   }
 
-  toggleLanguage = (activeLanguage) => {
-    this.setState({
-      activeLanguage,
-    })
-  }
-
   toggleModal = (name) => {
     this.setState({
       modalsOpen: {
@@ -252,7 +246,7 @@ class PagedIdentifiableList extends Component {
                 activeLanguage={activeLanguage}
                 key={language}
                 language={language}
-                toggle={this.toggleLanguage}
+                toggle={(activeLanguage) => this.setState({activeLanguage})}
               />
             ))}
         </Nav>
