@@ -1,30 +1,35 @@
-import React from 'react'
+import React, {useContext} from 'react'
 import {Button, ButtonGroup} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 import {FaExchangeAlt, FaEye, FaPencilAlt, FaUnlink} from 'react-icons/fa'
 
+import AppContext from './AppContext'
 import PreviewImage from './PreviewImage'
 
 const IdentifiableListItem = ({
-  apiContextPath,
   enableMove,
   enableRemove,
-  identifiers,
+  identifiable,
   identifierTypes,
   index,
-  label,
-  lastModified,
+  language,
   onMove,
   onRemove,
   parentType,
-  previewImage,
-  previewImageRenderingHints = {},
   showEdit,
   type,
   uiLocale,
-  uuid,
 }) => {
   const {t} = useTranslation()
+  const {apiContextPath} = useContext(AppContext)
+  const {
+    identifiers,
+    label,
+    lastModified,
+    previewImage,
+    previewImageRenderingHints,
+    uuid,
+  } = identifiable
   const viewUrl = `${apiContextPath}${type.toLowerCase()}s/${uuid}`
   return (
     <tr>
@@ -36,7 +41,7 @@ const IdentifiableListItem = ({
           width={30}
         />
       </td>
-      <td>{label && <a href={viewUrl}>{label}</a>}</td>
+      <td>{label[language] && <a href={viewUrl}>{label[language]}</a>}</td>
       <td>
         <ul className="list-inline mb-0">
           {identifiers.map(({id, namespace}) => (
