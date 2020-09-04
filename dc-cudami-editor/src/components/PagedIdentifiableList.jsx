@@ -28,7 +28,7 @@ class PagedIdentifiableList extends Component {
     super(props)
     const {existingLanguages} = this.props
     this.state = {
-      activeLanguage: existingLanguages ? existingLanguages[0] : '',
+      activeLanguage: existingLanguages?.[0] ?? '',
       existingLanguages: existingLanguages ?? [],
       identifiables: [],
       identifierTypes: [],
