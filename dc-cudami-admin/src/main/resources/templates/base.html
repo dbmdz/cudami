@@ -34,7 +34,7 @@
   </head>
   <body>
     <div class="navbar navbar-expand-md bg-white navbar-light fixed-top">
-      <div class="container">
+      <div class="container-fluid">
         <a class="navbar-brand nav-link" th:href="@{/}">
           <img th:src="@{/images/logo-cudami.png}" height="39" style="margin-top:-5px;"/>
           <!--            <i class="logo fas fa-code-branch"></i>-->
@@ -70,7 +70,7 @@
       </div>
     </div>
 
-    <div class="container">
+    <div class="container-fluid">
       <div th:replace="fragments/feedback-messages :: global-bootstrap4"></div>
 
       <section layout:fragment="content">
