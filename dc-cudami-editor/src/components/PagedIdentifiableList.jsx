@@ -1,3 +1,4 @@
+import classNames from 'classnames'
 import uniqBy from 'lodash/uniqBy'
 import React, {Component} from 'react'
 import {Alert, Button, Card, CardBody, Col, Nav, Row, Table} from 'reactstrap'
@@ -209,7 +210,37 @@ class PagedIdentifiableList extends Component {
       numberOfPages,
       pageNumber,
       showSuccessfullyMoved,
+      totalElements,
     } = this.state
+    const TablePagination = ({position}) => (
+      <ReactPaginate
+        activeClassName="active"
+        breakClassName="page-item"
+        breakLabel="&hellip;"
+        breakLinkClassName="page-link"
+        containerClassName={classNames({
+          'd-inline-flex': true,
+          pagination: true,
+          'mb-0': position === 'under',
+          'mb-2': position === 'above',
+          'mt-2': position === 'under',
+        })}
+        disabledClassName="disabled"
+        forcePage={pageNumber}
+        marginPagesDisplayed={1}
+        nextClassName="page-item"
+        nextLabel="&raquo;"
+        nextLinkClassName="page-link"
+        onPageChange={this.updatePage}
+        pageClassName="page-item"
+        pageCount={numberOfPages}
+        pageLinkClassName="page-link"
+        pageRangeDisplayed={5}
+        previousClassName="page-item"
+        previousLabel="&laquo;"
+        previousLinkClassName="page-link"
+      />
+    )
     return (
       <AppContext.Provider value={{apiContextPath, defaultLanguage, mockApi}}>
         <Row>
@@ -252,31 +283,9 @@ class PagedIdentifiableList extends Component {
         </Nav>
         <Card className="border-top-0">
           <CardBody>
-            {this.state.identifiables.length > 0 && (
-              <ReactPaginate
-                activeClassName="active"
-                breakClassName="page-item"
-                breakLabel="&hellip;"
-                breakLinkClassName="page-link"
-                containerClassName="d-inline-flex mb-2 pagination"
-                disabledClassName="disabled"
-                forcePage={this.state.pageNumber}
-                marginPagesDisplayed={1}
-                nextClassName="page-item"
-                nextLabel="&raquo;"
-                nextLinkClassName="page-link"
-                onPageChange={this.updatePage}
-                pageClassName="page-item"
-                pageCount={this.state.numberOfPages}
-                pageLinkClassName="page-link"
-                pageRangeDisplayed={5}
-                previousClassName="page-item"
-                previousLabel="&laquo;"
-                previousLinkClassName="page-link"
-              />
-            )}
+            {identifiables.length > 0 && <TablePagination position="above" />}
             <span className="ml-2">
-              {t(`totalElements.${type}s`, {count: this.state.totalElements})}
+              {t(`totalElements.${type}s`, {count: totalElements})}
             </span>
             <Table bordered className="mb-0" hover responsive size="sm" striped>
               <thead>
@@ -326,29 +335,7 @@ class PagedIdentifiableList extends Component {
                 ))}
               </tbody>
             </Table>
-            {identifiables.length > 0 && (
-              <ReactPaginate
-                activeClassName="active"
-                breakClassName="page-item"
-                breakLabel="&hellip;"
-                breakLinkClassName="page-link"
-                containerClassName="mb-0 mt-2 pagination"
-                disabledClassName="disabled"
-                forcePage={pageNumber}
-                marginPagesDisplayed={1}
-                nextClassName="page-item"
-                nextLabel="&raquo;"
-                nextLinkClassName="page-link"
-                onPageChange={this.updatePage}
-                pageClassName="page-item"
-                pageCount={numberOfPages}
-                pageLinkClassName="page-link"
-                pageRangeDisplayed={5}
-                previousClassName="page-item"
-                previousLabel="&laquo;"
-                previousLinkClassName="page-link"
-              />
-            )}
+            {identifiables.length > 0 && <TablePagination position="under" />}
           </CardBody>
         </Card>
         {enableAdd && (
