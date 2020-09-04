@@ -36,9 +36,7 @@ const IdentifiableListItem = ({
           width={30}
         />
       </td>
-      <td>
-        <a href={viewUrl}>{label}</a>
-      </td>
+      <td>{label && <a href={viewUrl}>{label}</a>}</td>
       <td>
         <ul className="list-inline mb-0">
           {identifiers.map(({id, namespace}) => (
