@@ -305,15 +305,13 @@ class PagedIdentifiableList extends Component {
               <tbody>
                 {identifiables.map((identifiable, index) => (
                   <IdentifiableListItem
-                    apiContextPath={apiContextPath}
                     enableMove={enableMove}
                     enableRemove={enableRemove}
-                    identifiers={identifiable.identifiers}
+                    identifiable={identifiable}
                     identifierTypes={identifierTypes}
                     index={index + 1 + pageNumber * this.pageSize}
                     key={identifiable.uuid}
-                    label={identifiable.label[activeLanguage]}
-                    lastModified={identifiable.lastModified}
+                    language={activeLanguage}
                     onMove={() => {
                       this.toggleModal('moveAttachedIdentifiable')
                       this.setState({moveIndex: index})
@@ -323,14 +321,9 @@ class PagedIdentifiableList extends Component {
                       this.setState({removeIndex: index})
                     }}
                     parentType={parentType}
-                    previewImage={identifiable.previewImage}
-                    previewImageRenderingHints={
-                      identifiable.previewImageRenderingHints
-                    }
                     showEdit={showEdit}
                     type={type}
                     uiLocale={uiLocale}
-                    uuid={identifiable.uuid}
                   />
                 ))}
               </tbody>
