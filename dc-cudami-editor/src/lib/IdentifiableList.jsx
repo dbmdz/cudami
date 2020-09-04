@@ -12,6 +12,7 @@ export default function (config) {
       enableAdd={config.enableAdd}
       enableMove={config.enableMove}
       enableRemove={config.enableRemove}
+      existingLanguages={config.existingLanguages}
       parentType={config.parentType}
       parentUuid={config.parentUuid}
       showEdit={config.showEdit}
