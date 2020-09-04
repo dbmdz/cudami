@@ -212,34 +212,41 @@ class PagedIdentifiableList extends Component {
       showSuccessfullyMoved,
       totalElements,
     } = this.state
-    const TablePagination = ({position}) => (
-      <ReactPaginate
-        activeClassName="active"
-        breakClassName="page-item"
-        breakLabel="&hellip;"
-        breakLinkClassName="page-link"
-        containerClassName={classNames({
-          'd-inline-flex': true,
-          pagination: true,
-          'mb-0': position === 'under',
-          'mb-2': position === 'above',
-          'mt-2': position === 'under',
-        })}
-        disabledClassName="disabled"
-        forcePage={pageNumber}
-        marginPagesDisplayed={1}
-        nextClassName="page-item"
-        nextLabel="&raquo;"
-        nextLinkClassName="page-link"
-        onPageChange={this.updatePage}
-        pageClassName="page-item"
-        pageCount={numberOfPages}
-        pageLinkClassName="page-link"
-        pageRangeDisplayed={5}
-        previousClassName="page-item"
-        previousLabel="&laquo;"
-        previousLinkClassName="page-link"
-      />
+    const TablePagination = ({position, showTotalElements}) => (
+      <>
+        <ReactPaginate
+          activeClassName="active"
+          breakClassName="page-item"
+          breakLabel="&hellip;"
+          breakLinkClassName="page-link"
+          containerClassName={classNames({
+            'd-inline-flex': true,
+            pagination: true,
+            'mb-0': position === 'under',
+            'mb-2': position === 'above',
+            'mt-2': position === 'under',
+          })}
+          disabledClassName="disabled"
+          forcePage={pageNumber}
+          marginPagesDisplayed={1}
+          nextClassName="page-item"
+          nextLabel="&raquo;"
+          nextLinkClassName="page-link"
+          onPageChange={this.updatePage}
+          pageClassName="page-item"
+          pageCount={numberOfPages}
+          pageLinkClassName="page-link"
+          pageRangeDisplayed={5}
+          previousClassName="page-item"
+          previousLabel="&laquo;"
+          previousLinkClassName="page-link"
+        />
+        {showTotalElements && (
+          <span className="ml-2">
+            {t(`totalElements.${type}s`, {count: totalElements})}
+          </span>
+        )}
+      </>
     )
     return (
       <AppContext.Provider value={{apiContextPath, defaultLanguage, mockApi}}>
@@ -283,10 +290,9 @@ class PagedIdentifiableList extends Component {
         </Nav>
         <Card className="border-top-0">
           <CardBody>
-            {identifiables.length > 0 && <TablePagination position="above" />}
-            <span className="ml-2">
-              {t(`totalElements.${type}s`, {count: totalElements})}
-            </span>
+            {identifiables.length > 0 && (
+              <TablePagination position="above" showTotalElements />
+            )}
             <Table bordered className="mb-0" hover responsive size="sm" striped>
               <thead>
                 <tr>
