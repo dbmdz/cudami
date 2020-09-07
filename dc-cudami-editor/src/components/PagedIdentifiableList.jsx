@@ -1,13 +1,14 @@
 import classNames from 'classnames'
 import uniqBy from 'lodash/uniqBy'
 import React, {Component} from 'react'
-import {Alert, Button, Card, CardBody, Col, Nav, Row, Table} from 'reactstrap'
+import {Button, Card, CardBody, Col, Nav, Row, Table} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 import {FaHashtag, FaImage} from 'react-icons/fa'
 import ReactPaginate from 'react-paginate'
 
 import './common.css'
 import AppContext from './AppContext'
+import FeedbackMessage from './FeedbackMessage'
 import IdentifiableListItem from './IdentifiableListItem'
 import LanguageTab from './LanguageTab'
 import AddAttachedIdentifiablesModal from './modals/AddAttachedIdentifiablesModal'
@@ -85,6 +86,14 @@ class PagedIdentifiableList extends Component {
     return successful
   }
 
+  getLabelValue = (label) => {
+    return (
+      label[this.state.activeLanguage] ??
+      label[this.state.defaultLanguage] ??
+      Object.values(label)[0]
+    )
+  }
+
   handleAdd = async (identifiablesToAdd) => {
     const {identifiables, pageNumber} = this.state
     const uniqueIdentifiables = uniqBy(identifiablesToAdd, 'uuid')
@@ -92,27 +101,44 @@ class PagedIdentifiableList extends Component {
     if (!successful) {
       return console.error('an error occured while adding the identifiables')
     }
+    this.setState({
+      feedbackMessage: {
+        color: 'success',
+        key: `${this.props.type}AddedSuccessfully`,
+        values: {count: uniqueIdentifiables.length},
+      },
+    })
     if (identifiables.length === this.pageSize) {
       return this.updatePage({selected: pageNumber + 1})
     }
     this.updatePage({selected: pageNumber})
   }
 
-  handleMove = async ({uuid}) => {
+  handleMove = async ({label: targetLabel, uuid: targetUuid}) => {
+    const {apiContextPath, parentUuid, type} = this.props
     const {identifiables, moveIndex, pageNumber} = this.state
-    const uuidToMove = identifiables[moveIndex].uuid
-    if (uuid === uuidToMove) {
+    const {label, uuid} = identifiables[moveIndex]
+    if (uuid === targetUuid) {
       return console.error('an identifiable cannot be moved to itself')
     }
-    const addedSuccessfully = await this.addIdentifiable(uuid, uuidToMove)
+    const addedSuccessfully = await this.addIdentifiable(targetUuid, uuid)
     if (addedSuccessfully) {
       const removedSuccessfully = await this.removeIdentifiable(
-        this.props.parentUuid,
-        uuidToMove
+        parentUuid,
+        uuid
       )
       if (removedSuccessfully) {
-        this.setState({showSuccessfullyMoved: true})
-        setTimeout(() => this.setState({showSuccessfullyMoved: false}), 3000)
+        this.setState({
+          feedbackMessage: {
+            color: 'success',
+            key: `${type}MovedSuccessfully`,
+            links: [`${apiContextPath}${type.toLowerCase()}s/${uuid}`],
+            values: {
+              name: this.getLabelValue(label),
+              targetName: this.getLabelValue(targetLabel),
+            },
+          },
+        })
         if (pageNumber > 0 && identifiables.length === 1) {
           return this.updatePage({selected: pageNumber - 1})
         }
@@ -123,14 +149,23 @@ class PagedIdentifiableList extends Component {
 
   handleRemove = async () => {
     const {identifiables, pageNumber, removeIndex} = this.state
-    const uuidToRemove = identifiables[removeIndex].uuid
+    const {label, uuid} = identifiables[removeIndex]
     const successful = await this.removeIdentifiable(
       this.props.parentUuid,
-      uuidToRemove
+      uuid
     )
     if (!successful) {
       return console.error('an error occured while removing the identifiable')
     }
+    this.setState({
+      feedbackMessage: {
+        color: 'success',
+        key: `${this.props.type}RemovedSuccessfully`,
+        values: {
+          name: this.getLabelValue(label),
+        },
+      },
+    })
     if (pageNumber > 0 && identifiables.length === 1) {
       return this.updatePage({selected: pageNumber - 1})
     }
@@ -204,6 +239,7 @@ class PagedIdentifiableList extends Component {
       activeLanguage,
       defaultLanguage,
       existingLanguages,
+      feedbackMessage,
       identifiables,
       identifierTypes,
       modalsOpen,
@@ -272,10 +308,12 @@ class PagedIdentifiableList extends Component {
             )}
           </Col>
         </Row>
-        {showSuccessfullyMoved && (
-          <Alert className="mb-2" color="info">
-            {t(`${type}SuccessfullyMoved`)}
-          </Alert>
+        {feedbackMessage && (
+          <FeedbackMessage
+            className="mb-2"
+            message={feedbackMessage}
+            onClose={() => this.setState({feedbackMessage: undefined})}
+          />
         )}
         <Nav tabs>
           {existingLanguages.length > 1 &&
