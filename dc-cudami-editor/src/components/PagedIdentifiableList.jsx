@@ -41,7 +41,6 @@ class PagedIdentifiableList extends Component {
       },
       numberOfPages: 0,
       pageNumber: 0,
-      showSuccessfullyMoved: false,
       totalElements: 0,
     }
   }
@@ -245,7 +244,6 @@ class PagedIdentifiableList extends Component {
       modalsOpen,
       numberOfPages,
       pageNumber,
-      showSuccessfullyMoved,
       totalElements,
     } = this.state
     const TablePagination = ({position, showTotalElements}) => (
