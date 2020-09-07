@@ -1,10 +1,11 @@
 import React, {Component} from 'react'
-import {Alert, Col, FormGroup, Input, Row} from 'reactstrap'
+import {Col, FormGroup, Input, Row} from 'reactstrap'
 import Autosuggest from 'react-autosuggest'
 import {withTranslation} from 'react-i18next'
 
 import './Autocomplete.css'
 import AppContext from './AppContext'
+import FeedbackMessage from './FeedbackMessage'
 import PreviewImage from './PreviewImage'
 
 class Autocomplete extends Component {
@@ -97,12 +98,15 @@ class Autocomplete extends Component {
     return (
       <div {...containerProps}>
         {this.state.totalElements > this.maxElements && (
-          <Alert className="mb-0" color="info">
-            {this.props.t('autocomplete.moreElementsFound', {
-              maxElements: this.maxElements,
-              totalElements: this.state.totalElements,
-            })}
-          </Alert>
+          <FeedbackMessage
+            message={{
+              key: 'autocomplete.moreElementsFound',
+              values: {
+                maxElements: this.maxElements,
+                totalElements: this.state.totalElements,
+              },
+            }}
+          />
         )}
         {children}
       </div>

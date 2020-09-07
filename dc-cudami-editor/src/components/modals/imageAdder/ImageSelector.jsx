@@ -1,7 +1,6 @@
 import React, {Component} from 'react'
 import classNames from 'classnames'
 import {
-  Alert,
   Card,
   CardBody,
   CardHeader,
@@ -22,6 +21,7 @@ import Autocomplete from '../../Autocomplete'
 import ImageLabelInput from './ImageLabelInput'
 import ImagePreview from './ImagePreview'
 import AppContext from '../../AppContext'
+import FeedbackMessage from '../../FeedbackMessage'
 import FileUploadForm from '../../FileUploadForm'
 import {getImageUrl} from '../../utils'
 import {searchImages, uploadFile} from '../../../api'
@@ -174,9 +174,14 @@ class ImageSelector extends Component {
                   uri={fileResource.uri}
                 />
               )}
-              <Alert color="success" isOpen={this.state.showUploadSuccess}>
-                {t('selectImage.uploadSuccessful')}
-              </Alert>
+              {this.state.showUploadSuccess && (
+                <FeedbackMessage
+                  message={{
+                    color: 'success',
+                    key: 'selectImage.uploadSuccessful',
+                  }}
+                />
+              )}
               <FileUploadForm
                 onChange={(file) => this.uploadImage(file)}
                 progress={this.state.progress}
