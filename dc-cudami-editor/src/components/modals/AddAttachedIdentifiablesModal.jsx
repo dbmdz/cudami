@@ -1,7 +1,6 @@
 import startCase from 'lodash/startCase'
 import React, {Component} from 'react'
 import {
-  Alert,
   Button,
   Col,
   Form,
@@ -19,6 +18,7 @@ import {FaTrash} from 'react-icons/fa'
 
 import AppContext from '../AppContext'
 import Autocomplete from '../Autocomplete'
+import FeedbackMessage from '../FeedbackMessage'
 import IdentifierSearch from '../IdentifierSearch'
 import PreviewImage from '../PreviewImage'
 import {searchIdentifiables} from '../../api'
@@ -147,9 +147,7 @@ class AddAttachedIdentifiablesModal extends Component {
             {identifiables.length > 0 && (
               <ListGroup className="mb-3">
                 {maxElements !== 1 && (
-                  <Alert className="mb-0" color="info">
-                    {t('duplicateInformation')}
-                  </Alert>
+                  <FeedbackMessage message={{key: 'duplicateInformation'}} />
                 )}
                 {identifiables.map(
                   (

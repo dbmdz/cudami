@@ -1,16 +1,10 @@
 import {publish, subscribe, unsubscribe} from 'pubsub-js'
 import React, {useState} from 'react'
-import {
-  Alert,
-  Button,
-  ButtonGroup,
-  Card,
-  CardBody,
-  CardFooter,
-} from 'reactstrap'
+import {Button, ButtonGroup, Card, CardBody, CardFooter} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 import {FaEdit, FaPlus, FaTrashAlt} from 'react-icons/fa'
 
+import FeedbackMessage from './FeedbackMessage'
 import PreviewImage from './PreviewImage'
 
 const handleClick = (
@@ -117,9 +111,9 @@ const TeaserPreviewImage = ({
         </CardBody>
         {showRemoveNotification && (
           <CardFooter className="p-0">
-            <Alert className="mb-0" color="info">
-              {t('removePreviewImageAfterSaveNotification')}
-            </Alert>
+            <FeedbackMessage
+              message={{key: 'removePreviewImageAfterSaveNotification'}}
+            />
           </CardFooter>
         )}
       </Card>
