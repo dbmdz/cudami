@@ -1,11 +1,13 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.Project;
+import de.digitalcollections.model.api.identifiable.entity.enums.EntityType;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -90,5 +92,10 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
       UUID digitalObjectUuid, List<FileResource> fileResources) {
     return ((DigitalObjectRepository) repository)
         .saveFileResources(digitalObjectUuid, fileResources);
+  }
+
+  @Override
+  public List<DigitalObject> findAllMetadata() {
+    return ((EntityRepository) repository).findAllMetadata(EntityType.DIGITAL_OBJECT);
   }
 }

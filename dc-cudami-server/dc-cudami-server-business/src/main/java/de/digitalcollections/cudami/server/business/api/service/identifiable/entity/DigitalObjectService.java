@@ -29,4 +29,6 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
       DigitalObject digitalObject, List<FileResource> fileResources);
 
   List<FileResource> saveFileResources(UUID digitalObjectUuid, List<FileResource> fileResources);
+
+  List<DigitalObject> findAllMetadata();
 }

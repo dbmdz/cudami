@@ -73,6 +73,17 @@ public class DigitalObjectController {
 
   @ApiMethod(
       description =
+          "Get all digital objects with their metadata (only all identifiers and last modification date)")
+  @GetMapping(
+      value = {"/latest/digitalobjects/metadata", "/v2/digitalobjects/metadata"},
+      produces = "application/json")
+  @ApiResponseObject
+  public List<DigitalObject> findAllMetadata() {
+    return service.findAllMetadata();
+  }
+
+  @ApiMethod(
+      description =
           "Find limited amount of digital objects containing searchTerm in label or description")
   @GetMapping(
       value = {"/latest/digitalobjects/search", "/v3/digitalobjects/search"},
