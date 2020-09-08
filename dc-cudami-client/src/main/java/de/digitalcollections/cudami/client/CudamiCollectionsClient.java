@@ -94,6 +94,12 @@ public class CudamiCollectionsClient extends CudamiBaseClient<CollectionImpl> {
     return doGetRequestForPagedObjectList("/latest/collections/top", pageRequest);
   }
 
+  public Collection getParent(UUID uuid) throws HttpException {
+    return (Collection)
+        doGetRequestForObject(
+            String.format("/latest/collections/%s/parent", uuid), CollectionImpl.class);
+  }
+
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws HttpException {
     return (BreadcrumbNavigation)
         doGetRequestForObject(

@@ -209,6 +209,15 @@ public class CollectionController {
     return collectionService.count();
   }
 
+  @ApiMethod(description = "Get the first created parent of a collection")
+  @GetMapping(
+      value = {"/latest/collections/{uuid}/parent", "/v3/collections/{uuid}/parent"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public Collection getParent(@PathVariable UUID uuid) {
+    return collectionService.getParent(uuid);
+  }
+
   @ApiMethod(description = "Get the breadcrumb for a collection")
   @GetMapping(
       value = {"/latest/collections/{uuid}/breadcrumb", "/v3/collections/{uuid}/breadcrumb"},

@@ -10,7 +10,7 @@ import java.util.UUID;
 /** @param <E> entity instance */
 public interface EntityRepository<E extends Entity> extends IdentifiableRepository<E> {
 
-  void addRelation(EntityRelation<E> relation);
+  void addRelation(EntityRelation relation);
 
   void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid);
 
