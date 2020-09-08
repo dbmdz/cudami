@@ -131,7 +131,7 @@ class PagedIdentifiableList extends Component {
           feedbackMessage: {
             color: 'success',
             key: `${type}MovedSuccessfully`,
-            links: [`${apiContextPath}${type.toLowerCase()}s/${uuid}`],
+            links: [`${apiContextPath}${type.toLowerCase()}s/${targetUuid}`],
             values: {
               name: this.getLabelValue(label),
               targetName: this.getLabelValue(targetLabel),
