@@ -62,7 +62,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   // select to return only metadata (uuid, identifiers and lastmodified
   private static final String REDUCED_FIND_ALL_METADATA_SQL =
-      "SELECT e.uuid e_uuid, e.last_modified e_last_modified, e.identifiable_type e_type, id.identifiable id_identifiable"
+      "SELECT e.uuid e_uuid, e.last_modified e_last_modified, e.identifiable_type e_type, id.identifiable id_identifiable, id.uuid id_uuid, id.namespace id_namespace, id.identifier id_id"
           + " FROM %s as e"
           + " LEFT JOIN identifiers as id on e.uuid = id.identifiable";
 
@@ -371,6 +371,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
             h ->
                 h.createQuery(query.toString())
                     .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
+                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .reduceRows(
                         new LinkedHashMap<UUID, EntityImpl>(),
                         (map, rowView) -> {
@@ -380,6 +381,11 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
                                   fn -> {
                                     return rowView.getRow(EntityImpl.class);
                                   });
+
+                          if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                            IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                            entity.addIdentifier(dbIdentifier);
+                          }
                           return map;
                         })
                     .values()));
