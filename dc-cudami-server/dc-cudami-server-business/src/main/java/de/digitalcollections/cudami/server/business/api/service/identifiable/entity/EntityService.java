@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface EntityService<E extends Entity> extends IdentifiableService<E> {
 
-  void addRelation(EntityRelation<E> relation);
+  void addRelation(EntityRelation relation);
 
   void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid);
 

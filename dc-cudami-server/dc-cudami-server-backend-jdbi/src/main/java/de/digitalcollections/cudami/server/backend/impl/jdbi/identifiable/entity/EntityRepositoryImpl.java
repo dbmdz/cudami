@@ -85,7 +85,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public void addRelation(EntityRelation<E> relation) {
+  public void addRelation(EntityRelation relation) {
     addRelation(
         relation.getSubject().getUuid(), relation.getPredicate(), relation.getObject().getUuid());
   }

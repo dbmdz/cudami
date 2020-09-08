@@ -19,12 +19,13 @@ import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.paging.enums.Direction;
-import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -296,10 +297,23 @@ public class CollectionsController extends AbstractController {
         languageSortingHelper.sortLanguages(displayLocale, existingSubcollectionLanguages));
     model.addAttribute("collection", collection);
 
-    BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
-    List<Node> breadcrumbs = breadcrumbNavigation.getNavigationItems();
+    List<Node> breadcrumbs = new ArrayList<>();
+    addParentNodeToBreadcrumb(collection, breadcrumbs);
+    Collections.reverse(breadcrumbs);
+
+    //    BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
+    //    List<Node> breadcrumbs = breadcrumbNavigation.getNavigationItems();
     model.addAttribute("breadcrumbs", breadcrumbs);
 
     return "collections/view";
+  }
+
+  private void addParentNodeToBreadcrumb(Node currentNode, List<Node> breadcrumbs)
+      throws HttpException {
+    Node parent = service.getParent(currentNode.getUuid());
+    if (parent != null && parent.getUuid() != null) {
+      breadcrumbs.add(parent);
+      addParentNodeToBreadcrumb(parent, breadcrumbs);
+    }
   }
 }
