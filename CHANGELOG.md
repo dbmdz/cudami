@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.6.0](https://github.com/dbmdz/cudami/releases/tag/3.6.0) - 2020-09-09
+
+### Added
+
+- Added functionality to stay in the same language when switching from the view to the edit page
+- Added functionality to add and remove digital objects from a project
+- Added the possibility to add, move and remove subcollections
+- Added display of identifiers to identifiable list
+- Added floating labels instead of placeholders for some input fields, so that the label is still visible when the is content in the field
+- Added language tabs for paged list of identifiables
+
+### Changed
+
+- Fixed external links to open in a new tab
+- Fixed link urls containing whitespace
+- Made the whole application use the complete width of the screen
+- Fixed the filename of images added as url to only contain the last part of the url
+
 ## [3.5.0](https://github.com/dbmdz/cudami/releases/tag/3.5.0) - 2020-08-18
 
 ### Added
