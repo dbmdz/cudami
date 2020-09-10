@@ -1,5 +1,7 @@
 import {marks} from 'prosemirror-schema-basic'
 
+import linkMark from './custom/LinkMark'
+
 const subscript = {
   excludes: 'superscript',
   parseDOM: [{tag: 'sub'}, {style: 'vertical-align=sub'}],
@@ -42,4 +44,6 @@ export default {
   superscript,
   strikethrough,
   underline,
+  // custom marks
+  ...linkMark,
 }
