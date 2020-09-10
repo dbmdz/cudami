@@ -38,14 +38,14 @@ const ImageMetadataForm = ({
             <InputGroup>
               <FloatingLabelInput
                 label={t('caption')}
-                name="caption"
+                name="image-caption"
                 onChange={(value) => onChange('caption', value)}
                 value={caption}
               />
               <InputGroupAddon addonType="append">
                 <InfoTooltip
                   isOpen={tooltipsOpen.caption}
-                  name="caption"
+                  name="image-caption"
                   text={t('tooltips.caption')}
                   toggle={() => toggleTooltip('caption')}
                 />
@@ -56,14 +56,14 @@ const ImageMetadataForm = ({
             <InputGroup>
               <FloatingLabelInput
                 label={t('tooltip')}
-                name="title"
+                name="image-title"
                 onChange={(value) => onChange('title', value)}
                 value={title}
               />
               <InputGroupAddon addonType="append">
                 <InfoTooltip
                   isOpen={tooltipsOpen.title}
-                  name="title"
+                  name="image-title"
                   text={t('tooltips.title')}
                   toggle={() => toggleTooltip('title')}
                 />
@@ -74,14 +74,14 @@ const ImageMetadataForm = ({
             <InputGroup>
               <FloatingLabelInput
                 label={t('altText')}
-                name="altText"
+                name="image-alttext"
                 onChange={(value) => onChange('altText', value)}
                 value={altText}
               />
               <InputGroupAddon addonType="append">
                 <InfoTooltip
                   isOpen={tooltipsOpen.altText}
-                  name="alttext"
+                  name="image-alttext"
                   text={t('tooltips.altText')}
                   toggle={() => toggleTooltip('altText')}
                 />
