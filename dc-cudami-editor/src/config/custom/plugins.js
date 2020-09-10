@@ -3,7 +3,7 @@ import {Plugin} from 'prosemirror-state'
 import IframeView from './IframeView'
 import ImageView from './ImageView'
 
-export default () => {
+export const nodeViews = () => {
   return new Plugin({
     props: {
       nodeViews: {
