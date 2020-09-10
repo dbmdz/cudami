@@ -10,8 +10,9 @@ import {wrapInList} from 'prosemirror-schema-list'
 // import { addColumnAfter, addColumnBefore } from 'prosemirror-tables'
 import {publish, subscribe, unsubscribe} from 'pubsub-js'
 
-import schema from './schema'
 import icons from './icons'
+import schema from './schema'
+import {markActive} from './utils'
 
 const blockActive = (type, attrs = {}) => (state) => {
   const {$from, to, node} = state.selection
@@ -47,14 +48,6 @@ const headingActive = () => (state) => {
     }
   }
   return active
-}
-
-const markActive = (type) => (state) => {
-  const {from, $from, to, empty} = state.selection
-
-  return empty
-    ? type.isInSet(state.storedMarks || $from.marks())
-    : state.doc.rangeHasMark(from, to, type)
 }
 
 export default function (t) {
