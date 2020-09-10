@@ -119,7 +119,7 @@ const ImageRenderingHintsForm = ({
             <Label className="font-weight-bold">{t('imageLink')}</Label>
             <FloatingLabelInput
               label="URL"
-              name="imageLink"
+              name="image-link"
               onChange={(value) => onChange('linkUrl', value)}
               type="url"
               value={linkUrl}
