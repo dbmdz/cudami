@@ -333,7 +333,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public List<E> findAllMetadata(EntityType entityType) {
+  public List<E> findAllReduced(EntityType entityType) {
 
     String tableName = "";
     switch (entityType) {

@@ -30,5 +30,10 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
 
   List<FileResource> saveFileResources(UUID digitalObjectUuid, List<FileResource> fileResources);
 
-  List<DigitalObject> findAllMetadata();
+  /**
+   * Returns a list of all DigitalObjects, reduced to their identifiers and last modified date
+   *
+   * @return partially (see above) filled list of all DigitalObjects
+   */
+  List<DigitalObject> findAllReduced();
 }

@@ -15,7 +15,13 @@ public interface EntityRepository<E extends Entity> extends IdentifiableReposito
 
   void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid);
 
-  List<E> findAllMetadata(EntityType entityType);
+  /**
+   * Returns a list of all Entities, reduced to their identifiers and last modification date
+   *
+   * @param entityType the entity type, from which the source table is calculated
+   * @return partially filled list of all entities
+   */
+  List<E> findAllReduced(EntityType entityType);
 
   E findOneByRefId(long refId);
 

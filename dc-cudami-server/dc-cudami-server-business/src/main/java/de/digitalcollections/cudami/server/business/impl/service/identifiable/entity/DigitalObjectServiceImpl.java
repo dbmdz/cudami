@@ -95,7 +95,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
-  public List<DigitalObject> findAllMetadata() {
-    return ((EntityRepository) repository).findAllMetadata(EntityType.DIGITAL_OBJECT);
+  public List<DigitalObject> findAllReduced() {
+    return ((EntityRepository) repository).findAllReduced(EntityType.DIGITAL_OBJECT);
   }
 }
