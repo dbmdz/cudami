@@ -106,7 +106,7 @@ public class CorporationController {
 
   @ApiMethod(description = "Update an corporation")
   @PutMapping(
-      value = {"/latest/corporations/{uuid}", "/v2/corporations/{uuid}"},
+      value = {"/latest/corporations/gnd:{uuid}", "/v2/corporations/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Corporation update(

@@ -66,6 +66,7 @@
     <module>dc-cudami-client</module>
     <module>dc-cudami-server</module>
     <module>dc-cudami-templates</module>
+    <module>dc-cudami-lobid-client</module>
   </modules>
 
   <properties>

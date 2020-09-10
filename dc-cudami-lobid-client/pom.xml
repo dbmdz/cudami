@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>de.digitalcollections.cudami</groupId>
+    <artifactId>dc-cudami</artifactId>
+    <version>3.7.0-SNAPSHOT</version>
+  </parent>
+  
+  <name>DigitalCollections: cudami lobid.org Client</name>
+  <artifactId>dc-cudami-lobid-client</artifactId>
+  <packaging>jar</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.11.2</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>de.digitalcollections.model</groupId>
+            <artifactId>dc-model</artifactId>
+            <version>6.3.0-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+    </dependencies>
+</project>
