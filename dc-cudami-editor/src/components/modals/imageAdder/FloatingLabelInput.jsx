@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import React, {useState} from 'react'
 import {Input, Label} from 'reactstrap'
 
-const FloatingLabelInput = ({label, name, onChange, value}) => {
+const FloatingLabelInput = ({label, name, onChange, type = 'text', value}) => {
   const [focussed, setFocussed] = useState(false)
   return (
     <>
@@ -13,7 +13,7 @@ const FloatingLabelInput = ({label, name, onChange, value}) => {
         onBlur={() => setFocussed(false)}
         onChange={(evt) => onChange(evt.target.value)}
         onFocus={() => setFocussed(true)}
-        type="text"
+        type={type}
         value={value}
       />
       <Label
