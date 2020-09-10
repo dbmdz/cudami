@@ -1,6 +1,27 @@
-import React from 'react'
-
-export const ApiContext = React.createContext(null)
+export async function addAttachedIdentifiable(
+  contextPath,
+  mock,
+  parentType,
+  parentUuid,
+  type,
+  uuid
+) {
+  if (mock) {
+    return true
+  }
+  const url = `${contextPath}api/${parentType.toLowerCase()}s/${parentUuid}/${type.toLowerCase()}s/${uuid}`
+  try {
+    const response = await fetch(url, {
+      headers: {
+        credentials: 'same-origin',
+      },
+      method: 'POST',
+    })
+    return response.ok
+  } catch (err) {
+    return false
+  }
+}
 
 export async function addAttachedIdentifiables(
   contextPath,
@@ -21,7 +42,7 @@ export async function addAttachedIdentifiables(
         'Content-Type': 'application/json',
         credentials: 'same-origin',
       },
-      method: 'PATCH',
+      method: 'POST',
     })
     return response.ok
   } catch (err) {
@@ -200,7 +221,7 @@ export async function saveIdentifiable(
       return json
     }
   } catch (err) {
-    console.log('An error occured')
+    console.log('An error occured while saving the identifiable')
   }
 }
 
@@ -295,7 +316,7 @@ export async function updateIdentifiable(
       return json
     }
   } catch (err) {
-    console.log('An error occured')
+    console.log('An error occured while updating the identifiable')
   }
 }
 

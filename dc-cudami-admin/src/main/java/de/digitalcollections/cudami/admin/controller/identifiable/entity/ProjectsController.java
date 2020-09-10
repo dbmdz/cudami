@@ -9,9 +9,11 @@ import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.CudamiProjectsClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
+import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.Project;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -27,6 +29,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -57,6 +60,17 @@ public class ProjectsController extends AbstractController {
   @ModelAttribute("menu")
   protected String module() {
     return "projects";
+  }
+
+  @PostMapping("/api/projects/{uuid}/digitalobjects")
+  public ResponseEntity addDigitalObjects(
+      @PathVariable UUID uuid, @RequestBody List<DigitalObject> digitalObjects)
+      throws HttpException {
+    boolean successful = service.addDigitalObjects(uuid, digitalObjects);
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
   @GetMapping("/projects/new")
@@ -99,6 +113,19 @@ public class ProjectsController extends AbstractController {
     return service.findOne(uuid);
   }
 
+  @GetMapping("/api/projects/{uuid}/digitalobjects")
+  @ResponseBody
+  public PageResponse<DigitalObject> getDigitalObjects(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      throws HttpException {
+    PageRequest pageRequest = new PageRequestImpl();
+    pageRequest.setPageNumber(pageNumber);
+    pageRequest.setPageSize(pageSize);
+    return service.getDigitalObjects(uuid, pageRequest);
+  }
+
   @GetMapping("/projects")
   public String list(
       Model model,
@@ -115,11 +142,15 @@ public class ProjectsController extends AbstractController {
     return "projects/list";
   }
 
-  @GetMapping("/projects/{projectUuid}/digitalobjects/{digitalobjectUuid}/remove")
-  public String removeDigitalObjectFromProject(
+  @DeleteMapping("/api/projects/{projectUuid}/digitalobjects/{digitalobjectUuid}")
+  @ResponseBody
+  public ResponseEntity removeDigitalObject(
       @PathVariable UUID projectUuid, @PathVariable UUID digitalobjectUuid) throws HttpException {
-    service.removeDigitalObject(projectUuid, digitalobjectUuid);
-    return "redirect:/projects/" + projectUuid;
+    boolean successful = service.removeDigitalObject(projectUuid, digitalobjectUuid);
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
   @PostMapping("/api/projects/new")
@@ -155,11 +186,6 @@ public class ProjectsController extends AbstractController {
 
     model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("project", project);
-
-    final PageRequest pageRequest = PageableConverter.convert(pageable);
-    final PageResponse pageResponse = service.getDigitalObjects(uuid, pageRequest);
-    Page page = PageConverter.convert(pageResponse, pageRequest);
-    model.addAttribute("page", new PageWrapper(page, "/projects/" + uuid));
 
     return "projects/view";
   }

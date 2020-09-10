@@ -7,10 +7,11 @@ import {
   Collapse,
   CustomInput,
   FormGroup,
-  Input,
   Label,
 } from 'reactstrap'
 import {useTranslation} from 'react-i18next'
+
+import FloatingLabelInput from '../../FloatingLabelInput'
 
 const ImageRenderingHintsForm = ({
   alignment,
@@ -115,17 +116,11 @@ const ImageRenderingHintsForm = ({
             </FormGroup>
           )}
           <FormGroup className="mb-0">
-            <Label
-              className="font-weight-bold"
-              for="rendering-hints-image-link"
-            >
-              {t('imageLink')}
-            </Label>
-            <Input
-              id="rendering-hints-image-link"
-              name="imageLink"
-              onChange={(evt) => onChange('linkUrl', evt.target.value)}
-              placeholder="URL"
+            <Label className="font-weight-bold">{t('imageLink')}</Label>
+            <FloatingLabelInput
+              label="URL"
+              name="image-link"
+              onChange={(value) => onChange('linkUrl', value)}
               type="url"
               value={linkUrl}
             />

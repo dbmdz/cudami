@@ -1,7 +1,6 @@
 import startCase from 'lodash/startCase'
 import React, {Component} from 'react'
 import {
-  Alert,
   Button,
   Col,
   Form,
@@ -17,10 +16,12 @@ import {
 import {withTranslation} from 'react-i18next'
 import {FaTrash} from 'react-icons/fa'
 
+import AppContext from '../AppContext'
 import Autocomplete from '../Autocomplete'
+import FeedbackMessage from '../FeedbackMessage'
 import IdentifierSearch from '../IdentifierSearch'
-import {getImageUrl} from '../utils'
-import {ApiContext, getIdentifierTypes, searchIdentifiables} from '../../api'
+import PreviewImage from '../PreviewImage'
+import {searchIdentifiables} from '../../api'
 
 class AddAttachedIdentifiablesModal extends Component {
   fixedOptions = ['label']
@@ -29,19 +30,8 @@ class AddAttachedIdentifiablesModal extends Component {
     super(props)
     this.state = {
       identifiables: [],
-      identifierTypes: [],
       selectedOption: 0,
     }
-  }
-
-  async componentDidMount() {
-    const identifierTypes = await getIdentifierTypes(
-      this.context.apiContextPath,
-      this.context.mockApi
-    )
-    this.setState({
-      identifierTypes,
-    })
   }
 
   addIdentifiableToList = (identifiable) => {
@@ -66,114 +56,136 @@ class AddAttachedIdentifiablesModal extends Component {
   }
 
   render() {
-    const {defaultLanguage, isOpen, onAdd, t, type} = this.props
-    const {identifiables, identifierTypes, selectedOption} = this.state
+    const {
+      action,
+      identifierTypes,
+      isOpen,
+      maxElements,
+      onSubmit,
+      t,
+      type,
+    } = this.props
+    const {identifiables, selectedOption} = this.state
     const showAutocomplete = selectedOption < this.fixedOptions.length
+    const showInputFields =
+      maxElements === undefined || identifiables.length < maxElements
     return (
       <Modal isOpen={isOpen} size="lg" toggle={this.destroy}>
         <ModalHeader toggle={this.destroy}>
-          {t(`add${startCase(type).replace(' ', '')}s`)}
+          {t(`${action}${startCase(type).replace(' ', '')}s`)}
         </ModalHeader>
         <ModalBody>
           <Form
             onSubmit={(evt) => {
               evt.preventDefault()
-              onAdd(identifiables)
+              onSubmit(identifiables)
               this.destroy()
             }}
           >
-            <FormGroup className="d-inline-block w-25">
-              <Input
-                onChange={(evt) => {
-                  this.setState({selectedOption: parseInt(evt.target.value)})
-                }}
-                type="select"
-              >
-                {this.fixedOptions.map((option, index) => (
-                  <option key={option} value={index}>
-                    {t(option)}
-                  </option>
-                ))}
-                {identifierTypes.map((identifierType, index) => (
-                  <option
-                    key={identifierType.uuid}
-                    value={index + this.fixedOptions.length}
+            {showInputFields && (
+              <>
+                <FormGroup className="d-inline-block w-25">
+                  <Input
+                    onChange={(evt) => {
+                      this.setState({
+                        selectedOption: parseInt(evt.target.value),
+                      })
+                    }}
+                    type="select"
                   >
-                    {identifierType.label}
-                  </option>
-                ))}
-              </Input>
-            </FormGroup>
-            <FormGroup className="d-inline-block pl-1 w-75">
-              {showAutocomplete ? (
-                <Autocomplete
-                  defaultLanguage={defaultLanguage}
-                  onSelect={this.addIdentifiableToList}
-                  placeholder={t('autocomplete.searchTerm')}
-                  search={(
-                    contextPath,
-                    mock,
-                    searchTerm,
-                    pageNumber,
-                    pageSize
-                  ) =>
-                    searchIdentifiables(
-                      contextPath,
-                      mock,
-                      searchTerm,
-                      type,
-                      pageNumber,
-                      pageSize
-                    )
-                  }
-                />
-              ) : (
-                <IdentifierSearch
-                  defaultLanguage={defaultLanguage}
-                  namespace={
-                    identifierTypes[selectedOption - this.fixedOptions.length]
-                      .namespace
-                  }
-                  onSelect={this.addIdentifiableToList}
-                  type={type}
-                />
-              )}
-            </FormGroup>
+                    {this.fixedOptions.map((option, index) => (
+                      <option key={option} value={index}>
+                        {t(option)}
+                      </option>
+                    ))}
+                    {identifierTypes.map((identifierType, index) => (
+                      <option
+                        key={identifierType.uuid}
+                        value={index + this.fixedOptions.length}
+                      >
+                        {identifierType.label}
+                      </option>
+                    ))}
+                  </Input>
+                </FormGroup>
+                <FormGroup className="d-inline-block pl-1 w-75">
+                  {showAutocomplete ? (
+                    <Autocomplete
+                      onSelect={this.addIdentifiableToList}
+                      placeholder={t('autocomplete.searchTerm')}
+                      search={(
+                        contextPath,
+                        mock,
+                        searchTerm,
+                        pageNumber,
+                        pageSize
+                      ) =>
+                        searchIdentifiables(
+                          contextPath,
+                          mock,
+                          searchTerm,
+                          type,
+                          pageNumber,
+                          pageSize
+                        )
+                      }
+                    />
+                  ) : (
+                    <IdentifierSearch
+                      namespace={
+                        identifierTypes[
+                          selectedOption - this.fixedOptions.length
+                        ].namespace
+                      }
+                      onSelect={this.addIdentifiableToList}
+                      type={type}
+                    />
+                  )}
+                </FormGroup>
+              </>
+            )}
             {identifiables.length > 0 && (
               <ListGroup className="mb-3">
-                <Alert className="mb-0" color="info">
-                  {t('duplicateInformation')}
-                </Alert>
-                {identifiables.map(({label, previewImage}, index) => (
-                  <ListGroupItem key={index}>
-                    <Row>
-                      <Col className="text-center" md="2">
-                        <img
-                          className="img-fluid"
-                          src={getImageUrl(previewImage, '50,')}
-                        />
-                      </Col>
-                      <Col md="9">
-                        {label[defaultLanguage] ?? Object.values(label)[0]}
-                      </Col>
-                      <Col className="text-right" md="1">
-                        <Button
-                          className="p-0"
-                          color="link"
-                          onClick={() =>
-                            this.setState({
-                              identifiables: this.removeIdentifiableFromList(
-                                index
-                              ),
-                            })
-                          }
-                        >
-                          <FaTrash />
-                        </Button>
-                      </Col>
-                    </Row>
-                  </ListGroupItem>
-                ))}
+                {maxElements !== 1 && (
+                  <FeedbackMessage message={{key: 'duplicateInformation'}} />
+                )}
+                {identifiables.map(
+                  (
+                    {label, previewImage, previewImageRenderingHints, uuid},
+                    index
+                  ) => (
+                    <ListGroupItem key={uuid}>
+                      <Row>
+                        <Col className="text-center" md="2">
+                          <PreviewImage
+                            image={previewImage}
+                            renderingHints={previewImageRenderingHints}
+                            width={50}
+                          />
+                        </Col>
+                        <Col md="9">
+                          {label[this.context.defaultLanguage] ??
+                            Object.values(label)[0]}
+                        </Col>
+                        <Col className="text-right" md="1">
+                          <Button
+                            className="p-0"
+                            color="link"
+                            onClick={() =>
+                              this.setState({
+                                identifiables: this.removeIdentifiableFromList(
+                                  index
+                                ),
+                              })
+                            }
+                          >
+                            <FaTrash />
+                          </Button>
+                        </Col>
+                      </Row>
+                    </ListGroupItem>
+                  )
+                )}
               </ListGroup>
             )}
             <Button
@@ -182,7 +194,7 @@ class AddAttachedIdentifiablesModal extends Component {
               disabled={identifiables.length === 0}
               type="submit"
             >
-              {t('add')}
+              {t(action)}
             </Button>
           </Form>
         </ModalBody>
@@ -191,6 +203,6 @@ class AddAttachedIdentifiablesModal extends Component {
   }
 }
 
-AddAttachedIdentifiablesModal.contextType = ApiContext
+AddAttachedIdentifiablesModal.contextType = AppContext
 
 export default withTranslation()(AddAttachedIdentifiablesModal)

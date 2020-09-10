@@ -1,11 +1,12 @@
 import React, {Component} from 'react'
-import {Alert, Col, FormGroup, Input, Row} from 'reactstrap'
+import {Col, FormGroup, Input, Row} from 'reactstrap'
 import Autosuggest from 'react-autosuggest'
 import {withTranslation} from 'react-i18next'
 
 import './Autocomplete.css'
-import {getImageUrl} from './utils'
-import {ApiContext} from '../api'
+import AppContext from './AppContext'
+import FeedbackMessage from './FeedbackMessage'
+import PreviewImage from './PreviewImage'
 
 class Autocomplete extends Component {
   /* defines the number of suggestions to be fetched */
@@ -21,13 +22,11 @@ class Autocomplete extends Component {
   }
 
   getLabelValue = (label) => {
-    const {activeLanguage, defaultLanguage} = this.props
-    if (label[activeLanguage]) {
-      return label[activeLanguage]
-    } else if (label[defaultLanguage]) {
-      return label[defaultLanguage]
-    }
-    return Object.values(label)[0]
+    return (
+      label[this.props.activeLanguage] ??
+      label[this.context.defaultLanguage] ??
+      Object.values(label)[0]
+    )
   }
 
   getSuggestionAsString = (suggestion) =>
@@ -78,13 +77,19 @@ class Autocomplete extends Component {
     )
   }
 
-  renderSuggestion = ({label, previewImage}) => {
+  renderSuggestion = ({label, previewImage, previewImageRenderingHints}) => {
     return (
       <Row>
         <Col md="1">
-          <img className="img-fluid" src={getImageUrl(previewImage, '50,')} />
+          <PreviewImage
+            image={previewImage}
+            renderingHints={previewImageRenderingHints}
+            width={50}
+          />
         </Col>
-        <Col md="11">{this.getLabelValue(label)}</Col>
+        <Col className="text-left" md="11">
+          {this.getLabelValue(label)}
+        </Col>
       </Row>
     )
   }
@@ -93,12 +98,15 @@ class Autocomplete extends Component {
     return (
       <div {...containerProps}>
         {this.state.totalElements > this.maxElements && (
-          <Alert className="mb-0" color="info">
-            {this.props.t('autocomplete.moreElementsFound', {
-              maxElements: this.maxElements,
-              totalElements: this.state.totalElements,
-            })}
-          </Alert>
+          <FeedbackMessage
+            message={{
+              key: 'autocomplete.moreElementsFound',
+              values: {
+                maxElements: this.maxElements,
+                totalElements: this.state.totalElements,
+              },
+            }}
+          />
         )}
         {children}
       </div>
@@ -134,6 +142,6 @@ class Autocomplete extends Component {
   }
 }
 
-Autocomplete.contextType = ApiContext
+Autocomplete.contextType = AppContext
 
 export default withTranslation()(Autocomplete)

@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.admin.util;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -12,7 +13,7 @@ public class LanguageSortingHelper {
     this.prioritisedSortedLanguages = prioritisedSortedLanguages;
   }
 
-  public List<Locale> sortLanguages(Locale displayLocale, List<Locale> languagesToSort) {
+  public List<Locale> sortLanguages(Locale displayLocale, Collection<Locale> languagesToSort) {
     List<Locale> sortedLanguages =
         prioritisedSortedLanguages.stream()
             .filter(languagesToSort::contains)
@@ -20,6 +21,7 @@ public class LanguageSortingHelper {
     languagesToSort.stream()
         .filter(l -> !prioritisedSortedLanguages.contains(l))
         .sorted(Comparator.comparing(l -> l.getDisplayLanguage(displayLocale)))
+        .distinct()
         .forEach(sortedLanguages::add);
     return sortedLanguages;
   }

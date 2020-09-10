@@ -386,7 +386,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
           handle -> {
             PreparedBatch preparedBatch =
                 handle.prepareBatch(
-                    "INSERT INTO project_digitalobjects(project_uuid, digitalobject_uuid, sortIndex) VALUES (:uuid, :digitalObjectUuid, :sortIndex) ON CONFLICT (collection_uuid, digitalobject_uuid) DO NOTHING");
+                    "INSERT INTO project_digitalobjects(project_uuid, digitalobject_uuid, sortIndex) VALUES (:uuid, :digitalObjectUuid, :sortIndex) ON CONFLICT (project_uuid, digitalobject_uuid) DO NOTHING");
             for (DigitalObject digitalObject : digitalObjects) {
               preparedBatch
                   .bind("uuid", projectUuid)

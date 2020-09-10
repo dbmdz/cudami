@@ -20,15 +20,16 @@ public class CudamiProjectsClient extends CudamiBaseClient<ProjectImpl> {
 
   public boolean addDigitalObject(UUID projectUuid, UUID digitalObjectUuid) throws HttpException {
     return Boolean.parseBoolean(
-        doPatchRequestForString(
-            String.format("/latest/projects/%s/digitalobject/%s", projectUuid, digitalObjectUuid)));
+        doPostRequestForString(
+            String.format(
+                "/latest/projects/%s/digitalobjects/%s", projectUuid, digitalObjectUuid)));
   }
 
   public boolean addDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects)
       throws HttpException {
     return Boolean.parseBoolean(
-        doPatchRequestForString(
-            String.format("/latest/projects/%s/digitalobject", projectUuid), digitalObjects));
+        doPostRequestForString(
+            String.format("/latest/projects/%s/digitalobjects", projectUuid), digitalObjects));
   }
 
   public Project create() {
@@ -68,7 +69,8 @@ public class CudamiProjectsClient extends CudamiBaseClient<ProjectImpl> {
       throws HttpException {
     return Boolean.parseBoolean(
         doDeleteRequestForString(
-            String.format("/latest/projects/%s/digitalobject/%s", projectUuid, digitalObjectUuid)));
+            String.format(
+                "/latest/projects/%s/digitalobjects/%s", projectUuid, digitalObjectUuid)));
   }
 
   public Project save(Project project) throws HttpException {

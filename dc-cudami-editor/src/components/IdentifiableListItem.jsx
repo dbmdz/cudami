@@ -1,64 +1,101 @@
-import React from 'react'
-import {Button, ButtonGroup, Col, ListGroupItem, Row} from 'reactstrap'
-import {FaEye, FaTrash} from 'react-icons/fa'
+import React, {useContext} from 'react'
+import {Button, ButtonGroup} from 'reactstrap'
+import {useTranslation} from 'react-i18next'
+import {FaExchangeAlt, FaEye, FaPencilAlt, FaUnlink} from 'react-icons/fa'
 
-import {getImageUrl} from './utils'
+import AppContext from './AppContext'
+import PreviewImage from './PreviewImage'
 
 const IdentifiableListItem = ({
-  apiContextPath,
+  enableMove,
+  enableRemove,
+  identifiable,
+  identifierTypes,
   index,
-  label,
-  lastModified,
+  language,
+  onMove,
   onRemove,
-  previewImage,
-  previewImageRenderingHints = {},
+  parentType,
+  showEdit,
   type,
   uiLocale,
-  uuid,
 }) => {
-  const {altText, title, caption} = previewImageRenderingHints
+  const {t} = useTranslation()
+  const {apiContextPath} = useContext(AppContext)
+  const {
+    identifiers,
+    label,
+    lastModified,
+    previewImage,
+    previewImageRenderingHints,
+    uuid,
+  } = identifiable
   const viewUrl = `${apiContextPath}${type.toLowerCase()}s/${uuid}`
   return (
-    <ListGroupItem className="list-item pb-0 pt-0">
-      <Row>
-        <Col className="border-right pb-1 pt-1 text-right" md="1">
-          {index}
-        </Col>
-        <Col className="border-right pb-1 pt-1 text-center" md="1">
-          <figure className="mb-0">
-            <img
-              alt={altText?.[uiLocale]}
-              className="mw-100"
-              src={
-                previewImage
-                  ? getImageUrl(previewImage, '50,')
-                  : `${apiContextPath}images/no-image.png`
-              }
-              title={title?.[uiLocale]}
-            />
-            {caption?.[uiLocale] && (
-              <figcaption>{caption[uiLocale]}</figcaption>
-            )}
-          </figure>
-        </Col>
-        <Col md="7" className="border-right pb-1 pt-1">
-          <a href={viewUrl}>{label}</a>
-        </Col>
-        <Col className="border-right pb-1 pt-1 text-center" md="2">
-          {new Date(lastModified).toLocaleString(uiLocale, {hour12: false})}
-        </Col>
-        <Col className="pb-1 pt-1 text-center" md="1">
-          <ButtonGroup>
-            <Button className="p-0" color="link" href={viewUrl}>
-              <FaEye />
+    <tr>
+      <td className="text-right">{index}</td>
+      <td className="text-center">
+        <PreviewImage
+          image={previewImage}
+          renderingHints={previewImageRenderingHints}
+          width={30}
+        />
+      </td>
+      <td>{label[language] && <a href={viewUrl}>{label[language]}</a>}</td>
+      <td>
+        <ul className="list-inline mb-0">
+          {identifiers.map(({id, namespace}) => (
+            <li className="list-inline-item" key={`${namespace}:${id}`}>{`${
+              identifierTypes.find(
+                (identifierType) => identifierType.namespace === namespace
+              )?.label ?? namespace
+            }: ${id}`}</li>
+          ))}
+        </ul>
+      </td>
+      <td className="text-center">
+        {new Date(lastModified).toLocaleString(uiLocale, {hour12: false})}
+      </td>
+      <td className="text-center">
+        <ButtonGroup>
+          <Button className="p-0" color="link" href={viewUrl} title={t('view')}>
+            <FaEye />
+          </Button>
+          {showEdit && (
+            <Button
+              className="ml-1 p-0"
+              color="link"
+              href={`${viewUrl}/edit`}
+              title={t('edit')}
+            >
+              <FaPencilAlt />
             </Button>
-            <Button className="p-0 ml-1" color="link" onClick={onRemove}>
-              <FaTrash />
+          )}
+        </ButtonGroup>
+        <ButtonGroup>
+          {enableMove && (
+            <Button
+              className="ml-1 p-0"
+              color="link"
+              onClick={onMove}
+              title={t(`moveTo.${parentType}`)}
+            >
+              <FaExchangeAlt />
             </Button>
-          </ButtonGroup>
-        </Col>
-      </Row>
-    </ListGroupItem>
+          )}
+          {enableRemove && (
+            <Button
+              className="ml-1 p-0"
+              color="link"
+              onClick={onRemove}
+              title={t(`removeFrom.${parentType}`)}
+            >
+              <FaUnlink />
+            </Button>
+          )}
+        </ButtonGroup>
+      </td>
+    </tr>
   )
 }
 

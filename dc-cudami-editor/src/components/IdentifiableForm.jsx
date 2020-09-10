@@ -1,8 +1,8 @@
 import React, {Component} from 'react'
-import {Container, Label} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
-import './IdentifiableForm.css'
+import './common.css'
+import AppContext from './AppContext'
 import ArticleForm from './ArticleForm'
 import CollectionForm from './CollectionForm'
 import CorporationForm from './CorporationForm'
@@ -14,7 +14,6 @@ import TopicForm from './TopicForm'
 import WebpageForm from './WebpageForm'
 import WebsiteForm from './WebsiteForm'
 import {
-  ApiContext,
   loadAvailableLanguages,
   loadDefaultLanguage,
   loadIdentifiable,
@@ -237,30 +236,26 @@ class IdentifiableForm extends Component {
   }
 
   render() {
-    const {apiContextPath, debug, mockApi} = this.props
+    const {apiContextPath, mockApi} = this.props
     return this.state.identifiable ? (
-      <ApiContext.Provider value={{apiContextPath, mockApi}}>
-        <Container className="identifiable-editor">
+      <AppContext.Provider
+        value={{
+          apiContextPath,
+          defaultLanguage: this.state.defaultLanguage,
+          mockApi,
+        }}
+      >
+        <div className="identifiable-editor">
           {this.state.invalidLanguages.length > 0 && (
             <FormErrors invalidLanguages={this.state.invalidLanguages} />
           )}
           {this.getFormComponent()}
-          {debug && (
-            <>
-              <Label className="font-weight-bold mt-3">JSON (debug)</Label>
-              <pre className="border">
-                <code>{JSON.stringify(this.state.identifiable, null, 4)}</code>
-              </pre>
-            </>
-          )}
           <IframeAdderModal
             isOpen={this.state.modalsOpen.iframeAdder}
             onToggle={() => this.toggleModal('iframeAdder')}
           />
           <ImageAdderModal
             activeLanguage={this.state.activeLanguage}
-            debug={debug}
-            defaultLanguage={this.state.defaultLanguage}
             isOpen={this.state.modalsOpen.imageAdder}
             onToggle={() => this.toggleModal('imageAdder')}
           />
@@ -276,8 +271,6 @@ class IdentifiableForm extends Component {
           />
           <PreviewImageAdderModal
             activeLanguage={this.state.activeLanguage}
-            debug={debug}
-            defaultLanguage={this.state.defaultLanguage}
             isOpen={this.state.modalsOpen.previewImageAdder}
             onToggle={() => this.toggleModal('previewImageAdder')}
           />
@@ -285,15 +278,14 @@ class IdentifiableForm extends Component {
             isOpen={this.state.modalsOpen.tableAdder}
             onToggle={() => this.toggleModal('tableAdder')}
           />
-        </Container>
-      </ApiContext.Provider>
+        </div>
+      </AppContext.Provider>
     ) : null
   }
 }
 
 IdentifiableForm.defaultProps = {
   apiContextPath: '/',
-  debug: false,
   mockApi: false,
 }
 

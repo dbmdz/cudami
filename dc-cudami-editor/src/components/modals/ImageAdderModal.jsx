@@ -1,18 +1,14 @@
 import {publish, subscribe} from 'pubsub-js'
 import React, {Component} from 'react'
-import {Button, Form, Label, Modal, ModalBody, ModalHeader} from 'reactstrap'
+import {Button, Form, Modal, ModalBody, ModalHeader} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
 import './ImageAdderModal.css'
 import ImageMetadataForm from './imageAdder/ImageMetadataForm'
 import ImageRenderingHintsForm from './imageAdder/ImageRenderingHintsForm'
 import ImageSelector from './imageAdder/ImageSelector'
-import {
-  ApiContext,
-  loadIdentifiable,
-  saveFileResource,
-  updateFileResource,
-} from '../../api'
+import AppContext from '../AppContext'
+import {loadIdentifiable, saveFileResource, updateFileResource} from '../../api'
 
 class ImageAdderModal extends Component {
   initialAttributes = {
@@ -174,7 +170,7 @@ class ImageAdderModal extends Component {
   }
 
   render() {
-    const {activeLanguage, debug, defaultLanguage, isOpen, t} = this.props
+    const {activeLanguage, isOpen, t} = this.props
     const {
       alignment,
       altText,
@@ -186,7 +182,11 @@ class ImageAdderModal extends Component {
     } = this.state.attributes
     return (
       <Modal isOpen={isOpen} size="lg" toggle={this.destroy}>
-        <ModalHeader toggle={this.destroy}>{t('insert.image')}</ModalHeader>
+        <ModalHeader toggle={this.destroy}>
+          {this.state.showImageSelector
+            ? t('insert.image.new')
+            : t('insert.image.edit')}
+        </ModalHeader>
         <ModalBody>
           <Form
             onSubmit={async (evt) => {
@@ -198,7 +198,6 @@ class ImageAdderModal extends Component {
             {this.state.showImageSelector && (
               <ImageSelector
                 activeLanguage={activeLanguage}
-                defaultLanguage={defaultLanguage}
                 fileResource={this.state.fileResource}
                 onChange={this.updateFileResource}
                 onTabChanged={this.onTabChanged}
@@ -231,14 +230,6 @@ class ImageAdderModal extends Component {
               }
               width={width}
             />
-            {debug && (
-              <>
-                <Label className="font-weight-bold mt-3">JSON (debug)</Label>
-                <pre className="border">
-                  <code>{JSON.stringify(this.state, null, 4)}</code>
-                </pre>
-              </>
-            )}
             <Button className="float-right mt-2" color="primary" type="submit">
               {t('save')}
             </Button>
@@ -249,6 +240,6 @@ class ImageAdderModal extends Component {
   }
 }
 
-ImageAdderModal.contextType = ApiContext
+ImageAdderModal.contextType = AppContext
 
 export default withTranslation()(ImageAdderModal)

@@ -5,17 +5,19 @@ import {
   Form,
   FormGroup,
   FormText,
-  Input,
   Modal,
   ModalBody,
   ModalHeader,
 } from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
+import FloatingLabelInput from '../FloatingLabelInput'
+
 class IframeAdderModal extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      editing: false,
       height: '',
       src: '',
       title: '',
@@ -50,9 +52,14 @@ class IframeAdderModal extends Component {
 
   render() {
     const {isOpen, t} = this.props
+    const {editing, height, src, title, width} = this.state
     return (
       <Modal isOpen={isOpen} toggle={this.destroy}>
-        <ModalHeader toggle={this.destroy}>{t('insert.iframe')}</ModalHeader>
+        <ModalHeader toggle={this.destroy}>
+          {this.state.editing
+            ? t('insert.iframe.edit')
+            : t('insert.iframe.new')}
+        </ModalHeader>
         <ModalBody>
           <Form
             onSubmit={(evt) => {
@@ -61,33 +68,21 @@ class IframeAdderModal extends Component {
             }}
           >
             <FormGroup>
-              <Input
-                onChange={(evt) => this.setState({src: evt.target.value})}
-                placeholder="URL"
+              <FloatingLabelInput
+                label="URL"
+                name="iframe-url"
+                onChange={(value) => this.setState({src: value})}
                 required
                 type="url"
-                value={this.state.src}
+                value={src}
               />
             </FormGroup>
             <FormGroup>
-              <Input
-                onChange={(evt) => this.setState({width: evt.target.value})}
-                placeholder={t('width')}
-                type="text"
-                value={this.state.width}
-              />
-              <FormText className="ml-1">
-                {t('forExample')}
-                <code className="ml-1">500</code>, <code>300px</code> or
-                <code className="ml-1">50%</code>
-              </FormText>
-            </FormGroup>
-            <FormGroup>
-              <Input
-                onChange={(evt) => this.setState({height: evt.target.value})}
-                placeholder={t('height')}
-                type="text"
-                value={this.state.height}
+              <FloatingLabelInput
+                label={t('width')}
+                name="iframe-width"
+                onChange={(value) => this.setState({width: value})}
+                value={width}
               />
               <FormText className="ml-1">
                 {t('forExample')}
@@ -96,11 +91,24 @@ class IframeAdderModal extends Component {
               </FormText>
             </FormGroup>
             <FormGroup>
-              <Input
-                onChange={(evt) => this.setState({title: evt.target.value})}
-                placeholder={t('title')}
-                type="text"
-                value={this.state.title}
+              <FloatingLabelInput
+                label={t('height')}
+                name="iframe-height"
+                onChange={(value) => this.setState({height: value})}
+                value={height}
+              />
+              <FormText className="ml-1">
+                {t('forExample')}
+                <code className="ml-1">500</code>, <code>300px</code> or
+                <code className="ml-1">50%</code>
+              </FormText>
+            </FormGroup>
+            <FormGroup>
+              <FloatingLabelInput
+                label={t('title')}
+                name="iframe-title"
+                onChange={(value) => this.setState({title: value})}
+                value={title}
               />
             </FormGroup>
             <Button className="float-right" color="primary" type="submit">

@@ -11,8 +11,9 @@ import {
 } from 'reactstrap'
 import {FaSearch} from 'react-icons/fa'
 
-import {getImageUrl} from './utils'
-import {ApiContext, findByIdentifier} from '../api'
+import AppContext from './AppContext'
+import PreviewImage from './PreviewImage'
+import {findByIdentifier} from '../api'
 
 class IdentifierSearch extends Component {
   constructor(props) {
@@ -59,13 +60,14 @@ class IdentifierSearch extends Component {
             >
               <Row>
                 <Col md="1">
-                  <img
-                    className="img-fluid"
-                    src={getImageUrl(result.previewImage, '50,')}
+                  <PreviewImage
+                    image={result.previewImage}
+                    renderingHints={result.previewImageRenderingHints}
+                    width={50}
                   />
                 </Col>
                 <Col md="11">
-                  {result.label[this.props.defaultLanguage] ??
+                  {result.label[this.context.defaultLanguage] ??
                     Object.values(result.label)[0]}
                 </Col>
               </Row>
@@ -77,6 +79,6 @@ class IdentifierSearch extends Component {
   }
 }
 
-IdentifierSearch.contextType = ApiContext
+IdentifierSearch.contextType = AppContext
 
 export default IdentifierSearch

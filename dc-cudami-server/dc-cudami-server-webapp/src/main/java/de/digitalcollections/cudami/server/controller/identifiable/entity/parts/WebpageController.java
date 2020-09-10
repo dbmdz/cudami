@@ -29,7 +29,6 @@ import org.jsondoc.core.annotation.ApiPathParam;
 import org.jsondoc.core.annotation.ApiQueryParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -48,8 +47,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class WebpageController {
 
   @Autowired private WebpageService<Entity> webpageService;
-
-  @Autowired private ConversionService conversionService;
 
   @Autowired private LocaleService localeService;
 

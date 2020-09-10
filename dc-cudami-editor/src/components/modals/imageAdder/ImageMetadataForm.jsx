@@ -6,23 +6,13 @@ import {
   CardHeader,
   Collapse,
   FormGroup,
-  Input,
   InputGroup,
   InputGroupAddon,
-  InputGroupText,
-  Popover,
-  PopoverBody,
 } from 'reactstrap'
 import {useTranslation} from 'react-i18next'
-import {FaQuestionCircle} from 'react-icons/fa'
 
-const InputTooltip = ({isOpen, target, text, toggle}) => {
-  return (
-    <Popover isOpen={isOpen} placement="left" target={target} toggle={toggle}>
-      <PopoverBody>{text}</PopoverBody>
-    </Popover>
-  )
-}
+import FloatingLabelInput from '../../FloatingLabelInput'
+import InfoTooltip from '../../InfoTooltip'
 
 const ImageMetadataForm = ({
   altText,
@@ -46,76 +36,55 @@ const ImageMetadataForm = ({
         <CardBody>
           <FormGroup>
             <InputGroup>
-              <Input
-                name="caption"
-                onChange={(evt) => onChange('caption', evt.target.value)}
-                placeholder={t('caption')}
-                type="text"
+              <FloatingLabelInput
+                label={t('caption')}
+                name="image-caption"
+                onChange={(value) => onChange('caption', value)}
                 value={caption}
               />
               <InputGroupAddon addonType="append">
-                <InputGroupText>
-                  <FaQuestionCircle
-                    className="tooltip-icon"
-                    id="caption-tooltip"
-                  />
-                  <InputTooltip
-                    isOpen={tooltipsOpen.caption}
-                    target="caption-tooltip"
-                    text={t('tooltips.caption')}
-                    toggle={() => toggleTooltip('caption')}
-                  />
-                </InputGroupText>
+                <InfoTooltip
+                  isOpen={tooltipsOpen.caption}
+                  name="image-caption"
+                  text={t('tooltips.caption')}
+                  toggle={() => toggleTooltip('caption')}
+                />
               </InputGroupAddon>
             </InputGroup>
           </FormGroup>
           <FormGroup>
             <InputGroup>
-              <Input
-                name="title"
-                onChange={(evt) => onChange('title', evt.target.value)}
-                placeholder={t('tooltip')}
-                type="text"
+              <FloatingLabelInput
+                label={t('tooltip')}
+                name="image-title"
+                onChange={(value) => onChange('title', value)}
                 value={title}
               />
               <InputGroupAddon addonType="append">
-                <InputGroupText>
-                  <FaQuestionCircle
-                    className="tooltip-icon"
-                    id="title-tooltip"
-                  />
-                  <InputTooltip
-                    isOpen={tooltipsOpen.title}
-                    target="title-tooltip"
-                    text={t('tooltips.title')}
-                    toggle={() => toggleTooltip('title')}
-                  />
-                </InputGroupText>
+                <InfoTooltip
+                  isOpen={tooltipsOpen.title}
+                  name="image-title"
+                  text={t('tooltips.title')}
+                  toggle={() => toggleTooltip('title')}
+                />
               </InputGroupAddon>
             </InputGroup>
           </FormGroup>
           <FormGroup className="mb-0">
             <InputGroup>
-              <Input
-                name="altText"
-                onChange={(evt) => onChange('altText', evt.target.value)}
-                placeholder={t('altText')}
-                type="text"
+              <FloatingLabelInput
+                label={t('altText')}
+                name="image-alttext"
+                onChange={(value) => onChange('altText', value)}
                 value={altText}
               />
               <InputGroupAddon addonType="append">
-                <InputGroupText>
-                  <FaQuestionCircle
-                    className="tooltip-icon"
-                    id="altText-tooltip"
-                  />
-                  <InputTooltip
-                    isOpen={tooltipsOpen.altText}
-                    target="altText-tooltip"
-                    text={t('tooltips.altText')}
-                    toggle={() => toggleTooltip('altText')}
-                  />
-                </InputGroupText>
+                <InfoTooltip
+                  isOpen={tooltipsOpen.altText}
+                  name="image-alttext"
+                  text={t('tooltips.altText')}
+                  toggle={() => toggleTooltip('altText')}
+                />
               </InputGroupAddon>
             </InputGroup>
           </FormGroup>

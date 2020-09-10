@@ -29,4 +29,11 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
       DigitalObject digitalObject, List<FileResource> fileResources);
 
   List<FileResource> saveFileResources(UUID digitalObjectUuid, List<FileResource> fileResources);
+
+  /**
+   * Returns a list of all DigitalObjects, reduced to their identifiers and last modified date
+   *
+   * @return partially (see above) filled list of all DigitalObjects
+   */
+  List<DigitalObject> findAllReduced();
 }

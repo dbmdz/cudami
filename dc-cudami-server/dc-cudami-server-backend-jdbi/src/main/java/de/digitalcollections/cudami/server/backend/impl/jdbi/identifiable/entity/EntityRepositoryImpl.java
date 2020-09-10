@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.Identi
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
+import de.digitalcollections.model.api.identifiable.entity.enums.EntityType;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -58,6 +59,12 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
           + " FROM entities as e"
           + " LEFT JOIN fileresources_image as file on e.previewfileresource = file.uuid";
+
+  // select to return only metadata (uuid, identifiers and lastmodified
+  private static final String REDUCED_FIND_ALL_METADATA_SQL =
+      "SELECT e.uuid e_uuid, e.last_modified e_last_modified, e.identifiable_type e_type, id.identifiable id_identifiable, id.uuid id_uuid, id.namespace id_namespace, id.identifier id_id"
+          + " FROM %s as e"
+          + " LEFT JOIN identifiers as id on e.uuid = id.identifiable";
 
   @Autowired
   public EntityRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
@@ -323,6 +330,65 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
             .stream()
             .findFirst();
     return (E) result.orElse(null);
+  }
+
+  @Override
+  public List<E> findAllReduced(EntityType entityType) {
+
+    String tableName = "";
+    switch (entityType) {
+      case ARTICLE:
+        tableName = "articles";
+        break;
+      case COLLECTION:
+        tableName = "collections";
+        break;
+      case CORPORATION:
+        tableName = "corporations";
+        break;
+      case DIGITAL_OBJECT:
+        tableName = "digitalobjects";
+        break;
+      case PERSON:
+        tableName = "persons";
+        break;
+      case PROJECT:
+        tableName = "projects";
+        break;
+      case TOPIC:
+        tableName = "topics";
+        break;
+      case WEBSITE:
+        tableName = "websites";
+        break;
+      default:
+        tableName = "entity";
+    }
+    String query = REDUCED_FIND_ALL_METADATA_SQL.replaceAll("%s", tableName);
+
+    return new ArrayList(
+        dbi.withHandle(
+            h ->
+                h.createQuery(query.toString())
+                    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
+                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                    .reduceRows(
+                        new LinkedHashMap<UUID, EntityImpl>(),
+                        (map, rowView) -> {
+                          EntityImpl entity =
+                              map.computeIfAbsent(
+                                  rowView.getColumn("e_uuid", UUID.class),
+                                  fn -> {
+                                    return rowView.getRow(EntityImpl.class);
+                                  });
+
+                          if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                            IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                            entity.addIdentifier(dbIdentifier);
+                          }
+                          return map;
+                        })
+                    .values()));
   }
 
   @Override

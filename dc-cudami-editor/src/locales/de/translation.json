@@ -4,7 +4,7 @@
     "add": "Hinzufügen",
     "addDigitalObjects": "Digitalisate hinzufügen",
     "addLanguage": "Sprache hinzufügen",
-    "addPreviewImage": "Vorschaubild hinzufügen",
+    "addSubcollections": "Untergeordnete Sammlungen hinzufügen",
     "alignment": "Ausrichtung",
     "alignmentLeft": "links (mit Textumlauf)",
     "alignmentRight": "rechts (mit Textumlauf)",
@@ -29,7 +29,8 @@
     "chooseLanguage": "Sprache auswählen",
     "confirmRemove": {
       "digitalObjectFromCollection": "Sind Sie sicher, dass Sie das Digitalisat aus der Sammlung entfernen wollen?",
-      "digitalObjectFromProject": "Sind Sie sicher, dass Sie das Digitalisat aus dem Projekt entfernen wollen?"
+      "digitalObjectFromProject": "Sind Sie sicher, dass Sie das Digitalisat aus dem Projekt entfernen wollen?",
+      "subcollectionFromCollection": "Sind Sie sicher, dass Sie die untergeordnete Sammlung aus der Sammlung entfernen wollen?"
     },
     "createArticle": "Neuen Artikel anlegen",
     "createCollection": "Neue Sammlung anlegen",
@@ -50,12 +51,17 @@
     "defineRenderingHints": "Darstellungshinweise festlegen",
     "description": "Kurzbeschreibung",
     "digitalObjects": "Digitalisate (Digitale Objekte)",
+    "digitalObjectAddedSuccessfully": "Das gewählte Digitalisat wurde erfolgreich hinzugefügt.",
+    "digitalObjectAddedSuccessfully_plural": "Die gewählten Digitalisate wurden erfolgreich hinzugefügt.",
+    "digitalObjectRemovedSuccessfully": "{{ name }} wurde erfolgreich entfernt.",
     "dragAndDropImage": "Datei zum Hochladen hier hereinziehen und ablegen",
-    "duplicateInformation": "Duplikate in der Liste unten werden beim Klick auf \"$t(add)\" automatisch herausgefiltert.",
+    "duplicateInformation": "Werden Einträge mehrfach ausgewählt, so werden die Duplikate beim Klick auf \"$t(add)\" automatisch entfernt.",
+    "edit": "bearbeiten",
     "editArticle": "Artikel bearbeiten",
     "editCollection": "Sammlung bearbeiten",
     "editCorporation": "Institution bearbeiten",
     "editFileResource": "Datei \"{{ name }}\" bearbeiten",
+    "editPreviewImage": "Vorschaubild bearbeiten",
     "editProject": "Projekt bearbeiten",
     "editSubtopic": "Unterthema bearbeiten",
     "editTopic": "Thema bearbeiten",
@@ -70,12 +76,19 @@
       "redo": "Letzte rückgängig gemachte Änderung wiederholen",
       "undo": "Letzte Änderung rückgängig machen"
     },
+    "identifiers": "Identifikatoren",
     "imageLink": "Bild-Link",
     "insert": {
       "footnote": "Fußnote einfügen",
       "hr": "Horizontale Linie einfügen",
-      "iframe": "Iframe einfügen",
-      "image": "Bild einfügen",
+      "iframe": {
+        "edit": "Iframe bearbeiten",
+        "new": "Iframe einfügen"
+      },
+      "image": {
+        "edit": "Bild bearbeiten",
+        "new": "Bild einfügen"
+      },
       "table": "Tabelle einfügen"
     },
     "insertLink": "Verlinkung einfügen",
@@ -92,6 +105,12 @@
       "superscript": "Hochgestellt",
       "underline": "Unterstrichen"
     },
+    "move": "Verschieben",
+    "moveSubcollections": "Untergeordnete Sammlung verschieben",
+    "moveTo": {
+      "collection": "in andere Sammlung verschieben"
+    },
+    "new": "Neu",
     "next": "Weiter",
     "no": "Nein",
     "noAlignment": "ohne Textumlauf",
@@ -99,6 +118,9 @@
     "numberOfRows": "Anzahl an Zeilen",
     "openLinkNewTab": "in einem neuen Tab öffnen",
     "openLinkSameTab": "im selben Tab öffnen",
+    "removeFrom": {
+      "collection": "aus Sammlung entfernen"
+    },
     "removePreviewImageAfterSaveNotification": "Klicken Sie auf \"$t(save)\", um die Löschung zu bestätigen.",
     "save": "Speichern",
     "selectImage": {
@@ -108,7 +130,13 @@
       "useUpload": "Bild hochladen",
       "useUrl": "Bild per Weblink einbinden"
     },
+    "setPreviewImage": "Vorschaubild festlegen",
     "startPublicationDate": "Start-Publikationsdatum",
+    "subcollections": "Untergeordnete Sammlungen",
+    "subcollectionAddedSuccessfully": "Die gewählte Sammlung wurde erfolgreich als Untersammlung hinzugefügt.",
+    "subcollectionAddedSuccessfully_plural": "Die gewählten Sammlungen wurden erfolgreich als Untersammlungen hinzugefügt.",
+    "subcollectionMovedSuccessfully": "{{ name }} wurde erfolgreich nach <0>{{ targetName }}</0> verschoben.",
+    "subcollectionRemovedSuccessfully": "{{ name }} wurde erfolgreich entfernt.",
     "text": "Langtext",
     "title": "Titel",
     "tooltip": "Tooltip",
@@ -121,7 +149,12 @@
       "upload": "Auswählen und Hochladen eines Bildes von der lokalen Festplatte",
       "url": "Einbinden eines Bildes aus dem Internet durch Eingabe einer gültigen URL"
     },
+    "totalElements": {
+      "digitalObjects": "{{count}} Digitalisate gefunden",
+      "subcollections": "{{count}} Sammlungen gefunden"
+    },
     "uploadFileResource": "Neue Datei hochladen",
+    "view": "anzeigen",
     "warning": "Warnung",
     "width": "Breite",
     "yes": "Ja"

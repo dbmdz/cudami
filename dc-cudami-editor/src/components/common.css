@@ -1,0 +1,20 @@
+.floating-label {
+  left: 14px;
+  pointer-events: none;
+  position: absolute;
+  top: 7px;
+  transition: 0.2s ease all;
+}
+
+input:focus ~ .floating-label,
+input:not([value=""]) ~ .floating-label {
+  background: white;
+  font-size: 14px;
+  padding: 0 5px;
+  top: -11px;
+  z-index: 5;
+}
+
+.nav-tabs .nav-link {
+  cursor: pointer;
+}

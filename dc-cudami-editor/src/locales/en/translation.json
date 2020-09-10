@@ -4,7 +4,7 @@
     "add": "Add",
     "addDigitalObjects": "Add digital objects",
     "addLanguage": "Add language",
-    "addPreviewImage": "Add preview image",
+    "addSubcollections": "Add sub collections",
     "alignment": "Alignment",
     "alignmentLeft": "left (with text wrapping)",
     "alignmentRight": "right (with text wrapping)",
@@ -29,7 +29,8 @@
     "chooseLanguage": "Choose a language",
     "confirmRemove": {
       "digitalObjectFromCollection": "Are you sure that you want to remove this digital object from the collection?",
-      "digitalObjectFromProject": "Are you sure that you want to remove this digital object from the project?"
+      "digitalObjectFromProject": "Are you sure that you want to remove this digital object from the project?",
+      "subcollectionFromCollection": "Are you sure that you want to remove this sub collection from the collection?"
     },
     "createArticle": "Create a new article",
     "createCollection": "Create a new collection",
@@ -50,12 +51,17 @@
     "defineRenderingHints": "Define rendering hints",
     "description": "Abstract",
     "digitalObjects": "Digital objects",
+    "digitalObjectAddedSuccessfully": "The selected digital object has been added successfully.",
+    "digitalObjectAddedSuccessfully_plural": "The selected digital objects have been added successfully.",
+    "digitalObjectRemovedSuccessfully": "{{ name }} has been removed successfully.",
     "dragAndDropImage": "Drag and drop file to upload here",
-    "duplicateInformation": "Duplicates in the list below are automatically filtered out when you click \"$t(add)\".",
+    "duplicateInformation": "If entries are selected multiple times, the duplicates are automatically removed when you click on \"$t(add)\".",
+    "edit": "edit",
     "editArticle": "Edit article",
     "editCollection": "Edit collection",
     "editCorporation": "Edit corporation",
     "editFileResource": "Edit file \"{{ name }}\"",
+    "editPreviewImage": "Edit preview image",
     "editProject": "Edit project",
     "editSubtopic": "Edit subtopic",
     "editTopic": "Edit topic",
@@ -70,12 +76,19 @@
       "redo": "Redo last undone change",
       "undo": "Undo last change"
     },
+    "identifiers": "Identifiers",
     "imageLink": "Image link",
     "insert": {
       "footnote": "Insert footnote",
       "hr": "Insert horizontal rule",
-      "iframe": "Insert iframe",
-      "image": "Insert image",
+      "iframe": {
+        "edit": "Edit iframe",
+        "new": "Insert iframe"
+      },
+      "image": {
+        "edit": "Edit image",
+        "new": "Insert image"
+      },
       "table": "Insert table"
     },
     "insertLink": "Insert hyperlink",
@@ -92,6 +105,12 @@
       "superscript": "Superscript",
       "underline": "Underline"
     },
+    "move": "Move",
+    "moveSubcollections": "Move sub collection",
+    "moveTo": {
+      "collection": "move to another collection"
+    },
+    "new": "New",
     "next": "Next",
     "no": "No",
     "noAlignment": "without text wrapping",
@@ -99,6 +118,9 @@
     "numberOfRows": "Number of rows",
     "openLinkNewTab": "open in a new tab",
     "openLinkSameTab": "open in the same tab",
+    "removeFrom": {
+      "collection": "remove from collection"
+    },
     "removePreviewImageAfterSaveNotification": "Click \"$t(save)\" to confirm the deletion.",
     "save": "Save",
     "selectImage": {
@@ -108,7 +130,13 @@
       "useUpload": "Upload image",
       "useUrl": "Integrate image via web link"
     },
+    "setPreviewImage": "Set preview image",
     "startPublicationDate": "Start of publication",
+    "subcollections": "Sub collections",
+    "subcollectionAddedSuccessfully": "The selected collection has been added successfully as a subcollection.",
+    "subcollectionAddedSuccessfully_plural": "The selected collections have been added successfully as subcollections.",
+    "subcollectionMovedSuccessfully": "{{ name }} has been moved successfully to <0>{{ targetName }}</0>.",
+    "subcollectionRemovedSuccessfully": "{{ name }} has been removed successfully.",
     "text": "Long text",
     "title": "Title",
     "tooltip": "Tooltip",
@@ -121,7 +149,12 @@
       "upload": "selecting and uploading an image from the local hard disk",
       "url": "embedding an image from the internet by using a valid URL"
     },
+    "totalElements": {
+      "digitalObjects": "found {{count}} digital objects",
+      "subcollections": "found {{count}} collections"
+    },
     "uploadFileResource": "Upload a new file",
+    "view": "view",
     "warning": "Warning",
     "width": "Width",
     "yes": "Yes"

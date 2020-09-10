@@ -6,9 +6,12 @@ import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
 import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
+import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
 import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
 import java.net.http.HttpClient;
 import java.util.List;
@@ -24,15 +27,15 @@ public class CudamiCollectionsClient extends CudamiBaseClient<CollectionImpl> {
   public boolean addDigitalObject(UUID collectionUuid, UUID digitalObjectUuid)
       throws HttpException {
     return Boolean.parseBoolean(
-        doPatchRequestForString(
+        doPostRequestForString(
             String.format(
-                "/latest/collections/%s/digitalobject/%s", collectionUuid, digitalObjectUuid)));
+                "/latest/collections/%s/digitalobjects/%s", collectionUuid, digitalObjectUuid)));
   }
 
   public boolean addDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects)
       throws HttpException {
     return Boolean.parseBoolean(
-        doPatchRequestForString(
+        doPostRequestForString(
             String.format("/latest/collections/%s/digitalobjects", collectionUuid),
             digitalObjects));
   }
@@ -50,11 +53,23 @@ public class CudamiCollectionsClient extends CudamiBaseClient<CollectionImpl> {
     return Boolean.parseBoolean(
         doDeleteRequestForString(
             String.format(
-                "/latest/collections/%s/digitalobject/%s", collectionUuid, digitalObjectUuid)));
+                "/latest/collections/%s/digitalobjects/%s", collectionUuid, digitalObjectUuid)));
   }
 
   public PageResponse<CollectionImpl> find(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/collections", pageRequest);
+  }
+
+  public SearchPageResponse<CollectionImpl> find(SearchPageRequest searchPageRequest)
+      throws HttpException {
+    return doGetSearchRequestForPagedObjectList("/latest/collections/search", searchPageRequest);
+  }
+
+  public List<CollectionImpl> find(String searchTerm, int maxResults) throws HttpException {
+    SearchPageRequest searchPageRequest =
+        new SearchPageRequestImpl(searchTerm, 0, maxResults, null);
+    SearchPageResponse<CollectionImpl> response = find(searchPageRequest);
+    return response.getContent();
   }
 
   public Collection findOne(UUID uuid) throws HttpException {
@@ -77,6 +92,12 @@ public class CudamiCollectionsClient extends CudamiBaseClient<CollectionImpl> {
   public PageResponse<CollectionImpl> findTopCollections(PageRequest pageRequest)
       throws HttpException {
     return doGetRequestForPagedObjectList("/latest/collections/top", pageRequest);
+  }
+
+  public Collection getParent(UUID uuid) throws HttpException {
+    return (Collection)
+        doGetRequestForObject(
+            String.format("/latest/collections/%s/parent", uuid), CollectionImpl.class);
   }
 
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws HttpException {
@@ -118,5 +139,37 @@ public class CudamiCollectionsClient extends CudamiBaseClient<CollectionImpl> {
   public Collection update(UUID uuid, Collection collection) throws HttpException {
     return doPutRequestForObject(
         String.format("/latest/collections/%s", uuid), (CollectionImpl) collection);
+  }
+
+  public boolean addSubcollection(UUID collectionUuid, UUID subcollectionUuid)
+      throws HttpException {
+    return Boolean.parseBoolean(
+        doPostRequestForString(
+            String.format(
+                "/latest/collections/%s/subcollections/%s", collectionUuid, subcollectionUuid)));
+  }
+
+  public boolean addSubcollections(UUID collectionUuid, List<Collection> subcollections)
+      throws HttpException {
+    return Boolean.parseBoolean(
+        doPostRequestForString(
+            String.format("/latest/collections/%s/subcollections", collectionUuid),
+            subcollections));
+  }
+
+  public PageResponse<Collection> getSubcollections(UUID uuid, PageRequest pageRequest)
+      throws HttpException {
+    return doGetRequestForPagedObjectList(
+        String.format("/latest/collections/%s/subcollections", uuid),
+        pageRequest,
+        CollectionImpl.class);
+  }
+
+  public boolean removeSubcollection(UUID collectionUuid, UUID subcollectionUuid)
+      throws HttpException {
+    return Boolean.parseBoolean(
+        doDeleteRequestForString(
+            String.format(
+                "/latest/collections/%s/subcollections/%s", collectionUuid, subcollectionUuid)));
   }
 }

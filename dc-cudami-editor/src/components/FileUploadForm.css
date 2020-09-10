@@ -5,3 +5,7 @@
 .file-drop-dragging-over-target {
   border-color: gray;
 }
+
+#file-upload-button {
+  cursor: pointer;
+}

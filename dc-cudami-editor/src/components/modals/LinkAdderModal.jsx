@@ -50,7 +50,9 @@ class LinkAdderModal extends Component {
           >
             <FormGroup>
               <Input
-                onChange={(evt) => this.setState({href: evt.target.value})}
+                onChange={(evt) =>
+                  this.setState({href: evt.target.value.trim()})
+                }
                 placeholder="URL"
                 required
                 type="url"

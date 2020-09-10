@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.api.repository.identifiable.
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
+import de.digitalcollections.model.api.identifiable.entity.enums.EntityType;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import java.util.List;
 import java.util.UUID;
@@ -13,6 +14,14 @@ public interface EntityRepository<E extends Entity> extends IdentifiableReposito
   void addRelation(EntityRelation relation);
 
   void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid);
+
+  /**
+   * Returns a list of all Entities, reduced to their identifiers and last modification date
+   *
+   * @param entityType the entity type, from which the source table is calculated
+   * @return partially filled list of all entities
+   */
+  List<E> findAllReduced(EntityType entityType);
 
   E findOneByRefId(long refId);
 

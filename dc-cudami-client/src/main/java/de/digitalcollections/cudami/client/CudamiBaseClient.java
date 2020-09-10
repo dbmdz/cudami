@@ -86,7 +86,7 @@ public class CudamiBaseClient<T extends Object> {
     LOGGER.debug("PATCH " + url);
     HttpRequest req =
         HttpRequest.newBuilder()
-            .method("PATCH", null)
+            .method("PATCH", HttpRequest.BodyPublishers.noBody())
             .uri(url)
             .header("Accept", "application/json")
             // TODO add creation of a request id if needed
@@ -467,6 +467,36 @@ public class CudamiBaseClient<T extends Object> {
       return result;
     } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to error", e);
+    }
+  }
+
+  protected String doPostRequestForString(String requestUrl) throws HttpException {
+    try {
+      HttpRequest req = createPostRequest(requestUrl);
+      HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
+      Integer statusCode = response.statusCode();
+      if (statusCode != 200) {
+        throw CudamiRestErrorDecoder.decode("POST " + requestUrl, statusCode);
+      }
+      final String body = response.body();
+      return body;
+    } catch (InterruptedException | IOException e) {
+      throw new HttpException("Failed to retrieve response due to connection error", e);
+    }
+  }
+
+  protected String doPostRequestForString(String requestUrl, Object object) throws HttpException {
+    try {
+      HttpRequest req = createPostRequest(requestUrl, object);
+      HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
+      Integer statusCode = response.statusCode();
+      if (statusCode != 200) {
+        throw CudamiRestErrorDecoder.decode("PATCH " + requestUrl, statusCode);
+      }
+      final String body = response.body();
+      return body;
+    } catch (IOException | InterruptedException e) {
+      throw new HttpException("Failed to retrieve response due to connection error", e);
     }
   }
 

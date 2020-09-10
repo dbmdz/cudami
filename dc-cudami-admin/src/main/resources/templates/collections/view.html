@@ -77,71 +77,48 @@
         </div>
       </div>
 
-      <div class="row main-content">
-        <div class="col-sm-6">
-          <h2 th:text="#{sub_collections}">Sub collections</h2>
-        </div>
-        <div class="col-sm-6">
-          <div class="float-right">
-            <a class="btn btn-secondary new-button" th:href="@{/collections/new(parentType=collection, parentUuid=*{uuid})}" th:text="#{btn_new}">New</a>
-          </div>
+      <div class="mt-3 row">
+        <div class="col-sm-12">
+          <div id="subcollection-list"></div>
         </div>
       </div>
 
-      <div class="row">
+      <div class="mt-3 row">
         <div class="col-sm-12">
-          <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
-            <thead>
-              <tr>
-                <th class="text-right">Nr.</th>
-                <th></th>
-                <th class="center" th:text="#{label}">Label</th>
-                <th class="center" th:text="#{last_modified}">last modified</th>
-                <th class="center" th:text="#{actions}">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr th:each="subcollection, stats : *{children}">
-                <td class="text-right" th:text="${stats.index + 1}">1</td>
-                <td class="center">
-                  <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${subcollection.previewImage}, ${subcollection.previewImageRenderingHints}, ${#locale}, 30)"></th:block>
-                </td>
-                <td>
-                  <a th:href="@{'/collections/' + ${subcollection.uuid}}" th:text="${subcollection.label.text}">Label</a>
-                </td>
-                <td>
-                  <span class="float-right" th:with="df=#{dateTime.format},dateTime=${subcollection.lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
-                </td>
-                <td class="center">
-                  <a th:href="@{'/collections/' + ${subcollection.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
-                  <a th:href="@{'/collections/' + ${subcollection.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      
-      <div class="row">
-        <div class="col-sm-12">
-           <div id="list"></div>
-            <script th:src="@{/js/identifiable-list.bundle.js}"></script>
-            <script th:inline="javascript">
-              IdentifiableList({
-                apiContextPath: /*[[@{/}]]*/ '',
-                id: "list",
-                parentType: "collection",
-                parentUuid: /*[[*{uuid}]]*/,
-                type: "digitalObject",
-                uiLocale: /*[[${#locale.language}]]*/
-              });
-            </script>
+          <div id="digitalobject-list"></div>
         </div>
       </div>
     </section>
     <section layout:fragment="beforeBodyEnds">
       <script>
         addLanguageChangeHandler()
+      </script>
+      <script th:src="@{/js/identifiable-list.bundle.js}"></script>
+      <script th:inline="javascript">
+        IdentifiableList({
+          apiContextPath: /*[[@{/}]]*/ '',
+          enableAdd: true,
+          enableMove: true,
+          enableRemove: true,
+          existingLanguages: /*[[${existingSubcollectionLanguages}]]*/,
+          id: "subcollection-list",
+          parentType: "collection",
+          parentUuid: /*[[*{uuid}]]*/,
+          showEdit: true,
+          showNew: true,
+          type: "subcollection",
+          uiLocale: /*[[${#locale.language}]]*/
+        });
+        IdentifiableList({
+          apiContextPath: /*[[@{/}]]*/ '',
+          enableAdd: true,
+          enableRemove: true,
+          id: "digitalobject-list",
+          parentType: "collection",
+          parentUuid: /*[[*{uuid}]]*/,
+          type: "digitalObject",
+          uiLocale: /*[[${#locale.language}]]*/
+        });
       </script>
     </section>
   </body>

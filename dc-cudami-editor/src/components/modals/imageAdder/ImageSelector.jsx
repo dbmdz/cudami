@@ -1,7 +1,6 @@
 import React, {Component} from 'react'
 import classNames from 'classnames'
 import {
-  Alert,
   Card,
   CardBody,
   CardHeader,
@@ -21,9 +20,11 @@ import {FaQuestionCircle} from 'react-icons/fa'
 import Autocomplete from '../../Autocomplete'
 import ImageLabelInput from './ImageLabelInput'
 import ImagePreview from './ImagePreview'
+import AppContext from '../../AppContext'
+import FeedbackMessage from '../../FeedbackMessage'
 import FileUploadForm from '../../FileUploadForm'
 import {getImageUrl} from '../../utils'
-import {ApiContext, searchImages, uploadFile} from '../../../api'
+import {searchImages, uploadFile} from '../../../api'
 
 class ImageSelector extends Component {
   constructor(props) {
@@ -89,7 +90,6 @@ class ImageSelector extends Component {
   render() {
     const {
       activeLanguage,
-      defaultLanguage,
       fileResource,
       onChange,
       t,
@@ -110,10 +110,7 @@ class ImageSelector extends Component {
                 onClick={(evt) => this.toggleTab('upload', evt)}
               >
                 {t('selectImage.useUpload')}
-                <FaQuestionCircle
-                  className="ml-1 tooltip-icon"
-                  id="upload-tooltip"
-                />
+                <FaQuestionCircle className="ml-1" id="upload-tooltip" />
                 <Popover
                   isOpen={tooltipsOpen.upload}
                   placement="top"
@@ -132,10 +129,7 @@ class ImageSelector extends Component {
                 onClick={(evt) => this.toggleTab('url', evt)}
               >
                 {t('selectImage.useUrl')}
-                <FaQuestionCircle
-                  className="ml-1 tooltip-icon"
-                  id="url-tooltip"
-                />
+                <FaQuestionCircle className="ml-1" id="url-tooltip" />
                 <Popover
                   isOpen={tooltipsOpen.url}
                   placement="top"
@@ -156,10 +150,7 @@ class ImageSelector extends Component {
                 onClick={(evt) => this.toggleTab('search', evt)}
               >
                 {t('selectImage.useSearch')}
-                <FaQuestionCircle
-                  className="ml-1 tooltip-icon"
-                  id="search-tooltip"
-                />
+                <FaQuestionCircle className="ml-1" id="search-tooltip" />
                 <Popover
                   isOpen={tooltipsOpen.search}
                   placement="top"
@@ -183,9 +174,14 @@ class ImageSelector extends Component {
                   uri={fileResource.uri}
                 />
               )}
-              <Alert color="success" isOpen={this.state.showUploadSuccess}>
-                {t('selectImage.uploadSuccessful')}
-              </Alert>
+              {this.state.showUploadSuccess && (
+                <FeedbackMessage
+                  message={{
+                    color: 'success',
+                    key: 'selectImage.uploadSuccessful',
+                  }}
+                />
+              )}
               <FileUploadForm
                 onChange={(file) => this.uploadImage(file)}
                 progress={this.state.progress}
@@ -237,7 +233,6 @@ class ImageSelector extends Component {
               )}
               <Autocomplete
                 activeLanguage={activeLanguage}
-                defaultLanguage={defaultLanguage}
                 onSelect={(suggestion) => {
                   onChange({
                     ...suggestion.previewImage,
@@ -256,6 +251,6 @@ class ImageSelector extends Component {
   }
 }
 
-ImageSelector.contextType = ApiContext
+ImageSelector.contextType = AppContext
 
 export default withTranslation()(ImageSelector)

@@ -30,7 +30,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -131,10 +130,10 @@ public class ProjectController {
   }
 
   @ApiMethod(description = "Add an existing digital object to an existing project")
-  @PatchMapping(
+  @PostMapping(
       value = {
-        "/latest/projects/{uuid}/digitalobject/{digitalObjectUuid}",
-        "/v3/projects/{uuid}/digitalobject/{digitalObjectUuid}"
+        "/latest/projects/{uuid}/digitalobjects/{digitalObjectUuid}",
+        "/v3/projects/{uuid}/digitalobjects/{digitalObjectUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
@@ -151,13 +150,13 @@ public class ProjectController {
     boolean successful = projectService.addDigitalObject(project, digitalObject);
 
     if (successful) {
-      return new ResponseEntity<>(HttpStatus.OK);
+      return new ResponseEntity<>(successful, HttpStatus.OK);
     }
-    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
   @ApiMethod(description = "Add existing digital objects to an existing project")
-  @PatchMapping(
+  @PostMapping(
       value = {"/latest/projects/{uuid}/digitalobjects", "/v3/projects/{uuid}/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
@@ -171,9 +170,9 @@ public class ProjectController {
     boolean successful = projectService.addDigitalObjects(project, digitalObjects);
 
     if (successful) {
-      return new ResponseEntity<>(HttpStatus.OK);
+      return new ResponseEntity<>(successful, HttpStatus.OK);
     }
-    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
   @ApiMethod(description = "Get paged digital objects of a project")
@@ -195,8 +194,8 @@ public class ProjectController {
   @ApiMethod(description = "Remove an existing digital object from an existing project")
   @DeleteMapping(
       value = {
-        "/latest/projects/{uuid}/digitalobject/{digitalObjectUuid}",
-        "/v3/projects/{uuid}/digitalobject/{digitalObjectUuid}"
+        "/latest/projects/{uuid}/digitalobjects/{digitalObjectUuid}",
+        "/v3/projects/{uuid}/digitalobjects/{digitalObjectUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
@@ -213,9 +212,9 @@ public class ProjectController {
     boolean successful = projectService.removeDigitalObject(project, digitalObject);
 
     if (successful) {
-      return new ResponseEntity<>(HttpStatus.OK);
+      return new ResponseEntity<>(successful, HttpStatus.OK);
     }
-    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
   @ApiMethod(description = "Save existing digital objects into an existing project")
@@ -233,9 +232,9 @@ public class ProjectController {
     boolean successful = projectService.saveDigitalObjects(project, digitalObjects);
 
     if (successful) {
-      return new ResponseEntity<>(HttpStatus.OK);
+      return new ResponseEntity<>(successful, HttpStatus.OK);
     }
-    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
   @ApiMethod(
