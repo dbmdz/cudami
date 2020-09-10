@@ -5,7 +5,7 @@ import {Input, Label} from 'reactstrap'
 const FloatingLabelInput = ({label, name, onChange, type = 'text', value}) => {
   const [focussed, setFocussed] = useState(false)
   return (
-    <>
+    <div className="border-0 form-control p-0 position-relative">
       <Input
         className="text-dark"
         id={`${name}-input`}
@@ -26,7 +26,7 @@ const FloatingLabelInput = ({label, name, onChange, type = 'text', value}) => {
       >
         {label}
       </Label>
-    </>
+    </div>
   )
 }
 
