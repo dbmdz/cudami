@@ -11,7 +11,7 @@ import {
 } from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-import FloatingLabelInput from './FloatingLabelInput'
+import FloatingLabelInput from '../../FloatingLabelInput'
 import InfoTooltip from '../../InfoTooltip'
 
 const ImageMetadataForm = ({
