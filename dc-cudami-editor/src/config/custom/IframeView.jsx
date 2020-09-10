@@ -47,7 +47,7 @@ class IframeView {
       dispatch(transaction)
       unsubscribe(token)
     })
-    publish('editor.show-iframe-modal', this.node.attrs)
+    publish('editor.show-iframe-modal', {...this.node.attrs, editing: true})
   }
 
   selectNode() {

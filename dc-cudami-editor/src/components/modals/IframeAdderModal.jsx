@@ -17,6 +17,7 @@ class IframeAdderModal extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      editing: false,
       height: '',
       src: '',
       title: '',
@@ -51,10 +52,14 @@ class IframeAdderModal extends Component {
 
   render() {
     const {isOpen, t} = this.props
-    const {height, src, title, width} = this.state
+    const {editing, height, src, title, width} = this.state
     return (
       <Modal isOpen={isOpen} toggle={this.destroy}>
-        <ModalHeader toggle={this.destroy}>{t('insert.iframe')}</ModalHeader>
+        <ModalHeader toggle={this.destroy}>
+          {this.state.editing
+            ? t('insert.iframe.edit')
+            : t('insert.iframe.new')}
+        </ModalHeader>
         <ModalBody>
           <Form
             onSubmit={(evt) => {

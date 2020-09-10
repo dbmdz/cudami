@@ -81,7 +81,10 @@
     "insert": {
       "footnote": "Fußnote einfügen",
       "hr": "Horizontale Linie einfügen",
-      "iframe": "Iframe einfügen",
+      "iframe": {
+        "edit": "Iframe bearbeiten",
+        "new": "Iframe einfügen"
+      },
       "image": {
         "edit": "Bild bearbeiten",
         "new": "Bild einfügen"

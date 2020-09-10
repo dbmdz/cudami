@@ -81,7 +81,10 @@
     "insert": {
       "footnote": "Insert footnote",
       "hr": "Insert horizontal rule",
-      "iframe": "Insert iframe",
+      "iframe": {
+        "edit": "Edit iframe",
+        "new": "Insert iframe"
+      },
       "image": {
         "edit": "Edit image",
         "new": "Insert image"
