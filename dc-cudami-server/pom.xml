@@ -20,5 +20,6 @@
     <module>dc-cudami-server-backend-inmemory</module>
     <module>dc-cudami-server-backend-jdbi</module>
     <module>dc-cudami-server-backend-file</module>
+    <module>dc-cudami-server-backend-lobid</module>
   </modules>
 </project>
