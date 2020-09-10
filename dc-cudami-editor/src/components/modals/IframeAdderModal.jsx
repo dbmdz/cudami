@@ -34,7 +34,9 @@ class IframeAdderModal extends Component {
 
   addIframeToEditor = () => {
     const filteredState = Object.fromEntries(
-      Object.entries(this.state).filter(([_, value]) => value !== '')
+      Object.entries(this.state).filter(
+        ([key, value]) => key !== 'editing' && value !== ''
+      )
     )
     publish('editor.add-iframe', filteredState)
     this.destroy()
@@ -56,9 +58,7 @@ class IframeAdderModal extends Component {
     return (
       <Modal isOpen={isOpen} toggle={this.destroy}>
         <ModalHeader toggle={this.destroy}>
-          {this.state.editing
-            ? t('insert.iframe.edit')
-            : t('insert.iframe.new')}
+          {editing ? t('insert.iframe.edit') : t('insert.iframe.new')}
         </ModalHeader>
         <ModalBody>
           <Form
@@ -112,7 +112,7 @@ class IframeAdderModal extends Component {
               />
             </FormGroup>
             <Button className="float-right" color="primary" type="submit">
-              {t('add')}
+              {editing ? t('save') : t('add')}
             </Button>
           </Form>
         </ModalBody>
