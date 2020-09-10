@@ -31,6 +31,7 @@ export default {
     cellContent: 'block+',
   }),
   ...footnoteNodes,
+  // custom nodes
   ...iframeNode,
   ...imageNode,
 }
