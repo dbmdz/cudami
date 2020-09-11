@@ -2,8 +2,8 @@ package de.digitalcollections.cudami.server.backend.impl.lobid.identifiable.enti
 
 import de.digitalcollections.cudami.lobid.client.LobidClient;
 import de.digitalcollections.cudami.lobid.client.LobidCorporationsClient;
-import de.digitalcollections.cudami.lobid.client.exceptions.HttpException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ExternalCorporationRepository;
+import de.digitalcollections.model.api.http.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Corporation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
