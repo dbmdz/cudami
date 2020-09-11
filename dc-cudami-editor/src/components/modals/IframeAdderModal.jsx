@@ -88,7 +88,7 @@ class IframeAdderModal extends Component {
               <FloatingLabelInput
                 label="URL"
                 name="iframe-url"
-                onChange={(value) => this.setAttribute('src', value)}
+                onChange={(value) => this.setAttribute('src', value.trim())}
                 required
                 type="url"
                 value={attributes.src}
