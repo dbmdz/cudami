@@ -24,14 +24,14 @@ class LinkEditingToolbar {
       view.dispatch(
         view.state.tr.removeMark(selection.from, selection.to, link)
       )
-      link.attrs = {
-        ...link.attrs,
-        ...data,
-      }
+      link.attrs = data
       view.dispatch(view.state.tr.addMark(selection.from, selection.to, link))
       unsubscribe(token)
     })
-    publish('editor.show-link-modal', {...this.link.attrs, editing: true})
+    publish('editor.show-link-modal', {
+      attributes: this.link.attrs,
+      editing: true,
+    })
   }
 
   update(view, lastState) {

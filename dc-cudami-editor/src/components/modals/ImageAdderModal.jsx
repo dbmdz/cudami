@@ -1,3 +1,4 @@
+import mapValues from 'lodash/mapValues'
 import {publish, subscribe} from 'pubsub-js'
 import React, {Component} from 'react'
 import {Button, Form, Modal, ModalBody, ModalHeader} from 'reactstrap'
@@ -26,10 +27,10 @@ class ImageAdderModal extends Component {
     this.state = {
       attributes: this.initialAttributes,
       doUpdateRequest: false,
+      editing: false,
       fileResource: {},
       metadataOpen: true,
       renderingHintsOpen: false,
-      showImageSelector: true,
       tooltipsOpen: {
         altText: false,
         caption: false,
@@ -41,30 +42,24 @@ class ImageAdderModal extends Component {
         url: false,
       },
     }
-    subscribe('editor.show-image-modal', (_msg, data = {}) => {
-      const attributes = Object.fromEntries(
-        Object.entries(data).filter(([key, value]) => {
-          // alignment is allowed to be null and should not be filtered out in that case
-          if (key === 'alignment') {
-            return true
-          }
-          return key !== 'showImageSelector' && value !== null
+    subscribe(
+      'editor.show-image-modal',
+      (_msg, {attributes = {}, editing = false} = {}) => {
+        this.setState({
+          attributes: {
+            ...this.state.attributes,
+            ...mapValues(attributes, (value) => value ?? ''),
+          },
+          editing,
+          fileResource: {
+            ...this.state.fileResource,
+            uri: attributes.url ?? '',
+            uuid: attributes.resourceId,
+          },
         })
-      )
-      this.setState({
-        attributes: {
-          ...this.initialAttributes,
-          ...attributes,
-        },
-        fileResource: {
-          ...this.state.fileResource,
-          uri: attributes.url ?? '',
-          uuid: attributes.resourceId,
-        },
-        showImageSelector: data.showImageSelector ?? true,
-      })
-      this.props.onToggle()
-    })
+        this.props.onToggle()
+      }
+    )
   }
 
   async componentDidMount() {
@@ -87,11 +82,10 @@ class ImageAdderModal extends Component {
   }
 
   addImageToEditor = (resourceId) => {
-    const filteredAttributes = Object.fromEntries(
-      Object.entries(this.state.attributes).filter(([_, value]) => value !== '')
-    )
     const data = {
-      ...filteredAttributes,
+      ...mapValues(this.state.attributes, (value) =>
+        value !== '' ? value : undefined
+      ),
       resourceId,
       url: this.state.fileResource.uri,
     }
@@ -172,20 +166,17 @@ class ImageAdderModal extends Component {
   render() {
     const {activeLanguage, isOpen, t} = this.props
     const {
-      alignment,
-      altText,
-      caption,
-      linkNewTab,
-      linkUrl,
-      title,
-      width,
-    } = this.state.attributes
+      attributes,
+      editing,
+      fileResource,
+      metadataOpen,
+      renderingHintsOpen,
+      tooltipsOpen,
+    } = this.state
     return (
       <Modal isOpen={isOpen} size="lg" toggle={this.destroy}>
         <ModalHeader toggle={this.destroy}>
-          {this.state.showImageSelector
-            ? t('insert.image.new')
-            : t('insert.image.edit')}
+          {editing ? t('insert.image.edit') : t('insert.image.new')}
         </ModalHeader>
         <ModalBody>
           <Form
@@ -195,45 +186,43 @@ class ImageAdderModal extends Component {
               this.addImageToEditor(resourceId)
             }}
           >
-            {this.state.showImageSelector && (
+            {!editing && (
               <ImageSelector
                 activeLanguage={activeLanguage}
-                fileResource={this.state.fileResource}
+                fileResource={fileResource}
                 onChange={this.updateFileResource}
                 onTabChanged={this.onTabChanged}
                 toggleTooltip={this.toggleTooltip}
-                tooltipsOpen={this.state.tooltipsOpen}
+                tooltipsOpen={tooltipsOpen}
               />
             )}
             <ImageMetadataForm
-              altText={altText}
-              caption={caption}
-              isOpen={this.state.metadataOpen}
+              altText={attributes.altText}
+              caption={attributes.caption}
+              isOpen={metadataOpen}
               onChange={this.setAttribute}
-              title={title}
-              toggle={() =>
-                this.setState({metadataOpen: !this.state.metadataOpen})
-              }
+              title={attributes.title}
+              toggle={() => this.setState({metadataOpen: !metadataOpen})}
               toggleTooltip={this.toggleTooltip}
-              tooltipsOpen={this.state.tooltipsOpen}
+              tooltipsOpen={tooltipsOpen}
             />
             <ImageRenderingHintsForm
-              alignment={alignment}
+              alignment={attributes.alignment}
               enableAlignment={true}
               enableWidth={true}
-              isOpen={this.state.renderingHintsOpen}
-              linkNewTab={linkNewTab}
-              linkUrl={linkUrl}
+              isOpen={renderingHintsOpen}
+              linkNewTab={attributes.linkNewTab}
+              linkUrl={attributes.linkUrl}
               onChange={this.setAttribute}
               toggle={() =>
                 this.setState({
-                  renderingHintsOpen: !this.state.renderingHintsOpen,
+                  renderingHintsOpen: !renderingHintsOpen,
                 })
               }
-              width={width}
+              width={attributes.width}
             />
             <Button className="float-right mt-2" color="primary" type="submit">
-              {t('save')}
+              {editing ? t('save') : t('add')}
             </Button>
           </Form>
         </ModalBody>

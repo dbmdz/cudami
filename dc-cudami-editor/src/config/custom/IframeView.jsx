@@ -34,20 +34,15 @@ class IframeView {
 
   editContent = () => {
     const token = subscribe('editor.add-iframe', (_msg, data) => {
-      const newAttrs = {
-        ...this.node.attrs,
-        ...data,
-      }
       const {dispatch, state} = this.view
-      const transaction = state.tr.setNodeMarkup(
-        this.getPos(),
-        undefined,
-        newAttrs
-      )
+      const transaction = state.tr.setNodeMarkup(this.getPos(), undefined, data)
       dispatch(transaction)
       unsubscribe(token)
     })
-    publish('editor.show-iframe-modal', {...this.node.attrs, editing: true})
+    publish('editor.show-iframe-modal', {
+      attributes: this.node.attrs,
+      editing: true,
+    })
   }
 
   selectNode() {
