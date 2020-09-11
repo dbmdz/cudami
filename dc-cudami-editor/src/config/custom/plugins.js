@@ -2,6 +2,15 @@ import {Plugin} from 'prosemirror-state'
 
 import IframeView from './IframeView'
 import ImageView from './ImageView'
+import LinkEditingToolbar from './LinkEditingToolbar'
+
+export const linkEditing = () => {
+  return new Plugin({
+    view(editorView) {
+      return new LinkEditingToolbar(editorView)
+    },
+  })
+}
 
 export const nodeViews = () => {
   return new Plugin({

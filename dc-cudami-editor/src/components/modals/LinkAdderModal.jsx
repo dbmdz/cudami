@@ -15,16 +15,26 @@ class LinkAdderModal extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      editing: false,
       href: '',
       title: '',
     }
-    subscribe('editor.show-link-modal', () => {
+    subscribe('editor.show-link-modal', (_msg, data = {}) => {
+      this.setState({
+        ...data,
+        title: data.title ?? '',
+      })
       this.props.onToggle()
     })
   }
 
   addLinkToEditor = () => {
-    publish('editor.add-link', this.state)
+    const filteredState = Object.fromEntries(
+      Object.entries(this.state).filter(
+        ([key, value]) => key !== 'editing' && value !== ''
+      )
+    )
+    publish('editor.add-link', filteredState)
     this.destroy()
   }
 
@@ -38,9 +48,12 @@ class LinkAdderModal extends Component {
 
   render() {
     const {isOpen, t} = this.props
+    const {editing, href, title} = this.state
     return (
       <Modal isOpen={isOpen} toggle={this.destroy}>
-        <ModalHeader toggle={this.destroy}>{t('insertLink')}</ModalHeader>
+        <ModalHeader toggle={this.destroy}>
+          {editing ? t('editLink') : t('insertLink')}
+        </ModalHeader>
         <ModalBody>
           <Form
             onSubmit={(evt) => {
@@ -56,7 +69,7 @@ class LinkAdderModal extends Component {
                 placeholder="URL"
                 required
                 type="url"
-                value={this.state.href}
+                value={href}
               />
             </FormGroup>
             <FormGroup>
@@ -64,11 +77,11 @@ class LinkAdderModal extends Component {
                 onChange={(evt) => this.setState({title: evt.target.value})}
                 placeholder={t('label')}
                 type="text"
-                value={this.state.height}
+                value={title}
               />
             </FormGroup>
             <Button className="float-right" color="primary" type="submit">
-              {t('add')}
+              {editing ? t('save') : t('add')}
             </Button>
           </Form>
         </ModalBody>
