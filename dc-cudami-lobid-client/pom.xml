@@ -11,18 +11,71 @@
   <name>DigitalCollections: cudami lobid.org Client</name>
   <artifactId>dc-cudami-lobid-client</artifactId>
   <packaging>jar</packaging>
-    <dependencies>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.11.2</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>de.digitalcollections.model</groupId>
-            <artifactId>dc-model</artifactId>
-            <version>6.3.0-SNAPSHOT</version>
-            <type>jar</type>
-        </dependency>
-    </dependencies>
+  
+  <properties>
+    <skipIntegrationTests>true</skipIntegrationTests>
+    <version.maven-failsafe-plugin>2.22.2</version.maven-failsafe-plugin>
+  </properties>
+  
+  <dependencies>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.model</groupId>
+      <artifactId>dc-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  
+  <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>${version.maven-failsafe-plugin}</version>
+            <configuration>
+              <skipITs>${skipIntegrationTests}</skipITs>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+      
+  <profiles>
+    <profile>
+      <id>integrationTests</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>${version.maven-failsafe-plugin}</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

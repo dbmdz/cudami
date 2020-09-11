@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.lobid.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.cudami.lobid.client.model.jackson.LobidObjectMapper;
 import java.net.http.HttpClient;
 import java.time.Duration;
 
@@ -8,6 +9,10 @@ public class LobidClient {
 
   protected final HttpClient http;
   private final LobidCorporationsClient lobidCorporationsClient;
+
+  public LobidClient() {
+    this("https://lobid.org", new LobidObjectMapper());
+  }
 
   public LobidClient(String serverUrl, ObjectMapper mapper) {
     this(
