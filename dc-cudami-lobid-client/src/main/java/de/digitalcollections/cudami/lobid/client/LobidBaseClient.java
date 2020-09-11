@@ -60,7 +60,7 @@ public class LobidBaseClient<T extends Object> {
     try {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
       Integer statusCode = response.statusCode();
-      if (statusCode != 200) {
+      if (statusCode >= 400) {
         throw HttpErrorDecoder.decode("GET " + requestUrl, statusCode, response);
       }
       // This is the most performant approach for Jackson
@@ -84,7 +84,7 @@ public class LobidBaseClient<T extends Object> {
     try {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
       Integer statusCode = response.statusCode();
-      if (statusCode != 200) {
+      if (statusCode >= 400) {
         throw HttpErrorDecoder.decode("GET " + requestUrl, statusCode, response);
       }
       // This is the most performant approach for Jackson
@@ -105,7 +105,7 @@ public class LobidBaseClient<T extends Object> {
     try {
       HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
       Integer statusCode = response.statusCode();
-      if (statusCode != 200) {
+      if (statusCode >= 400) {
         throw HttpErrorDecoder.decode("GET " + requestUrl, statusCode, response);
       }
       final String body = response.body();
