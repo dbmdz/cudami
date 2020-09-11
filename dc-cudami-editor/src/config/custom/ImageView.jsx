@@ -46,22 +46,14 @@ class ImageView {
 
   editContent = () => {
     const token = subscribe('editor.add-image', (_msg, data) => {
-      const newAttrs = {
-        ...this.node.attrs,
-        ...data,
-      }
       const {dispatch, state} = this.view
-      const transaction = state.tr.setNodeMarkup(
-        this.getPos(),
-        undefined,
-        newAttrs
-      )
+      const transaction = state.tr.setNodeMarkup(this.getPos(), undefined, data)
       dispatch(transaction)
       unsubscribe(token)
     })
     publish('editor.show-image-modal', {
-      ...this.node.attrs,
-      showImageSelector: false,
+      attributes: this.node.attrs,
+      editing: true,
     })
   }
 

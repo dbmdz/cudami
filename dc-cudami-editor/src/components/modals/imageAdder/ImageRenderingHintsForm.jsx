@@ -62,11 +62,11 @@ const ImageRenderingHintsForm = ({
                   value="right"
                 />
                 <CustomInput
-                  checked={!alignment}
+                  checked={alignment === ''}
                   id="rendering-hits-no-alignment"
                   inline
                   label={t('noAlignment')}
-                  onChange={() => onChange('alignment', null)}
+                  onChange={() => onChange('alignment', '')}
                   type="radio"
                 />
               </div>
