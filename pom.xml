@@ -136,6 +136,11 @@
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.cudami</groupId>
+        <artifactId>dc-cudami-lobid-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>de.digitalcollections.cudami</groupId>
         <artifactId>dc-cudami-server-backend-api</artifactId>
         <version>${project.version}</version>
       </dependency>
