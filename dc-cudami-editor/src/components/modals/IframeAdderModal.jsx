@@ -85,9 +85,7 @@ class IframeAdderModal extends Component {
                 value={width}
               />
               <FormText className="ml-1">
-                {t('forExample')}
-                <code className="ml-1">500</code>, <code>300px</code> or
-                <code className="ml-1">50%</code>
+                {t('forExample')} <code>300px</code> or <code>50%</code>
               </FormText>
             </FormGroup>
             <FormGroup>
@@ -98,9 +96,7 @@ class IframeAdderModal extends Component {
                 value={height}
               />
               <FormText className="ml-1">
-                {t('forExample')}
-                <code className="ml-1">500</code>, <code>300px</code> or
-                <code className="ml-1">50%</code>
+                {t('forExample')} <code>300px</code> or <code>50%</code>
               </FormText>
             </FormGroup>
             <FormGroup>
