@@ -14,6 +14,7 @@ import de.digitalcollections.model.impl.paging.SortingImpl;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiPathParam;
@@ -35,6 +36,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Api(description = "The corporation controller", name = "Corporation controller")
 public class CorporationController {
+
+  private static final Pattern GNDID_PATTERN = Pattern.compile("\\d+-\\d");
 
   private CorporationService corporationService;
 
@@ -107,7 +110,7 @@ public class CorporationController {
   @ApiMethod(
       description = "Save a newly created corporation fetched by GND-ID from external system")
   @PostMapping(
-      value = {"/latest/corporations/gnd:{gndId}", "/v3/corporations/gnd:{gndId}"},
+      value = {"/latest/corporations/gnd/{gndId}", "/v3/corporations/gnd/{gndId}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Corporation fetchAndSaveByGndId(
@@ -115,6 +118,9 @@ public class CorporationController {
           @PathVariable("gndId")
           String gndId)
       throws IdentifiableServiceException {
+    if (!GNDID_PATTERN.matcher(gndId).matches()) {
+      throw new IllegalArgumentException("Invalid GND ID: " + gndId);
+    }
     return corporationService.fetchAndSaveByGndId(gndId);
   }
 
