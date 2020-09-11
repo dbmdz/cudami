@@ -3,8 +3,8 @@ import {orderedList, bulletList, listItem} from 'prosemirror-schema-list'
 import {tableNodes} from 'prosemirror-tables'
 import {footnoteNodes} from '@aeaton/prosemirror-footnotes'
 
-import iframeNode from './custom/IframeNode'
-import imageNode from './custom/ImageNode'
+import iframe from './custom/IframeNode'
+import image from './custom/ImageNode'
 
 const listNodes = {
   ordered_list: {
@@ -32,6 +32,6 @@ export default {
   }),
   ...footnoteNodes,
   // custom nodes
-  ...iframeNode,
-  ...imageNode,
+  iframe,
+  image,
 }
