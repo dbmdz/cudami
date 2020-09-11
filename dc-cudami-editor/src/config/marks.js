@@ -1,6 +1,6 @@
 import {marks} from 'prosemirror-schema-basic'
 
-import linkMark from './custom/LinkMark'
+import link from './custom/LinkMark'
 
 const subscript = {
   excludes: 'superscript',
@@ -45,5 +45,5 @@ export default {
   strikethrough,
   underline,
   // custom marks
-  ...linkMark,
+  link,
 }
