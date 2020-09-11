@@ -15,6 +15,8 @@ import FloatingLabelInput from '../../FloatingLabelInput'
 
 const ImageRenderingHintsForm = ({
   alignment,
+  enableAlignment,
+  enableWidth,
   isOpen,
   linkNewTab,
   linkUrl,
@@ -32,7 +34,7 @@ const ImageRenderingHintsForm = ({
       </CardHeader>
       <Collapse isOpen={isOpen}>
         <CardBody>
-          {alignment && (
+          {enableAlignment && (
             <FormGroup>
               <Label
                 className="font-weight-bold"
@@ -70,7 +72,7 @@ const ImageRenderingHintsForm = ({
               </div>
             </FormGroup>
           )}
-          {width && (
+          {enableWidth && (
             <FormGroup>
               <Label className="font-weight-bold" for="rendering-hints-width">
                 {t('width')}
