@@ -31,6 +31,5 @@ public class EntityTypeParser {
     return null;
   }
 
-  private EntityTypeParser() {
-  }
+  private EntityTypeParser() {}
 }

@@ -47,14 +47,6 @@ public interface EntityRepository<E extends Entity> extends IdentifiableReposito
   List<FileResource> getRelatedFileResources(UUID entityUuid);
 
   /**
-   * Get GND data from an official GND-source and import as new entity.
-   * 
-   * @param gndId GND-ID of entity, e.g. "2007744-0" (DFG)
-   * @return saved entity
-   */
-  E importByGndId(String gndId);
-
-  /**
    * Save list of file resources related to an entity. Prerequisite: file resources have been saved
    * before (exist already)
    *

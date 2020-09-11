@@ -14,7 +14,8 @@ public class LobidCorporateBody {
     return abbreviatedNameForTheCorporateBody;
   }
 
-  public void setAbbreviatedNameForTheCorporateBody(List<String> abbreviatedNameForTheCorporateBody) {
+  public void setAbbreviatedNameForTheCorporateBody(
+      List<String> abbreviatedNameForTheCorporateBody) {
     this.abbreviatedNameForTheCorporateBody = abbreviatedNameForTheCorporateBody;
   }
 
@@ -49,5 +50,4 @@ public class LobidCorporateBody {
   public void setPreferredName(String preferredName) {
     this.preferredName = preferredName;
   }
-
 }

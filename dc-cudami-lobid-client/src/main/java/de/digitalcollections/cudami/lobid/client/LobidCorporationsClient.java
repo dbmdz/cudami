@@ -7,6 +7,7 @@ import de.digitalcollections.cudami.lobid.client.model.LobidDepiction;
 import de.digitalcollections.cudami.lobid.client.model.LobidHomepage;
 import de.digitalcollections.model.api.identifiable.entity.Corporation;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
+import de.digitalcollections.model.api.identifiable.resource.MimeType;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.entity.CorporationImpl;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
@@ -21,15 +22,15 @@ import org.slf4j.LoggerFactory;
 
 public class LobidCorporationsClient extends LobidBaseClient<LobidCorporateBody> {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(LobidCorporationsClient.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(LobidCorporationsClient.class);
 
   LobidCorporationsClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
     super(http, serverUrl, LobidCorporateBody.class, mapper);
   }
 
   public Corporation getByGndId(String gndId) throws HttpException {
-    LobidCorporateBody lobidCorporateBody
-            = doGetRequestForObject(String.format("/gnd/%s.json", gndId));
+    LobidCorporateBody lobidCorporateBody =
+        doGetRequestForObject(String.format("/gnd/%s.json", gndId));
     Corporation corporation = mapLobidToModel(lobidCorporateBody);
     return corporation;
   }
@@ -39,10 +40,10 @@ public class LobidCorporationsClient extends LobidBaseClient<LobidCorporateBody>
 
     // label
     String labelText = lobidCorporateBody.getPreferredName();
-    List<String> abbreviatedNameForTheCorporateBody = lobidCorporateBody.getAbbreviatedNameForTheCorporateBody();
+    List<String> abbreviatedNameForTheCorporateBody =
+        lobidCorporateBody.getAbbreviatedNameForTheCorporateBody();
     if (labelText != null && abbreviatedNameForTheCorporateBody != null) {
-      labelText = labelText + " (" + abbreviatedNameForTheCorporateBody.get(0)
-              + ")";
+      labelText = labelText + " (" + abbreviatedNameForTheCorporateBody.get(0) + ")";
     }
     corporation.setLabel(new LocalizedTextImpl(Locale.GERMAN, labelText));
 
@@ -62,13 +63,14 @@ public class LobidCorporationsClient extends LobidBaseClient<LobidCorporateBody>
         LOGGER.warn("Invalid homepage URL: " + homepageId);
       }
     }
-    
+
     // preview image = logo
     List<LobidDepiction> depiction = lobidCorporateBody.getDepiction();
     if (depiction != null && !depiction.isEmpty()) {
       String thumbnailUrl = depiction.get(0).getThumbnail();
       ImageFileResource previewImage = new ImageFileResourceImpl();
       previewImage.setUri(URI.create(thumbnailUrl));
+      previewImage.setMimeType(MimeType.MIME_IMAGE);
       corporation.setPreviewImage(previewImage);
     }
 

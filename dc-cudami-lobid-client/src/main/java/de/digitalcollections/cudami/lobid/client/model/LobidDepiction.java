@@ -29,5 +29,4 @@ public class LobidDepiction {
   public void setUrl(String url) {
     this.url = url;
   }
-
 }
