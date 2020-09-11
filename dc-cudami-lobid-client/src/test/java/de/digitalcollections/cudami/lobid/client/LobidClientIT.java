@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.lobid.client;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.digitalcollections.cudami.lobid.client.exceptions.HttpException;
+import de.digitalcollections.model.api.http.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Corporation;
 import org.junit.jupiter.api.Test;
 

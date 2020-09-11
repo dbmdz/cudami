@@ -2,8 +2,8 @@ package de.digitalcollections.cudami.lobid.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import de.digitalcollections.cudami.lobid.client.exceptions.HttpException;
-import de.digitalcollections.cudami.lobid.client.exceptions.RestErrorDecoder;
+import de.digitalcollections.model.api.http.exceptions.HttpErrorDecoder;
+import de.digitalcollections.model.api.http.exceptions.HttpException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -61,7 +61,7 @@ public class LobidBaseClient<T extends Object> {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
       Integer statusCode = response.statusCode();
       if (statusCode != 200) {
-        throw RestErrorDecoder.decode("GET " + requestUrl, statusCode);
+        throw HttpErrorDecoder.decode("GET " + requestUrl, statusCode, response);
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.body();
@@ -71,7 +71,8 @@ public class LobidBaseClient<T extends Object> {
       T result = mapper.readerFor(targetType).readValue(body);
       return result;
     } catch (IOException | InterruptedException e) {
-      throw new HttpException("Failed to retrieve response due to connection error", e);
+      LOGGER.warn("Failed to retrieve response due to connection error", e);
+      throw HttpErrorDecoder.decode("GET " + requestUrl, 500, null);
     }
   }
 
@@ -84,7 +85,7 @@ public class LobidBaseClient<T extends Object> {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
       Integer statusCode = response.statusCode();
       if (statusCode != 200) {
-        throw RestErrorDecoder.decode("GET " + requestUrl, statusCode);
+        throw HttpErrorDecoder.decode("GET " + requestUrl, statusCode, response);
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.body();
@@ -94,7 +95,8 @@ public class LobidBaseClient<T extends Object> {
       List result = mapper.readerForListOf(targetType).readValue(body);
       return result;
     } catch (IOException | InterruptedException e) {
-      throw new HttpException("Failed to retrieve response due to connection error", e);
+      LOGGER.warn("Failed to retrieve response due to connection error", e);
+      throw HttpErrorDecoder.decode("GET " + requestUrl, 500, null);
     }
   }
 
@@ -104,12 +106,13 @@ public class LobidBaseClient<T extends Object> {
       HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
       Integer statusCode = response.statusCode();
       if (statusCode != 200) {
-        throw RestErrorDecoder.decode("GET " + requestUrl, statusCode);
+        throw HttpErrorDecoder.decode("GET " + requestUrl, statusCode, response);
       }
       final String body = response.body();
       return body;
     } catch (IOException | InterruptedException e) {
-      throw new HttpException("Failed to retrieve response due to connection error", e);
+      LOGGER.warn("Failed to retrieve response due to connection error", e);
+      throw HttpErrorDecoder.decode("GET " + requestUrl, 500, null);
     }
   }
 }
