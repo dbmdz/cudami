@@ -3,11 +3,14 @@ package de.digitalcollections.cudami.lobid.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.lobid.client.exceptions.HttpException;
 import de.digitalcollections.cudami.lobid.client.model.LobidCorporateBody;
+import de.digitalcollections.cudami.lobid.client.model.LobidDepiction;
 import de.digitalcollections.cudami.lobid.client.model.LobidHomepage;
 import de.digitalcollections.model.api.identifiable.entity.Corporation;
+import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.entity.CorporationImpl;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
+import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -61,7 +64,13 @@ public class LobidCorporationsClient extends LobidBaseClient<LobidCorporateBody>
     }
     
     // preview image = logo
-    
+    List<LobidDepiction> depiction = lobidCorporateBody.getDepiction();
+    if (depiction != null && !depiction.isEmpty()) {
+      String thumbnailUrl = depiction.get(0).getThumbnail();
+      ImageFileResource previewImage = new ImageFileResourceImpl();
+      previewImage.setUri(URI.create(thumbnailUrl));
+      corporation.setPreviewImage(previewImage);
+    }
 
     return corporation;
   }
