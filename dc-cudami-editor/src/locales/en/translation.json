@@ -61,6 +61,7 @@
     "editCollection": "Edit collection",
     "editCorporation": "Edit corporation",
     "editFileResource": "Edit file \"{{ name }}\"",
+    "editLink": "Edit hyperlink",
     "editPreviewImage": "Edit preview image",
     "editProject": "Edit project",
     "editSubtopic": "Edit subtopic",
