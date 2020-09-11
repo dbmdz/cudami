@@ -40,6 +40,10 @@ public class CudamiCorporationsClient extends CudamiBaseClient<CorporationImpl> 
         String.format("/latest/corporations/identifier/%s:%s.json", namespace, id));
   }
 
+  public Corporation fetchAndSaveByGndId(String gndId) throws HttpException {
+    return doPostRequestForObject(String.format("/latest/corporations/gnd/%s", gndId));
+  }
+
   public Corporation save(Corporation corporation) throws HttpException {
     return doPostRequestForObject("/latest/corporations", (CorporationImpl) corporation);
   }

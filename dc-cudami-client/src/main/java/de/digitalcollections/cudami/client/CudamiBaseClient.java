@@ -423,6 +423,25 @@ public class CudamiBaseClient<T extends Object> {
     }
   }
 
+  protected T doPostRequestForObject(String requestUrl) throws HttpException {
+    try {
+      HttpRequest req = createPostRequest(requestUrl);
+      HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
+      Integer statusCode = response.statusCode();
+      if (statusCode != 200) {
+        throw CudamiRestErrorDecoder.decode("POST " + requestUrl, statusCode);
+      }
+      final byte[] body = response.body();
+      if (body == null || body.length == 0) {
+        return null;
+      }
+      T result = mapper.readerFor(targetType).readValue(body);
+      return result;
+    } catch (InterruptedException | IOException e) {
+      throw new HttpException("Failed to retrieve response due to connection error", e);
+    }
+  }
+
   protected Object doPostRequestForObject(String requestUrl, Class<?> targetType)
       throws HttpException {
     try {
