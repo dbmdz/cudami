@@ -205,7 +205,7 @@ class ImageSelector extends Component {
               <FormGroup>
                 <Input
                   name="url"
-                  onChange={(evt) => onChange({uri: evt.target.value})}
+                  onChange={(evt) => onChange({uri: evt.target.value.trim()})}
                   pattern="(https?://|/).+?"
                   placeholder="URL"
                   required
