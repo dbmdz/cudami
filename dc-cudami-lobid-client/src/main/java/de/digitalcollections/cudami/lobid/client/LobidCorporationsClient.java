@@ -1,10 +1,10 @@
 package de.digitalcollections.cudami.lobid.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.lobid.client.exceptions.HttpException;
 import de.digitalcollections.cudami.lobid.client.model.LobidCorporateBody;
 import de.digitalcollections.cudami.lobid.client.model.LobidDepiction;
 import de.digitalcollections.cudami.lobid.client.model.LobidHomepage;
+import de.digitalcollections.model.api.http.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Corporation;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.identifiable.resource.MimeType;

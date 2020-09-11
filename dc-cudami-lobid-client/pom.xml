@@ -25,6 +25,16 @@
     <dependency>
       <groupId>de.digitalcollections.model</groupId>
       <artifactId>dc-model</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.security</groupId>
+          <artifactId>spring-security-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.wikidata.wdtk</groupId>
+          <artifactId>wdtk-datamodel</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -40,6 +50,10 @@
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
   </dependencies>
   
