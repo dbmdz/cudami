@@ -133,7 +133,7 @@ public class CorporationController {
     return corporationService.getByIdentifier(namespace, id);
   }
 
-  @ApiMethod(description = "Get corporation by namespace and id")
+  @ApiMethod(description = "Get corporation by refId")
   @GetMapping(
       value = {"/latest/corporations/{refId:[0-9]+}", "/v3/corporations/{refId:[0-9]+}"},
       produces = "application/json")
