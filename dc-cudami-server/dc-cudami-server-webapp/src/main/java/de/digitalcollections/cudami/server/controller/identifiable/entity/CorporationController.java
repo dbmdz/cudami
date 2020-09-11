@@ -104,13 +104,33 @@ public class CorporationController {
     return corporationService.save(corporation);
   }
 
+  @ApiMethod(
+      description = "Save a newly created corporation fetched by GND-ID from external system")
+  @PostMapping(
+      value = {"/latest/corporations/gnd:{gndId}", "/v3/corporations/gnd:{gndId}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public Corporation fetchAndSaveByGndId(
+      @ApiPathParam(description = "GND-ID of the corporation, e.g. <tt>2007744-0</tt>")
+          @PathVariable("gndId")
+          String gndId)
+      throws IdentifiableServiceException {
+    return corporationService.fetchAndSaveByGndId(gndId);
+  }
+
   @ApiMethod(description = "Update an corporation")
   @PutMapping(
-      value = {"/latest/corporations/gnd:{uuid}", "/v2/corporations/{uuid}"},
+      value = {"/latest/corporations/{uuid}", "/v2/corporations/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Corporation update(
-      @PathVariable UUID uuid, @RequestBody Corporation corporation, BindingResult errors)
+      @ApiPathParam(
+              description =
+                  "UUID of the corporation, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @RequestBody Corporation corporation,
+      BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, corporation.getUuid());
     return corporationService.update(corporation);

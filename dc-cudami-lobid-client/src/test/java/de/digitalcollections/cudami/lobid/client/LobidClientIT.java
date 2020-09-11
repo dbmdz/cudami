@@ -1,14 +1,14 @@
 package de.digitalcollections.cudami.lobid.client;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import de.digitalcollections.cudami.lobid.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Corporation;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 public class LobidClientIT {
 
-  public LobidClientIT() {
-  }
+  public LobidClientIT() {}
 
   @Test
   public void getCorporationByGndId() throws HttpException {

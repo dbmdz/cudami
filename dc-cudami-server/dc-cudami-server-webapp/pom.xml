@@ -57,6 +57,11 @@
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
+      <artifactId>dc-cudami-server-backend-lobid</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-server-business</artifactId>
     </dependency>
     <dependency>
