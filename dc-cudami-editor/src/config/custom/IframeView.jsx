@@ -32,7 +32,7 @@ class IframeView {
     this.dom.removeChild(this.dom.lastChild)
   }
 
-  editContent = () => {
+  editIframe = () => {
     const token = subscribe('editor.add-iframe', (_msg, data) => {
       const {dispatch, state} = this.view
       const transaction = state.tr.setNodeMarkup(this.getPos(), undefined, data)
@@ -49,7 +49,7 @@ class IframeView {
     this.dom.classList.add('ProseMirror-selectednode')
     const menu = document.createElement('span')
     menu.classList.add('contentblock-menu')
-    render(<EditButton onClick={this.editContent} />, menu)
+    render(<EditButton onClick={this.editIframe} />, menu)
     this.dom.appendChild(menu)
   }
 }

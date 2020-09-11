@@ -44,7 +44,7 @@ class ImageView {
     this.dom.removeChild(this.dom.lastChild)
   }
 
-  editContent = () => {
+  editImage = () => {
     const token = subscribe('editor.add-image', (_msg, data) => {
       const {dispatch, state} = this.view
       const transaction = state.tr.setNodeMarkup(this.getPos(), undefined, data)
@@ -62,7 +62,7 @@ class ImageView {
     const menu = document.createElement('span')
     menu.classList.add('contentblock-menu')
     menu.style.zIndex = 1
-    render(<EditButton onClick={this.editContent} />, menu)
+    render(<EditButton onClick={this.editImage} />, menu)
     this.dom.appendChild(menu)
   }
 }
