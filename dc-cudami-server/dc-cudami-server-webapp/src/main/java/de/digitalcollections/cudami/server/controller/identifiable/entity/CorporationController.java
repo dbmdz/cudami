@@ -39,11 +39,28 @@ public class CorporationController {
 
   private static final Pattern GNDID_PATTERN = Pattern.compile("\\d+-\\d");
 
-  private CorporationService corporationService;
+  private final CorporationService corporationService;
 
   @Autowired
   public CorporationController(CorporationService corporationService) {
     this.corporationService = corporationService;
+  }
+
+  @ApiMethod(
+      description = "Save a newly created corporation fetched by GND-ID from external system")
+  @PostMapping(
+      value = {"/latest/corporations/gnd/{gndId}", "/v3/corporations/gnd/{gndId}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public Corporation fetchAndSaveByGndId(
+      @ApiPathParam(description = "GND-ID of the corporation, e.g. <tt>2007744-0</tt>")
+          @PathVariable("gndId")
+          String gndId)
+      throws IdentifiableServiceException {
+    if (!GNDID_PATTERN.matcher(gndId).matches()) {
+      throw new IllegalArgumentException("Invalid GND ID: " + gndId);
+    }
+    return corporationService.fetchAndSaveByGndId(gndId);
   }
 
   @ApiMethod(description = "Get all corporations")
@@ -71,7 +88,10 @@ public class CorporationController {
       description =
           "Get an corporation as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
-      value = {"/latest/corporations/{uuid}", "/v2/corporations/{uuid}"},
+      value = {
+        "/latest/corporations/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v2/corporations/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+      },
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   @ApiResponseObject
   public ResponseEntity<Corporation> get(
@@ -97,6 +117,33 @@ public class CorporationController {
     return new ResponseEntity<>(corporation, HttpStatus.OK);
   }
 
+  @ApiMethod(description = "Get corporation by namespace and id")
+  @GetMapping(
+      value = {
+        "/latest/corporations/identifier/{namespace}:{id}",
+        "/v3/corporations/identifier/{namespace}:{id}"
+      },
+      produces = "application/json")
+  @ApiResponseObject
+  public Corporation getByIdentifier(
+      @ApiPathParam(description = "namespace of identifier") @PathVariable("namespace")
+          String namespace,
+      @ApiPathParam(description = "id of identifier") @PathVariable("id") String id)
+      throws IdentifiableServiceException {
+    return corporationService.getByIdentifier(namespace, id);
+  }
+
+  @ApiMethod(description = "Get corporation by namespace and id")
+  @GetMapping(
+      value = {"/latest/corporations/{refId:[0-9]+}", "/v3/corporations/{refId:[0-9]+}"},
+      produces = "application/json")
+  @ApiResponseObject
+  public Corporation getByRefId(
+      @ApiPathParam(description = "reference id") @PathVariable("refId") long refId)
+      throws IdentifiableServiceException {
+    return corporationService.getByRefId(refId);
+  }
+
   @ApiMethod(description = "Save a newly created corporation")
   @PostMapping(
       value = {"/latest/corporations", "/v2/corporations"},
@@ -105,23 +152,6 @@ public class CorporationController {
   public Corporation save(@RequestBody Corporation corporation, BindingResult errors)
       throws IdentifiableServiceException {
     return corporationService.save(corporation);
-  }
-
-  @ApiMethod(
-      description = "Save a newly created corporation fetched by GND-ID from external system")
-  @PostMapping(
-      value = {"/latest/corporations/gnd/{gndId}", "/v3/corporations/gnd/{gndId}"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
-  public Corporation fetchAndSaveByGndId(
-      @ApiPathParam(description = "GND-ID of the corporation, e.g. <tt>2007744-0</tt>")
-          @PathVariable("gndId")
-          String gndId)
-      throws IdentifiableServiceException {
-    if (!GNDID_PATTERN.matcher(gndId).matches()) {
-      throw new IllegalArgumentException("Invalid GND ID: " + gndId);
-    }
-    return corporationService.fetchAndSaveByGndId(gndId);
   }
 
   @ApiMethod(description = "Update an corporation")
