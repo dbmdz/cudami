@@ -139,7 +139,6 @@
     "subcollectionMovedSuccessfully": "{{ name }} has been moved successfully to <0>{{ targetName }}</0>.",
     "subcollectionRemovedSuccessfully": "{{ name }} has been removed successfully.",
     "text": "Long text",
-    "title": "Title",
     "tooltip": "Tooltip",
     "tooltips": {
       "altText": "is read out in the screen reader or is output if image cannot be displayed",
