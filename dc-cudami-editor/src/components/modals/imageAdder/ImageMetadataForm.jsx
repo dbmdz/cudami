@@ -26,7 +26,7 @@ const ImageMetadataForm = ({
 }) => {
   const {t} = useTranslation()
   return (
-    <Card>
+    <Card className="mb-2">
       <CardHeader>
         <Button className="font-weight-bold p-0" color="link" onClick={toggle}>
           {t('enterMetadata')}

@@ -97,7 +97,7 @@ class ImageSelector extends Component {
       tooltipsOpen,
     } = this.props
     return (
-      <Card className="mt-0">
+      <Card className="mb-2">
         <CardHeader className="font-weight-bold">
           <Nav className="card-header-tabs" tabs>
             <NavItem>
