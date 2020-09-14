@@ -118,7 +118,7 @@ class IframeAdderModal extends Component {
             </FormGroup>
             <FormGroup>
               <FloatingLabelInput
-                label={t('title')}
+                label={t('tooltip')}
                 name="iframe-title"
                 onChange={(value) => this.setAttribute('title', value)}
                 value={attributes.title}
