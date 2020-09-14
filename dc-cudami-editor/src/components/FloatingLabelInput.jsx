@@ -10,6 +10,7 @@ const FloatingLabelInput = ({
   type = 'text',
   value,
 }) => {
+  const emptyValue = value === ''
   const [focussed, setFocussed] = useState(false)
   return (
     <div className="border-0 form-control p-0 position-relative">
@@ -27,8 +28,9 @@ const FloatingLabelInput = ({
       <Label
         className={classNames({
           'floating-label': true,
+          'text-muted': emptyValue && !focussed,
           'text-primary': focussed,
-          'text-secondary': !focussed,
+          'text-secondary': !emptyValue && !focussed,
         })}
         for={`${name}-input`}
       >
