@@ -12,6 +12,8 @@ import {
 } from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
+import FloatingLabelInput from '../FloatingLabelInput'
+
 class LinkAdderModal extends Component {
   initialAttributes = {
     href: '',
@@ -81,21 +83,20 @@ class LinkAdderModal extends Component {
             }}
           >
             <FormGroup>
-              <Input
-                onChange={(evt) =>
-                  this.setAttribute('href', evt.target.value.trim())
-                }
-                placeholder="URL"
+              <FloatingLabelInput
+                label="URL"
+                name="link-url"
+                onChange={(value) => this.setAttribute('href', value.trim())}
                 required
                 type="url"
                 value={attributes.href}
               />
             </FormGroup>
             <FormGroup>
-              <Input
-                onChange={(evt) => this.setAttribute('title', evt.target.value)}
-                placeholder={t('label')}
-                type="text"
+              <FloatingLabelInput
+                label={t('tooltip')}
+                name="link-title"
+                onChange={(value) => this.setAttribute('title', value.trim())}
                 value={attributes.title}
               />
             </FormGroup>
