@@ -55,12 +55,12 @@
                 <span style="display:none;" sec:authentication="principal.authorities">[ROLE_USER, ROLE_ADMIN]</span>
               </a>
               <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="userMenuDropdownButton" role="menu">
-                <li class="dropdown-item">
-                  <a th:href="@{/users/updatePassword}" th:text="#{change_password}">Change password</a>
+                <li class="dropdown-item position-relative">
+                  <a class="stretched-link" th:href="@{/users/updatePassword}" th:text="#{change_password}">Change password</a>
                 </li>
-                <li class="dropdown-item">
+                <li class="dropdown-item position-relative">
                   <form th:action="@{/logout}" role="logout" method="post">
-                    <button class="btn btn-link btn-sm font-weight-light p-0" type="submit" th:text="#{menu_logout}">Logout</button>
+                    <button class="btn btn-link btn-sm font-weight-light p-0 stretched-link" type="submit" th:text="#{menu_logout}">Logout</button>
                   </form>
                 </li>
               </ul>
