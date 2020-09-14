@@ -37,12 +37,6 @@ class LinkEditingToolbar {
   update(view, lastState) {
     const {dom, state} = view
 
-    // Add the toolbar to the dom if it was not alredy appended
-    const toolbar = dom.parentNode.querySelector('.link-editing-toolbar')
-    if (!toolbar) {
-      dom.parentNode.appendChild(this.toolbar)
-    }
-
     // Don't do anything if the document/selection didn't change
     if (
       lastState &&
@@ -71,6 +65,12 @@ class LinkEditingToolbar {
 
     // Also set the current selection as class attribute, it is later needed to update the mark
     this.selection = state.selection
+
+    // Add the toolbar to the dom if it was not alredy appended
+    const toolbar = dom.parentNode.querySelector('.link-editing-toolbar')
+    if (!toolbar) {
+      dom.parentNode.appendChild(this.toolbar)
+    }
 
     // Show the toolbar if we have a link
     this.toolbar.classList.remove('d-none')
