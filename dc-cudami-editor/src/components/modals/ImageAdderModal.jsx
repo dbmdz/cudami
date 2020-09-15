@@ -208,8 +208,6 @@ class ImageAdderModal extends Component {
             />
             <ImageRenderingHintsForm
               alignment={attributes.alignment}
-              enableAlignment={true}
-              enableWidth={true}
               isOpen={renderingHintsOpen}
               linkNewTab={attributes.linkNewTab}
               linkUrl={attributes.linkUrl}
