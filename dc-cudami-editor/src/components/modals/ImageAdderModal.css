@@ -1,3 +1,8 @@
+.image-metadata .form-group:last-of-type,
+.image-rendering-hints .form-group:last-of-type {
+  margin-bottom: 0;
+}
+
 .image-preview {
   max-width: 250px;
 }
