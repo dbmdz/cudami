@@ -16,6 +16,7 @@ import FloatingLabelInput from '../../FloatingLabelInput'
 const ImageRenderingHintsForm = ({
   alignment,
   enableAlignment,
+  enableLink,
   enableWidth,
   isOpen,
   linkNewTab,
@@ -26,7 +27,7 @@ const ImageRenderingHintsForm = ({
 }) => {
   const {t} = useTranslation()
   return (
-    <Card>
+    <Card className="image-rendering-hints">
       <CardHeader>
         <Button className="font-weight-bold p-0" color="link" onClick={toggle}>
           {t('defineRenderingHints')}
@@ -117,35 +118,43 @@ const ImageRenderingHintsForm = ({
               </div>
             </FormGroup>
           )}
-          <FormGroup className="mb-0">
-            <Label className="font-weight-bold">{t('imageLink')}</Label>
-            <FloatingLabelInput
-              label="URL"
-              name="image-link"
-              onChange={(value) => onChange('linkUrl', value)}
-              type="url"
-              value={linkUrl}
-            />
-            <CustomInput
-              checked={linkNewTab}
-              className="mt-1"
-              id="rendering-hits-image-link-blank"
-              label={t('openLinkNewTab')}
-              onChange={() => onChange('linkNewTab', true)}
-              type="radio"
-            />
-            <CustomInput
-              checked={!linkNewTab}
-              id="rendering-hits-image-link-no-blank"
-              label={t('openLinkSameTab')}
-              onChange={() => onChange('linkNewTab', false)}
-              type="radio"
-            />
-          </FormGroup>
+          {enableLink && (
+            <FormGroup>
+              <Label className="font-weight-bold">{t('imageLink')}</Label>
+              <FloatingLabelInput
+                label="URL"
+                name="image-link"
+                onChange={(value) => onChange('linkUrl', value)}
+                type="url"
+                value={linkUrl}
+              />
+              <CustomInput
+                checked={linkNewTab}
+                className="mt-1"
+                id="rendering-hits-image-link-blank"
+                label={t('openLinkNewTab')}
+                onChange={() => onChange('linkNewTab', true)}
+                type="radio"
+              />
+              <CustomInput
+                checked={!linkNewTab}
+                id="rendering-hits-image-link-no-blank"
+                label={t('openLinkSameTab')}
+                onChange={() => onChange('linkNewTab', false)}
+                type="radio"
+              />
+            </FormGroup>
+          )}
         </CardBody>
       </Collapse>
     </Card>
   )
+}
+
+ImageRenderingHintsForm.defaultProps = {
+  enableAlignment: true,
+  enableLink: true,
+  enableWidth: true,
 }
 
 export default ImageRenderingHintsForm

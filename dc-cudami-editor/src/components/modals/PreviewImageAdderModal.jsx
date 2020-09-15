@@ -225,6 +225,8 @@ class PreviewImageAdderModal extends Component {
               tooltipsOpen={this.state.tooltipsOpen}
             />
             <ImageRenderingHintsForm
+              enableAlignment={false}
+              enableWidth={false}
               isOpen={this.state.renderingHintsOpen}
               linkNewTab={linkNewTab}
               linkUrl={linkUrl}
