@@ -18,6 +18,7 @@ public class CudamiPredicatesClient extends CudamiBaseClient<PredicateImpl> {
   }
 
   public Predicate save(Predicate predicate) throws HttpException {
-    return doPutRequestForObject("/latest/works", (PredicateImpl) predicate);
+    return doPutRequestForObject(
+        String.format("/latest/predicates/%s", predicate.getValue()), (PredicateImpl) predicate);
   }
 }
