@@ -27,8 +27,9 @@ const FloatingLabelInput = ({
       <Label
         className={classNames({
           'floating-label': true,
+          'text-muted': value === '' && !focussed,
           'text-primary': focussed,
-          'text-secondary': !focussed,
+          'text-secondary': value !== '' && !focussed,
         })}
         for={`${name}-input`}
       >

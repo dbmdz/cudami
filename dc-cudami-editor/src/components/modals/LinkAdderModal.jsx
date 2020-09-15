@@ -1,54 +1,74 @@
+import mapValues from 'lodash/mapValues'
 import {publish, subscribe} from 'pubsub-js'
 import React, {Component} from 'react'
 import {
   Button,
   Form,
   FormGroup,
-  Input,
   Modal,
   ModalBody,
   ModalHeader,
 } from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
+import FloatingLabelInput from '../FloatingLabelInput'
+
 class LinkAdderModal extends Component {
+  initialAttributes = {
+    href: '',
+    title: '',
+  }
+
   constructor(props) {
     super(props)
     this.state = {
+      attributes: this.initialAttributes,
       editing: false,
-      href: '',
-      title: '',
     }
-    subscribe('editor.show-link-modal', (_msg, data = {}) => {
-      this.setState({
-        ...data,
-        title: data.title ?? '',
-      })
-      this.props.onToggle()
-    })
+    subscribe(
+      'editor.show-link-modal',
+      (_msg, {attributes = {}, editing = false} = {}) => {
+        this.setState({
+          attributes: {
+            ...this.state.attributes,
+            ...mapValues(attributes, (value) => value ?? ''),
+          },
+          editing,
+        })
+        this.props.onToggle()
+      }
+    )
   }
 
   addLinkToEditor = () => {
-    const filteredState = Object.fromEntries(
-      Object.entries(this.state).filter(
-        ([key, value]) => key !== 'editing' && value !== ''
+    publish(
+      'editor.add-link',
+      mapValues(this.state.attributes, (value) =>
+        value !== '' ? value : undefined
       )
     )
-    publish('editor.add-link', filteredState)
     this.destroy()
   }
 
   destroy = () => {
     this.props.onToggle()
     this.setState({
-      href: '',
-      title: '',
+      attributes: this.initialAttributes,
+    })
+  }
+
+  setAttribute = (key, value) => {
+    this.setState({
+      attributes: {
+        ...this.state.attributes,
+        [key]: value,
+      },
     })
   }
 
   render() {
     const {isOpen, t} = this.props
-    const {editing, href, title} = this.state
+    const {attributes, editing} = this.state
     return (
       <Modal isOpen={isOpen} toggle={this.destroy}>
         <ModalHeader toggle={this.destroy}>
@@ -62,22 +82,21 @@ class LinkAdderModal extends Component {
             }}
           >
             <FormGroup>
-              <Input
-                onChange={(evt) =>
-                  this.setState({href: evt.target.value.trim()})
-                }
-                placeholder="URL"
+              <FloatingLabelInput
+                label="URL"
+                name="link-url"
+                onChange={(value) => this.setAttribute('href', value.trim())}
                 required
                 type="url"
-                value={href}
+                value={attributes.href}
               />
             </FormGroup>
             <FormGroup>
-              <Input
-                onChange={(evt) => this.setState({title: evt.target.value})}
-                placeholder={t('label')}
-                type="text"
-                value={title}
+              <FloatingLabelInput
+                label={t('tooltip')}
+                name="link-title"
+                onChange={(value) => this.setAttribute('title', value.trim())}
+                value={attributes.title}
               />
             </FormGroup>
             <Button className="float-right" color="primary" type="submit">

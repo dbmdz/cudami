@@ -1,3 +1,4 @@
+import mapValues from 'lodash/mapValues'
 import {publish, subscribe} from 'pubsub-js'
 import React, {Component} from 'react'
 import {
@@ -14,47 +15,63 @@ import {withTranslation} from 'react-i18next'
 import FloatingLabelInput from '../FloatingLabelInput'
 
 class IframeAdderModal extends Component {
+  initialAttributes = {
+    height: '',
+    src: '',
+    title: '',
+    width: '',
+  }
+
   constructor(props) {
     super(props)
     this.state = {
+      attributes: this.initialAttributes,
       editing: false,
-      height: '',
-      src: '',
-      title: '',
-      width: '',
     }
-    subscribe('editor.show-iframe-modal', (_msg, data = {}) => {
-      this.setState({
-        ...data,
-        title: data.title ?? '',
-      })
-      this.props.onToggle()
-    })
+    subscribe(
+      'editor.show-iframe-modal',
+      (_msg, {attributes = {}, editing = false} = {}) => {
+        this.setState({
+          attributes: {
+            ...this.state.attributes,
+            ...mapValues(attributes, (value) => value ?? ''),
+          },
+          editing,
+        })
+        this.props.onToggle()
+      }
+    )
   }
 
   addIframeToEditor = () => {
-    const filteredState = Object.fromEntries(
-      Object.entries(this.state).filter(
-        ([key, value]) => key !== 'editing' && value !== ''
+    publish(
+      'editor.add-iframe',
+      mapValues(this.state.attributes, (value) =>
+        value !== '' ? value : undefined
       )
     )
-    publish('editor.add-iframe', filteredState)
     this.destroy()
   }
 
   destroy = () => {
     this.props.onToggle()
     this.setState({
-      height: '',
-      src: '',
-      title: '',
-      width: '',
+      attributes: this.initialAttributes,
+    })
+  }
+
+  setAttribute = (key, value) => {
+    this.setState({
+      attributes: {
+        ...this.state.attributes,
+        [key]: value,
+      },
     })
   }
 
   render() {
     const {isOpen, t} = this.props
-    const {editing, height, src, title, width} = this.state
+    const {attributes, editing} = this.state
     return (
       <Modal isOpen={isOpen} toggle={this.destroy}>
         <ModalHeader toggle={this.destroy}>
@@ -71,44 +88,40 @@ class IframeAdderModal extends Component {
               <FloatingLabelInput
                 label="URL"
                 name="iframe-url"
-                onChange={(value) => this.setState({src: value})}
+                onChange={(value) => this.setAttribute('src', value.trim())}
                 required
                 type="url"
-                value={src}
+                value={attributes.src}
               />
             </FormGroup>
             <FormGroup>
               <FloatingLabelInput
                 label={t('width')}
                 name="iframe-width"
-                onChange={(value) => this.setState({width: value})}
-                value={width}
+                onChange={(value) => this.setAttribute('width', value)}
+                value={attributes.width}
               />
               <FormText className="ml-1">
-                {t('forExample')}
-                <code className="ml-1">500</code>, <code>300px</code> or
-                <code className="ml-1">50%</code>
+                {t('forExample')} <code>300px</code> or <code>50%</code>
               </FormText>
             </FormGroup>
             <FormGroup>
               <FloatingLabelInput
                 label={t('height')}
                 name="iframe-height"
-                onChange={(value) => this.setState({height: value})}
-                value={height}
+                onChange={(value) => this.setAttribute('height', value)}
+                value={attributes.height}
               />
               <FormText className="ml-1">
-                {t('forExample')}
-                <code className="ml-1">500</code>, <code>300px</code> or
-                <code className="ml-1">50%</code>
+                {t('forExample')} <code>300px</code> or <code>50%</code>
               </FormText>
             </FormGroup>
             <FormGroup>
               <FloatingLabelInput
-                label={t('title')}
+                label={t('tooltip')}
                 name="iframe-title"
-                onChange={(value) => this.setState({title: value})}
-                value={title}
+                onChange={(value) => this.setAttribute('title', value)}
+                value={attributes.title}
               />
             </FormGroup>
             <Button className="float-right" color="primary" type="submit">

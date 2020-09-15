@@ -44,24 +44,16 @@ class ImageView {
     this.dom.removeChild(this.dom.lastChild)
   }
 
-  editContent = () => {
+  editImage = () => {
     const token = subscribe('editor.add-image', (_msg, data) => {
-      const newAttrs = {
-        ...this.node.attrs,
-        ...data,
-      }
       const {dispatch, state} = this.view
-      const transaction = state.tr.setNodeMarkup(
-        this.getPos(),
-        undefined,
-        newAttrs
-      )
+      const transaction = state.tr.setNodeMarkup(this.getPos(), undefined, data)
       dispatch(transaction)
       unsubscribe(token)
     })
     publish('editor.show-image-modal', {
-      ...this.node.attrs,
-      showImageSelector: false,
+      attributes: this.node.attrs,
+      editing: true,
     })
   }
 
@@ -70,7 +62,7 @@ class ImageView {
     const menu = document.createElement('span')
     menu.classList.add('contentblock-menu')
     menu.style.zIndex = 1
-    render(<EditButton onClick={this.editContent} />, menu)
+    render(<EditButton onClick={this.editImage} />, menu)
     this.dom.appendChild(menu)
   }
 }
