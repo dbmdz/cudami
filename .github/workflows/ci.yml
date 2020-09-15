@@ -1,0 +1,37 @@
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [11, 14]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - uses: actions/cache@v2
+        env:
+          cache-name: cache-maven-artifacts
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+      - name: Check Java codestyle
+        run: mvn com.coveo:fmt-maven-plugin:check
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '12'
+          check-latest: true
+      - name: Check Javascript codestyle
+        run: npm install --only=dev && npm run format-check
+        working-directory: dc-cudami-editor
+      - name: Build with Maven
+        run: mvn -B verify
+      - name: Report Coverage
+        uses: codecov/codecov-action@v1
