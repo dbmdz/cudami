@@ -3,10 +3,10 @@ import React, {Component} from 'react'
 import {Button, Form, Modal, ModalBody, ModalHeader} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
-import './ImageAdderModal.css'
-import ImageMetadataForm from './imageAdder/ImageMetadataForm'
-import ImageRenderingHintsForm from './imageAdder/ImageRenderingHintsForm'
-import ImageSelector from './imageAdder/ImageSelector'
+import './MediaAdderModal.css'
+import MediaMetadataForm from './mediaAdder/MediaMetadataForm'
+import MediaRenderingHintsForm from './mediaAdder/MediaRenderingHintsForm'
+import MediaSelector from './mediaAdder/MediaSelector'
 import AppContext from '../AppContext'
 import {loadIdentifiable, saveFileResource, updateFileResource} from '../../api'
 
@@ -187,6 +187,7 @@ class PreviewImageAdderModal extends Component {
   render() {
     const {activeLanguage, isOpen, t} = this.props
     const {altText, caption, linkNewTab, linkUrl, title} = this.state.attributes
+    const mediaType = 'image'
     return (
       <Modal isOpen={isOpen} size="lg" toggle={this.destroy}>
         <ModalHeader toggle={this.destroy}>
@@ -203,19 +204,21 @@ class PreviewImageAdderModal extends Component {
             }}
           >
             {this.state.showImageSelector && (
-              <ImageSelector
+              <MediaSelector
                 activeLanguage={activeLanguage}
                 fileResource={this.state.fileResource}
+                mediaType={mediaType}
                 onChange={this.updateFileResource}
                 onTabChanged={this.onTabChanged}
                 toggleTooltip={this.toggleTooltip}
                 tooltipsOpen={this.state.tooltipsOpen}
               />
             )}
-            <ImageMetadataForm
+            <MediaMetadataForm
               altText={altText}
               caption={caption}
               isOpen={this.state.metadataOpen}
+              mediaType={mediaType}
               onChange={this.setAttribute}
               title={title}
               toggle={() =>
@@ -224,12 +227,13 @@ class PreviewImageAdderModal extends Component {
               toggleTooltip={this.toggleTooltip}
               tooltipsOpen={this.state.tooltipsOpen}
             />
-            <ImageRenderingHintsForm
+            <MediaRenderingHintsForm
               enableAlignment={false}
               enableWidth={false}
               isOpen={this.state.renderingHintsOpen}
               linkNewTab={linkNewTab}
               linkUrl={linkUrl}
+              mediaType={mediaType}
               onChange={this.setAttribute}
               toggle={() =>
                 this.setState({
