@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.UUID;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -31,6 +33,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
 @ActiveProfiles("TEST")
 @AutoConfigureMockMvc
@@ -41,7 +45,6 @@ public class WebpageHtmlControllerTest {
 
   @MockBean private WebpageService webpageService;
 
-  @Disabled("Disable until issue #578 got fixed")
   @Test
   public void shouldReturnValidHtml() throws Exception {
     prepareWebpageMock();
@@ -54,11 +57,22 @@ public class WebpageHtmlControllerTest {
     File contentFile = File.createTempFile("content", ".html");
     contentFile.deleteOnExit();
     Files.write(contentFile.toPath(), content.getBytes());
-    SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
-    Schema schema = factory.newSchema(new ClassPathResource("xhtml11.xsd").getFile());
-    Validator validator = schema.newValidator();
-    Source source = new StreamSource(contentFile);
-    assertThatCode(() -> validator.validate(source)).doesNotThrowAnyException();
+
+    SAXParserFactory factory = SAXParserFactory.newInstance();
+    factory.setValidating(true);
+    factory.setNamespaceAware(true);
+
+    SchemaFactory schemaFactory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
+
+    factory.setSchema(
+        schemaFactory.newSchema(
+            new Source[] {new StreamSource(new ClassPathResource("xhtml11.xsd").getFile())}));
+
+    SAXParser parser = factory.newSAXParser();
+    XMLReader reader = parser.getXMLReader();
+
+    assertThatCode(() -> reader.parse(new InputSource(contentFile.getAbsolutePath())))
+        .doesNotThrowAnyException();
   }
 
   private void prepareWebpageMock() {
