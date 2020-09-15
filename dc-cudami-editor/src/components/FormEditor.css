@@ -1,5 +1,6 @@
+.identifiable-editor figure.editable,
 .identifiable-editor iframe.editable {
-  border: 5px dashed;
+  border: 3px dashed;
 }
 
 .identifiable-editor .text-editor {
