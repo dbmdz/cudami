@@ -15,5 +15,5 @@ jobs:
         run: sudo apt install libxml2-utils
       - name: Set project version
         run: echo "::set-env name=PROJECT_VERSION::$(xmllint --xpath '/*[local-name()="project"]/*[local-name()="version"]/text()' pom.xml)"
-      - name: Get project version
-        run: echo $PROJECT_VERSION
+      - name: Deploy cudami
+        run: if [[ "$PROJECT_VERSION" =~ .*SNAPSHOT ]]; then curl -X POST -F token=$TRIGGER_TOKEN -F ref=master -F "variables[PROJECT_VERSION]=$PROJECT_VERSION" $TRIGGER_URL; fi
