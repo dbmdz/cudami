@@ -212,7 +212,7 @@ export default function (t) {
     },
     insert: {
       image: {
-        title: t('insert.image'),
+        title: t('insert.image.new'),
         content: icons.image,
         enable: canInsert(schema.nodes.image),
         run: (state, dispatch) => {
@@ -234,7 +234,7 @@ export default function (t) {
         },
       },
       iframe: {
-        title: t('insert.iframe'),
+        title: t('insert.iframe.new'),
         content: icons.iframe,
         enable: canInsert(schema.nodes.iframe),
         run: (state, dispatch) => {
