@@ -46,8 +46,7 @@ public class CorporationController {
     this.corporationService = corporationService;
   }
 
-  @ApiMethod(
-      description = "Fetch a corporation by GND-ID from external system and save it")
+  @ApiMethod(description = "Fetch a corporation by GND-ID from external system and save it")
   @PostMapping(
       value = {"/latest/corporations/gnd/{gndId}", "/v3/corporations/gnd/{gndId}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
