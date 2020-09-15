@@ -106,9 +106,13 @@ public class CudamiEntitiesClient extends CudamiBaseClient<EntityImpl> {
         FileResourceImpl.class);
   }
 
-  public List<EntityRelation> saveRelations(List relations) throws HttpException {
+  public List<EntityRelation> saveRelationsForSubject(List relations) throws HttpException {
     return doPutRequestForObjectList(
-        "/latest/entities/relations", relations, EntityRelationImpl.class);
+        String.format(
+            "/latest/entities/%s/relations",
+            ((EntityRelation) relations.get(0)).getSubject().getUuid()),
+        relations,
+        EntityRelationImpl.class);
   }
 
   public Entity update(UUID uuid, Entity entity) throws HttpException {
