@@ -11,7 +11,9 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Get project version
+      - name: Install XML utils
+        run: sudo apt install libxml2-utils
+      - name: Set project version
         run: echo "::set-env name=PROJECT_VERSION::$(xmllint --xpath '/*[local-name()="project"]/*[local-name()="version"]/text()' pom.xml)"
       - name: Get project version
         run: echo $PROJECT_VERSION
