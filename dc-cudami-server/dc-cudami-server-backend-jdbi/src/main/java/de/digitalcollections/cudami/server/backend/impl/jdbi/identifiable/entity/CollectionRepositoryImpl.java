@@ -746,7 +746,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                     .list());
 
     if (result.isEmpty()) {
-      // Special case: If we are on a top level subtopic, we have no parent, so
+      // Special case: If we are on a top level collection, we have no parent, so
       // we must construct a breadcrumb more or less manually
       result =
           dbi.withHandle(
