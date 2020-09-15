@@ -17,7 +17,7 @@ class ImageView {
       dom.classList.add(`alignment-${alignment}`)
     }
     const figure = document.createElement('figure')
-    figure.classList.add('mb-0')
+    figure.classList.add('editable', 'mb-0')
     const image = document.createElement('img')
     image.setAttribute('src', url)
     if (altText) {
