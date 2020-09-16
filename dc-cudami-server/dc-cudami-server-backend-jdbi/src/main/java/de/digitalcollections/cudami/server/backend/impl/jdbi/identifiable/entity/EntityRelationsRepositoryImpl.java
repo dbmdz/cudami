@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRelationsRepository;
 import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
 import java.util.List;
+import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,5 +42,23 @@ public class EntityRelationsRepositoryImpl implements EntityRelationsRepository 
           preparedBatch.execute();
         });
     return entityRelations;
+  }
+
+  @Override
+  public boolean deleteAllForSubjectAndPredicate(UUID subjectUuid, String predicate) {
+    if (subjectUuid == null || predicate == null || predicate.isBlank()) {
+      return false;
+    }
+
+    String query =
+        "DELETE FROM rel_entity_entities WHERE subject_uuid=:subjectUuid AND predicate=:predicate";
+
+    dbi.withHandle(
+        h ->
+            h.createUpdate(query)
+                .bind("subject_uuid", subjectUuid)
+                .bind("predicate", predicate)
+                .execute());
+    return true;
   }
 }
