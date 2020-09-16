@@ -120,4 +120,22 @@ public class EntityRelationsRepositoryImpl extends AbstractPagingAndSortingRepos
         });
     return entityRelations;
   }
+
+  @Override
+  public boolean deleteAllForSubjectAndPredicate(UUID subjectUuid, String predicate) {
+    if (subjectUuid == null || predicate == null || predicate.isBlank()) {
+      return false;
+    }
+
+    String query =
+        "DELETE FROM rel_entity_entities WHERE subject_uuid=:subjectUuid AND predicate=:predicate";
+
+    dbi.withHandle(
+        h ->
+            h.createUpdate(query)
+                .bind("subject_uuid", subjectUuid)
+                .bind("predicate", predicate)
+                .execute());
+    return true;
+  }
 }

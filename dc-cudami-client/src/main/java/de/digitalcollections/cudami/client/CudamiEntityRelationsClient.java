@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
+import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -27,5 +28,11 @@ public class CudamiEntityRelationsClient extends CudamiBaseClient {
   public List<EntityRelation> saveRelations(List<EntityRelation> relations) throws HttpException {
     return doPutRequestForObjectList(
         "/latest/entities/relations", relations, EntityRelationImpl.class);
+  }
+
+  public void deleteAllForSubjectAndPredicate(Entity subject, String predicate)
+      throws HttpException {
+    doDeleteRequestForString(
+        String.format("/latest/entities/relations/%s/%s", subject.getUuid().toString(), predicate));
   }
 }

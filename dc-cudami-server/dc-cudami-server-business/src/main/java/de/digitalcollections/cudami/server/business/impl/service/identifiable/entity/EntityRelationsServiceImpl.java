@@ -6,6 +6,7 @@ import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,5 +28,10 @@ public class EntityRelationsServiceImpl implements EntityRelationsService {
   @Override
   public List<EntityRelation> saveEntityRelations(List<EntityRelation> entityRelations) {
     return repository.save(entityRelations);
+  }
+
+  @Override
+  public boolean deleteAllForSubjectAndPredicate(UUID subjectUuid, String predicate) {
+    return repository.deleteAllForSubjectAndPredicate(subjectUuid, predicate);
   }
 }

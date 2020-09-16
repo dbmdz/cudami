@@ -11,10 +11,14 @@ import java.util.List;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
+import org.jsondoc.core.annotation.ApiPathParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -75,5 +79,28 @@ public class EntityRelationsController {
   @ApiResponseObject
   List<EntityRelation> saveEntityRelations(@RequestBody List<EntityRelation> entityRelations) {
     return service.saveEntityRelations(entityRelations);
+  }
+
+  @ApiMethod(description = "Delete all entity relations for a given subject and predicate")
+  @DeleteMapping(
+      value = {
+        "/latest/entities/relations/{subjectuuid}/{predicate}",
+        "/v3/entities/relations/{subjectuuid}/{predicate}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public ResponseEntity deleteAllEntityRelationsForSubjectAndPredicate(
+      @ApiPathParam(description = "UUID of the subject") @PathVariable("subjectuuid")
+          UUID subjectUuid,
+      @ApiPathParam(description = "predicate") @PathVariable("predicate") String predicate) {
+
+    boolean successful = service.deleteAllForSubjectAndPredicate(subjectUuid, predicate);
+
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+
+    // Errors can only happen for a bad request, when one of the two required params is empty
+    return new ResponseEntity<>(successful, HttpStatus.BAD_REQUEST);
   }
 }
