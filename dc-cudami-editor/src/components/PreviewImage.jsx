@@ -4,6 +4,7 @@ import AppContext from './AppContext'
 import {getImageUrl} from './utils'
 
 const PreviewImage = ({
+  className = 'mb-0 mx-auto',
   image,
   language,
   renderingHints = {},
@@ -16,7 +17,7 @@ const PreviewImage = ({
   }
   const {altText, caption, title} = renderingHints
   return (
-    <figure className="mb-0 mx-auto" style={{maxWidth: `${width}px`}}>
+    <figure className={className} style={{maxWidth: `${width}px`}}>
       <img
         alt={altText?.[language] ?? ''}
         className="img-fluid mw-100"
@@ -28,7 +29,7 @@ const PreviewImage = ({
         title={title?.[language]}
       />
       {showCaption && caption?.[language] && (
-        <figcaption>{caption[language]}</figcaption>
+        <figcaption className="figure-caption">{caption[language]}</figcaption>
       )}
     </figure>
   )

@@ -12,6 +12,12 @@ export default function (locale) {
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false,
+      format: function (value, format) {
+        if (format === 'capitalize') {
+          return value.charAt(0).toUpperCase() + value.slice(1)
+        }
+        return value
+      },
     },
     lng: locale,
     resources: {

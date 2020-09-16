@@ -12,36 +12,37 @@
   overflow-y: auto;
 }
 
-.identifiable-editor .text-editor prosemirror-image.alignment-left {
+.identifiable-editor .text-editor .alignment-left {
   float: left;
   margin-right: 1rem;
 }
 
-.identifiable-editor .text-editor prosemirror-image.alignment-right {
+.identifiable-editor .text-editor .alignment-right {
   float: right;
   margin-left: 1rem;
 }
 
-.identifiable-editor .text-editor prosemirror-image.width-25 {
+.identifiable-editor .text-editor .width-25 {
   width: 25%;
 }
 
-.identifiable-editor .text-editor prosemirror-image.width-33 {
+.identifiable-editor .text-editor .width-33 {
   width: 33%;
 }
 
-.identifiable-editor .text-editor prosemirror-image.width-50 {
+.identifiable-editor .text-editor .width-50 {
   width: 50%;
 }
 
-.identifiable-editor .text-editor prosemirror-image.width-100 {
+.identifiable-editor .text-editor .width-100 {
   float: none;
   margin-left: 0;
   margin-right: 0;
   width: 100%;
 }
 
-.identifiable-editor .text-editor figure > img {
+.identifiable-editor .text-editor figure > img,
+.identifiable-editor .text-editor figure > video {
   max-width: 100%;
 }
 
@@ -51,7 +52,7 @@
   top: 0;
 }
 
-.identifiable-editor .text-editor prosemirror-image.alignment-right .contentblock-menu,
-.identifiable-editor .text-editor prosemirror-image.width-100 .contentblock-menu {
+.identifiable-editor .text-editor .alignment-right .contentblock-menu,
+.identifiable-editor .text-editor .width-100 .contentblock-menu {
   right: 0;
 }

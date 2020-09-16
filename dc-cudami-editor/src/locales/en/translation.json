@@ -78,6 +78,7 @@
       "undo": "Undo last change"
     },
     "identifiers": "Identifiers",
+    "image": "image",
     "imageLink": "Image link",
     "insert": {
       "footnote": "Insert footnote",
@@ -124,12 +125,12 @@
     },
     "removePreviewImageAfterSaveNotification": "Click \"$t(save)\" to confirm the deletion.",
     "save": "Save",
-    "selectImage": {
+    "selectMedia": {
       "searchTerm": "$t(autocomplete.searchTerm) (from label, file name, description)",
-      "uploadSuccessful": "Image uploaded successfully",
-      "useSearch": "Use existing image",
-      "useUpload": "Upload image",
-      "useUrl": "Integrate image via web link"
+      "uploadSuccessful": "$t({{ mediaType }}, capitalize) uploaded successfully",
+      "useSearch": "Use existing $t({{ mediaType }})",
+      "useUpload": "Upload $t({{ mediaType }})",
+      "useUrl": "Integrate $t({{ mediaType }}) via web link"
     },
     "setPreviewImage": "Set preview image",
     "startPublicationDate": "Start of publication",
@@ -141,13 +142,13 @@
     "text": "Long text",
     "tooltip": "Tooltip",
     "tooltips": {
-      "altText": "is read out in the screen reader or is output if image cannot be displayed",
+      "altText": "is read out in the screen reader or is output if the file cannot be displayed",
       "caption": "is displayed as a caption",
-      "label": "name of the image (for retrievability in the system); default value=file name (e.g. picture.jpg); changeable",
-      "search": "using an image already existing in the system",
-      "title": "appears when the mouse moves over the image",
-      "upload": "selecting and uploading an image from the local hard disk",
-      "url": "embedding an image from the internet by using a valid URL"
+      "label": "name of the file (for retrievability in the system); default value=file name (e.g. picture.jpg); changeable",
+      "search": "using a file already existing in the system",
+      "title": "appears when the mouse moves over the file",
+      "upload": "selecting and uploading a file from the local hard disk",
+      "url": "embedding a file from the internet by using a valid URL"
     },
     "totalElements": {
       "digitalObjects": "found {{count}} digital objects",

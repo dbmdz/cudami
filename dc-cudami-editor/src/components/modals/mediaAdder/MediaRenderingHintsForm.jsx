@@ -13,21 +13,22 @@ import {useTranslation} from 'react-i18next'
 
 import FloatingLabelInput from '../../FloatingLabelInput'
 
-const ImageRenderingHintsForm = ({
+const MediaRenderingHintsForm = ({
   alignment,
-  enableAlignment,
-  enableLink,
-  enableWidth,
+  enableAlignment = true,
+  enableLink = true,
+  enableWidth = true,
   isOpen,
   linkNewTab,
   linkUrl,
+  mediaType,
   onChange,
   toggle,
   width,
 }) => {
   const {t} = useTranslation()
   return (
-    <Card className="image-rendering-hints">
+    <Card className="media-rendering-hints">
       <CardHeader>
         <Button className="font-weight-bold p-0" color="link" onClick={toggle}>
           {t('defineRenderingHints')}
@@ -120,10 +121,12 @@ const ImageRenderingHintsForm = ({
           )}
           {enableLink && (
             <FormGroup>
-              <Label className="font-weight-bold">{t('imageLink')}</Label>
+              <Label className="font-weight-bold">
+                {t(`${mediaType}Link`)}
+              </Label>
               <FloatingLabelInput
                 label="URL"
-                name="image-link"
+                name={`${mediaType}-link`}
                 onChange={(value) => onChange('linkUrl', value)}
                 type="url"
                 value={linkUrl}
@@ -131,14 +134,14 @@ const ImageRenderingHintsForm = ({
               <CustomInput
                 checked={linkNewTab}
                 className="mt-1"
-                id="rendering-hits-image-link-blank"
+                id={`${mediaType}-link-blank`}
                 label={t('openLinkNewTab')}
                 onChange={() => onChange('linkNewTab', true)}
                 type="radio"
               />
               <CustomInput
                 checked={!linkNewTab}
-                id="rendering-hits-image-link-no-blank"
+                id={`${mediaType}-link-no-blank`}
                 label={t('openLinkSameTab')}
                 onChange={() => onChange('linkNewTab', false)}
                 type="radio"
@@ -151,10 +154,4 @@ const ImageRenderingHintsForm = ({
   )
 }
 
-ImageRenderingHintsForm.defaultProps = {
-  enableAlignment: true,
-  enableLink: true,
-  enableWidth: true,
-}
-
-export default ImageRenderingHintsForm
+export default MediaRenderingHintsForm
