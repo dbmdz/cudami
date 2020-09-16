@@ -17,16 +17,16 @@ import {
 import {withTranslation} from 'react-i18next'
 import {FaQuestionCircle} from 'react-icons/fa'
 
-import Autocomplete from '../../Autocomplete'
-import ImageLabelInput from './ImageLabelInput'
-import ImagePreview from './ImagePreview'
+import MediaLabelInput from './MediaLabelInput'
 import AppContext from '../../AppContext'
+import Autocomplete from '../../Autocomplete'
 import FeedbackMessage from '../../FeedbackMessage'
 import FileUploadForm from '../../FileUploadForm'
+import PreviewImage from '../../PreviewImage'
 import {getImageUrl} from '../../utils'
-import {searchImages, uploadFile} from '../../../api'
+import {searchMedia, uploadFile} from '../../../api'
 
-class ImageSelector extends Component {
+class MediaSelector extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -66,13 +66,13 @@ class ImageSelector extends Component {
     })
   }
 
-  uploadImage = async (image) => {
+  uploadFile = async (file) => {
     this.setState({
       tabToggleEnabled: false,
     })
     const response = await uploadFile(
       this.context.apiContextPath,
-      image,
+      file,
       this.context.mockApi,
       this.updateProgress
     )
@@ -91,11 +91,19 @@ class ImageSelector extends Component {
     const {
       activeLanguage,
       fileResource,
+      mediaType,
       onChange,
       t,
       toggleTooltip,
       tooltipsOpen,
     } = this.props
+    const {
+      activeTab,
+      progress,
+      showUploadSuccess,
+      tabToggleEnabled,
+    } = this.state
+    const {label, previewImage, uri} = fileResource
     return (
       <Card className="mb-2">
         <CardHeader className="font-weight-bold">
@@ -103,13 +111,13 @@ class ImageSelector extends Component {
             <NavItem>
               <NavLink
                 className={classNames({
-                  active: this.state.activeTab === 'upload',
+                  active: activeTab === 'upload',
                 })}
-                disabled={!this.state.tabToggleEnabled}
+                disabled={!tabToggleEnabled}
                 href="#"
                 onClick={(evt) => this.toggleTab('upload', evt)}
               >
-                {t('selectImage.useUpload')}
+                {t('selectMedia.useUpload', {mediaType})}
                 <FaQuestionCircle className="ml-1" id="upload-tooltip" />
                 <Popover
                   isOpen={tooltipsOpen.upload}
@@ -123,12 +131,12 @@ class ImageSelector extends Component {
             </NavItem>
             <NavItem>
               <NavLink
-                className={classNames({active: this.state.activeTab === 'url'})}
-                disabled={!this.state.tabToggleEnabled}
+                className={classNames({active: activeTab === 'url'})}
+                disabled={!tabToggleEnabled}
                 href="#"
                 onClick={(evt) => this.toggleTab('url', evt)}
               >
-                {t('selectImage.useUrl')}
+                {t('selectMedia.useUrl', {mediaType})}
                 <FaQuestionCircle className="ml-1" id="url-tooltip" />
                 <Popover
                   isOpen={tooltipsOpen.url}
@@ -143,13 +151,13 @@ class ImageSelector extends Component {
             <NavItem>
               <NavLink
                 className={classNames({
-                  active: this.state.activeTab === 'search',
+                  active: activeTab === 'search',
                 })}
-                disabled={!this.state.tabToggleEnabled}
+                disabled={!tabToggleEnabled}
                 href="#"
                 onClick={(evt) => this.toggleTab('search', evt)}
               >
-                {t('selectImage.useSearch')}
+                {t('selectMedia.useSearch', {mediaType})}
                 <FaQuestionCircle className="ml-1" id="search-tooltip" />
                 <Popover
                   isOpen={tooltipsOpen.search}
@@ -164,32 +172,38 @@ class ImageSelector extends Component {
           </Nav>
         </CardHeader>
         <CardBody className="text-center">
-          <TabContent activeTab={this.state.activeTab} className="border-0 p-0">
+          <TabContent activeTab={activeTab} className="border-0 p-0">
             <TabPane tabId="upload">
-              {fileResource.uuid && (
-                <ImagePreview
-                  iiifBaseUrl={fileResource.iiifBaseUrl}
-                  filename={fileResource.filename}
-                  mimeType={fileResource.mimeType}
-                  uri={fileResource.uri}
+              {previewImage && (
+                <PreviewImage
+                  className="mx-auto"
+                  image={previewImage}
+                  renderingHints={{
+                    caption: {
+                      [this.context.defaultLanguage]: previewImage.filename,
+                    },
+                  }}
+                  showCaption={true}
+                  width={250}
                 />
               )}
-              {this.state.showUploadSuccess && (
+              {showUploadSuccess && (
                 <FeedbackMessage
                   message={{
                     color: 'success',
-                    key: 'selectImage.uploadSuccessful',
+                    key: 'selectMedia.uploadSuccessful',
+                    values: {mediaType},
                   }}
                 />
               )}
               <FileUploadForm
-                onChange={(file) => this.uploadImage(file)}
-                progress={this.state.progress}
+                onChange={(file) => this.uploadFile(file)}
+                progress={progress}
               />
-              <ImageLabelInput
+              <MediaLabelInput
                 className="mt-3"
-                label={fileResource.label}
-                name="label-upload"
+                label={label}
+                name={`${mediaType}-label-upload`}
                 onChange={(label) =>
                   this.updateLabel(label, {
                     doUpdateRequest: true,
@@ -201,7 +215,9 @@ class ImageSelector extends Component {
               />
             </TabPane>
             <TabPane tabId="url">
-              {fileResource.uri && <ImagePreview uri={fileResource.uri} />}
+              {uri && (
+                <PreviewImage className="mx-auto" image={{uri}} width={250} />
+              )}
               <FormGroup>
                 <Input
                   name="url"
@@ -210,12 +226,12 @@ class ImageSelector extends Component {
                   placeholder="URL"
                   required
                   type="text"
-                  value={fileResource.uri}
+                  value={uri}
                 />
               </FormGroup>
-              <ImageLabelInput
-                label={fileResource.label}
-                name="label-url"
+              <MediaLabelInput
+                label={label}
+                name={`${mediaType}-label-url`}
                 onChange={this.updateLabel}
                 toggleTooltip={toggleTooltip}
                 tooltipName="labelUrl"
@@ -223,12 +239,17 @@ class ImageSelector extends Component {
               />
             </TabPane>
             <TabPane tabId="search">
-              {fileResource.uuid && (
-                <ImagePreview
-                  iiifBaseUrl={fileResource.iiifBaseUrl}
-                  filename={fileResource.filename}
-                  mimeType={fileResource.mimeType}
-                  uri={fileResource.uri}
+              {previewImage && (
+                <PreviewImage
+                  className="mx-auto"
+                  image={previewImage}
+                  renderingHints={{
+                    caption: {
+                      [this.context.defaultLanguage]: previewImage.filename,
+                    },
+                  }}
+                  showCaption={true}
+                  width={250}
                 />
               )}
               <Autocomplete
@@ -240,8 +261,17 @@ class ImageSelector extends Component {
                     uri: getImageUrl(suggestion.previewImage),
                   })
                 }}
-                placeholder={t('selectImage.searchTerm')}
-                search={searchImages}
+                placeholder={t('selectMedia.searchTerm', {mediaType})}
+                search={(contextPath, mock, searchTerm, pageNumber, pageSize) =>
+                  searchMedia(
+                    contextPath,
+                    mediaType,
+                    mock,
+                    searchTerm,
+                    pageNumber,
+                    pageSize
+                  )
+                }
               />
             </TabPane>
           </TabContent>
@@ -251,6 +281,6 @@ class ImageSelector extends Component {
   }
 }
 
-ImageSelector.contextType = AppContext
+MediaSelector.contextType = AppContext
 
-export default withTranslation()(ImageSelector)
+export default withTranslation()(MediaSelector)

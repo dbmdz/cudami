@@ -252,16 +252,17 @@ export async function searchIdentifiables(
   }
 }
 
-export async function searchImages(
+export async function searchMedia(
   contextPath,
+  mediaType,
   mock,
   searchTerm,
   pageNumber = 0,
   pageSize = 10
 ) {
-  let url = `${contextPath}api/fileresources/images?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
+  let url = `${contextPath}api/fileresources/${mediaType}s?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
   if (mock) {
-    url = '/__mock__/images.json'
+    url = `/__mock__/${mediaType}s.json`
   }
   try {
     const result = await fetch(url)
