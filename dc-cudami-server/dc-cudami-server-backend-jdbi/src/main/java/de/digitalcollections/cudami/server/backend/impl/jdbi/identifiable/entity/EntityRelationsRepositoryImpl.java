@@ -28,7 +28,9 @@ public class EntityRelationsRepositoryImpl implements EntityRelationsRepository 
         handle -> {
           PreparedBatch preparedBatch =
               handle.prepareBatch(
-                  "INSERT INTO rel_entity_entities(subject_uuid, predicate, object_uuid) VALUES(:subjectUuid, :predicate, :objectUuid)");
+                  "INSERT INTO rel_entity_entities(subject_uuid, predicate, object_uuid) "
+                      + "VALUES(:subjectUuid, :predicate, :objectUuid) "
+                      + "ON CONFLICT ON CONSTRAINT rel_entity_entities_pkey DO NOTHING");
           for (EntityRelation relation : entityRelations) {
             preparedBatch
                 .bind("subjectUuid", relation.getSubject().getUuid())
