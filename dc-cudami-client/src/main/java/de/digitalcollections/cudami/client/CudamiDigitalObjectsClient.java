@@ -60,6 +60,10 @@ public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObjectIm
         String.format("/latest/digitalobjects/identifier/%s:%s.json", namespace, id));
   }
 
+  public List<DigitalObject> findAllReduced() throws HttpException {
+    return doGetRequestForObjectList("/latest/digitalobjects/reduced", DigitalObjectImpl.class);
+  }
+
   public PageResponse<Collection> getCollections(UUID uuid, PageRequest pageRequest)
       throws HttpException {
     return doGetRequestForPagedObjectList(
