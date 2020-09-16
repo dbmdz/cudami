@@ -15,9 +15,9 @@ import FloatingLabelInput from '../../FloatingLabelInput'
 
 const MediaRenderingHintsForm = ({
   alignment,
-  enableAlignment,
-  enableLink,
-  enableWidth,
+  enableAlignment = true,
+  enableLink = true,
+  enableWidth = true,
   isOpen,
   linkNewTab,
   linkUrl,
@@ -152,12 +152,6 @@ const MediaRenderingHintsForm = ({
       </Collapse>
     </Card>
   )
-}
-
-MediaRenderingHintsForm.defaultProps = {
-  enableAlignment: true,
-  enableLink: true,
-  enableWidth: true,
 }
 
 export default MediaRenderingHintsForm

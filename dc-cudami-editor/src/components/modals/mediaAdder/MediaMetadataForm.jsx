@@ -17,9 +17,9 @@ import InfoTooltip from '../../InfoTooltip'
 const MediaMetadataForm = ({
   altText,
   caption,
-  enableAltText,
-  enableCaption,
-  enableTitle,
+  enableAltText = true,
+  enableCaption = true,
+  enableTitle = true,
   isOpen,
   mediaType,
   onChange,
@@ -102,12 +102,6 @@ const MediaMetadataForm = ({
       </Collapse>
     </Card>
   )
-}
-
-MediaMetadataForm.defaultProps = {
-  enableAltText: true,
-  enableCaption: true,
-  enableTitle: true,
 }
 
 export default MediaMetadataForm
