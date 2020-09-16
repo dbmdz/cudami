@@ -75,7 +75,7 @@ public class DigitalObjectController {
       description =
           "Get all digital objects, reduced to their metadata fields (only all identifiers and last modification date)")
   @GetMapping(
-      value = {"/latest/digitalobjects/reduced", "/v2/digitalobjects/reduced"},
+      value = {"/latest/digitalobjects/reduced", "/v3/digitalobjects/reduced"},
       produces = "application/json")
   @ApiResponseObject
   public List<DigitalObject> findAllReduced() {
