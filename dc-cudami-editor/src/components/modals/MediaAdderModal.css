@@ -1,0 +1,8 @@
+.image-preview {
+  max-width: 250px;
+}
+
+.media-metadata .form-group:last-of-type,
+.media-rendering-hints .form-group:last-of-type {
+  margin-bottom: 0;
+}

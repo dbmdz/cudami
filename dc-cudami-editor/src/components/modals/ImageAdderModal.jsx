@@ -4,10 +4,10 @@ import React, {Component} from 'react'
 import {Button, Form, Modal, ModalBody, ModalHeader} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
-import './ImageAdderModal.css'
-import ImageMetadataForm from './imageAdder/ImageMetadataForm'
-import ImageRenderingHintsForm from './imageAdder/ImageRenderingHintsForm'
-import ImageSelector from './imageAdder/ImageSelector'
+import './MediaAdderModal.css'
+import MediaMetadataForm from './mediaAdder/MediaMetadataForm'
+import MediaRenderingHintsForm from './mediaAdder/MediaRenderingHintsForm'
+import MediaSelector from './mediaAdder/MediaSelector'
 import AppContext from '../AppContext'
 import {loadIdentifiable, saveFileResource, updateFileResource} from '../../api'
 
@@ -173,6 +173,7 @@ class ImageAdderModal extends Component {
       renderingHintsOpen,
       tooltipsOpen,
     } = this.state
+    const mediaType = 'image'
     return (
       <Modal isOpen={isOpen} size="lg" toggle={this.destroy}>
         <ModalHeader toggle={this.destroy}>
@@ -187,30 +188,33 @@ class ImageAdderModal extends Component {
             }}
           >
             {!editing && (
-              <ImageSelector
+              <MediaSelector
                 activeLanguage={activeLanguage}
                 fileResource={fileResource}
+                mediaType={mediaType}
                 onChange={this.updateFileResource}
                 onTabChanged={this.onTabChanged}
                 toggleTooltip={this.toggleTooltip}
                 tooltipsOpen={tooltipsOpen}
               />
             )}
-            <ImageMetadataForm
+            <MediaMetadataForm
               altText={attributes.altText}
               caption={attributes.caption}
               isOpen={metadataOpen}
+              mediaType={mediaType}
               onChange={this.setAttribute}
               title={attributes.title}
               toggle={() => this.setState({metadataOpen: !metadataOpen})}
               toggleTooltip={this.toggleTooltip}
               tooltipsOpen={tooltipsOpen}
             />
-            <ImageRenderingHintsForm
+            <MediaRenderingHintsForm
               alignment={attributes.alignment}
               isOpen={renderingHintsOpen}
               linkNewTab={attributes.linkNewTab}
               linkUrl={attributes.linkUrl}
+              mediaType={mediaType}
               onChange={this.setAttribute}
               toggle={() =>
                 this.setState({
