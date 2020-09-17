@@ -23,7 +23,7 @@ public class CudamiPredicatesClient extends CudamiBaseClient<PredicateImpl> {
     return doPutRequestForObject(
         String.format(
             "/latest/predicates/%s",
-            URLEncoder.encode(predicate.getValue()), StandardCharsets.UTF_8),
+            URLEncoder.encode(predicate.getValue(), StandardCharsets.UTF_8)),
         (PredicateImpl) predicate);
   }
 }
