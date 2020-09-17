@@ -1,5 +1,5 @@
 export function getImageUrl(image, width = 'full') {
-  if (!image.iiifBaseUrl || !image.mimeType) {
+  if (!image.httpBaseUrl || !image.mimeType) {
     return image.uri
   }
   const mimeExtensionMapping = {
@@ -7,7 +7,7 @@ export function getImageUrl(image, width = 'full') {
     png: 'png',
   }
   const subMimeType = image.mimeType.split('/')[1]
-  return `${image.iiifBaseUrl}/full/${width}/0/default.${
+  return `${image.httpBaseUrl}/full/${width}/0/default.${
     mimeExtensionMapping[subMimeType] ?? 'jpg'
   }`
 }

@@ -362,10 +362,10 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
           iiifUrl += "/";
         }
         iiifUrl += getIiifIdentifier(imageFileResource);
-        imageFileResource.setIiifBaseUrl(URI.create(iiifUrl).toURL());
+        imageFileResource.setHttpBaseUrl(URI.create(iiifUrl).toURL());
       } catch (MalformedURLException ex) {
         throw new IllegalStateException(
-            "creating a valid iiif url failed! check configuration!", ex);
+            "Creating a valid iiif url failed! Check configuration!", ex);
       }
     }
   }

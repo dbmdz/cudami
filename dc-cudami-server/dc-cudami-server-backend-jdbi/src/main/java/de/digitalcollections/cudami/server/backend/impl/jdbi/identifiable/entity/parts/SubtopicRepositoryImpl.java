@@ -49,7 +49,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
           + " s.created s_created, s.last_modified s_lastModified,"
           + " s.preview_hints s_previewImageRenderingHints,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
           + " FROM subtopics as s"
           + " LEFT JOIN identifiers as id on s.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on s.previewfileresource = file.uuid";
@@ -60,7 +60,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
           + " s.identifiable_type s_type,"
           + " s.created s_created, s.last_modified s_lastModified,"
           + " s.preview_hints s_previewImageRenderingHints,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
           + " FROM subtopics as s"
           + " LEFT JOIN fileresources_image as file on s.previewfileresource = file.uuid";
 
@@ -69,7 +69,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
           + " s.identifiable_type s_type,"
           + " s.created s_created, s.last_modified s_lastModified,"
           + " s.preview_hints s_previewImageRenderingHints,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
           + " FROM subtopics as s INNER JOIN subtopic_subtopics ss ON s.uuid = ss.child_subtopic_uuid"
           + " LEFT JOIN fileresources_image as file on s.previewfileresource = file.uuid"
           + " WHERE ss.parent_subtopic_uuid = :uuid";
@@ -332,7 +332,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
             + " e.identifiable_type e_type, e.entity_type e_entityType,"
             + " e.created e_created, e.last_modified e_lastModified,"
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-            + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
+            + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
             + " FROM entities as e INNER JOIN subtopic_entities se ON e.uuid = se.entity_uuid"
             + " LEFT JOIN fileresources_image as file on e.previewfileresource = file.uuid"
             + " LEFT JOIN identifiers as id on e.uuid = id.identifiable"
@@ -384,7 +384,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
             + " f.identifiable_type f_type,"
             + " f.created f_created, f.last_modified f_lastModified,"
             + " f.filename f_filename, f.mimetype f_mimeType,"
-            + " pf.uuid pf_uuid, pf.filename pf_filename, pf.mimetype pf_mimeType, pf.size_in_bytes pf_sizeInBytes, pf.uri pf_uri, pf.iiif_base_url pf_iiifBaseUrl"
+            + " pf.uuid pf_uuid, pf.filename pf_filename, pf.mimetype pf_mimeType, pf.size_in_bytes pf_sizeInBytes, pf.uri pf_uri, pf.http_base_url pf_httpBaseUrl"
             + " FROM fileresources as f INNER JOIN subtopic_fileresources sf ON f.uuid = sf.fileresource_uuid"
             + " LEFT JOIN fileresources_image as pf on f.previewfileresource = pf.uuid"
             + " WHERE sf.subtopic_uuid = :uuid"

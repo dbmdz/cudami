@@ -710,7 +710,7 @@ public class PersonRepositoryImpl extends IdentifiableRepositoryImpl<Person>
   public Set<DigitalObject> getDigitalObjects(UUID uuidPerson) {
     String query =
         "SELECT d.uuid d_uuid, d.label d_label, d.refid d_refId,"
-            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimetype, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.iiif_base_url pf_iiifBaseUrl"
+            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimetype, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.http_base_url pf_httpBaseUrl"
             + " FROM digitalobjects as d"
             + " LEFT JOIN item_digitalobjects as itdi on d.uuid = itdi.digitalobject_uuid"
             + " LEFT JOIN item_works as itwo on itdi.item_uuid = itwo.item_uuid"
