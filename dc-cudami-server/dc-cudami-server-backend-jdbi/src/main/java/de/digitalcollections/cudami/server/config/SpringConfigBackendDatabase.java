@@ -52,6 +52,9 @@ public class SpringConfigBackendDatabase {
   @Value("${cudami.database.username}")
   private String databaseUsername;
 
+  @Value("${cudami.database.maxConnections:8}")
+  private Integer maxDatabaseConnections;
+
   @Autowired
   @Bean
   @Qualifier(value = "pds")
@@ -96,6 +99,9 @@ public class SpringConfigBackendDatabase {
 
   private Properties getConnectionProperties() {
     Properties props = new Properties();
+
+    props.put("maxTotal", "" + maxDatabaseConnections);
+
     props.put("tcpKeepAlive", "true");
     // Enable or disable TCP keep-alive probe. The default is false.
 
