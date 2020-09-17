@@ -16,6 +16,7 @@ public class CudamiClient {
   private final CudamiDigitalObjectsClient cudamiDigitalObjectsClient;
   private final CudamiEntitiesClient cudamiEntitiesClient;
   private final CudamiEntityPartsClient cudamiEntityPartsClient;
+  private final CudamiEntityRelationsClient cudamiEntityRelationsClient;
   private final CudamiFileResourcesBinaryClient cudamiFileResourcesBinaryClient;
   private final CudamiFileResourcesMetadataClient cudamiFileResourcesMetadataClient;
   private final CudamiIdentifiablesClient cudamiIdentifiablesClient;
@@ -49,6 +50,8 @@ public class CudamiClient {
     this.cudamiDigitalObjectsClient = new CudamiDigitalObjectsClient(http, cudamiServerUrl, mapper);
     this.cudamiEntitiesClient = new CudamiEntitiesClient(http, cudamiServerUrl, mapper);
     this.cudamiEntityPartsClient = new CudamiEntityPartsClient(http, cudamiServerUrl, mapper);
+    this.cudamiEntityRelationsClient =
+        new CudamiEntityRelationsClient(http, cudamiServerUrl, mapper);
     this.cudamiFileResourcesBinaryClient =
         new CudamiFileResourcesBinaryClient(cudamiServerUrl, mapper);
     this.cudamiFileResourcesMetadataClient =
@@ -90,6 +93,10 @@ public class CudamiClient {
 
   public CudamiEntityPartsClient forEntityParts() {
     return cudamiEntityPartsClient;
+  }
+
+  public CudamiEntityRelationsClient forEntityRelations() {
+    return cudamiEntityRelationsClient;
   }
 
   public CudamiFileResourcesBinaryClient forFileResourcesBinary() {
