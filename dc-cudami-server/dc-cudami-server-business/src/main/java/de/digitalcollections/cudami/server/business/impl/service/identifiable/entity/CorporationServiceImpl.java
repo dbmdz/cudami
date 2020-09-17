@@ -34,16 +34,22 @@ public class CorporationServiceImpl extends EntityServiceImpl<Corporation>
   @Override
   public Corporation fetchAndSaveByGndId(String gndId) {
     Corporation corporation = externalRepository.getByGndId(gndId);
-    try {
-      ImageFileResource previewImage =
-          (ImageFileResource) fileResourceMetadataService.save(corporation.getPreviewImage());
-      corporation.setPreviewImage(previewImage);
-    } catch (IdentifiableServiceException ex) {
-      LOGGER.warn(
-          "Can not save previewImage of corporation: "
-              + corporation.getLabel().getText()
-              + ", gndId: "
-              + gndId);
+    if (corporation == null) {
+      return null;
+    }
+
+    if (corporation.getPreviewImage() != null) {
+      try {
+        ImageFileResource previewImage =
+            (ImageFileResource) fileResourceMetadataService.save(corporation.getPreviewImage());
+        corporation.setPreviewImage(previewImage);
+      } catch (IdentifiableServiceException ex) {
+        LOGGER.warn(
+            "Can not save previewImage of corporation: "
+                + corporation.getLabel().getText()
+                + ", gndId: "
+                + gndId);
+      }
     }
     return repository.save(corporation);
   }
