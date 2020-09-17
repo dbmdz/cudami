@@ -38,7 +38,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
           + " t.created t_created, t.last_modified t_lastModified,"
           + " t.preview_hints t_previewImageRenderingHints,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
           + " FROM topics as t"
           + " LEFT JOIN identifiers as id on t.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on t.previewfileresource = file.uuid";
@@ -49,7 +49,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
           + " t.identifiable_type t_type, t.entity_type t_entityType,"
           + " t.created t_created, t.last_modified t_lastModified,"
           + " t.preview_hints t_previewImageRenderingHints,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
           + " FROM topics as t"
           + " LEFT JOIN fileresources_image as file on t.previewfileresource = file.uuid";
 
@@ -207,7 +207,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
         "SELECT st.uuid st_uuid, st.label st_label, st.description st_description,"
             + " st.identifiable_type st_type,"
             + " st.created st_created, st.last_modified st_lastModified,"
-            + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
+            + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
             + " FROM subtopics as st INNER JOIN topic_subtopics ts ON st.uuid = ts.subtopic_uuid"
             + " LEFT JOIN fileresources_image as file on st.previewfileresource = file.uuid"
             + " WHERE ts.topic_uuid = :uuid"

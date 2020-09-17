@@ -42,7 +42,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
           + " p.text p_text, p.start_date p_startDate, p.end_date p_endDate,"
           + " p.preview_hints p_previewImageRenderingHints,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
           + " FROM projects as p"
           + " LEFT JOIN identifiers as id on p.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on p.previewfileresource = file.uuid";
@@ -54,7 +54,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
           + " p.created p_created, p.last_modified p_lastModified,"
           + " p.start_date p_startDate, p.end_date p_endDate,"
           + " p.preview_hints p_previewImageRenderingHints,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.iiif_base_url f_iiifBaseUrl"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
           + " FROM projects as p"
           + " LEFT JOIN fileresources_image as file on p.previewfileresource = file.uuid";
 
@@ -241,7 +241,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
         "SELECT d.uuid d_uuid, d.label d_label,"
             + " d.created d_created, d.last_modified d_lastModified,"
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.iiif_base_url pf_iiifBaseUrl"
+            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.http_base_url pf_httpBaseUrl"
             + " FROM digitalobjects as d"
             + " LEFT JOIN identifiers as id on d.uuid = id.identifiable"
             + " LEFT JOIN fileresources_image as file on d.previewfileresource = file.uuid"

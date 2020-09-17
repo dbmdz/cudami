@@ -9,13 +9,13 @@
         <th:block th:if="${hints != null && hints.targetLink != null}">
           <a th:href="${hints.targetLink}" th:target="${hints.openLinkInNewWindow}? '_blank'">
         </th:block>
-        <th:block th:if="${previewImage.iiifBaseUrl}">
-          <img th:src="|${previewImage.iiifBaseUrl}/full/${width},/0/default.${#strings.equals(previewImage.mimeType.subType, 'png')?'png':'jpg'}|"
+        <th:block th:if="${previewImage.httpBaseUrl}">
+          <img th:src="|${previewImage.httpBaseUrl}/full/${width},/0/default.${#strings.equals(previewImage.mimeType.subType, 'png')?'png':'jpg'}|"
                th:alt="${hints != null && hints.altText != null}? ${hints.altText.getText(language)} : ${previewImage.filename}"
                th:title="${hints != null && hints.title != null}? ${hints.title.getText(language)}"
                />
         </th:block>
-        <th:block th:unless="${previewImage.iiifBaseUrl}">
+        <th:block th:unless="${previewImage.httpBaseUrl}">
           <img th:src="${previewImage.uri}"
                th:alt="${hints != null && hints.altText != null}? ${hints.altText.getText(language)} : ${previewImage.filename}"
                th:title="${hints != null && hints.title != null}? ${hints.title.getText(language)}"
