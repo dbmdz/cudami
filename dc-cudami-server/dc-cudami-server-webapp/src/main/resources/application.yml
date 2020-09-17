@@ -7,6 +7,7 @@ cudami:
     password: somepassword
     port: 22222
     username: cudami
+    maxConnections: 25
   defaults:
     language: en
     locale: en_US

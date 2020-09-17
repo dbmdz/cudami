@@ -33,12 +33,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
 
   @Override
   public DigitalObject getByIdentifier(String namespace, String id) {
-    long start = System.currentTimeMillis();
-    DigitalObject digitalObject =
-        ((DigitalObjectRepository) repository).findByIdentifier(namespace, id);
-    long end = System.currentTimeMillis();
-    LOGGER.info("duration : " + (end - start));
-    return digitalObject;
+    return ((DigitalObjectRepository) repository).findByIdentifier(namespace, id);
   }
 
   @Override
