@@ -62,7 +62,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   // select to return only metadata (uuid, identifiers and lastmodified
   private static final String REDUCED_FIND_ALL_METADATA_SQL =
-      "SELECT e.uuid e_uuid, e.refid e_refid, e.last_modified e_last_modified, e.identifiable_type e_type, e.entity_type e_entityType, id.identifiable id_identifiable, id.uuid id_uuid, id.namespace "
+      "SELECT e.uuid e_uuid, e.refid e_refId, e.last_modified e_last_modified, e.identifiable_type e_type, e.entity_type e_entityType, id.identifiable id_identifiable, id.uuid id_uuid, id.namespace "
           + "id_namespace, id"
           + ".identifier id_id"
           + " FROM %s as e"
