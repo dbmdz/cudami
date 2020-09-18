@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.r
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.identifiable.resource.MimeType;
+import de.digitalcollections.model.api.identifiable.resource.VideoFileResource;
 import de.digitalcollections.model.api.identifiable.resource.exceptions.ResourceIOException;
 import de.digitalcollections.model.api.identifiable.resource.exceptions.ResourceNotFoundException;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
@@ -57,6 +58,7 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
       LoggerFactory.getLogger(FileResourceBinaryRepositoryImpl.class);
   public static final String DEFAULT_FILENAME_WITHOUT_EXTENSION = "resource";
   private final URL iiifImageBaseUrl;
+  private final URL mediaVideoBaseUrl;
   private final String repositoryFolderPath;
   private final ResourceLoader resourceLoader;
 
@@ -64,8 +66,10 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
   public FileResourceBinaryRepositoryImpl(
       @Value("${cudami.repositoryFolderPath}") String folderPath,
       @Value("${iiif.image.baseUrl:#{null}}") URL iiifImageBaseUrl,
+      @Value("${media.video.baseUrl:#{null}}") URL mediaVideoBaseUrl,
       ResourceLoader resourceLoader) {
     this.iiifImageBaseUrl = iiifImageBaseUrl;
+    this.mediaVideoBaseUrl = mediaVideoBaseUrl;
     this.repositoryFolderPath = folderPath.replace("~", System.getProperty("user.home"));
     this.resourceLoader = resourceLoader;
   }
@@ -303,6 +307,9 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
         ImageFileResource imageFileResource = (ImageFileResource) fileResource;
         setImageProperties(imageFileResource);
         setIiifProperties(imageFileResource);
+      } else if (fileResource instanceof VideoFileResource) {
+        VideoFileResource videoFileResource = (VideoFileResource) fileResource;
+        setVideoProperties(videoFileResource);
       }
 
     } catch (IOException ex) {
@@ -361,7 +368,7 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
         if (!iiifUrl.endsWith("/")) {
           iiifUrl += "/";
         }
-        iiifUrl += getIiifIdentifier(imageFileResource);
+        iiifUrl += imageFileResource.getUuid().toString();
         imageFileResource.setHttpBaseUrl(URI.create(iiifUrl).toURL());
       } catch (MalformedURLException ex) {
         throw new IllegalStateException(
@@ -370,14 +377,19 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
     }
   }
 
-  /**
-   * default implementation: IIIF identifier is uuid
-   *
-   * @param imageFileResource image fileresource
-   * @return iiif identifier for image fileresource
-   */
-  public String getIiifIdentifier(ImageFileResource imageFileResource) {
-    // default: IIIF identifier is uuid
-    return imageFileResource.getUuid().toString();
+  private void setVideoProperties(VideoFileResource videoFileResource) {
+    if (mediaVideoBaseUrl != null) {
+      try {
+        String videoUrl = mediaVideoBaseUrl.toString();
+        if (!videoUrl.endsWith("/")) {
+          videoUrl += "/";
+        }
+        videoUrl += videoFileResource.getUuid().toString();
+        videoFileResource.setHttpBaseUrl(URI.create(videoUrl).toURL());
+      } catch (MalformedURLException ex) {
+        throw new IllegalStateException(
+            "Creating a valid video url failed! Check configuration!", ex);
+      }
+    }
   }
 }

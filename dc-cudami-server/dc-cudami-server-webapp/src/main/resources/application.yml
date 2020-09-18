@@ -41,6 +41,10 @@ management:
   server:
     port: 9001
 
+media:
+  video:
+    baseUrl: "http://localhost:24242/stream/"
+
 server:
   port: 9000
   server-header: "@project.name@ v@project.version@"
