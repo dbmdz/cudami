@@ -26,7 +26,14 @@ class CorporationControllerTest {
       name =
           "shall accept proper and refuse invalid GND IDs when fetching and retrieving institutions by GND ID")
   @CsvSource(
-      value = {"1234-5, true", "12345, true", "1234-X, true", "abcde, false", "abcd-e, false"})
+      value = {
+        "1234-5, true",
+        "12345, true",
+        "1234-X, true",
+        "abcde, false",
+        "abcd-e, false",
+        "11489308X, true"
+      })
   void gndIdVerification(String gndId, boolean isValue) throws IdentifiableServiceException {
     if (isValue) {
       corporationController.fetchAndSaveByGndId(gndId);
