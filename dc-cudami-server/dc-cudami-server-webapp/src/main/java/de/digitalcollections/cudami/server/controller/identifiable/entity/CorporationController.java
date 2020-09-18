@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The corporation controller", name = "Corporation controller")
 public class CorporationController {
 
-  private static final Pattern GNDID_PATTERN = Pattern.compile("\\d+(-.)?");
+  private static final Pattern GNDID_PATTERN = Pattern.compile("(\\d+(-.)?)|(\\d+X)");
 
   private final CorporationService corporationService;
 
