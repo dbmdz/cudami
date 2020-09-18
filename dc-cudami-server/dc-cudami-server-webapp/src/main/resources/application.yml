@@ -1,13 +1,6 @@
 # local/default
 
 cudami:
-  database:
-    hostname: localhost
-    name: cudami
-    password: somepassword
-    port: 22222
-    username: cudami
-    maxConnections: 25
   defaults:
     language: en
     locale: en_US
@@ -53,16 +46,23 @@ server:
   server-header: "@project.name@ v@project.version@"
 
 spring:
+  datasource:
+    # see https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-connect-to-production-database
+    url: "jdbc:postgresql://localhost:22222/cudami"
+    username: cudami
+    password: somepassword
+    # driver-class-name: org.postgresql.Driver
+    # see https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html#data-properties
+    # see https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby
+    hikari:
+      maximum-pool-size: 25
   flyway:
     baseline-on-migrate: true
     enabled: true
     locations: "classpath:/de/digitalcollections/cudami/server/backend/impl/database/migration"
     out-of-order: true
-    password: "${cudami.database.password}"
     placeholders:
       iiifBaseUrl: "${iiif.image.baseUrl}"
-    url: "jdbc:postgresql://${cudami.database.hostname}:${cudami.database.port}/${cudami.database.name}"
-    user: "${cudami.database.username}"
   main:
     banner-mode: 'off'
   profiles:
