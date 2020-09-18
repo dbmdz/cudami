@@ -11,3 +11,10 @@ export function getImageUrl(image, width = 'full') {
     mimeExtensionMapping[subMimeType] ?? 'jpg'
   }`
 }
+
+export function getVideoUrl(video) {
+  if (!video.httpBaseUrl || !video.mimeType) {
+    return video.uri
+  }
+  return `${video.httpBaseUrl}/default.mp4`
+}

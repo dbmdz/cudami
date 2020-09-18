@@ -23,7 +23,7 @@ import Autocomplete from '../../Autocomplete'
 import FeedbackMessage from '../../FeedbackMessage'
 import FileUploadForm from '../../FileUploadForm'
 import PreviewImage from '../../PreviewImage'
-import {getImageUrl} from '../../utils'
+import {getImageUrl, getVideoUrl} from '../../utils'
 import {searchMedia, uploadFile} from '../../../api'
 
 class MediaSelector extends Component {
@@ -34,6 +34,17 @@ class MediaSelector extends Component {
       progress: 0,
       showUploadSuccess: false,
       tabToggleEnabled: true,
+    }
+  }
+
+  getMediaUrl = (fileResource, mediaType) => {
+    switch (mediaType) {
+      case 'image':
+        return getImageUrl(fileResource)
+      case 'video':
+        return getVideoUrl(fileResource)
+      default:
+        return null
     }
   }
 
@@ -83,7 +94,7 @@ class MediaSelector extends Component {
     setTimeout(() => this.setState({showUploadSuccess: false}), 3000)
     this.props.onChange({
       ...response,
-      uri: getImageUrl(response),
+      uri: this.getMediaUrl(response, this.props.mediaType),
     })
   }
 
@@ -256,9 +267,8 @@ class MediaSelector extends Component {
                 activeLanguage={activeLanguage}
                 onSelect={(suggestion) => {
                   onChange({
-                    ...suggestion.previewImage,
                     ...suggestion,
-                    uri: getImageUrl(suggestion.previewImage),
+                    uri: this.getMediaUrl(suggestion, mediaType),
                   })
                 }}
                 placeholder={t('selectMedia.searchTerm', {mediaType})}
