@@ -50,7 +50,7 @@ class CorporationServiceImplTest {
   void savePreviewImage() throws MalformedURLException, IdentifiableServiceException {
     Corporation corporation = mock(Corporation.class);
     ImageFileResource previewImageFileResource = mock(ImageFileResource.class);
-    when(previewImageFileResource.getIiifBaseUrl()).thenReturn(new URL("file:///tmp/foo"));
+    when(previewImageFileResource.getHttpBaseUrl()).thenReturn(new URL("file:///tmp/foo"));
     when(corporation.getPreviewImage()).thenReturn(previewImageFileResource);
     when(externalCorporationRepository.getByGndId(any(String.class))).thenReturn(corporation);
 
