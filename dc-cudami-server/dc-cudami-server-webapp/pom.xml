@@ -27,6 +27,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.zaxxer</groupId>
+      <artifactId>HikariCP</artifactId>
+    </dependency>
+    <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-springboot</artifactId>
       <version>${version.dc-commons-springboot}</version>
