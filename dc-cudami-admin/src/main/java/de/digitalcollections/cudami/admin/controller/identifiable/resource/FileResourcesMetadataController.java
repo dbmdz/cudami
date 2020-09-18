@@ -137,9 +137,10 @@ public class FileResourcesMetadataController extends AbstractController {
     }
   }
 
-  @GetMapping("/api/fileresources/images")
+  @GetMapping("/api/fileresources/type/{type}")
   @ResponseBody
-  public SearchPageResponse<FileResourceImpl> searchImages(
+  public SearchPageResponse<FileResourceImpl> searchFileResourcesByType(
+      @PathVariable String type,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortField", required = false, defaultValue = "lastModified")
@@ -152,7 +153,7 @@ public class FileResourcesMetadataController extends AbstractController {
     Sorting sorting = new SortingImpl(order);
     SearchPageRequest pageRequest =
         new SearchPageRequestImpl(searchTerm, pageNumber, pageSize, sorting);
-    return service.findImages(pageRequest);
+    return service.findFileResourcesByType(pageRequest, type);
   }
 
   @PutMapping("/api/fileresources/{uuid}")

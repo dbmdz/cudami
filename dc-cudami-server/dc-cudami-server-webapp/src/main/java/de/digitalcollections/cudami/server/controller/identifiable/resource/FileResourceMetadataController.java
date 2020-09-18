@@ -75,10 +75,13 @@ public class FileResourceMetadataController {
       description =
           "Find limited amount of image fileresources containing searchTerm in label or description")
   @GetMapping(
-      value = {"/latest/fileresources/images", "/v2/fileresources/images"},
+      value = {"/latest/fileresources/type/{type}", "/v2/fileresources/type/{type}"},
       produces = "application/json")
   @ApiResponseObject
-  public SearchPageResponse<FileResource> findImages(
+  public SearchPageResponse<FileResource> findFileResourcesByType(
+      @ApiPathParam(description = "Type of the fileresource, e.g. <tt>image</tt>")
+          @PathVariable("type")
+          String type,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
@@ -92,11 +95,20 @@ public class FileResourceMetadataController {
     SearchPageRequest pageRequest =
         new SearchPageRequestImpl(searchTerm, pageNumber, pageSize, sorting);
 
+    FileResourceType fileResourceType = null;
+    switch (type) {
+      case "image":
+        fileResourceType = FileResourceType.IMAGE;
+        break;
+      case "video":
+        fileResourceType = FileResourceType.VIDEO;
+        break;
+      default:
+        break;
+    }
+
     Filtering filtering =
-        Filtering.defaultBuilder()
-            .filter("fileResourceType")
-            .isEquals(FileResourceType.IMAGE)
-            .build();
+        Filtering.defaultBuilder().filter("fileResourceType").isEquals(fileResourceType).build();
     pageRequest.setFiltering(filtering);
 
     return fileResourceService.find(pageRequest);

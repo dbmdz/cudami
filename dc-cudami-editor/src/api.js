@@ -260,7 +260,7 @@ export async function searchMedia(
   pageNumber = 0,
   pageSize = 10
 ) {
-  let url = `${contextPath}api/fileresources/${mediaType}s?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
+  let url = `${contextPath}api/fileresources/type/${mediaType}?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
   if (mock) {
     url = `/__mock__/${mediaType}s.json`
   }

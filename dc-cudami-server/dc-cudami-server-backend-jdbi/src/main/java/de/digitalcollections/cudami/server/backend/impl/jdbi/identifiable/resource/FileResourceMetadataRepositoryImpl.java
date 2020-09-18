@@ -183,6 +183,10 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
             filterQuery = " AND f.mimetype ilike 'image/%'";
             query.append(filterQuery);
             break;
+          case VIDEO:
+            filterQuery = " AND f.mimetype ilike 'video/%'";
+            query.append(filterQuery);
+            break;
           default:
             break;
         }
