@@ -21,3 +21,15 @@ services:
     volumes:
       - ./iiif_rules.yml:/application-iiif.yml
       - ~/cudami/fileResources:/iiif/upload
+  media:
+    build:
+      args:
+        EUPHORIA_VERSION: "4.0.0"
+      context: .
+      dockerfile: Dockerfile-media
+    ports:
+      - "24242:9000"
+      - "24244:9001"
+    volumes:
+      - ./media_rules.yml:/application-media.yml
+      - ~/cudami/fileResources:/media/upload
