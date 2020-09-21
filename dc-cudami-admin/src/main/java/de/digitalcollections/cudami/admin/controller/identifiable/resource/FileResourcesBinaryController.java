@@ -10,7 +10,6 @@ import java.io.InputStream;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.tomcat.util.http.fileupload.FileItemIterator;
 import org.apache.tomcat.util.http.fileupload.FileItemStream;
-import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +63,7 @@ public class FileResourcesBinaryController extends AbstractController {
           return fileResource;
         }
       }
-    } catch (IOException | FileUploadException e) {
+    } catch (IOException e) {
       LOGGER.error("Error saving uploaded file data", e);
       redirectAttributes.addFlashAttribute("message", "Error saving file resource!");
       return null;
