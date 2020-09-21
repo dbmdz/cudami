@@ -17,7 +17,6 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.tomcat.util.http.fileupload.FileItemIterator;
 import org.apache.tomcat.util.http.fileupload.FileItemStream;
-import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiResponseObject;
@@ -83,7 +82,7 @@ public class FileResourceBinaryController {
           stream.close();
         }
       }
-    } catch (FileUploadException | IOException | IdentifiableServiceException ex) {
+    } catch (IOException | IdentifiableServiceException ex) {
       LOGGER.error("Error getting binary data from uploaded file", ex);
     } finally {
       if (stream != null) {
