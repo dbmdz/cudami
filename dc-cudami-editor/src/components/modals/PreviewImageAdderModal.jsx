@@ -1,3 +1,4 @@
+import transform from 'lodash/transform'
 import {publish, subscribe} from 'pubsub-js'
 import React, {Component} from 'react'
 import {Button, Form, Modal, ModalBody, ModalHeader} from 'reactstrap'
@@ -24,10 +25,10 @@ class PreviewImageAdderModal extends Component {
     this.state = {
       attributes: this.initialAttributes,
       doUpdateRequest: false,
+      editing: false,
       fileResource: {},
       metadataOpen: true,
       renderingHintsOpen: false,
-      showImageSelector: true,
       tooltipsOpen: {
         altText: false,
         caption: false,
@@ -39,36 +40,29 @@ class PreviewImageAdderModal extends Component {
         url: false,
       },
     }
-    subscribe('editor.show-preview-image-modal', (_msg, data = {}) => {
-      const attributes = Object.fromEntries(
-        Object.entries(data)
-          .filter(([key, value]) => {
-            return !['showImageSelector', 'uuid'].includes(key) && value
-          })
-          .map(([key, value]) => {
-            const keyMapping = {
-              openLinkInNewWindow: 'linkNewTab',
-              targetLink: 'linkUrl',
-            }
-            if (key in keyMapping) {
-              return [keyMapping[key], value]
-            }
-            return [key, value]
-          })
-      )
-      this.setState({
-        attributes: {
-          ...this.initialAttributes,
-          ...attributes,
-        },
-        fileResource: {
-          ...this.state.fileResource,
-          uuid: data.uuid,
-        },
-        showImageSelector: data.showImageSelector ?? true,
-      })
-      this.props.onToggle()
-    })
+    subscribe(
+      'editor.show-preview-image-modal',
+      (_msg, {attributes = {}, editing = false, uuid} = {}) => {
+        this.setState({
+          attributes: {
+            ...this.state.attributes,
+            ...transform(attributes, (result, value, key) => {
+              const keyMapping = {
+                openLinkInNewWindow: 'linkNewTab',
+                targetLink: 'linkUrl',
+              }
+              result[keyMapping[key] ?? key] = value ?? ''
+            }),
+          },
+          editing,
+          fileResource: {
+            ...this.state.fileResource,
+            uuid,
+          },
+        })
+        this.props.onToggle()
+      }
+    )
   }
 
   async componentDidMount() {
@@ -164,36 +158,37 @@ class PreviewImageAdderModal extends Component {
   }
 
   updatePreviewImage = (fileResource) => {
-    const filteredAttributes = Object.fromEntries(
-      Object.entries(this.state.attributes).filter(([_, value]) => value !== '')
-    )
-    const {altText, caption, linkNewTab, linkUrl, title} = filteredAttributes
     publish('editor.update-preview-image', {
       previewImage: {
         ...fileResource,
         fileResourceType: 'IMAGE',
       },
-      renderingHints: {
-        altText,
-        caption,
-        openLinkInNewWindow: linkNewTab,
-        targetLink: linkUrl,
-        title,
-      },
+      renderingHints: transform(this.state.attributes, (result, value, key) => {
+        const keyMapping = {
+          linkNewTab: 'openLinkInNewWindow',
+          linkUrl: 'targetLink',
+        }
+        result[keyMapping[key] ?? key] = value !== '' ? value : undefined
+      }),
     })
     this.destroy()
   }
 
   render() {
     const {activeLanguage, isOpen, t} = this.props
-    const {altText, caption, linkNewTab, linkUrl, title} = this.state.attributes
+    const {
+      attributes,
+      editing,
+      fileResource,
+      metadataOpen,
+      renderingHintsOpen,
+      tooltipsOpen,
+    } = this.state
     const mediaType = 'image'
     return (
       <Modal isOpen={isOpen} size="lg" toggle={this.destroy}>
         <ModalHeader toggle={this.destroy}>
-          {this.state.showImageSelector
-            ? t('setPreviewImage')
-            : t('editPreviewImage')}
+          {editing ? t('editPreviewImage') : t('setPreviewImage')}
         </ModalHeader>
         <ModalBody>
           <Form
@@ -203,41 +198,39 @@ class PreviewImageAdderModal extends Component {
               this.updatePreviewImage(fileResource)
             }}
           >
-            {this.state.showImageSelector && (
+            {!editing && (
               <MediaSelector
                 activeLanguage={activeLanguage}
-                fileResource={this.state.fileResource}
+                fileResource={fileResource}
                 mediaType={mediaType}
                 onChange={this.updateFileResource}
                 onTabChanged={this.onTabChanged}
                 toggleTooltip={this.toggleTooltip}
-                tooltipsOpen={this.state.tooltipsOpen}
+                tooltipsOpen={tooltipsOpen}
               />
             )}
             <MediaMetadataForm
-              altText={altText}
-              caption={caption}
-              isOpen={this.state.metadataOpen}
+              altText={attributes.altText}
+              caption={attributes.caption}
+              isOpen={metadataOpen}
               mediaType={mediaType}
               onChange={this.setAttribute}
-              title={title}
-              toggle={() =>
-                this.setState({metadataOpen: !this.state.metadataOpen})
-              }
+              title={attributes.title}
+              toggle={() => this.setState({metadataOpen: !metadataOpen})}
               toggleTooltip={this.toggleTooltip}
-              tooltipsOpen={this.state.tooltipsOpen}
+              tooltipsOpen={tooltipsOpen}
             />
             <MediaRenderingHintsForm
               enableAlignment={false}
               enableWidth={false}
-              isOpen={this.state.renderingHintsOpen}
-              linkNewTab={linkNewTab}
-              linkUrl={linkUrl}
+              isOpen={renderingHintsOpen}
+              linkNewTab={attributes.linkNewTab}
+              linkUrl={attributes.linkUrl}
               mediaType={mediaType}
               onChange={this.setAttribute}
               toggle={() =>
                 this.setState({
-                  renderingHintsOpen: !this.state.renderingHintsOpen,
+                  renderingHintsOpen: !renderingHintsOpen,
                 })
               }
             />
