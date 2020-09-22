@@ -36,12 +36,14 @@ const handleClick = (
       title,
     } = currentRenderingHints
     publish('editor.show-preview-image-modal', {
-      altText: altText?.[language],
-      caption: caption?.[language],
-      openLinkInNewWindow,
-      showImageSelector: false,
-      targetLink: targetLink,
-      title: title?.[language],
+      attributes: {
+        altText: altText?.[language],
+        caption: caption?.[language],
+        openLinkInNewWindow,
+        targetLink,
+        title: title?.[language],
+      },
+      editing: true,
       uuid: currentPreviewImage.uuid,
     })
   } else {
