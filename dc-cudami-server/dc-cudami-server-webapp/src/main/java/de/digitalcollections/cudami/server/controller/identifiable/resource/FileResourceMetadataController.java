@@ -73,7 +73,7 @@ public class FileResourceMetadataController {
 
   @ApiMethod(
       description =
-          "Find limited amount of image fileresources containing searchTerm in label or description")
+          "Find limited amount of fileresources of given type containing searchTerm in label or description")
   @GetMapping(
       value = {"/latest/fileresources/type/{type}", "/v2/fileresources/type/{type}"},
       produces = "application/json")
@@ -104,7 +104,7 @@ public class FileResourceMetadataController {
         fileResourceType = FileResourceType.VIDEO;
         break;
       default:
-        break;
+        return null;
     }
 
     Filtering filtering =
