@@ -27,6 +27,7 @@ import LanguageAdderModal from './modals/LanguageAdderModal'
 import LinkAdderModal from './modals/LinkAdderModal'
 import PreviewImageAdderModal from './modals/PreviewImageAdderModal'
 import TableAdderModal from './modals/TableAdderModal'
+import VideoAdderModal from './modals/VideoAdderModal'
 
 class IdentifiableForm extends Component {
   identifiablesWithLongText = [
@@ -52,6 +53,7 @@ class IdentifiableForm extends Component {
         linkAdder: false,
         previewImageAdder: false,
         tableAdder: false,
+        videoAdder: false,
       },
     }
   }
@@ -269,14 +271,19 @@ class IdentifiableForm extends Component {
             isOpen={this.state.modalsOpen.linkAdder}
             onToggle={() => this.toggleModal('linkAdder')}
           />
+          <TableAdderModal
+            isOpen={this.state.modalsOpen.tableAdder}
+            onToggle={() => this.toggleModal('tableAdder')}
+          />
+          <VideoAdderModal
+            activeLanguage={this.state.activeLanguage}
+            isOpen={this.state.modalsOpen.videoAdder}
+            onToggle={() => this.toggleModal('videoAdder')}
+          />
           <PreviewImageAdderModal
             activeLanguage={this.state.activeLanguage}
             isOpen={this.state.modalsOpen.previewImageAdder}
             onToggle={() => this.toggleModal('previewImageAdder')}
-          />
-          <TableAdderModal
-            isOpen={this.state.modalsOpen.tableAdder}
-            onToggle={() => this.toggleModal('tableAdder')}
           />
         </div>
       </AppContext.Provider>

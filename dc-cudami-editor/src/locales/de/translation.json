@@ -91,7 +91,11 @@
         "edit": "Bild bearbeiten",
         "new": "Bild einfügen"
       },
-      "table": "Tabelle einfügen"
+      "table": "Tabelle einfügen",
+      "video": {
+        "edit": "Video bearbeiten",
+        "new": "Video einfügen"
+      }
     },
     "insertLink": "Verlinkung einfügen",
     "invalidLabels": "Bitte füllen Sie in den folgenden Sprachen das Feld \"$t(label)\" noch aus):",
