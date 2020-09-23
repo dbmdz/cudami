@@ -123,6 +123,7 @@
     "removeFrom": {
       "collection": "remove from collection"
     },
+    "removePreviewImage": "Remove preview image",
     "removePreviewImageAfterSaveNotification": "Click \"$t(save)\" to confirm the deletion.",
     "save": "Save",
     "selectMedia": {

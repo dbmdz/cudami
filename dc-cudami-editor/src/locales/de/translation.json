@@ -123,6 +123,7 @@
     "removeFrom": {
       "collection": "aus Sammlung entfernen"
     },
+    "removePreviewImage": "Vorschaubild entfernen",
     "removePreviewImageAfterSaveNotification": "Klicken Sie auf \"$t(save)\", um die Löschung zu bestätigen.",
     "save": "Speichern",
     "selectMedia": {
