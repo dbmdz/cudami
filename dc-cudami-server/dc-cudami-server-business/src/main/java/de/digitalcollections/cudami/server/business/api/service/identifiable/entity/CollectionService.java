@@ -27,6 +27,14 @@ public interface CollectionService extends NodeService<Collection>, EntityServic
 
   boolean removeDigitalObject(Collection collection, DigitalObject digitalObject);
 
+  /**
+   * Removes a digitalObject from all collections, to which it was connected to.
+   *
+   * @param digitalObject the digital object
+   * @return boolean value for success
+   */
+  boolean removeDigitalObjectFromAllCollections(DigitalObject digitalObject);
+
   boolean saveDigitalObjects(Collection collection, List<DigitalObject> digitalObjects);
 
   Collection saveWithParentCollection(Collection collection, UUID parentUuid)

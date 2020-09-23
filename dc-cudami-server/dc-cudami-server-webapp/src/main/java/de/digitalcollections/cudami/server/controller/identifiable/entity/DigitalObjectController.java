@@ -27,7 +27,11 @@ import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiPathParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,7 +49,7 @@ public class DigitalObjectController {
   @ApiMethod(description = "Get count of digital objects")
   @GetMapping(
       value = {"/latest/digitalobjects/count", "/v2/digitalobjects/count"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public long count() {
     return service.count();
@@ -54,7 +58,7 @@ public class DigitalObjectController {
   @ApiMethod(description = "Get all digital objects")
   @GetMapping(
       value = {"/latest/digitalobjects", "/v2/digitalobjects"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<DigitalObject> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -76,7 +80,7 @@ public class DigitalObjectController {
           "Get all digital objects, reduced to their metadata fields (only all identifiers and last modification date)")
   @GetMapping(
       value = {"/latest/digitalobjects/reduced", "/v3/digitalobjects/reduced"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<DigitalObject> findAllReduced() {
     return service.findAllReduced();
@@ -87,7 +91,7 @@ public class DigitalObjectController {
           "Find limited amount of digital objects containing searchTerm in label or description")
   @GetMapping(
       value = {"/latest/digitalobjects/search", "/v3/digitalobjects/search"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public SearchPageResponse<DigitalObject> findDigitalObjects(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -108,7 +112,7 @@ public class DigitalObjectController {
   @ApiMethod(description = "Get digital object by uuid")
   @GetMapping(
       value = {"/latest/digitalobjects/{uuid}", "/v2/digitalobjects/{uuid}"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public DigitalObject findById(@PathVariable UUID uuid) {
     return service.get(uuid);
@@ -120,9 +124,12 @@ public class DigitalObjectController {
         "/latest/digitalobjects/identifier/{namespace}:{id}",
         "/v2/digitalobjects/identifier/{namespace}:{id}"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
-  public DigitalObject findByIdentifier(@PathVariable String namespace, @PathVariable String id)
+  public DigitalObject findByIdentifier(
+      @ApiPathParam(description = "Namespace of the identifier") @PathVariable("namespace")
+          String namespace,
+      @ApiPathParam(description = "value of the identifier") @PathVariable("id") String id)
       throws IdentifiableServiceException {
     return service.getByIdentifier(namespace, id);
     //    if (digitalObject == null) {
@@ -139,7 +146,7 @@ public class DigitalObjectController {
         "/latest/digitalobjects/{uuid}/collections",
         "/v3/digitalobjects/{uuid}/collections"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Collection> getCollections(
       @ApiPathParam(description = "UUID of the digital object") @PathVariable("uuid") UUID uuid,
@@ -158,7 +165,7 @@ public class DigitalObjectController {
         "/latest/digitalobjects/{uuid}/fileresources/images",
         "/v2/digitalobjects/{uuid}/fileresources/images"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<ImageFileResource> getImageFileResources(@PathVariable UUID uuid) {
     return service.getImageFileResources(uuid);
@@ -170,7 +177,7 @@ public class DigitalObjectController {
         "/latest/digitalobjects/{uuid}/fileresources",
         "/v2/digitalobjects/{uuid}/fileresources"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<FileResource> getFileResources(@PathVariable UUID uuid) {
     return service.getFileResources(uuid);
@@ -179,7 +186,7 @@ public class DigitalObjectController {
   @ApiMethod(description = "Get paged projects of a digital objects")
   @GetMapping(
       value = {"/latest/digitalobjects/{uuid}/projects", "/v3/digitalobjects/{uuid}/projects"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Project> getProjects(
       @ApiPathParam(description = "UUID of the digital object") @PathVariable("uuid") UUID uuid,
@@ -195,7 +202,7 @@ public class DigitalObjectController {
   @ApiMethod(description = "Save a newly created digital object")
   @PostMapping(
       value = {"/latest/digitalobjects", "/v2/digitalobjects"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public DigitalObject save(@RequestBody DigitalObject digitalObject, BindingResult errors)
       throws IdentifiableServiceException {
@@ -208,7 +215,7 @@ public class DigitalObjectController {
         "/latest/digitalobjects/{uuid}/fileresources",
         "/v3/digitalobjects/{uuid}/fileresources"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<FileResource> saveFileResources(
       @ApiPathParam(description = "UUID of the digital object") @PathVariable("uuid") UUID uuid,
@@ -219,7 +226,7 @@ public class DigitalObjectController {
   @ApiMethod(description = "Update a digital object")
   @PutMapping(
       value = {"/latest/digitalobjects/{uuid}", "/v2/digitalobjects/{uuid}"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public DigitalObject update(
       @ApiPathParam(description = "UUID of the digital object") @PathVariable("uuid") UUID uuid,
@@ -228,5 +235,20 @@ public class DigitalObjectController {
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, digitalObject.getUuid());
     return service.update(digitalObject);
+  }
+
+  @ApiMethod(description = "Delete a digital object with all its relations")
+  @DeleteMapping(
+      value = {"/latest/digitalobjects/{uuid}", "/v2/digitalobjects/{uuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public ResponseEntity delete(
+      @ApiPathParam(description = "UUID of the digital object") @PathVariable("uuid") UUID uuid) {
+    boolean successful = service.delete(uuid);
+
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 }

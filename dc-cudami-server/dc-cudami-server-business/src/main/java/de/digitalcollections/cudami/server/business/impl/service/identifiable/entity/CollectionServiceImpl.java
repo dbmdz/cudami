@@ -113,4 +113,9 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   public boolean saveDigitalObjects(Collection collection, List<DigitalObject> digitalObjects) {
     return ((CollectionRepository) repository).saveDigitalObjects(collection, digitalObjects);
   }
+
+  @Override
+  public boolean removeDigitalObjectFromAllCollections(DigitalObject digitalObject) {
+    return ((CollectionRepository) repository).removeDigitalObjectFromAllCollections(digitalObject);
+  }
 }

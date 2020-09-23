@@ -80,4 +80,13 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
   public List<Project> getAll() {
     return ((ProjectRepository) repository).getAll();
   }
+
+  @Override
+  public boolean removeDigitalObjectFromAllProjects(DigitalObject digitalObject) {
+    if (digitalObject == null) {
+      return false;
+    }
+    return ((ProjectRepository) repository)
+        .removeDigitalObjectFromAllProjects(digitalObject.getUuid());
+  }
 }
