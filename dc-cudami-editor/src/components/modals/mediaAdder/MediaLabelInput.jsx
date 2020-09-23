@@ -5,7 +5,7 @@ import {useTranslation} from 'react-i18next'
 
 import InfoTooltip from '../../InfoTooltip'
 
-const ImageLabelInput = ({
+const MediaLabelInput = ({
   className,
   label,
   name,
@@ -39,4 +39,4 @@ const ImageLabelInput = ({
   )
 }
 
-export default ImageLabelInput
+export default MediaLabelInput
