@@ -2,8 +2,6 @@ import React, {Component} from 'react'
 import {
   Button,
   Col,
-  Input,
-  InputGroup,
   InputGroupAddon,
   ListGroup,
   ListGroupItem,
@@ -12,6 +10,7 @@ import {
 import {FaSearch} from 'react-icons/fa'
 
 import AppContext from './AppContext'
+import InputWithSpinner from './InputWithSpinner'
 import PreviewImage from './PreviewImage'
 import {findByIdentifier} from '../api'
 
@@ -20,11 +19,13 @@ class IdentifierSearch extends Component {
     super(props)
     this.state = {
       id: '',
+      loading: false,
       result: null,
     }
   }
 
   search = async () => {
+    this.setState({loading: true})
     const result = await findByIdentifier(
       this.context.apiContextPath,
       this.context.mockApi,
@@ -32,24 +33,26 @@ class IdentifierSearch extends Component {
       this.props.namespace,
       this.props.type
     )
-    this.setState({result})
+    this.setState({loading: false, result})
   }
 
   render() {
-    const {id, result} = this.state
+    const {id, loading, result} = this.state
     return (
       <>
-        <InputGroup>
-          <Input
-            onChange={(evt) => this.setState({id: evt.target.value})}
-            value={id}
-          />
+        <InputWithSpinner
+          inputProps={{
+            onChange: (evt) => this.setState({id: evt.target.value}),
+            value: id,
+          }}
+          loading={loading}
+        >
           <InputGroupAddon addonType="append">
             <Button color="primary" disabled={!id.length} onClick={this.search}>
               <FaSearch />
             </Button>
           </InputGroupAddon>
-        </InputGroup>
+        </InputWithSpinner>
         {result && (
           <ListGroup className="suggestion-container">
             <ListGroupItem
