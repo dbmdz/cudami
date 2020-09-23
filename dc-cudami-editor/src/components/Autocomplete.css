@@ -3,5 +3,5 @@
   overflow-y: auto;
   position: absolute;
   width: calc(100% - 2.5rem);
-  z-index: 1;
+  z-index: 6;
 }

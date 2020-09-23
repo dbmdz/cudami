@@ -1,4 +1,4 @@
-import transform from 'lodash/transform'
+import mapValues from 'lodash/mapValues'
 import {publish, subscribe} from 'pubsub-js'
 import React, {Component} from 'react'
 import {Button, Form, Modal, ModalBody, ModalHeader} from 'reactstrap'
@@ -6,18 +6,18 @@ import {withTranslation} from 'react-i18next'
 
 import './MediaAdderModal.css'
 import MediaMetadataForm from './mediaAdder/MediaMetadataForm'
+import MediaPreviewImage from './mediaAdder/MediaPreviewImage'
 import MediaRenderingHintsForm from './mediaAdder/MediaRenderingHintsForm'
 import MediaSelector from './mediaAdder/MediaSelector'
 import AppContext from '../AppContext'
 import {loadIdentifiable, saveFileResource, updateFileResource} from '../../api'
 
-class PreviewImageAdderModal extends Component {
+class VideoAdderModal extends Component {
   initialAttributes = {
-    altText: '',
+    alignment: 'left',
     caption: '',
-    linkNewTab: true,
-    linkUrl: '',
     title: '',
+    width: '33%',
   }
 
   constructor(props) {
@@ -26,8 +26,6 @@ class PreviewImageAdderModal extends Component {
       attributes: this.initialAttributes,
       doUpdateRequest: false,
       editing: false,
-      enableMetadata: true,
-      enableRenderingHints: true,
       fileResource: {},
       metadataOpen: true,
       renderingHintsOpen: false,
@@ -43,34 +41,18 @@ class PreviewImageAdderModal extends Component {
       },
     }
     subscribe(
-      'editor.show-preview-image-modal',
-      (
-        _msg,
-        {
-          attributes = {},
-          editing = false,
-          enableMetadata = true,
-          enableRenderingHints = true,
-          uuid,
-        } = {}
-      ) => {
+      'editor.show-video-modal',
+      (_msg, {attributes = {}, editing = false} = {}) => {
         this.setState({
           attributes: {
             ...this.state.attributes,
-            ...transform(attributes, (result, value, key) => {
-              const keyMapping = {
-                openLinkInNewWindow: 'linkNewTab',
-                targetLink: 'linkUrl',
-              }
-              result[keyMapping[key] ?? key] = value ?? ''
-            }),
+            ...mapValues(attributes, (value) => value ?? ''),
           },
           editing,
-          enableMetadata,
-          enableRenderingHints,
           fileResource: {
             ...this.state.fileResource,
-            uuid,
+            uri: attributes.url ?? '',
+            uuid: attributes.resourceId,
           },
         })
         this.props.onToggle()
@@ -86,15 +68,27 @@ class PreviewImageAdderModal extends Component {
     )
     const initialFileResource = {
       ...newFileResource,
-      fileResourceType: 'IMAGE',
+      fileResourceType: 'VIDEO',
       label: {[this.props.activeLanguage]: ''},
-      mimeType: 'image/png',
+      mimeType: 'video/mp4',
       uri: '',
     }
     this.setState({
       fileResource: initialFileResource,
       initialFileResource,
     })
+  }
+
+  addVideoToEditor = (resourceId) => {
+    const data = {
+      ...mapValues(this.state.attributes, (value) =>
+        value !== '' ? value : undefined
+      ),
+      resourceId,
+      url: this.state.fileResource.uri,
+    }
+    publish('editor.add-video', data)
+    this.destroy()
   }
 
   destroy = () => {
@@ -132,23 +126,29 @@ class PreviewImageAdderModal extends Component {
     })
   }
 
+  setAttributes = (attributes) => {
+    this.setState({
+      attributes: {
+        ...this.state.attributes,
+        ...attributes,
+      },
+    })
+  }
+
   submitFileResource = async () => {
     const {apiContextPath, mockApi} = this.context
-    let fileResource = this.state.fileResource
-    if (!fileResource.uuid) {
-      fileResource = await saveFileResource(
+    let resourceId = this.state.fileResource.uuid
+    if (!resourceId) {
+      const {uuid} = await saveFileResource(
         apiContextPath,
         this.state.fileResource,
         mockApi
       )
+      resourceId = uuid
     } else if (this.state.doUpdateRequest) {
-      fileResource = await updateFileResource(
-        apiContextPath,
-        this.state.fileResource,
-        mockApi
-      )
+      updateFileResource(apiContextPath, this.state.fileResource, mockApi)
     }
-    return fileResource
+    return resourceId
   }
 
   toggleTooltip = (name) => {
@@ -170,47 +170,28 @@ class PreviewImageAdderModal extends Component {
     })
   }
 
-  updatePreviewImage = (fileResource) => {
-    publish('editor.update-preview-image', {
-      previewImage: {
-        ...fileResource,
-        fileResourceType: 'IMAGE',
-      },
-      renderingHints: transform(this.state.attributes, (result, value, key) => {
-        const keyMapping = {
-          linkNewTab: 'openLinkInNewWindow',
-          linkUrl: 'targetLink',
-        }
-        result[keyMapping[key] ?? key] = value !== '' ? value : undefined
-      }),
-    })
-    this.destroy()
-  }
-
   render() {
     const {activeLanguage, isOpen, t} = this.props
     const {
       attributes,
       editing,
-      enableMetadata,
-      enableRenderingHints,
       fileResource,
       metadataOpen,
       renderingHintsOpen,
       tooltipsOpen,
     } = this.state
-    const mediaType = 'image'
+    const mediaType = 'video'
     return (
       <Modal isOpen={isOpen} size="lg" toggle={this.destroy}>
         <ModalHeader toggle={this.destroy}>
-          {editing ? t('editPreviewImage') : t('setPreviewImage')}
+          {editing ? t('insert.video.edit') : t('insert.video.new')}
         </ModalHeader>
         <ModalBody>
           <Form
             onSubmit={async (evt) => {
               evt.preventDefault()
-              const fileResource = await this.submitFileResource()
-              this.updatePreviewImage(fileResource)
+              const resourceId = await this.submitFileResource()
+              this.addVideoToEditor(resourceId)
             }}
           >
             {!editing && (
@@ -224,37 +205,41 @@ class PreviewImageAdderModal extends Component {
                 tooltipsOpen={tooltipsOpen}
               />
             )}
-            {enableMetadata && (
-              <MediaMetadataForm
-                altText={attributes.altText}
-                caption={attributes.caption}
-                isOpen={metadataOpen}
-                mediaType={mediaType}
-                onChange={this.setAttribute}
-                title={attributes.title}
-                toggle={() => this.setState({metadataOpen: !metadataOpen})}
-                toggleTooltip={this.toggleTooltip}
-                tooltipsOpen={tooltipsOpen}
-              />
-            )}
-            {enableRenderingHints && (
-              <MediaRenderingHintsForm
-                enableAlignment={false}
-                enableWidth={false}
-                isOpen={renderingHintsOpen}
-                linkNewTab={attributes.linkNewTab}
-                linkUrl={attributes.linkUrl}
-                mediaType={mediaType}
-                onChange={this.setAttribute}
-                toggle={() =>
-                  this.setState({
-                    renderingHintsOpen: !renderingHintsOpen,
-                  })
-                }
-              />
-            )}
+            <MediaMetadataForm
+              altText={attributes.altText}
+              caption={attributes.caption}
+              enableAltText={false}
+              isOpen={metadataOpen}
+              mediaType={mediaType}
+              onChange={this.setAttribute}
+              title={attributes.title}
+              toggle={() => this.setState({metadataOpen: !metadataOpen})}
+              toggleTooltip={this.toggleTooltip}
+              tooltipsOpen={tooltipsOpen}
+            />
+            <MediaRenderingHintsForm
+              alignment={attributes.alignment}
+              enableLink={false}
+              isOpen={renderingHintsOpen}
+              linkNewTab={attributes.linkNewTab}
+              linkUrl={attributes.linkUrl}
+              mediaType={mediaType}
+              onChange={this.setAttribute}
+              toggle={() =>
+                this.setState({
+                  renderingHintsOpen: !renderingHintsOpen,
+                })
+              }
+              width={attributes.width}
+            />
+            <MediaPreviewImage
+              previewUrl={attributes.previewUrl}
+              onUpdate={(uri, uuid) =>
+                this.setAttributes({previewUrl: uri, previewResourceId: uuid})
+              }
+            />
             <Button className="float-right mt-2" color="primary" type="submit">
-              {t('save')}
+              {editing ? t('save') : t('add')}
             </Button>
           </Form>
         </ModalBody>
@@ -263,6 +248,6 @@ class PreviewImageAdderModal extends Component {
   }
 }
 
-PreviewImageAdderModal.contextType = AppContext
+VideoAdderModal.contextType = AppContext
 
-export default withTranslation()(PreviewImageAdderModal)
+export default withTranslation()(VideoAdderModal)

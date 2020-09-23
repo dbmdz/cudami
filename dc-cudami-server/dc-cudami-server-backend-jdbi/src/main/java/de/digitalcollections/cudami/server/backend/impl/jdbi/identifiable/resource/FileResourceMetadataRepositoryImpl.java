@@ -183,6 +183,10 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
             filterQuery = " AND f.mimetype ilike 'image/%'";
             query.append(filterQuery);
             break;
+          case VIDEO:
+            filterQuery = " AND f.mimetype ilike 'video/%'";
+            query.append(filterQuery);
+            break;
           default:
             break;
         }
@@ -349,7 +353,8 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
             + " f.identifiable_type f_type,"
             + " f.created f_created, f.last_modified f_lastModified,"
             + " f.filename f_filename, f.mimetype f_mimetype, f.size_in_bytes f_sizeInBytes, f.uri f_uri,"
-            + " f.duration f_duration," // file resource type specific fields
+            // file resource type specific fields:
+            + " f.duration f_duration,"
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
             + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.http_base_url pf_httpBaseUrl"
             + " FROM fileresources_audio as f"
@@ -396,9 +401,9 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
         "SELECT f.uuid f_uuid, f.label f_label, f.description f_description,"
             + " f.identifiable_type f_type,"
             + " f.created f_created, f.last_modified f_lastModified,"
-            + " f.filename f_filename, f.mimetype f_mimetype, f.size_in_bytes f_sizeInBytes, f.uri f_uri,"
+            + " f.filename f_filename, f.mimetype f_mimetype, f.size_in_bytes f_sizeInBytes, f.uri f_uri, f.http_base_url f_httpBaseUrl,"
             // file resource type specific fields:
-            + " f.height f_height, f.width f_width, f.http_base_url f_httpBaseUrl,"
+            + " f.height f_height, f.width f_width,"
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
             + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.http_base_url pf_httpBaseUrl"
             + " FROM fileresources_image as f"
@@ -450,8 +455,8 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
             + " f.identifiable_type f_type,"
             + " f.created f_created, f.last_modified f_lastModified,"
             + " f.filename f_filename, f.mimetype f_mimetype, f.size_in_bytes f_sizeInBytes, f.uri f_uri,"
-            + " f.context f_context, f.object_type f_objectType," // file resource type specific
-            // fields
+            // file resource type specific fields:
+            + " f.context f_context, f.object_type f_objectType,"
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
             + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.http_base_url pf_httpBaseUrl"
             + " FROM fileresources_linkeddata as f"
@@ -544,8 +549,9 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
         "SELECT f.uuid f_uuid, f.label f_label, f.description f_description,"
             + " f.identifiable_type f_type,"
             + " f.created f_created, f.last_modified f_lastModified,"
-            + " f.filename f_filename, f.mimetype f_mimetype, f.size_in_bytes f_sizeInBytes, f.uri f_uri,"
-            + " f.duration f_duration," // file resource type specific fields
+            + " f.filename f_filename, f.mimetype f_mimetype, f.size_in_bytes f_sizeInBytes, f.uri f_uri, f.http_base_url f_httpBaseUrl,"
+            // file resource type specific fields:
+            + " f.duration f_duration,"
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
             + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.http_base_url pf_httpBaseUrl"
             + " FROM fileresources_video as f"

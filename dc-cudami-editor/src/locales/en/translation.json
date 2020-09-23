@@ -91,7 +91,11 @@
         "edit": "Edit image",
         "new": "Insert image"
       },
-      "table": "Insert table"
+      "table": "Insert table",
+      "video": {
+        "edit": "Edit video",
+        "new": "Insert video"
+      }
     },
     "insertLink": "Insert hyperlink",
     "invalidLabels": "Please fill in the field \"$t(label)\" in the following languages:",
@@ -123,6 +127,7 @@
     "removeFrom": {
       "collection": "remove from collection"
     },
+    "removePreviewImage": "Remove preview image",
     "removePreviewImageAfterSaveNotification": "Click \"$t(save)\" to confirm the deletion.",
     "save": "Save",
     "selectMedia": {

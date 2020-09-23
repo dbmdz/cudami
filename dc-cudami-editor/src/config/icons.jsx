@@ -5,6 +5,7 @@ import {
   FaBold,
   FaCode,
   FaEdit,
+  FaFilm,
   FaHeading,
   FaImage,
   FaItalic,
@@ -52,4 +53,5 @@ export default {
   table: <FaTable />,
   underline: <FaUnderline />,
   undo: <FaUndo />,
+  video: <FaFilm />,
 }

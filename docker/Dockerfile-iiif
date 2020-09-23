@@ -12,4 +12,4 @@ ADD https://github.com/uclouvain/openjpeg/releases/download/v$OPENJPEG_VERSION/o
 
 RUN tar -xvf /tmp/openjpeg.tar.gz
 
-ENTRYPOINT [ "sh", "-c", "java -jar /hymir.jar --server.port=9000 --spring.profiles.active=PROD" ]
+ENTRYPOINT [ "sh", "-c", "java -jar /hymir.jar --management.server.port=9001 --server.port=9000 --spring.config.additional-location=file:/application-iiif.yml" ]

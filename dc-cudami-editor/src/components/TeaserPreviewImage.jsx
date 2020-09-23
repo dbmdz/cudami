@@ -143,6 +143,7 @@ const TeaserPreviewImage = ({
               )
             }}
             size="sm"
+            title={t('editPreviewImage')}
           >
             <FaEdit />
           </Button>
@@ -156,6 +157,7 @@ const TeaserPreviewImage = ({
               })
             }}
             size="sm"
+            title={t('removePreviewImage')}
           >
             <FaTrashAlt />
           </Button>

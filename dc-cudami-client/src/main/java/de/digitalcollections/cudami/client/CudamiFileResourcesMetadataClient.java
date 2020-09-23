@@ -43,9 +43,10 @@ public class CudamiFileResourcesMetadataClient extends CudamiBaseClient<FileReso
     return response.getContent();
   }
 
-  public SearchPageResponse<FileResourceImpl> findImages(SearchPageRequest searchPageRequest)
-      throws HttpException {
-    return doGetSearchRequestForPagedObjectList("/latest/fileresources/images", searchPageRequest);
+  public SearchPageResponse<FileResourceImpl> findFileResourcesByType(
+      SearchPageRequest searchPageRequest, String type) throws HttpException {
+    return doGetSearchRequestForPagedObjectList(
+        String.format("/latest/fileresources/type/%s", type), searchPageRequest);
   }
 
   public FileResource findOne(UUID uuid) throws HttpException {

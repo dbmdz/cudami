@@ -224,6 +224,19 @@ export default function (t) {
           publish('editor.show-image-modal')
         },
       },
+      video: {
+        title: t('insert.video.new'),
+        content: icons.video,
+        enable: canInsert(schema.nodes.video),
+        run: (state, dispatch) => {
+          const token = subscribe('editor.add-video', (_msg, data) => {
+            const video = schema.nodes.video.createAndFill(data)
+            dispatch(state.tr.replaceSelectionWith(video))
+            unsubscribe(token)
+          })
+          publish('editor.show-video-modal')
+        },
+      },
       hr: {
         title: t('insert.hr'),
         content: icons.hr,

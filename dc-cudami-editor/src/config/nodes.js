@@ -5,6 +5,7 @@ import {footnoteNodes} from '@aeaton/prosemirror-footnotes'
 
 import iframe from './custom/IframeNode'
 import image from './custom/ImageNode'
+import video from './custom/VideoNode'
 
 const listNodes = {
   ordered_list: {
@@ -34,4 +35,5 @@ export default {
   // custom nodes
   iframe,
   image,
+  video,
 }
