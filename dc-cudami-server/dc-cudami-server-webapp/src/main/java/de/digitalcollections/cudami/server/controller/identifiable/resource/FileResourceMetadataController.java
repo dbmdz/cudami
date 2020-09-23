@@ -95,7 +95,7 @@ public class FileResourceMetadataController {
     SearchPageRequest pageRequest =
         new SearchPageRequestImpl(searchTerm, pageNumber, pageSize, sorting);
 
-    FileResourceType fileResourceType = null;
+    FileResourceType fileResourceType;
     switch (type) {
       case "image":
         fileResourceType = FileResourceType.IMAGE;
