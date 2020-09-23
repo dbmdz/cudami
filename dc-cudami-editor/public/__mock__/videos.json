@@ -1,16 +1,16 @@
 {
   "content": [
     {
-      "created": "2020-06-04T13:19:46.130817",
+      "created": "2020-09-18T08:21:22.558052",
       "fileResourceType": "UNDEFINED",
-      "filename": "my-first-image-file-resource.png",
-      "filenameExtension": "png",
+      "filename": "my-first-video-file-resource.mp4",
+      "filenameExtension": "mp4",
       "identifiers": [],
       "label": {
-        "en": "My first image file resource"
+        "en": "My first video file resource"
       },
-      "lastModified": "2020-06-04T13:19:46.130824",
-      "mimeType": "image/png",
+      "lastModified": "2020-09-18T08:21:22.558052",
+      "mimeType": "video/mp4",
       "previewImage": {
         "fileResourceType": "IMAGE",
         "filename": "my-first-image-file-resource.png",
@@ -28,8 +28,8 @@
       "readonly": false,
       "sizeInBytes": 12345,
       "type": "RESOURCE",
-      "uri": "/image.png",
-      "uuid": "6af49346-632a-44e6-bc7e-cee05ed975a2"
+      "uri": "/video.mp4",
+      "uuid": "e72fd475-fafb-48ac-bb82-b7dcaa1e6f87"
     }
   ],
   "totalElements": 1
