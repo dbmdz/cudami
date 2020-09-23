@@ -1,11 +1,12 @@
 import React, {Component} from 'react'
-import {Col, FormGroup, Input, Row} from 'reactstrap'
+import {Col, FormGroup, Row} from 'reactstrap'
 import Autosuggest from 'react-autosuggest'
 import {withTranslation} from 'react-i18next'
 
 import './Autocomplete.css'
 import AppContext from './AppContext'
 import FeedbackMessage from './FeedbackMessage'
+import InputWithSpinner from './InputWithSpinner'
 import PreviewImage from './PreviewImage'
 
 class Autocomplete extends Component {
@@ -15,6 +16,7 @@ class Autocomplete extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      loading: false,
       searchTerm: '',
       suggestions: [],
       totalElements: 0,
@@ -49,6 +51,7 @@ class Autocomplete extends Component {
     if (searchTerm.length < 2) {
       return
     }
+    this.setState({loading: true})
     const {suggestions, totalElements} = await this.props.search(
       this.context.apiContextPath,
       this.context.mockApi,
@@ -57,6 +60,7 @@ class Autocomplete extends Component {
       this.maxElements
     )
     this.setState({
+      loading: false,
       suggestions,
       totalElements,
     })
@@ -72,7 +76,10 @@ class Autocomplete extends Component {
   renderInputComponent = (inputProps) => {
     return (
       <FormGroup className="mb-0">
-        <Input {...inputProps} />
+        <InputWithSpinner
+          inputProps={inputProps}
+          loading={this.state.loading}
+        />
       </FormGroup>
     )
   }
