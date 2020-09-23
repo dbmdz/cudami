@@ -30,7 +30,7 @@ const MediaMetadataForm = ({
 }) => {
   const {t} = useTranslation()
   return (
-    <Card className="media-metadata mb-2">
+    <Card className="media-adder-content media-metadata">
       <CardHeader>
         <Button className="font-weight-bold p-0" color="link" onClick={toggle}>
           {t('enterMetadata')}

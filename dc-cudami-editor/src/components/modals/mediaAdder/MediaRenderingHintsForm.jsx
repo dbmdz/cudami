@@ -28,7 +28,7 @@ const MediaRenderingHintsForm = ({
 }) => {
   const {t} = useTranslation()
   return (
-    <Card className="media-rendering-hints">
+    <Card className="media-adder-content media-rendering-hints">
       <CardHeader>
         <Button className="font-weight-bold p-0" color="link" onClick={toggle}>
           {t('defineRenderingHints')}

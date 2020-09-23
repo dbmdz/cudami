@@ -116,7 +116,7 @@ class MediaSelector extends Component {
     } = this.state
     const {label, previewImage, uri} = fileResource
     return (
-      <Card className="mb-2">
+      <Card className="media-adder-content">
         <CardHeader className="font-weight-bold">
           <Nav className="card-header-tabs" tabs>
             <NavItem>

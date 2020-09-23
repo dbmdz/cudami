@@ -26,6 +26,8 @@ class PreviewImageAdderModal extends Component {
       attributes: this.initialAttributes,
       doUpdateRequest: false,
       editing: false,
+      enableMetadata: true,
+      enableRenderingHints: true,
       fileResource: {},
       metadataOpen: true,
       renderingHintsOpen: false,
@@ -42,7 +44,16 @@ class PreviewImageAdderModal extends Component {
     }
     subscribe(
       'editor.show-preview-image-modal',
-      (_msg, {attributes = {}, editing = false, uuid} = {}) => {
+      (
+        _msg,
+        {
+          attributes = {},
+          editing = false,
+          enableMetadata = true,
+          enableRenderingHints = true,
+          uuid,
+        } = {}
+      ) => {
         this.setState({
           attributes: {
             ...this.state.attributes,
@@ -55,6 +66,8 @@ class PreviewImageAdderModal extends Component {
             }),
           },
           editing,
+          enableMetadata,
+          enableRenderingHints,
           fileResource: {
             ...this.state.fileResource,
             uuid,
@@ -179,6 +192,8 @@ class PreviewImageAdderModal extends Component {
     const {
       attributes,
       editing,
+      enableMetadata,
+      enableRenderingHints,
       fileResource,
       metadataOpen,
       renderingHintsOpen,
@@ -209,31 +224,35 @@ class PreviewImageAdderModal extends Component {
                 tooltipsOpen={tooltipsOpen}
               />
             )}
-            <MediaMetadataForm
-              altText={attributes.altText}
-              caption={attributes.caption}
-              isOpen={metadataOpen}
-              mediaType={mediaType}
-              onChange={this.setAttribute}
-              title={attributes.title}
-              toggle={() => this.setState({metadataOpen: !metadataOpen})}
-              toggleTooltip={this.toggleTooltip}
-              tooltipsOpen={tooltipsOpen}
-            />
-            <MediaRenderingHintsForm
-              enableAlignment={false}
-              enableWidth={false}
-              isOpen={renderingHintsOpen}
-              linkNewTab={attributes.linkNewTab}
-              linkUrl={attributes.linkUrl}
-              mediaType={mediaType}
-              onChange={this.setAttribute}
-              toggle={() =>
-                this.setState({
-                  renderingHintsOpen: !renderingHintsOpen,
-                })
-              }
-            />
+            {enableMetadata && (
+              <MediaMetadataForm
+                altText={attributes.altText}
+                caption={attributes.caption}
+                isOpen={metadataOpen}
+                mediaType={mediaType}
+                onChange={this.setAttribute}
+                title={attributes.title}
+                toggle={() => this.setState({metadataOpen: !metadataOpen})}
+                toggleTooltip={this.toggleTooltip}
+                tooltipsOpen={tooltipsOpen}
+              />
+            )}
+            {enableRenderingHints && (
+              <MediaRenderingHintsForm
+                enableAlignment={false}
+                enableWidth={false}
+                isOpen={renderingHintsOpen}
+                linkNewTab={attributes.linkNewTab}
+                linkUrl={attributes.linkUrl}
+                mediaType={mediaType}
+                onChange={this.setAttribute}
+                toggle={() =>
+                  this.setState({
+                    renderingHintsOpen: !renderingHintsOpen,
+                  })
+                }
+              />
+            )}
             <Button className="float-right mt-2" color="primary" type="submit">
               {t('save')}
             </Button>

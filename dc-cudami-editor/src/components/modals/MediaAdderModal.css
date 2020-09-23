@@ -2,6 +2,10 @@
   max-width: 250px;
 }
 
+.media-adder-content:not(:last-of-type) {
+  margin-bottom: 0.5rem;
+}
+
 .media-metadata .form-group:last-of-type,
 .media-rendering-hints .form-group:last-of-type {
   margin-bottom: 0;
