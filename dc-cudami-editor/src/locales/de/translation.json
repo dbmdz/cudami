@@ -132,6 +132,7 @@
     "save": "Speichern",
     "selectMedia": {
       "searchTerm": "$t(autocomplete.searchTerm) (aus $t({{ mediaType }})-Titel, Dateiname, Kurzbeschreibung)",
+      "uploadFailed": "Beim Hochladen ist ein Fehler eingetreten",
       "uploadSuccessful": "$t({{ mediaType }}) erfolgreich hochgeladen",
       "useSearch": "Vorhandenes $t({{ mediaType }}) verwenden",
       "useUpload": "$t({{ mediaType }}) hochladen",

@@ -32,7 +32,6 @@ class MediaSelector extends Component {
     this.state = {
       activeTab: 'upload',
       progress: 0,
-      showUploadSuccess: false,
       tabToggleEnabled: true,
     }
   }
@@ -71,31 +70,40 @@ class MediaSelector extends Component {
     )
   }
 
-  updateProgress = (progress) => {
-    this.setState({
-      progress,
-    })
-  }
-
   uploadFile = async (file) => {
+    const {mediaType, onChange} = this.props
     this.setState({
       tabToggleEnabled: false,
     })
-    const response = await uploadFile(
-      this.context.apiContextPath,
-      file,
-      this.context.mockApi,
-      this.updateProgress
-    )
-    this.setState({
-      tabToggleEnabled: true,
-      showUploadSuccess: true,
-    })
-    setTimeout(() => this.setState({showUploadSuccess: false}), 3000)
-    this.props.onChange({
-      ...response,
-      uri: this.getMediaUrl(response, this.props.mediaType),
-    })
+    let feedbackMessage = {
+      color: 'success',
+      key: 'selectMedia.uploadSuccessful',
+      values: {mediaType},
+    }
+    try {
+      const response = await uploadFile(
+        this.context.apiContextPath,
+        file,
+        this.context.mockApi,
+        (progress) => this.setState({progress})
+      )
+      onChange({
+        ...response,
+        uri: this.getMediaUrl(response, mediaType),
+      })
+    } catch (err) {
+      console.log(err)
+      feedbackMessage = {
+        color: 'danger',
+        key: 'selectMedia.uploadFailed',
+      }
+    } finally {
+      this.setState({
+        feedbackMessage,
+        tabToggleEnabled: true,
+      })
+      setTimeout(() => this.setState({feedbackMessage: undefined}), 3000)
+    }
   }
 
   render() {
@@ -108,12 +116,7 @@ class MediaSelector extends Component {
       toggleTooltip,
       tooltipsOpen,
     } = this.props
-    const {
-      activeTab,
-      progress,
-      showUploadSuccess,
-      tabToggleEnabled,
-    } = this.state
+    const {activeTab, progress, feedbackMessage, tabToggleEnabled} = this.state
     const {label, previewImage, uri} = fileResource
     return (
       <Card className="media-adder-content">
@@ -198,15 +201,7 @@ class MediaSelector extends Component {
                   width={250}
                 />
               )}
-              {showUploadSuccess && (
-                <FeedbackMessage
-                  message={{
-                    color: 'success',
-                    key: 'selectMedia.uploadSuccessful',
-                    values: {mediaType},
-                  }}
-                />
-              )}
+              {feedbackMessage && <FeedbackMessage message={feedbackMessage} />}
               <FileUploadForm
                 onChange={(file) => this.uploadFile(file)}
                 progress={progress}

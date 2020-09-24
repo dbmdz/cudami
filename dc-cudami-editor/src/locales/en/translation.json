@@ -132,6 +132,7 @@
     "save": "Save",
     "selectMedia": {
       "searchTerm": "$t(autocomplete.searchTerm) (from label, file name, description)",
+      "uploadFailed": "An error occurred while uploading",
       "uploadSuccessful": "$t({{ mediaType }}, capitalize) uploaded successfully",
       "useSearch": "Use existing $t({{ mediaType }})",
       "useUpload": "Upload $t({{ mediaType }})",
