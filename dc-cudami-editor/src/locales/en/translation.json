@@ -161,6 +161,7 @@
       "subcollections": "found {{count}} collections"
     },
     "uploadFileResource": "Upload a new file",
+    "video": "video",
     "view": "view",
     "warning": "Warning",
     "width": "Width",
