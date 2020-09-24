@@ -9,6 +9,7 @@ import MediaMetadataForm from './mediaAdder/MediaMetadataForm'
 import MediaRenderingHintsForm from './mediaAdder/MediaRenderingHintsForm'
 import MediaSelector from './mediaAdder/MediaSelector'
 import AppContext from '../AppContext'
+import {getClosedTooltipsState} from '../utils'
 import {loadIdentifiable, saveFileResource, updateFileResource} from '../../api'
 
 class ImageAdderModal extends Component {
@@ -101,21 +102,15 @@ class ImageAdderModal extends Component {
       fileResource: this.state.initialFileResource,
       metadataOpen: true,
       renderingHintsOpen: false,
-      tooltipsOpen: this.getClosedTooltipsState(),
+      tooltipsOpen: getClosedTooltipsState(this.state.tooltipsOpen),
     })
-  }
-
-  getClosedTooltipsState = () => {
-    return Object.fromEntries(
-      Object.entries(this.state.tooltipsOpen).map(([name, _]) => [name, false])
-    )
   }
 
   onTabChanged = () => {
     this.setState({
       doUpdateRequest: false,
       fileResource: this.state.initialFileResource,
-      tooltipsOpen: this.getClosedTooltipsState(),
+      tooltipsOpen: getClosedTooltipsState(this.state.tooltipsOpen),
     })
   }
 
@@ -147,7 +142,7 @@ class ImageAdderModal extends Component {
   toggleTooltip = (name) => {
     this.setState({
       tooltipsOpen: {
-        ...this.getClosedTooltipsState(),
+        ...getClosedTooltipsState(this.state.tooltipsOpen),
         [name]: !this.state.tooltipsOpen[name],
       },
     })
