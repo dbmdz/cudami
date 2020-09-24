@@ -329,19 +329,20 @@ export async function uploadFile(contextPath, file, mock, updateProgress) {
   }
   return new Promise((resolve, reject) => {
     const request = new XMLHttpRequest()
-    request.onerror = () => reject(request.statusText)
-    request.onload = () => {
-      if (request.status >= 200 && request.status < 300) {
-        resolve(JSON.parse(request.response))
-      } else {
-        reject(request.statusText)
-      }
+    for (let eventType of ['abort', 'error', 'timeout']) {
+      request.addEventListener(eventType, () => reject(request.statusText))
     }
+
+    request.addEventListener('load', () => {
+      resolve(JSON.parse(request.response))
+    })
+
     request.upload.addEventListener('progress', (evt) => {
       if (evt.lengthComputable) {
         updateProgress(Math.round((evt.loaded / evt.total) * 100))
       }
     })
+
     request.open('POST', `${contextPath}api/files`, true)
     const formData = new FormData()
     formData.append('userfile', file, file.name)
