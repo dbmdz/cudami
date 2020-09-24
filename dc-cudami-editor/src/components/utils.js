@@ -1,6 +1,6 @@
 export function getClosedTooltipsState(currentTooltipsState) {
   return Object.fromEntries(
-    Object.entries(currentTooltipsState).map(([name, _]) => [name, false])
+    Object.keys(currentTooltipsState).map((name) => [name, false])
   )
 }
 
