@@ -1,3 +1,9 @@
+export function getClosedTooltipsState(currentTooltipsState) {
+  return Object.fromEntries(
+    Object.entries(currentTooltipsState).map(([name, _]) => [name, false])
+  )
+}
+
 export function getImageUrl(image, width = 'full') {
   if (!image.httpBaseUrl || !image.mimeType) {
     return image.uri
