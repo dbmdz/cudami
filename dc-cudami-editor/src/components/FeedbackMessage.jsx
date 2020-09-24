@@ -6,7 +6,11 @@ import {FaTimes} from 'react-icons/fa'
 const FeedbackMessage = ({className = 'mb-0', message, onClose}) => {
   let {color = 'info', key, links = [], values} = message
   links = links.map((link) => (
-    <a href={link} style={{color: 'inherit', textDecoration: 'underline'}}></a>
+    <a
+      href={link}
+      key={link}
+      style={{color: 'inherit', textDecoration: 'underline'}}
+    ></a>
   ))
   return (
     <Alert className={className} color={color}>
