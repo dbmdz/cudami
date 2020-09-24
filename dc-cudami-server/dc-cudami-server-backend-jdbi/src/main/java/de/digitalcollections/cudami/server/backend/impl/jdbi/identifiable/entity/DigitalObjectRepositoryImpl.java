@@ -696,7 +696,10 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       return false;
     }
 
-    digitalObject.getIdentifiers().stream().forEach(i -> identifierRepository.delete(i.getUuid()));
+    identifierRepository.delete(
+        digitalObject.getIdentifiers().stream()
+            .map(Identifier::getUuid)
+            .collect(Collectors.toList()));
 
     return true;
   }

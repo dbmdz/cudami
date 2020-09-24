@@ -23,4 +23,6 @@ public interface IdentifierRepository {
   Identifier update(Identifier identifier);
 
   void delete(UUID uuid);
+
+  void delete(List<UUID> uuids);
 }

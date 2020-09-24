@@ -125,10 +125,15 @@ public class IdentifierRepositoryImpl extends AbstractPagingAndSortingRepository
 
   @Override
   public void delete(UUID uuid) {
+    delete(List.of(uuid)); // same performance as "where uuid = :uuid"
+  }
+
+  @Override
+  public void delete(List<UUID> uuids) {
     dbi.withHandle(
         h ->
-            h.createUpdate("DELETE FROM identifiers WHERE uuid = :uuid")
-                .bind("uuid", uuid)
+            h.createUpdate("DELETE FROM identifiers WHERE uuid in (<uuids>)")
+                .bindList("uuids", uuids)
                 .execute());
   }
 
