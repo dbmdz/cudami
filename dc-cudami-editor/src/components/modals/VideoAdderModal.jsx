@@ -29,6 +29,7 @@ class VideoAdderModal extends Component {
       editing: false,
       fileResource: {},
       metadataOpen: true,
+      previewImageOpen: false,
       renderingHintsOpen: false,
       tooltipsOpen: {
         altText: false,
@@ -172,6 +173,7 @@ class VideoAdderModal extends Component {
       editing,
       fileResource,
       metadataOpen,
+      previewImageOpen,
       renderingHintsOpen,
       tooltipsOpen,
     } = this.state
@@ -228,9 +230,13 @@ class VideoAdderModal extends Component {
               width={attributes.width}
             />
             <MediaPreviewImage
+              isOpen={previewImageOpen}
               previewUrl={attributes.previewUrl}
               onUpdate={(uri, uuid) =>
                 this.setAttributes({previewUrl: uri, previewResourceId: uuid})
+              }
+              toggle={() =>
+                this.setState({previewImageOpen: !previewImageOpen})
               }
             />
             <Button className="float-right mt-2" color="primary" type="submit">
