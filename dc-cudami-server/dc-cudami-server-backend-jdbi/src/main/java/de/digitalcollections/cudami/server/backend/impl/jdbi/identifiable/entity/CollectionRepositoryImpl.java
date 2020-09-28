@@ -46,7 +46,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
       "SELECT c.uuid c_uuid, c.refid c_refId, c.label c_label, c.description c_description,"
           + " c.identifiable_type c_type, c.entity_type c_entityType,"
           + " c.created c_created, c.last_modified c_lastModified,"
-          + " c.text c_text, c.preview_hints c_previewImageRenderingHints,"
+          + " c.text c_text, c.publication_start c_publicationStart, c.publication_end c_publicationEnd,"
+          + " c.preview_hints c_previewImageRenderingHints,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
           + " FROM collections as c"
@@ -59,6 +60,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
       "SELECT c.uuid c_uuid, c.refid c_refId, c.label c_label, c.description c_description,"
           + " c.identifiable_type c_type, c.entity_type c_entityType,"
           + " c.created c_created, c.last_modified c_lastModified,"
+          + " c.publication_start c_publicationStart, c.publication_end c_publicationEnd,"
           + " c.preview_hints c_previewImageRenderingHints,"
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
           + " FROM collections as c"
@@ -430,12 +432,12 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + "uuid, label, description, previewfileresource, preview_hints,"
             + " identifiable_type, entity_type,"
             + " created, last_modified,"
-            + " text"
+            + " text, publication_start, publication_end"
             + ") VALUES ("
             + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
             + " :type, :entityType,"
             + " :created, :lastModified,"
-            + " :text::JSONB"
+            + " :text::JSONB, :publicationStart, :publicationEnd"
             + ")";
 
     dbi.withHandle(
@@ -524,7 +526,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + " label=:label::JSONB, description=:description::JSONB,"
             + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
             + " last_modified=:lastModified,"
-            + " text=:text::JSONB"
+            + " text=:text::JSONB, publication_start=:publicationStart, publication_end=:publicationEnd"
             + " WHERE uuid=:uuid";
 
     dbi.withHandle(
@@ -546,7 +548,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[] {"created", "lastModified", "refId"};
+    return new String[] {"created", "lastModified", "publicationEnd", "publicationStart", "refId"};
   }
 
   @Override
@@ -559,6 +561,10 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
         return "c.created";
       case "lastModified":
         return "c.last_modified";
+      case "publicationEnd":
+        return "c.publication_end";
+      case "publicationStart":
+        return "c.publication_start";
       case "refId":
         return "c.refid";
       default:
