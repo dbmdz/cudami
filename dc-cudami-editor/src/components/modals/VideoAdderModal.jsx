@@ -10,7 +10,6 @@ import MediaPreviewImage from './mediaAdder/MediaPreviewImage'
 import MediaRenderingHintsForm from './mediaAdder/MediaRenderingHintsForm'
 import MediaSelector from './mediaAdder/MediaSelector'
 import AppContext from '../AppContext'
-import {getClosedTooltipsState} from '../utils'
 import {loadIdentifiable, saveFileResource, updateFileResource} from '../../api'
 
 class VideoAdderModal extends Component {
@@ -31,16 +30,6 @@ class VideoAdderModal extends Component {
       metadataOpen: true,
       previewImageOpen: false,
       renderingHintsOpen: false,
-      tooltipsOpen: {
-        altText: false,
-        caption: false,
-        labelUpload: false,
-        labelUrl: false,
-        search: false,
-        title: false,
-        upload: false,
-        url: false,
-      },
     }
     subscribe(
       'editor.show-video-modal',
@@ -101,7 +90,6 @@ class VideoAdderModal extends Component {
       fileResource: this.state.initialFileResource,
       metadataOpen: true,
       renderingHintsOpen: false,
-      tooltipsOpen: getClosedTooltipsState(this.state.tooltipsOpen),
     })
   }
 
@@ -109,7 +97,6 @@ class VideoAdderModal extends Component {
     this.setState({
       doUpdateRequest: false,
       fileResource: this.state.initialFileResource,
-      tooltipsOpen: getClosedTooltipsState(this.state.tooltipsOpen),
     })
   }
 
@@ -147,15 +134,6 @@ class VideoAdderModal extends Component {
     return resourceId
   }
 
-  toggleTooltip = (name) => {
-    this.setState({
-      tooltipsOpen: {
-        ...getClosedTooltipsState(this.state.tooltipsOpen),
-        [name]: !this.state.tooltipsOpen[name],
-      },
-    })
-  }
-
   updateFileResource = (updateFields, additionalFields = {}) => {
     this.setState({
       fileResource: {
@@ -175,7 +153,6 @@ class VideoAdderModal extends Component {
       metadataOpen,
       previewImageOpen,
       renderingHintsOpen,
-      tooltipsOpen,
     } = this.state
     const mediaType = 'video'
     return (
@@ -198,8 +175,6 @@ class VideoAdderModal extends Component {
                 mediaType={mediaType}
                 onChange={this.updateFileResource}
                 onTabChanged={this.onTabChanged}
-                toggleTooltip={this.toggleTooltip}
-                tooltipsOpen={tooltipsOpen}
               />
             )}
             <MediaMetadataForm
@@ -211,8 +186,6 @@ class VideoAdderModal extends Component {
               onChange={this.setAttribute}
               title={attributes.title}
               toggle={() => this.setState({metadataOpen: !metadataOpen})}
-              toggleTooltip={this.toggleTooltip}
-              tooltipsOpen={tooltipsOpen}
             />
             <MediaRenderingHintsForm
               alignment={attributes.alignment}

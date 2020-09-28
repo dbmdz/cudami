@@ -1,8 +1,8 @@
 import React from 'react'
-import {Button, Popover, PopoverBody} from 'reactstrap'
+import {Button, PopoverBody, UncontrolledPopover} from 'reactstrap'
 import {FaQuestionCircle} from 'react-icons/fa'
 
-const InfoTooltip = ({isOpen, name, text, toggle}) => (
+const InfoTooltip = ({name, text}) => (
   <>
     <Button
       className="border"
@@ -12,14 +12,13 @@ const InfoTooltip = ({isOpen, name, text, toggle}) => (
     >
       <FaQuestionCircle />
     </Button>
-    <Popover
-      isOpen={isOpen}
+    <UncontrolledPopover
       placement="left"
       target={`${name}-tooltip`}
-      toggle={toggle}
+      trigger="focus"
     >
       <PopoverBody>{text}</PopoverBody>
-    </Popover>
+    </UncontrolledPopover>
   </>
 )
 
