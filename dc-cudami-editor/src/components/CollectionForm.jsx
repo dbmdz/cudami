@@ -16,6 +16,7 @@ import FormIdInput from './FormIdInput'
 import FormButtons from './FormButtons'
 import LanguageAdder from './LanguageAdder'
 import LanguageTab from './LanguageTab'
+import PublicationDatesForm from './PublicationDatesForm'
 import Teaser from './Teaser'
 
 const CollectionForm = ({
@@ -54,6 +55,13 @@ const CollectionForm = ({
       <Row>
         <Col sm="12">
           {identifiable.uuid && <FormIdInput id={identifiable.uuid} />}
+          <PublicationDatesForm
+            onChange={(updateKey, updateValue) =>
+              onUpdate({...identifiable, [updateKey]: updateValue})
+            }
+            publicationEndDate={identifiable.publicationEnd}
+            publicationStartDate={identifiable.publicationStart}
+          />
           <Nav tabs>
             {existingLanguages.map((language) => (
               <LanguageTab
