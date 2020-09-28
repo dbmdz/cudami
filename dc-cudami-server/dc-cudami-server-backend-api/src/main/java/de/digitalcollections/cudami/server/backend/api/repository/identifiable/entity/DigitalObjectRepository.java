@@ -44,4 +44,8 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
       DigitalObject digitalObject, List<FileResource> fileResources);
 
   List<FileResource> saveFileResources(UUID digitalObjectUuid, List<FileResource> fileResources);
+
+  void deleteFileResources(UUID digitalObjectUuid);
+
+  boolean deleteIdentifiers(UUID digitalObjectUuid);
 }

@@ -780,4 +780,18 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     }
     return false;
   }
+
+  @Override
+  public boolean removeDigitalObjectFromAllCollections(DigitalObject digitalObject) {
+    if (digitalObject == null) {
+      return false;
+    }
+
+    String query =
+        "DELETE FROM collection_digitalobjects WHERE digitalobject_uuid=:digitalObjectUuid";
+
+    dbi.withHandle(
+        h -> h.createUpdate(query).bind("digitalObjectUuid", digitalObject.getUuid()).execute());
+    return true;
+  }
 }

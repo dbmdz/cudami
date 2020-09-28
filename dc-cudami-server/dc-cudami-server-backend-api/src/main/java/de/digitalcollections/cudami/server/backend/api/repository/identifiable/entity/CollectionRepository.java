@@ -93,4 +93,12 @@ public interface CollectionRepository
   }
 
   boolean removeChild(UUID parentUuid, UUID childUuid);
+
+  /**
+   * Removes a digitalObject from all collections, to which is was connected to
+   *
+   * @param digitalObject the DigitalObject
+   * @return boolean value for success
+   */
+  boolean removeDigitalObjectFromAllCollections(DigitalObject digitalObject);
 }

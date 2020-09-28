@@ -22,4 +22,6 @@ public interface ProjectService extends EntityService<Project> {
   void delete(UUID uuid);
 
   List<Project> getAll();
+
+  boolean removeDigitalObjectFromAllProjects(DigitalObject digitalObject);
 }

@@ -36,4 +36,6 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
    * @return partially (see above) filled list of all DigitalObjects
    */
   List<DigitalObject> findAllReduced();
+
+  boolean delete(UUID uuid);
 }

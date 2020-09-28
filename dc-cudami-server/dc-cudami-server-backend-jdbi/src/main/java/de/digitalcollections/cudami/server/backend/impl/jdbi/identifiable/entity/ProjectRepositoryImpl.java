@@ -473,4 +473,17 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
     }
     return false;
   }
+
+  @Override
+  public boolean removeDigitalObjectFromAllProjects(UUID digitalObjectUuid) {
+    if (digitalObjectUuid == null) {
+      return false;
+    }
+
+    String query = "DELETE FROM project_digitalobjects WHERE digitalobject_uuid=:digitalObjectUuid";
+
+    dbi.withHandle(
+        h -> h.createUpdate(query).bind("digitalObjectUuid", digitalObjectUuid).execute());
+    return true;
+  }
 }

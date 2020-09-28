@@ -104,4 +104,9 @@ public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObjectIm
     return doPutRequestForObject(
         String.format("/latest/digitalobjects/%s", uuid), (DigitalObjectImpl) digitalObject);
   }
+
+  public boolean delete(UUID uuid) throws HttpException {
+    return Boolean.parseBoolean(
+        doDeleteRequestForString(String.format("/latest/digitalobjects/%s", uuid)));
+  }
 }

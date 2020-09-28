@@ -625,6 +625,16 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
+  public void deleteFileResources(UUID digitalObjectUuid) {
+    dbi.withHandle(
+        h ->
+            h.createUpdate(
+                    "DELETE FROM digitalobject_fileresources WHERE digitalobject_uuid = :uuid")
+                .bind("uuid", digitalObjectUuid)
+                .execute());
+  }
+
+  @Override
   public DigitalObject update(DigitalObject digitalObject) {
     digitalObject.setLastModified(LocalDateTime.now());
 
@@ -677,5 +687,20 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       default:
         return null;
     }
+  }
+
+  @Override
+  public boolean deleteIdentifiers(UUID digitalObjectUuid) {
+    DigitalObject digitalObject = findOne(digitalObjectUuid);
+    if (digitalObject == null) {
+      return false;
+    }
+
+    identifierRepository.delete(
+        digitalObject.getIdentifiers().stream()
+            .map(Identifier::getUuid)
+            .collect(Collectors.toList()));
+
+    return true;
   }
 }
