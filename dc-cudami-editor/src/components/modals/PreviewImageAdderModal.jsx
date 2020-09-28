@@ -9,7 +9,6 @@ import MediaMetadataForm from './mediaAdder/MediaMetadataForm'
 import MediaRenderingHintsForm from './mediaAdder/MediaRenderingHintsForm'
 import MediaSelector from './mediaAdder/MediaSelector'
 import AppContext from '../AppContext'
-import {getClosedTooltipsState} from '../utils'
 import {loadIdentifiable, saveFileResource, updateFileResource} from '../../api'
 
 class PreviewImageAdderModal extends Component {
@@ -32,16 +31,6 @@ class PreviewImageAdderModal extends Component {
       fileResource: {},
       metadataOpen: true,
       renderingHintsOpen: false,
-      tooltipsOpen: {
-        altText: false,
-        caption: false,
-        labelUpload: false,
-        labelUrl: false,
-        search: false,
-        title: false,
-        upload: false,
-        url: false,
-      },
     }
     subscribe(
       'editor.show-preview-image-modal',
@@ -106,7 +95,6 @@ class PreviewImageAdderModal extends Component {
       fileResource: this.state.initialFileResource,
       metadataOpen: true,
       renderingHintsOpen: false,
-      tooltipsOpen: getClosedTooltipsState(this.state.tooltipsOpen),
     })
   }
 
@@ -114,7 +102,6 @@ class PreviewImageAdderModal extends Component {
     this.setState({
       doUpdateRequest: false,
       fileResource: this.state.initialFileResource,
-      tooltipsOpen: getClosedTooltipsState(this.state.tooltipsOpen),
     })
   }
 
@@ -144,15 +131,6 @@ class PreviewImageAdderModal extends Component {
       )
     }
     return fileResource
-  }
-
-  toggleTooltip = (name) => {
-    this.setState({
-      tooltipsOpen: {
-        ...getClosedTooltipsState(this.state.tooltipsOpen),
-        [name]: !this.state.tooltipsOpen[name],
-      },
-    })
   }
 
   updateFileResource = (updateFields, additionalFields = {}) => {
@@ -192,7 +170,6 @@ class PreviewImageAdderModal extends Component {
       fileResource,
       metadataOpen,
       renderingHintsOpen,
-      tooltipsOpen,
     } = this.state
     const mediaType = 'image'
     return (
@@ -215,8 +192,6 @@ class PreviewImageAdderModal extends Component {
                 mediaType={mediaType}
                 onChange={this.updateFileResource}
                 onTabChanged={this.onTabChanged}
-                toggleTooltip={this.toggleTooltip}
-                tooltipsOpen={tooltipsOpen}
               />
             )}
             {enableMetadata && (
@@ -228,8 +203,6 @@ class PreviewImageAdderModal extends Component {
                 onChange={this.setAttribute}
                 title={attributes.title}
                 toggle={() => this.setState({metadataOpen: !metadataOpen})}
-                toggleTooltip={this.toggleTooltip}
-                tooltipsOpen={tooltipsOpen}
               />
             )}
             {enableRenderingHints && (

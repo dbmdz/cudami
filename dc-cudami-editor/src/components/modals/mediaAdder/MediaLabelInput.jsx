@@ -5,15 +5,7 @@ import {useTranslation} from 'react-i18next'
 
 import InfoTooltip from '../../InfoTooltip'
 
-const MediaLabelInput = ({
-  className,
-  label,
-  name,
-  onChange,
-  toggleTooltip,
-  tooltipName,
-  tooltipsOpen,
-}) => {
+const MediaLabelInput = ({className, label, name, onChange}) => {
   const {t} = useTranslation()
   return (
     <FormGroup className={classNames(['mb-0', className])}>
@@ -27,12 +19,7 @@ const MediaLabelInput = ({
           value={label ? Object.values(label)[0] : ''}
         />
         <InputGroupAddon addonType="append">
-          <InfoTooltip
-            isOpen={tooltipsOpen[tooltipName]}
-            name={name}
-            text={t('tooltips.label')}
-            toggle={() => toggleTooltip(tooltipName)}
-          />
+          <InfoTooltip name={name} text={t('tooltips.label')} />
         </InputGroupAddon>
       </InputGroup>
     </FormGroup>

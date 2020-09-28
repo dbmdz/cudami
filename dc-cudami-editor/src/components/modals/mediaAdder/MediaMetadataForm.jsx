@@ -25,8 +25,6 @@ const MediaMetadataForm = ({
   onChange,
   title,
   toggle,
-  toggleTooltip,
-  tooltipsOpen,
 }) => {
   const {t} = useTranslation()
   return (
@@ -49,10 +47,8 @@ const MediaMetadataForm = ({
                 />
                 <InputGroupAddon addonType="append">
                   <InfoTooltip
-                    isOpen={tooltipsOpen.caption}
                     name={`${mediaType}-caption`}
                     text={t('tooltips.caption')}
-                    toggle={() => toggleTooltip('caption')}
                   />
                 </InputGroupAddon>
               </InputGroup>
@@ -69,10 +65,8 @@ const MediaMetadataForm = ({
                 />
                 <InputGroupAddon addonType="append">
                   <InfoTooltip
-                    isOpen={tooltipsOpen.title}
                     name={`${mediaType}-title`}
                     text={t('tooltips.title')}
-                    toggle={() => toggleTooltip('title')}
                   />
                 </InputGroupAddon>
               </InputGroup>
@@ -89,10 +83,8 @@ const MediaMetadataForm = ({
                 />
                 <InputGroupAddon addonType="append">
                   <InfoTooltip
-                    isOpen={tooltipsOpen.altText}
                     name={`${mediaType}-alttext`}
                     text={t('tooltips.altText')}
-                    toggle={() => toggleTooltip('altText')}
                   />
                 </InputGroupAddon>
               </InputGroup>
