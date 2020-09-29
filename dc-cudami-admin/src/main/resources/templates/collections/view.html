@@ -66,6 +66,14 @@
                 </th:block>
               </div>
             </div>
+            <div class="row" th:if="${not #lists.isEmpty(parents)}">
+              <div class="col-md-3"><label class="font-weight-bold" th:text="#{parent_collections}">Parent collections</label></div>
+              <div class="col-md-9">
+                <th:block th:each="parent,iterStat: ${parents}">
+                <a th:href="@{/collections/} + ${parent.uuid}"><th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${parent.label}, ${locale})">Parent Label</th:block></a>
+              </th:block>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -79,6 +79,11 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
+  public List<Collection> getParents(UUID uuid) {
+    return ((CollectionRepository) repository).getParents(uuid);
+  }
+
+  @Override
   public PageResponse<Collection> getTopCollections(PageRequest pageRequest) {
     return ((CollectionRepository) repository).getTopCollections(pageRequest);
   }

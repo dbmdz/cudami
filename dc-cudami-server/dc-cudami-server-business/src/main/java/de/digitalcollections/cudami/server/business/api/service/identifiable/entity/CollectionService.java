@@ -21,6 +21,8 @@ public interface CollectionService extends NodeService<Collection>, EntityServic
 
   PageResponse<DigitalObject> getDigitalObjects(Collection collection, PageRequest pageRequest);
 
+  List<Collection> getParents(UUID uuid);
+
   PageResponse<Collection> getTopCollections(PageRequest pageRequest);
 
   boolean removeChild(Collection parent, Collection child);

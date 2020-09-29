@@ -327,6 +327,17 @@ public class CollectionController {
     return collectionService.getDigitalObjects(collection, pageRequest);
   }
 
+  @ApiMethod(description = "Get parent collections")
+  @GetMapping(
+      value = {"/latest/collections/{uuid}/parents", "/v3/collections/{uuid}/parents"},
+      produces = "application/json")
+  @ApiResponseObject
+  public List<Collection> getParents(
+      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
+          UUID collectionUuid) {
+    return collectionService.getParents(collectionUuid);
+  }
+
   @ApiMethod(description = "Remove an existing digital object from an existing collection")
   @DeleteMapping(
       value = {

@@ -297,6 +297,9 @@ public class CollectionsController extends AbstractController {
         languageSortingHelper.sortLanguages(displayLocale, existingSubcollectionLanguages));
     model.addAttribute("collection", collection);
 
+    List<CollectionImpl> parents = service.getParents(uuid);
+    model.addAttribute("parents", parents);
+
     List<Node> breadcrumbs = new ArrayList<>();
     addParentNodeToBreadcrumb(collection, breadcrumbs);
     Collections.reverse(breadcrumbs);
