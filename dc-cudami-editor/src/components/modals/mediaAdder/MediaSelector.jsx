@@ -9,19 +9,17 @@ import {
   Nav,
   NavItem,
   NavLink,
-  PopoverBody,
   TabContent,
   TabPane,
-  UncontrolledPopover,
 } from 'reactstrap'
 import {withTranslation} from 'react-i18next'
-import {FaQuestionCircle} from 'react-icons/fa'
 
 import MediaLabelInput from './MediaLabelInput'
 import AppContext from '../../AppContext'
 import Autocomplete from '../../Autocomplete'
 import FeedbackMessage from '../../FeedbackMessage'
 import FileUploadForm from '../../FileUploadForm'
+import InfoTooltip from '../../InfoTooltip'
 import PreviewImage from '../../PreviewImage'
 import {getImageUrl, getVideoUrl} from '../../utils'
 import {searchMedia, uploadFile} from '../../../api'
@@ -124,14 +122,12 @@ class MediaSelector extends Component {
                 onClick={(evt) => this.toggleTab('upload', evt)}
               >
                 {t('selectMedia.useUpload', {mediaType})}
-                <FaQuestionCircle className="ml-1" id="upload-tooltip" />
-                <UncontrolledPopover
-                  placement="top"
-                  target="upload-tooltip"
-                  trigger="focus"
-                >
-                  <PopoverBody>{t('tooltips.upload')}</PopoverBody>
-                </UncontrolledPopover>
+                <InfoTooltip
+                  className="ml-1 p-0"
+                  color="link"
+                  name="upload"
+                  text={t('tooltips.upload')}
+                />
               </NavLink>
             </NavItem>
             <NavItem>
@@ -142,14 +138,12 @@ class MediaSelector extends Component {
                 onClick={(evt) => this.toggleTab('url', evt)}
               >
                 {t('selectMedia.useUrl', {mediaType})}
-                <FaQuestionCircle className="ml-1" id="url-tooltip" />
-                <UncontrolledPopover
-                  placement="top"
-                  target="url-tooltip"
-                  trigger="focus"
-                >
-                  <PopoverBody>{t('tooltips.url')}</PopoverBody>
-                </UncontrolledPopover>
+                <InfoTooltip
+                  className="ml-1 p-0"
+                  color="link"
+                  name="url"
+                  text={t('tooltips.url')}
+                />
               </NavLink>
             </NavItem>
             <NavItem>
@@ -162,14 +156,12 @@ class MediaSelector extends Component {
                 onClick={(evt) => this.toggleTab('search', evt)}
               >
                 {t('selectMedia.useSearch', {mediaType})}
-                <FaQuestionCircle className="ml-1" id="search-tooltip" />
-                <UncontrolledPopover
-                  placement="top"
-                  target="search-tooltip"
-                  trigger="focus"
-                >
-                  <PopoverBody>{t('tooltips.search')}</PopoverBody>
-                </UncontrolledPopover>
+                <InfoTooltip
+                  className="ml-1 p-0"
+                  color="link"
+                  name="search"
+                  text={t('tooltips.search')}
+                />
               </NavLink>
             </NavItem>
           </Nav>
