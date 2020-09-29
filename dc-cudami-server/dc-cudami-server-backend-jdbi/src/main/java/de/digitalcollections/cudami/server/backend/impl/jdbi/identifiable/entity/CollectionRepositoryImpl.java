@@ -2,6 +2,9 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CollectionRepository;
+import de.digitalcollections.model.api.filter.FilterCriterion;
+import de.digitalcollections.model.api.filter.Filtering;
+import de.digitalcollections.model.api.filter.enums.FilterOperation;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
@@ -665,6 +668,34 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   public PageResponse<Collection> getChildren(UUID uuid, PageRequest pageRequest) {
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
     StringBuilder query = new StringBuilder(BASE_CHILDREN_QUERY);
+
+    // handle optional filtering params
+    Filtering filtering = pageRequest.getFiltering();
+    if (filtering != null) {
+      // handle publication start criteria
+      FilterCriterion fc = (FilterCriterion) filtering.getFilterCriterionFor("publicationStart");
+      if (fc != null) {
+        query.append(" AND ").append(getWhereClause(fc));
+      }
+
+      // handle publication end criteria
+      fc = (FilterCriterion) filtering.getFilterCriterionFor("publicationEnd");
+      if (fc != null) {
+        if (fc.getOperation() == FilterOperation.GREATER_THAN_OR_EQUAL_TO) {
+          query
+              .append(" AND (")
+              .append(getWhereClause(fc))
+              .append(" OR ")
+              .append(getColumnName("publicationEnd"))
+              .append(" IS NULL")
+              .append(")");
+        } else {
+          query.append(" AND ").append(getWhereClause(fc));
+        }
+      }
+    }
+    query.append(" ORDER BY cc.sortIndex ASC");
+    pageRequest.setSorting(null);
     addPageRequestParams(pageRequest, query);
     List<Collection> result =
         new ArrayList(
