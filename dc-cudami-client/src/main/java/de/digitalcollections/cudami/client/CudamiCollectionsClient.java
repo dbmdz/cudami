@@ -100,6 +100,10 @@ public class CudamiCollectionsClient extends CudamiBaseClient<CollectionImpl> {
             String.format("/latest/collections/%s/parent", uuid), CollectionImpl.class);
   }
 
+  public List<CollectionImpl> getParents(UUID uuid) throws HttpException {
+    return doGetRequestForObjectList(String.format("/latest/collections/%s/parents", uuid));
+  }
+
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws HttpException {
     return (BreadcrumbNavigation)
         doGetRequestForObject(

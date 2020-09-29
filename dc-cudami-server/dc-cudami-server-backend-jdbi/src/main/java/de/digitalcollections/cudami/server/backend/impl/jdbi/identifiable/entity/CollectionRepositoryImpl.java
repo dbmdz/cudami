@@ -632,6 +632,42 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
+  public List<Collection> getParents(UUID uuid) {
+    String query =
+        REDUCED_FIND_ONE_BASE_SQL
+            + " INNER JOIN collection_collections cc ON c.uuid = cc.parent_collection_uuid"
+            + " WHERE cc.child_collection_uuid = :uuid";
+
+    List<Collection> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(query)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, CollectionImpl>(),
+                            (map, rowView) -> {
+                              CollectionImpl parent =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("c_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(CollectionImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                parent.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            }))
+            .values()
+            .stream()
+            .collect(Collectors.toList());
+    return result;
+  }
+
+  @Override
   public List<Collection> getChildren(UUID uuid) {
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
     String query = BASE_CHILDREN_QUERY + " ORDER BY cc.sortIndex ASC";

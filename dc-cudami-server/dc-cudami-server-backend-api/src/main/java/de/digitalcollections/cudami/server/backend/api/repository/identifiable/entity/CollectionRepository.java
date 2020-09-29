@@ -94,6 +94,8 @@ public interface CollectionRepository
 
   boolean removeChild(UUID parentUuid, UUID childUuid);
 
+  List<Collection> getParents(UUID uuid);
+
   /**
    * Removes a digitalObject from all collections, to which is was connected to
    *
