@@ -3,34 +3,31 @@ import {Col, FormGroup, Label, Row} from 'reactstrap'
 import DatePicker from 'react-date-picker'
 import {useTranslation} from 'react-i18next'
 
+const formatDate = (date) => {
+  if (date) {
+    // Selected datetime will be displayed correctly in DatePicker.
+    // But after reloading, there's a minus one-day offset. Here
+    // we add 12 hours (could be related to the time zone of the user)
+    // to the user-defined date to workaround this issue 😒
+    date.setHours(date.getHours() + 12)
+    return date.toISOString().slice(0, 10)
+  }
+  return undefined
+}
+
 const PublicationDatesForm = ({
   onChange,
   publicationEndDate,
   publicationStartDate,
 }) => {
   const {t} = useTranslation()
-
-  const formatDate = (date) => {
-    if (date) {
-      // Selected datetime will be displayed correctly in DatePicker.
-      // But after reloading, there's a minus one-day offset. Here
-      // we add 12 hours (could be related to the time zone of the user)
-      // to the user-defined date to workaround this issue 😒
-      date.setHours(date.getHours() + 12)
-      return date.toISOString().slice(0, 10)
-    }
-    return undefined
-  }
-
   return (
-    <FormGroup>
-      <Row>
-        <Col>
-          <Label className="font-weight-bold" for="publication-start-date">
+    <Row>
+      <Col sm="2">
+        <FormGroup>
+          <Label className="font-weight-bold mr-2" for="publication-start-date">
             {t('startPublicationDate')}:
           </Label>
-        </Col>
-        <Col>
           <DatePicker
             calendarAriaLabel={t('datePicker.toggleCalendar')}
             clearAriaLabel={t('datePicker.clearDate')}
@@ -43,13 +40,13 @@ const PublicationDatesForm = ({
             value={publicationStartDate && new Date(publicationStartDate)}
             yearAriaLabel={t('datePicker.year')}
           />
-        </Col>
-        <Col>
-          <Label className="font-weight-bold" for="publication-end-date">
+        </FormGroup>
+      </Col>
+      <Col sm="2">
+        <FormGroup>
+          <Label className="font-weight-bold mr-2" for="publication-end-date">
             {t('endPublicationDate')}:
           </Label>
-        </Col>
-        <Col>
           <DatePicker
             calendarAriaLabel={t('datePicker.toggleCalendar')}
             clearAriaLabel={t('datePicker.clearDate')}
@@ -62,9 +59,9 @@ const PublicationDatesForm = ({
             value={publicationEndDate && new Date(publicationEndDate)}
             yearAriaLabel={t('datePicker.year')}
           />
-        </Col>
-      </Row>
-    </FormGroup>
+        </FormGroup>
+      </Col>
+    </Row>
   )
 }
 
