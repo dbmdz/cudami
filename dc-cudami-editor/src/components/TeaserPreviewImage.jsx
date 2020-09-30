@@ -92,7 +92,7 @@ const TeaserPreviewImage = ({
   const {t} = useTranslation()
   if (!previewImage) {
     return (
-      <Card className="rounded text-center">
+      <Card className="rounded text-center" style={{zIndex: 0}}>
         <CardBody>
           <Button
             className="stretched-link"
