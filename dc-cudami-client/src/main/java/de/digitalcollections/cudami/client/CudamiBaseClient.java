@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import de.digitalcollections.cudami.client.exceptions.CudamiRestErrorDecoder;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
+import de.digitalcollections.model.api.filter.FilterCriterion;
+import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.paging.FindParams;
 import de.digitalcollections.model.api.paging.Order;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -27,6 +29,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -245,6 +248,10 @@ public class CudamiBaseClient<T extends Object> {
                 findParams.getSortField(),
                 findParams.getSortDirection(),
                 findParams.getNullHandling());
+    Filtering filtering = pageRequest.getFiltering();
+    if (filtering != null) {
+      requestUrl += "&" + getFilterParamsAsString(filtering.getFilterCriterias());
+    }
     HttpRequest req = createGetRequest(requestUrl);
     try {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
@@ -579,6 +586,16 @@ public class CudamiBaseClient<T extends Object> {
     } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to error", e);
     }
+  }
+
+  /**
+   * Converts the given list of filter criterias to a request string
+   *
+   * @param filterCriterias a list of filter criterias
+   * @return the filter criterias as request string
+   */
+  private String getFilterParamsAsString(List<FilterCriterion> filterCriterias) {
+    return filterCriterias.stream().map(Object::toString).collect(Collectors.joining("&"));
   }
 
   /**
