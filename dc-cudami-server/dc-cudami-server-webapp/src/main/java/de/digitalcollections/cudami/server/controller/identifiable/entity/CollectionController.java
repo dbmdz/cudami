@@ -71,10 +71,19 @@ public class CollectionController {
       @RequestParam(name = "sortDirection", required = false, defaultValue = "DESC")
           Direction sortDirection,
       @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
-          NullHandling nullHandling) {
+          NullHandling nullHandling,
+      @RequestParam(name = "publicationStart", required = false)
+          FilterCriterion<LocalDate> publicationStart,
+      @RequestParam(name = "publicationEnd", required = false)
+          FilterCriterion<LocalDate> publicationEnd) {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
+    Filtering filtering =
+        Filtering.defaultBuilder()
+            .add("publicationStart", publicationStart)
+            .add("publicationEnd", publicationEnd)
+            .build();
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting, filtering);
     return collectionService.find(pageRequest);
   }
 
