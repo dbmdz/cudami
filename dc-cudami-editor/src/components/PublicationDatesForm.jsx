@@ -1,7 +1,9 @@
-import React from 'react'
+import React, {useContext} from 'react'
 import {Col, FormGroup, Label, Row} from 'reactstrap'
 import DatePicker from 'react-date-picker'
 import {useTranslation} from 'react-i18next'
+
+import AppContext from './AppContext'
 
 const formatDate = (date) => {
   if (date) {
@@ -20,6 +22,7 @@ const PublicationDatesForm = ({
   publicationEndDate,
   publicationStartDate,
 }) => {
+  const {uiLocale} = useContext(AppContext)
   const {t} = useTranslation()
   return (
     <Row>
@@ -33,6 +36,7 @@ const PublicationDatesForm = ({
             clearAriaLabel={t('datePicker.clearDate')}
             dayAriaLabel={t('datePicker.day')}
             id={'publication-start-date'}
+            locale={uiLocale}
             monthAriaLabel={t('datePicker.month')}
             nativeInputAriaLabel={t('datePicker.date')}
             onChange={(date) => onChange('publicationStart', formatDate(date))}
@@ -52,6 +56,7 @@ const PublicationDatesForm = ({
             clearAriaLabel={t('datePicker.clearDate')}
             dayAriaLabel={t('datePicker.day')}
             id={'publication-end-date'}
+            locale={uiLocale}
             monthAriaLabel={t('datePicker.month')}
             nativeInputAriaLabel={t('datePicker.date')}
             onChange={(date) => onChange('publicationEnd', formatDate(date))}
