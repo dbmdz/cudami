@@ -163,8 +163,31 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   @Override
   public PageResponse<Collection> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder(REDUCED_FIND_ONE_BASE_SQL);
-    addPageRequestParams(pageRequest, query);
 
+    // handle optional filtering params
+    Filtering filtering = pageRequest.getFiltering();
+    if (filtering != null) {
+      List<String> filters = new ArrayList<>();
+      FilterCriterion fc = (FilterCriterion) filtering.getFilterCriterionFor("publicationStart");
+      if (fc != null) {
+        filters.add(getWhereClause(fc));
+      }
+      fc = (FilterCriterion) filtering.getFilterCriterionFor("publicationEnd");
+      if (fc != null) {
+        if (fc.getOperation() == FilterOperation.GREATER_THAN_OR_EQUAL_TO) {
+          filters.add(
+              String.format(
+                  "(%s OR %s IS NULL)", getWhereClause(fc), getColumnName("publicationEnd")));
+        } else {
+          filters.add(getWhereClause(fc));
+        }
+      }
+      if (!filters.isEmpty()) {
+        query.append(" WHERE ").append(String.join(" AND ", filters));
+      }
+    }
+
+    addPageRequestParams(pageRequest, query);
     List<CollectionImpl> result =
         new ArrayList(
             dbi.withHandle(
