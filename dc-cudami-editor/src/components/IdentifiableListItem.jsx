@@ -18,10 +18,9 @@ const IdentifiableListItem = ({
   parentType,
   showEdit,
   type,
-  uiLocale,
 }) => {
   const {t} = useTranslation()
-  const {apiContextPath} = useContext(AppContext)
+  const {apiContextPath, uiLocale} = useContext(AppContext)
   const {
     identifiers,
     label,

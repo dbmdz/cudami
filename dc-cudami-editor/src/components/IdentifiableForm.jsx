@@ -238,13 +238,14 @@ class IdentifiableForm extends Component {
   }
 
   render() {
-    const {apiContextPath, mockApi} = this.props
+    const {apiContextPath, mockApi, uiLocale} = this.props
     return this.state.identifiable ? (
       <AppContext.Provider
         value={{
           apiContextPath,
           defaultLanguage: this.state.defaultLanguage,
           mockApi,
+          uiLocale,
         }}
       >
         <div className="identifiable-editor">

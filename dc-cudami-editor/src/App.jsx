@@ -142,6 +142,7 @@ const App = () => {
                 activeLanguage="en"
                 mockApi={true}
                 type={match.params.type}
+                uiLocale={uiLocale}
               />
             </Container>
           )}
@@ -155,6 +156,7 @@ const App = () => {
                 existingLanguages={['en', 'de']}
                 mockApi={true}
                 type={match.params.type}
+                uiLocale={uiLocale}
                 uuid="mock"
               />
             </Container>

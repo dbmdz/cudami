@@ -283,7 +283,9 @@ class PagedIdentifiableList extends Component {
       </>
     )
     return (
-      <AppContext.Provider value={{apiContextPath, defaultLanguage, mockApi}}>
+      <AppContext.Provider
+        value={{apiContextPath, defaultLanguage, mockApi, uiLocale}}
+      >
         <Row>
           <Col>
             <h2>{t(`${type}s`)}</h2>
@@ -365,7 +367,6 @@ class PagedIdentifiableList extends Component {
                     parentType={parentType}
                     showEdit={showEdit}
                     type={type}
-                    uiLocale={uiLocale}
                   />
                 ))}
               </tbody>

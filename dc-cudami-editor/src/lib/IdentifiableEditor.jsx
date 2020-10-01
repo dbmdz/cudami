@@ -14,6 +14,7 @@ export default function (config) {
       parentType={config.parentType}
       parentUuid={config.parentUuid}
       type={config.type}
+      uiLocale={config.uiLocale}
       uuid={config.uuid}
     />,
     document.getElementById(config.id)
