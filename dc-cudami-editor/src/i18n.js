@@ -21,11 +21,14 @@ export default function (locale) {
     },
     lng: locale,
     resources: {
-      de,
-      en,
+      de: {
+        ...de,
+        ...deLanguageNames,
+      },
+      en: {
+        ...en,
+        ...enLanguageNames,
+      },
     },
   })
-  instance.addResourceBundle('de', 'languageNames', deLanguageNames)
-  instance.addResourceBundle('en', 'languageNames', enLanguageNames)
-  return instance
 }
