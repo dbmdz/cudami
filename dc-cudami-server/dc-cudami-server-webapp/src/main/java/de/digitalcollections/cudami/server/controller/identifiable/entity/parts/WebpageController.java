@@ -100,7 +100,6 @@ public class WebpageController {
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws IdentifiableServiceException {
-
     Webpage webpage;
     if (pLocale == null) {
       webpage = webpageService.get(uuid);
@@ -123,17 +122,27 @@ public class WebpageController {
           UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortField", required = false) String sortField,
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "DESC")
+          Direction sortDirection,
+      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
+          NullHandling nullHandling,
       @RequestParam(name = "publicationStart", required = false)
           FilterCriterion<LocalDate> publicationStart,
       @RequestParam(name = "publicationEnd", required = false)
           FilterCriterion<LocalDate> publicationEnd)
       throws IdentifiableServiceException {
+    Sorting sorting = null;
+    if (sortField != null) {
+      OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
+      sorting = new SortingImpl(order);
+    }
     Filtering filtering =
         Filtering.defaultBuilder()
             .add("publicationStart", publicationStart)
             .add("publicationEnd", publicationEnd)
             .build();
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, null, filtering);
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting, filtering);
     return webpageService.getChildren(uuid, pageRequest);
   }
 
