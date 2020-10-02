@@ -315,8 +315,9 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
         }
       }
     }
-    query.append(" ORDER BY ww.sortIndex ASC");
-    pageRequest.setSorting(null);
+    if (pageRequest.getSorting() == null) {
+      query.append(" ORDER BY ww.sortIndex ASC");
+    }
     addPageRequestParams(pageRequest, query);
     List<Webpage> result =
         new ArrayList(
