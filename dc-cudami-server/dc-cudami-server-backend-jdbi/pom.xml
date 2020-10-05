@@ -15,7 +15,7 @@
 
   <properties>
     <version.dc-commons-jdbi>4.1.2</version.dc-commons-jdbi>
-    <version.jdbi>3.14.4</version.jdbi>
+    <version.jdbi>3.15.0</version.jdbi>
   </properties>
 
   <dependencies>
