@@ -109,7 +109,7 @@ public class ItemRepositoryImpl extends IdentifiableRepositoryImpl<Item> impleme
     // select only what is shown/needed in alphabetical sorted paged list:
     StringBuilder query =
         new StringBuilder(
-            "SELECT i.uuid i_uuid, i.label i_label, i.description i_description,"
+            "SELECT i.uuid i_uuid, i.refid i_refId, i.label i_label, i.description i_description,"
                 //      + " i.identifiable_type i_type, i.entity_type i_entityType,"
                 //      + " i.created i_created, i.last_modified i_last_modified,"
                 //      + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace
