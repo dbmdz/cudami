@@ -293,7 +293,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   @Override
   public PageResponse<Collection> getCollections(UUID digitalObjectUuid, PageRequest pageRequest) {
     final String baseQuery =
-        "SELECT c.uuid c_uuid, c.label c_label,"
+        "SELECT c.uuid c_uuid, c.label c_label, c.refid c_refId,"
             + " c.created c_created, c.last_modified c_lastModified,"
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
             + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.http_base_url pf_httpBaseUrl"
@@ -470,7 +470,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   @Override
   public PageResponse<Project> getProjects(UUID digitalObjectUuid, PageRequest pageRequest) {
     final String baseQuery =
-        "SELECT p.uuid p_uuid, p.label p_label,"
+        "SELECT p.uuid p_uuid, p.label p_label, p.refid p_refId,"
             + " p.created p_created, p.last_modified p_lastModified,"
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
             + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.http_base_url pf_httpBaseUrl"

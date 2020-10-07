@@ -424,7 +424,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   public List<EntityRelation> getRelations(E subjectEntity) {
     // query predicate and object entity (subject entity is given)
     String query =
-        "SELECT rel.predicate as predicate, e.uuid as uuid, e.created as created, e.description as description, e.identifiable_type as identifiable_type, e.label as label, e.last_modified as last_modified, e.entity_type as entity_type"
+        "SELECT rel.predicate as predicate, e.uuid as uuid, e.refid e_refId, e.created as created, e.description as description, e.identifiable_type as identifiable_type, e.label as label, e.last_modified as last_modified, e.entity_type as entity_type"
             + " FROM rel_entity_entities rel"
             + " INNER JOIN entities e ON rel.object_uuid=e.uuid"
             + " WHERE rel.subject_uuid = :uuid";

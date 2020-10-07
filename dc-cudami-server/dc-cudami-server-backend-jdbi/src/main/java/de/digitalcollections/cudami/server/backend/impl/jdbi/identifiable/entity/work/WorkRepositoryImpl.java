@@ -111,7 +111,7 @@ public class WorkRepositoryImpl extends IdentifiableRepositoryImpl<Work> impleme
     // select only what is shown/needed in alphabetical sorted paged list:
     StringBuilder query =
         new StringBuilder(
-            "SELECT w.uuid w_uuid, w.label w_label, w.description w_description,"
+            "SELECT w.uuid w_uuid, w.refid w_refId, w.label w_label, w.description w_description,"
                 //      + " w.identifiable_type w_type, w.entity_type w_entityType,
                 // w.geolocation_type w_geoLocationType,"
                 //      + " w.created w_created, w.last_modified w_last_modified,"
