@@ -2,9 +2,6 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CollectionRepository;
-import de.digitalcollections.model.api.filter.FilterCriterion;
-import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.filter.enums.FilterOperation;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
@@ -81,12 +78,12 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   private static final String BREADCRUMB_QUERY =
       "WITH recursive breadcrumb (uuid,label,parent_uuid,depth)"
           + " AS ("
-          + "        SELECT c.uuid as uuid, c.label as label, cc.parent_collection_uuid as parent_uuid,99 as depth"
+          + "        SELECT c.uuid as uuid, c.label as label, c.refid c_refId, cc.parent_collection_uuid as parent_uuid,99 as depth"
           + "        FROM collections c, collection_collections cc"
           + "        WHERE uuid= :uuid and cc.child_collection_uuid = c.uuid"
           + ""
           + "        UNION ALL"
-          + "        SELECT c.uuid as uuid, c.label as label, cc.parent_collection_uuid as parent_uuid, depth-1 as depth"
+          + "        SELECT c.uuid as uuid, c.label as label, c.refid c_refId, cc.parent_collection_uuid as parent_uuid, depth-1 as depth"
           + "        FROM collections c,"
           + "             collection_collections cc,"
           + "             breadcrumb b"
@@ -163,33 +160,15 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   @Override
   public PageResponse<Collection> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder(REDUCED_FIND_ONE_BASE_SQL);
-
     // handle optional filtering params
-    Filtering filtering = pageRequest.getFiltering();
-    if (filtering != null) {
-      List<String> filters = new ArrayList<>();
-      FilterCriterion fc = (FilterCriterion) filtering.getFilterCriterionFor("publicationStart");
-      if (fc != null) {
-        filters.add(getWhereClause(fc));
-      }
-      fc = (FilterCriterion) filtering.getFilterCriterionFor("publicationEnd");
-      if (fc != null) {
-        if (fc.getOperation() == FilterOperation.GREATER_THAN_OR_EQUAL_TO) {
-          filters.add(
-              String.format(
-                  "(%s OR %s IS NULL)", getWhereClause(fc), getColumnName("publicationEnd")));
-        } else {
-          filters.add(getWhereClause(fc));
-        }
-      }
-      if (!filters.isEmpty()) {
-        query.append(" WHERE ").append(String.join(" AND ", filters));
-      }
+    String filterClauses = getFilterClauses(pageRequest.getFiltering());
+    if (filterClauses.length() > 0) {
+      query.append(" WHERE ").append(filterClauses);
     }
-
     addPageRequestParams(pageRequest, query);
+
     List<CollectionImpl> result =
-        new ArrayList(
+        new ArrayList<>(
             dbi.withHandle(
                 h ->
                     h.createQuery(query.toString())
@@ -212,7 +191,14 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                               return map;
                             })
                         .values()));
-    long total = count();
+
+    String sql = "SELECT count(*) FROM collections as c";
+    if (filterClauses.length() > 0) {
+      sql += " WHERE " + filterClauses;
+    }
+    final String sqlCount = sql;
+    long total = dbi.withHandle(h -> h.createQuery(sqlCount).mapTo(Long.class).findOne().get());
+
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
   }
@@ -231,10 +217,15 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                 + " LEFT JOIN LATERAL jsonb_object_keys(c.description) n(keys) on c.description is not null"
                 + " WHERE (c.label->>l.keys ilike '%' || :searchTerm || '%'"
                 + " OR c.description->>n.keys ilike '%' || :searchTerm || '%')");
+    // handle optional filtering params
+    String filterClauses = getFilterClauses(searchPageRequest.getFiltering());
+    if (filterClauses.length() > 0) {
+      query.append(" AND ").append(filterClauses);
+    }
     addPageRequestParams(searchPageRequest, query);
 
     List<Collection> result =
-        new ArrayList(
+        new ArrayList<>(
             dbi.withHandle(
                 h ->
                     h.createQuery(query.toString())
@@ -262,10 +253,14 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + " LEFT JOIN LATERAL jsonb_object_keys(c.description) n(keys) on c.description is not null"
             + " WHERE (c.label->>l.keys ilike '%' || :searchTerm || '%'"
             + " OR c.description->>n.keys ilike '%' || :searchTerm || '%')";
+    if (filterClauses.length() > 0) {
+      countQuery += " AND " + filterClauses;
+    }
+    final String sqlCount = countQuery;
     long total =
         dbi.withHandle(
             h ->
-                h.createQuery(countQuery)
+                h.createQuery(sqlCount)
                     .bind("searchTerm", searchPageRequest.getQuery())
                     .mapTo(Long.class)
                     .findOne()
@@ -384,10 +379,16 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + " LEFT JOIN identifiers as id on d.uuid = id.identifiable"
             + " LEFT JOIN fileresources_image as file on d.previewfileresource = file.uuid"
             + " LEFT JOIN collection_digitalobjects as cd on d.uuid = cd.digitalobject_uuid"
-            + " WHERE cd.collection_uuid = :uuid"
-            + " ORDER BY cd.sortIndex ASC";
+            + " WHERE cd.collection_uuid = :uuid";
     StringBuilder query = new StringBuilder(baseQuery);
 
+    // handle optional filtering params
+    String filterClauses = getFilterClauses(pageRequest.getFiltering());
+    if (filterClauses.length() > 0) {
+      query.append(" AND ").append(filterClauses);
+    }
+
+    query.append(" ORDER BY cd.sortIndex ASC");
     // we add fix sorting in above query; otherwise we get in conflict with allowed sorting
     // and column names of this repository (it is for collections, not sublists of
     // digitalobjects...)
@@ -432,10 +433,14 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
         "SELECT count(*) FROM digitalobjects as d"
             + " LEFT JOIN collection_digitalobjects as cd on d.uuid = cd.digitalobject_uuid"
             + " WHERE cd.collection_uuid = :uuid";
+    if (filterClauses.length() > 0) {
+      countQuery += " AND " + filterClauses;
+    }
+    final String sqlCount = countQuery;
     long total =
         dbi.withHandle(
             h ->
-                h.createQuery(countQuery)
+                h.createQuery(sqlCount)
                     .bind("uuid", collectionUuid)
                     .mapTo(Long.class)
                     .findOne()
@@ -696,7 +701,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     String query = BASE_CHILDREN_QUERY + " ORDER BY cc.sortIndex ASC";
 
     List<Collection> result =
-        new ArrayList(
+        new ArrayList<>(
             dbi.withHandle(
                 h ->
                     h.createQuery(query)
@@ -729,35 +734,16 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     StringBuilder query = new StringBuilder(BASE_CHILDREN_QUERY);
 
     // handle optional filtering params
-    Filtering filtering = pageRequest.getFiltering();
-    if (filtering != null) {
-      // handle publication start criteria
-      FilterCriterion fc = (FilterCriterion) filtering.getFilterCriterionFor("publicationStart");
-      if (fc != null) {
-        query.append(" AND ").append(getWhereClause(fc));
-      }
-
-      // handle publication end criteria
-      fc = (FilterCriterion) filtering.getFilterCriterionFor("publicationEnd");
-      if (fc != null) {
-        if (fc.getOperation() == FilterOperation.GREATER_THAN_OR_EQUAL_TO) {
-          query
-              .append(" AND (")
-              .append(getWhereClause(fc))
-              .append(" OR ")
-              .append(getColumnName("publicationEnd"))
-              .append(" IS NULL")
-              .append(")");
-        } else {
-          query.append(" AND ").append(getWhereClause(fc));
-        }
-      }
+    String filterClauses = getFilterClauses(pageRequest.getFiltering());
+    if (filterClauses.length() > 0) {
+      query.append(" AND ").append(filterClauses);
     }
+
     query.append(" ORDER BY cc.sortIndex ASC");
     pageRequest.setSorting(null);
     addPageRequestParams(pageRequest, query);
     List<Collection> result =
-        new ArrayList(
+        new ArrayList<>(
             dbi.withHandle(
                 h ->
                     h.createQuery(query.toString())
@@ -781,13 +767,19 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                               return map;
                             })
                         .values()));
-    String sql =
+
+    String countQuery =
         "SELECT count(*) FROM collections as c"
             + " INNER JOIN collection_collections cc ON c.uuid = cc.child_collection_uuid"
             + " WHERE cc.parent_collection_uuid = :uuid";
+    if (filterClauses.length() > 0) {
+      countQuery += " AND " + filterClauses;
+    }
+    final String sqlCount = countQuery;
     long total =
         dbi.withHandle(
-            h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Long.class).findOne().get());
+            h -> h.createQuery(sqlCount).bind("uuid", uuid).mapTo(Long.class).findOne().get());
+
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
   }
@@ -796,9 +788,15 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   public PageResponse<Collection> getTopCollections(PageRequest pageRequest) {
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
     StringBuilder query = new StringBuilder(BASE_TOP_QUERY);
+    // handle optional filtering params
+    String filterClauses = getFilterClauses(pageRequest.getFiltering());
+    if (filterClauses.length() > 0) {
+      query.append(" AND ").append(filterClauses);
+    }
     addPageRequestParams(pageRequest, query);
+
     List<Collection> result =
-        new ArrayList(
+        new ArrayList<>(
             dbi.withHandle(
                 h ->
                     h.createQuery(query.toString())
@@ -821,10 +819,16 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                               return map;
                             })
                         .values()));
-    String sql =
+
+    String countQuery =
         "SELECT count(*) FROM collections as c"
             + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = c.uuid)";
-    long total = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
+    if (filterClauses.length() > 0) {
+      countQuery += " AND " + filterClauses;
+    }
+    final String sqlCount = countQuery;
+    long total = dbi.withHandle(h -> h.createQuery(sqlCount).mapTo(Long.class).findOne().get());
+
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
   }
