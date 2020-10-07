@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi;
 
 import de.digitalcollections.model.api.filter.FilterCriterion;
+import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.filter.enums.FilterOperation;
 import de.digitalcollections.model.api.paging.Order;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -11,6 +12,7 @@ import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Convenience repository implementation to be inherited from if applicable.
@@ -91,6 +93,23 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
    */
   protected abstract String getColumnName(String modelProperty);
 
+  protected String getFilterClauses(Filtering filtering) {
+    if (filtering == null || filtering.getFilterCriterias().isEmpty()) {
+      return "";
+    }
+    StringBuilder sbFilterClauses = new StringBuilder();
+    List<FilterCriterion> filterCriterias = filtering.getFilterCriterias();
+    for (int i = 0; i < filterCriterias.size(); i++) {
+      FilterCriterion fc = filterCriterias.get(i);
+      if (i > 0) {
+        // only prepend " AND " beginning with the second criteria
+        sbFilterClauses.append(" AND ");
+      }
+      sbFilterClauses.append(getWhereClause(fc));
+    }
+    return sbFilterClauses.toString();
+  }
+
   protected String getWhereClause(FilterCriterion<?> fc)
       throws IllegalArgumentException, UnsupportedOperationException {
     StringBuilder query = new StringBuilder();
@@ -167,6 +186,18 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
               .append(convertToSqlString(fc.getValue()))
               .append(")");
           break;
+        case GREATER_THAN_OR_NOT_SET:
+          // @see https://www.postgresql.org/docs/11/functions-comparison.html
+          query
+              .append("(")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" > ")
+              .append(convertToSqlString(fc.getValue()))
+              .append(" OR ")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" IS NULL")
+              .append(")");
+          break;
         case GREATER_THAN_OR_EQUAL_TO:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
@@ -185,13 +216,25 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
               .append(convertToSqlString(fc.getValue()))
               .append(")");
           break;
-        case LESSTHAN_OR_EQUAL_TO:
+        case LESS_THAN_OR_EQUAL_TO:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
               .append(getColumnName(fc.getFieldName()))
               .append(" <= ")
               .append(convertToSqlString(fc.getValue()))
+              .append(")");
+          break;
+        case LESS_THAN_OR_EQUAL_TO_OR_NOT_SET:
+          // @see https://www.postgresql.org/docs/11/functions-comparison.html
+          query
+              .append("(")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" <= ")
+              .append(convertToSqlString(fc.getValue()))
+              .append(" OR ")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" IS NULL")
               .append(")");
           break;
         case SET:
@@ -213,7 +256,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
     return query.toString();
   }
 
-  private String convertToSqlString(Object value) {
+  protected String convertToSqlString(Object value) {
     if (value == null) {
       return "";
     }

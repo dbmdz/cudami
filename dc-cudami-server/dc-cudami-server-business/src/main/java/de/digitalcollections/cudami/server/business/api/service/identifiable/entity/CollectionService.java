@@ -19,6 +19,10 @@ public interface CollectionService extends NodeService<Collection>, EntityServic
 
   boolean addDigitalObjects(Collection collection, List<DigitalObject> digitalObjects);
 
+  List<Collection> getActiveChildren(UUID uuid);
+
+  PageResponse<Collection> getActiveChildren(UUID uuid, PageRequest pageRequest);
+
   PageResponse<DigitalObject> getDigitalObjects(Collection collection, PageRequest pageRequest);
 
   List<Collection> getParents(UUID uuid);

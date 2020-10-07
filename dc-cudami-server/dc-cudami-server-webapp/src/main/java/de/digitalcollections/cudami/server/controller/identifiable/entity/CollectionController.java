@@ -447,7 +447,7 @@ public class CollectionController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @ApiMethod(description = "Get paged subcollections of a collection")
+  @ApiMethod(description = "Get (active or all) paged subcollections of a collection")
   @GetMapping(
       value = {
         "/latest/collections/{uuid}/subcollections",
@@ -460,16 +460,11 @@ public class CollectionController {
           UUID collectionUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "publicationStart", required = false)
-          FilterCriterion<LocalDate> publicationStart,
-      @RequestParam(name = "publicationEnd", required = false)
-          FilterCriterion<LocalDate> publicationEnd) {
-    Filtering filtering =
-        Filtering.defaultBuilder()
-            .add("publicationStart", publicationStart)
-            .add("publicationEnd", publicationEnd)
-            .build();
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, null, filtering);
+      @RequestParam(name = "active", required = false) String active) {
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
+    if (active != null) {
+      return collectionService.getActiveChildren(collectionUuid, pageRequest);
+    }
     return collectionService.getChildren(collectionUuid, pageRequest);
   }
 
