@@ -7,6 +7,7 @@ import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public interface CollectionService extends NodeService<Collection>, EntityService<Collection> {
@@ -18,6 +19,12 @@ public interface CollectionService extends NodeService<Collection>, EntityServic
   boolean addDigitalObject(Collection collection, DigitalObject digitalObject);
 
   boolean addDigitalObjects(Collection collection, List<DigitalObject> digitalObjects);
+
+  PageResponse<Collection> findActive(PageRequest pageRequest);
+
+  Collection getActive(UUID uuid);
+
+  Collection getActive(UUID uuid, Locale pLocale);
 
   List<Collection> getActiveChildren(UUID uuid);
 

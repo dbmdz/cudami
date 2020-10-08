@@ -80,6 +80,16 @@ public class CudamiCollectionsClient extends CudamiBaseClient<CollectionImpl> {
     return response.getContent();
   }
 
+  public PageResponse<CollectionImpl> findActive(PageRequest pageRequest) throws HttpException {
+    return doGetRequestForPagedObjectList(
+        String.format("/latest/collections?active=true"), pageRequest);
+  }
+
+  public Collection findActiveOne(UUID uuid, Locale locale) throws HttpException {
+    return doGetRequestForObject(
+        String.format("/latest/collections/%s?active=true&pLocale=%s", uuid, locale));
+  }
+
   public Collection findOne(UUID uuid) throws HttpException {
     return doGetRequestForObject(String.format("/latest/collections/%s", uuid));
   }
@@ -100,6 +110,14 @@ public class CudamiCollectionsClient extends CudamiBaseClient<CollectionImpl> {
   public PageResponse<CollectionImpl> findTopCollections(PageRequest pageRequest)
       throws HttpException {
     return doGetRequestForPagedObjectList("/latest/collections/top", pageRequest);
+  }
+
+  public PageResponse<Collection> getActiveSubcollections(UUID uuid, PageRequest pageRequest)
+      throws HttpException {
+    return doGetRequestForPagedObjectList(
+        String.format("/latest/collections/%s/subcollections?active=true", uuid),
+        pageRequest,
+        CollectionImpl.class);
   }
 
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws HttpException {
@@ -125,14 +143,6 @@ public class CudamiCollectionsClient extends CudamiBaseClient<CollectionImpl> {
 
   public List<CollectionImpl> getParents(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(String.format("/latest/collections/%s/parents", uuid));
-  }
-
-  public PageResponse<Collection> getActiveSubcollections(UUID uuid, PageRequest pageRequest)
-      throws HttpException {
-    return doGetRequestForPagedObjectList(
-        String.format("/latest/collections/%s/subcollections?active=true", uuid),
-        pageRequest,
-        CollectionImpl.class);
   }
 
   public PageResponse<Collection> getSubcollections(UUID uuid, PageRequest pageRequest)
