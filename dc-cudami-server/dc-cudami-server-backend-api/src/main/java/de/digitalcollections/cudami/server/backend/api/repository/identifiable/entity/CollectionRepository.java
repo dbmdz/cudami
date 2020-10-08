@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
+import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -12,54 +13,6 @@ import java.util.UUID;
 /** Repository for Collection persistence handling. */
 public interface CollectionRepository
     extends NodeRepository<Collection>, EntityRepository<Collection> {
-
-  Collection saveWithParentCollection(Collection collection, UUID parentUuid);
-
-  PageResponse<Collection> getTopCollections(PageRequest pageRequest);
-
-  default boolean addDigitalObject(Collection collection, DigitalObject digitalObject) {
-    if (collection == null || digitalObject == null) {
-      return false;
-    }
-    return addDigitalObjects(collection.getUuid(), Arrays.asList(digitalObject));
-  }
-
-  default boolean addDigitalObjects(Collection collection, List<DigitalObject> digitalObjects) {
-    if (collection == null || digitalObjects == null) {
-      return false;
-    }
-    return addDigitalObjects(collection.getUuid(), digitalObjects);
-  }
-
-  boolean addDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects);
-
-  default PageResponse<DigitalObject> getDigitalObjects(
-      Collection collection, PageRequest pageRequest) {
-    if (collection == null) {
-      return null;
-    }
-    return getDigitalObjects(collection.getUuid(), pageRequest);
-  }
-
-  PageResponse<DigitalObject> getDigitalObjects(UUID collectionUuid, PageRequest pageRequest);
-
-  default boolean removeDigitalObject(Collection collection, DigitalObject digitalObject) {
-    if (collection == null || digitalObject == null) {
-      return false;
-    }
-    return removeDigitalObject(collection.getUuid(), digitalObject.getUuid());
-  }
-
-  boolean removeDigitalObject(UUID collectionUuid, UUID digitalObjectUuid);
-
-  default boolean saveDigitalObjects(Collection collection, List<DigitalObject> digitalObjects) {
-    if (collection == null || digitalObjects == null) {
-      return false;
-    }
-    return saveDigitalObjects(collection.getUuid(), digitalObjects);
-  }
-
-  boolean saveDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects);
 
   default boolean addChild(Collection parent, Collection child) {
     if (parent == null || child == null) {
@@ -77,6 +30,24 @@ public interface CollectionRepository
 
   boolean addChildren(UUID parentUuid, List<Collection> collections);
 
+  default boolean addDigitalObject(Collection collection, DigitalObject digitalObject) {
+    if (collection == null || digitalObject == null) {
+      return false;
+    }
+    return addDigitalObjects(collection.getUuid(), Arrays.asList(digitalObject));
+  }
+
+  default boolean addDigitalObjects(Collection collection, List<DigitalObject> digitalObjects) {
+    if (collection == null || digitalObjects == null) {
+      return false;
+    }
+    return addDigitalObjects(collection.getUuid(), digitalObjects);
+  }
+
+  boolean addDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects);
+
+  Collection findOne(UUID uuid, Filtering filtering);
+
   @Override
   default List<Collection> getChildren(Collection collection) {
     if (collection == null) {
@@ -84,6 +55,20 @@ public interface CollectionRepository
     }
     return getChildren(collection.getUuid());
   }
+
+  default PageResponse<DigitalObject> getDigitalObjects(
+      Collection collection, PageRequest pageRequest) {
+    if (collection == null) {
+      return null;
+    }
+    return getDigitalObjects(collection.getUuid(), pageRequest);
+  }
+
+  PageResponse<DigitalObject> getDigitalObjects(UUID collectionUuid, PageRequest pageRequest);
+
+  List<Collection> getParents(UUID uuid);
+
+  PageResponse<Collection> getTopCollections(PageRequest pageRequest);
 
   default boolean removeChild(Collection parent, Collection child) {
     if (parent == null || child == null) {
@@ -94,7 +79,14 @@ public interface CollectionRepository
 
   boolean removeChild(UUID parentUuid, UUID childUuid);
 
-  List<Collection> getParents(UUID uuid);
+  default boolean removeDigitalObject(Collection collection, DigitalObject digitalObject) {
+    if (collection == null || digitalObject == null) {
+      return false;
+    }
+    return removeDigitalObject(collection.getUuid(), digitalObject.getUuid());
+  }
+
+  boolean removeDigitalObject(UUID collectionUuid, UUID digitalObjectUuid);
 
   /**
    * Removes a digitalObject from all collections, to which is was connected to
@@ -103,4 +95,15 @@ public interface CollectionRepository
    * @return boolean value for success
    */
   boolean removeDigitalObjectFromAllCollections(DigitalObject digitalObject);
+
+  default boolean saveDigitalObjects(Collection collection, List<DigitalObject> digitalObjects) {
+    if (collection == null || digitalObjects == null) {
+      return false;
+    }
+    return saveDigitalObjects(collection.getUuid(), digitalObjects);
+  }
+
+  boolean saveDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects);
+
+  Collection saveWithParentCollection(Collection collection, UUID parentUuid);
 }

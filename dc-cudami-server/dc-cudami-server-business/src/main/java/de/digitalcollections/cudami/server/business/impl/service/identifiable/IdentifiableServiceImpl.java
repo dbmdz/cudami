@@ -70,6 +70,10 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   public I get(UUID uuid, Locale locale) throws IdentifiableServiceException {
     // get identifiable with all translations:
     I identifiable = get(uuid);
+    return reduceMultilanguageFieldsToGivenLocale(identifiable, locale);
+  }
+
+  protected I reduceMultilanguageFieldsToGivenLocale(I identifiable, Locale locale) {
     if (identifiable == null) {
       return null;
     }

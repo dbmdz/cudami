@@ -13,6 +13,7 @@ import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,38 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
     return ((CollectionRepository) repository).addDigitalObjects(collection, digitalObjects);
   }
 
+  private Filtering filteringForActive() {
+    // business logic that defines, what "active" means:
+    LocalDate now = LocalDate.now();
+    Filtering filtering =
+        Filtering.defaultBuilder()
+            .filter("publicationStart")
+            .lessOrEqual(now)
+            .filter("publicationEnd")
+            .greaterOrNotSet(now)
+            .build();
+    return filtering;
+  }
+
+  @Override
+  public PageResponse<Collection> findActive(PageRequest pageRequest) {
+    Filtering filtering = filteringForActive();
+    pageRequest.setFiltering(filtering);
+    return find(pageRequest);
+  }
+
+  @Override
+  public Collection getActive(UUID uuid) {
+    Filtering filtering = filteringForActive();
+    return ((CollectionRepository) repository).findOne(uuid, filtering);
+  }
+
+  @Override
+  public Collection getActive(UUID uuid, Locale pLocale) {
+    Collection collection = getActive(uuid);
+    return reduceMultilanguageFieldsToGivenLocale(collection, pLocale);
+  }
+
   @Override
   public List<Collection> getActiveChildren(UUID uuid) {
     Filtering filtering = filteringForActive();
@@ -63,19 +96,6 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
     Filtering filtering = filteringForActive();
     pageRequest.setFiltering(filtering);
     return getChildren(uuid, pageRequest);
-  }
-
-  private Filtering filteringForActive() {
-    // business logic that defines, what "active" means:
-    LocalDate now = LocalDate.now();
-    Filtering filtering =
-        Filtering.defaultBuilder()
-            .filter("publicationStart")
-            .lessOrEqual(now)
-            .filter("publicationEnd")
-            .greaterOrNotSet(now)
-            .build();
-    return filtering;
   }
 
   @Override
