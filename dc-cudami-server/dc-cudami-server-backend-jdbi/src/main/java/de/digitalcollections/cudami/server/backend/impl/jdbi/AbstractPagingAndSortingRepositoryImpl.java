@@ -94,11 +94,11 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
   protected abstract String getColumnName(String modelProperty);
 
   protected String getFilterClauses(Filtering filtering) {
-    if (filtering == null || filtering.getFilterCriterias().isEmpty()) {
+    if (filtering == null || filtering.getFilterCriteria().isEmpty()) {
       return "";
     }
     String filterClauses =
-        filtering.getFilterCriterias().stream()
+        filtering.getFilterCriteria().stream()
             .map(this::getWhereClause)
             .collect(Collectors.joining(" AND "));
     return filterClauses;

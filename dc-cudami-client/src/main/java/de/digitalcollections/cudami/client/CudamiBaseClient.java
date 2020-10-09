@@ -250,7 +250,7 @@ public class CudamiBaseClient<T extends Object> {
                 findParams.getNullHandling());
     Filtering filtering = pageRequest.getFiltering();
     if (filtering != null) {
-      requestUrl += "&" + getFilterParamsAsString(filtering.getFilterCriterias());
+      requestUrl += "&" + getFilterParamsAsString(filtering.getFilterCriteria());
     }
     HttpRequest req = createGetRequest(requestUrl);
     try {

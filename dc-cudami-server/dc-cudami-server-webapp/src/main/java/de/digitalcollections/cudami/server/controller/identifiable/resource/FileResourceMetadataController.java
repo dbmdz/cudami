@@ -109,7 +109,7 @@ public class FileResourceMetadataController {
 
     Filtering filtering =
         Filtering.defaultBuilder().filter("fileResourceType").isEquals(fileResourceType).build();
-    pageRequest.setFiltering(filtering);
+    pageRequest.add(filtering);
 
     return fileResourceService.find(pageRequest);
   }
