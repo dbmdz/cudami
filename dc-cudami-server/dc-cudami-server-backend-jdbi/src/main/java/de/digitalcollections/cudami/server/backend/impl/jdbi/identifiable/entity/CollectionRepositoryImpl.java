@@ -165,7 +165,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     StringBuilder query = new StringBuilder(REDUCED_FIND_ONE_BASE_SQL);
     // handle optional filtering params
     String filterClauses = getFilterClauses(pageRequest.getFiltering());
-    if (filterClauses.length() > 0) {
+    if (!filterClauses.isEmpty()) {
       query.append(" WHERE ").append(filterClauses);
     }
     addPageRequestParams(pageRequest, query);
@@ -196,7 +196,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                         .values()));
 
     String sql = "SELECT count(*) FROM collections as c";
-    if (filterClauses.length() > 0) {
+    if (!filterClauses.isEmpty()) {
       sql += " WHERE " + filterClauses;
     }
     final String sqlCount = sql;
@@ -222,7 +222,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                 + " OR c.description->>n.keys ilike '%' || :searchTerm || '%')");
     // handle optional filtering params
     String filterClauses = getFilterClauses(searchPageRequest.getFiltering());
-    if (filterClauses.length() > 0) {
+    if (!filterClauses.isEmpty()) {
       query.append(" AND ").append(filterClauses);
     }
     addPageRequestParams(searchPageRequest, query);
@@ -256,7 +256,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + " LEFT JOIN LATERAL jsonb_object_keys(c.description) n(keys) on c.description is not null"
             + " WHERE (c.label->>l.keys ilike '%' || :searchTerm || '%'"
             + " OR c.description->>n.keys ilike '%' || :searchTerm || '%')";
-    if (filterClauses.length() > 0) {
+    if (!filterClauses.isEmpty()) {
       countQuery += " AND " + filterClauses;
     }
     final String sqlCount = countQuery;
@@ -339,7 +339,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     if (filtering != null) {
       // handle optional filtering params
       String filterClauses = getFilterClauses(filtering);
-      if (filterClauses.length() > 0) {
+      if (!filterClauses.isEmpty()) {
         query += " AND " + filterClauses;
       }
     }
@@ -462,7 +462,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
     // handle optional filtering params
     String filterClauses = getFilterClauses(pageRequest.getFiltering());
-    if (filterClauses.length() > 0) {
+    if (!filterClauses.isEmpty()) {
       query.append(" AND ").append(filterClauses);
     }
 
@@ -499,7 +499,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
         "SELECT count(*) FROM collections as c"
             + " INNER JOIN collection_collections cc ON c.uuid = cc.child_collection_uuid"
             + " WHERE cc.parent_collection_uuid = :uuid";
-    if (filterClauses.length() > 0) {
+    if (!filterClauses.isEmpty()) {
       countQuery += " AND " + filterClauses;
     }
     final String sqlCount = countQuery;
@@ -549,7 +549,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
     // handle optional filtering params
     String filterClauses = getFilterClauses(pageRequest.getFiltering());
-    if (filterClauses.length() > 0) {
+    if (!filterClauses.isEmpty()) {
       query.append(" AND ").append(filterClauses);
     }
 
@@ -598,7 +598,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
         "SELECT count(*) FROM digitalobjects as d"
             + " LEFT JOIN collection_digitalobjects as cd on d.uuid = cd.digitalobject_uuid"
             + " WHERE cd.collection_uuid = :uuid";
-    if (filterClauses.length() > 0) {
+    if (!filterClauses.isEmpty()) {
       countQuery += " AND " + filterClauses;
     }
     final String sqlCount = countQuery;
@@ -692,7 +692,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     StringBuilder query = new StringBuilder(BASE_TOP_QUERY);
     // handle optional filtering params
     String filterClauses = getFilterClauses(pageRequest.getFiltering());
-    if (filterClauses.length() > 0) {
+    if (!filterClauses.isEmpty()) {
       query.append(" AND ").append(filterClauses);
     }
     addPageRequestParams(pageRequest, query);
@@ -725,7 +725,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     String countQuery =
         "SELECT count(*) FROM collections as c"
             + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = c.uuid)";
-    if (filterClauses.length() > 0) {
+    if (!filterClauses.isEmpty()) {
       countQuery += " AND " + filterClauses;
     }
     final String sqlCount = countQuery;
