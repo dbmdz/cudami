@@ -12,7 +12,6 @@ import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -98,11 +97,11 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
     if (filtering == null || filtering.getFilterCriterias().isEmpty()) {
       return "";
     }
-    List<String> filterClauses =
+    String filterClauses =
         filtering.getFilterCriterias().stream()
             .map(this::getWhereClause)
-            .collect(Collectors.toList());
-    return String.join(" AND ", filterClauses);
+            .collect(Collectors.joining(" AND "));
+    return filterClauses;
   }
 
   protected String getWhereClause(FilterCriterion<?> fc)
