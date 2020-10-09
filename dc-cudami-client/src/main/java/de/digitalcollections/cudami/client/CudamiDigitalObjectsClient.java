@@ -64,6 +64,14 @@ public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObjectIm
     return doGetRequestForObjectList("/latest/digitalobjects/reduced", DigitalObjectImpl.class);
   }
 
+  public PageResponse<Collection> getActiveCollections(UUID uuid, PageRequest pageRequest)
+      throws HttpException {
+    return doGetRequestForPagedObjectList(
+        String.format("/latest/digitalobjects/%s/collections?active=true", uuid),
+        pageRequest,
+        CollectionImpl.class);
+  }
+
   public PageResponse<Collection> getCollections(UUID uuid, PageRequest pageRequest)
       throws HttpException {
     return doGetRequestForPagedObjectList(

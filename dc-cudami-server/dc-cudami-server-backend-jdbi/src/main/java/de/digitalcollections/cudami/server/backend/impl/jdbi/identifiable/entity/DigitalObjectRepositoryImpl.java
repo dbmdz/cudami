@@ -301,10 +301,14 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             + " LEFT JOIN identifiers as id on c.uuid = id.identifiable"
             + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid"
             + " LEFT JOIN collection_digitalobjects as cd on c.uuid = cd.collection_uuid"
-            + " WHERE cd.digitalobject_uuid = :uuid"
-            + " ORDER BY c.label";
+            + " WHERE cd.digitalobject_uuid = :uuid";
     StringBuilder query = new StringBuilder(baseQuery);
-
+    // handle optional filtering params
+    String filterClauses = getFilterClauses(pageRequest.getFiltering());
+    if (filterClauses.length() > 0) {
+      query.append(" AND ").append(filterClauses);
+    }
+    query.append(" ORDER BY c.label");
     // we add fix sorting in above query; otherwise we get in conflict with allowed sorting
     // and column names of this repository (it is for digitalobjects, not sublists of
     // collections...)
@@ -348,10 +352,14 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         "SELECT count(*) FROM collections as c"
             + " LEFT JOIN collection_digitalobjects as cd on c.uuid = cd.collection_uuid"
             + " WHERE cd.digitalobject_uuid = :uuid";
+    if (filterClauses.length() > 0) {
+      countQuery += " AND " + filterClauses;
+    }
+    final String sqlCount = countQuery;
     long total =
         dbi.withHandle(
             h ->
-                h.createQuery(countQuery)
+                h.createQuery(sqlCount)
                     .bind("uuid", digitalObjectUuid)
                     .mapTo(Long.class)
                     .findOne()

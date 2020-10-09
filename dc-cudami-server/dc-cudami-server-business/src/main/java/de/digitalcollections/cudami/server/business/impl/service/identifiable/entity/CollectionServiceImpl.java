@@ -11,7 +11,6 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -51,23 +50,10 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
     return ((CollectionRepository) repository).addDigitalObjects(collection, digitalObjects);
   }
 
-  private Filtering filteringForActive() {
-    // business logic that defines, what "active" means:
-    LocalDate now = LocalDate.now();
-    Filtering filtering =
-        Filtering.defaultBuilder()
-            .filter("publicationStart")
-            .lessOrEqual(now)
-            .filter("publicationEnd")
-            .greaterOrNotSet(now)
-            .build();
-    return filtering;
-  }
-
   @Override
   public PageResponse<Collection> findActive(PageRequest pageRequest) {
     Filtering filtering = filteringForActive();
-    pageRequest.setFiltering(filtering);
+    pageRequest.add(filtering);
     return find(pageRequest);
   }
 
@@ -87,14 +73,14 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   public List<Collection> getActiveChildren(UUID uuid) {
     Filtering filtering = filteringForActive();
     PageRequest pageRequest = new PageRequestImpl();
-    pageRequest.setFiltering(filtering);
+    pageRequest.add(filtering);
     return getChildren(uuid, pageRequest).getContent();
   }
 
   @Override
   public PageResponse<Collection> getActiveChildren(UUID uuid, PageRequest pageRequest) {
     Filtering filtering = filteringForActive();
-    pageRequest.setFiltering(filtering);
+    pageRequest.add(filtering);
     return getChildren(uuid, pageRequest);
   }
 

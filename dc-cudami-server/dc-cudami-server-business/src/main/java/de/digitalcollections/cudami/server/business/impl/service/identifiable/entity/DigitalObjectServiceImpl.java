@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
+import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
@@ -42,6 +43,45 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
+  public boolean delete(UUID uuid) {
+    // Check for existance. If not given, return false.
+    DigitalObject existingDigitalObject = get(uuid);
+    if (existingDigitalObject == null) {
+      return false;
+    }
+
+    // Remove connection to collections
+    collectionService.removeDigitalObjectFromAllCollections(existingDigitalObject);
+
+    // Remove connection to projects
+    projectService.removeDigitalObjectFromAllProjects(existingDigitalObject);
+
+    // Remove preview images
+    ((DigitalObjectRepository) repository).deleteFileResources(existingDigitalObject.getUuid());
+
+    // Remove identifiers
+    ((DigitalObjectRepository) repository).deleteIdentifiers(existingDigitalObject.getUuid());
+
+    // Remove the digitalObject itself
+    repository.delete(uuid);
+
+    return true;
+  }
+
+  @Override
+  public List<DigitalObject> findAllReduced() {
+    return ((EntityRepository) repository).findAllReduced(EntityType.DIGITAL_OBJECT);
+  }
+
+  @Override
+  public PageResponse<Collection> getActiveCollections(
+      DigitalObject digitalObject, PageRequest pageRequest) {
+    Filtering filtering = filteringForActive();
+    pageRequest.add(filtering);
+    return ((DigitalObjectRepository) repository).getCollections(digitalObject, pageRequest);
+  }
+
+  @Override
   public DigitalObject getByIdentifier(String namespace, String id) {
     return ((DigitalObjectRepository) repository).findByIdentifier(namespace, id);
   }
@@ -72,6 +112,11 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     return ((DigitalObjectRepository) repository).getImageFileResources(digitalObjectUuid);
   }
 
+  @Override
+  public PageResponse<Project> getProjects(DigitalObject digitalObject, PageRequest pageRequest) {
+    return ((DigitalObjectRepository) repository).getProjects(digitalObject, pageRequest);
+  }
+
   Identifier getidentifer(DigitalObject digitalObject, String name) {
     for (Identifier identifier : digitalObject.getIdentifiers()) {
       if (name.equals(identifier.getNamespace())) {
@@ -79,11 +124,6 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
       }
     }
     return null;
-  }
-
-  @Override
-  public PageResponse<Project> getProjects(DigitalObject digitalObject, PageRequest pageRequest) {
-    return ((DigitalObjectRepository) repository).getProjects(digitalObject, pageRequest);
   }
 
   @Override
@@ -97,36 +137,5 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
       UUID digitalObjectUuid, List<FileResource> fileResources) {
     return ((DigitalObjectRepository) repository)
         .saveFileResources(digitalObjectUuid, fileResources);
-  }
-
-  @Override
-  public List<DigitalObject> findAllReduced() {
-    return ((EntityRepository) repository).findAllReduced(EntityType.DIGITAL_OBJECT);
-  }
-
-  @Override
-  public boolean delete(UUID uuid) {
-    // Check for existance. If not given, return false.
-    DigitalObject existingDigitalObject = get(uuid);
-    if (existingDigitalObject == null) {
-      return false;
-    }
-
-    // Remove connection to collections
-    collectionService.removeDigitalObjectFromAllCollections(existingDigitalObject);
-
-    // Remove connection to projects
-    projectService.removeDigitalObjectFromAllProjects(existingDigitalObject);
-
-    // Remove preview images
-    ((DigitalObjectRepository) repository).deleteFileResources(existingDigitalObject.getUuid());
-
-    // Remove identifiers
-    ((DigitalObjectRepository) repository).deleteIdentifiers(existingDigitalObject.getUuid());
-
-    // Remove the digitalObject itself
-    repository.delete(uuid);
-
-    return true;
   }
 }

@@ -140,7 +140,7 @@ public class DigitalObjectController {
     //    return digitalObject;
   }
 
-  @ApiMethod(description = "Get paged collections of a digital objects")
+  @ApiMethod(description = "Get (active) paged collections of a digital objects")
   @GetMapping(
       value = {
         "/latest/digitalobjects/{uuid}/collections",
@@ -151,11 +151,15 @@ public class DigitalObjectController {
   public PageResponse<Collection> getCollections(
       @ApiPathParam(description = "UUID of the digital object") @PathVariable("uuid") UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "active", required = false) String active) {
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, new SortingImpl());
 
     DigitalObject digitalObject = new DigitalObjectImpl();
     digitalObject.setUuid(uuid);
+    if (active != null) {
+      return service.getActiveCollections(digitalObject, pageRequest);
+    }
     return service.getCollections(digitalObject, pageRequest);
   }
 

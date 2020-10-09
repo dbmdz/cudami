@@ -3,9 +3,11 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
+import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,19 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
   @Override
   public void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid) {
     ((EntityRepository) repository).addRelation(subjectEntityUuid, predicate, objectEntityUuid);
+  }
+
+  protected Filtering filteringForActive() {
+    // business logic that defines, what "active" means
+    LocalDate now = LocalDate.now();
+    Filtering filtering =
+        Filtering.defaultBuilder()
+            .filter("publicationStart")
+            .lessOrEqual(now)
+            .filter("publicationEnd")
+            .greaterOrNotSet(now)
+            .build();
+    return filtering;
   }
 
   @Override
