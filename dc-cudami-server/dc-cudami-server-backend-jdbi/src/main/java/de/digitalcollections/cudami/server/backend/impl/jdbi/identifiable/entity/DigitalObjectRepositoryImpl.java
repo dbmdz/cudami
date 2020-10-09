@@ -305,7 +305,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     StringBuilder query = new StringBuilder(baseQuery);
     // handle optional filtering params
     String filterClauses = getFilterClauses(pageRequest.getFiltering());
-    if (filterClauses.length() > 0) {
+    if (!filterClauses.isEmpty()) {
       query.append(" AND ").append(filterClauses);
     }
     query.append(" ORDER BY c.label");
@@ -352,7 +352,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         "SELECT count(*) FROM collections as c"
             + " LEFT JOIN collection_digitalobjects as cd on c.uuid = cd.collection_uuid"
             + " WHERE cd.digitalobject_uuid = :uuid";
-    if (filterClauses.length() > 0) {
+    if (!filterClauses.isEmpty()) {
       countQuery += " AND " + filterClauses;
     }
     final String sqlCount = countQuery;
