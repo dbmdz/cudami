@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Convenience repository implementation to be inherited from if applicable.
@@ -97,17 +98,11 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
     if (filtering == null || filtering.getFilterCriterias().isEmpty()) {
       return "";
     }
-    StringBuilder sbFilterClauses = new StringBuilder();
-    List<FilterCriterion> filterCriterias = filtering.getFilterCriterias();
-    for (int i = 0; i < filterCriterias.size(); i++) {
-      FilterCriterion fc = filterCriterias.get(i);
-      if (i > 0) {
-        // only prepend " AND " beginning with the second criteria
-        sbFilterClauses.append(" AND ");
-      }
-      sbFilterClauses.append(getWhereClause(fc));
-    }
-    return sbFilterClauses.toString();
+    List<String> filterClauses =
+        filtering.getFilterCriterias().stream()
+            .map(f -> getWhereClause(f))
+            .collect(Collectors.toList());
+    return String.join(" AND ", filterClauses);
   }
 
   protected String getWhereClause(FilterCriterion<?> fc)
