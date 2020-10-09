@@ -100,7 +100,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
     }
     List<String> filterClauses =
         filtering.getFilterCriterias().stream()
-            .map(f -> getWhereClause(f))
+            .map(this::getWhereClause)
             .collect(Collectors.toList());
     return String.join(" AND ", filterClauses);
   }
@@ -135,14 +135,10 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
             query.append(" NOT");
           }
           query.append(" IN (");
-          int i = 0;
-          for (Object value : fc.getValues()) {
-            i++;
-            query.append(convertToSqlString(value));
-            if (i < fc.getValues().size()) {
-              query.append(",");
-            }
-          }
+          query.append(
+              fc.getValues().stream()
+                  .map(this::convertToSqlString)
+                  .collect(Collectors.joining(",")));
           query.append("))");
           break;
         case CONTAINS:
