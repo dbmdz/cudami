@@ -48,7 +48,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       "SELECT d.uuid d_uuid, d.refid d_refId, d.label d_label, d.description d_description,"
           + " d.identifiable_type d_type, d.entity_type d_entityType,"
           + " d.created d_created, d.last_modified d_lastModified,"
-          + " d.preview_hints d_previewImageRenderingHints,"
+          + " d.preview_hints d_previewImageRenderingHints, d.custom_attrs d_customAttributes,"
           // TODO: add d.license d_license, d.version d_version, when features added
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl,"
@@ -65,7 +65,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       "SELECT d.uuid d_uuid, d.refid d_refId, d.label d_label, d.description d_description,"
           + " d.identifiable_type d_type, d.entity_type d_entityType,"
           + " d.created d_created, d.last_modified d_lastModified,"
-          + " d.preview_hints d_previewImageRenderingHints,"
+          + " d.preview_hints d_previewImageRenderingHints, d.custom_attrs d_customAttributes,"
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
           + " FROM digitalobjects as d"
           + " LEFT JOIN fileresources_image as file on d.previewfileresource = file.uuid";
@@ -129,6 +129,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         new StringBuilder(
             "SELECT d.uuid d_uuid, d.refid d_refId, d.label d_label, d.description d_description,"
                 + " d.entity_type d_entityType,"
+                + " d.custom_attrs d_customAttributes,"
                 + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
                 + " FROM digitalobjects as d"
                 + " LEFT JOIN fileresources_image as file on d.previewfileresource = file.uuid"
@@ -556,11 +557,11 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
     String query =
         "INSERT INTO digitalobjects("
-            + "uuid, label, description, previewFileResource, preview_hints,"
+            + "uuid, label, description, previewFileResource, preview_hints, custom_attrs,"
             + " identifiable_type, entity_type,"
             + " created, last_modified"
             + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
+            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
             + " :type, :entityType,"
             + " :created, :lastModified"
             + ")";
@@ -654,7 +655,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     String query =
         "UPDATE digitalobjects SET"
             + " label=:label::JSONB, description=:description::JSONB,"
-            + " previewFileResource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
+            + " previewFileResource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
             + " last_modified=:lastModified"
             + " WHERE uuid=:uuid";
 
