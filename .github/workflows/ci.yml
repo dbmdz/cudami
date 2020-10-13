@@ -72,4 +72,4 @@ jobs:
       - name: Set project version
         run: echo "::set-env name=PROJECT_VERSION::$(xmllint --xpath '/*[local-name()="project"]/*[local-name()="version"]/text()' pom.xml)"
       - name: Deploy cudami
-        run: if [[ "$PROJECT_VERSION" =~ .*SNAPSHOT ]]; then curl -X POST -F token=${{ secrets.TRIGGER_TOKEN }} -F ref=master -F "variables[PROJECT_VERSION]=$PROJECT_VERSION" ${{ secrets.TRIGGER_URL }}; fi
+        run: if [[ "$PROJECT_VERSION" =~ .*SNAPSHOT ]]; then curl -X POST -F token=${{ secrets.TRIGGER_TOKEN }} -F ref=main -F "variables[DEPLOY_VERSION_TO_ENVIRONMENT]=$(printf '%s > development' $PROJECT_VERSION)" ${{ secrets.TRIGGER_URL }}; fi
