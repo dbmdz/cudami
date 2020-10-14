@@ -253,11 +253,12 @@ public class CollectionController {
       } else {
         collection = collectionService.getActive(uuid, pLocale);
       }
-    }
-    if (pLocale == null) {
-      collection = collectionService.get(uuid);
     } else {
-      collection = collectionService.get(uuid, pLocale);
+      if (pLocale == null) {
+        collection = collectionService.get(uuid);
+      } else {
+        collection = collectionService.get(uuid, pLocale);
+      }
     }
     return new ResponseEntity<>(collection, HttpStatus.OK);
   }
