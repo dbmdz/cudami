@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
+import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
@@ -13,6 +14,8 @@ import java.util.UUID;
  */
 public interface WebpageRepository<E extends Entity>
     extends NodeRepository<Webpage>, EntityPartRepository<Webpage, E> {
+
+  Webpage findOne(UUID uuid, Filtering filtering);
 
   /**
    * @param webpage newly created webpage to be saved

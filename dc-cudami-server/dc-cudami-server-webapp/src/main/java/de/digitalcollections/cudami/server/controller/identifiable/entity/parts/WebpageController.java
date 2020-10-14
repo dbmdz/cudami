@@ -98,18 +98,31 @@ public class WebpageController {
               description =
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
-          Locale pLocale)
+          Locale pLocale,
+      @ApiQueryParam(
+              name = "active",
+              description = "If set, object will only be returned if active")
+          @RequestParam(name = "active", required = false)
+          String active)
       throws IdentifiableServiceException {
     Webpage webpage;
-    if (pLocale == null) {
-      webpage = webpageService.get(uuid);
+    if (active != null) {
+      if (pLocale == null) {
+        webpage = webpageService.getActive(uuid);
+      } else {
+        webpage = webpageService.getActive(uuid, pLocale);
+      }
     } else {
-      webpage = webpageService.get(uuid, pLocale);
+      if (pLocale == null) {
+        webpage = webpageService.get(uuid);
+      } else {
+        webpage = webpageService.get(uuid, pLocale);
+      }
     }
     return new ResponseEntity<>(webpage, HttpStatus.OK);
   }
 
-  @ApiMethod(description = "Get children of a webpage as JSON")
+  @ApiMethod(description = "Get (active or all) paged children of a webpage as JSON")
   @GetMapping(
       value = {"/latest/webpages/{uuid}/children", "/v3/webpages/{uuid}/children"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -127,22 +140,17 @@ public class WebpageController {
           Direction sortDirection,
       @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
           NullHandling nullHandling,
-      @RequestParam(name = "publicationStart", required = false)
-          FilterCriterion<LocalDate> publicationStart,
-      @RequestParam(name = "publicationEnd", required = false)
-          FilterCriterion<LocalDate> publicationEnd)
+      @RequestParam(name = "active", required = false) String active)
       throws IdentifiableServiceException {
     Sorting sorting = null;
     if (sortField != null) {
       OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
       sorting = new SortingImpl(order);
     }
-    Filtering filtering =
-        Filtering.defaultBuilder()
-            .add("publicationStart", publicationStart)
-            .add("publicationEnd", publicationEnd)
-            .build();
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting, filtering);
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
+    if (active != null) {
+      return webpageService.getActiveChildren(uuid, pageRequest);
+    }
     return webpageService.getChildren(uuid, pageRequest);
   }
 
