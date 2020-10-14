@@ -50,7 +50,7 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
     Filtering filtering =
         Filtering.defaultBuilder()
             .filter("publicationStart")
-            .lessOrEqual(now)
+            .lessOrEqualAndSet(now)
             .filter("publicationEnd")
             .greaterOrNotSet(now)
             .build();
