@@ -4,12 +4,14 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.N
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.WebpageRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.WebpageService;
+import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
+import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -50,6 +52,38 @@ public class WebpageServiceImpl<E extends Entity> extends EntityPartServiceImpl<
       webpage.getText().entrySet().removeIf((Map.Entry entry) -> !entry.getKey().equals(fLocale));
     }
     return webpage;
+  }
+
+  @Override
+  public Webpage getActive(UUID uuid) {
+    Filtering filtering = filteringForActive();
+    return ((WebpageRepository) repository).findOne(uuid, filtering);
+  }
+
+  @Override
+  public Webpage getActive(UUID uuid, Locale pLocale) {
+    Webpage webpage = getActive(uuid);
+    return reduceMultilanguageFieldsToGivenLocale(webpage, pLocale);
+  }
+
+  @Override
+  public List<Webpage> getActiveChildren(UUID uuid) {
+    Filtering filtering = filteringForActive();
+    PageRequest pageRequest = new PageRequestImpl();
+    pageRequest.add(filtering);
+    return getChildren(uuid, pageRequest).getContent();
+  }
+
+  @Override
+  public PageResponse<Webpage> getActiveChildren(UUID uuid, PageRequest pageRequest) {
+    Filtering filtering = filteringForActive();
+    pageRequest.add(filtering);
+    return getChildren(uuid, pageRequest);
+  }
+
+  @Override
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) {
+    return ((NodeRepository<Webpage>) repository).getBreadcrumbNavigation(uuid);
   }
 
   @Override
@@ -111,10 +145,5 @@ public class WebpageServiceImpl<E extends Entity> extends EntityPartServiceImpl<
       LOGGER.error("Cannot save webpage " + webpage + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
     }
-  }
-
-  @Override
-  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) {
-    return ((NodeRepository<Webpage>) repository).getBreadcrumbNavigation(uuid);
   }
 }

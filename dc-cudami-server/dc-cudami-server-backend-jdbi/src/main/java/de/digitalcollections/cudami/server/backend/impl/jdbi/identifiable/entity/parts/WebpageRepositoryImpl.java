@@ -247,6 +247,57 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
   }
 
   @Override
+  public Webpage findOne(UUID uuid, Filtering filtering) {
+    String query = FIND_ONE_BASE_SQL + " WHERE w.uuid = :uuid";
+
+    if (filtering != null) {
+      // handle optional filtering params
+      String filterClauses = getFilterClauses(filtering);
+      if (!filterClauses.isEmpty()) {
+        query += " AND " + filterClauses;
+      }
+    }
+    String finalQuery = query;
+    WebpageImpl result =
+        dbi.withHandle(
+                h ->
+                    h.createQuery(finalQuery)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, WebpageImpl>(),
+                            (map, rowView) -> {
+                              WebpageImpl webpage =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("w_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(WebpageImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                webpage.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
+                                webpage.addIdentifier(identifier);
+                              }
+
+                              return map;
+                            }))
+            .get(uuid);
+
+    if (result != null) {
+      // TODO could be replaced with another join in above query...
+      result.setChildren(getChildren(result));
+    }
+    return result;
+  }
+
+  @Override
   public List<Webpage> getChildren(Webpage webpage) {
     return getChildren(webpage.getUuid());
   }
