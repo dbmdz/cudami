@@ -64,6 +64,11 @@ public class CudamiWebpagesClient extends CudamiBaseClient<WebpageImpl> {
         WebpageImpl.class);
   }
 
+  public List<WebpageImpl> getActiveChildrenTree(UUID uuid) throws HttpException {
+    return doGetRequestForObjectList(
+        String.format("/latest/webpages/%s/childrentree?active=true", uuid));
+  }
+
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws HttpException {
     return (BreadcrumbNavigation)
         doGetRequestForObject(
@@ -72,6 +77,10 @@ public class CudamiWebpagesClient extends CudamiBaseClient<WebpageImpl> {
 
   public List<WebpageImpl> getChildren(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(String.format("/latest/webpages/%s/children", uuid));
+  }
+
+  public List<WebpageImpl> getChildrenTree(UUID uuid) throws HttpException {
+    return doGetRequestForObjectList(String.format("/latest/webpages/%s/childrentree", uuid));
   }
 
   public PageResponse<WebpageImpl> getChildren(UUID uuid, PageRequest pageRequest)
