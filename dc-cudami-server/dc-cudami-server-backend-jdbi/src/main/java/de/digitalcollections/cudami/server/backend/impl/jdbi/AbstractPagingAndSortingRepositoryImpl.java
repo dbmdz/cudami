@@ -206,6 +206,18 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
               .append(convertToSqlString(fc.getValue()))
               .append(")");
           break;
+        case LESS_THAN_AND_SET:
+          // @see https://www.postgresql.org/docs/11/functions-comparison.html
+          query
+              .append("(")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" < ")
+              .append(convertToSqlString(fc.getValue()))
+              .append(" AND ")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" IS NOT NULL")
+              .append(")");
+          break;
         case LESS_THAN_OR_EQUAL_TO:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
@@ -213,6 +225,18 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
               .append(getColumnName(fc.getFieldName()))
               .append(" <= ")
               .append(convertToSqlString(fc.getValue()))
+              .append(")");
+          break;
+        case LESS_THAN_OR_EQUAL_TO_AND_SET:
+          // @see https://www.postgresql.org/docs/11/functions-comparison.html
+          query
+              .append("(")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" <= ")
+              .append(convertToSqlString(fc.getValue()))
+              .append(" AND ")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" IS NOT NULL")
               .append(")");
           break;
         case LESS_THAN_OR_EQUAL_TO_OR_NOT_SET:
