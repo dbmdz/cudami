@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.parts;
 
+import com.google.common.base.Strings;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.WebpageService;
@@ -143,7 +144,7 @@ public class WebpageController {
       @RequestParam(name = "active", required = false) String active)
       throws IdentifiableServiceException {
     Sorting sorting = null;
-    if (sortField != null) {
+    if (!Strings.isNullOrEmpty(sortField)) {
       OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
       sorting = new SortingImpl(order);
     }
