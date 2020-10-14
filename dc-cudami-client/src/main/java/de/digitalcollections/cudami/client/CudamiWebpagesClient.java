@@ -34,6 +34,11 @@ public class CudamiWebpagesClient extends CudamiBaseClient<WebpageImpl> {
     return doGetRequestForPagedObjectList("/latest/webpages", pageRequest);
   }
 
+  public Webpage findActiveOne(UUID uuid, Locale locale) throws HttpException {
+    return doGetRequestForObject(
+        String.format("/latest/webpages/%s?active=true&pLocale=%s", uuid, locale));
+  }
+
   public Webpage findOne(UUID uuid) throws HttpException {
     return doGetRequestForObject(String.format("/latest/webpages/%s", uuid));
   }
@@ -49,6 +54,14 @@ public class CudamiWebpagesClient extends CudamiBaseClient<WebpageImpl> {
   public Webpage findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
         String.format("/latest/webpages/identifier/%s:%s.json", namespace, id));
+  }
+
+  public PageResponse<WebpageImpl> getActiveChildren(UUID uuid, PageRequest pageRequest)
+      throws HttpException {
+    return doGetRequestForPagedObjectList(
+        String.format("/latest/webpages/%s/children?active=true", uuid),
+        pageRequest,
+        WebpageImpl.class);
   }
 
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws HttpException {
