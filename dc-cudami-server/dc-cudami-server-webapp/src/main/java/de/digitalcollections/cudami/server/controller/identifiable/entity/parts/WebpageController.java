@@ -155,6 +155,32 @@ public class WebpageController {
     return webpageService.getChildren(uuid, pageRequest);
   }
 
+  @ApiMethod(description = "Get (active or all) children of a webpage recursivly as JSON")
+  @GetMapping(
+      value = {"/latest/webpages/{uuid}/childrentree", "/v3/webpages/{uuid}/childrentree"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public List<Webpage> getWebpageChildrenTree(
+      @ApiPathParam(
+              description =
+                  "UUID of the root webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @ApiQueryParam(name = "active", description = "If set, only active children will be returned")
+          @RequestParam(name = "active", required = false)
+          String active) {
+    List<Webpage> children;
+    if (active != null) {
+      children = webpageService.getActiveChildren(uuid);
+    } else {
+      children = webpageService.getChildren(uuid);
+    }
+    for (Webpage child : children) {
+      child.setChildren(getWebpageChildrenTree(child.getUuid(), active));
+    }
+    return children;
+  }
+
   @ApiMethod(description = "Get parent of a webpage as JSON")
   @GetMapping(
       value = {"/latest/webpages/{uuid}/parent", "/v3/webpages/{uuid}/parent"},
