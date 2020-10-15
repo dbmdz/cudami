@@ -61,7 +61,9 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   public Collection getActive(UUID uuid) {
     Filtering filtering = filteringForActive();
     Collection collection = ((CollectionRepository) repository).findOne(uuid, filtering);
-    collection.setChildren(getActiveChildren(uuid));
+    if (collection != null) {
+      collection.setChildren(getActiveChildren(uuid));
+    }
     return collection;
   }
 

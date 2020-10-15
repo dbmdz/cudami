@@ -58,7 +58,9 @@ public class WebpageServiceImpl<E extends Entity> extends EntityPartServiceImpl<
   public Webpage getActive(UUID uuid) {
     Filtering filtering = filteringForActive();
     Webpage webpage = ((WebpageRepository) repository).findOne(uuid, filtering);
-    webpage.setChildren(getActiveChildren(uuid));
+    if (webpage != null) {
+      webpage.setChildren(getActiveChildren(uuid));
+    }
     return webpage;
   }
 
