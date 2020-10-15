@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.parts;
 
-import com.google.common.base.Strings;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.WebpageService;
@@ -33,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -144,7 +144,7 @@ public class WebpageController {
       @RequestParam(name = "active", required = false) String active)
       throws IdentifiableServiceException {
     Sorting sorting = null;
-    if (!Strings.isNullOrEmpty(sortField)) {
+    if (!StringUtils.isEmpty(sortField)) {
       OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
       sorting = new SortingImpl(order);
     }
