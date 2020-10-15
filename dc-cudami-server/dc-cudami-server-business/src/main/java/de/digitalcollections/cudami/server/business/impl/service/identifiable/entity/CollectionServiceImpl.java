@@ -60,7 +60,9 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   @Override
   public Collection getActive(UUID uuid) {
     Filtering filtering = filteringForActive();
-    return ((CollectionRepository) repository).findOne(uuid, filtering);
+    Collection collection = ((CollectionRepository) repository).findOne(uuid, filtering);
+    collection.setChildren(getActiveChildren(uuid));
+    return collection;
   }
 
   @Override
