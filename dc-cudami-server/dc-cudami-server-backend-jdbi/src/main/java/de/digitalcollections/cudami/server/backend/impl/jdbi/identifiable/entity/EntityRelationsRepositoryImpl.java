@@ -74,7 +74,7 @@ public class EntityRelationsRepositoryImpl extends AbstractPagingAndSortingRepos
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[] {"subject_uuid", "predicate", "object_uuid"};
+    return new String[] {"subject", "predicate", "object"};
   }
 
   @Override
@@ -83,8 +83,12 @@ public class EntityRelationsRepositoryImpl extends AbstractPagingAndSortingRepos
       return null;
     }
     switch (modelProperty) {
+      case "object":
+        return "rel.object_uuid";
       case "predicate":
         return "rel.predicate";
+      case "subject":
+        return "rel.subject_uuid";
       default:
         return null;
     }
