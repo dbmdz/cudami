@@ -5,12 +5,18 @@ import static org.mockito.Mockito.mock;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CorporationService;
+import de.digitalcollections.cudami.server.config.SpringConfigBackendForTest;
+import de.digitalcollections.cudami.server.config.SpringConfigBusinessForTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 @DisplayName("The corporation controller")
+@ActiveProfiles("TEST")
+@SpringBootTest(classes = {SpringConfigBusinessForTest.class, SpringConfigBackendForTest.class})
 class CorporationControllerTest {
 
   private CorporationController corporationController;

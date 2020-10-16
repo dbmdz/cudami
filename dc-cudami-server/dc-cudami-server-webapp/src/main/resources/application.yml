@@ -105,6 +105,14 @@ spring:
 
 # TEST
 spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.jdbc.JdbcRepositoriesAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration
   flyway:
     enabled: false
+  main:
+    allow-bean-definition-overriding: true
   profiles: TEST

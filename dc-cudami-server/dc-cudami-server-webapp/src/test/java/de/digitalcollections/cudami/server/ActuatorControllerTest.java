@@ -2,6 +2,8 @@ package de.digitalcollections.cudami.server;
 
 import static org.assertj.core.api.BDDAssertions.then;
 
+import de.digitalcollections.cudami.server.config.SpringConfigBackendForTest;
+import de.digitalcollections.cudami.server.config.SpringConfigBusinessForTest;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,9 @@ import org.springframework.test.context.ActiveProfiles;
 
 /** Basic integration tests for service application. */
 @ActiveProfiles("TEST")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+    classes = {SpringConfigBusinessForTest.class, SpringConfigBackendForTest.class},
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ActuatorControllerTest {
 
   @Value("${management.endpoints.web.base-path}")
