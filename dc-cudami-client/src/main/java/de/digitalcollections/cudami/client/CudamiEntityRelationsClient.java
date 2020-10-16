@@ -14,6 +14,12 @@ public class CudamiEntityRelationsClient extends CudamiBaseClient {
     super(http, serverUrl, EntityPartImpl.class, mapper);
   }
 
+  public List<EntityRelation> getRelationsByPredicate(String predicate) throws HttpException {
+    return doGetRequestForObjectList(
+        String.format("/latest/entities/relations?predicate=%s", predicate),
+        EntityRelationImpl.class);
+  }
+
   public List<EntityRelation> saveRelations(List<EntityRelation> relations) throws HttpException {
     return doPutRequestForObjectList(
         "/latest/entities/relations", relations, EntityRelationImpl.class);

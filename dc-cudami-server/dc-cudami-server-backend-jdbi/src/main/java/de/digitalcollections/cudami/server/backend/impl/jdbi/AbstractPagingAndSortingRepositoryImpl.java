@@ -278,6 +278,9 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
       DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
       return "'" + ((ChronoLocalDate) value).format(formatter) + "'";
     }
+    if (value instanceof String) {
+      return "'" + value + "'";
+    }
     return value.toString();
   }
 }
