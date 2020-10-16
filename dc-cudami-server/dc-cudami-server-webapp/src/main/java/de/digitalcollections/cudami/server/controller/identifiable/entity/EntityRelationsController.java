@@ -2,7 +2,11 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityRelationsService;
+import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import java.util.List;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
@@ -10,9 +14,12 @@ import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -22,6 +29,25 @@ public class EntityRelationsController {
   @Autowired private DigitalObjectService digitalObjectService;
 
   @Autowired private EntityRelationsService service;
+
+  @ApiMethod(description = "Get paged, sorted, filtered relations")
+  @GetMapping(
+      value = {"/latest/entities/relations", "/v3/entities/relations"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public PageResponse<EntityRelation> getEntitiesRelations(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "predicate", required = false) String predicate) {
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
+
+    if (predicate != null && !StringUtils.isEmpty(predicate)) {
+      Filtering filtering =
+          Filtering.defaultBuilder().filter("predicate").isEquals(predicate).build();
+      pageRequest.add(filtering);
+    }
+    return service.find(pageRequest);
+  }
 
   @ApiMethod(
       description =
