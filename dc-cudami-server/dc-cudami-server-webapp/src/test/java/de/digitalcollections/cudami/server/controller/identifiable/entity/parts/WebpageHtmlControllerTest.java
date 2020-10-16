@@ -7,6 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Resources;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.WebpageService;
+import de.digitalcollections.cudami.server.config.SpringConfigBackendForTest;
+import de.digitalcollections.cudami.server.config.SpringConfigBusinessForTest;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
@@ -34,9 +36,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
-@ActiveProfiles("TEST")
 @AutoConfigureMockMvc
-@SpringBootTest
+@ActiveProfiles("TEST")
+@SpringBootTest(classes = {SpringConfigBusinessForTest.class, SpringConfigBackendForTest.class})
 public class WebpageHtmlControllerTest {
 
   @Autowired private MockMvc mockMvc;
