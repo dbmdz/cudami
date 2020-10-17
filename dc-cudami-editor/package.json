@@ -35,7 +35,7 @@
     "prosemirror-tables": "^1.1.1",
     "pubsub-js": "^1.9.0",
     "react": "^16.13.1",
-    "react-autosuggest": "^10.0.2",
+    "react-autosuggest": "^10.0.3",
     "react-date-picker": "^8.0.3",
     "react-dom": "^16.13.1",
     "react-file-drop": "^3.1.0",
