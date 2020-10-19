@@ -239,7 +239,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   public PageResponse<DigitalObject> getDigitalObjects(UUID projectUuid, PageRequest pageRequest) {
     final String baseQuery =
         "SELECT d.uuid d_uuid, d.label d_label, d.refid d_refId,"
-            + " d.created d_created, d.last_modified d_lastModified,"
+            + " d.created d_created, d.last_modified d_lastModified, d.custom_attrs d_customAttributes,"
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
             + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.http_base_url pf_httpBaseUrl"
             + " FROM digitalobjects as d"
