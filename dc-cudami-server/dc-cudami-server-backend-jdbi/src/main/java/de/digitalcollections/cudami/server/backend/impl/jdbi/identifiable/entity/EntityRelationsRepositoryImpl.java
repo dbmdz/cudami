@@ -19,6 +19,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
+// FIXME: added Spring JDBC-Template framework, because I couldn't get JDBI get to work with double
+// join on entities... sorry. Solutions welcome
 public class EntityRelationsRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl
     implements EntityRelationsRepository {
 
