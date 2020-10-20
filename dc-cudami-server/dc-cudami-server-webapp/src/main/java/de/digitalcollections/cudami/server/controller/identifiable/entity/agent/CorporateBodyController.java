@@ -1,8 +1,8 @@
-package de.digitalcollections.cudami.server.controller.identifiable.entity;
+package de.digitalcollections.cudami.server.controller.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CorporationService;
-import de.digitalcollections.model.api.identifiable.entity.Corporation;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
+import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
@@ -34,40 +34,40 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Api(description = "The corporation controller", name = "Corporation controller")
-public class CorporationController {
+@Api(description = "The corporate body controller", name = "Corporate body controller")
+public class CorporateBodyController {
 
   private static final Pattern GNDID_PATTERN = Pattern.compile("(\\d+(-.)?)|(\\d+X)");
 
-  private final CorporationService corporationService;
+  private final CorporateBodyService corporateBodyService;
 
   @Autowired
-  public CorporationController(CorporationService corporationService) {
-    this.corporationService = corporationService;
+  public CorporateBodyController(CorporateBodyService corporateBodyService) {
+    this.corporateBodyService = corporateBodyService;
   }
 
-  @ApiMethod(description = "Fetch a corporation by GND-ID from external system and save it")
+  @ApiMethod(description = "Fetch a corporate body by GND-ID from external system and save it")
   @PostMapping(
-      value = {"/latest/corporations/gnd/{gndId}", "/v3/corporations/gnd/{gndId}"},
+      value = {"/latest/corporatebodies/gnd/{gndId}", "/v3/corporatebodies/gnd/{gndId}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
-  public Corporation fetchAndSaveByGndId(
-      @ApiPathParam(description = "GND-ID of the corporation, e.g. <tt>2007744-0</tt>")
+  public CorporateBody fetchAndSaveByGndId(
+      @ApiPathParam(description = "GND-ID of the corporate body, e.g. <tt>2007744-0</tt>")
           @PathVariable("gndId")
           String gndId)
       throws IdentifiableServiceException {
     if (!GNDID_PATTERN.matcher(gndId).matches()) {
       throw new IllegalArgumentException("Invalid GND ID: " + gndId);
     }
-    return corporationService.fetchAndSaveByGndId(gndId);
+    return corporateBodyService.fetchAndSaveByGndId(gndId);
   }
 
-  @ApiMethod(description = "Get all corporations")
+  @ApiMethod(description = "Get all corporate bodies")
   @GetMapping(
-      value = {"/latest/corporations", "/v2/corporations"},
+      value = {"/latest/corporatebodies", "/v2/corporatebodies"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
-  public PageResponse<Corporation> findAll(
+  public PageResponse<CorporateBody> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortField", required = false, defaultValue = "lastModified")
@@ -79,24 +79,24 @@ public class CorporationController {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
-    return corporationService.find(pageRequest);
+    return corporateBodyService.find(pageRequest);
   }
 
-  // Test-URL: http://localhost:9000/latest/corporations/599a120c-2dd5-11e8-b467-0ed5f89f718b
+  // Test-URL: http://localhost:9000/latest/corporatebodies/599a120c-2dd5-11e8-b467-0ed5f89f718b
   @ApiMethod(
       description =
-          "Get an corporation as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+          "Get an corporate body as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {
-        "/latest/corporations/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v2/corporations/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+        "/latest/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v2/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   @ApiResponseObject
-  public ResponseEntity<Corporation> get(
+  public ResponseEntity<CorporateBody> get(
       @ApiPathParam(
               description =
-                  "UUID of the corporation, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+                  "UUID of the corporate body, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid,
       @ApiQueryParam(
@@ -107,67 +107,67 @@ public class CorporationController {
           Locale pLocale)
       throws IdentifiableServiceException {
 
-    Corporation corporation;
+    CorporateBody corporateBody;
     if (pLocale == null) {
-      corporation = corporationService.get(uuid);
+      corporateBody = corporateBodyService.get(uuid);
     } else {
-      corporation = corporationService.get(uuid, pLocale);
+      corporateBody = corporateBodyService.get(uuid, pLocale);
     }
-    return new ResponseEntity<>(corporation, HttpStatus.OK);
+    return new ResponseEntity<>(corporateBody, HttpStatus.OK);
   }
 
-  @ApiMethod(description = "Get corporation by namespace and id")
+  @ApiMethod(description = "Get corporate body by namespace and id")
   @GetMapping(
       value = {
-        "/latest/corporations/identifier/{namespace}:{id}",
-        "/v3/corporations/identifier/{namespace}:{id}"
+        "/latest/corporatebodies/identifier/{namespace}:{id}",
+        "/v3/corporatebodies/identifier/{namespace}:{id}"
       },
       produces = "application/json")
   @ApiResponseObject
-  public Corporation getByIdentifier(
+  public CorporateBody getByIdentifier(
       @ApiPathParam(description = "namespace of identifier") @PathVariable("namespace")
           String namespace,
       @ApiPathParam(description = "id of identifier") @PathVariable("id") String id)
       throws IdentifiableServiceException {
-    return corporationService.getByIdentifier(namespace, id);
+    return corporateBodyService.getByIdentifier(namespace, id);
   }
 
-  @ApiMethod(description = "Get corporation by refId")
+  @ApiMethod(description = "Get corporate body by refId")
   @GetMapping(
-      value = {"/latest/corporations/{refId:[0-9]+}", "/v3/corporations/{refId:[0-9]+}"},
+      value = {"/latest/corporatebodies/{refId:[0-9]+}", "/v3/corporatebodies/{refId:[0-9]+}"},
       produces = "application/json")
   @ApiResponseObject
-  public Corporation getByRefId(
+  public CorporateBody getByRefId(
       @ApiPathParam(description = "reference id") @PathVariable("refId") long refId)
       throws IdentifiableServiceException {
-    return corporationService.getByRefId(refId);
+    return corporateBodyService.getByRefId(refId);
   }
 
-  @ApiMethod(description = "Save a newly created corporation")
+  @ApiMethod(description = "Save a newly created corporate body")
   @PostMapping(
-      value = {"/latest/corporations", "/v2/corporations"},
+      value = {"/latest/corporatebodies", "/v2/corporatebodies"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
-  public Corporation save(@RequestBody Corporation corporation, BindingResult errors)
+  public CorporateBody save(@RequestBody CorporateBody corporateBody, BindingResult errors)
       throws IdentifiableServiceException {
-    return corporationService.save(corporation);
+    return corporateBodyService.save(corporateBody);
   }
 
-  @ApiMethod(description = "Update an corporation")
+  @ApiMethod(description = "Update a corporate body")
   @PutMapping(
-      value = {"/latest/corporations/{uuid}", "/v2/corporations/{uuid}"},
+      value = {"/latest/corporatebodies/{uuid}", "/v2/corporatebodies/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
-  public Corporation update(
+  public CorporateBody update(
       @ApiPathParam(
               description =
-                  "UUID of the corporation, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+                  "UUID of the corporate body, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid,
-      @RequestBody Corporation corporation,
+      @RequestBody CorporateBody corporateBody,
       BindingResult errors)
       throws IdentifiableServiceException {
-    assert Objects.equals(uuid, corporation.getUuid());
-    return corporationService.update(corporation);
+    assert Objects.equals(uuid, corporateBody.getUuid());
+    return corporateBodyService.update(corporateBody);
   }
 }

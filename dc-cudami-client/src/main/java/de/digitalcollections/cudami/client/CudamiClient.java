@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.cudami.client.entity.agent.CudamiCorporateBodiesClient;
 import de.digitalcollections.cudami.client.entity.agent.CudamiPersonsClient;
 import de.digitalcollections.cudami.client.entity.work.CudamiItemsClient;
 import de.digitalcollections.cudami.client.entity.work.CudamiWorksClient;
@@ -12,7 +13,7 @@ public class CudamiClient {
   protected final HttpClient http;
   private final CudamiArticlesClient cudamiArticlesClient;
   private final CudamiCollectionsClient cudamiCollectionsClient;
-  private final CudamiCorporationsClient cudamiCorporationsClient;
+  private final CudamiCorporateBodiesClient cudamiCorporateBodiesClient;
   private final CudamiDigitalObjectsClient cudamiDigitalObjectsClient;
   private final CudamiEntitiesClient cudamiEntitiesClient;
   private final CudamiEntityPartsClient cudamiEntityPartsClient;
@@ -47,7 +48,8 @@ public class CudamiClient {
     this.http = http;
     this.cudamiArticlesClient = new CudamiArticlesClient(http, cudamiServerUrl, mapper);
     this.cudamiCollectionsClient = new CudamiCollectionsClient(http, cudamiServerUrl, mapper);
-    this.cudamiCorporationsClient = new CudamiCorporationsClient(http, cudamiServerUrl, mapper);
+    this.cudamiCorporateBodiesClient =
+        new CudamiCorporateBodiesClient(http, cudamiServerUrl, mapper);
     this.cudamiDigitalObjectsClient = new CudamiDigitalObjectsClient(http, cudamiServerUrl, mapper);
     this.cudamiEntitiesClient = new CudamiEntitiesClient(http, cudamiServerUrl, mapper);
     this.cudamiEntityPartsClient = new CudamiEntityPartsClient(http, cudamiServerUrl, mapper);
@@ -81,8 +83,8 @@ public class CudamiClient {
     return cudamiCollectionsClient;
   }
 
-  public CudamiCorporationsClient forCorporations() {
-    return cudamiCorporationsClient;
+  public CudamiCorporateBodiesClient forCorporateBodies() {
+    return cudamiCorporateBodiesClient;
   }
 
   public CudamiDigitalObjectsClient forDigitalObjects() {

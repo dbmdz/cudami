@@ -1,10 +1,10 @@
-package de.digitalcollections.cudami.server.controller.identifiable.entity;
+package de.digitalcollections.cudami.server.controller.identifiable.entity.agent;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CorporationService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
 import de.digitalcollections.cudami.server.config.SpringConfigBackendForTest;
 import de.digitalcollections.cudami.server.config.SpringConfigBusinessForTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,19 +14,13 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-@DisplayName("The corporation controller")
+@DisplayName("The corporate body controller")
 @ActiveProfiles("TEST")
 @SpringBootTest(classes = {SpringConfigBusinessForTest.class, SpringConfigBackendForTest.class})
-class CorporationControllerTest {
+class CorporateBodyControllerTest {
 
-  private CorporationController corporationController;
-  private CorporationService corporationService;
-
-  @BeforeEach
-  void setUp() {
-    corporationService = mock(CorporationService.class);
-    corporationController = new CorporationController(corporationService);
-  }
+  private CorporateBodyController corporateBodyController;
+  private CorporateBodyService corporateBodyService;
 
   @ParameterizedTest(
       name =
@@ -42,10 +36,16 @@ class CorporationControllerTest {
       })
   void gndIdVerification(String gndId, boolean isValue) throws IdentifiableServiceException {
     if (isValue) {
-      corporationController.fetchAndSaveByGndId(gndId);
+      corporateBodyController.fetchAndSaveByGndId(gndId);
     } else {
       assertThrows(
-          IllegalArgumentException.class, () -> corporationController.fetchAndSaveByGndId(gndId));
+          IllegalArgumentException.class, () -> corporateBodyController.fetchAndSaveByGndId(gndId));
     }
+  }
+
+  @BeforeEach
+  void setUp() {
+    corporateBodyService = mock(CorporateBodyService.class);
+    corporateBodyController = new CorporateBodyController(corporateBodyService);
   }
 }

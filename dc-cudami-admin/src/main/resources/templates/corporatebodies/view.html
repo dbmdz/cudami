@@ -4,16 +4,16 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
   <head>
-    <title th:text="|#{corporations}: #{corporation}|">Corporations: Corporation</title>
+    <title th:text="|#{corporateBodies}: #{corporateBody}|">Corporate bodies: Corporate body</title>
     <!-- Custom styles for this template -->
     <link th:href="@{/css/cudami/media-in-text.css}" rel="stylesheet" />
   </head>
   <body>
-    <section layout:fragment="content" th:object="${corporation}">
+    <section layout:fragment="content" th:object="${corporateBody}">
 
       <div class="row">
         <div class="col-sm-6">
-          <h1 th:text="#{corporation}">Corporation</h1>
+          <h1 th:text="#{corporateBody}">Corporate body</h1>
         </div>
         <div class="col-sm-6">
           <div class="float-right">
@@ -50,9 +50,9 @@
             <div th:each="language,iter : ${existingLanguages}" th:id="${language}" class="tab-pane" th:classappend="${iter.index} == 0 ? active">
               <div class="card">
                 <div class="card-body bg-light">
-                  <div th:replace="fragments/identifiable::renderTeaser(${corporation}, ${language})"></div>
+                  <div th:replace="fragments/identifiable::renderTeaser(${corporateBody}, ${language})"></div>
                 </div>
-                <th:block th:if="*{text} and ${corporation.text.containsKey(language)}">
+                <th:block th:if="*{text} and ${corporateBody.text.containsKey(language)}">
                   <div class="card-body long-text">
                     <div th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(*{text}, ${language})"></div>
                   </div>

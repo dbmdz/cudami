@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.server.backend.impl.lobid.identifiable.entity;
+package de.digitalcollections.cudami.server.backend.impl.lobid.identifiable.entity.agent;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

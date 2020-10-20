@@ -5,11 +5,11 @@ import de.digitalcollections.cudami.lobid.client.model.LobidCorporateBody;
 import de.digitalcollections.cudami.lobid.client.model.LobidDepiction;
 import de.digitalcollections.cudami.lobid.client.model.LobidHomepage;
 import de.digitalcollections.model.api.http.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.entity.Corporation;
+import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.identifiable.resource.MimeType;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
-import de.digitalcollections.model.impl.identifiable.entity.CorporationImpl;
+import de.digitalcollections.model.impl.identifiable.entity.agent.CorporateBodyImpl;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import java.net.MalformedURLException;
@@ -20,23 +20,23 @@ import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LobidCorporationsClient extends LobidBaseClient<LobidCorporateBody> {
+public class LobidCorporateBodiesClient extends LobidBaseClient<LobidCorporateBody> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(LobidCorporationsClient.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(LobidCorporateBodiesClient.class);
 
-  LobidCorporationsClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
+  LobidCorporateBodiesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
     super(http, serverUrl, LobidCorporateBody.class, mapper);
   }
 
-  public Corporation getByGndId(String gndId) throws HttpException {
+  public CorporateBody getByGndId(String gndId) throws HttpException {
     LobidCorporateBody lobidCorporateBody =
         doGetRequestForObject(String.format("/gnd/%s.json", gndId));
-    Corporation corporation = mapLobidToModel(lobidCorporateBody);
-    return corporation;
+    CorporateBody corporateBody = mapLobidToModel(lobidCorporateBody);
+    return corporateBody;
   }
 
-  private Corporation mapLobidToModel(LobidCorporateBody lobidCorporateBody) {
-    Corporation corporation = new CorporationImpl();
+  private CorporateBody mapLobidToModel(LobidCorporateBody lobidCorporateBody) {
+    CorporateBody corporateBody = new CorporateBodyImpl();
 
     // label
     String labelText = lobidCorporateBody.getPreferredName();
@@ -45,12 +45,12 @@ public class LobidCorporationsClient extends LobidBaseClient<LobidCorporateBody>
     if (labelText != null && abbreviatedNameForTheCorporateBody != null) {
       labelText = labelText + " (" + abbreviatedNameForTheCorporateBody.get(0) + ")";
     }
-    corporation.setLabel(new LocalizedTextImpl(Locale.GERMAN, labelText));
+    corporateBody.setLabel(new LocalizedTextImpl(Locale.GERMAN, labelText));
 
     // identifier
     String gndIdentifier = lobidCorporateBody.getGndIdentifier();
     if (gndIdentifier != null) {
-      corporation.addIdentifier(new IdentifierImpl(null, "gnd", gndIdentifier));
+      corporateBody.addIdentifier(new IdentifierImpl(null, "gnd", gndIdentifier));
     }
 
     // homepage
@@ -58,7 +58,7 @@ public class LobidCorporationsClient extends LobidBaseClient<LobidCorporateBody>
     if (homepage != null && !homepage.isEmpty()) {
       String homepageId = homepage.get(0).getId();
       try {
-        corporation.setHomepageUrl(URI.create(homepageId).toURL());
+        corporateBody.setHomepageUrl(URI.create(homepageId).toURL());
       } catch (MalformedURLException ex) {
         LOGGER.warn("Invalid homepage URL: " + homepageId);
       }
@@ -71,9 +71,9 @@ public class LobidCorporationsClient extends LobidBaseClient<LobidCorporateBody>
       ImageFileResource previewImage = new ImageFileResourceImpl();
       previewImage.setUri(URI.create(thumbnailUrl));
       previewImage.setMimeType(MimeType.MIME_IMAGE);
-      corporation.setPreviewImage(previewImage);
+      corporateBody.setPreviewImage(previewImage);
     }
 
-    return corporation;
+    return corporateBody;
   }
 }

@@ -8,7 +8,7 @@ import java.time.Duration;
 public class LobidClient {
 
   protected final HttpClient http;
-  private final LobidCorporationsClient lobidCorporationsClient;
+  private final LobidCorporateBodiesClient lobidCorporateBodiesClient;
 
   public LobidClient() {
     this("https://lobid.org", new LobidObjectMapper());
@@ -26,10 +26,10 @@ public class LobidClient {
 
   public LobidClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
     this.http = http;
-    this.lobidCorporationsClient = new LobidCorporationsClient(http, serverUrl, mapper);
+    this.lobidCorporateBodiesClient = new LobidCorporateBodiesClient(http, serverUrl, mapper);
   }
 
-  public LobidCorporationsClient forCorporations() {
-    return lobidCorporationsClient;
+  public LobidCorporateBodiesClient forCorporateBodies() {
+    return lobidCorporateBodiesClient;
   }
 }

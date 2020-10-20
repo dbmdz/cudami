@@ -18,7 +18,7 @@ import LanguageAdder from './LanguageAdder'
 import LanguageTab from './LanguageTab'
 import Teaser from './Teaser'
 
-const CorporationForm = ({
+const CorporateBodyForm = ({
   activeLanguage,
   canAddLanguage,
   existingLanguages,
@@ -39,7 +39,7 @@ const CorporationForm = ({
       <Row>
         <Col xs="6" sm="9">
           <h1>
-            {identifiable.uuid ? t('editCorporation') : t('createCorporation')}
+            {identifiable.uuid ? t('editCorporateBody') : t('createCorporateBody')}
           </h1>
         </Col>
         <Col xs="6" sm="3">
@@ -112,4 +112,4 @@ const CorporationForm = ({
   )
 }
 
-export default CorporationForm
+export default CorporateBodyForm

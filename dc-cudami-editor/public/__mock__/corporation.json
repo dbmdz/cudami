@@ -23,18 +23,18 @@
           "content": [
             {
               "type": "text",
-              "text": "This is my first corporation."
+              "text": "This is my first corporate body."
             }
           ]
         }
       ]
     }
   },
-  "entityType": "CORPORATION",
+  "entityType": "CORPORATE_BODY",
   "identifiers": [],
   "label": {
     "de": "Meine erste Institution",
-    "en": "My first corporation"
+    "en": "My first corporate body"
   },
   "lastModified": "2019-08-05T16:54:29.711332",
   "text": {
@@ -59,7 +59,7 @@
           "content": [
             {
               "type": "text",
-              "text": "This is my first corporation."
+              "text": "This is my first corporate body."
             }
           ]
         }

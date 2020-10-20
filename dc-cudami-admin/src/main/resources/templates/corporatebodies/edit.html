@@ -4,7 +4,7 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
   <head>
-    <title th:text="|#{corporations}: #{corporation_create}|">Corporations: Create a new corporation</title>
+    <title th:text="|#{corporateBodies}: #{corporateBody_edit}|">Corporate bodies: Edit corporate body</title>
   </head>
   <body>
     <section layout:fragment="content">
@@ -14,9 +14,11 @@
         IdentifiableEditor({
           activeLanguage: /*[[${activeLanguage}]]*/,
           apiContextPath: /*[[@{/}]]*/ '',
+          existingLanguages: /*[[${existingLanguages}]]*/,
           id: "editor",
-          type: "corporation",
-          uiLocale: /*[[${#locale.language}]]*/
+          type: "corporateBody",
+          uiLocale: /*[[${#locale.language}]]*/,
+          uuid: /*[[${uuid}]]*/
         });
       </script>
     </section>
