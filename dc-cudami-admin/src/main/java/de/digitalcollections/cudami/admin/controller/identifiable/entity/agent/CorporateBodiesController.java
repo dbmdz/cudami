@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.admin.controller.identifiable.entity;
+package de.digitalcollections.cudami.admin.controller.identifiable.entity.agent;
 
 import de.digitalcollections.commons.springdata.domain.PageConverter;
 import de.digitalcollections.commons.springdata.domain.PageWrapper;
@@ -6,10 +6,10 @@ import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiCorporationsClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
+import de.digitalcollections.cudami.client.entity.agent.CudamiCorporateBodiesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.entity.Corporation;
+import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.List;
@@ -36,51 +36,46 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-/** Controller for corporation management pages. */
+/** Controller for CorporateBody management pages. */
 @Controller
-public class CorporationsController extends AbstractController {
+public class CorporateBodiesController extends AbstractController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(CorporationsController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CorporateBodiesController.class);
 
   private final LanguageSortingHelper languageSortingHelper;
   private final CudamiLocalesClient localeService;
-  private final CudamiCorporationsClient service;
+  private final CudamiCorporateBodiesClient service;
 
   @Autowired
-  public CorporationsController(
+  public CorporateBodiesController(
       LanguageSortingHelper languageSortingHelper, CudamiClient cudamiClient) {
     this.languageSortingHelper = languageSortingHelper;
     this.localeService = cudamiClient.forLocales();
-    this.service = cudamiClient.forCorporations();
+    this.service = cudamiClient.forCorporateBodies();
   }
 
-  @ModelAttribute("menu")
-  protected String module() {
-    return "corporations";
-  }
-
-  @GetMapping("/corporations/new")
+  @GetMapping("/corporatebodies/new")
   public String create(Model model) throws HttpException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
-    return "corporations/create";
+    return "corporatebodies/create";
   }
 
-  @GetMapping("/api/corporations/new")
+  @GetMapping("/api/corporatebodies/new")
   @ResponseBody
-  public Corporation create() {
+  public CorporateBody create() {
     return service.create();
   }
 
-  @GetMapping("/corporations/{uuid}/edit")
+  @GetMapping("/corporatebodies/{uuid}/edit")
   public String edit(
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
       Model model)
       throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Corporation corporation = service.findOne(uuid);
+    CorporateBody corporateBody = service.findOne(uuid);
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, corporation.getLabel().getLocales());
+        languageSortingHelper.sortLanguages(displayLocale, corporateBody.getLabel().getLocales());
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);
@@ -88,18 +83,18 @@ public class CorporationsController extends AbstractController {
       model.addAttribute("activeLanguage", existingLanguages.get(0));
     }
     model.addAttribute("existingLanguages", existingLanguages);
-    model.addAttribute("uuid", corporation.getUuid());
+    model.addAttribute("uuid", corporateBody.getUuid());
 
-    return "corporations/edit";
+    return "corporatebodies/edit";
   }
 
-  @GetMapping("/api/corporations/{uuid}")
+  @GetMapping("/api/corporatebodies/{uuid}")
   @ResponseBody
-  public Corporation get(@PathVariable UUID uuid) throws HttpException {
+  public CorporateBody get(@PathVariable UUID uuid) throws HttpException {
     return service.findOne(uuid);
   }
 
-  @GetMapping("/corporations")
+  @GetMapping("/corporatebodies")
   public String list(
       Model model,
       @PageableDefault(
@@ -111,42 +106,47 @@ public class CorporationsController extends AbstractController {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
     final PageResponse pageResponse = service.find(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
-    model.addAttribute("page", new PageWrapper(page, "/corporations"));
-    return "corporations/list";
+    model.addAttribute("page", new PageWrapper(page, "/corporatebodies"));
+    return "corporatebodies/list";
   }
 
-  @PostMapping("/api/corporations/new")
-  public ResponseEntity save(@RequestBody Corporation corporation) {
+  @ModelAttribute("menu")
+  protected String module() {
+    return "corporatebodies";
+  }
+
+  @PostMapping("/api/corporatebodies/new")
+  public ResponseEntity save(@RequestBody CorporateBody corporateBody) {
     try {
-      Corporation corporationDb = service.save(corporation);
-      return ResponseEntity.status(HttpStatus.CREATED).body(corporationDb);
+      CorporateBody corporateBodyDb = service.save(corporateBody);
+      return ResponseEntity.status(HttpStatus.CREATED).body(corporateBodyDb);
     } catch (HttpException e) {
-      LOGGER.error("Cannot save corporation: ", e);
+      LOGGER.error("Cannot save corporate body: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
 
-  @PutMapping("/api/corporations/{uuid}")
-  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Corporation corporation) {
+  @PutMapping("/api/corporatebodies/{uuid}")
+  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody CorporateBody corporateBody) {
     try {
-      Corporation corporationDb = service.update(uuid, corporation);
-      return ResponseEntity.ok(corporationDb);
+      CorporateBody corporateBodyDb = service.update(uuid, corporateBody);
+      return ResponseEntity.ok(corporateBodyDb);
     } catch (HttpException e) {
-      LOGGER.error("Cannot save corporation with uuid={}", uuid, e);
+      LOGGER.error("Cannot save corporate body with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
 
-  @GetMapping("/corporations/{uuid}")
+  @GetMapping("/corporatebodies/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Corporation corporation = service.findOne(uuid);
+    CorporateBody corporateBody = service.findOne(uuid);
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, corporation.getLabel().getLocales());
+        languageSortingHelper.sortLanguages(displayLocale, corporateBody.getLabel().getLocales());
 
     model.addAttribute("existingLanguages", existingLanguages);
-    model.addAttribute("corporation", corporation);
+    model.addAttribute("corporateBody", corporateBody);
 
-    return "corporations/view";
+    return "corporatebodies/view";
   }
 }

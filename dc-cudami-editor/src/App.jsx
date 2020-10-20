@@ -37,7 +37,7 @@ const availableListTypes = {
 const availableTypes = [
   'article',
   'collection',
-  'corporation',
+  'corporateBody',
   'fileResource',
   'project',
   'subtopic',
@@ -55,7 +55,7 @@ const StartPage = () => {
   const iconMapping = {
     article: FaNewspaper,
     collection: FaList,
-    corporation: FaUniversity,
+    corporateBody: FaUniversity,
     digitalObject: FaCubes,
     fileResource: FaFile,
     project: FaIndustry,

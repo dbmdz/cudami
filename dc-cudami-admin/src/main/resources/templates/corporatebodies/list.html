@@ -5,18 +5,18 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
   <head>
-    <title th:text="#{corporations}">Corporations</title>
+    <title th:text="#{corporateBodies}">Corporate bodies</title>
   </head>
   <body>
     <section layout:fragment="content">
 
       <div class="row">
         <div class="col-sm-6">
-          <h1 th:text="#{corporations}">Corporations</h1>
+          <h1 th:text="#{corporateBodies}">Corporate bodies</h1>
         </div>
         <div class="col-sm-6">
           <div class="float-right">
-            <a class="btn btn-secondary" th:href="@{/corporations/new}" th:text="#{btn_new}">New</a>
+            <a class="btn btn-secondary" th:href="@{/corporatebodies/new}" th:text="#{btn_new}">New</a>
           </div>
         </div>
       </div>
@@ -42,20 +42,20 @@
               </tr>
             </thead>
             <tbody>
-              <tr th:each="corporation, stats : ${page.content}">
+              <tr th:each="corporateBody, stats : ${page.content}">
                 <td class="text-right" th:text="(${page.number - 1} * ${page.size}) + ${stats.index + 1}">1</td>
                 <td class="center">
-                  <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${corporation.previewImage}, ${corporation.previewImageRenderingHints}, ${#locale}, 30)"></th:block>
+                  <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${corporateBody.previewImage}, ${corporateBody.previewImageRenderingHints}, ${#locale}, 30)"></th:block>
                 </td>
                 <td>
-                  <a th:href="@{'/corporations/' + ${corporation.uuid}}" th:if="${corporation.label}" th:text="${corporation.label.text}">bavarikon</a>
+                  <a th:href="@{'/corporatebodies/' + ${corporateBody.uuid}}" th:if="${corporateBody.label}" th:text="${corporateBody.label.text}">bavarikon</a>
                 </td>
                 <td>
-                  <span class="float-right" th:with="df=#{dateTime.format},dateTime=${corporation.lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
+                  <span class="float-right" th:with="df=#{dateTime.format},dateTime=${corporateBody.lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
                 </td>
                 <td class="center">
-                  <a th:href="@{'/corporations/' + ${corporation.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
-                  <a th:href="@{'/corporations/' + ${corporation.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
+                  <a th:href="@{'/corporatebodies/' + ${corporateBody.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
+                  <a th:href="@{'/corporatebodies/' + ${corporateBody.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
                 </td>
               </tr>
             </tbody>

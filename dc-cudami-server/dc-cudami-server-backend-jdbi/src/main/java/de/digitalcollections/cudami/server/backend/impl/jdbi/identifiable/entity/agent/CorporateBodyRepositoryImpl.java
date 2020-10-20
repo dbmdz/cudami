@@ -1,13 +1,14 @@
-package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
+package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CorporationRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifier;
-import de.digitalcollections.model.api.identifiable.entity.Corporation;
+import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
-import de.digitalcollections.model.impl.identifiable.entity.CorporationImpl;
+import de.digitalcollections.model.impl.identifiable.entity.agent.CorporateBodyImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
@@ -19,16 +20,12 @@ import java.util.Set;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
-    implements CorporationRepository {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(CorporationRepositoryImpl.class);
+public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateBody>
+    implements CorporateBodyRepository {
 
   // select all details shown/needed in single object details page
   private static final String FIND_ONE_BASE_SQL =
@@ -38,7 +35,7 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
           + " c.text c_text, c.homepage_url c_homepageUrl, c.preview_hints c_previewImageRenderingHints,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
-          + " FROM corporations as c"
+          + " FROM corporatebodies as c"
           + " LEFT JOIN identifiers as id on c.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid";
 
@@ -49,45 +46,45 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
           + " c.created c_created, c.last_modified c_lastModified,"
           + " c.preview_hints c_previewImageRenderingHints,"
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
-          + " FROM corporations as c"
+          + " FROM corporatebodies as c"
           + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid";
 
   @Autowired
-  public CorporationRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
+  public CorporateBodyRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     super(dbi, identifierRepository);
   }
 
   @Override
   public long count() {
-    String sql = "SELECT count(*) FROM corporations";
+    String sql = "SELECT count(*) FROM corporatebodies";
     long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
     return count;
   }
 
   @Override
-  public PageResponse<Corporation> find(PageRequest pageRequest) {
+  public PageResponse<CorporateBody> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder(REDUCED_FIND_ONE_BASE_SQL);
     addPageRequestParams(pageRequest, query);
 
-    List<CorporationImpl> result =
+    List<CorporateBodyImpl> result =
         new ArrayList(
             dbi.withHandle(
                 h ->
                     h.createQuery(query.toString())
-                        .registerRowMapper(BeanMapper.factory(CorporationImpl.class, "c"))
+                        .registerRowMapper(BeanMapper.factory(CorporateBodyImpl.class, "c"))
                         .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                         .reduceRows(
-                            new LinkedHashMap<UUID, CorporationImpl>(),
+                            new LinkedHashMap<UUID, CorporateBodyImpl>(),
                             (map, rowView) -> {
-                              CorporationImpl corporation =
+                              CorporateBodyImpl corporateBody =
                                   map.computeIfAbsent(
                                       rowView.getColumn("c_uuid", UUID.class),
                                       fn -> {
-                                        return rowView.getRow(CorporationImpl.class);
+                                        return rowView.getRow(CorporateBodyImpl.class);
                                       });
 
                               if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                corporation.setPreviewImage(
+                                corporateBody.setPreviewImage(
                                     rowView.getRow(ImageFileResourceImpl.class));
                               }
                               return map;
@@ -99,35 +96,35 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
   }
 
   @Override
-  public Corporation findOne(UUID uuid) {
+  public CorporateBody findOne(UUID uuid) {
     String query = FIND_ONE_BASE_SQL + " WHERE c.uuid = :uuid";
 
-    CorporationImpl result =
+    CorporateBodyImpl result =
         dbi.withHandle(
                 h ->
                     h.createQuery(query)
                         .bind("uuid", uuid)
-                        .registerRowMapper(BeanMapper.factory(CorporationImpl.class, "c"))
+                        .registerRowMapper(BeanMapper.factory(CorporateBodyImpl.class, "c"))
                         .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                         .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                         .reduceRows(
-                            new LinkedHashMap<UUID, CorporationImpl>(),
+                            new LinkedHashMap<UUID, CorporateBodyImpl>(),
                             (map, rowView) -> {
-                              CorporationImpl corporation =
+                              CorporateBodyImpl corporateBody =
                                   map.computeIfAbsent(
                                       rowView.getColumn("c_uuid", UUID.class),
                                       fn -> {
-                                        return rowView.getRow(CorporationImpl.class);
+                                        return rowView.getRow(CorporateBodyImpl.class);
                                       });
 
                               if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                corporation.setPreviewImage(
+                                corporateBody.setPreviewImage(
                                     rowView.getRow(ImageFileResourceImpl.class));
                               }
 
                               if (rowView.getColumn("id_uuid", UUID.class) != null) {
                                 IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
-                                corporation.addIdentifier(identifier);
+                                corporateBody.addIdentifier(identifier);
                               }
 
                               return map;
@@ -137,7 +134,7 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
   }
 
   @Override
-  public Corporation findOne(Identifier identifier) {
+  public CorporateBody findOne(Identifier identifier) {
     if (identifier.getIdentifiable() != null) {
       return findOne(identifier.getIdentifiable());
     }
@@ -147,34 +144,34 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
 
     String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
-    Optional<CorporationImpl> result =
+    Optional<CorporateBodyImpl> result =
         dbi
             .withHandle(
                 h ->
                     h.createQuery(query)
                         .bind("id", identifierId)
                         .bind("namespace", namespace)
-                        .registerRowMapper(BeanMapper.factory(CorporationImpl.class, "c"))
+                        .registerRowMapper(BeanMapper.factory(CorporateBodyImpl.class, "c"))
                         .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                         .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                         .reduceRows(
-                            new LinkedHashMap<UUID, CorporationImpl>(),
+                            new LinkedHashMap<UUID, CorporateBodyImpl>(),
                             (map, rowView) -> {
-                              CorporationImpl corporation =
+                              CorporateBodyImpl corporateBody =
                                   map.computeIfAbsent(
                                       rowView.getColumn("c_uuid", UUID.class),
                                       fn -> {
-                                        return rowView.getRow(CorporationImpl.class);
+                                        return rowView.getRow(CorporateBodyImpl.class);
                                       });
 
                               if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                corporation.setPreviewImage(
+                                corporateBody.setPreviewImage(
                                     rowView.getRow(ImageFileResourceImpl.class));
                               }
 
                               if (rowView.getColumn("id_uuid", UUID.class) != null) {
                                 IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
-                                corporation.addIdentifier(dbIdentifier);
+                                corporateBody.addIdentifier(dbIdentifier);
                               }
 
                               return map;
@@ -183,76 +180,6 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
             .stream()
             .findFirst();
     return result.orElse(null);
-  }
-
-  @Override
-  public Corporation save(Corporation corporation) {
-    corporation.setUuid(UUID.randomUUID());
-    corporation.setCreated(LocalDateTime.now());
-    corporation.setLastModified(LocalDateTime.now());
-    // refid is generated as serial, DO NOT SET!
-    final UUID previewImageUuid =
-        corporation.getPreviewImage() == null ? null : corporation.getPreviewImage().getUuid();
-
-    String query =
-        "INSERT INTO corporations("
-            + "uuid, label, description, previewfileresource, preview_hints,"
-            + " identifiable_type, entity_type,"
-            + " created, last_modified,"
-            + " text, homepage_url"
-            + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
-            + " :type, :entityType,"
-            + " :created, :lastModified,"
-            + " :text::JSONB, :homepageUrl"
-            + ")";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(corporation)
-                .execute());
-
-    // save identifiers
-    Set<Identifier> identifiers = corporation.getIdentifiers();
-    saveIdentifiers(identifiers, corporation);
-
-    Corporation result = findOne(corporation.getUuid());
-    return result;
-  }
-
-  @Override
-  public Corporation update(Corporation corporation) {
-    corporation.setLastModified(LocalDateTime.now());
-    // do not update/left out from statement (not changed since insert):
-    // uuid, created, identifiable_type, entity_type, refid
-    final UUID previewImageUuid =
-        corporation.getPreviewImage() == null ? null : corporation.getPreviewImage().getUuid();
-
-    String query =
-        "UPDATE corporations SET"
-            + " label=:label::JSONB, description=:description::JSONB,"
-            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
-            + " last_modified=:lastModified,"
-            + " text=:text::JSONB, homepage_url=:homepageUrl"
-            + " WHERE uuid=:uuid";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(corporation)
-                .execute());
-
-    // save identifiers
-    // as we store the whole list new: delete old entries
-    deleteIdentifiers(corporation);
-    Set<Identifier> identifiers = corporation.getIdentifiers();
-    saveIdentifiers(identifiers, corporation);
-
-    Corporation result = findOne(corporation.getUuid());
-    return result;
   }
 
   @Override
@@ -275,5 +202,75 @@ public class CorporationRepositoryImpl extends EntityRepositoryImpl<Corporation>
       default:
         return null;
     }
+  }
+
+  @Override
+  public CorporateBody save(CorporateBody corporateBody) {
+    corporateBody.setUuid(UUID.randomUUID());
+    corporateBody.setCreated(LocalDateTime.now());
+    corporateBody.setLastModified(LocalDateTime.now());
+    // refid is generated as serial, DO NOT SET!
+    final UUID previewImageUuid =
+        corporateBody.getPreviewImage() == null ? null : corporateBody.getPreviewImage().getUuid();
+
+    String query =
+        "INSERT INTO corporatebodies("
+            + "uuid, label, description, previewfileresource, preview_hints,"
+            + " identifiable_type, entity_type,"
+            + " created, last_modified,"
+            + " text, homepage_url"
+            + ") VALUES ("
+            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
+            + " :type, :entityType,"
+            + " :created, :lastModified,"
+            + " :text::JSONB, :homepageUrl"
+            + ")";
+
+    dbi.withHandle(
+        h ->
+            h.createUpdate(query)
+                .bind("previewFileResource", previewImageUuid)
+                .bindBean(corporateBody)
+                .execute());
+
+    // save identifiers
+    Set<Identifier> identifiers = corporateBody.getIdentifiers();
+    saveIdentifiers(identifiers, corporateBody);
+
+    CorporateBody result = findOne(corporateBody.getUuid());
+    return result;
+  }
+
+  @Override
+  public CorporateBody update(CorporateBody corporateBody) {
+    corporateBody.setLastModified(LocalDateTime.now());
+    // do not update/left out from statement (not changed since insert):
+    // uuid, created, identifiable_type, entity_type, refid
+    final UUID previewImageUuid =
+        corporateBody.getPreviewImage() == null ? null : corporateBody.getPreviewImage().getUuid();
+
+    String query =
+        "UPDATE corporatebodies SET"
+            + " label=:label::JSONB, description=:description::JSONB,"
+            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
+            + " last_modified=:lastModified,"
+            + " text=:text::JSONB, homepage_url=:homepageUrl"
+            + " WHERE uuid=:uuid";
+
+    dbi.withHandle(
+        h ->
+            h.createUpdate(query)
+                .bind("previewFileResource", previewImageUuid)
+                .bindBean(corporateBody)
+                .execute());
+
+    // save identifiers
+    // as we store the whole list new: delete old entries
+    deleteIdentifiers(corporateBody);
+    Set<Identifier> identifiers = corporateBody.getIdentifiers();
+    saveIdentifiers(identifiers, corporateBody);
+
+    CorporateBody result = findOne(corporateBody.getUuid());
+    return result;
   }
 }

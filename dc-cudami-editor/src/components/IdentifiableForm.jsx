@@ -5,7 +5,7 @@ import './common.css'
 import AppContext from './AppContext'
 import ArticleForm from './ArticleForm'
 import CollectionForm from './CollectionForm'
-import CorporationForm from './CorporationForm'
+import CorporateBodyForm from './CorporateBodyForm'
 import FileResourceForm from './FileResourceForm'
 import FormErrors from './FormErrors'
 import ProjectForm from './ProjectForm'
@@ -33,7 +33,7 @@ class IdentifiableForm extends Component {
   identifiablesWithLongText = [
     'article',
     'collection',
-    'corporation',
+    'corporateBody',
     'project',
     'webpage',
   ]
@@ -141,7 +141,7 @@ class IdentifiableForm extends Component {
     const FORM_COMPONENT_MAPPING = {
       article: ArticleForm,
       collection: CollectionForm,
-      corporation: CorporationForm,
+      corporateBody: CorporateBodyForm,
       fileResource: FileResourceForm,
       project: ProjectForm,
       subtopic: SubtopicForm,

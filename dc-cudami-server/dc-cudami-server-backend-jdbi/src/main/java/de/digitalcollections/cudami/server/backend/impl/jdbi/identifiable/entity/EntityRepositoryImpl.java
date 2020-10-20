@@ -36,8 +36,6 @@ import org.springframework.stereotype.Repository;
 public class EntityRepositoryImpl<E extends Entity> extends IdentifiableRepositoryImpl<E>
     implements EntityRepository<E> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(EntityRepositoryImpl.class);
-
   // select all details shown/needed in single object details page
   private static final String FIND_ONE_BASE_SQL =
       "SELECT e.uuid e_uuid, e.refid e_refId, e.label e_label, e.description e_description,"
@@ -50,6 +48,15 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
           + " LEFT JOIN identifiers as id on e.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image as file on e.previewfileresource = file.uuid";
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(EntityRepositoryImpl.class);
+
+  // select to return only metadata (uuid, refId, lastmodified, types and identifiers)
+  private static final String REDUCED_FIND_ALL_METADATA_SQL =
+      "SELECT e.uuid e_uuid, e.refid e_refId, e.last_modified e_last_modified, e.identifiable_type e_type, e.entity_type e_entityType,"
+          + " id.identifiable id_identifiable, id.uuid id_uuid, id.namespace id_namespace, id.identifier id_id"
+          + " FROM %s as e"
+          + " LEFT JOIN identifiers as id on e.uuid = id.identifiable";
+
   // select only what is shown/needed in paged list (to avoid unnecessary payload/traffic):
   private static final String REDUCED_FIND_ONE_BASE_SQL =
       "SELECT e.uuid e_uuid, e.refid e_refId, e.label e_label, e.description e_description,"
@@ -59,13 +66,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
           + " FROM entities as e"
           + " LEFT JOIN fileresources_image as file on e.previewfileresource = file.uuid";
-
-  // select to return only metadata (uuid, refId, lastmodified, types and identifiers)
-  private static final String REDUCED_FIND_ALL_METADATA_SQL =
-      "SELECT e.uuid e_uuid, e.refid e_refId, e.last_modified e_last_modified, e.identifiable_type e_type, e.entity_type e_entityType,"
-          + " id.identifiable id_identifiable, id.uuid id_uuid, id.namespace id_namespace, id.identifier id_id"
-          + " FROM %s as e"
-          + " LEFT JOIN identifiers as id on e.uuid = id.identifiable";
 
   @Autowired
   public EntityRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
@@ -209,6 +209,65 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
+  public List<E> findAllReduced(EntityType entityType) {
+
+    String tableName = "";
+    switch (entityType) {
+      case ARTICLE:
+        tableName = "articles";
+        break;
+      case COLLECTION:
+        tableName = "collections";
+        break;
+      case CORPORATE_BODY:
+        tableName = "corporatebodies";
+        break;
+      case DIGITAL_OBJECT:
+        tableName = "digitalobjects";
+        break;
+      case PERSON:
+        tableName = "persons";
+        break;
+      case PROJECT:
+        tableName = "projects";
+        break;
+      case TOPIC:
+        tableName = "topics";
+        break;
+      case WEBSITE:
+        tableName = "websites";
+        break;
+      default:
+        tableName = "entity";
+    }
+    String query = REDUCED_FIND_ALL_METADATA_SQL.replaceAll("%s", tableName);
+
+    return new ArrayList(
+        dbi.withHandle(
+            h ->
+                h.createQuery(query.toString())
+                    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
+                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                    .reduceRows(
+                        new LinkedHashMap<UUID, EntityImpl>(),
+                        (map, rowView) -> {
+                          EntityImpl entity =
+                              map.computeIfAbsent(
+                                  rowView.getColumn("e_uuid", UUID.class),
+                                  fn -> {
+                                    return rowView.getRow(EntityImpl.class);
+                                  });
+
+                          if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                            IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                            entity.addIdentifier(dbIdentifier);
+                          }
+                          return map;
+                        })
+                    .values()));
+  }
+
+  @Override
   public E findOne(UUID uuid) {
     String query = FIND_ONE_BASE_SQL + " WHERE e.uuid = :uuid";
 
@@ -334,62 +393,29 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public List<E> findAllReduced(EntityType entityType) {
+  protected String[] getAllowedOrderByFields() {
+    return new String[] {"created", "entityType", "lastModified", "refId", "type"};
+  }
 
-    String tableName = "";
-    switch (entityType) {
-      case ARTICLE:
-        tableName = "articles";
-        break;
-      case COLLECTION:
-        tableName = "collections";
-        break;
-      case CORPORATION:
-        tableName = "corporations";
-        break;
-      case DIGITAL_OBJECT:
-        tableName = "digitalobjects";
-        break;
-      case PERSON:
-        tableName = "persons";
-        break;
-      case PROJECT:
-        tableName = "projects";
-        break;
-      case TOPIC:
-        tableName = "topics";
-        break;
-      case WEBSITE:
-        tableName = "websites";
-        break;
-      default:
-        tableName = "entity";
+  @Override
+  protected String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
     }
-    String query = REDUCED_FIND_ALL_METADATA_SQL.replaceAll("%s", tableName);
-
-    return new ArrayList(
-        dbi.withHandle(
-            h ->
-                h.createQuery(query.toString())
-                    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, EntityImpl>(),
-                        (map, rowView) -> {
-                          EntityImpl entity =
-                              map.computeIfAbsent(
-                                  rowView.getColumn("e_uuid", UUID.class),
-                                  fn -> {
-                                    return rowView.getRow(EntityImpl.class);
-                                  });
-
-                          if (rowView.getColumn("id_uuid", UUID.class) != null) {
-                            IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
-                            entity.addIdentifier(dbIdentifier);
-                          }
-                          return map;
-                        })
-                    .values()));
+    switch (modelProperty) {
+      case "created":
+        return "e.created";
+      case "entityType":
+        return "e.entity_type";
+      case "lastModified":
+        return "e.last_modified";
+      case "refId":
+        return "e.refid";
+      case "type":
+        return "e.identifiable_type";
+      default:
+        return null;
+    }
   }
 
   @Override
@@ -518,31 +544,5 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   @Override
   public E update(E entity) {
     throw new UnsupportedOperationException("use update of specific/inherited entity repository");
-  }
-
-  @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"created", "entityType", "lastModified", "refId", "type"};
-  }
-
-  @Override
-  protected String getColumnName(String modelProperty) {
-    if (modelProperty == null) {
-      return null;
-    }
-    switch (modelProperty) {
-      case "created":
-        return "e.created";
-      case "entityType":
-        return "e.entity_type";
-      case "lastModified":
-        return "e.last_modified";
-      case "refId":
-        return "e.refid";
-      case "type":
-        return "e.identifiable_type";
-      default:
-        return null;
-    }
   }
 }

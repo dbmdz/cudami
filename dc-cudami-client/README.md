@@ -62,7 +62,7 @@ public class SpringConfig {
 Your instance of CudamiClient is the single entry point to all cudami clients:
 
 - For access to `Collection`-endpoint: `CudamiCollectionsClient cudamiCollectionsClient = cudamiClient.forCollections();`
-- For access to `Corporation`-endpoint: `CudamiCorporationsClient cudamiCorporationsClient = cudamiClient.forCorporations();`
+- For access to `CorporateBody`-endpoint: `CudamiCorporateBodiesClient cudamiCorporateBodiesClient = cudamiClient.forCorporateBodies();`
 - For access to `Project`-endpoint: `CudamiProjectsClient cudamiProjectsClient = cudamiClient.forProjects();`
 - For access to cudami system endpoint: `CudamiSystemClient cudamiSystemClient = cudamiClient.forSystem();`
 - For access to `Webpage`-endpoint: `CudamiWebpagesClient cudamiWebpagesClient = cudamiClient.forWebpages();`
