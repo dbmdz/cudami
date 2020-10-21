@@ -1,3 +1,17 @@
+const typeToEndpointMapping = {
+  article: 'articles',
+  collection: 'collections',
+  corporateBody: 'corporatebodies',
+  digitalObject: 'digitalobjects',
+  fileResource: 'fileresources',
+  project: 'projects',
+  subcollection: 'subcollections',
+  subtopic: 'subtopics',
+  topic: 'topics',
+  webpage: 'webpages',
+  website: 'websites',
+}
+
 export async function addAttachedIdentifiable(
   contextPath,
   mock,
@@ -9,7 +23,7 @@ export async function addAttachedIdentifiable(
   if (mock) {
     return true
   }
-  const url = `${contextPath}api/${parentType.toLowerCase()}s/${parentUuid}/${type.toLowerCase()}s/${uuid}`
+  const url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}/${uuid}`
   try {
     const response = await fetch(url, {
       headers: {
@@ -34,7 +48,7 @@ export async function addAttachedIdentifiables(
   if (mock) {
     return true
   }
-  const url = `${contextPath}api/${parentType.toLowerCase()}s/${parentUuid}/${type.toLowerCase()}s`
+  const url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}`
   try {
     const response = await fetch(url, {
       body: JSON.stringify(identifiables),
@@ -51,7 +65,7 @@ export async function addAttachedIdentifiables(
 }
 
 export async function findByIdentifier(contextPath, mock, id, namespace, type) {
-  let url = `${contextPath}api/${type.toLowerCase()}s/identifier/${namespace}:${id}`
+  let url = `${contextPath}api/${typeToEndpointMapping[type]}/identifier/${namespace}:${id}`
   if (mock) {
     url = `/__mock__/${type}.json`
   }
@@ -107,7 +121,7 @@ export async function loadDefaultLanguage(contextPath, mock) {
 }
 
 export async function loadIdentifiable(contextPath, mock, type, uuid = 'new') {
-  let url = `${contextPath}api/${type.toLowerCase()}s/${uuid}`
+  let url = `${contextPath}api/${typeToEndpointMapping[type]}/${uuid}`
   if (mock) {
     url =
       uuid === 'new' ? `/__mock__/new/${type}.json` : `/__mock__/${type}.json`
@@ -129,7 +143,7 @@ export async function loadAttachedIdentifiables(
   pageNumber,
   pageSize
 ) {
-  let url = `${contextPath}api/${parentType.toLowerCase()}s/${parentUuid}/${type.toLowerCase()}s?pageNumber=${pageNumber}&pageSize=${pageSize}`
+  let url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}?pageNumber=${pageNumber}&pageSize=${pageSize}`
   if (mock) {
     url = `/__mock__/${type}s.json`
   }
@@ -162,7 +176,7 @@ export async function removeAttachedIdentifiable(
   if (mock) {
     return true
   }
-  const url = `${contextPath}api/${parentType.toLowerCase()}s/${parentUuid}/${type.toLowerCase()}s/${uuid}`
+  const url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}/${uuid}`
   try {
     const response = await fetch(url, {
       headers: {
@@ -200,7 +214,7 @@ export async function saveIdentifiable(
   type,
   redirect = true
 ) {
-  let url = `${contextPath}api/${type.toLowerCase()}s/new`
+  let url = `${contextPath}api/${typeToEndpointMapping[type]}/new`
   if (parentType && parentUuid) {
     url = `${url}?parentType=${parentType}&parentUuid=${parentUuid}`
   }
@@ -215,7 +229,7 @@ export async function saveIdentifiable(
     })
     const json = await response.json()
     if (redirect) {
-      const viewUrl = `${contextPath}${type.toLowerCase()}s/${json.uuid}`
+      const viewUrl = `${contextPath}${typeToEndpointMapping[type]}/${json.uuid}`
       window.location.href = viewUrl
     } else {
       return json
@@ -233,7 +247,7 @@ export async function searchIdentifiables(
   pageNumber = 0,
   pageSize = 10
 ) {
-  let url = `${contextPath}api/${type.toLowerCase()}s/search?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
+  let url = `${contextPath}api/${typeToEndpointMapping[type]}/search?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
   if (mock) {
     url = `/__mock__/${type}s.json`
   }
@@ -299,7 +313,7 @@ export async function updateIdentifiable(
   type,
   redirect = true
 ) {
-  const url = `${contextPath}api/${type.toLowerCase()}s/${identifiable.uuid}`
+  const url = `${contextPath}api/${typeToEndpointMapping[type]}/${identifiable.uuid}`
   try {
     const response = await fetch(url, {
       body: JSON.stringify(identifiable),
@@ -311,7 +325,7 @@ export async function updateIdentifiable(
     })
     const json = await response.json()
     if (redirect) {
-      const viewUrl = `${contextPath}${type.toLowerCase()}s/${json.uuid}`
+      const viewUrl = `${contextPath}${typeToEndpointMapping[type]}/${json.uuid}`
       window.location.href = viewUrl
     } else {
       return json
