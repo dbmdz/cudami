@@ -21,6 +21,7 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
+import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ApplicationFileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.AudioFileResourceImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
@@ -34,6 +35,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
@@ -596,6 +598,10 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
   public FileResource save(FileResource fileResource) {
     if (fileResource.getUuid() == null) {
       fileResource.setUuid(UUID.randomUUID());
+    }
+    if (fileResource.getLabel() == null && fileResource.getFilename() != null) {
+      // set a default label = filename (an empty label violates constraint)
+      fileResource.setLabel(new LocalizedTextImpl(Locale.ROOT, fileResource.getFilename()));
     }
     fileResource.setCreated(LocalDateTime.now());
     fileResource.setLastModified(LocalDateTime.now());
