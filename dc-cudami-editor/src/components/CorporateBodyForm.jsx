@@ -39,7 +39,9 @@ const CorporateBodyForm = ({
       <Row>
         <Col xs="6" sm="9">
           <h1>
-            {identifiable.uuid ? t('editCorporateBody') : t('createCorporateBody')}
+            {identifiable.uuid
+              ? t('editCorporateBody')
+              : t('createCorporateBody')}
           </h1>
         </Col>
         <Col xs="6" sm="3">
