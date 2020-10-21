@@ -69,6 +69,7 @@ public class LobidCorporateBodiesClient extends LobidBaseClient<LobidCorporateBo
     if (depiction != null && !depiction.isEmpty()) {
       String thumbnailUrl = depiction.get(0).getThumbnail();
       ImageFileResource previewImage = new ImageFileResourceImpl();
+      previewImage.setLabel(new LocalizedTextImpl(Locale.GERMAN, "Logo " + labelText));
       previewImage.setUri(URI.create(thumbnailUrl));
       previewImage.setMimeType(MimeType.MIME_IMAGE);
       corporateBody.setPreviewImage(previewImage);
