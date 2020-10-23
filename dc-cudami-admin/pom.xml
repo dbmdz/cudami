@@ -26,7 +26,7 @@
     <version.dc-commons-springmvc>4.1.2</version.dc-commons-springmvc>
     <version.thymeleaf-spring-data-dialect>3.4.1</version.thymeleaf-spring-data-dialect>
     <version.webjar-bootstrap>4.5.2</version.webjar-bootstrap>
-    <version.webjar-bootswatch>4.5.2</version.webjar-bootswatch>
+    <version.webjar-bootswatch>4.5.3</version.webjar-bootswatch>
     <version.webjar-fontawesome>5.15.1</version.webjar-fontawesome>
     <version.webjar-html5shiv>3.7.3</version.webjar-html5shiv>
     <version.webjar-ie10-viewport-bug-workaround>1.0.3</version.webjar-ie10-viewport-bug-workaround>
