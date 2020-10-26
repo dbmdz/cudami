@@ -1,4 +1,4 @@
-const typeToEndpointMapping = {
+export const typeToEndpointMapping = {
   article: 'articles',
   collection: 'collections',
   corporateBody: 'corporatebodies',

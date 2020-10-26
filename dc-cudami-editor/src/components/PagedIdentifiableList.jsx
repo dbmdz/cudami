@@ -20,6 +20,7 @@ import {
   loadAttachedIdentifiables,
   loadDefaultLanguage,
   removeAttachedIdentifiable,
+  typeToEndpointMapping,
 } from '../api'
 import '../polyfills'
 
@@ -131,7 +132,9 @@ class PagedIdentifiableList extends Component {
           feedbackMessage: {
             color: 'success',
             key: `${type}MovedSuccessfully`,
-            links: [`${apiContextPath}${type.toLowerCase()}s/${targetUuid}`],
+            links: [
+              `${apiContextPath}${typeToEndpointMapping[type]}/${targetUuid}`,
+            ],
             values: {
               name: this.getLabelValue(label),
               targetName: this.getLabelValue(targetLabel),
@@ -293,7 +296,7 @@ class PagedIdentifiableList extends Component {
           <Col className="text-right">
             {showNew && (
               <Button
-                href={`${apiContextPath}${type.toLowerCase()}s/new?parentType=${parentType}&parentUuid=${parentUuid}`}
+                href={`${apiContextPath}${typeToEndpointMapping[type]}/new?parentType=${parentType}&parentUuid=${parentUuid}`}
               >
                 {t('new')}
               </Button>
