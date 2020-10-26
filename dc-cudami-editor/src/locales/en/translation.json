@@ -124,7 +124,10 @@
     "openLinkNewTab": "open in a new tab",
     "openLinkSameTab": "open in the same tab",
     "publicationStatus": {
+      "currentlyPublished": "currently published",
       "endDate": "End of publication",
+      "noLongerPublished": "no longer published",
+      "notYetPublished": "not yet published",
       "startDate": "Start of publication"
     },
     "removeFrom": {
@@ -142,6 +145,7 @@
       "useUrl": "Integrate $t({{ mediaType }}) via web link"
     },
     "setPreviewImage": "Set preview image",
+    "status": "Status",
     "subcollections": "Sub collections",
     "subcollectionAddedSuccessfully": "The selected collection has been added successfully as a subcollection.",
     "subcollectionAddedSuccessfully_plural": "The selected collections have been added successfully as subcollections.",

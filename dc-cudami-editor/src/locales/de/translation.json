@@ -124,7 +124,10 @@
     "openLinkNewTab": "in einem neuen Tab öffnen",
     "openLinkSameTab": "im selben Tab öffnen",
     "publicationStatus": {
+      "currentlyPublished": "aktuell veröffentlicht",
       "endDate": "End-Publikationsdatum",
+      "noLongerPublished": "nicht mehr veröffentlicht",
+      "notYetPublished": "noch nicht veröffentlicht",
       "startDate": "Start-Publikationsdatum"
     },
     "removeFrom": {
@@ -142,6 +145,7 @@
       "useUrl": "$t({{ mediaType }}) per Weblink einbinden"
     },
     "setPreviewImage": "Vorschaubild festlegen",
+    "status": "Status",
     "subcollections": "Untergeordnete Sammlungen",
     "subcollectionAddedSuccessfully": "Die gewählte Sammlung wurde erfolgreich als Untersammlung hinzugefügt.",
     "subcollectionAddedSuccessfully_plural": "Die gewählten Sammlungen wurden erfolgreich als Untersammlungen hinzugefügt.",
