@@ -51,76 +51,75 @@ const getUiLocale = (searchParams) => {
   return query.get('lang') ?? 'en'
 }
 
-const StartPage = () => {
-  const iconMapping = {
-    article: FaNewspaper,
-    collection: FaList,
-    corporateBody: FaUniversity,
-    digitalObject: FaCubes,
-    fileResource: FaFile,
-    project: FaIndustry,
-    subcollection: FaList,
-    subtopic: FaSitemap,
-    topic: FaSitemap,
-    webpage: FaGlobe,
-    website: FaGlobe,
-  }
-  return (
-    <Container>
-      <h1>Editor</h1>
-      <Row>
-        {availableTypes.map((type) => {
+const iconMapping = {
+  article: FaNewspaper,
+  collection: FaList,
+  corporateBody: FaUniversity,
+  digitalObject: FaCubes,
+  fileResource: FaFile,
+  project: FaIndustry,
+  subcollection: FaList,
+  subtopic: FaSitemap,
+  topic: FaSitemap,
+  webpage: FaGlobe,
+  website: FaGlobe,
+}
+
+const StartPage = () => (
+  <Container>
+    <h1>Editor</h1>
+    <Row>
+      {availableTypes.map((type) => {
+        const Icon = iconMapping[type]
+        return (
+          <Col key={type} md="3">
+            <Card className="mb-3 text-center">
+              <Icon className="card-img-top mt-3" size="65" />
+              <CardBody>{type}</CardBody>
+              <CardFooter className="p-0">
+                <ButtonGroup>
+                  <Button color="light">
+                    <Link className="stretched-link" to={`/${type}/new`}>
+                      <FaFolderPlus />
+                    </Link>
+                  </Button>
+                  <Button color="light">
+                    <Link className="stretched-link" to={`/${type}/edit`}>
+                      <FaPencilAlt />
+                    </Link>
+                  </Button>
+                </ButtonGroup>
+              </CardFooter>
+            </Card>
+          </Col>
+        )
+      })}
+    </Row>
+    <h1>List</h1>
+    <Row>
+      {Object.keys(availableListTypes).map((parentType) => {
+        return availableListTypes[parentType].map((type) => {
           const Icon = iconMapping[type]
           return (
             <Col key={type} md="3">
               <Card className="mb-3 text-center">
-                <Icon className="card-img-top mt-3" size="65" />
-                <CardBody>{type}</CardBody>
-                <CardFooter className="p-0">
-                  <ButtonGroup>
-                    <Button color="light">
-                      <Link className="stretched-link" to={`/${type}/new`}>
-                        <FaFolderPlus />
-                      </Link>
-                    </Button>
-                    <Button color="light">
-                      <Link className="stretched-link" to={`/${type}/edit`}>
-                        <FaPencilAlt />
-                      </Link>
-                    </Button>
-                  </ButtonGroup>
-                </CardFooter>
+                <Link
+                  className="stretched-link"
+                  to={`/${parentType}/${type}/list`}
+                >
+                  <Icon className="card-img-top mt-3" size="65" />
+                  <CardBody>
+                    {parentType} / {type}
+                  </CardBody>
+                </Link>
               </Card>
             </Col>
           )
-        })}
-      </Row>
-      <h1>List</h1>
-      <Row>
-        {Object.keys(availableListTypes).map((parentType) => {
-          return availableListTypes[parentType].map((type) => {
-            const Icon = iconMapping[type]
-            return (
-              <Col key={type} md="3">
-                <Card className="mb-3 text-center">
-                  <Link
-                    className="stretched-link"
-                    to={`/${parentType}/${type}/list`}
-                  >
-                    <Icon className="card-img-top mt-3" size="65" />
-                    <CardBody>
-                      {parentType} / {type}
-                    </CardBody>
-                  </Link>
-                </Card>
-              </Col>
-            )
-          })
-        })}
-      </Row>
-    </Container>
-  )
-}
+        })
+      })}
+    </Row>
+  </Container>
+)
 
 const App = () => {
   const uiLocale = getUiLocale(window.location.search)
