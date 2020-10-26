@@ -29,7 +29,7 @@ const PublicationDatesForm = ({
       <Col sm="2">
         <FormGroup>
           <Label className="font-weight-bold mr-2" for="publication-start-date">
-            {t('startPublicationDate')}:
+            {t('publicationStatus.startDate')}:
           </Label>
           <DatePicker
             calendarAriaLabel={t('datePicker.toggleCalendar')}
@@ -49,7 +49,7 @@ const PublicationDatesForm = ({
       <Col sm="2">
         <FormGroup>
           <Label className="font-weight-bold mr-2" for="publication-end-date">
-            {t('endPublicationDate')}:
+            {t('publicationStatus.endDate')}:
           </Label>
           <DatePicker
             calendarAriaLabel={t('datePicker.toggleCalendar')}

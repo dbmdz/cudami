@@ -68,7 +68,6 @@
     "editTopic": "Edit topic",
     "editWebpage": "Edit webpage",
     "editWebsite": "Edit website {{ url }}",
-    "endPublicationDate": "End of publication",
     "enterMetadata": "Enter metadata",
     "file": "File",
     "forExample": "e.g.",
@@ -124,6 +123,10 @@
     "numberOfRows": "Number of rows",
     "openLinkNewTab": "open in a new tab",
     "openLinkSameTab": "open in the same tab",
+    "publicationStatus": {
+      "endDate": "End of publication",
+      "startDate": "Start of publication"
+    },
     "removeFrom": {
       "collection": "remove from collection"
     },
@@ -139,7 +142,6 @@
       "useUrl": "Integrate $t({{ mediaType }}) via web link"
     },
     "setPreviewImage": "Set preview image",
-    "startPublicationDate": "Start of publication",
     "subcollections": "Sub collections",
     "subcollectionAddedSuccessfully": "The selected collection has been added successfully as a subcollection.",
     "subcollectionAddedSuccessfully_plural": "The selected collections have been added successfully as subcollections.",

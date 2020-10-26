@@ -68,7 +68,6 @@
     "editTopic": "Thema bearbeiten",
     "editWebpage": "Webseite bearbeiten",
     "editWebsite": "Website {{ url }} bearbeiten",
-    "endPublicationDate": "End-Publikationsdatum",
     "enterMetadata": "Metadaten eingeben",
     "file": "Datei",
     "forExample": "z.B.",
@@ -124,6 +123,10 @@
     "numberOfRows": "Anzahl an Zeilen",
     "openLinkNewTab": "in einem neuen Tab öffnen",
     "openLinkSameTab": "im selben Tab öffnen",
+    "publicationStatus": {
+      "endDate": "End-Publikationsdatum",
+      "startDate": "Start-Publikationsdatum"
+    },
     "removeFrom": {
       "collection": "aus Sammlung entfernen"
     },
@@ -139,7 +142,6 @@
       "useUrl": "$t({{ mediaType }}) per Weblink einbinden"
     },
     "setPreviewImage": "Vorschaubild festlegen",
-    "startPublicationDate": "Start-Publikationsdatum",
     "subcollections": "Untergeordnete Sammlungen",
     "subcollectionAddedSuccessfully": "Die gewählte Sammlung wurde erfolgreich als Untersammlung hinzugefügt.",
     "subcollectionAddedSuccessfully_plural": "Die gewählten Sammlungen wurden erfolgreich als Untersammlungen hinzugefügt.",
