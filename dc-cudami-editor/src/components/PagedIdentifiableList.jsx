@@ -1,16 +1,16 @@
 import classNames from 'classnames'
 import uniqBy from 'lodash/uniqBy'
 import React, {Component} from 'react'
-import {Button, Card, CardBody, Col, Nav, Row, Table} from 'reactstrap'
+import {Button, Card, CardBody, Col, Nav, Row} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
-import {FaHashtag, FaImage} from 'react-icons/fa'
 import ReactPaginate from 'react-paginate'
 
 import './common.css'
 import AppContext from './AppContext'
+import DigitalObjectList from './DigitalObjectList'
 import FeedbackMessage from './FeedbackMessage'
-import IdentifiableListItem from './IdentifiableListItem'
 import LanguageTab from './LanguageTab'
+import SubcollectionList from './SubcollectionList'
 import AddAttachedIdentifiablesModal from './modals/AddAttachedIdentifiablesModal'
 import RemoveAttachedIdentifiableModal from './modals/RemoveAttachedIdentifiableModal'
 import {
@@ -91,6 +91,43 @@ class PagedIdentifiableList extends Component {
       label[this.state.activeLanguage] ??
       label[this.state.defaultLanguage] ??
       Object.values(label)[0]
+    )
+  }
+
+  getListComponent = () => {
+    const LIST_COMPONENT_MAPPING = {
+      digitalObject: DigitalObjectList,
+      subcollection: SubcollectionList,
+    }
+    const ListComponent = LIST_COMPONENT_MAPPING[this.props.type]
+    const {enableMove, enableRemove, parentType, showEdit, type} = this.props
+    const {
+      activeLanguage,
+      identifiables,
+      identifierTypes,
+      pageNumber,
+    } = this.state
+    return (
+      <ListComponent
+        enableMove={enableMove}
+        enableRemove={enableRemove}
+        identifiables={identifiables}
+        identifierTypes={identifierTypes}
+        language={activeLanguage}
+        onMove={(moveIndex) => {
+          this.toggleModal('moveAttachedIdentifiable')
+          this.setState({moveIndex})
+        }}
+        onRemove={(removeIndex) => {
+          this.toggleModal('removeAttachedIdentifiable')
+          this.setState({removeIndex})
+        }}
+        pageNumber={pageNumber}
+        pageSize={this.pageSize}
+        parentType={parentType}
+        showEdit={showEdit}
+        type={type}
+      />
     )
   }
 
@@ -231,7 +268,6 @@ class PagedIdentifiableList extends Component {
       mockApi,
       parentType,
       parentUuid,
-      showEdit,
       showNew,
       t,
       type,
@@ -334,46 +370,7 @@ class PagedIdentifiableList extends Component {
             {identifiables.length > 0 && (
               <TablePagination position="above" showTotalElements />
             )}
-            <Table bordered className="mb-0" hover responsive size="sm" striped>
-              <thead>
-                <tr>
-                  <th className="text-right">
-                    <FaHashtag />
-                  </th>
-                  <th className="text-center">
-                    <FaImage />
-                  </th>
-                  <th>{t('label')}</th>
-                  <th>{t('identifiers')}</th>
-                  <th className="text-center">{t('lastModified')}</th>
-                  <th className="text-center">{t('actions')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {identifiables.map((identifiable, index) => (
-                  <IdentifiableListItem
-                    enableMove={enableMove}
-                    enableRemove={enableRemove}
-                    identifiable={identifiable}
-                    identifierTypes={identifierTypes}
-                    index={index + 1 + pageNumber * this.pageSize}
-                    key={identifiable.uuid}
-                    language={activeLanguage}
-                    onMove={() => {
-                      this.toggleModal('moveAttachedIdentifiable')
-                      this.setState({moveIndex: index})
-                    }}
-                    onRemove={() => {
-                      this.toggleModal('removeAttachedIdentifiable')
-                      this.setState({removeIndex: index})
-                    }}
-                    parentType={parentType}
-                    showEdit={showEdit}
-                    type={type}
-                  />
-                ))}
-              </tbody>
-            </Table>
+            {this.getListComponent()}
             {identifiables.length > 0 && <TablePagination position="under" />}
           </CardBody>
         </Card>
