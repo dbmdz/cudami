@@ -95,64 +95,29 @@
         </div>
       </div>
 
-      <div class="row main-content">
-        <div class="col-sm-6">
-          <h2 th:text="#{sub_webpages}">Sub webpages</h2>
-        </div>
-        <div class="col-sm-6">
-          <div class="float-right">
-            <a class="btn btn-secondary new-button" th:href="@{/webpages/new(parentType=webpage, parentUuid=*{uuid})}" th:text="#{btn_new}">New</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
+      <div class="mt-3 row">
         <div class="col-sm-12">
-          <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
-            <thead>
-              <tr>
-                <th class="text-right" th:text="#{abbr_number}">Nr.</th>
-                <th class="center" th:text="#{status}">Status</th>
-                <th></th>
-                <th class="center" th:text="#{label}">Label</th>
-                <th class="center" th:text="#{publicationStart}">Publication start</th>
-                <th class="center" th:text="#{publicationEnd}">Publication end</th>
-                <th class="center" th:text="#{last_modified}">last modified</th>
-                <th class="center" th:text="#{actions}">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr th:each="subpage, stats : *{children}">
-                <td class="text-right" th:text="${stats.index + 1}">1</td>
-                <td class="center" th:with="now=${T(java.time.LocalDate).now()}">
-                  <th:block th:if="${subpage.publicationStart}  == null OR  ${subpage.publicationStart.compareTo(now)} > 0"><span class="badge badge-pill badge-warning" th:title="#{tooltip_not_yet_published}">&nbsp;</span></th:block>
-                  <th:block th:if="(${subpage.publicationStart} != null AND ${subpage.publicationStart.compareTo(now)} <= 0) AND (${subpage.publicationEnd} == null OR ${subpage.publicationEnd.compareTo(now)} > 0)"><span class="badge badge-pill badge-success" th:title="#{tooltip_currently_published}">&nbsp;</span></th:block>
-                  <th:block th:if="(${subpage.publicationStart} != null AND ${subpage.publicationStart.compareTo(now)} <= 0) AND (${subpage.publicationEnd} != null AND ${subpage.publicationEnd.compareTo(now)} <= 0)"><span class="badge badge-pill badge-danger" th:title="#{tooltip_no_longer_published}">&nbsp;</span></th:block>
-                </td>
-                <td class="center">
-                  <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${subpage.previewImage}, ${subpage.previewImageRenderingHints}, ${#locale}, 50)"></th:block>
-                </td>
-                <td>
-                  <a th:href="@{'/webpages/' + ${subpage.uuid}}" th:text="${subpage.label.text}">Label</a>
-                </td>
-                <td><span th:with="df=#{date.format},pubStart=${subpage.publicationStart}" th:text="${#temporals.format(pubStart,df)}">01.01.2000</span></td>
-                <td><span th:with="df=#{date.format},pubEnd=${subpage.publicationEnd}" th:text="${#temporals.format(pubEnd,df)}">01.01.2000</span></td>
-                <td>
-                  <span class="float-right" th:with="df=#{dateTime.format},dateTime=${subpage.lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
-                </td>
-                <td class="center">
-                  <a th:href="@{'/webpages/' + ${subpage.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
-                  <a th:href="@{'/webpages/' + ${subpage.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div id="subpage-list"></div>
         </div>
       </div>
     </section>
     <section layout:fragment="beforeBodyEnds">
       <script>
         addLanguageChangeHandler()
+      </script>
+      <script th:src="@{/js/identifiable-list.bundle.js}"></script>
+      <script th:inline="javascript">
+        IdentifiableList({
+          apiContextPath: /*[[@{/}]]*/ '',
+          existingLanguages: /*[[${existingSubpageLanguages}]]*/,
+          id: "subpage-list",
+          parentType: "webpage",
+          parentUuid: /*[[*{uuid}]]*/,
+          showEdit: true,
+          showNew: true,
+          type: "webpage",
+          uiLocale: /*[[${#locale.language}]]*/
+        });
       </script>
     </section>
   </body>

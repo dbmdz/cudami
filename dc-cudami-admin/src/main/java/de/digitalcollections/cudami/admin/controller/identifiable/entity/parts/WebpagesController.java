@@ -10,10 +10,15 @@ import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
+import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
+import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,6 +105,19 @@ public class WebpagesController extends AbstractController {
     return service.findOne(uuid);
   }
 
+  @GetMapping("/api/webpages/{uuid}/webpages")
+  @ResponseBody
+  public PageResponse<WebpageImpl> getSubpages(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      throws HttpException {
+    PageRequest pageRequest = new PageRequestImpl();
+    pageRequest.setPageNumber(pageNumber);
+    pageRequest.setPageSize(pageSize);
+    return service.getChildren(uuid, pageRequest);
+  }
+
   @PostMapping("/api/webpages/new")
   public ResponseEntity save(
       @RequestBody Webpage webpage,
@@ -140,8 +158,16 @@ public class WebpagesController extends AbstractController {
     Webpage webpage = service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, webpage.getLabel().getLocales());
+    List<Locale> existingSubpageLanguages =
+        webpage.getChildren().stream()
+            .map(child -> child.getLabel().getLocales())
+            .flatMap(l -> l.stream())
+            .collect(Collectors.toList());
 
     model.addAttribute("existingLanguages", existingLanguages);
+    model.addAttribute(
+        "existingSubpageLanguages",
+        languageSortingHelper.sortLanguages(displayLocale, existingSubpageLanguages));
     model.addAttribute("webpage", webpage);
 
     List<FileResource> relatedFileResources = service.getRelatedFileResources(uuid);

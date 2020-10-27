@@ -10,11 +10,14 @@ import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.CudamiWebsitesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Website;
+import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,6 +103,19 @@ public class WebsitesController extends AbstractController {
     return service.findOne(uuid);
   }
 
+  @GetMapping("/api/websites/{uuid}/webpages")
+  @ResponseBody
+  public PageResponse<Webpage> getRootpages(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      throws HttpException {
+    PageRequest pageRequest = new PageRequestImpl();
+    pageRequest.setPageNumber(pageNumber);
+    pageRequest.setPageSize(pageSize);
+    return service.getRootPages(uuid, pageRequest);
+  }
+
   @GetMapping("/websites")
   public String list(
       Model model,
@@ -144,8 +160,16 @@ public class WebsitesController extends AbstractController {
     Website website = (Website) service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, website.getLabel().getLocales());
+    List<Locale> existingWebpageLanguages =
+        website.getRootPages().stream()
+            .map(child -> child.getLabel().getLocales())
+            .flatMap(l -> l.stream())
+            .collect(Collectors.toList());
 
     model.addAttribute("existingLanguages", existingLanguages);
+    model.addAttribute(
+        "existingWebpageLanguages",
+        languageSortingHelper.sortLanguages(displayLocale, existingWebpageLanguages));
     model.addAttribute("website", website);
 
     return "websites/view";

@@ -9,7 +9,6 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import java.net.http.HttpClient;
-import java.util.List;
 import java.util.UUID;
 
 public class CudamiWebsitesClient extends CudamiBaseClient<WebsiteImpl> {
@@ -43,9 +42,10 @@ public class CudamiWebsitesClient extends CudamiBaseClient<WebsiteImpl> {
         String.format("/latest/websites/identifier/%s:%s.json", namespace, id));
   }
 
-  public List<Webpage> getRootPages(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(
-        String.format("/latest/websites/%s/rootPages", uuid), WebpageImpl.class);
+  public PageResponse<Webpage> getRootPages(UUID uuid, PageRequest pageRequest)
+      throws HttpException {
+    return doGetRequestForPagedObjectList(
+        String.format("/latest/websites/%s/rootpages", uuid), pageRequest, WebpageImpl.class);
   }
 
   public Website save(Website website) throws HttpException {
