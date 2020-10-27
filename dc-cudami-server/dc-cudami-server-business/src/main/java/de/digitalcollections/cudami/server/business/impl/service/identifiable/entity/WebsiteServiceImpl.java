@@ -4,6 +4,8 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -31,5 +33,10 @@ public class WebsiteServiceImpl extends EntityServiceImpl<Website> implements We
   @Override
   public List<Webpage> getRootPages(UUID uuid) {
     return ((WebsiteRepository) repository).getRootPages(uuid);
+  }
+
+  @Override
+  public PageResponse<Webpage> getRootPages(UUID uuid, PageRequest pageRequest) {
+    return ((WebsiteRepository) repository).getRootPages(uuid, pageRequest);
   }
 }

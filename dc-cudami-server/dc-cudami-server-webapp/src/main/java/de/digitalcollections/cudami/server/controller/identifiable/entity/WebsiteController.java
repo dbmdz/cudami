@@ -12,14 +12,15 @@ import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
+import org.jsondoc.core.annotation.ApiPathParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -94,12 +95,31 @@ public class WebsiteController {
     return service.count();
   }
 
-  @ApiMethod(description = "Get root pages of website")
+  @ApiMethod(description = "Get paged root pages of a website")
   @GetMapping(
-      value = {"/latest/websites/{uuid}/rootPages", "/v2/websites/{uuid}/rootPages"},
+      value = {"/latest/websites/{uuid}/rootpages", "/v3/websites/{uuid}/rootpages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
-  List<Webpage> getRootPages(@PathVariable UUID uuid) {
-    return service.getRootPages(uuid);
+  public PageResponse<Webpage> getRootPages(
+      @ApiPathParam(
+              description =
+                  "UUID of the parent webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortField", required = false) String sortField,
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "DESC")
+          Direction sortDirection,
+      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
+          NullHandling nullHandling)
+      throws IdentifiableServiceException {
+    Sorting sorting = null;
+    if (!StringUtils.isEmpty(sortField)) {
+      OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
+      sorting = new SortingImpl(order);
+    }
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
+    return service.getRootPages(uuid, pageRequest);
   }
 }
