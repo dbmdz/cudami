@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.slf4j.Logger;
@@ -32,6 +31,18 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     implements WebsiteRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsiteRepositoryImpl.class);
+
+  private static final String BASE_ROOTPAGES_QUERY =
+      "SELECT w.uuid w_uuid, w.label w_label, w.description w_description,"
+          + " w.identifiable_type w_type,"
+          + " w.created w_created, w.last_modified w_lastModified,"
+          + " w.publication_start w_publicationStart, w.publication_end w_publicationEnd,"
+          + " w.preview_hints w_previewImageRenderingHints,"
+          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
+          + " FROM webpages as w INNER JOIN website_webpages ww ON w.uuid = ww.webpage_uuid"
+          + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid"
+          + " WHERE ww.website_uuid = :uuid"
+          + " ORDER BY ww.sortIndex ASC";
 
   // select all details shown/needed in single object details page
   private static final String FIND_ONE_BASE_SQL =
@@ -272,24 +283,78 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
 
   @Override
   public List<Webpage> getRootPages(Website website) {
-    UUID uuid = website.getUuid();
-    return getRootPages(uuid);
+    return getRootPages(website.getUuid());
   }
 
   @Override
   public List<Webpage> getRootPages(UUID uuid) {
-    // minimal data required (= identifiable fields) for creating text links/teasers in a list
-    String sql =
-        "SELECT "
-            + "uuid, created, description, label, last_modified"
-            + " FROM webpages INNER JOIN website_webpages ww ON uuid = ww.webpage_uuid"
-            + " WHERE ww.website_uuid = :uuid"
-            + " ORDER BY ww.sortIndex ASC";
+    List<Webpage> list =
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(BASE_ROOTPAGES_QUERY)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, WebpageImpl>(),
+                            (map, rowView) -> {
+                              WebpageImpl webpage =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("w_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(WebpageImpl.class);
+                                      });
 
-    List<WebpageImpl> list =
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                webpage.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
+    return list;
+  }
+
+  @Override
+  public PageResponse<Webpage> getRootPages(UUID uuid, PageRequest pageRequest) {
+    // minimal data required (= identifiable fields) for creating text links/teasers in a list
+    StringBuilder query = new StringBuilder(BASE_ROOTPAGES_QUERY);
+    addPageRequestParams(pageRequest, query);
+    List<Webpage> result =
+        new ArrayList(
+            dbi.withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, WebpageImpl>(),
+                            (map, rowView) -> {
+                              WebpageImpl webpage =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("w_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(WebpageImpl.class);
+                                      });
+
+                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                                webpage.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            })
+                        .values()));
+    String sql =
+        "SELECT count(*) FROM webpages as w"
+            + " INNER JOIN webpage_webpages ww ON w.uuid = ww.child_webpage_uuid"
+            + " WHERE ww.parent_webpage_uuid = :uuid";
+    long total =
         dbi.withHandle(
-            h -> h.createQuery(sql).bind("uuid", uuid).mapToBean(WebpageImpl.class).list());
-    return list.stream().map(WebpageImpl.class::cast).collect(Collectors.toList());
+            h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Long.class).findOne().get());
+    PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
+    return pageResponse;
   }
 
   @Override
