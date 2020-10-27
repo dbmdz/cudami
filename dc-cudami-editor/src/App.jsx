@@ -32,6 +32,8 @@ import PagedIdentifiableList from './components/PagedIdentifiableList'
 const availableListTypes = {
   collection: ['subcollection', 'digitalObject'],
   project: ['digitalObject'],
+  webpage: ['webpage'],
+  website: ['webpage'],
 }
 
 const availableTypes = [
