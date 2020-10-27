@@ -6,12 +6,11 @@
   <parent>
     <groupId>de.digitalcollections.cudami</groupId>
     <artifactId>dc-cudami</artifactId>
-    <version>4.0.0</version>
+    <version>4.0.1-SNAPSHOT</version>
   </parent>
 
   <name>DigitalCollections: cudami Management Webapp</name>
   <artifactId>dc-cudami-admin-webapp</artifactId>
-  <version>4.0.0</version>
   <packaging>jar</packaging>
 
   <properties>
