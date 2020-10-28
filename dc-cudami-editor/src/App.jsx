@@ -29,6 +29,7 @@ import initI18n from './i18n'
 import IdentifiableForm from './components/IdentifiableForm'
 import PagedIdentifiableList from './components/PagedIdentifiableList'
 
+// this is a mapping of parent types to possible child types
 const availableListTypes = {
   collection: ['subcollection', 'digitalObject'],
   project: ['digitalObject'],
