@@ -163,9 +163,12 @@
       "url": "embedding a file from the internet by using a valid URL"
     },
     "totalElements": {
-      "digitalObjects": "found {{ count }} digital object(s)",
-      "subcollections": "found {{ count }} collection(s)",
-      "webpages": "found {{ count }} webpage(s)"
+      "digitalObjects": "found {{ count }} digital object",
+      "digitalObjects_plural": "found {{ count }} digital objects",
+      "subcollections": "found {{ count }} collection",
+      "subcollections_plural": "found {{ count }} collections",
+      "webpages": "found {{ count }} webpage",
+      "webpages_plural": "found {{ count }} webpages"
     },
     "uploadFileResource": "Upload a new file",
     "video": "video",

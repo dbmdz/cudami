@@ -163,9 +163,12 @@
       "url": "Einbinden einer Datei aus dem Internet durch Eingabe einer gültigen URL"
     },
     "totalElements": {
-      "digitalObjects": "{{ count }} Digitalisat(e) gefunden",
-      "subcollections": "{{ count }} Sammlung(en) gefunden",
-      "webpages": "{{ count }} Webseite(n) gefunden"
+      "digitalObjects": "{{ count }} Digitalisat gefunden",
+      "digitalObjects_plural": "{{ count }} Digitalisate gefunden",
+      "subcollections": "{{ count }} Sammlung gefunden",
+      "subcollections_plural": "{{ count }} Sammlungen gefunden",
+      "webpages": "{{ count }} Webseite gefunden",
+      "webpages_plural": "{{ count }} Webseiten gefunden"
     },
     "uploadFileResource": "Neue Datei hochladen",
     "video": "Video",
