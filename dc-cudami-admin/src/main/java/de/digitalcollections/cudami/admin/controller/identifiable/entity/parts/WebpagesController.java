@@ -10,7 +10,6 @@ import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
@@ -112,10 +111,7 @@ public class WebpagesController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws HttpException {
-    PageRequest pageRequest = new PageRequestImpl();
-    pageRequest.setPageNumber(pageNumber);
-    pageRequest.setPageSize(pageSize);
-    return service.getChildren(uuid, pageRequest);
+    return service.getChildren(uuid, new PageRequestImpl(pageNumber, pageSize));
   }
 
   @PostMapping("/api/webpages/new")
@@ -160,8 +156,7 @@ public class WebpagesController extends AbstractController {
         languageSortingHelper.sortLanguages(displayLocale, webpage.getLabel().getLocales());
     List<Locale> existingSubpageLanguages =
         webpage.getChildren().stream()
-            .map(child -> child.getLabel().getLocales())
-            .flatMap(l -> l.stream())
+            .flatMap(child -> child.getLabel().getLocales().stream())
             .collect(Collectors.toList());
 
     model.addAttribute("existingLanguages", existingLanguages);

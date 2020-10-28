@@ -110,10 +110,7 @@ public class WebsitesController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws HttpException {
-    PageRequest pageRequest = new PageRequestImpl();
-    pageRequest.setPageNumber(pageNumber);
-    pageRequest.setPageSize(pageSize);
-    return service.getRootPages(uuid, pageRequest);
+    return service.getRootPages(uuid, new PageRequestImpl(pageNumber, pageSize));
   }
 
   @GetMapping("/websites")
@@ -162,8 +159,7 @@ public class WebsitesController extends AbstractController {
         languageSortingHelper.sortLanguages(displayLocale, website.getLabel().getLocales());
     List<Locale> existingWebpageLanguages =
         website.getRootPages().stream()
-            .map(child -> child.getLabel().getLocales())
-            .flatMap(l -> l.stream())
+            .flatMap(child -> child.getLabel().getLocales().stream())
             .collect(Collectors.toList());
 
     model.addAttribute("existingLanguages", existingLanguages);

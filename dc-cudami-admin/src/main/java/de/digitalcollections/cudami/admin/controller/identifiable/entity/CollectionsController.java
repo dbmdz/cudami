@@ -171,10 +171,7 @@ public class CollectionsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws HttpException {
-    PageRequest pageRequest = new PageRequestImpl();
-    pageRequest.setPageNumber(pageNumber);
-    pageRequest.setPageSize(pageSize);
-    return service.getDigitalObjects(uuid, pageRequest);
+    return service.getDigitalObjects(uuid, new PageRequestImpl(pageNumber, pageSize));
   }
 
   @GetMapping("/api/collections/{uuid}/subcollections")
@@ -184,10 +181,7 @@ public class CollectionsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws HttpException {
-    PageRequest pageRequest = new PageRequestImpl();
-    pageRequest.setPageNumber(pageNumber);
-    pageRequest.setPageSize(pageSize);
-    return service.getSubcollections(uuid, pageRequest);
+    return service.getSubcollections(uuid, new PageRequestImpl(pageNumber, pageSize));
   }
 
   @GetMapping("/collections")
@@ -287,8 +281,7 @@ public class CollectionsController extends AbstractController {
         languageSortingHelper.sortLanguages(displayLocale, collection.getLabel().getLocales());
     List<Locale> existingSubcollectionLanguages =
         collection.getChildren().stream()
-            .map(child -> child.getLabel().getLocales())
-            .flatMap(l -> l.stream())
+            .flatMap(child -> child.getLabel().getLocales().stream())
             .collect(Collectors.toList());
 
     model.addAttribute("existingLanguages", existingLanguages);
