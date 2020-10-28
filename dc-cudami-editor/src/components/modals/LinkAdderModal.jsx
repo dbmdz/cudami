@@ -95,7 +95,7 @@ class LinkAdderModal extends Component {
               <FloatingLabelInput
                 label={t('tooltip')}
                 name="link-title"
-                onChange={(value) => this.setAttribute('title', value.trim())}
+                onChange={(value) => this.setAttribute('title', value)}
                 value={attributes.title}
               />
             </FormGroup>
