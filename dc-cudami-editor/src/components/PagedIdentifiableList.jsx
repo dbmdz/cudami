@@ -329,7 +329,7 @@ class PagedIdentifiableList extends Component {
       >
         <Row>
           <Col>
-            <h2>{t(`${type}s`)}</h2>
+            <h2>{t(`${type}s`, {context: parentType})}</h2>
           </Col>
           <Col className="text-right">
             {showNew && (
