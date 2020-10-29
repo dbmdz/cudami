@@ -174,7 +174,8 @@
     "video": "video",
     "view": "view",
     "warning": "Warning",
-    "webpages": "(Sub) webpages",
+    "webpages_webpage": "Sub webpages",
+    "webpages_website": "Webpages",
     "width": "Width",
     "yes": "Yes"
   }

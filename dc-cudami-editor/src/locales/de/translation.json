@@ -174,7 +174,8 @@
     "video": "Video",
     "view": "anzeigen",
     "warning": "Warnung",
-    "webpages": "(Untergeordnete) Webseiten",
+    "webpages_webpage": "Untergeordnete Webseiten",
+    "webpages_website": "Webseiten",
     "width": "Breite",
     "yes": "Ja"
   }
