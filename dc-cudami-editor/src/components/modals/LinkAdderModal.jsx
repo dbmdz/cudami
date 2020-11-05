@@ -86,8 +86,8 @@ class LinkAdderModal extends Component {
                 label="URL"
                 name="link-url"
                 onChange={(value) => this.setAttribute('href', value.trim())}
+                pattern="^(https?://|/).*$"
                 required
-                type="url"
                 value={attributes.href}
               />
             </FormGroup>

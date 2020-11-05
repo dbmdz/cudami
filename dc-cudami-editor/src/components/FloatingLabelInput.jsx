@@ -6,6 +6,7 @@ const FloatingLabelInput = ({
   label,
   name,
   onChange,
+  pattern,
   required,
   type = 'text',
   value,
@@ -20,6 +21,7 @@ const FloatingLabelInput = ({
         onBlur={() => setFocussed(false)}
         onChange={(evt) => onChange(evt.target.value)}
         onFocus={() => setFocussed(true)}
+        pattern={pattern}
         required={required}
         type={type}
         value={value}
