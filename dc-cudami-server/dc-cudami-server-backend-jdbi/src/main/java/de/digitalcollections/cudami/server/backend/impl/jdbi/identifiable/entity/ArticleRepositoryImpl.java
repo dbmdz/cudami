@@ -315,7 +315,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   @Override
   public List<Agent> getCreators(UUID articleUuid) {
     String query =
-        "SELECT e.uuid e_uuid, e.label e_label, e.refid e_refId,"
+        "SELECT e.uuid e_uuid, e.label e_label, e.refid e_refId, e.entity_type e_entityType,"
             + " e.created e_created, e.last_modified e_lastModified,"
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
             + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimetype, file.size_in_bytes pf_size_in_bytes, file.uri pf_uri"
