@@ -7,13 +7,18 @@ import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.agent.Agent;
+import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.api.identifiable.entity.agent.Family;
 import de.digitalcollections.model.api.identifiable.entity.agent.Person;
+import de.digitalcollections.model.api.identifiable.entity.enums.EntityType;
 import de.digitalcollections.model.api.identifiable.entity.work.Item;
 import de.digitalcollections.model.api.identifiable.entity.work.Work;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
+import de.digitalcollections.model.impl.identifiable.entity.agent.CorporateBodyImpl;
+import de.digitalcollections.model.impl.identifiable.entity.agent.FamilyImpl;
 import de.digitalcollections.model.impl.identifiable.entity.agent.PersonImpl;
 import de.digitalcollections.model.impl.identifiable.entity.work.ItemImpl;
 import de.digitalcollections.model.impl.identifiable.entity.work.WorkImpl;
@@ -258,7 +263,7 @@ public class WorkRepositoryImpl extends IdentifiableRepositoryImpl<Work> impleme
     if (work != null) {
       work.setCreators(getCreators(work.getUuid()));
     }
-    return result.orElse(null);
+    return work;
   }
 
   @Override
@@ -390,12 +395,29 @@ public class WorkRepositoryImpl extends IdentifiableRepositoryImpl<Work> impleme
                     .stream()
                     .map(
                         (entity) -> {
-                          // FIXME: not only persons! use entityType to disambiguate!
-                          Person person = new PersonImpl();
-                          person.setLabel(entity.getLabel());
-                          person.setRefId(entity.getRefId());
-                          person.setUuid(entity.getUuid());
-                          return person;
+                          EntityType entityType = entity.getEntityType();
+                          switch (entityType) {
+                            case CORPORATE_BODY:
+                              CorporateBody corporateBody = new CorporateBodyImpl();
+                              corporateBody.setLabel(entity.getLabel());
+                              corporateBody.setRefId(entity.getRefId());
+                              corporateBody.setUuid(entity.getUuid());
+                              return corporateBody;
+                            case FAMILY:
+                              Family family = new FamilyImpl();
+                              family.setLabel(entity.getLabel());
+                              family.setRefId(entity.getRefId());
+                              family.setUuid(entity.getUuid());
+                              return family;
+                            case PERSON:
+                              Person person = new PersonImpl();
+                              person.setLabel(entity.getLabel());
+                              person.setRefId(entity.getRefId());
+                              person.setUuid(entity.getUuid());
+                              return person;
+                            default:
+                              return null;
+                          }
                         })
                     .collect(Collectors.toList()));
     return result;
