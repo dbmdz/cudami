@@ -66,7 +66,7 @@ public class ArticleController {
       value = {"/latest/articles/{uuid}", "/v2/articles/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   @ApiResponseObject
-  public ResponseEntity<Article> getWebpage(
+  public ResponseEntity<Article> getArticle(
       @ApiPathParam(
               description =
                   "UUID of the article, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
