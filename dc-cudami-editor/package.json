@@ -42,7 +42,7 @@
     "react-i18next": "^11.7.3",
     "react-icons": "^3.11.0",
     "react-paginate": "^6.5.0",
-    "react-scripts": "3.4.4",
+    "react-scripts": "4.0.0",
     "reactstrap": "^8.6.0"
   },
   "devDependencies": {
