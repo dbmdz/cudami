@@ -2,11 +2,13 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CollectionRepository;
+import de.digitalcollections.model.api.filter.FilterCriterion;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
@@ -16,6 +18,7 @@ import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.NodeImpl;
 import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
 import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
+import de.digitalcollections.model.impl.identifiable.entity.agent.CorporateBodyImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.paging.SearchPageResponseImpl;
@@ -677,6 +680,58 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
                               if (rowView.getColumn("f_uuid", UUID.class) != null) {
                                 parent.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                              }
+                              return map;
+                            }))
+            .values()
+            .stream()
+            .collect(Collectors.toList());
+    return result;
+  }
+
+  @Override
+  public List<CorporateBody> getRelatedCorporateBodies(UUID uuid, Filtering filtering) {
+    String baseQuery =
+        "SELECT cb.uuid cb_uuid, cb.label cb_label, cb.refid cb_refId,"
+            + " cb.created cb_created, cb.last_modified cb_lastModified,"
+            + " cb.homepage_url cb_homepageUrl,"
+            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType,"
+            + " file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.http_base_url pf_httpBaseUrl"
+            + " FROM corporatebodies as cb"
+            + " LEFT JOIN rel_entity_entities as r ON cb.uuid = r.object_uuid"
+            + " LEFT JOIN rel_entity_entities AS rel ON r.subject_uuid = rel.subject_uuid"
+            + " LEFT JOIN fileresources_image as file on cb.previewfileresource = file.uuid"
+            + " WHERE rel.object_uuid = :uuid"
+            + " AND rel.predicate = 'is_part_of'";
+    StringBuilder query = new StringBuilder(baseQuery);
+
+    FilterCriterion predicate = filtering.getFilterCriterionFor("predicate");
+    if (predicate != null) {
+      String predicateFilter = String.format(" AND r.predicate = '%s'", predicate.getValue());
+      query.append(predicateFilter);
+    }
+
+    List<CorporateBody> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(query.toString())
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(CorporateBodyImpl.class, "cb"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, CorporateBodyImpl>(),
+                            (map, rowView) -> {
+                              CorporateBodyImpl related =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("cb_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(CorporateBodyImpl.class);
+                                      });
+
+                              if (rowView.getColumn("pf_uuid", UUID.class) != null) {
+                                related.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
                               }
                               return map;
                             }))

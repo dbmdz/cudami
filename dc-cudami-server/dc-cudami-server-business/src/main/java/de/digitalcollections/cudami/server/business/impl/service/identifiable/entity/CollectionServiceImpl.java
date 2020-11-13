@@ -7,6 +7,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
@@ -127,6 +128,11 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   @Override
   public List<Collection> getParents(UUID uuid) {
     return ((CollectionRepository) repository).getParents(uuid);
+  }
+
+  @Override
+  public List<CorporateBody> getRelatedCorporateBodies(UUID uuid, Filtering filtering) {
+    return ((CollectionRepository) repository).getRelatedCorporateBodies(uuid, filtering);
   }
 
   @Override
