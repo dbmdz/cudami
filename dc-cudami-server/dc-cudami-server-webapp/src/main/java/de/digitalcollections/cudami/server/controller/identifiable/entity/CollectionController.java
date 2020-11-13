@@ -3,8 +3,11 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
+import de.digitalcollections.model.api.filter.FilterCriterion;
+import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
@@ -359,6 +362,22 @@ public class CollectionController {
       @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid) {
     return collectionService.getParents(collectionUuid);
+  }
+
+  @ApiMethod(
+      description = "Get all related - by the given predicate - corporate bodies of a collection")
+  @GetMapping(
+      value = {
+        "/latest/collections/{uuid}/related/corporatebodies",
+        "/v3/collections/{uuid}/related/corporatebodies"
+      },
+      produces = "application/json")
+  @ApiResponseObject
+  public List<CorporateBody> getRelatedCorporateBodies(
+      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid") UUID uuid,
+      @RequestParam(name = "predicate", required = true) FilterCriterion<String> predicate) {
+    Filtering filtering = Filtering.defaultBuilder().add("predicate", predicate).build();
+    return collectionService.getRelatedCorporateBodies(uuid, filtering);
   }
 
   @ApiMethod(description = "Get (active or all) paged subcollections of a collection")

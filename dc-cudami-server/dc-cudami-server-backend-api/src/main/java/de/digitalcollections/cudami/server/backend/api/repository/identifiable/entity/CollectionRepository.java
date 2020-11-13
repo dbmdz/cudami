@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.N
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.Arrays;
@@ -67,6 +68,8 @@ public interface CollectionRepository
   PageResponse<DigitalObject> getDigitalObjects(UUID collectionUuid, PageRequest pageRequest);
 
   List<Collection> getParents(UUID uuid);
+
+  List<CorporateBody> getRelatedCorporateBodies(UUID uuid, Filtering filtering);
 
   PageResponse<Collection> getTopCollections(PageRequest pageRequest);
 
