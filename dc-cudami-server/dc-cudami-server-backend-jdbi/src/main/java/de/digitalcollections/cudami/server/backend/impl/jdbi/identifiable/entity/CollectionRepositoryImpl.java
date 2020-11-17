@@ -698,6 +698,11 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType,"
             + " file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.http_base_url pf_httpBaseUrl"
             + " FROM corporatebodies as cb"
+            // We do a double join with "rel_entity_entities" because we have two different
+            // predicates:
+            // - one is fix ("is_part_of"): defines the relation between collection and project
+            // - the other one is given as part of the parameter "filtering" for defining relation
+            //   between corporatebody and project
             + " LEFT JOIN rel_entity_entities as r ON cb.uuid = r.object_uuid"
             + " LEFT JOIN rel_entity_entities AS rel ON r.subject_uuid = rel.subject_uuid"
             + " LEFT JOIN fileresources_image as file on cb.previewfileresource = file.uuid"
