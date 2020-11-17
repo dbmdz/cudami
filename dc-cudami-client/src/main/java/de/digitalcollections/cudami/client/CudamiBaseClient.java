@@ -203,11 +203,21 @@ public class CudamiBaseClient<T extends Object> {
   }
 
   protected List<T> doGetRequestForObjectList(String requestUrl) throws HttpException {
-    return (List<T>) doGetRequestForObjectList(requestUrl, targetType);
+    return (List<T>) doGetRequestForObjectList(requestUrl, targetType, null);
   }
 
   protected List doGetRequestForObjectList(String requestUrl, Class<?> targetType)
       throws HttpException {
+    return (List<T>) doGetRequestForObjectList(requestUrl, targetType, null);
+  }
+
+  protected List doGetRequestForObjectList(
+      String requestUrl, Class<?> targetType, Filtering filtering) throws HttpException {
+    if (filtering != null) {
+      requestUrl +=
+          (requestUrl.contains("?") ? "&" : "?")
+              + getFilterParamsAsString(filtering.getFilterCriteria());
+    }
     HttpRequest req = createGetRequest(requestUrl);
     // TODO add creation of a request id if needed
     //            .header("X-Request-Id", request.getRequestId())

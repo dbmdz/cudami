@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
+import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -11,6 +12,7 @@ import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
 import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
+import de.digitalcollections.model.impl.identifiable.entity.agent.CorporateBodyImpl;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
 import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
 import java.net.http.HttpClient;
@@ -151,6 +153,17 @@ public class CudamiCollectionsClient extends CudamiBaseClient<CollectionImpl> {
         String.format("/latest/collections/%s/subcollections", uuid),
         pageRequest,
         CollectionImpl.class);
+  }
+
+  public List<CorporateBodyImpl> getRelatedCorporateBodies(UUID uuid, Filtering filtering)
+      throws HttpException {
+    if (filtering.getFilterCriterionFor("predicate") == null) {
+      throw new IllegalArgumentException("Filter criterion 'predicate' is required");
+    }
+    return doGetRequestForObjectList(
+        String.format("/latest/collections/%s/related/corporatebodies", uuid),
+        CorporateBodyImpl.class,
+        filtering);
   }
 
   public boolean removeDigitalObject(UUID collectionUuid, UUID digitalObjectUuid)
