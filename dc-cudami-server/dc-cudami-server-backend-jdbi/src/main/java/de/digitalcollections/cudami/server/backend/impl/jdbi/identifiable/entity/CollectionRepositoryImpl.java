@@ -45,21 +45,21 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   private static final String BREADCRUMB_QUERY =
       "WITH recursive breadcrumb (uuid,label,parent_uuid,depth)"
           + " AS ("
-          + "        SELECT c.uuid as uuid, c.label as label, c.refid c_refId, cc.parent_collection_uuid as parent_uuid,99 as depth"
+          + "        SELECT c.uuid AS uuid, c.label AS label, c.refid c_refId, cc.parent_collection_uuid AS parent_uuid, 99 AS depth"
           + "        FROM collections c, collection_collections cc"
           + "        WHERE uuid= :uuid and cc.child_collection_uuid = c.uuid"
           + ""
           + "        UNION ALL"
-          + "        SELECT c.uuid as uuid, c.label as label, c.refid c_refId, cc.parent_collection_uuid as parent_uuid, depth-1 as depth"
+          + "        SELECT c.uuid AS uuid, c.label AS label, c.refid c_refId, cc.parent_collection_uuid AS parent_uuid, depth-1 AS depth"
           + "        FROM collections c,"
           + "             collection_collections cc,"
           + "             breadcrumb b"
-          + "        WHERE b.uuid = cc.child_collection_uuid and cc.parent_collection_uuid = c.uuid AND cc.parent_collection_uuid is not null"
+          + "        WHERE b.uuid = cc.child_collection_uuid AND cc.parent_collection_uuid = c.uuid AND cc.parent_collection_uuid IS NOT null"
           + "    )"
-          + " SELECT * from breadcrumb"
+          + " SELECT * FROM breadcrumb"
           + " ORDER BY depth ASC";
   private static final String BREADCRUMB_WITHOUT_PARENT_QUERY =
-      "SELECT c.uuid as uuid, c.label as label"
+      "SELECT c.uuid AS uuid, c.label AS label"
           + "        FROM collections c"
           + "        WHERE uuid= :uuid";
 
@@ -72,9 +72,9 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
           + " c.preview_hints c_previewImageRenderingHints,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
-          + " FROM collections as c"
-          + " LEFT JOIN identifiers as id on c.uuid = id.identifiable"
-          + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid";
+          + " FROM collections AS c"
+          + " LEFT JOIN identifiers AS id ON c.uuid = id.identifiable"
+          + " LEFT JOIN fileresources_image AS file ON c.previewfileresource = file.uuid";
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionRepositoryImpl.class);
 
   // select only what is shown/needed in paged list (commented some additional available fields
@@ -86,8 +86,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
           + " c.publication_start c_publicationStart, c.publication_end c_publicationEnd,"
           + " c.preview_hints c_previewImageRenderingHints,"
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
-          + " FROM collections as c"
-          + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid";
+          + " FROM collections AS c"
+          + " LEFT JOIN fileresources_image AS file ON c.previewfileresource = file.uuid";
 
   private static final String BASE_TOP_QUERY =
       REDUCED_FIND_ONE_BASE_SQL
@@ -198,7 +198,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                             })
                         .values()));
 
-    String sql = "SELECT count(*) FROM collections as c";
+    String sql = "SELECT count(*) FROM collections AS c";
     if (!filterClauses.isEmpty()) {
       sql += " WHERE " + filterClauses;
     }
@@ -217,12 +217,12 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             "SELECT c.uuid c_uuid, c.refid c_refId, c.label c_label, c.description c_description,"
                 + " c.entity_type c_entityType,"
                 + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
-                + " FROM collections as c"
-                + " LEFT JOIN fileresources_image as file on c.previewfileresource = file.uuid"
-                + " LEFT JOIN LATERAL jsonb_object_keys(c.label) l(keys) on c.label is not null"
-                + " LEFT JOIN LATERAL jsonb_object_keys(c.description) n(keys) on c.description is not null"
-                + " WHERE (c.label->>l.keys ilike '%' || :searchTerm || '%'"
-                + " OR c.description->>n.keys ilike '%' || :searchTerm || '%')");
+                + " FROM collections AS c"
+                + " LEFT JOIN fileresources_image AS file ON c.previewfileresource = file.uuid"
+                + " LEFT JOIN LATERAL jsonb_object_keys(c.label) l(keys) ON c.label IS NOT null"
+                + " LEFT JOIN LATERAL jsonb_object_keys(c.description) n(keys) ON c.description IS NOT null"
+                + " WHERE (c.label->>l.keys ILIKE '%' || :searchTerm || '%'"
+                + " OR c.description->>n.keys ILIKE '%' || :searchTerm || '%')");
     // handle optional filtering params
     String filterClauses = getFilterClauses(searchPageRequest.getFiltering());
     if (!filterClauses.isEmpty()) {
@@ -254,11 +254,11 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                         .values()));
 
     String countQuery =
-        "SELECT count(*) FROM collections as c"
-            + " LEFT JOIN LATERAL jsonb_object_keys(c.label) l(keys) on c.label is not null"
-            + " LEFT JOIN LATERAL jsonb_object_keys(c.description) n(keys) on c.description is not null"
-            + " WHERE (c.label->>l.keys ilike '%' || :searchTerm || '%'"
-            + " OR c.description->>n.keys ilike '%' || :searchTerm || '%')";
+        "SELECT count(*) FROM collections AS c"
+            + " LEFT JOIN LATERAL jsonb_object_keys(c.label) l(keys) ON c.label IS NOT null"
+            + " LEFT JOIN LATERAL jsonb_object_keys(c.description) n(keys) ON c.description IS NOT null"
+            + " WHERE (c.label->>l.keys ILIKE '%' || :searchTerm || '%'"
+            + " OR c.description->>n.keys ILIKE '%' || :searchTerm || '%')";
     if (!filterClauses.isEmpty()) {
       countQuery += " AND " + filterClauses;
     }
@@ -499,7 +499,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                         .values()));
 
     String countQuery =
-        "SELECT count(*) FROM collections as c"
+        "SELECT count(*) FROM collections AS c"
             + " INNER JOIN collection_collections cc ON c.uuid = cc.child_collection_uuid"
             + " WHERE cc.parent_collection_uuid = :uuid";
     if (!filterClauses.isEmpty()) {
@@ -543,10 +543,10 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + " d.created d_created, d.last_modified d_lastModified,"
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
             + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.http_base_url pf_httpBaseUrl"
-            + " FROM digitalobjects as d"
-            + " LEFT JOIN identifiers as id on d.uuid = id.identifiable"
-            + " LEFT JOIN fileresources_image as file on d.previewfileresource = file.uuid"
-            + " LEFT JOIN collection_digitalobjects as cd on d.uuid = cd.digitalobject_uuid"
+            + " FROM digitalobjects AS d"
+            + " LEFT JOIN identifiers AS id ON d.uuid = id.identifiable"
+            + " LEFT JOIN fileresources_image AS file ON d.previewfileresource = file.uuid"
+            + " LEFT JOIN collection_digitalobjects AS cd ON d.uuid = cd.digitalobject_uuid"
             + " WHERE cd.collection_uuid = :uuid";
     StringBuilder query = new StringBuilder(baseQuery);
 
@@ -598,8 +598,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                     .map(DigitalObject.class::cast)
                     .collect(Collectors.toList()));
     String countQuery =
-        "SELECT count(*) FROM digitalobjects as d"
-            + " LEFT JOIN collection_digitalobjects as cd on d.uuid = cd.digitalobject_uuid"
+        "SELECT count(*) FROM digitalobjects AS d"
+            + " LEFT JOIN collection_digitalobjects AS cd ON d.uuid = cd.digitalobject_uuid"
             + " WHERE cd.collection_uuid = :uuid";
     if (!filterClauses.isEmpty()) {
       countQuery += " AND " + filterClauses;
@@ -697,15 +697,15 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + " cb.homepage_url cb_homepageUrl,"
             + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType,"
             + " file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.http_base_url pf_httpBaseUrl"
-            + " FROM corporatebodies as cb"
+            + " FROM corporatebodies AS cb"
             // We do a double join with "rel_entity_entities" because we have two different
             // predicates:
             // - one is fix ("is_part_of"): defines the relation between collection and project
             // - the other one is given as part of the parameter "filtering" for defining relation
             //   between corporatebody and project
-            + " LEFT JOIN rel_entity_entities as r ON cb.uuid = r.object_uuid"
+            + " LEFT JOIN rel_entity_entities AS r ON cb.uuid = r.object_uuid"
             + " LEFT JOIN rel_entity_entities AS rel ON r.subject_uuid = rel.subject_uuid"
-            + " LEFT JOIN fileresources_image as file on cb.previewfileresource = file.uuid"
+            + " LEFT JOIN fileresources_image AS file ON cb.previewfileresource = file.uuid"
             + " WHERE rel.object_uuid = :uuid"
             + " AND rel.predicate = 'is_part_of'";
     StringBuilder query = new StringBuilder(baseQuery);
@@ -783,7 +783,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                         .values()));
 
     String countQuery =
-        "SELECT count(*) FROM collections as c"
+        "SELECT count(*) FROM collections AS c"
             + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = c.uuid)";
     if (!filterClauses.isEmpty()) {
       countQuery += " AND " + filterClauses;

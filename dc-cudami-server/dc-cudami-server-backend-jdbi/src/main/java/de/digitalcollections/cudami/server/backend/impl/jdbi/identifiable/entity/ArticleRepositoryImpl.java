@@ -51,9 +51,9 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
           + " a.date_published a_datePublished, a.timevalue_published a_timeValuePublished,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
-          + " FROM articles as a"
-          + " LEFT JOIN identifiers as id on a.uuid = id.identifiable"
-          + " LEFT JOIN fileresources_image as file on a.previewfileresource = file.uuid";
+          + " FROM articles AS a"
+          + " LEFT JOIN identifiers AS id ON a.uuid = id.identifiable"
+          + " LEFT JOIN fileresources_image AS file ON a.previewfileresource = file.uuid";
 
   // select only what is shown/needed in paged list (to avoid unnecessary payload/traffic):
   private static final String REDUCED_FIND_ONE_BASE_SQL =
@@ -63,8 +63,8 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
           + " a.preview_hints a_previewImageRenderingHints,"
           + " a.date_published a_datePublished, a.timevalue_published a_timeValuePublished,"
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
-          + " FROM articles as a"
-          + " LEFT JOIN fileresources_image as file on a.previewfileresource = file.uuid";
+          + " FROM articles AS a"
+          + " LEFT JOIN fileresources_image AS file ON a.previewfileresource = file.uuid";
 
   @Autowired
   public ArticleRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
@@ -319,10 +319,10 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
             + " e.created e_created, e.last_modified e_lastModified,"
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
             + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimetype, file.size_in_bytes pf_size_in_bytes, file.uri pf_uri"
-            + " FROM entities as e"
-            + " LEFT JOIN identifiers as id on e.uuid = id.identifiable"
-            + " LEFT JOIN fileresources_image as file on e.previewfileresource = file.uuid"
-            + " LEFT JOIN article_creators as ac on e.uuid = ac.agent_uuid"
+            + " FROM entities AS e"
+            + " LEFT JOIN identifiers AS id ON e.uuid = id.identifiable"
+            + " LEFT JOIN fileresources_image AS file ON e.previewfileresource = file.uuid"
+            + " LEFT JOIN article_creators AS ac ON e.uuid = ac.agent_uuid"
             + " WHERE ac.article_uuid = :uuid"
             + " ORDER BY ac.sortIndex ASC";
 
