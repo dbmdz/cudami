@@ -49,6 +49,7 @@ const WebsiteForm = ({
           {identifiable.uuid && <FormIdInput id={identifiable.uuid} />}
           <FormUrlInput
             onChange={(url) => onUpdate({...identifiable, url})}
+            required={true}
             url={identifiable.url}
           />
           <Nav tabs>
