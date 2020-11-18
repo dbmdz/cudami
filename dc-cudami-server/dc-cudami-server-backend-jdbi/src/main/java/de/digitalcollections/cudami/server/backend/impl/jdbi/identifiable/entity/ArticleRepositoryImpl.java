@@ -265,7 +265,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
             + " label=:label::JSONB, description=:description::JSONB,"
             + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
             + " last_modified=:lastModified,"
-            + " date_published=:datePublished , timevalue_published=:timeValuePublished::JSONB"
+            + " date_published=:datePublished, timevalue_published=:timeValuePublished::JSONB"
             + " text=:text::JSONB"
             + " WHERE uuid=:uuid";
 
