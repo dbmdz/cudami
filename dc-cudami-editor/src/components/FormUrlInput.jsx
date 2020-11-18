@@ -1,11 +1,18 @@
 import React from 'react'
 import {FormGroup, Input, Label} from 'reactstrap'
+import {useTranslation} from 'react-i18next'
 
-const FormUrlInput = ({onChange, required = false, url = ''}) => {
+const FormUrlInput = ({
+  labelKey = 'url',
+  onChange,
+  required = false,
+  url = '',
+}) => {
+  const {t} = useTranslation()
   return (
     <FormGroup>
       <Label className="font-weight-bold" for="url">
-        URL
+        {t(labelKey)}
       </Label>
       <Input
         id="url"
