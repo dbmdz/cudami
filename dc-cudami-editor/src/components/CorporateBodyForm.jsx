@@ -58,6 +58,7 @@ const CorporateBodyForm = ({
         <Col sm="12">
           {identifiable.uuid && <FormIdInput id={identifiable.uuid} />}
           <FormUrlInput
+            labelKey="homepage"
             onChange={(url) => onUpdate({...identifiable, homepageUrl: url})}
             url={identifiable.homepageUrl}
           />

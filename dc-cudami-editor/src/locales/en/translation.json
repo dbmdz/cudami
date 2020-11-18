@@ -76,6 +76,7 @@
       "redo": "Redo last undone change",
       "undo": "Undo last change"
     },
+    "homepage": "Homepage",
     "identifiers": "Identifiers",
     "image": "image",
     "imageLink": "Image link",
@@ -171,6 +172,7 @@
       "webpages_plural": "found {{ count }} webpages"
     },
     "uploadFileResource": "Upload a new file",
+    "url": "URL",
     "video": "video",
     "view": "view",
     "warning": "Warning",

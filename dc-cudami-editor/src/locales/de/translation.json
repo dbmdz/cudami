@@ -76,6 +76,7 @@
       "redo": "Letzte rückgängig gemachte Änderung wiederholen",
       "undo": "Letzte Änderung rückgängig machen"
     },
+    "homepage": "Homepage",
     "identifiers": "Identifikatoren",
     "image": "Bild",
     "imageLink": "Bild-Link",
@@ -171,6 +172,7 @@
       "webpages_plural": "{{ count }} Webseiten gefunden"
     },
     "uploadFileResource": "Neue Datei hochladen",
+    "url": "URL",
     "video": "Video",
     "view": "anzeigen",
     "warning": "Warnung",
