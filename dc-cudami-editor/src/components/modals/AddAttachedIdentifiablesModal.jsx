@@ -65,7 +65,7 @@ class AddAttachedIdentifiablesModal extends Component {
       t,
       type,
     } = this.props
-    const {identifiables, selectedOption} = this.state
+    const {feedbackMessage, identifiables, selectedOption} = this.state
     const showAutocomplete = selectedOption < this.fixedOptions.length
     const showInputFields =
       maxElements === undefined || identifiables.length < maxElements
@@ -75,6 +75,13 @@ class AddAttachedIdentifiablesModal extends Component {
           {t(`${action}${startCase(type).replace(' ', '')}s`)}
         </ModalHeader>
         <ModalBody>
+          {feedbackMessage && (
+            <FeedbackMessage
+              className="mb-1"
+              message={feedbackMessage}
+              onClose={() => this.setState({feedbackMessage: undefined})}
+            />
+          )}
           <Form
             onSubmit={(evt) => {
               evt.preventDefault()
@@ -138,6 +145,9 @@ class AddAttachedIdentifiablesModal extends Component {
                         ].namespace
                       }
                       onSelect={this.addIdentifiableToList}
+                      setFeedbackMessage={(feedbackMessage) =>
+                        this.setState({feedbackMessage})
+                      }
                       type={type}
                     />
                   )}

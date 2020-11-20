@@ -24,20 +24,34 @@ class IdentifierSearch extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this.props.setFeedbackMessage(undefined)
+  }
+
   search = async () => {
     this.setState({loading: true})
+    const {namespace, setFeedbackMessage, type} = this.props
     const result = await findByIdentifier(
       this.context.apiContextPath,
       this.context.mockApi,
       this.state.id,
-      this.props.namespace,
-      this.props.type
+      namespace,
+      type
     )
-    this.setState({loading: false, result})
+    const isEmptyResult = Object.keys(result).length === 0
+    if (isEmptyResult) {
+      setFeedbackMessage({
+        color: 'warning',
+        key: `notFound.${type}`,
+      })
+    } else {
+      setFeedbackMessage(undefined)
+    }
+    this.setState({isEmptyResult, loading: false, result})
   }
 
   render() {
-    const {id, loading, result} = this.state
+    const {id, isEmptyResult, loading, result} = this.state
     return (
       <>
         <InputWithSpinner
@@ -53,7 +67,7 @@ class IdentifierSearch extends Component {
             </Button>
           </InputGroupAddon>
         </InputWithSpinner>
-        {result && (
+        {result && !isEmptyResult && (
           <ListGroup className="suggestion-container">
             <ListGroupItem
               onClick={() => {

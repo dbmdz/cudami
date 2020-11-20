@@ -120,6 +120,10 @@
     "next": "Next",
     "no": "No",
     "noAlignment": "without text wrapping",
+    "notFound": {
+      "collection": "Collection was not found",
+      "digitalObject": "Digital object was not found"
+    },
     "numberOfColumns": "Number of columns",
     "numberOfRows": "Number of rows",
     "openLinkNewTab": "open in a new tab",
