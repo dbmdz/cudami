@@ -72,11 +72,12 @@ export async function findByIdentifier(contextPath, mock, id, namespace, type) {
   try {
     const response = await fetch(url)
     if (!response.ok) {
-      return null
+      return {}
     }
-    return response.json()
+    const json = await response.json()
+    return json
   } catch (err) {
-    return null
+    return {}
   }
 }
 

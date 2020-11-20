@@ -120,6 +120,10 @@
     "next": "Weiter",
     "no": "Nein",
     "noAlignment": "ohne Textumlauf",
+    "notFound": {
+      "collection": "Sammlung wurde nicht gefunden",
+      "digitalObject": "Digitalisat wurde nicht gefunden"
+    },
     "numberOfColumns": "Anzahl an Spalten",
     "numberOfRows": "Anzahl an Zeilen",
     "openLinkNewTab": "in einem neuen Tab öffnen",
