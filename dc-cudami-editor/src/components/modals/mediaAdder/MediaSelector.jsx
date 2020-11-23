@@ -206,10 +206,9 @@ class MediaSelector extends Component {
                 <Input
                   name="url"
                   onChange={(evt) => onChange({uri: evt.target.value.trim()})}
-                  pattern="^(https?:\/\/|\/).*$"
                   placeholder="URL"
                   required
-                  type="text"
+                  type="url"
                   value={uri}
                 />
               </FormGroup>

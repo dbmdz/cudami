@@ -28,7 +28,7 @@
       "readonly": false,
       "sizeInBytes": 12345,
       "type": "RESOURCE",
-      "uri": "/image.png",
+      "uri": "http://localhost:3000/image.png",
       "uuid": "6af49346-632a-44e6-bc7e-cee05ed975a2"
     }
   ],
