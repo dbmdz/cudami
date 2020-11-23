@@ -28,7 +28,7 @@
       "readonly": false,
       "sizeInBytes": 12345,
       "type": "RESOURCE",
-      "uri": "/video.mp4",
+      "uri": "http://localhost:3000/video.mp4",
       "uuid": "e72fd475-fafb-48ac-bb82-b7dcaa1e6f87"
     }
   ],
