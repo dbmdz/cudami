@@ -223,7 +223,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
             + "uuid, label, description, previewfileresource, preview_hints,"
             + " identifiable_type, entity_type,"
             + " created, last_modified,"
-            + " date_published, timevalue_published"
+            + " date_published, timevalue_published,"
             + " text"
             + ") VALUES ("
             + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
@@ -265,7 +265,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
             + " label=:label::JSONB, description=:description::JSONB,"
             + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
             + " last_modified=:lastModified,"
-            + " date_published=:datePublished, timevalue_published=:timeValuePublished::JSONB"
+            + " date_published=:datePublished, timevalue_published=:timeValuePublished::JSONB,"
             + " text=:text::JSONB"
             + " WHERE uuid=:uuid";
 
