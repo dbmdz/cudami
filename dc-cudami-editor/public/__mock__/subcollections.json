@@ -4,32 +4,32 @@
       "created": "2019-08-05T16:54:29.71132",
       "description": {
         "de": {
-          "type": "doc",
           "content": [
             {
-              "type": "paragraph",
               "content": [
                 {
-                  "type": "text",
-                  "text": "Das ist meine erste Sammlung."
+                  "text": "Das ist meine erste Sammlung.",
+                  "type": "text"
                 }
-              ]
+              ],
+              "type": "paragraph"
             }
-          ]
+          ],
+          "type": "doc"
         },
         "en": {
-          "type": "doc",
           "content": [
             {
-              "type": "paragraph",
               "content": [
                 {
-                  "type": "text",
-                  "text": "This is my first collection."
+                  "text": "This is my first collection.",
+                  "type": "text"
                 }
-              ]
+              ],
+              "type": "paragraph"
             }
-          ]
+          ],
+          "type": "doc"
         }
       },
       "entityType": "COLLECTION",
@@ -57,13 +57,13 @@
         "de": {
           "content": [
             {
-              "type": "paragraph",
               "content": [
                 {
-                  "type": "text",
-                  "text": "Das ist meine erste Sammlung."
+                  "text": "Das ist meine erste Sammlung.",
+                  "type": "text"
                 }
-              ]
+              ],
+              "type": "paragraph"
             }
           ],
           "type": "doc"
@@ -71,13 +71,13 @@
         "en": {
           "content": [
             {
-              "type": "paragraph",
               "content": [
                 {
-                  "type": "text",
-                  "text": "This is my first collection."
+                  "text": "This is my first collection.",
+                  "type": "text"
                 }
-              ]
+              ],
+              "type": "paragraph"
             }
           ],
           "type": "doc"
@@ -90,5 +90,5 @@
   "pageRequest": {
     "pageSize": 1
   },
-  "totalElements": 3
+  "totalElements": 1
 }

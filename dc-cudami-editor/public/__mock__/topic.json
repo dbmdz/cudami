@@ -2,32 +2,32 @@
   "created": "2019-08-05T16:54:29.71132",
   "description": {
     "de": {
-      "type": "doc",
       "content": [
         {
-          "type": "paragraph",
           "content": [
             {
-              "type": "text",
-              "text": "Das ist mein erstes Thema."
+              "text": "Das ist mein erstes Thema.",
+              "type": "text"
             }
-          ]
+          ],
+          "type": "paragraph"
         }
-      ]
+      ],
+      "type": "doc"
     },
     "en": {
-      "type": "doc",
       "content": [
         {
-          "type": "paragraph",
           "content": [
             {
-              "type": "text",
-              "text": "This is my first topic."
+              "text": "This is my first topic.",
+              "type": "text"
             }
-          ]
+          ],
+          "type": "paragraph"
         }
-      ]
+      ],
+      "type": "doc"
     }
   },
   "entityType": "TOPIC",

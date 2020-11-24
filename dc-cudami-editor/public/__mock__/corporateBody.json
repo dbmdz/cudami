@@ -2,32 +2,32 @@
   "created": "2019-08-05T16:54:29.71132",
   "description": {
     "de": {
-      "type": "doc",
       "content": [
         {
-          "type": "paragraph",
           "content": [
             {
-              "type": "text",
-              "text": "Das ist meine erste Institution."
+              "text": "Das ist meine erste Institution.",
+              "type": "text"
             }
-          ]
+          ],
+          "type": "paragraph"
         }
-      ]
+      ],
+      "type": "doc"
     },
     "en": {
-      "type": "doc",
       "content": [
         {
-          "type": "paragraph",
           "content": [
             {
-              "type": "text",
-              "text": "This is my first corporate body."
+              "text": "This is my first corporate body.",
+              "type": "text"
             }
-          ]
+          ],
+          "type": "paragraph"
         }
-      ]
+      ],
+      "type": "doc"
     }
   },
   "entityType": "CORPORATE_BODY",
@@ -41,13 +41,13 @@
     "de": {
       "content": [
         {
-          "type": "paragraph",
           "content": [
             {
-              "type": "text",
-              "text": "Das ist meine erste Institution."
+              "text": "Das ist meine erste Institution.",
+              "type": "text"
             }
-          ]
+          ],
+          "type": "paragraph"
         }
       ],
       "type": "doc"
@@ -55,13 +55,13 @@
     "en": {
       "content": [
         {
-          "type": "paragraph",
           "content": [
             {
-              "type": "text",
-              "text": "This is my first corporate body."
+              "text": "This is my first corporate body.",
+              "type": "text"
             }
-          ]
+          ],
+          "type": "paragraph"
         }
       ],
       "type": "doc"

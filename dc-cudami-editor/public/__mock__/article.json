@@ -2,32 +2,32 @@
   "created": "2019-08-05T16:54:29.71132",
   "description": {
     "de": {
-      "type": "doc",
       "content": [
         {
-          "type": "paragraph",
           "content": [
             {
-              "type": "text",
-              "text": "Das ist mein erster Artikel."
+              "text": "Das ist mein erster Artikel.",
+              "type": "text"
             }
-          ]
+          ],
+          "type": "paragraph"
         }
-      ]
+      ],
+      "type": "doc"
     },
     "en": {
-      "type": "doc",
       "content": [
         {
-          "type": "paragraph",
           "content": [
             {
-              "type": "text",
-              "text": "This is my first article."
+              "text": "This is my first article.",
+              "type": "text"
             }
-          ]
+          ],
+          "type": "paragraph"
         }
-      ]
+      ],
+      "type": "doc"
     }
   },
   "entityType": "ARTICLE",
@@ -41,13 +41,13 @@
     "de": {
       "content": [
         {
-          "type": "paragraph",
           "content": [
             {
-              "type": "text",
-              "text": "Das ist mein erster Artikel."
+              "text": "Das ist mein erster Artikel.",
+              "type": "text"
             }
-          ]
+          ],
+          "type": "paragraph"
         }
       ],
       "type": "doc"
@@ -55,13 +55,13 @@
     "en": {
       "content": [
         {
-          "type": "paragraph",
           "content": [
             {
-              "type": "text",
-              "text": "This is my first article."
+              "text": "This is my first article.",
+              "type": "text"
             }
-          ]
+          ],
+          "type": "paragraph"
         }
       ],
       "type": "doc"

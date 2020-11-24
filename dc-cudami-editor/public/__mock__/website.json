@@ -4,13 +4,13 @@
     "de": {
       "content": [
         {
-          "type": "paragraph",
           "content": [
             {
-              "type": "text",
-              "text": "Das ist meine erste Webseite."
+              "text": "Das ist meine erste Webseite.",
+              "type": "text"
             }
-          ]
+          ],
+          "type": "paragraph"
         }
       ],
       "type": "doc"
@@ -18,13 +18,13 @@
     "en": {
       "content": [
         {
-          "type": "paragraph",
           "content": [
             {
-              "type": "text",
-              "text": "This is my first website."
+              "text": "This is my first website.",
+              "type": "text"
             }
-          ]
+          ],
+          "type": "paragraph"
         }
       ],
       "type": "doc"

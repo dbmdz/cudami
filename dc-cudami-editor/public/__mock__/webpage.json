@@ -3,32 +3,32 @@
   "created": "2019-08-05T16:54:29.71132",
   "description": {
     "de": {
-      "type": "doc",
       "content": [
         {
-          "type": "paragraph",
           "content": [
             {
-              "type": "text",
-              "text": "Das ist meine erste Webpage."
+              "text": "Das ist meine erste Webpage.",
+              "type": "text"
             }
-          ]
+          ],
+          "type": "paragraph"
         }
-      ]
+      ],
+      "type": "doc"
     },
     "en": {
-      "type": "doc",
       "content": [
         {
-          "type": "paragraph",
           "content": [
             {
-              "type": "text",
-              "text": "This is my first webpage."
+              "text": "This is my first webpage.",
+              "type": "text"
             }
-          ]
+          ],
+          "type": "paragraph"
         }
-      ]
+      ],
+      "type": "doc"
     }
   },
   "entityPartType": "WEBPAGE",
@@ -42,13 +42,13 @@
     "de": {
       "content": [
         {
-          "type": "paragraph",
           "content": [
             {
-              "type": "text",
-              "text": "Das ist meine erste Webpage."
+              "text": "Das ist meine erste Webpage.",
+              "type": "text"
             }
-          ]
+          ],
+          "type": "paragraph"
         }
       ],
       "type": "doc"
@@ -56,13 +56,13 @@
     "en": {
       "content": [
         {
-          "type": "paragraph",
           "content": [
             {
-              "type": "text",
-              "text": "This is my first webpage."
+              "text": "This is my first webpage.",
+              "type": "text"
             }
-          ]
+          ],
+          "type": "paragraph"
         }
       ],
       "type": "doc"
