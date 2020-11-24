@@ -2,32 +2,32 @@
   "created": "2019-08-05T16:54:29.71132",
   "description": {
     "de": {
-      "type": "doc",
       "content": [
         {
-          "type": "paragraph",
           "content": [
             {
-              "type": "text",
-              "text": "Das ist meine erste Datei."
+              "text": "Das ist meine erste Datei.",
+              "type": "text"
             }
-          ]
+          ],
+          "type": "paragraph"
         }
-      ]
+      ],
+      "type": "doc"
     },
     "en": {
-      "type": "doc",
       "content": [
         {
-          "type": "paragraph",
           "content": [
             {
-              "type": "text",
-              "text": "This is my first file resource."
+              "text": "This is my first file resource.",
+              "type": "text"
             }
-          ]
+          ],
+          "type": "paragraph"
         }
-      ]
+      ],
+      "type": "doc"
     }
   },
   "fileResourceType": "IMAGE",
@@ -63,7 +63,7 @@
   },
   "previewImageRenderingHints": {
     "altText": {
-        "en": "Alt text"
+      "en": "Alt text"
     }
   },
   "readonly": false,
