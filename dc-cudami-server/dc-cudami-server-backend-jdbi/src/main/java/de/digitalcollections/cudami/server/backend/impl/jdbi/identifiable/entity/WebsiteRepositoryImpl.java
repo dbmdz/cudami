@@ -41,8 +41,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
           + " FROM webpages as w INNER JOIN website_webpages ww ON w.uuid = ww.webpage_uuid"
           + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid"
-          + " WHERE ww.website_uuid = :uuid"
-          + " ORDER BY ww.sortIndex ASC";
+          + " WHERE ww.website_uuid = :uuid";
 
   // select all details shown/needed in single object details page
   private static final String FIND_ONE_BASE_SQL =
@@ -320,6 +319,9 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   public PageResponse<Webpage> getRootPages(UUID uuid, PageRequest pageRequest) {
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
     StringBuilder query = new StringBuilder(BASE_ROOTPAGES_QUERY);
+    if (pageRequest.getSorting() == null) {
+      query.append(" ORDER BY ww.sortIndex ASC");
+    }
     addPageRequestParams(pageRequest, query);
     List<Webpage> result =
         new ArrayList(
