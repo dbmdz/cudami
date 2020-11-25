@@ -350,8 +350,8 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
                         .values()));
     String sql =
         "SELECT count(*) FROM webpages as w"
-            + " INNER JOIN webpage_webpages ww ON w.uuid = ww.child_webpage_uuid"
-            + " WHERE ww.parent_webpage_uuid = :uuid";
+            + " INNER JOIN website_webpages ww ON w.uuid = ww.webpage_uuid"
+            + " WHERE ww.website_uuid = :uuid";
     long total =
         dbi.withHandle(
             h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Long.class).findOne().get());
