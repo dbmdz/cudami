@@ -15,6 +15,7 @@ import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.paging.enums.Direction;
 import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
+import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
@@ -306,5 +307,24 @@ public class WebpageController {
     }
 
     return new ResponseEntity<>(breadcrumbNavigation, HttpStatus.OK);
+  }
+
+  @ApiMethod(description = "Update the order of a webpage's children")
+  @PutMapping(
+      value = {"/latest/webpages/{uuid}/children", "/v3/webpages/{uuid}/children"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public ResponseEntity updateChildrenOrder(
+      @ApiPathParam(description = "UUID of the webpage") @PathVariable("uuid") UUID uuid,
+      @ApiPathParam(description = "List of the children") @RequestBody List<Webpage> rootPages) {
+    Webpage webpage = new WebpageImpl();
+    webpage.setUuid(uuid);
+
+    boolean successful = webpageService.updateChildrenOrder(webpage, rootPages);
+
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 }

@@ -34,4 +34,6 @@ public interface WebpageService<E extends Entity>
 
   Webpage saveWithParentWebpage(Webpage webpage, UUID parentWebpageUuid)
       throws IdentifiableServiceException;
+
+  boolean updateChildrenOrder(Webpage webpage, List<Webpage> children);
 }

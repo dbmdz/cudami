@@ -15,4 +15,6 @@ public interface WebsiteService extends EntityService<Website> {
   List<Webpage> getRootPages(UUID uuid);
 
   PageResponse<Webpage> getRootPages(UUID uuid, PageRequest pageRequest);
+
+  boolean updateRootPagesOrder(Website website, List<Webpage> rootPages);
 }

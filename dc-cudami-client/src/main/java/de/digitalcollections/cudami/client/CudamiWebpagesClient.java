@@ -123,4 +123,11 @@ public class CudamiWebpagesClient extends CudamiBaseClient<WebpageImpl> {
   public Webpage update(UUID uuid, Webpage webpage) throws HttpException {
     return doPutRequestForObject(String.format("/latest/webpages/%s", uuid), (WebpageImpl) webpage);
   }
+
+  public boolean updateChildrenOrder(UUID webpageUuid, List<Webpage> children)
+      throws HttpException {
+    return Boolean.parseBoolean(
+        doPutRequestForString(
+            String.format("/latest/webpages/%s/children", webpageUuid), children));
+  }
 }

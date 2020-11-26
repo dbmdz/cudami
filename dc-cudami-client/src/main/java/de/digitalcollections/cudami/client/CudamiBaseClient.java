@@ -598,6 +598,21 @@ public class CudamiBaseClient<T extends Object> {
     }
   }
 
+  protected String doPutRequestForString(String requestUrl, Object object) throws HttpException {
+    try {
+      HttpRequest req = createPutRequest(requestUrl, object);
+      HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
+      Integer statusCode = response.statusCode();
+      if (statusCode >= 400) {
+        throw CudamiRestErrorDecoder.decode("PUT " + requestUrl, statusCode);
+      }
+      final String body = response.body();
+      return body;
+    } catch (IOException | InterruptedException e) {
+      throw new HttpException("Failed to retrieve response due to connection error", e);
+    }
+  }
+
   /**
    * Converts the given list of filter criterias to a request string
    *

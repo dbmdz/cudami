@@ -30,6 +30,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
+import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -627,5 +628,30 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
     List<Node> nodes = result.stream().map(s -> (Node) s).collect(Collectors.toList());
 
     return new BreadcrumbNavigationImpl(nodes);
+  }
+
+  @Override
+  public boolean updateChildrenOrder(UUID parentUuid, List<Webpage> children) {
+    if (parentUuid == null || children == null) {
+      return false;
+    }
+    String query =
+        "UPDATE webpage_webpages"
+            + " SET sortindex = :idx"
+            + " WHERE child_webpage_uuid = :childWebpageUuid AND parent_webpage_uuid = :parentWebpageUuid;";
+    dbi.withHandle(
+        h -> {
+          PreparedBatch batch = h.prepareBatch(query);
+          int idx = 0;
+          for (Webpage webpage : children) {
+            batch
+                .bind("idx", idx++)
+                .bind("childWebpageUuid", webpage.getUuid())
+                .bind("parentWebpageUuid", parentUuid)
+                .add();
+          }
+          return batch.execute();
+        });
+    return true;
   }
 }
