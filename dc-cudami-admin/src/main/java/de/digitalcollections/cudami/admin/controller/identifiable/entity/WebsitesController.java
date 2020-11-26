@@ -151,6 +151,16 @@ public class WebsitesController extends AbstractController {
     }
   }
 
+  @PutMapping("/api/websites/{uuid}/webpages")
+  public ResponseEntity updateRootPagesOrder(
+      @PathVariable UUID uuid, @RequestBody List<Webpage> rootPages) throws HttpException {
+    boolean successful = service.updateRootPagesOrder(uuid, rootPages);
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+  }
+
   @GetMapping("/websites/{uuid}")
   public String view(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();

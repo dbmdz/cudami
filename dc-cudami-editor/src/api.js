@@ -95,6 +95,37 @@ export async function getIdentifierTypes(contextPath, mock) {
   }
 }
 
+export async function loadAttachedIdentifiables(
+  contextPath,
+  mock,
+  parentType,
+  parentUuid,
+  type,
+  pageNumber,
+  pageSize
+) {
+  let url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}?pageNumber=${pageNumber}&pageSize=${pageSize}`
+  if (mock) {
+    url = `/__mock__/${type}s.json`
+  }
+  try {
+    const response = await fetch(url)
+    const json = await response.json()
+    const {content, pageRequest, totalElements} = json
+    return {
+      content,
+      pageSize: pageRequest.pageSize,
+      totalElements,
+    }
+  } catch (err) {
+    return {
+      content: [],
+      pageSize: 0,
+      totalElements: 0,
+    }
+  }
+}
+
 export async function loadAvailableLanguages(contextPath, mock) {
   if (mock) {
     return ['es', 'fr']
@@ -132,37 +163,6 @@ export async function loadIdentifiable(contextPath, mock, type, uuid = 'new') {
     return result.json()
   } catch (err) {
     return {}
-  }
-}
-
-export async function loadAttachedIdentifiables(
-  contextPath,
-  mock,
-  parentType,
-  parentUuid,
-  type,
-  pageNumber,
-  pageSize
-) {
-  let url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}?pageNumber=${pageNumber}&pageSize=${pageSize}`
-  if (mock) {
-    url = `/__mock__/${type}s.json`
-  }
-  try {
-    const response = await fetch(url)
-    const json = await response.json()
-    const {content, pageRequest, totalElements} = json
-    return {
-      content,
-      pageSize: pageRequest.pageSize,
-      totalElements,
-    }
-  } catch (err) {
-    return {
-      content: [],
-      pageSize: 0,
-      totalElements: 0,
-    }
   }
 }
 
@@ -291,6 +291,33 @@ export async function searchMedia(
       suggestions: [],
       totalElements: 0,
     }
+  }
+}
+
+export async function updateAttachedIdentifiablesOrder(
+  contextPath,
+  mock,
+  identifiables,
+  parentType,
+  parentUuid,
+  type
+) {
+  if (mock) {
+    return true
+  }
+  const url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}`
+  try {
+    const response = await fetch(url, {
+      body: JSON.stringify(identifiables),
+      headers: {
+        'Content-Type': 'application/json',
+        credentials: 'same-origin',
+      },
+      method: 'PUT',
+    })
+    return response.ok
+  } catch (err) {
+    return false
   }
 }
 
