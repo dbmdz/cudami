@@ -42,7 +42,7 @@ class IdentifierSearch extends Component {
     if (isEmptyResult) {
       setFeedbackMessage({
         color: 'warning',
-        key: `notFound.${type}`,
+        key: `${type}NotFound`,
       })
     } else {
       setFeedbackMessage(undefined)

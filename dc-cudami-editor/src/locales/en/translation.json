@@ -1,4 +1,18 @@
 {
+  "feedback": {
+    "collectionNotFound": "Collection was not found",
+    "digitalObjectAddedSuccessfully": "The selected digital object has been added successfully.",
+    "digitalObjectAddedSuccessfully_plural": "The selected digital objects have been added successfully.",
+    "digitalObjectNotFound": "Digital object was not found",
+    "digitalObjectRemovedSuccessfully": "{{ name }} has been removed successfully.",
+    "duplicateInformation": "If entries are selected multiple times, the duplicates are automatically removed when you click on \"$t(add)\".",
+    "subcollectionAddedSuccessfully": "The selected collection has been added successfully as a subcollection.",
+    "subcollectionAddedSuccessfully_plural": "The selected collections have been added successfully as subcollections.",
+    "subcollectionMovedSuccessfully": "{{ name }} has been moved successfully to <0>{{ targetName }}</0>.",
+    "subcollectionRemovedSuccessfully": "{{ name }} has been removed successfully.",
+    "uploadFailed": "An error occurred while uploading",
+    "uploadSuccessful": "$t({{ mediaType }}, capitalize) uploaded successfully"
+  },
   "translation": {
     "actions": "Actions",
     "add": "Add",
@@ -51,11 +65,7 @@
     "defineRenderingHints": "Define rendering hints",
     "description": "Abstract",
     "digitalObjects": "Digital objects",
-    "digitalObjectAddedSuccessfully": "The selected digital object has been added successfully.",
-    "digitalObjectAddedSuccessfully_plural": "The selected digital objects have been added successfully.",
-    "digitalObjectRemovedSuccessfully": "{{ name }} has been removed successfully.",
     "dragAndDropImage": "Drag and drop file to upload here",
-    "duplicateInformation": "If entries are selected multiple times, the duplicates are automatically removed when you click on \"$t(add)\".",
     "edit": "edit",
     "editArticle": "Edit article",
     "editCollection": "Edit collection",
@@ -120,10 +130,6 @@
     "next": "Next",
     "no": "No",
     "noAlignment": "without text wrapping",
-    "notFound": {
-      "collection": "Collection was not found",
-      "digitalObject": "Digital object was not found"
-    },
     "numberOfColumns": "Number of columns",
     "numberOfRows": "Number of rows",
     "openLinkNewTab": "open in a new tab",
@@ -143,8 +149,6 @@
     "save": "Save",
     "selectMedia": {
       "searchTerm": "$t(autocomplete.searchTerm) (from label, file name, description)",
-      "uploadFailed": "An error occurred while uploading",
-      "uploadSuccessful": "$t({{ mediaType }}, capitalize) uploaded successfully",
       "useSearch": "Use existing $t({{ mediaType }})",
       "useUpload": "Upload $t({{ mediaType }})",
       "useUrl": "Integrate $t({{ mediaType }}) via web link"
@@ -152,10 +156,6 @@
     "setPreviewImage": "Set preview image",
     "status": "Status",
     "subcollections": "Sub collections",
-    "subcollectionAddedSuccessfully": "The selected collection has been added successfully as a subcollection.",
-    "subcollectionAddedSuccessfully_plural": "The selected collections have been added successfully as subcollections.",
-    "subcollectionMovedSuccessfully": "{{ name }} has been moved successfully to <0>{{ targetName }}</0>.",
-    "subcollectionRemovedSuccessfully": "{{ name }} has been removed successfully.",
     "text": "Long text",
     "tooltip": "Tooltip",
     "tooltips": {
