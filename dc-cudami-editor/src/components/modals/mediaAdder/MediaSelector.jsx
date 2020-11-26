@@ -75,7 +75,7 @@ class MediaSelector extends Component {
     })
     let feedbackMessage = {
       color: 'success',
-      key: 'selectMedia.uploadSuccessful',
+      key: 'uploadSuccessful',
       values: {mediaType},
     }
     try {
@@ -90,10 +90,9 @@ class MediaSelector extends Component {
         uri: this.getMediaUrl(response, mediaType),
       })
     } catch (err) {
-      console.log(err)
       feedbackMessage = {
         color: 'danger',
-        key: 'selectMedia.uploadFailed',
+        key: 'uploadFailed',
       }
     } finally {
       this.setState({

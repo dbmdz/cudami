@@ -14,7 +14,7 @@ const FeedbackMessage = ({className = 'mb-0', message, onClose}) => {
   ))
   return (
     <Alert className={className} color={color}>
-      <Trans components={links} i18nKey={key} values={values} />
+      <Trans components={links} i18nKey={`feedback:${key}`} values={values} />
       {onClose && (
         <Button
           className="close"
