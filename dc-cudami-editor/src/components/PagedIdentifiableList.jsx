@@ -22,6 +22,7 @@ import {
   loadDefaultLanguage,
   removeAttachedIdentifiable,
   typeToEndpointMapping,
+  updateAttachedIdentifiablesOrder,
 } from '../api'
 import '../polyfills'
 
@@ -33,6 +34,7 @@ class PagedIdentifiableList extends Component {
     const {existingLanguages} = this.props
     this.state = {
       activeLanguage: existingLanguages?.[0] ?? '',
+      changeOfOrderActive: false,
       existingLanguages: existingLanguages ?? [],
       identifiables: [],
       identifierTypes: [],
@@ -50,12 +52,25 @@ class PagedIdentifiableList extends Component {
   async componentDidMount() {
     const {apiContextPath, mockApi} = this.props
     const identifierTypes = await getIdentifierTypes(apiContextPath, mockApi)
-    const {content, pageSize, totalElements} = await this.loadIdentifiables()
+    const {content, pageSize, totalElements} = await this.loadIdentifiables(0)
     const defaultLanguage = await loadDefaultLanguage(apiContextPath, mockApi)
     this.setState({
       defaultLanguage,
       identifiables: content,
       identifierTypes,
+      numberOfPages: Math.ceil(totalElements / pageSize),
+      totalElements,
+    })
+  }
+
+  activateChangeOfOrder = async () => {
+    const {content, pageSize, totalElements} = await this.loadIdentifiables(
+      0,
+      this.state.totalElements
+    )
+    this.setState({
+      changeOfOrderActive: true,
+      identifiables: content,
       numberOfPages: Math.ceil(totalElements / pageSize),
       totalElements,
     })
@@ -105,17 +120,20 @@ class PagedIdentifiableList extends Component {
     const {enableMove, enableRemove, parentType, showEdit, type} = this.props
     const {
       activeLanguage,
+      changeOfOrderActive,
       identifiables,
       identifierTypes,
       pageNumber,
     } = this.state
     return (
       <ListComponent
+        changeOfOrderActive={changeOfOrderActive}
         enableMove={enableMove}
         enableRemove={enableRemove}
         identifiables={identifiables}
         identifierTypes={identifierTypes}
         language={activeLanguage}
+        onChangeOrder={(identifiables) => this.setState({identifiables})}
         onMove={(moveIndex) => {
           this.toggleModal('moveAttachedIdentifiable')
           this.setState({moveIndex})
@@ -213,7 +231,7 @@ class PagedIdentifiableList extends Component {
     this.updatePage({selected: pageNumber})
   }
 
-  loadIdentifiables = async (pageNumber = 0) => {
+  loadIdentifiables = async (pageNumber, pageSize = this.pageSize) => {
     const {apiContextPath, mockApi, parentType, parentUuid, type} = this.props
     const identifiables = await loadAttachedIdentifiables(
       apiContextPath,
@@ -222,7 +240,7 @@ class PagedIdentifiableList extends Component {
       parentUuid,
       type,
       pageNumber,
-      this.pageSize
+      pageSize
     )
     return identifiables
   }
@@ -238,6 +256,37 @@ class PagedIdentifiableList extends Component {
       uuid
     )
     return successful
+  }
+
+  saveChangeOfOrder = async () => {
+    const {apiContextPath, mockApi, parentType, parentUuid, type} = this.props
+    const successful = await updateAttachedIdentifiablesOrder(
+      apiContextPath,
+      mockApi,
+      this.state.identifiables,
+      parentType,
+      parentUuid,
+      type
+    )
+    if (!successful) {
+      return this.setState({
+        feedbackMessage: {
+          color: 'danger',
+          key: 'orderNotChangedSuccessfully',
+        },
+      })
+    }
+    const {content, pageSize, totalElements} = await this.loadIdentifiables(0)
+    this.setState({
+      changeOfOrderActive: false,
+      feedbackMessage: {
+        color: 'success',
+        key: 'orderChangedSuccessfully',
+      },
+      identifiables: content,
+      numberOfPages: Math.ceil(totalElements / pageSize),
+      totalElements,
+    })
   }
 
   toggleModal = (name) => {
@@ -265,6 +314,7 @@ class PagedIdentifiableList extends Component {
     const {
       apiContextPath,
       enableAdd,
+      enableChangeOfOrder,
       enableMove,
       enableRemove,
       mockApi,
@@ -277,6 +327,7 @@ class PagedIdentifiableList extends Component {
     } = this.props
     const {
       activeLanguage,
+      changeOfOrderActive,
       defaultLanguage,
       existingLanguages,
       feedbackMessage,
@@ -287,8 +338,10 @@ class PagedIdentifiableList extends Component {
       pageNumber,
       totalElements,
     } = this.state
+    const showChangeOfOrder =
+      enableChangeOfOrder && !changeOfOrderActive && identifiables.length > 0
     const TablePagination = ({position, showTotalElements}) => (
-      <>
+      <div className="justify-content-start">
         <ReactPaginate
           activeClassName="active"
           breakClassName="page-item"
@@ -321,7 +374,7 @@ class PagedIdentifiableList extends Component {
             {t(`totalElements.${type}s`, {count: totalElements})}
           </span>
         )}
-      </>
+      </div>
     )
     return (
       <AppContext.Provider
@@ -369,9 +422,20 @@ class PagedIdentifiableList extends Component {
         </Nav>
         <Card className="border-top-0">
           <CardBody>
-            {identifiables.length > 0 && (
-              <TablePagination position="above" showTotalElements />
-            )}
+            <div className="d-flex justify-content-between">
+              {identifiables.length > 0 && (
+                <TablePagination position="above" showTotalElements />
+              )}
+              {showChangeOfOrder ? (
+                <Button className="mb-2" onClick={this.activateChangeOfOrder}>
+                  {t('changeOrder')}
+                </Button>
+              ) : (
+                <Button className="mb-2" onClick={this.saveChangeOfOrder}>
+                  {t('save')}
+                </Button>
+              )}
+            </div>
             {this.getListComponent()}
             {identifiables.length > 0 && <TablePagination position="under" />}
           </CardBody>
@@ -414,6 +478,7 @@ class PagedIdentifiableList extends Component {
 PagedIdentifiableList.defaultProps = {
   apiContextPath: '/',
   enableAdd: false,
+  enableChangeOfOrder: true,
   enableMove: false,
   enableRemove: false,
   mockApi: false,

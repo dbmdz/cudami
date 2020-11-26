@@ -6,6 +6,8 @@
     "digitalObjectNotFound": "Digital object was not found",
     "digitalObjectRemovedSuccessfully": "{{ name }} has been removed successfully.",
     "duplicateInformation": "If entries are selected multiple times, the duplicates are automatically removed when you click on \"$t(add)\".",
+    "orderNotChangedSuccessfully": "Order could not be changed.",
+    "orderChangedSuccessfully": "Order has been changed successfully.",
     "subcollectionAddedSuccessfully": "The selected collection has been added successfully as a subcollection.",
     "subcollectionAddedSuccessfully_plural": "The selected collections have been added successfully as subcollections.",
     "subcollectionMovedSuccessfully": "{{ name }} has been moved successfully to <0>{{ targetName }}</0>.",
@@ -39,6 +41,7 @@
       "paragraph": "Change to paragraph"
     },
     "caption": "Caption",
+    "changeOrder": "Change the order",
     "chooseFile": "Choose file",
     "chooseLanguage": "Choose a language",
     "confirmRemove": {
