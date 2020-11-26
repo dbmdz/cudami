@@ -527,7 +527,7 @@ public class CudamiBaseClient<T extends Object> {
       HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
       Integer statusCode = response.statusCode();
       if (statusCode >= 400) {
-        throw CudamiRestErrorDecoder.decode("PATCH " + requestUrl, statusCode);
+        throw CudamiRestErrorDecoder.decode("POST " + requestUrl, statusCode);
       }
       final String body = response.body();
       return body;
