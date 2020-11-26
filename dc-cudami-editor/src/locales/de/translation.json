@@ -6,6 +6,8 @@
     "digitalObjectNotFound": "Digitalisat wurde nicht gefunden",
     "digitalObjectRemovedSuccessfully": "{{ name }} wurde erfolgreich entfernt.",
     "duplicateInformation": "Werden Einträge mehrfach ausgewählt, so werden die Duplikate beim Klick auf \"$t(add)\" automatisch entfernt.",
+    "orderNotChangedSuccessfully": "Reihenfolge konnte nicht geändert werden.",
+    "orderChangedSuccessfully": "Reihenfolge wurde erfolgreich geändert.",
     "subcollectionAddedSuccessfully": "Die gewählte Sammlung wurde erfolgreich als Untersammlung hinzugefügt.",
     "subcollectionAddedSuccessfully_plural": "Die gewählten Sammlungen wurden erfolgreich als Untersammlungen hinzugefügt.",
     "subcollectionMovedSuccessfully": "{{ name }} wurde erfolgreich nach <0>{{ targetName }}</0> verschoben.",
@@ -39,6 +41,7 @@
       "paragraph": "In Paragraph umwandeln"
     },
     "caption": "Bildunterschrift",
+    "changeOrder": "Reihenfolge ändern",
     "chooseFile": "Datei auswählen",
     "chooseLanguage": "Sprache auswählen",
     "confirmRemove": {
