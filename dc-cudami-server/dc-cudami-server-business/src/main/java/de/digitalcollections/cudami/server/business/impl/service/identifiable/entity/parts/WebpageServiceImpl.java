@@ -150,4 +150,9 @@ public class WebpageServiceImpl<E extends Entity> extends EntityPartServiceImpl<
       throw new IdentifiableServiceException(e.getMessage());
     }
   }
+
+  @Override
+  public boolean updateChildrenOrder(Webpage webpage, List<Webpage> children) {
+    return ((WebpageRepository) repository).updateChildrenOrder(webpage, children);
+  }
 }

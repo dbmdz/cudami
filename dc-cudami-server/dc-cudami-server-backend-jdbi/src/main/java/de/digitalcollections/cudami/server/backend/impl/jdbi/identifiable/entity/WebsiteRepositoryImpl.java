@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
+import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -381,5 +382,30 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
       default:
         return null;
     }
+  }
+
+  @Override
+  public boolean updateRootPagesOrder(UUID websiteUuid, List<Webpage> rootPages) {
+    if (websiteUuid == null || rootPages == null) {
+      return false;
+    }
+    String query =
+        "UPDATE website_webpages"
+            + " SET sortindex = :idx"
+            + " WHERE website_uuid = :websiteUuid AND webpage_uuid = :webpageUuid;";
+    dbi.withHandle(
+        h -> {
+          PreparedBatch batch = h.prepareBatch(query);
+          int idx = 0;
+          for (Webpage webpage : rootPages) {
+            batch
+                .bind("idx", idx++)
+                .bind("webpageUuid", webpage.getUuid())
+                .bind("websiteUuid", websiteUuid)
+                .add();
+          }
+          return batch.execute();
+        });
+    return true;
   }
 }

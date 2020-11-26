@@ -5,6 +5,7 @@ import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -36,4 +37,13 @@ public interface WebpageRepository<E extends Entity>
    * @return the website the given root-webpage belongs to (webpage is top level webpage)
    */
   Website getWebsite(UUID rootWebpageUuid);
+
+  default boolean updateChildrenOrder(Webpage webpage, List<Webpage> children) {
+    if (webpage == null || children == null) {
+      return false;
+    }
+    return updateChildrenOrder(webpage.getUuid(), children);
+  }
+
+  boolean updateChildrenOrder(UUID parentUuid, List<Webpage> children);
 }

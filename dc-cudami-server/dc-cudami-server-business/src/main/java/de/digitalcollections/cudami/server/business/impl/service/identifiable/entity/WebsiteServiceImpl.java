@@ -39,4 +39,9 @@ public class WebsiteServiceImpl extends EntityServiceImpl<Website> implements We
   public PageResponse<Webpage> getRootPages(UUID uuid, PageRequest pageRequest) {
     return ((WebsiteRepository) repository).getRootPages(uuid, pageRequest);
   }
+
+  @Override
+  public boolean updateRootPagesOrder(Website website, List<Webpage> rootPages) {
+    return ((WebsiteRepository) repository).updateRootPagesOrder(website, rootPages);
+  }
 }

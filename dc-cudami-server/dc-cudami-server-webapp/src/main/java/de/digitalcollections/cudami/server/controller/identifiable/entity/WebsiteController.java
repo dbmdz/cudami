@@ -9,9 +9,11 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.paging.enums.Direction;
 import de.digitalcollections.model.api.paging.enums.NullHandling;
+import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
@@ -19,7 +21,9 @@ import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiPathParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -121,5 +125,24 @@ public class WebsiteController {
     }
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
     return service.getRootPages(uuid, pageRequest);
+  }
+
+  @ApiMethod(description = "Update the order of a website's rootpages")
+  @PutMapping(
+      value = {"/latest/websites/{uuid}/rootpages", "/v3/websites/{uuid}/rootpages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public ResponseEntity updateRootPagesOrder(
+      @ApiPathParam(description = "UUID of the website") @PathVariable("uuid") UUID uuid,
+      @ApiPathParam(description = "List of the rootpages") @RequestBody List<Webpage> rootPages) {
+    Website website = new WebsiteImpl();
+    website.setUuid(uuid);
+
+    boolean successful = service.updateRootPagesOrder(website, rootPages);
+
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 }
