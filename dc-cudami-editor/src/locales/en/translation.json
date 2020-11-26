@@ -1,9 +1,9 @@
 {
   "feedback": {
-    "collectionNotFound": "Collection was not found",
+    "collectionNotFound": "Collection was not found.",
     "digitalObjectAddedSuccessfully": "The selected digital object has been added successfully.",
     "digitalObjectAddedSuccessfully_plural": "The selected digital objects have been added successfully.",
-    "digitalObjectNotFound": "Digital object was not found",
+    "digitalObjectNotFound": "Digital object was not found.",
     "digitalObjectRemovedSuccessfully": "{{ name }} has been removed successfully.",
     "duplicateInformation": "If entries are selected multiple times, the duplicates are automatically removed when you click on \"$t(add)\".",
     "orderNotChangedSuccessfully": "Order could not be changed.",
@@ -12,8 +12,8 @@
     "subcollectionAddedSuccessfully_plural": "The selected collections have been added successfully as subcollections.",
     "subcollectionMovedSuccessfully": "{{ name }} has been moved successfully to <0>{{ targetName }}</0>.",
     "subcollectionRemovedSuccessfully": "{{ name }} has been removed successfully.",
-    "uploadFailed": "An error occurred while uploading",
-    "uploadSuccessful": "$t({{ mediaType }}, capitalize) uploaded successfully"
+    "uploadFailed": "An error occurred while uploading.",
+    "uploadSuccessful": "$t({{ mediaType }}, capitalize) uploaded successfully."
   },
   "translation": {
     "actions": "Actions",
