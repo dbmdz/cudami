@@ -340,6 +340,7 @@ class PagedIdentifiableList extends Component {
     } = this.state
     const showChangeOfOrder =
       enableChangeOfOrder && !changeOfOrderActive && totalElements > 1
+    const showPagination = totalElements > 0
     const TablePagination = ({position, showTotalElements}) => (
       <div className="justify-content-start">
         <ReactPaginate
@@ -423,7 +424,7 @@ class PagedIdentifiableList extends Component {
         <Card className="border-top-0">
           <CardBody>
             <div className="d-flex justify-content-between">
-              {totalElements > this.pageSize && (
+              {showPagination && (
                 <TablePagination position="above" showTotalElements />
               )}
               {showChangeOfOrder && (
@@ -438,7 +439,7 @@ class PagedIdentifiableList extends Component {
               )}
             </div>
             {this.getListComponent()}
-            {totalElements > this.pageSize > 0 && <TablePagination position="under" />}
+            {showPagination > 0 && <TablePagination position="under" />}
           </CardBody>
         </Card>
         {enableAdd && (
