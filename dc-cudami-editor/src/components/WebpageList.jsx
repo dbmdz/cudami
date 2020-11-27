@@ -45,9 +45,19 @@ const WebpageItem = forwardRef(
     const viewBaseUrl = `${apiContextPath}${typeToEndpointMapping[type]}`
     const publicationEndDate = publicationEnd && new Date(publicationEnd)
     const publicationStartDate = publicationStart && new Date(publicationStart)
+    const [
+      indexCol,
+      publicationStatusCol,
+      previewCol,
+      labelCol,
+      publicationStartCol,
+      publicationEndCol,
+      lastModifiedCol,
+      actionsCol,
+    ] = widths
     return (
       <tr key={uuid} ref={ref} style={style}>
-        <td className="text-right" style={{width: widths[0]}}>
+        <td className="text-right" style={{width: indexCol}}>
           {changeOfOrderActive ? (
             <Button className="p-0" color="link" data-movable-handle size="sm">
               <FaArrowsAltV />
@@ -58,34 +68,34 @@ const WebpageItem = forwardRef(
             index + 1 + pageNumber * pageSize
           )}
         </td>
-        <td className="text-center" style={{width: widths[1]}}>
+        <td className="text-center" style={{width: publicationStatusCol}}>
           <PublicationStatus
             publicationEnd={publicationEndDate}
             publicationStart={publicationStartDate}
           />
         </td>
-        <td className="text-center" style={{width: widths[2]}}>
+        <td className="text-center" style={{width: previewCol}}>
           <PreviewImage
             image={previewImage}
             renderingHints={previewImageRenderingHints}
             width={30}
           />
         </td>
-        <td style={{width: widths[3]}}>
+        <td style={{width: labelCol}}>
           {label[language] && (
             <a href={`${viewBaseUrl}/${uuid}`}>{label[language]}</a>
           )}
         </td>
-        <td style={{width: widths[4]}}>
+        <td style={{width: publicationStartCol}}>
           {formatDate(publicationStartDate, uiLocale, true)}
         </td>
-        <td style={{width: widths[5]}}>
+        <td style={{width: publicationEndCol}}>
           {formatDate(publicationEndDate, uiLocale, true)}
         </td>
-        <td className="text-center" style={{width: widths[6]}}>
+        <td className="text-center" style={{width: lastModifiedCol}}>
           {formatDate(new Date(lastModified), uiLocale)}
         </td>
-        <td className="text-center" style={{width: widths[7]}}>
+        <td className="text-center" style={{width: actionsCol}}>
           <ListButtons
             enableMove={enableMove}
             enableRemove={enableRemove}
