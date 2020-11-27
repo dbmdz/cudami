@@ -4,22 +4,36 @@ import ReactDOM from 'react-dom'
 import initI18n from '../i18n'
 import PagedIdentifiableList from '../components/PagedIdentifiableList'
 
-export default function (config) {
-  initI18n(config.uiLocale)
+export default function ({
+  apiContextPath,
+  enableAdd,
+  enableChangeOfOrder,
+  enableMove,
+  enableRemove,
+  existingLanguages,
+  id,
+  parentType,
+  parentUuid,
+  showEdit,
+  showNew,
+  type,
+  uiLocale,
+}) {
+  initI18n(uiLocale)
   ReactDOM.render(
     <PagedIdentifiableList
-      apiContextPath={config.apiContextPath}
-      enableAdd={config.enableAdd}
-      enableMove={config.enableMove}
-      enableRemove={config.enableRemove}
-      existingLanguages={config.existingLanguages}
-      parentType={config.parentType}
-      parentUuid={config.parentUuid}
-      showEdit={config.showEdit}
-      showNew={config.showNew}
-      type={config.type}
-      uiLocale={config.uiLocale}
+      apiContextPath={apiContextPath}
+      enableAdd={enableAdd}
+      enableMove={enableMove}
+      enableRemove={enableRemove}
+      existingLanguages={existingLanguages}
+      parentType={parentType}
+      parentUuid={parentUuid}
+      showEdit={showEdit}
+      showNew={showNew}
+      type={type}
+      uiLocale={uiLocale}
     />,
-    document.getElementById(config.id)
+    document.getElementById(id)
   )
 }

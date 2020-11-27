@@ -4,19 +4,29 @@ import ReactDOM from 'react-dom'
 import initI18n from '../i18n'
 import IdentifiableForm from '../components/IdentifiableForm'
 
-export default function (config) {
-  initI18n(config.uiLocale)
+export default function ({
+  activeLanguage,
+  apiContextPath,
+  existingLanguages,
+  id,
+  parentType,
+  parentUuid,
+  type,
+  uiLocale,
+  uuid,
+}) {
+  initI18n(uiLocale)
   ReactDOM.render(
     <IdentifiableForm
-      activeLanguage={config.activeLanguage}
-      apiContextPath={config.apiContextPath}
-      existingLanguages={config.existingLanguages}
-      parentType={config.parentType}
-      parentUuid={config.parentUuid}
-      type={config.type}
-      uiLocale={config.uiLocale}
-      uuid={config.uuid}
+      activeLanguage={activeLanguage}
+      apiContextPath={apiContextPath}
+      existingLanguages={existingLanguages}
+      parentType={parentType}
+      parentUuid={parentUuid}
+      type={type}
+      uiLocale={uiLocale}
+      uuid={uuid}
     />,
-    document.getElementById(config.id)
+    document.getElementById(id)
   )
 }
