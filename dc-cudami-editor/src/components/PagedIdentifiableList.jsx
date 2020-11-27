@@ -331,7 +331,6 @@ class PagedIdentifiableList extends Component {
       defaultLanguage,
       existingLanguages,
       feedbackMessage,
-      identifiables,
       identifierTypes,
       modalsOpen,
       numberOfPages,
