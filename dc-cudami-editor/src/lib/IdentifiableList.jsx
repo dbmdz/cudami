@@ -24,6 +24,7 @@ export default function ({
     <PagedIdentifiableList
       apiContextPath={apiContextPath}
       enableAdd={enableAdd}
+      enableChangeOfOrder={enableChangeOfOrder}
       enableMove={enableMove}
       enableRemove={enableRemove}
       existingLanguages={existingLanguages}
