@@ -339,7 +339,7 @@ class PagedIdentifiableList extends Component {
       totalElements,
     } = this.state
     const showChangeOfOrder =
-      enableChangeOfOrder && !changeOfOrderActive && identifiables.length > 0
+      enableChangeOfOrder && !changeOfOrderActive && totalElements > 1
     const TablePagination = ({position, showTotalElements}) => (
       <div className="justify-content-start">
         <ReactPaginate
@@ -426,11 +426,12 @@ class PagedIdentifiableList extends Component {
               {identifiables.length > 0 && (
                 <TablePagination position="above" showTotalElements />
               )}
-              {showChangeOfOrder ? (
+              {showChangeOfOrder && (
                 <Button className="mb-2" onClick={this.activateChangeOfOrder}>
                   {t('changeOrder')}
                 </Button>
-              ) : (
+              )}
+              {changeOfOrderActive && (
                 <Button className="mb-2" onClick={this.saveChangeOfOrder}>
                   {t('save')}
                 </Button>
@@ -478,7 +479,7 @@ class PagedIdentifiableList extends Component {
 PagedIdentifiableList.defaultProps = {
   apiContextPath: '/',
   enableAdd: false,
-  enableChangeOfOrder: true,
+  enableChangeOfOrder: false,
   enableMove: false,
   enableRemove: false,
   mockApi: false,

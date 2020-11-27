@@ -170,6 +170,7 @@ const App = () => {
             <Container>
               <PagedIdentifiableList
                 enableAdd={true}
+                enableChangeOfOrder={true}
                 enableMove={true}
                 enableRemove={true}
                 mockApi={true}
