@@ -423,7 +423,7 @@ class PagedIdentifiableList extends Component {
         <Card className="border-top-0">
           <CardBody>
             <div className="d-flex justify-content-between">
-              {identifiables.length > 0 && (
+              {totalElements > this.pageSize && (
                 <TablePagination position="above" showTotalElements />
               )}
               {showChangeOfOrder && (
@@ -438,7 +438,7 @@ class PagedIdentifiableList extends Component {
               )}
             </div>
             {this.getListComponent()}
-            {identifiables.length > 0 && <TablePagination position="under" />}
+            {totalElements > this.pageSize > 0 && <TablePagination position="under" />}
           </CardBody>
         </Card>
         {enableAdd && (
