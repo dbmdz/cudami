@@ -52,7 +52,7 @@ public class CudamiEntitiesClient extends CudamiBaseClient<EntityImpl> {
 
   public SearchPageResponse<EntityImpl> find(SearchPageRequest searchPageRequest)
       throws HttpException {
-    return doGetSearchRequestForPagedObjectList("/latest/entities", searchPageRequest);
+    return doGetSearchRequestForPagedObjectList("/latest/entities/search", searchPageRequest);
   }
 
   public List<EntityImpl> find(String searchTerm, int maxResults) throws HttpException {
