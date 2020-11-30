@@ -119,7 +119,6 @@ class AddAttachedIdentifiablesModal extends Component {
                   {showAutocomplete ? (
                     <Autocomplete
                       onSelect={this.addIdentifiableToList}
-                      placeholder={t('autocomplete.searchTerm')}
                       search={(
                         contextPath,
                         mock,
