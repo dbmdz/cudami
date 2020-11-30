@@ -6,8 +6,10 @@
     "digitalObjectNotFound": "Digitalisat wurde nicht gefunden.",
     "digitalObjectRemovedSuccessfully": "{{ name }} wurde erfolgreich entfernt.",
     "duplicateInformation": "Werden Einträge mehrfach ausgewählt, so werden die Duplikate beim Klick auf \"$t(add)\" automatisch entfernt.",
+    "moreElementsFound": "{{ maxElements }} von {{ totalElements }} Treffern, bitte verfeinern Sie Ihre Suche.",
     "orderNotChangedSuccessfully": "Reihenfolge konnte nicht geändert werden.",
     "orderChangedSuccessfully": "Reihenfolge wurde erfolgreich geändert.",
+    "removePreviewImageAfterSaveNotification": "Klicken Sie auf \"$t(save)\", um die Löschung zu bestätigen.",
     "subcollectionAddedSuccessfully": "Die gewählte Sammlung wurde erfolgreich als Untersammlung hinzugefügt.",
     "subcollectionAddedSuccessfully_plural": "Die gewählten Sammlungen wurden erfolgreich als Untersammlungen hinzugefügt.",
     "subcollectionMovedSuccessfully": "{{ name }} wurde erfolgreich nach <0>{{ targetName }}</0> verschoben.",
@@ -25,10 +27,6 @@
     "alignmentLeft": "links (mit Textumlauf)",
     "alignmentRight": "rechts (mit Textumlauf)",
     "altText": "Alt-Text",
-    "autocomplete": {
-      "moreElementsFound": "{{ maxElements }} von {{ totalElements }} Treffern, bitte verfeinern Sie Ihre Suche.",
-      "searchTerm": "Suchbegriff"
-    },
     "blocks": {
       "blockquote": "Zitat einfügen",
       "bulletList": "In Aufzählungsliste umwandeln",
@@ -148,10 +146,10 @@
       "collection": "aus Sammlung entfernen"
     },
     "removePreviewImage": "Vorschaubild entfernen",
-    "removePreviewImageAfterSaveNotification": "Klicken Sie auf \"$t(save)\", um die Löschung zu bestätigen.",
     "save": "Speichern",
+    "searchTerm": "Suchbegriff",
     "selectMedia": {
-      "searchTerm": "$t(autocomplete.searchTerm) (aus $t({{ mediaType }})-Titel, Dateiname, Kurzbeschreibung)",
+      "searchTerm": "$t(searchTerm) (aus $t({{ mediaType }})-Titel, Dateiname, Kurzbeschreibung)",
       "useSearch": "Vorhandenes $t({{ mediaType }}) verwenden",
       "useUpload": "$t({{ mediaType }}) hochladen",
       "useUrl": "$t({{ mediaType }}) per Weblink einbinden"

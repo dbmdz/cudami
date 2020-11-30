@@ -107,7 +107,7 @@ class Autocomplete extends Component {
         {this.state.totalElements > this.maxElements && (
           <FeedbackMessage
             message={{
-              key: 'autocomplete.moreElementsFound',
+              key: 'moreElementsFound',
               values: {
                 maxElements: this.maxElements,
                 totalElements: this.state.totalElements,
@@ -122,9 +122,10 @@ class Autocomplete extends Component {
 
   render() {
     const {searchTerm, suggestions} = this.state
+    const {placeholder, t} = this.props
     const inputProps = {
       onChange: this.onChange,
-      placeholder: this.props.placeholder,
+      placeholder: placeholder ?? t('searchTerm'),
       value: searchTerm,
     }
     return (
