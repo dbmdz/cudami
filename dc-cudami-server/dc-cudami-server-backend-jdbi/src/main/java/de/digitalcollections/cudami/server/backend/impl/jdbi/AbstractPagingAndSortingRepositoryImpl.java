@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi;
 import de.digitalcollections.model.api.filter.FilterCriterion;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.filter.enums.FilterOperation;
-import de.digitalcollections.model.api.paging.Order;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.paging.enums.Direction;
@@ -11,8 +10,10 @@ import java.time.LocalDate;
 import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.util.StringUtils;
 
 /**
  * Convenience repository implementation to be inherited from if applicable.
@@ -43,31 +44,37 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
     // Sorting
     Sorting sorting = pageRequest.getSorting();
     if (sorting != null) {
-      Iterator<Order> iterator = sorting.iterator();
-      if (iterator.hasNext()) {
-        // TODO only one sort field supported by now...
-        Order order = iterator.next();
-        String sortField = order.getProperty();
-        String sortDirection = null;
-        if (sortField != null) {
-          if (allowedOrderByFields != null
-              && Arrays.asList(allowedOrderByFields).contains(sortField)) {
-            String fullQualifiedColumnName = getColumnName(sortField);
-            Direction direction = order.getDirection();
-            if (direction != null && direction.isDescending()) {
-              sortDirection = "DESC";
-            } else {
-              sortDirection = "ASC";
-            }
-            query
-                .append(" ")
-                .append("ORDER BY")
-                .append(" ")
-                .append(fullQualifiedColumnName)
-                .append(" ")
-                .append(sortDirection);
-          }
-        }
+      String orderBy =
+          Optional.ofNullable(sorting.getOrders()).orElse(Collections.emptyList()).stream()
+              .filter(
+                  o -> {
+                    String sortField = o.getProperty();
+                    return sortField != null
+                        && allowedOrderByFields != null
+                        && Arrays.asList(allowedOrderByFields).contains(sortField);
+                  })
+              .map(
+                  o -> {
+                    String sortDirection = null;
+                    Direction direction = o.getDirection();
+                    if (direction != null && direction.isDescending()) {
+                      sortDirection = "DESC";
+                    } else {
+                      sortDirection = "ASC";
+                    }
+                    String sortField = o.getProperty();
+                    Optional<String> subSortField = o.getSubProperty();
+                    String fullQualifiedColumnName = getColumnName(sortField);
+                    if (subSortField.isEmpty()) {
+                      return String.format("%s %s", fullQualifiedColumnName, sortDirection);
+                    }
+                    return String.format(
+                        "%s->>'%s' %s", fullQualifiedColumnName, subSortField.get(), sortDirection);
+                  })
+              .collect(Collectors.joining(","));
+
+      if (!StringUtils.isEmpty(orderBy)) {
+        query.append(" ORDER BY ").append(orderBy);
       }
     }
   }
