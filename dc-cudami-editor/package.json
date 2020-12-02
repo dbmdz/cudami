@@ -43,7 +43,7 @@
     "react-icons": "^4.1.0",
     "react-movable": "^2.5.3",
     "react-paginate": "^6.5.0",
-    "react-scripts": "3.4.4",
+    "react-scripts": "4.0.1",
     "reactstrap": "^8.6.0"
   },
   "devDependencies": {
