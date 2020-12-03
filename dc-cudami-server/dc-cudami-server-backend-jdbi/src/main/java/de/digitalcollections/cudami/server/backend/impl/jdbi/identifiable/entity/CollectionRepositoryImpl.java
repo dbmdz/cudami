@@ -388,7 +388,9 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[] {"created", "lastModified", "publicationEnd", "publicationStart", "refId"};
+    return new String[] {
+      "created", "label", "lastModified", "publicationEnd", "publicationStart", "refId"
+    };
   }
 
   @Override
@@ -522,6 +524,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     switch (modelProperty) {
       case "created":
         return "c.created";
+      case "label":
+        return "c.label";
       case "lastModified":
         return "c.last_modified";
       case "publicationEnd":
