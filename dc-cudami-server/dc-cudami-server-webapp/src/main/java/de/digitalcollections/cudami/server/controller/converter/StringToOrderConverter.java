@@ -23,12 +23,6 @@ import org.springframework.stereotype.Component;
  * @see de.digitalcollections.model.api.filter.FilterCriterion
  */
 public class StringToOrderConverter implements GenericConverter {
-
-  //  private final Pattern ORDER_PATTERN =
-  //      Pattern.compile(
-  //
-  // "^name:(?<name>[A-Za-z]+(>[A-Za-z]+)?)(;dir:(?<dir>ASC|DESC))?(;handling:(?<handling>NATIVE|NULLS_FIRST|NULLS_LAST))?$");
-
   private final Pattern ORDER_PATTERN =
       Pattern.compile(
           "^(?<property>[A-Za-z]+)(_(?<subProperty>[A-Za-z]+))?(\\.(?<direction>asc|desc))?(\\.(?<nullHandling>nullsfirst|nullslast))?$");
