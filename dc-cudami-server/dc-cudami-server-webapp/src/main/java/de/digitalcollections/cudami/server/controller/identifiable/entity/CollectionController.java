@@ -33,6 +33,8 @@ import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiPathParam;
 import org.jsondoc.core.annotation.ApiQueryParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -50,6 +52,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Api(description = "The collection controller", name = "Collection controller")
 public class CollectionController {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(CollectionController.class);
 
   private final CollectionService collectionService;
 
@@ -188,6 +192,7 @@ public class CollectionController {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
     if (sortBy != null) {
+      LOGGER.warn("Endpoint was called with the old AND the new sorting syntax (sortBy).");
       sorting =
           new SortingImpl(sortBy.stream().filter(Objects::nonNull).collect(Collectors.toList()));
     }
