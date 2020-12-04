@@ -29,6 +29,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -241,7 +242,6 @@ public class CudamiBaseClient<T extends Object> {
 
   protected PageResponse<T> doGetRequestForPagedObjectList(
       String requestUrl, PageRequest pageRequest) throws HttpException {
-    FindParams findParams = getFindParams(pageRequest);
     if (!requestUrl.contains("?")) {
       requestUrl = requestUrl + "?";
     } else {
@@ -249,15 +249,8 @@ public class CudamiBaseClient<T extends Object> {
         requestUrl = requestUrl + "&";
       }
     }
-    requestUrl =
-        requestUrl
-            + String.format(
-                "pageNumber=%d&pageSize=%d&sortField=%s&sortDirection=%s&nullHandling=%s",
-                findParams.getPageNumber(),
-                findParams.getPageSize(),
-                findParams.getSortField(),
-                findParams.getSortDirection(),
-                findParams.getNullHandling());
+    String findParams = getFindParamsAsString(pageRequest);
+    requestUrl = requestUrl + findParams;
     Filtering filtering = pageRequest.getFiltering();
     if (filtering != null) {
       requestUrl += "&" + getFilterParamsAsString(filtering.getFilterCriteria());
@@ -647,6 +640,63 @@ public class CudamiBaseClient<T extends Object> {
       }
     }
     return new FindParamsImpl(pageNumber, pageSize, sortField, sortDirection, nullHandling);
+  }
+
+  /**
+   * Converts the given pagerequest to a request string
+   *
+   * @param pageRequest source for find params
+   * @return the find params as request string
+   */
+  private String getFindParamsAsString(PageRequest pageRequest) {
+    int pageNumber = pageRequest.getPageNumber();
+    int pageSize = pageRequest.getPageSize();
+    StringBuilder findParams =
+        new StringBuilder(String.format("pageNumber=%d&pageSize=%d", pageNumber, pageSize));
+    Sorting sorting = pageRequest.getSorting();
+    if (sorting == null) {
+      return findParams.toString();
+    }
+    List<Order> orders = sorting.getOrders();
+    if (orders == null || orders.isEmpty()) {
+      return findParams.toString();
+    }
+    if (orders.size() == 1) {
+      FindParams params = getFindParams(pageRequest);
+      String paramsString =
+          String.format(
+              "&sortField=%s&sortDirection=%s&nullHandling=%s",
+              params.getSortField(), params.getSortDirection(), params.getNullHandling());
+      findParams.append(paramsString);
+    } else {
+      String sortBy =
+          orders.stream()
+              .map(
+                  o -> {
+                    String property = o.getProperty();
+                    StringBuilder order = new StringBuilder(property);
+                    Optional<String> subProperty = o.getSubProperty();
+                    if (subProperty.isPresent()) {
+                      order.append("_").append(subProperty.get());
+                    }
+                    Direction direction = o.getDirection();
+                    if (direction != null && direction.isDescending()) {
+                      order.append(".desc");
+                    } else {
+                      order.append(".asc");
+                    }
+                    NullHandling nullHandling = o.getNullHandling();
+                    if (nullHandling == NullHandling.NULLS_FIRST) {
+                      order.append(".nullsfirst");
+                    } else if (nullHandling == NullHandling.NULLS_LAST) {
+                      order.append(".nullslast");
+                    }
+                    return order.toString();
+                  })
+              .collect(Collectors.joining(","));
+      findParams.append("&sortBy=").append(sortBy);
+    }
+    return findParams.toString();
   }
 
   public PageResponse<T> findByLanguageAndInitial(
