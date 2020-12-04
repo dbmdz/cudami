@@ -14,13 +14,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 /**
- * Converter for converting URL params for Filtering from String to FilterCriterion-instance. Used
- * in WebController. Fills model object FilterCriterion.
+ * Converter for converting URL params for Sorting from String to Order-instance. Used in
+ * WebController. Fills model object Order.
  *
- * <p>For available filter operations and request examples:
- *
- * @see de.digitalcollections.model.api.filter.enums.FilterOperation
- * @see de.digitalcollections.model.api.filter.FilterCriterion
+ * @see de.digitalcollections.model.api.paging.Order
  */
 public class StringToOrderConverter implements GenericConverter {
   private final Pattern ORDER_PATTERN =
