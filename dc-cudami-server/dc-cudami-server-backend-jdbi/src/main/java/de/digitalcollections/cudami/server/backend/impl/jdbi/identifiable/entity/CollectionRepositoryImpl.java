@@ -220,9 +220,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                 + " FROM collections AS c"
                 + " LEFT JOIN fileresources_image AS file ON c.previewfileresource = file.uuid"
                 + " LEFT JOIN LATERAL jsonb_object_keys(c.label) l(keys) ON c.label IS NOT null"
-                + " LEFT JOIN LATERAL jsonb_object_keys(c.description) n(keys) ON c.description IS NOT null"
-                + " WHERE (c.label->>l.keys ILIKE '%' || :searchTerm || '%'"
-                + " OR c.description->>n.keys ILIKE '%' || :searchTerm || '%')");
+                + " WHERE (c.label->>l.keys ILIKE '%' || :searchTerm || '%')");
     // handle optional filtering params
     String filterClauses = getFilterClauses(searchPageRequest.getFiltering());
     if (!filterClauses.isEmpty()) {
