@@ -8,6 +8,8 @@ import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -23,6 +25,8 @@ public interface CollectionService extends NodeService<Collection>, EntityServic
   boolean addDigitalObjects(Collection collection, List<DigitalObject> digitalObjects);
 
   PageResponse<Collection> findActive(PageRequest pageRequest);
+
+  SearchPageResponse<Collection> findActive(SearchPageRequest searchPageRequest);
 
   Collection getActive(UUID uuid);
 
