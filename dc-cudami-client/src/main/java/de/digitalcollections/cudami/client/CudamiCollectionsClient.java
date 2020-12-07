@@ -89,7 +89,8 @@ public class CudamiCollectionsClient extends CudamiBaseClient<CollectionImpl> {
 
   public SearchPageResponse<CollectionImpl> findActive(SearchPageRequest searchPageRequest)
       throws HttpException {
-    return doGetSearchRequestForPagedObjectList("/latest/collections/search?active", searchPageRequest);
+    return doGetSearchRequestForPagedObjectList(
+        "/latest/collections/search?active", searchPageRequest);
   }
 
   public Collection findActiveOne(UUID uuid, Locale locale) throws HttpException {
