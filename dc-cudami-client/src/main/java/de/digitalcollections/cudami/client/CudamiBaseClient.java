@@ -276,19 +276,20 @@ public class CudamiBaseClient<T extends Object> {
 
   protected SearchPageResponse<T> doGetSearchRequestForPagedObjectList(
       String requestUrl, SearchPageRequest searchPageRequest) throws HttpException {
-    FindParams findParams = getFindParams(searchPageRequest);
+    if (!requestUrl.contains("?")) {
+      requestUrl = requestUrl + "?";
+    } else {
+      if (!requestUrl.endsWith("&")) {
+        requestUrl = requestUrl + "&";
+      }
+    }
+    String findParams = getFindParamsAsString(searchPageRequest);
+    requestUrl = requestUrl + findParams;
     String searchTerm = searchPageRequest.getQuery();
-    requestUrl =
-        requestUrl
-            + "?"
-            + String.format(
-                "pageNumber=%d&pageSize=%d&sortField=%s&sortDirection=%s&nullHandling=%s&searchTerm=%s",
-                findParams.getPageNumber(),
-                findParams.getPageSize(),
-                findParams.getSortField(),
-                findParams.getSortDirection(),
-                findParams.getNullHandling(),
-                URLEncoder.encode(searchTerm, StandardCharsets.UTF_8));
+    if (searchTerm != null) {
+      requestUrl =
+          requestUrl + "&searchTerm=" + URLEncoder.encode(searchTerm, StandardCharsets.UTF_8);
+    }
     HttpRequest req = createGetRequest(requestUrl);
     try {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
