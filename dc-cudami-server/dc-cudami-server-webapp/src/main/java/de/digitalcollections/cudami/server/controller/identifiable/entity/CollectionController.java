@@ -288,6 +288,7 @@ public class CollectionController {
   public SearchPageResponse<Collection> findCollections(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
       @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
           Direction sortDirection,
@@ -297,6 +298,12 @@ public class CollectionController {
       @RequestParam(name = "active", required = false) String active) {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
+    if (sortBy != null) {
+      LOGGER.warn(
+          "Endpoint '/latest/collections/search' was called with the old AND the new sorting syntax (sortBy).");
+      sorting =
+          new SortingImpl(sortBy.stream().filter(Objects::nonNull).collect(Collectors.toList()));
+    }
     SearchPageRequest pageRequest =
         new SearchPageRequestImpl(searchTerm, pageNumber, pageSize, sorting);
     if (active != null) {
