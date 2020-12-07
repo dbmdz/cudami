@@ -10,6 +10,8 @@ import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.SearchPageRequest;
+import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import java.util.List;
@@ -53,6 +55,13 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
 
   @Override
   public PageResponse<Collection> findActive(PageRequest pageRequest) {
+    Filtering filtering = filteringForActive();
+    pageRequest.add(filtering);
+    return find(pageRequest);
+  }
+
+  @Override
+  public SearchPageResponse<Collection> findActive(SearchPageRequest pageRequest) {
     Filtering filtering = filteringForActive();
     pageRequest.add(filtering);
     return find(pageRequest);

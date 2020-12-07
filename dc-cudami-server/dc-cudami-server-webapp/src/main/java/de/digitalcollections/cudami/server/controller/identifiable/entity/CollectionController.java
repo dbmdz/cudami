@@ -280,7 +280,7 @@ public class CollectionController {
 
   @ApiMethod(
       description =
-          "Find limited amount of collections containing searchTerm in label or description")
+          "Find limited amount of (active or all) collections containing searchTerm in label or description")
   @GetMapping(
       value = {"/latest/collections/search", "/v3/collections/search"},
       produces = "application/json")
@@ -293,11 +293,15 @@ public class CollectionController {
           Direction sortDirection,
       @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
           NullHandling nullHandling,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "active", required = false) String active) {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
     SearchPageRequest pageRequest =
         new SearchPageRequestImpl(searchTerm, pageNumber, pageSize, sorting);
+    if (active != null) {
+      return collectionService.findActive(pageRequest);
+    }
     return collectionService.find(pageRequest);
   }
 
