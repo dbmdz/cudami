@@ -192,7 +192,8 @@ public class CollectionController {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
     if (sortBy != null) {
-      LOGGER.warn("Endpoint was called with the old AND the new sorting syntax (sortBy).");
+      LOGGER.warn(
+          "Endpoint '/latest/collections' was called with the old AND the new sorting syntax (sortBy).");
       sorting =
           new SortingImpl(sortBy.stream().filter(Objects::nonNull).collect(Collectors.toList()));
     }
