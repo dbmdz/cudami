@@ -229,7 +229,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
             + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
             + " :type, :entityType,"
             + " :created, :lastModified,"
-            + " :datePublished, :timeValuePublished::JSONB"
+            + " :datePublished, :timeValuePublished::JSONB,"
             + " :text::JSONB"
             + ")";
 
