@@ -111,6 +111,8 @@ const WebpageItem = forwardRef(
   }
 )
 
+WebpageItem.displayName = 'WebpageItem'
+
 const WebpageList = ({
   changeOfOrderActive,
   identifiables,
