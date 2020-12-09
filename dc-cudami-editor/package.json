@@ -34,7 +34,7 @@
     "prosemirror-schema-list": "^1.1.4",
     "prosemirror-tables": "^1.1.1",
     "pubsub-js": "^1.9.1",
-    "react": "^16.13.1",
+    "react": "^16.14.0",
     "react-autosuggest": "^10.0.4",
     "react-date-picker": "^8.0.5",
     "react-dom": "^16.13.1",
