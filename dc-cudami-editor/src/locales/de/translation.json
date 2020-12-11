@@ -177,7 +177,6 @@
       "webpages_plural": "{{ count }} Webseiten gefunden"
     },
     "uploadFileResource": "Neue Datei hochladen",
-    "url": "URL",
     "video": "Video",
     "view": "anzeigen",
     "warning": "Warnung",
