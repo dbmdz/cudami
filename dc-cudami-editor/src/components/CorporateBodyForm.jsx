@@ -11,10 +11,9 @@ import {
 } from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-import FormEditor from './FormEditor'
-import FormIdInput from './FormIdInput'
 import FormButtons from './FormButtons'
-import FormUrlInput from './FormUrlInput'
+import FormEditor from './FormEditor'
+import FormInput from './FormInput'
 import LanguageAdder from './LanguageAdder'
 import LanguageTab from './LanguageTab'
 import Teaser from './Teaser'
@@ -56,11 +55,20 @@ const CorporateBodyForm = ({
       </Row>
       <Row>
         <Col sm="12">
-          {identifiable.uuid && <FormIdInput id={identifiable.uuid} />}
-          <FormUrlInput
+          {identifiable.uuid && (
+            <FormInput
+              id="uuid"
+              label="ID"
+              readOnly
+              value={identifiable.uuid}
+            />
+          )}
+          <FormInput
+            îd="homepage"
             labelKey="homepage"
             onChange={(url) => onUpdate({...identifiable, homepageUrl: url})}
-            url={identifiable.homepageUrl}
+            type="url"
+            value={identifiable.homepageUrl}
           />
           <Nav tabs>
             {existingLanguages.map((language) => (
@@ -103,7 +111,7 @@ const CorporateBodyForm = ({
                       onUpdate={(document) => {
                         onUpdate({
                           text: {
-                            ...identifiable['text'],
+                            ...identifiable.text,
                             [language]: document,
                           },
                         })

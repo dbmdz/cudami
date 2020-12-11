@@ -11,9 +11,9 @@ import {
 } from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-import FormEditor from './FormEditor'
-import FormIdInput from './FormIdInput'
 import FormButtons from './FormButtons'
+import FormEditor from './FormEditor'
+import FormInput from './FormInput'
 import LanguageAdder from './LanguageAdder'
 import LanguageTab from './LanguageTab'
 import Teaser from './Teaser'
@@ -51,7 +51,14 @@ const ArticleForm = ({
       </Row>
       <Row>
         <Col sm="12">
-          {identifiable.uuid && <FormIdInput id={identifiable.uuid} />}
+          {identifiable.uuid && (
+            <FormInput
+              id="uuid"
+              label="ID"
+              readOnly
+              value={identifiable.uuid}
+            />
+          )}
           <Nav tabs>
             {existingLanguages.map((language) => (
               <LanguageTab

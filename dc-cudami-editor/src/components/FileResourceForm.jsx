@@ -3,8 +3,8 @@ import {Col, Form, Nav, Row, TabContent, TabPane} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
 import FileResourceUploadForm from './FileResourceUploadForm'
-import FormIdInput from './FormIdInput'
 import FormButtons from './FormButtons'
+import FormInput from './FormInput'
 import LanguageAdder from './LanguageAdder'
 import LanguageTab from './LanguageTab'
 import Teaser from './Teaser'
@@ -45,7 +45,7 @@ const FileResourceForm = ({
       </Row>
       <Row>
         <Col sm="12">
-          <FormIdInput id={identifiable.uuid} />
+          <FormInput id="uuid" label="ID" readOnly value={identifiable.uuid} />
           <Nav tabs>
             {existingLanguages.map((language) => (
               <LanguageTab
