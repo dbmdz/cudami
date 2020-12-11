@@ -100,7 +100,7 @@ const ArticleForm = ({
                       onUpdate={(document) => {
                         onUpdate({
                           text: {
-                            ...identifiable['text'],
+                            ...identifiable.text,
                             [language]: document,
                           },
                         })
