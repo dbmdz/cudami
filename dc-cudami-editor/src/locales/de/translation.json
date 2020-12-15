@@ -51,6 +51,7 @@
     "createCollection": "Neue Sammlung anlegen",
     "createCorporateBody": "Neue Institution anlegen",
     "createProject": "Neues Projekt anlegen",
+    "createRenderingTemplate": "Neue Gestaltungsvorlage anlegen",
     "createSubtopic": "Neues Unterthema anlegen",
     "createTopic": "Neues Thema anlegen",
     "createWebpage": "Neue Webseite anlegen",
@@ -75,6 +76,7 @@
     "editLink": "Verlinkung bearbeiten",
     "editPreviewImage": "Vorschaubild bearbeiten",
     "editProject": "Projekt bearbeiten",
+    "editRenderingTemplate": "Gestaltungsvorlage \"{{ name }}\" bearbeiten",
     "editSubtopic": "Unterthema bearbeiten",
     "editTopic": "Thema bearbeiten",
     "editWebpage": "Webseite bearbeiten",
@@ -127,6 +129,7 @@
     "moveTo": {
       "collection": "in andere Sammlung verschieben"
     },
+    "name": "Name",
     "new": "Neu",
     "next": "Weiter",
     "no": "Nein",
@@ -146,6 +149,7 @@
       "collection": "aus Sammlung entfernen"
     },
     "removePreviewImage": "Vorschaubild entfernen",
+    "renderingTemplates": "Gestaltungsvorlagen",
     "save": "Speichern",
     "searchTerm": "Suchbegriff",
     "selectMedia": {
@@ -171,6 +175,8 @@
     "totalElements": {
       "digitalObjects": "{{ count }} Digitalisat gefunden",
       "digitalObjects_plural": "{{ count }} Digitalisate gefunden",
+      "renderingTemplates": "{{ count }} Gestaltungsvorlage gefunden",
+      "renderingTemplates_plural": "{{ count }} Gestaltungsvorlagen gefunden",
       "subcollections": "{{ count }} Sammlung gefunden",
       "subcollections_plural": "{{ count }} Sammlungen gefunden",
       "webpages": "{{ count }} Webseite gefunden",
