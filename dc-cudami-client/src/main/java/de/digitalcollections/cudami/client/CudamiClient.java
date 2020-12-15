@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.client.entity.agent.CudamiCorporateBodiesCli
 import de.digitalcollections.cudami.client.entity.agent.CudamiPersonsClient;
 import de.digitalcollections.cudami.client.entity.work.CudamiItemsClient;
 import de.digitalcollections.cudami.client.entity.work.CudamiWorksClient;
+import de.digitalcollections.cudami.client.view.CudamiRenderingTemplatesClient;
 import java.net.http.HttpClient;
 import java.time.Duration;
 
@@ -27,6 +28,7 @@ public class CudamiClient {
   private final CudamiPersonsClient cudamiPersonsClient;
   private final CudamiPredicatesClient cudamiPredicatesClient;
   private final CudamiProjectsClient cudamiProjectsClient;
+  private final CudamiRenderingTemplatesClient cudamiRenderingTemplatesClient;
   private final CudamiSubtopicsClient cudamiSubtopicsClient;
   private final CudamiTopicsClient cudamiTopicsClient;
   private final CudamiUsersClient cudamiUsersClient;
@@ -67,6 +69,8 @@ public class CudamiClient {
     this.cudamiPersonsClient = new CudamiPersonsClient(http, cudamiServerUrl, mapper);
     this.cudamiPredicatesClient = new CudamiPredicatesClient(http, cudamiServerUrl, mapper);
     this.cudamiProjectsClient = new CudamiProjectsClient(http, cudamiServerUrl, mapper);
+    this.cudamiRenderingTemplatesClient =
+        new CudamiRenderingTemplatesClient(http, cudamiServerUrl, mapper);
     this.cudamiSubtopicsClient = new CudamiSubtopicsClient(http, cudamiServerUrl, mapper);
     this.cudamiTopicsClient = new CudamiTopicsClient(http, cudamiServerUrl, mapper);
     this.cudamiUsersClient = new CudamiUsersClient(http, cudamiServerUrl, mapper);
@@ -137,6 +141,10 @@ public class CudamiClient {
 
   public CudamiProjectsClient forProjects() {
     return cudamiProjectsClient;
+  }
+
+  public CudamiRenderingTemplatesClient forRenderingTemplates() {
+    return cudamiRenderingTemplatesClient;
   }
 
   public CudamiSubtopicsClient forSubtopics() {
