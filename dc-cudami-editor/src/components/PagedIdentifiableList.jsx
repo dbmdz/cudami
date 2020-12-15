@@ -1,15 +1,14 @@
-import classNames from 'classnames'
 import uniqBy from 'lodash/uniqBy'
 import React, {Component} from 'react'
 import {Button, Card, CardBody, Col, Nav, Row} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
-import ReactPaginate from 'react-paginate'
 
 import './common.css'
 import AppContext from './AppContext'
 import DigitalObjectList from './DigitalObjectList'
 import FeedbackMessage from './FeedbackMessage'
 import LanguageTab from './LanguageTab'
+import ListPagination from './ListPagination'
 import SubcollectionList from './SubcollectionList'
 import WebpageList from './WebpageList'
 import AddAttachedIdentifiablesModal from './modals/AddAttachedIdentifiablesModal'
@@ -339,43 +338,6 @@ class PagedIdentifiableList extends Component {
     } = this.state
     const showChangeOfOrder =
       enableChangeOfOrder && !changeOfOrderActive && totalElements > 1
-    const showPagination = totalElements > 0
-    const TablePagination = ({position, showTotalElements}) => (
-      <div className="justify-content-start">
-        <ReactPaginate
-          activeClassName="active"
-          breakClassName="page-item"
-          breakLabel="&hellip;"
-          breakLinkClassName="page-link"
-          containerClassName={classNames({
-            'd-inline-flex': true,
-            pagination: true,
-            'mb-0': position === 'under',
-            'mb-2': position === 'above',
-            'mt-2': position === 'under',
-          })}
-          disabledClassName="disabled"
-          forcePage={pageNumber}
-          marginPagesDisplayed={1}
-          nextClassName="page-item"
-          nextLabel="&raquo;"
-          nextLinkClassName="page-link"
-          onPageChange={this.updatePage}
-          pageClassName="page-item"
-          pageCount={numberOfPages}
-          pageLinkClassName="page-link"
-          pageRangeDisplayed={5}
-          previousClassName="page-item"
-          previousLabel="&laquo;"
-          previousLinkClassName="page-link"
-        />
-        {showTotalElements && (
-          <span className="ml-2">
-            {t(`totalElements.${type}s`, {count: totalElements})}
-          </span>
-        )}
-      </div>
-    )
     return (
       <AppContext.Provider
         value={{apiContextPath, defaultLanguage, mockApi, uiLocale}}
@@ -423,9 +385,13 @@ class PagedIdentifiableList extends Component {
         <Card className="border-top-0">
           <CardBody>
             <div className="d-flex justify-content-between">
-              {showPagination && (
-                <TablePagination position="above" showTotalElements />
-              )}
+              <ListPagination
+                changePage={this.updatePage}
+                numberOfPages={numberOfPages}
+                pageNumber={pageNumber}
+                totalElements={totalElements}
+                type={type}
+              />
               {showChangeOfOrder && (
                 <Button className="mb-2" onClick={this.activateChangeOfOrder}>
                   {t('changeOrder')}
@@ -438,7 +404,15 @@ class PagedIdentifiableList extends Component {
               )}
             </div>
             {this.getListComponent()}
-            {showPagination > 0 && <TablePagination position="under" />}
+            <ListPagination
+              changePage={this.updatePage}
+              numberOfPages={numberOfPages}
+              pageNumber={pageNumber}
+              position="under"
+              showTotalElements={false}
+              totalElements={totalElements}
+              type={type}
+            />
           </CardBody>
         </Card>
         {enableAdd && (
