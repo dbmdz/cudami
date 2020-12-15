@@ -1,0 +1,23 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+  <head>
+    <title th:text="|#{rendering_templates}: #{rendering_template_edit(${name})}|">Rendering templates: Edit rendering template "template"</title>
+  </head>
+  <body>
+    <section layout:fragment="content">
+      <div id="editor"></div>
+      <script th:src="@{/js/rendering-template-editor.bundle.js}"></script>
+      <script th:inline="javascript">
+        RenderingTemplateEditor({
+          apiContextPath: /*[[@{/}]]*/ '',
+          id: "editor",
+          uiLocale: /*[[${#locale.language}]]*/,
+          uuid: /*[[${uuid}]]*/
+        });
+      </script>
+    </section>
+  </body>
+</html>
