@@ -5,6 +5,7 @@ export const typeToEndpointMapping = {
   digitalObject: 'digitalobjects',
   fileResource: 'fileresources',
   project: 'projects',
+  renderingTemplate: 'renderingtemplates',
   subcollection: 'subcollections',
   subtopic: 'subtopics',
   topic: 'topics',
@@ -163,6 +164,35 @@ export async function loadIdentifiable(contextPath, mock, type, uuid = 'new') {
     return result.json()
   } catch (err) {
     return {}
+  }
+}
+
+export async function loadIdentifiables(
+  contextPath,
+  mock,
+  type,
+  pageNumber,
+  pageSize
+) {
+  let url = `${contextPath}api/${typeToEndpointMapping[type]}?pageNumber=${pageNumber}&pageSize=${pageSize}`
+  if (mock) {
+    url = `/__mock__/${type}s.json`
+  }
+  try {
+    const response = await fetch(url)
+    const json = await response.json()
+    const {content, pageRequest, totalElements} = json
+    return {
+      content,
+      pageSize: pageRequest.pageSize,
+      totalElements,
+    }
+  } catch (err) {
+    return {
+      content: [],
+      pageSize: 0,
+      totalElements: 0,
+    }
   }
 }
 

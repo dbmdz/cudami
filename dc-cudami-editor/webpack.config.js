@@ -7,6 +7,8 @@ const config = {
   entry: {
     IdentifiableEditor: './src/lib/IdentifiableEditor.jsx',
     IdentifiableList: './src/lib/IdentifiableList.jsx',
+    RenderingTemplateEditor: './src/lib/RenderingTemplateEditor.jsx',
+    RenderingTemplateList: './src/lib/RenderingTemplateList.jsx'
   },
   mode: 'production',
   module: {
