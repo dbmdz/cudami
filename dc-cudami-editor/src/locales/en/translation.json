@@ -50,6 +50,7 @@
     "createArticle": "Create a new article",
     "createCollection": "Create a new collection",
     "createCorporateBody": "Create a new corporate body",
+    "createRenderingTemplate": "Create a new design template",
     "createProject": "Create a new project",
     "createSubtopic": "Create a new subtopic",
     "createTopic": "Create a new topic",
@@ -74,6 +75,7 @@
     "editFileResource": "Edit file \"{{ name }}\"",
     "editLink": "Edit hyperlink",
     "editPreviewImage": "Edit preview image",
+    "editRenderingTemplate": "Edit design template \"{{ name }}\"",
     "editProject": "Edit project",
     "editSubtopic": "Edit subtopic",
     "editTopic": "Edit topic",
@@ -127,6 +129,7 @@
     "moveTo": {
       "collection": "move to another collection"
     },
+    "name": "Name",
     "new": "New",
     "next": "Next",
     "no": "No",
@@ -146,6 +149,7 @@
       "collection": "remove from collection"
     },
     "removePreviewImage": "Remove preview image",
+    "renderingTemplates": "Design templates",
     "save": "Save",
     "searchTerm": "Search term",
     "selectMedia": {
@@ -171,6 +175,8 @@
     "totalElements": {
       "digitalObjects": "found {{ count }} digital object",
       "digitalObjects_plural": "found {{ count }} digital objects",
+      "renderingTemplates": "found {{ count }} design template",
+      "renderingTemplates_plural": "found {{ count }} design templates",
       "subcollections": "found {{ count }} collection",
       "subcollections_plural": "found {{ count }} collections",
       "webpages": "found {{ count }} webpage",

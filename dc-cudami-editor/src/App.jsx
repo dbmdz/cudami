@@ -18,6 +18,7 @@ import {
   FaIndustry,
   FaList,
   FaNewspaper,
+  FaPalette,
   FaPencilAlt,
   FaSitemap,
   FaUniversity,
@@ -28,16 +29,10 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import initI18n from './i18n'
 import IdentifiableForm from './components/IdentifiableForm'
 import PagedIdentifiableList from './components/PagedIdentifiableList'
+import PagedRenderingTemplateList from './components/PagedRenderingTemplateList'
+import RenderingTemplateForm from './components/RenderingTemplateForm'
 
-// this is a mapping of parent types to possible child types
-const availableListTypes = {
-  collection: ['subcollection', 'digitalObject'],
-  project: ['digitalObject'],
-  webpage: ['webpage'],
-  website: ['webpage'],
-}
-
-const availableTypes = [
+const availableFormTypes = [
   'article',
   'collection',
   'corporateBody',
@@ -48,6 +43,14 @@ const availableTypes = [
   'webpage',
   'website',
 ]
+
+// this is a mapping of parent types to possible child types
+const availableListTypes = {
+  collection: ['subcollection', 'digitalObject'],
+  project: ['digitalObject'],
+  webpage: ['webpage'],
+  website: ['webpage'],
+}
 
 const getUiLocale = (searchParams) => {
   const query = new URLSearchParams(searchParams)
@@ -61,6 +64,7 @@ const iconMapping = {
   digitalObject: FaCubes,
   fileResource: FaFile,
   project: FaIndustry,
+  renderingTemplate: FaPalette,
   subcollection: FaList,
   subtopic: FaSitemap,
   topic: FaSitemap,
@@ -68,58 +72,78 @@ const iconMapping = {
   website: FaGlobe,
 }
 
+const FormCard = ({type}) => {
+  const Icon = iconMapping[type]
+  return (
+    <Col md="3">
+      <Card className="mb-3 text-center">
+        <Icon className="card-img-top mt-3" size="65" />
+        <CardBody>{type}</CardBody>
+        <CardFooter className="p-0">
+          <ButtonGroup>
+            <Button color="light">
+              <Link className="stretched-link" to={`/${type}/new`}>
+                <FaFolderPlus />
+              </Link>
+            </Button>
+            <Button color="light">
+              <Link className="stretched-link" to={`/${type}/edit`}>
+                <FaPencilAlt />
+              </Link>
+            </Button>
+          </ButtonGroup>
+        </CardFooter>
+      </Card>
+    </Col>
+  )
+}
+
+const ListCard = ({parentType, type}) => {
+  const Icon = iconMapping[type]
+  const label = parentType ? `${parentType} / ${type}` : `${type}`
+  const link = parentType ? `/${parentType}/${type}/list` : `/${type}/list`
+  return (
+    <Col key={type} md="3">
+      <Card className="mb-3 text-center">
+        <Link className="stretched-link" to={link}>
+          <Icon className="card-img-top mt-3" size="65" />
+          <CardBody>{label}</CardBody>
+        </Link>
+      </Card>
+    </Col>
+  )
+}
+
 const StartPage = () => (
   <Container>
-    <h1>Editor</h1>
+    <h1>Available components</h1>
+    <h2>Form</h2>
+    <h3>Identifiables</h3>
     <Row>
-      {availableTypes.map((type) => {
-        const Icon = iconMapping[type]
-        return (
-          <Col key={type} md="3">
-            <Card className="mb-3 text-center">
-              <Icon className="card-img-top mt-3" size="65" />
-              <CardBody>{type}</CardBody>
-              <CardFooter className="p-0">
-                <ButtonGroup>
-                  <Button color="light">
-                    <Link className="stretched-link" to={`/${type}/new`}>
-                      <FaFolderPlus />
-                    </Link>
-                  </Button>
-                  <Button color="light">
-                    <Link className="stretched-link" to={`/${type}/edit`}>
-                      <FaPencilAlt />
-                    </Link>
-                  </Button>
-                </ButtonGroup>
-              </CardFooter>
-            </Card>
-          </Col>
-        )
-      })}
+      {availableFormTypes.map((type) => (
+        <FormCard key={type} type={type} />
+      ))}
     </Row>
-    <h1>List</h1>
+    <h3>Other</h3>
+    <Row>
+      <FormCard type="renderingTemplate" />
+    </Row>
+    <h2>List</h2>
+    <h3>Identifiables</h3>
     <Row>
       {Object.keys(availableListTypes).map((parentType) => {
-        return availableListTypes[parentType].map((type) => {
-          const Icon = iconMapping[type]
-          return (
-            <Col key={type} md="3">
-              <Card className="mb-3 text-center">
-                <Link
-                  className="stretched-link"
-                  to={`/${parentType}/${type}/list`}
-                >
-                  <Icon className="card-img-top mt-3" size="65" />
-                  <CardBody>
-                    {parentType} / {type}
-                  </CardBody>
-                </Link>
-              </Card>
-            </Col>
-          )
-        })
+        return availableListTypes[parentType].map((type) => (
+          <ListCard
+            key={`${parentType}-${type}`}
+            parentType={parentType}
+            type={type}
+          />
+        ))
       })}
+    </Row>
+    <h3>Other</h3>
+    <Row>
+      <ListCard type="renderingTemplate" />
     </Row>
   </Container>
 )
@@ -135,9 +159,9 @@ const App = () => {
         </a>
       </Container>
       <Router>
-        <Route component={StartPage} exact={true} path="/" />
+        <Route component={StartPage} exact path="/" />
         <Route
-          path={`/:type(${availableTypes.join('|')})/new`}
+          path={`/:type(${availableFormTypes.join('|')})/new`}
           render={({match}) => (
             <Container>
               <IdentifiableForm
@@ -150,7 +174,7 @@ const App = () => {
           )}
         />
         <Route
-          path={`/:type(${availableTypes.join('|')})/edit`}
+          path={`/:type(${availableFormTypes.join('|')})/edit`}
           render={({match}) => (
             <Container>
               <IdentifiableForm
@@ -180,6 +204,30 @@ const App = () => {
                 type={match.params.type}
                 uiLocale={uiLocale}
               />
+            </Container>
+          )}
+        />
+        <Route
+          path={'/renderingTemplate/new'}
+          render={() => (
+            <Container>
+              <RenderingTemplateForm mockApi={true} />
+            </Container>
+          )}
+        />
+        <Route
+          path={'/renderingTemplate/edit'}
+          render={() => (
+            <Container>
+              <RenderingTemplateForm mockApi={true} uuid="mock" />
+            </Container>
+          )}
+        />
+        <Route
+          path={'/renderingTemplate/list'}
+          render={() => (
+            <Container>
+              <PagedRenderingTemplateList mockApi={true} />
             </Container>
           )}
         />
