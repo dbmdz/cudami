@@ -4,26 +4,30 @@ import {useTranslation} from 'react-i18next'
 import {FaExchangeAlt, FaEye, FaPencilAlt, FaUnlink} from 'react-icons/fa'
 
 const ListButtons = ({
+  editUrl,
   enableMove,
   enableRemove,
   onMove,
   onRemove,
   parentType,
   showEdit,
+  showView = true,
   viewUrl,
 }) => {
   const {t} = useTranslation()
   return (
     <>
       <ButtonGroup>
-        <Button className="p-0" color="link" href={viewUrl} title={t('view')}>
-          <FaEye />
-        </Button>
+        {showView && (
+          <Button className="p-0" color="link" href={viewUrl} title={t('view')}>
+            <FaEye />
+          </Button>
+        )}
         {showEdit && (
           <Button
             className="ml-1 p-0"
             color="link"
-            href={`${viewUrl}/edit`}
+            href={editUrl ?? `${viewUrl}/edit`}
             title={t('edit')}
           >
             <FaPencilAlt />
