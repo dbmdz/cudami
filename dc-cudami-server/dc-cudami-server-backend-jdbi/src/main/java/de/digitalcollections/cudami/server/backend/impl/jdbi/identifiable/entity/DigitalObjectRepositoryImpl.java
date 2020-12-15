@@ -163,9 +163,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     String countQuery =
         "SELECT count(*) FROM digitalobjects as d"
             + " LEFT JOIN LATERAL jsonb_object_keys(d.label) l(keys) on d.label is not null"
-            + " LEFT JOIN LATERAL jsonb_object_keys(d.description) n(keys) on d.description is not null"
-            + " WHERE (d.label->>l.keys ilike '%' || :searchTerm || '%'"
-            + " OR d.description->>n.keys ilike '%' || :searchTerm || '%')";
+            + " WHERE (d.label->>l.keys ilike '%' || :searchTerm || '%')";
     long total =
         dbi.withHandle(
             h ->
