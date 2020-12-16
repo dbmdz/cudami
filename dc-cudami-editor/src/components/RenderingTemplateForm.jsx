@@ -33,12 +33,7 @@ const loadData = async (context, mock, uuid) => {
   )
   return {
     defaultLanguage,
-    template: {
-      description: {},
-      label: {},
-      name: '',
-      ...template,
-    },
+    template,
   }
 }
 
@@ -105,7 +100,7 @@ const RenderingTemplateForm = ({
             labelKey="name"
             onChange={(name) => setTemplate({...template, name})}
             required
-            value={name}
+            value={name ?? ''}
           />
           <Nav tabs>
             <LanguageTab
@@ -124,12 +119,14 @@ const RenderingTemplateForm = ({
                     onChange={(label) =>
                       setTemplate({
                         ...template,
-                        label: {
-                          [defaultLanguage]: label,
-                        },
+                        label: label
+                          ? {
+                              [defaultLanguage]: label,
+                            }
+                          : undefined,
                       })
                     }
-                    value={label[defaultLanguage]}
+                    value={label?.[defaultLanguage] ?? ''}
                   />
                   <FormInput
                     id="description"
@@ -137,12 +134,14 @@ const RenderingTemplateForm = ({
                     onChange={(description) =>
                       setTemplate({
                         ...template,
-                        description: {
-                          [defaultLanguage]: description,
-                        },
+                        description: description
+                          ? {
+                              [defaultLanguage]: description,
+                            }
+                          : undefined,
                       })
                     }
-                    value={description[defaultLanguage]}
+                    value={description?.[defaultLanguage] ?? ''}
                   />
                 </CardBody>
               </Card>

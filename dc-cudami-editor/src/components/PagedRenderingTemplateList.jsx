@@ -94,8 +94,8 @@ const PagedRenderingTemplateList = ({
             <tbody>
               {templates.map(({description, label, name, uuid}) => (
                 <tr key={uuid}>
-                  <td>{label[defaultLanguage]}</td>
-                  <td>{description[defaultLanguage]}</td>
+                  <td>{label?.[defaultLanguage]}</td>
+                  <td>{description?.[defaultLanguage]}</td>
                   <td>{name}</td>
                   <td className="text-center">
                     <ListButtons
