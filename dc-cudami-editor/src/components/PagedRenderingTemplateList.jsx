@@ -124,5 +124,3 @@ const PagedRenderingTemplateList = ({
 }
 
 export default PagedRenderingTemplateList
-
-// const viewBaseUrl = `${apiContextPath}${typeToEndpointMapping[type]}`

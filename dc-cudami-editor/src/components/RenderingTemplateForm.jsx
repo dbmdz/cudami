@@ -39,7 +39,6 @@ const loadData = async (context, mock, uuid) => {
 
 const submitData = async (context, data, uuid) => {
   const type = 'renderingTemplate'
-  //let response
   if (uuid) {
     await updateIdentifiable(context, data, type, false)
   } else {
