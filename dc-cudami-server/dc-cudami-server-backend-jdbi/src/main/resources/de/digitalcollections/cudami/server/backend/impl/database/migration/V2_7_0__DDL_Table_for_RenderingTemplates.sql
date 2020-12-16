@@ -1,6 +1,5 @@
 CREATE TABLE IF NOT EXISTS rendering_templates (
-  id SERIAL PRIMARY KEY NOT NULL,
-  uuid UUID NOT NULL UNIQUE,
+  uuid UUID NOT NULL PRIMARY KEY UNIQUE,
 
   description JSONB,
   label JSONB,
