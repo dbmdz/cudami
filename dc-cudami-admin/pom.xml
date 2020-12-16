@@ -279,7 +279,7 @@
           </execution>
           <execution>
             <configuration>
-              <arguments>--outputPath=${project.basedir}/target/classes/static/js</arguments>
+              <arguments>--output-path=${project.basedir}/target/classes/static/js</arguments>
             </configuration>
             <goals>
               <goal>webpack</goal>
