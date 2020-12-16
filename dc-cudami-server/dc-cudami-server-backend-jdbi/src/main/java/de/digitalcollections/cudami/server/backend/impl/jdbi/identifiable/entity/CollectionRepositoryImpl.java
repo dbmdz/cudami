@@ -254,9 +254,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     String countQuery =
         "SELECT count(*) FROM collections AS c"
             + " LEFT JOIN LATERAL jsonb_object_keys(c.label) l(keys) ON c.label IS NOT null"
-            + " LEFT JOIN LATERAL jsonb_object_keys(c.description) n(keys) ON c.description IS NOT null"
-            + " WHERE (c.label->>l.keys ILIKE '%' || :searchTerm || '%'"
-            + " OR c.description->>n.keys ILIKE '%' || :searchTerm || '%')";
+            + " WHERE (c.label->>l.keys ILIKE '%' || :searchTerm || '%')";
     if (!filterClauses.isEmpty()) {
       countQuery += " AND " + filterClauses;
     }
