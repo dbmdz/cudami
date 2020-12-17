@@ -38,6 +38,8 @@ class IdentifiableForm extends Component {
     'webpage',
   ]
 
+  identifiablesWithRenderingHints = ['webpage']
+
   constructor(props) {
     super(props)
     this.state = {
@@ -71,12 +73,20 @@ class IdentifiableForm extends Component {
       type,
       uuid
     )
-    identifiable = {
+    const initialIdentifiable = {
       description: {},
       label: {
         [this.state.activeLanguage]: '',
       },
-      text: this.identifiablesWithLongText.includes(type) ? {} : undefined,
+    }
+    if (this.identifiablesWithRenderingHints.includes(type)) {
+      initialIdentifiable.renderingHints = {showInPageNavigation: true}
+    }
+    if (this.identifiablesWithLongText.includes(type)) {
+      initialIdentifiable.text = {}
+    }
+    identifiable = {
+      ...initialIdentifiable,
       ...identifiable,
     }
     this.setState({

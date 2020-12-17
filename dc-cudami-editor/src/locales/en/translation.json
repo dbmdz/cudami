@@ -159,6 +159,7 @@
       "useUrl": "Integrate $t({{ mediaType }}) via web link"
     },
     "setPreviewImage": "Set preview image",
+    "showInPageNavigation": "Show page navigation",
     "status": "Status",
     "subcollections": "Sub collections",
     "text": "Long text",

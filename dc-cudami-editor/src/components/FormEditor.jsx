@@ -19,7 +19,7 @@ class FormEditor extends Component {
   }
 
   render() {
-    const {onUpdate, restrictedMenu, t, type} = this.props
+    const {children, onUpdate, restrictedMenu, t, type} = this.props
     let translatedMenu = menu(t)
     if (restrictedMenu) {
       translatedMenu = {
@@ -29,6 +29,7 @@ class FormEditor extends Component {
     return (
       <>
         <Label className="font-weight-bold">{t(type)}</Label>
+        {children}
         <div className="clearfix text-editor">
           <Editor
             options={this.editorOptions}
