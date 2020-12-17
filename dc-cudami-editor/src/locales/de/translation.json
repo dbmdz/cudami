@@ -159,6 +159,7 @@
       "useUrl": "$t({{ mediaType }}) per Weblink einbinden"
     },
     "setPreviewImage": "Vorschaubild festlegen",
+    "showInPageNavigation": "Seitennavigation anzeigen",
     "status": "Status",
     "subcollections": "Untergeordnete Sammlungen",
     "text": "Langtext",

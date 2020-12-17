@@ -3,6 +3,7 @@ import {
   Card,
   CardBody,
   Col,
+  CustomInput,
   Form,
   Nav,
   Row,
@@ -113,7 +114,26 @@ const WebpageForm = ({
                           },
                         })
                       }}
-                    />
+                    >
+                      <CustomInput
+                        checked={
+                          identifiable.renderingHints.showInPageNavigation
+                        }
+                        className="ml-4"
+                        id="show-in-page-navigation"
+                        inline
+                        label={t('showInPageNavigation')}
+                        onChange={(evt) => {
+                          onUpdate({
+                            renderingHints: {
+                              ...identifiable.renderingHints,
+                              showInPageNavigation: evt.target.checked,
+                            },
+                          })
+                        }}
+                        type="switch"
+                      />
+                    </FormEditor>
                   </CardBody>
                 </Card>
               </TabPane>
