@@ -48,6 +48,7 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
           + " w.identifiable_type w_type,"
           + " w.created w_created, w.last_modified w_lastModified,"
           + " w.text w_text, w.publication_start w_publicationStart, w.publication_end w_publicationEnd,"
+          + " w.rendering_hints w_renderingHints,"
           + " w.preview_hints w_previewImageRenderingHints,"
           + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
@@ -61,6 +62,7 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
           + " w.identifiable_type w_type,"
           + " w.created w_created, w.last_modified w_lastModified,"
           + " w.publication_start w_publicationStart, w.publication_end w_publicationEnd,"
+          + " w.rendering_hints w_renderingHints,"
           + " w.preview_hints w_previewImageRenderingHints,"
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
           + " FROM webpages as w"
@@ -458,12 +460,14 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
             + "uuid, label, description, previewfileresource, preview_hints,"
             + " identifiable_type,"
             + " created, last_modified,"
-            + " text, publication_start, publication_end"
+            + " text, publication_start, publication_end,"
+            + " rendering_hints"
             + ") VALUES ("
             + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
             + " :type,"
             + " :created, :lastModified,"
-            + " :text::JSONB, :publicationStart, :publicationEnd"
+            + " :text::JSONB, :publicationStart, :publicationEnd,"
+            + " :renderingHints::JSONB"
             + ")";
 
     dbi.withHandle(
@@ -538,7 +542,8 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
             + " label=:label::JSONB, description=:description::JSONB,"
             + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
             + " last_modified=:lastModified,"
-            + " text=:text::JSONB, publication_start=:publicationStart, publication_end=:publicationEnd"
+            + " text=:text::JSONB, publication_start=:publicationStart, publication_end=:publicationEnd,"
+            + " rendering_hints=:renderingHints::JSONB"
             + " WHERE uuid=:uuid";
 
     dbi.withHandle(
