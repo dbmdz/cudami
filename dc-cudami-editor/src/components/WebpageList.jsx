@@ -1,7 +1,13 @@
 import React, {forwardRef, useContext, useState} from 'react'
 import {Button, Table} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
-import {FaArrowsAltV, FaHashtag, FaImage} from 'react-icons/fa'
+import {
+  FaArrowsAltV,
+  FaCheck,
+  FaHashtag,
+  FaImage,
+  FaTimes,
+} from 'react-icons/fa'
 import {List, arrayMove} from 'react-movable'
 
 import AppContext from './AppContext'
@@ -39,6 +45,7 @@ const WebpageItem = forwardRef(
       previewImageRenderingHints,
       publicationEnd,
       publicationStart,
+      renderingHints,
       uuid,
     } = identifiable
     const {apiContextPath, uiLocale} = useContext(AppContext)
@@ -73,6 +80,13 @@ const WebpageItem = forwardRef(
             publicationEnd={publicationEndDate}
             publicationStart={publicationStartDate}
           />
+        </td>
+        <td className="text-center">
+          {!renderingHints || renderingHints.showInPageNavigation ? (
+            <FaCheck className="text-success" />
+          ) : (
+            <FaTimes className="text-danger" />
+          )}
         </td>
         <td className="text-center" style={{width: previewCol}}>
           <PreviewImage
@@ -161,6 +175,7 @@ const WebpageList = ({
                 <FaHashtag />
               </th>
               <th className="text-center">{t('status')}</th>
+              <th className="text-center">{t('inPageNavigation')}</th>
               <th className="text-center">
                 <FaImage />
               </th>
