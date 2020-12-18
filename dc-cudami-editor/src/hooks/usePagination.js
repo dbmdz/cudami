@@ -4,6 +4,7 @@ import {loadIdentifiables} from '../api'
 
 const usePagination = (apiContextPath, mockApi, type) => {
   const [content, setContent] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
   const [numberOfPages, setNumberOfPages] = useState(0)
   const [pageNumber, setPageNumber] = useState(0)
   const [totalElements, setTotalElements] = useState(0)
@@ -22,16 +23,20 @@ const usePagination = (apiContextPath, mockApi, type) => {
     }
   }
   useEffect(() => {
-    loadData(apiContextPath, mockApi, pageNumber).then(
-      ({content, numberOfPages, totalElements}) => {
+    setIsLoading(true)
+    loadData(apiContextPath, mockApi, pageNumber)
+      .then(({content, numberOfPages, totalElements}) => {
         setNumberOfPages(numberOfPages)
         setContent(content)
         setTotalElements(totalElements)
-      }
-    )
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
   }, [pageNumber])
   return {
     content,
+    isLoading,
     numberOfPages,
     pageNumber,
     setPageNumber,
