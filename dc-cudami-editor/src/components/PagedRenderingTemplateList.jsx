@@ -5,50 +5,28 @@ import {useTranslation} from 'react-i18next'
 import LanguageTab from './LanguageTab'
 import ListButtons from './ListButtons'
 import ListPagination from './ListPagination'
-import {
-  loadDefaultLanguage,
-  loadIdentifiables,
-  typeToEndpointMapping,
-} from '../api'
-
-const loadData = async (context, mock, pageNumber, pageSize = 20) => {
-  const defaultLanguage = await loadDefaultLanguage(context, mock)
-  const {content, totalElements} = await loadIdentifiables(
-    context,
-    mock,
-    'renderingTemplate',
-    pageNumber,
-    pageSize
-  )
-  return {
-    defaultLanguage,
-    numberOfPages: Math.ceil(totalElements / pageSize),
-    templates: content,
-    totalElements,
-  }
-}
+import {loadDefaultLanguage, typeToEndpointMapping} from '../api'
+import usePagination from '../hooks/usePagination'
 
 const PagedRenderingTemplateList = ({
   apiContextPath = '/',
   mockApi = false,
 }) => {
-  const [defaultLanguage, setDefaultLanguage] = useState('')
-  const [numberOfPages, setNumberOfPages] = useState(0)
-  const [pageNumber, setPageNumber] = useState(0)
-  const [templates, setTemplates] = useState([])
-  const [totalElements, setTotalElements] = useState(0)
-  useEffect(() => {
-    loadData(apiContextPath, mockApi, pageNumber).then(
-      ({defaultLanguage, numberOfPages, templates, totalElements}) => {
-        setDefaultLanguage(defaultLanguage)
-        setNumberOfPages(numberOfPages)
-        setTemplates(templates)
-        setTotalElements(totalElements)
-      }
-    )
-  }, [pageNumber])
-  const {t} = useTranslation()
   const type = 'renderingTemplate'
+  const {
+    content: templates,
+    numberOfPages,
+    pageNumber,
+    setPageNumber,
+    totalElements,
+  } = usePagination(apiContextPath, mockApi, type)
+  const [defaultLanguage, setDefaultLanguage] = useState('')
+  useEffect(() => {
+    loadDefaultLanguage(apiContextPath, mockApi).then((defaultLanguage) =>
+      setDefaultLanguage(defaultLanguage)
+    )
+  }, [])
+  const {t} = useTranslation()
   return (
     <>
       <Row>
