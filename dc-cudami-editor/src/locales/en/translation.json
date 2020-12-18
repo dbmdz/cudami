@@ -38,10 +38,13 @@
       "orderedList": "Change to numbered list",
       "paragraph": "Change to paragraph"
     },
+    "cancel": "Cancel",
     "caption": "Caption",
     "changeOrder": "Change the order",
+    "choose": "Choose",
     "chooseFile": "Choose file",
     "chooseLanguage": "Choose a language",
+    "chooseRenderingTemplate": "Choose a design template",
     "confirmRemove": {
       "digitalObjectFromCollection": "Are you sure that you want to remove this digital object from the collection?",
       "digitalObjectFromProject": "Are you sure that you want to remove this digital object from the project?",
@@ -149,6 +152,7 @@
       "collection": "remove from collection"
     },
     "removePreviewImage": "Remove preview image",
+    "renderingTemplate": "Design template",
     "renderingTemplates": "Design templates",
     "save": "Save",
     "searchTerm": "Search term",
