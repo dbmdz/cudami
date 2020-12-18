@@ -76,11 +76,11 @@
             <div class="row">
               <div class="col-md-3"><label class="font-weight-bold" th:text="#{in_page_navigation}">...</label></div>
               <div class="align-items-center col-md-9 d-flex"
-                  th:if="*{renderingHints == null} OR *{renderingHints.showInPageNavigation}">
+                   th:if="*{renderingHints == null} OR *{renderingHints.showInPageNavigation}">
                 <i aria-hidden="true" class="fa fa-check text-success"></i>
               </div>
               <div class="align-items-center col-md-9 d-flex"
-                  th:unless="*{renderingHints?.showInPageNavigation}">
+                   th:if="*{renderingHints != null} AND *{not renderingHints.showInPageNavigation}">
                 <i aria-hidden="true" class="fa fa-times text-danger"></i>
               </div>
             </div>
