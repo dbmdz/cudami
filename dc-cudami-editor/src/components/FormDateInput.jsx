@@ -22,7 +22,7 @@ const FormDateInput = ({id, label, onChange, value}) => {
   const {t} = useTranslation()
   return (
     <FormGroup>
-      <Label className="font-weight-bold" for={id}>
+      <Label className="d-block font-weight-bold" for={id}>
         {label}
       </Label>
       <DatePicker
