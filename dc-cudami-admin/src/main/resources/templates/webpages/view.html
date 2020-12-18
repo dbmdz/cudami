@@ -57,15 +57,36 @@
                   <i class="fas fa-question-circle"></i>
                 </button>
               </div>
-              <div class="col-md-9" th:with="now=${T(java.time.LocalDate).now()}">
-                <th:block th:if="${webpage.publicationStart}  == null OR  ${webpage.publicationStart.compareTo(now)} > 0"><span class="badge badge-pill badge-warning">&nbsp;</span></th:block>
-                <th:block th:if="(${webpage.publicationStart} != null AND ${webpage.publicationStart.compareTo(now)} <= 0) AND (${webpage.publicationEnd} == null OR ${webpage.publicationEnd.compareTo(now)} > 0)"><span class="badge badge-pill badge-success">&nbsp;</span></th:block>
-                <th:block th:if="(${webpage.publicationStart} != null AND ${webpage.publicationStart.compareTo(now)} <= 0) AND (${webpage.publicationEnd} != null AND ${webpage.publicationEnd.compareTo(now)} <= 0)"><span class="badge badge-pill badge-danger">&nbsp;</span></th:block>
+              <div class="align-items-center col-md-9 d-flex" th:with="now=${T(java.time.LocalDate).now()}">
+                <th:block th:if="${webpage.publicationStart}  == null OR  ${webpage.publicationStart.compareTo(now)} > 0">
+                  <i aria-hidden="true" class="fa fa-circle pr-1 text-warning"></i>
+                </th:block>
+                <th:block th:if="(${webpage.publicationStart} != null AND ${webpage.publicationStart.compareTo(now)} <= 0) AND (${webpage.publicationEnd} == null OR ${webpage.publicationEnd.compareTo(now)} > 0)">
+                  <i aria-hidden="true" class="fa fa-circle pr-1 text-success"></i>
+                </th:block>
+                <th:block th:if="(${webpage.publicationStart} != null AND ${webpage.publicationStart.compareTo(now)} <= 0) AND (${webpage.publicationEnd} != null AND ${webpage.publicationEnd.compareTo(now)} <= 0)">
+                  <i aria-hidden="true" class="fa fa-circle pr-1 text-danger"></i>
+                </th:block>
 
                 <th:block th:if="*{publicationStart} != null OR *{publicationEnd} != null">
                   (<span th:with="df=#{date.format},pubStart=*{publicationStart}" th:text="${#temporals.format(pubStart,df)}">01.01.2000</span>&nbsp;<span th:text="#{to}">to</span>&nbsp;<span th:with="df=#{date.format},pubEnd=*{publicationEnd}" th:text="${#temporals.format(pubEnd,df)}">01.01.2000</span>)
                 </th:block>
               </div>
+            </div>
+            <div class="row">
+              <div class="col-md-3"><label class="font-weight-bold" th:text="#{in_page_navigation}">...</label></div>
+              <div class="align-items-center col-md-9 d-flex"
+                  th:if="*{renderingHints == null} OR *{renderingHints.showInPageNavigation}">
+                <i aria-hidden="true" class="fa fa-check text-success"></i>
+              </div>
+              <div class="align-items-center col-md-9 d-flex"
+                  th:unless="*{renderingHints?.showInPageNavigation}">
+                <i aria-hidden="true" class="fa fa-times text-danger"></i>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-3"><label class="font-weight-bold" th:text="#{rendering_template}">...</label></div>
+              <div class="col-md-9"><span th:text="*{renderingHints?.templateName} ?: '--'">-</span></div>
             </div>
           </div>
         </div>

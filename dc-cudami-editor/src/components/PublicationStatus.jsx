@@ -1,6 +1,6 @@
 import React from 'react'
-import {Badge} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
+import {FaCircle} from 'react-icons/fa'
 
 const PublicationStatus = ({publicationEnd, publicationStart}) => {
   const {t} = useTranslation()
@@ -24,11 +24,8 @@ const PublicationStatus = ({publicationEnd, publicationStart}) => {
     publicationStatus = 'noLongerPublished'
   }
   return (
-    <Badge
-      className="d-inline-block mt-1"
-      color={color}
-      pill
-      style={{height: '15px', width: '15px'}}
+    <FaCircle
+      className={`text-${color}`}
       title={t(`publicationStatus.${publicationStatus}`)}
     />
   )
