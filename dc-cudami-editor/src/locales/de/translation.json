@@ -38,10 +38,13 @@
       "orderedList": "In geordnete Liste umwandeln",
       "paragraph": "In Paragraph umwandeln"
     },
+    "cancel": "Abbrechen",
     "caption": "Bildunterschrift",
     "changeOrder": "Reihenfolge ändern",
+    "choose": "Auswählen",
     "chooseFile": "Datei auswählen",
     "chooseLanguage": "Sprache auswählen",
+    "chooseRenderingTemplate": "Gestaltungsvorlage auswählen",
     "confirmRemove": {
       "digitalObjectFromCollection": "Sind Sie sicher, dass Sie das Digitalisat aus der Sammlung entfernen wollen?",
       "digitalObjectFromProject": "Sind Sie sicher, dass Sie das Digitalisat aus dem Projekt entfernen wollen?",
@@ -149,6 +152,7 @@
       "collection": "aus Sammlung entfernen"
     },
     "removePreviewImage": "Vorschaubild entfernen",
+    "renderingTemplate": "Gestaltungsvorlage",
     "renderingTemplates": "Gestaltungsvorlagen",
     "save": "Speichern",
     "searchTerm": "Suchbegriff",
