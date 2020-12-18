@@ -140,10 +140,10 @@
     "openLinkSameTab": "im selben Tab öffnen",
     "publicationStatus": {
       "currentlyPublished": "aktuell veröffentlicht",
-      "endDate": "End-Publikationsdatum",
+      "endDate": "Publikationsende",
       "noLongerPublished": "nicht mehr veröffentlicht",
       "notYetPublished": "noch nicht veröffentlicht",
-      "startDate": "Start-Publikationsdatum"
+      "startDate": "Publikationsstart"
     },
     "removeFrom": {
       "collection": "aus Sammlung entfernen"

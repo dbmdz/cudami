@@ -12,11 +12,11 @@ import {
 import {useTranslation} from 'react-i18next'
 
 import FormButtons from './FormButtons'
+import FormDateInput from './FormDateInput'
 import FormEditor from './FormEditor'
 import FormInput from './FormInput'
 import LanguageAdder from './LanguageAdder'
 import LanguageTab from './LanguageTab'
-import PublicationDatesForm from './PublicationDatesForm'
 import Teaser from './Teaser'
 
 const CollectionForm = ({
@@ -52,23 +52,38 @@ const CollectionForm = ({
           <hr />
         </Col>
       </Row>
-      <Row>
-        <Col sm="12">
-          {identifiable.uuid && (
+      {identifiable.uuid && (
+        <Row>
+          <Col sm="12">
             <FormInput
               id="uuid"
               label="ID"
               readOnly
               value={identifiable.uuid}
             />
-          )}
-          <PublicationDatesForm
-            onChange={(updateKey, updateValue) =>
-              onUpdate({...identifiable, [updateKey]: updateValue})
-            }
-            publicationEndDate={identifiable.publicationEnd}
-            publicationStartDate={identifiable.publicationStart}
+          </Col>
+        </Row>
+      )}
+      <Row>
+        <Col sm="3">
+          <FormDateInput
+            id="publication-start-date"
+            label={t('publicationStatus.startDate')}
+            onChange={(date) => onUpdate({publicationStart: date})}
+            value={identifiable.publicationStart}
           />
+        </Col>
+        <Col sm="3">
+          <FormDateInput
+            id="publication-end-date"
+            label={t('publicationStatus.endDate')}
+            onChange={(date) => onUpdate({publicationEnd: date})}
+            value={identifiable.publicationEnd}
+          />
+        </Col>
+      </Row>
+      <Row>
+        <Col sm="12">
           <Nav tabs>
             {existingLanguages.map((language) => (
               <LanguageTab
