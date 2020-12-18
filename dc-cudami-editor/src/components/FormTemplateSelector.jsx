@@ -15,23 +15,35 @@ const FormTemplateSelector = ({onClick, onRemove, templateName}) => {
   const id = 'rendering-template-selector'
   return (
     <FormGroup>
-      <Label className="d-block font-weight-bold" for={id}>
+      <Label className="d-block font-weight-bold">
         {t('renderingTemplate')}
       </Label>
       {templateName ? (
         <InputGroup id={id} size="sm">
           <Input readOnly value={templateName} />
           <InputGroupAddon addonType="append">
-            <Button className="px-1" onClick={onClick} outline size="sm">
+            <Button
+              className="px-1"
+              color="primary"
+              onClick={onClick}
+              outline
+              size="sm"
+            >
               <FaEdit />
             </Button>
-            <Button className="px-1" onClick={onRemove} outline size="sm">
+            <Button
+              className="px-1"
+              color="primary"
+              onClick={onRemove}
+              outline
+              size="sm"
+            >
               <FaTrash />
             </Button>
           </InputGroupAddon>
         </InputGroup>
       ) : (
-        <Button id={id} onClick={onClick} size="sm">
+        <Button color="primary" id={id} onClick={onClick} size="sm">
           <FaPlus />
         </Button>
       )}
