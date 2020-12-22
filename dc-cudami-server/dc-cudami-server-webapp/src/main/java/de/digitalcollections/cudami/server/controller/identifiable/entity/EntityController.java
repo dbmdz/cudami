@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
+import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -140,5 +141,14 @@ public class EntityController<E extends Entity> {
   @ApiResponseObject
   List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
     return service.getRelatedFileResources(uuid);
+  }
+
+  @ApiMethod(description = "Get relations for an entity (being the subject)")
+  @GetMapping(
+      value = {"/latest/entities/relations/{uuid}", "/v2/entities/relations/{uuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  List<EntityRelation> getRelations(@PathVariable UUID uuid) {
+    return service.getRelations(uuid);
   }
 }
