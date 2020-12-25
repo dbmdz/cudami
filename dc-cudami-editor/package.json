@@ -44,7 +44,7 @@
     "react-movable": "^2.5.3",
     "react-paginate": "^6.5.0",
     "react-scripts": "4.0.1",
-    "reactstrap": "^8.7.1"
+    "reactstrap": "^8.8.0"
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.12.10",
