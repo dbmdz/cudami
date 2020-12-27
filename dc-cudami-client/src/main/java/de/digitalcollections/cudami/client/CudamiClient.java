@@ -3,6 +3,8 @@ package de.digitalcollections.cudami.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.entity.agent.CudamiCorporateBodiesClient;
 import de.digitalcollections.cudami.client.entity.agent.CudamiPersonsClient;
+import de.digitalcollections.cudami.client.entity.geo.CudamiGeoLocationsClient;
+import de.digitalcollections.cudami.client.entity.geo.CudamiHumanSettlementsClient;
 import de.digitalcollections.cudami.client.entity.work.CudamiItemsClient;
 import de.digitalcollections.cudami.client.entity.work.CudamiWorksClient;
 import de.digitalcollections.cudami.client.view.CudamiRenderingTemplatesClient;
@@ -21,6 +23,8 @@ public class CudamiClient {
   private final CudamiEntityRelationsClient cudamiEntityRelationsClient;
   private final CudamiFileResourcesBinaryClient cudamiFileResourcesBinaryClient;
   private final CudamiFileResourcesMetadataClient cudamiFileResourcesMetadataClient;
+  private final CudamiGeoLocationsClient cudamiGeoLocationsClient;
+  private final CudamiHumanSettlementsClient cudamiHumanSettlementsClient;
   private final CudamiIdentifiablesClient cudamiIdentifiablesClient;
   private final CudamiIdentifierTypesClient cudamiIdentifierTypesClient;
   private final CudamiItemsClient cudamiItemsClient;
@@ -61,6 +65,9 @@ public class CudamiClient {
         new CudamiFileResourcesBinaryClient(cudamiServerUrl, mapper);
     this.cudamiFileResourcesMetadataClient =
         new CudamiFileResourcesMetadataClient(http, cudamiServerUrl, mapper);
+    this.cudamiGeoLocationsClient = new CudamiGeoLocationsClient(http, cudamiServerUrl, mapper);
+    this.cudamiHumanSettlementsClient =
+        new CudamiHumanSettlementsClient(http, cudamiServerUrl, mapper);
     this.cudamiIdentifiablesClient = new CudamiIdentifiablesClient(http, cudamiServerUrl, mapper);
     this.cudamiIdentifierTypesClient =
         new CudamiIdentifierTypesClient(http, cudamiServerUrl, mapper);
@@ -113,6 +120,14 @@ public class CudamiClient {
 
   public CudamiFileResourcesMetadataClient forFileResourcesMetadata() {
     return cudamiFileResourcesMetadataClient;
+  }
+
+  public CudamiGeoLocationsClient forGeoLocations() {
+    return cudamiGeoLocationsClient;
+  }
+
+  public CudamiHumanSettlementsClient forHumanSettlements() {
+    return cudamiHumanSettlementsClient;
   }
 
   public CudamiIdentifiablesClient forIdentifiables() {
