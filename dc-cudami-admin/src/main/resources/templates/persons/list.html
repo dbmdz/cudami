@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+  <head>
+    <title th:text="#{persons}">Persons</title>
+  </head>
+  <body>
+    <section layout:fragment="content">
+      <div id="list"></div>
+      <script th:src="@{/js/persons-list.bundle.js}"></script>
+      <script th:inline="javascript">
+        PersonsList({
+          apiContextPath: /*[[@{/}]]*/ '',
+          id: "list",
+          uiLocale: /*[[${#locale.language}]]*/
+        });
+      </script>
+    </section>
+  </body>
+</html>

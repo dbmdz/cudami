@@ -5,8 +5,10 @@ const config = {
   cache: true,
   devtool: 'sourcemaps',
   entry: {
+    GeoLocationsList: './src/lib/GeoLocationsList.jsx',
     IdentifiableEditor: './src/lib/IdentifiableEditor.jsx',
     IdentifiableList: './src/lib/IdentifiableList.jsx',
+    PersonsList: './src/lib/PersonsList.jsx',
     RenderingTemplateEditor: './src/lib/RenderingTemplateEditor.jsx',
     RenderingTemplateList: './src/lib/RenderingTemplateList.jsx'
   },

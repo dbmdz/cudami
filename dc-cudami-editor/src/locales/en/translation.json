@@ -87,6 +87,8 @@
     "enterMetadata": "Enter metadata",
     "file": "File",
     "forExample": "e.g.",
+    "geolocation": "Geolocation",
+    "geolocations": "Geolocations",
     "height": "Height",
     "history": {
       "redo": "Redo last undone change",
@@ -142,6 +144,8 @@
     "numberOfRows": "Number of rows",
     "openLinkNewTab": "open in a new tab",
     "openLinkSameTab": "open in the same tab",
+    "person": "Person",
+    "persons": "Persons",
     "publicationStatus": {
       "currentlyPublished": "currently published",
       "endDate": "End of publication",
@@ -181,6 +185,10 @@
     "totalElements": {
       "digitalObjects": "found {{ count }} digital object",
       "digitalObjects_plural": "found {{ count }} digital objects",
+      "geoLocations": "found {{ count }} geolocation",
+      "geoLocations_plural": "found {{ count }} geolocations",
+      "persons": "found {{ count }} person",
+      "persons_plural": "found {{ count }} persons",
       "renderingTemplates": "found {{ count }} design template",
       "renderingTemplates_plural": "found {{ count }} design templates",
       "subcollections": "found {{ count }} collection",

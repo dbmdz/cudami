@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+  <head>
+    <title th:text="#{geolocations}">Geolocations</title>
+  </head>
+  <body>
+    <section layout:fragment="content">
+      <div id="list"></div>
+      <script th:src="@{/js/geo-locations-list.bundle.js}"></script>
+      <script th:inline="javascript">
+        GeoLocationsList({
+          apiContextPath: /*[[@{/}]]*/ '',
+          id: "list",
+          uiLocale: /*[[${#locale.language}]]*/
+        });
+      </script>
+    </section>
+  </body>
+</html>

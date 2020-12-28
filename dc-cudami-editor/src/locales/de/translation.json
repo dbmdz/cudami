@@ -87,6 +87,8 @@
     "enterMetadata": "Metadaten eingeben",
     "file": "Datei",
     "forExample": "z.B.",
+    "geolocation": "Ort",
+    "geolocations": "Orte",
     "height": "Höhe",
     "history": {
       "redo": "Letzte rückgängig gemachte Änderung wiederholen",
@@ -142,6 +144,8 @@
     "numberOfRows": "Anzahl an Zeilen",
     "openLinkNewTab": "in einem neuen Tab öffnen",
     "openLinkSameTab": "im selben Tab öffnen",
+    "person": "Person",
+    "persons": "Personen",
     "publicationStatus": {
       "currentlyPublished": "aktuell veröffentlicht",
       "endDate": "Publikationsende",
@@ -181,6 +185,10 @@
     "totalElements": {
       "digitalObjects": "{{ count }} Digitalisat gefunden",
       "digitalObjects_plural": "{{ count }} Digitalisate gefunden",
+      "geoLocations": "{{ count }} Ort gefunden",
+      "geoLocations_plural": "{{ count }} Orte gefunden",
+      "persons": "{{ count }} Person gefunden",
+      "persons_plural": "{{ count }} Personen gefunden",
       "renderingTemplates": "{{ count }} Gestaltungsvorlage gefunden",
       "renderingTemplates_plural": "{{ count }} Gestaltungsvorlagen gefunden",
       "subcollections": "{{ count }} Sammlung gefunden",
