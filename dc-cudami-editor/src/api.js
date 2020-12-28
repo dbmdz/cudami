@@ -4,6 +4,8 @@ export const typeToEndpointMapping = {
   corporateBody: 'corporatebodies',
   digitalObject: 'digitalobjects',
   fileResource: 'fileresources',
+  geoLocation: 'geolocations',
+  person: 'persons',
   project: 'projects',
   renderingTemplate: 'renderingtemplates',
   subcollection: 'subcollections',
