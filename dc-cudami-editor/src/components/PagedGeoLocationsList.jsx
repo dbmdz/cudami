@@ -34,11 +34,7 @@ const PagedGeoLocationsList = ({
           <h1>{t('geolocations')}</h1>
         </Col>
         <Col className="text-right">
-        {/*
-          <Button href={`${apiContextPath}${typeToEndpointMapping[type]}/new`}>
-            {t('new')}
-          </Button>
-        */}
+
         </Col>
       </Row>
       <Row>
