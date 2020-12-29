@@ -8,10 +8,7 @@ import ListPagination from './ListPagination'
 import {loadDefaultLanguage, typeToEndpointMapping} from '../api'
 import usePagination from '../hooks/usePagination'
 
-const PagedPersonsList = ({
-  apiContextPath = '/',
-  mockApi = false,
-}) => {
+const PagedPersonsList = ({apiContextPath = '/', mockApi = false}) => {
   const type = 'person'
   const {
     content: persons,
@@ -33,9 +30,7 @@ const PagedPersonsList = ({
         <Col>
           <h1>{t('persons')}</h1>
         </Col>
-        <Col className="text-right">
-
-        </Col>
+        <Col className="text-right"></Col>
       </Row>
       <Row>
         <Col>
