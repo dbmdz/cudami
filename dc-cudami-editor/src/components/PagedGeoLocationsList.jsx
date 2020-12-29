@@ -8,10 +8,7 @@ import ListPagination from './ListPagination'
 import {loadDefaultLanguage, typeToEndpointMapping} from '../api'
 import usePagination from '../hooks/usePagination'
 
-const PagedGeoLocationsList = ({
-  apiContextPath = '/',
-  mockApi = false,
-}) => {
+const PagedGeoLocationsList = ({apiContextPath = '/', mockApi = false}) => {
   const type = 'geoLocation'
   const {
     content: geoLocations,
@@ -33,9 +30,7 @@ const PagedGeoLocationsList = ({
         <Col>
           <h1>{t('geolocations')}</h1>
         </Col>
-        <Col className="text-right">
-
-        </Col>
+        <Col className="text-right"></Col>
       </Row>
       <Row>
         <Col>
