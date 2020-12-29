@@ -8,7 +8,10 @@ import ListPagination from './ListPagination'
 import {loadDefaultLanguage, typeToEndpointMapping} from '../api'
 import usePagination from '../hooks/usePagination'
 
-const PagedPersonsList = ({apiContextPath = '/', mockApi = false}) => {
+const PagedPersonsList = ({
+  apiContextPath = '/',
+  mockApi = false
+}) => {
   const type = 'person'
   const {
     content: persons,
