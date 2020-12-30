@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Api(description = "The identifier types controller", name = "Identifier types controller")
-public class IndentifierTypeController {
+public class IdentifierTypeController {
 
   @Autowired private IdentifierTypeService service;
 
