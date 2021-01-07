@@ -555,7 +555,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     // we add fix sorting in above query; otherwise we get in conflict with allowed sorting
     // and column names of this repository (it is for collections, not sublists of
     // digitalobjects...)
-    //    pageRequest.setSorting(null);
+    pageRequest.setSorting(null);
     addPageRequestParams(pageRequest, innerQuery);
 
     final String baseQuery =
