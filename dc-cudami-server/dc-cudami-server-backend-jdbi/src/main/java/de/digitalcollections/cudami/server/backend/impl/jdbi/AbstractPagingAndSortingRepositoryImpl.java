@@ -24,6 +24,24 @@ import org.springframework.util.StringUtils;
  */
 public abstract class AbstractPagingAndSortingRepositoryImpl {
 
+  public void addFiltering(Filtering filtering, StringBuilder innerQuery) {
+    // handle optional filtering params
+    String filterClauses = getFilterClauses(filtering);
+    if (!filterClauses.isEmpty()) {
+      String innerQueryStr = innerQuery.toString();
+      if (innerQueryStr.toUpperCase().contains(" WHERE ")) {
+        innerQuery.append(" AND ");
+      } else {
+        innerQuery.append(" WHERE ");
+      }
+      innerQuery.append(filterClauses);
+    }
+  }
+
+  public void addFiltering(PageRequest pageRequest, StringBuilder innerQuery) {
+    addFiltering(pageRequest.getFiltering(), innerQuery);
+  }
+
   public void addLimit(PageRequest pageRequest, StringBuilder query) {
     int pageSize = pageRequest.getPageSize();
     if (pageSize > 0) {
@@ -85,6 +103,20 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
       addLimit(pageRequest, query);
       addOffset(pageRequest, query);
     }
+  }
+
+  protected String convertToSqlString(Object value) {
+    if (value == null) {
+      return "";
+    }
+    if (value instanceof LocalDate) {
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+      return "'" + ((ChronoLocalDate) value).format(formatter) + "'";
+    }
+    if (value instanceof String) {
+      return "'" + value + "'";
+    }
+    return value.toString();
   }
 
   /**
@@ -275,19 +307,5 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
       }
     }
     return query.toString();
-  }
-
-  protected String convertToSqlString(Object value) {
-    if (value == null) {
-      return "";
-    }
-    if (value instanceof LocalDate) {
-      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-      return "'" + ((ChronoLocalDate) value).format(formatter) + "'";
-    }
-    if (value instanceof String) {
-      return "'" + value + "'";
-    }
-    return value.toString();
   }
 }
