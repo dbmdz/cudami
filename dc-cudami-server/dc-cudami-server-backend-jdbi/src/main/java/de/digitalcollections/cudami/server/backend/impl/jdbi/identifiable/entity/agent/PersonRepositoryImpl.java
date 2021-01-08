@@ -230,6 +230,18 @@ public class PersonRepositoryImpl extends IdentifiableRepositoryImpl<Person>
   }
 
   @Override
+  public PageResponse<Person> findByLocationOfBirth(PageRequest pageRequest, UUID uuidGeoLocation) {
+    throw new UnsupportedOperationException(
+        "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
+  public PageResponse<Person> findByLocationOfDeath(PageRequest pageRequest, UUID uuidGeoLocation) {
+    throw new UnsupportedOperationException(
+        "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
   public Person findOne(UUID uuid) {
     String query =
         "SELECT p.uuid p_uuid, p.label p_label, p.description p_description, p.refid p_refId,"
@@ -468,171 +480,43 @@ public class PersonRepositoryImpl extends IdentifiableRepositoryImpl<Person>
   }
 
   @Override
-  public Person save(Person person) {
-    if (person.getUuid() == null) {
-      person.setUuid(UUID.randomUUID());
-    }
-    person.setCreated(LocalDateTime.now());
-    person.setLastModified(LocalDateTime.now());
-
-    final UUID previewImageUuid =
-        person.getPreviewImage() == null ? null : person.getPreviewImage().getUuid();
-    //    final UUID locationOfBirthUuid = person.getPlaceOfBirth() == null ? null :
-    // person.getPlaceOfBirth().getUuid();
-    //    final UUID locationOfDeathUuid = person.getPlaceOfDeath() == null ? null :
-    // person.getPlaceOfDeath().getUuid();
-
+  public Set<DigitalObject> getDigitalObjects(UUID uuidPerson) {
     String query =
-        "INSERT INTO persons("
-            + "uuid, previewFileResource, label, description,"
-            + " identifiable_type, entity_type,"
-            + " created, last_modified,"
-            + " dateOfBirth, timeValueOfBirth,"
-            //            + " locationOfBirth,"
-            + " dateOfDeath, timeValueOfDeath,"
-            //            + " locationOfDeath,"
-            + " gender"
-            + ") VALUES ("
-            + ":uuid, :previewFileResource, :label::JSONB, :description::JSONB,"
-            + " :type, :entityType,"
-            + " :created, :lastModified,"
-            + " :dateOfBirth, :timeValueOfBirth::JSONB,"
-            //            + " :locationOfBirth,"
-            + " :dateOfDeath, :timeValueOfDeath::JSONB,"
-            //            + " :locationOfDeath,"
-            + " :gender"
-            + ")";
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                //            .bind("locationOfBirth", locationOfBirthUuid)
-                //            .bind("locationOfDeath", locationOfDeathUuid)
-                .bindBean(person)
-                .execute());
+        "SELECT d.uuid d_uuid, d.label d_label, d.refid d_refId,"
+            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimetype, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.http_base_url pf_httpBaseUrl"
+            + " FROM digitalobjects as d"
+            + " LEFT JOIN item_digitalobjects as itdi on d.uuid = itdi.digitalobject_uuid"
+            + " LEFT JOIN item_works as itwo on itdi.item_uuid = itwo.item_uuid"
+            + " LEFT JOIN work_creators as wocr on itwo.work_uuid = wocr.work_uuid"
+            + " LEFT JOIN fileresources_image as file on d.previewfileresource = file.uuid"
+            + " WHERE wocr.agent_uuid = :uuid";
 
-    // save identifiers
-    Set<Identifier> identifiers = person.getIdentifiers();
-    saveIdentifiers(identifiers, person);
-
-    // save given names
-    //    List<GivenName> givenNames = person.getGivenNames();
-    //    saveRelatedGivenNames(givenNames, person);
-
-    // save family names
-    //    List<FamilyName> familyNames = person.getFamilyNames();
-    //    saveRelatedFamilyNames(familyNames, person);
-
-    Person result = findOne(person.getUuid());
-    return result;
-  }
-
-  //  private void saveIdentifiers(List<Identifier> identifiers, Person person) {
-  //    // we assume that identifiers (unique to object) are new (existing ones were deleted before
-  //    // (e.g. see update))
-  //    if (identifiers != null) {
-  //      for (Identifier identifier : identifiers) {
-  //        identifier.setIdentifiable(person.getUuid());
-  //        identifierRepository.save(identifier);
-  //      }
-  //    }
-  //  }
-
-  //  private void saveRelatedFamilyNames(List<FamilyName> familyNames, Person person) {
-  //    // we assume that relations are new (existing ones were deleted before (e.g. see update))
-  //    if (familyNames != null) {
-  //      dbi.useHandle(handle -> {
-  //        PreparedBatch preparedBatch = handle.prepareBatch("INSERT INTO
-  // rel_person_familynames(person_uuid, familyname_uuid, sortIndex) VALUES(:uuid, :familynameUuid,
-  // :sortIndex)");
-  //        int i = 0;
-  //        for (FamilyName familyName : familyNames) {
-  //          preparedBatch.bind("uuid", person.getUuid())
-  //                  .bind("familynameUuid", familyName.getUuid())
-  //                  .bind("sortIndex", i)
-  //                  .add();
-  //          i++;
-  //        }
-  //        preparedBatch.execute();
-  //      });
-  //    }
-  //  }
-
-  //  private void saveRelatedGivenNames(List<GivenName> givenNames, Person person) {
-  //    // we assume that relations are new (existing ones were deleted before (e.g. see update))
-  //    if (givenNames != null) {
-  //      dbi.useHandle(handle -> {
-  //        PreparedBatch preparedBatch = handle.prepareBatch("INSERT INTO
-  // rel_person_givennames(person_uuid, givenname_uuid, sortIndex) VALUES(:uuid, :givennameUuid,
-  // :sortIndex)");
-  //        int i = 0;
-  //        for (GivenName givenName : givenNames) {
-  //          preparedBatch.bind("uuid", person.getUuid())
-  //                  .bind("givennameUuid", givenName.getUuid())
-  //                  .bind("sortIndex", i)
-  //                  .add();
-  //          i++;
-  //        }
-  //        preparedBatch.execute();
-  //      });
-  //    }
-  //  }
-
-  @Override
-  public Person update(Person person) {
-    person.setLastModified(LocalDateTime.now());
-    final UUID previewImageUuid =
-        person.getPreviewImage() == null ? null : person.getPreviewImage().getUuid();
-    //    final UUID locationOfBirthUuid = person.getPlaceOfBirth() == null ? null :
-    // person.getPlaceOfBirth().getUuid();
-    //    final UUID locationOfDeathUuid = person.getPlaceOfDeath() == null ? null :
-    // person.getPlaceOfDeath().getUuid();
-
-    String query =
-        "UPDATE persons SET"
-            + " previewFileResource=:previewFileResource, label=:label::JSONB, description=:description::JSONB,"
-            + " last_modified=:lastModified,"
-            + " dateOfBirth=:dateOfBirth, timeValueOfBirth=:timeValueOfBirth::JSONB,"
-            //            + " locationOfBirth=:locationOfBirth,"
-            + " dateOfDeath=:dateOfDeath, timeValueOfDeath=:timeValueOfDeath::JSONB,"
-            //            + " locationOfDeath=:locationOfDeath,"
-            + " gender=:gender"
-            + " WHERE uuid=:uuid";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                //            .bind("locationOfBirth", locationOfBirthUuid)
-                //            .bind("locationOfDeath", locationOfDeathUuid)
-                .bindBean(person)
-                .execute());
-
-    // save identifiers
-    Set<Identifier> identifiers = person.getIdentifiers();
-    // as we store the whole list new: delete old entries
-    dbi.withHandle(
-        h ->
-            h.createUpdate("DELETE FROM identifiers WHERE identifiable = :uuid")
-                .bind("uuid", person.getUuid())
-                .execute());
-    saveIdentifiers(identifiers, person);
-
-    // save given names
-    //    List<GivenName> givenNames = person.getGivenNames();
-    //    // as we store the whole list new: delete old entries
-    //    dbi.withHandle(h -> h.createUpdate("DELETE FROM rel_person_givennames WHERE person_uuid =
-    // :uuid").bind("uuid", person.getUuid()).execute());
-    //    saveRelatedGivenNames(givenNames, person);
-
-    // save family names
-    //    List<FamilyName> familyNames = person.getFamilyNames();
-    //    // as we store the whole list new: delete old entries
-    //    dbi.withHandle(h -> h.createUpdate("DELETE FROM rel_person_familynames WHERE person_uuid =
-    // :uuid").bind("uuid", person.getUuid()).execute());
-    //    saveRelatedFamilyNames(familyNames, person);
-
-    Person result = findOne(person.getUuid());
+    Set<DigitalObject> result =
+        dbi.withHandle(
+            h ->
+                h
+                    .createQuery(query)
+                    .bind("uuid", uuidPerson)
+                    .registerRowMapper(BeanMapper.factory(DigitalObjectImpl.class, "d"))
+                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
+                    .reduceRows(
+                        new LinkedHashMap<UUID, DigitalObject>(),
+                        (map, rowView) -> {
+                          DigitalObject digitalObject =
+                              map.computeIfAbsent(
+                                  rowView.getColumn("d_uuid", UUID.class),
+                                  fn -> {
+                                    return rowView.getRow(DigitalObjectImpl.class);
+                                  });
+                          if (rowView.getColumn("pf_uuid", UUID.class) != null) {
+                            digitalObject.setPreviewImage(
+                                rowView.getRow(ImageFileResourceImpl.class));
+                          }
+                          return map;
+                        })
+                    .values()
+                    .stream()
+                    .collect(Collectors.toSet()));
     return result;
   }
 
@@ -707,43 +591,164 @@ public class PersonRepositoryImpl extends IdentifiableRepositoryImpl<Person>
   }
 
   @Override
-  public Set<DigitalObject> getDigitalObjects(UUID uuidPerson) {
-    String query =
-        "SELECT d.uuid d_uuid, d.label d_label, d.refid d_refId,"
-            + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimetype, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.http_base_url pf_httpBaseUrl"
-            + " FROM digitalobjects as d"
-            + " LEFT JOIN item_digitalobjects as itdi on d.uuid = itdi.digitalobject_uuid"
-            + " LEFT JOIN item_works as itwo on itdi.item_uuid = itwo.item_uuid"
-            + " LEFT JOIN work_creators as wocr on itwo.work_uuid = wocr.work_uuid"
-            + " LEFT JOIN fileresources_image as file on d.previewfileresource = file.uuid"
-            + " WHERE wocr.agent_uuid = :uuid";
+  public Person save(Person person) {
+    if (person.getUuid() == null) {
+      person.setUuid(UUID.randomUUID());
+    }
+    person.setCreated(LocalDateTime.now());
+    person.setLastModified(LocalDateTime.now());
 
-    Set<DigitalObject> result =
-        dbi.withHandle(
-            h ->
-                h
-                    .createQuery(query)
-                    .bind("uuid", uuidPerson)
-                    .registerRowMapper(BeanMapper.factory(DigitalObjectImpl.class, "d"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, DigitalObject>(),
-                        (map, rowView) -> {
-                          DigitalObject digitalObject =
-                              map.computeIfAbsent(
-                                  rowView.getColumn("d_uuid", UUID.class),
-                                  fn -> {
-                                    return rowView.getRow(DigitalObjectImpl.class);
-                                  });
-                          if (rowView.getColumn("pf_uuid", UUID.class) != null) {
-                            digitalObject.setPreviewImage(
-                                rowView.getRow(ImageFileResourceImpl.class));
-                          }
-                          return map;
-                        })
-                    .values()
-                    .stream()
-                    .collect(Collectors.toSet()));
+    final UUID previewImageUuid =
+        person.getPreviewImage() == null ? null : person.getPreviewImage().getUuid();
+    //    final UUID locationOfBirthUuid = person.getPlaceOfBirth() == null ? null :
+    // person.getPlaceOfBirth().getUuid();
+    //    final UUID locationOfDeathUuid = person.getPlaceOfDeath() == null ? null :
+    // person.getPlaceOfDeath().getUuid();
+
+    String query =
+        "INSERT INTO persons("
+            + "uuid, previewFileResource, label, description,"
+            + " identifiable_type, entity_type,"
+            + " created, last_modified,"
+            + " dateOfBirth, timeValueOfBirth,"
+            //            + " locationOfBirth,"
+            + " dateOfDeath, timeValueOfDeath,"
+            //            + " locationOfDeath,"
+            + " gender"
+            + ") VALUES ("
+            + ":uuid, :previewFileResource, :label::JSONB, :description::JSONB,"
+            + " :type, :entityType,"
+            + " :created, :lastModified,"
+            + " :dateOfBirth, :timeValueOfBirth::JSONB,"
+            //            + " :locationOfBirth,"
+            + " :dateOfDeath, :timeValueOfDeath::JSONB,"
+            //            + " :locationOfDeath,"
+            + " :gender"
+            + ")";
+    dbi.withHandle(
+        h ->
+            h.createUpdate(query)
+                .bind("previewFileResource", previewImageUuid)
+                //            .bind("locationOfBirth", locationOfBirthUuid)
+                //            .bind("locationOfDeath", locationOfDeathUuid)
+                .bindBean(person)
+                .execute());
+
+    // save identifiers
+    Set<Identifier> identifiers = person.getIdentifiers();
+    saveIdentifiers(identifiers, person);
+
+    // save given names
+    //    List<GivenName> givenNames = person.getGivenNames();
+    //    saveRelatedGivenNames(givenNames, person);
+    // save family names
+    //    List<FamilyName> familyNames = person.getFamilyNames();
+    //    saveRelatedFamilyNames(familyNames, person);
+    Person result = findOne(person.getUuid());
+    return result;
+  }
+
+  //  private void saveIdentifiers(List<Identifier> identifiers, Person person) {
+  //    // we assume that identifiers (unique to object) are new (existing ones were deleted before
+  //    // (e.g. see update))
+  //    if (identifiers != null) {
+  //      for (Identifier identifier : identifiers) {
+  //        identifier.setIdentifiable(person.getUuid());
+  //        identifierRepository.save(identifier);
+  //      }
+  //    }
+  //  }
+  //  private void saveRelatedFamilyNames(List<FamilyName> familyNames, Person person) {
+  //    // we assume that relations are new (existing ones were deleted before (e.g. see update))
+  //    if (familyNames != null) {
+  //      dbi.useHandle(handle -> {
+  //        PreparedBatch preparedBatch = handle.prepareBatch("INSERT INTO
+  // rel_person_familynames(person_uuid, familyname_uuid, sortIndex) VALUES(:uuid, :familynameUuid,
+  // :sortIndex)");
+  //        int i = 0;
+  //        for (FamilyName familyName : familyNames) {
+  //          preparedBatch.bind("uuid", person.getUuid())
+  //                  .bind("familynameUuid", familyName.getUuid())
+  //                  .bind("sortIndex", i)
+  //                  .add();
+  //          i++;
+  //        }
+  //        preparedBatch.execute();
+  //      });
+  //    }
+  //  }
+  //  private void saveRelatedGivenNames(List<GivenName> givenNames, Person person) {
+  //    // we assume that relations are new (existing ones were deleted before (e.g. see update))
+  //    if (givenNames != null) {
+  //      dbi.useHandle(handle -> {
+  //        PreparedBatch preparedBatch = handle.prepareBatch("INSERT INTO
+  // rel_person_givennames(person_uuid, givenname_uuid, sortIndex) VALUES(:uuid, :givennameUuid,
+  // :sortIndex)");
+  //        int i = 0;
+  //        for (GivenName givenName : givenNames) {
+  //          preparedBatch.bind("uuid", person.getUuid())
+  //                  .bind("givennameUuid", givenName.getUuid())
+  //                  .bind("sortIndex", i)
+  //                  .add();
+  //          i++;
+  //        }
+  //        preparedBatch.execute();
+  //      });
+  //    }
+  //  }
+  @Override
+  public Person update(Person person) {
+    person.setLastModified(LocalDateTime.now());
+    final UUID previewImageUuid =
+        person.getPreviewImage() == null ? null : person.getPreviewImage().getUuid();
+    //    final UUID locationOfBirthUuid = person.getPlaceOfBirth() == null ? null :
+    // person.getPlaceOfBirth().getUuid();
+    //    final UUID locationOfDeathUuid = person.getPlaceOfDeath() == null ? null :
+    // person.getPlaceOfDeath().getUuid();
+
+    String query =
+        "UPDATE persons SET"
+            + " previewFileResource=:previewFileResource, label=:label::JSONB, description=:description::JSONB,"
+            + " last_modified=:lastModified,"
+            + " dateOfBirth=:dateOfBirth, timeValueOfBirth=:timeValueOfBirth::JSONB,"
+            //            + " locationOfBirth=:locationOfBirth,"
+            + " dateOfDeath=:dateOfDeath, timeValueOfDeath=:timeValueOfDeath::JSONB,"
+            //            + " locationOfDeath=:locationOfDeath,"
+            + " gender=:gender"
+            + " WHERE uuid=:uuid";
+
+    dbi.withHandle(
+        h ->
+            h.createUpdate(query)
+                .bind("previewFileResource", previewImageUuid)
+                //            .bind("locationOfBirth", locationOfBirthUuid)
+                //            .bind("locationOfDeath", locationOfDeathUuid)
+                .bindBean(person)
+                .execute());
+
+    // save identifiers
+    Set<Identifier> identifiers = person.getIdentifiers();
+    // as we store the whole list new: delete old entries
+    dbi.withHandle(
+        h ->
+            h.createUpdate("DELETE FROM identifiers WHERE identifiable = :uuid")
+                .bind("uuid", person.getUuid())
+                .execute());
+    saveIdentifiers(identifiers, person);
+
+    // save given names
+    //    List<GivenName> givenNames = person.getGivenNames();
+    //    // as we store the whole list new: delete old entries
+    //    dbi.withHandle(h -> h.createUpdate("DELETE FROM rel_person_givennames WHERE person_uuid =
+    // :uuid").bind("uuid", person.getUuid()).execute());
+    //    saveRelatedGivenNames(givenNames, person);
+    // save family names
+    //    List<FamilyName> familyNames = person.getFamilyNames();
+    //    // as we store the whole list new: delete old entries
+    //    dbi.withHandle(h -> h.createUpdate("DELETE FROM rel_person_familynames WHERE person_uuid =
+    // :uuid").bind("uuid", person.getUuid()).execute());
+    //    saveRelatedFamilyNames(familyNames, person);
+    Person result = findOne(person.getUuid());
     return result;
   }
 }
