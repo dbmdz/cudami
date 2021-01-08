@@ -14,6 +14,10 @@ public interface PersonService extends IdentifiableService<Person> {
   PageResponse<Person> findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial);
 
+  PageResponse<Person> findByLocationOfBirth(PageRequest pageRequest, UUID uuid);
+
+  PageResponse<Person> findByLocationOfDeath(PageRequest pageRequest, UUID uuid);
+
   default Set<Work> getWorks(Person person) {
     if (person == null) {
       return null;

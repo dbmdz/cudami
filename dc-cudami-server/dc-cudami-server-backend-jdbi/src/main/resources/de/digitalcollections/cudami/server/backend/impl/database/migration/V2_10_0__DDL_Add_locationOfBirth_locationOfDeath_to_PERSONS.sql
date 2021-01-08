@@ -1,0 +1,3 @@
+ALTER TABLE persons
+ADD COLUMN IF NOT EXISTS locationOfBirth UUID,
+ADD COLUMN IF NOT EXISTS locationOfDeath UUID;
