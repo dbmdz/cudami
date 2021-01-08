@@ -22,6 +22,9 @@ public class IdentifierRepositoryImpl extends AbstractPagingAndSortingRepository
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifierRepositoryImpl.class);
 
+  public static final String SQL_FULL_IDENTIFIER_FIELDS_ID =
+      " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id";
+
   private final Jdbi dbi;
 
   @Autowired

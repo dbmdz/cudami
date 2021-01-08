@@ -18,14 +18,21 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.BiFunction;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
+import org.jdbi.v3.core.result.RowView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateBody>
     implements CorporateBodyRepository {
+
+  public static final String SQL_REDUCED_CORPORATEBODY_FIELDS_CB =
+      " cb.uuid cb_uuid, cb.label cb_label, cb.refid cb_refId,"
+          + " cb.created cb_created, cb.last_modified cb_lastModified,"
+          + " cb.homepage_url cb_homepageUrl";
 
   // select all details shown/needed in single object details page
   private static final String FIND_ONE_BASE_SQL =
@@ -272,5 +279,33 @@ public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateB
 
     CorporateBody result = findOne(corporateBody.getUuid());
     return result;
+  }
+
+  public static BiFunction<
+          LinkedHashMap<UUID, CorporateBody>, RowView, LinkedHashMap<UUID, CorporateBody>>
+      mapRowToCorporateBody() {
+    return mapRowToCorporateBody(false);
+  }
+
+  public static BiFunction<
+          LinkedHashMap<UUID, CorporateBody>, RowView, LinkedHashMap<UUID, CorporateBody>>
+      mapRowToCorporateBody(boolean withIdentifiers) {
+    return (map, rowView) -> {
+      CorporateBody corporateBody =
+          map.computeIfAbsent(
+              rowView.getColumn("cb_uuid", UUID.class),
+              fn -> {
+                return rowView.getRow(CorporateBodyImpl.class);
+              });
+
+      if (rowView.getColumn("pi_uuid", UUID.class) != null) {
+        corporateBody.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+      }
+      if (withIdentifiers && rowView.getColumn("id_uuid", UUID.class) != null) {
+        IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+        corporateBody.addIdentifier(dbIdentifier);
+      }
+      return map;
+    };
   }
 }
