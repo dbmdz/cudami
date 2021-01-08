@@ -24,7 +24,6 @@ import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.paging.SearchPageResponseImpl;
 import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -43,6 +42,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     implements CollectionRepository {
+
   private static final String BREADCRUMB_QUERY =
       "WITH recursive breadcrumb (uuid,label,parent_uuid,depth)"
           + " AS ("
@@ -76,6 +76,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
           + " FROM collections AS c"
           + " LEFT JOIN identifiers AS id ON c.uuid = id.identifiable"
           + " LEFT JOIN fileresources_image AS file ON c.previewfileresource = file.uuid";
+
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionRepositoryImpl.class);
 
   // select only what is shown/needed in paged list (commented some additional available fields
@@ -90,13 +91,14 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
           + " FROM collections AS c"
           + " LEFT JOIN fileresources_image AS file ON c.previewfileresource = file.uuid";
 
-  private static final String BASE_TOP_QUERY =
-      REDUCED_FIND_ONE_BASE_SQL
-          + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = c.uuid)";
   private static final String BASE_CHILDREN_QUERY =
       REDUCED_FIND_ONE_BASE_SQL
           + " INNER JOIN collection_collections cc ON c.uuid = cc.child_collection_uuid"
           + " WHERE cc.parent_collection_uuid = :uuid";
+
+  private static final String BASE_TOP_QUERY =
+      REDUCED_FIND_ONE_BASE_SQL
+          + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = c.uuid)";
 
   @Autowired
   public CollectionRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
@@ -117,13 +119,14 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
               handle.prepareBatch(
                   "INSERT INTO collection_collections(parent_collection_uuid, child_collection_uuid, sortIndex)"
                       + " VALUES (:parentCollectionUuid, :childCollectionUuid, :sortIndex) ON CONFLICT (parent_collection_uuid, child_collection_uuid) DO NOTHING");
-          for (Collection child : children) {
-            preparedBatch
-                .bind("parentCollectionUuid", parentUuid)
-                .bind("childCollectionUuid", child.getUuid())
-                .bind("sortIndex", nextSortIndex + getIndex(children, child))
-                .add();
-          }
+          children.forEach(
+              child -> {
+                preparedBatch
+                    .bind("parentCollectionUuid", parentUuid)
+                    .bind("childCollectionUuid", child.getUuid())
+                    .bind("sortIndex", nextSortIndex + getIndex(children, child))
+                    .add();
+              });
           preparedBatch.execute();
         });
     return true;
@@ -143,13 +146,14 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             PreparedBatch preparedBatch =
                 handle.prepareBatch(
                     "INSERT INTO collection_digitalobjects(collection_uuid, digitalobject_uuid, sortIndex) VALUES (:uuid, :digitalObjectUuid, :sortIndex) ON CONFLICT (collection_uuid, digitalobject_uuid) DO NOTHING");
-            for (DigitalObject digitalObject : digitalObjects) {
-              preparedBatch
-                  .bind("uuid", collectionUuid)
-                  .bind("digitalObjectUuid", digitalObject.getUuid())
-                  .bind("sortIndex", nextSortIndex + getIndex(digitalObjects, digitalObject))
-                  .add();
-            }
+            digitalObjects.forEach(
+                digitalObject -> {
+                  preparedBatch
+                      .bind("uuid", collectionUuid)
+                      .bind("digitalObjectUuid", digitalObject.getUuid())
+                      .bind("sortIndex", nextSortIndex + getIndex(digitalObjects, digitalObject))
+                      .add();
+                });
             preparedBatch.execute();
           });
       return true;
@@ -167,24 +171,20 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   @Override
   public PageResponse<Collection> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder(REDUCED_FIND_ONE_BASE_SQL);
-    // handle optional filtering params
-    String filterClauses = getFilterClauses(pageRequest.getFiltering());
-    if (!filterClauses.isEmpty()) {
-      query.append(" WHERE ").append(filterClauses);
-    }
+    addFiltering(pageRequest, query);
     addPageRequestParams(pageRequest, query);
 
-    List<CollectionImpl> result =
-        new ArrayList<>(
-            dbi.withHandle(
+    List<Collection> result =
+        dbi
+            .withHandle(
                 h ->
                     h.createQuery(query.toString())
                         .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
                         .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                         .reduceRows(
-                            new LinkedHashMap<UUID, CollectionImpl>(),
+                            new LinkedHashMap<UUID, Collection>(),
                             (map, rowView) -> {
-                              CollectionImpl collection =
+                              Collection collection =
                                   map.computeIfAbsent(
                                       rowView.getColumn("c_uuid", UUID.class),
                                       fn -> {
@@ -196,18 +196,17 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                                     rowView.getRow(ImageFileResourceImpl.class));
                               }
                               return map;
-                            })
-                        .values()));
+                            }))
+            .values()
+            .stream()
+            .collect(Collectors.toList());
 
-    String sql = "SELECT count(*) FROM collections AS c";
-    if (!filterClauses.isEmpty()) {
-      sql += " WHERE " + filterClauses;
-    }
-    final String sqlCount = sql;
-    long total = dbi.withHandle(h -> h.createQuery(sqlCount).mapTo(Long.class).findOne().get());
+    StringBuilder sql = new StringBuilder("SELECT count(*) FROM collections AS c");
+    addFiltering(pageRequest, sql);
+    long total =
+        dbi.withHandle(h -> h.createQuery(sql.toString()).mapTo(Long.class).findOne().get());
 
-    PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
-    return pageResponse;
+    return new PageResponseImpl<>(result, pageRequest, total);
   }
 
   @Override
@@ -222,54 +221,49 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                 + " LEFT JOIN fileresources_image AS file ON c.previewfileresource = file.uuid"
                 + " LEFT JOIN LATERAL jsonb_object_keys(c.label) l(keys) ON c.label IS NOT null"
                 + " WHERE (c.label->>l.keys ILIKE '%' || :searchTerm || '%')");
-    // handle optional filtering params
-    String filterClauses = getFilterClauses(searchPageRequest.getFiltering());
-    if (!filterClauses.isEmpty()) {
-      query.append(" AND ").append(filterClauses);
-    }
+    addFiltering(searchPageRequest, query);
     addPageRequestParams(searchPageRequest, query);
 
     List<Collection> result =
-        new ArrayList<>(
-            dbi.withHandle(
-                h ->
-                    h.createQuery(query.toString())
-                        .bind("searchTerm", searchPageRequest.getQuery())
-                        .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
-                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                        .reduceRows(
-                            new LinkedHashMap<UUID, Collection>(),
-                            (map, rowView) -> {
-                              Collection collection =
-                                  map.computeIfAbsent(
-                                      rowView.getColumn("c_uuid", UUID.class),
-                                      uuid -> rowView.getRow(CollectionImpl.class));
-                              if (rowView.getColumn("f_uuid", String.class) != null) {
-                                collection.setPreviewImage(
-                                    rowView.getRow(ImageFileResourceImpl.class));
-                              }
-                              return map;
-                            })
-                        .values()));
+        dbi.withHandle(
+            h ->
+                h
+                    .createQuery(query.toString())
+                    .bind("searchTerm", searchPageRequest.getQuery())
+                    .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
+                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                    .reduceRows(
+                        new LinkedHashMap<UUID, Collection>(),
+                        (map, rowView) -> {
+                          Collection collection =
+                              map.computeIfAbsent(
+                                  rowView.getColumn("c_uuid", UUID.class),
+                                  uuid -> rowView.getRow(CollectionImpl.class));
+                          if (rowView.getColumn("f_uuid", String.class) != null) {
+                            collection.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+                          return map;
+                        })
+                    .values()
+                    .stream()
+                    .collect(Collectors.toList()));
 
-    String countQuery =
-        "SELECT count(*) FROM collections AS c"
-            + " LEFT JOIN LATERAL jsonb_object_keys(c.label) l(keys) ON c.label IS NOT null"
-            + " WHERE (c.label->>l.keys ILIKE '%' || :searchTerm || '%')";
-    if (!filterClauses.isEmpty()) {
-      countQuery += " AND " + filterClauses;
-    }
-    final String sqlCount = countQuery;
+    StringBuilder countQuery =
+        new StringBuilder(
+            "SELECT count(*) FROM collections AS c"
+                + " LEFT JOIN LATERAL jsonb_object_keys(c.label) l(keys) ON c.label IS NOT null"
+                + " WHERE (c.label->>l.keys ILIKE '%' || :searchTerm || '%')");
+    addFiltering(searchPageRequest, countQuery);
     long total =
         dbi.withHandle(
             h ->
-                h.createQuery(sqlCount)
+                h.createQuery(countQuery.toString())
                     .bind("searchTerm", searchPageRequest.getQuery())
                     .mapTo(Long.class)
                     .findOne()
                     .get());
 
-    return new SearchPageResponseImpl(result, searchPageRequest, total);
+    return new SearchPageResponseImpl<>(result, searchPageRequest, total);
   }
 
   @Override
@@ -288,7 +282,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
     String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
 
-    Optional<CollectionImpl> result =
+    Optional<Collection> result =
         dbi
             .withHandle(
                 h ->
@@ -299,9 +293,9 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                         .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                         .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                         .reduceRows(
-                            new LinkedHashMap<UUID, CollectionImpl>(),
+                            new LinkedHashMap<UUID, Collection>(),
                             (map, rowView) -> {
-                              CollectionImpl collection =
+                              Collection collection =
                                   map.computeIfAbsent(
                                       rowView.getColumn("c_uuid", UUID.class),
                                       fn -> {
@@ -334,28 +328,20 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
   @Override
   public Collection findOne(UUID uuid, Filtering filtering) {
-    String query = FIND_ONE_BASE_SQL + " WHERE c.uuid = :uuid";
-
-    if (filtering != null) {
-      // handle optional filtering params
-      String filterClauses = getFilterClauses(filtering);
-      if (!filterClauses.isEmpty()) {
-        query += " AND " + filterClauses;
-      }
-    }
-    String finalQuery = query;
-    CollectionImpl result =
+    StringBuilder query = new StringBuilder(FIND_ONE_BASE_SQL + " WHERE c.uuid = :uuid");
+    addFiltering(filtering, query);
+    Collection result =
         dbi.withHandle(
                 h ->
-                    h.createQuery(finalQuery)
+                    h.createQuery(query.toString())
                         .bind("uuid", uuid)
                         .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
                         .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                         .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                         .reduceRows(
-                            new LinkedHashMap<UUID, CollectionImpl>(),
+                            new LinkedHashMap<UUID, Collection>(),
                             (map, rowView) -> {
-                              CollectionImpl collection =
+                              Collection collection =
                                   map.computeIfAbsent(
                                       rowView.getColumn("c_uuid", UUID.class),
                                       fn -> {
@@ -430,87 +416,86 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     String query = BASE_CHILDREN_QUERY + " ORDER BY cc.sortIndex ASC";
 
     List<Collection> result =
-        new ArrayList<>(
-            dbi.withHandle(
-                h ->
-                    h.createQuery(query)
-                        .bind("uuid", uuid)
-                        .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
-                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                        .reduceRows(
-                            new LinkedHashMap<UUID, CollectionImpl>(),
-                            (map, rowView) -> {
-                              CollectionImpl collection =
-                                  map.computeIfAbsent(
-                                      rowView.getColumn("c_uuid", UUID.class),
-                                      fn -> {
-                                        return rowView.getRow(CollectionImpl.class);
-                                      });
+        dbi.withHandle(
+            h ->
+                h
+                    .createQuery(query)
+                    .bind("uuid", uuid)
+                    .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
+                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                    .reduceRows(
+                        new LinkedHashMap<UUID, Collection>(),
+                        (map, rowView) -> {
+                          Collection collection =
+                              map.computeIfAbsent(
+                                  rowView.getColumn("c_uuid", UUID.class),
+                                  fn -> {
+                                    return rowView.getRow(CollectionImpl.class);
+                                  });
 
-                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                collection.setPreviewImage(
-                                    rowView.getRow(ImageFileResourceImpl.class));
-                              }
-                              return map;
-                            })
-                        .values()));
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            collection.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+                          return map;
+                        })
+                    .values()
+                    .stream()
+                    .collect(Collectors.toList()));
     return result;
   }
 
   @Override
   public PageResponse<Collection> getChildren(UUID uuid, PageRequest pageRequest) {
-    // minimal data required (= identifiable fields) for creating text links/teasers in a list
     StringBuilder query = new StringBuilder(BASE_CHILDREN_QUERY);
+    addFiltering(pageRequest, query);
 
-    // handle optional filtering params
-    String filterClauses = getFilterClauses(pageRequest.getFiltering());
-    if (!filterClauses.isEmpty()) {
-      query.append(" AND ").append(filterClauses);
-    }
-
-    query.append(" ORDER BY cc.sortIndex ASC");
     pageRequest.setSorting(null);
+    query.append(" ORDER BY cc.sortIndex ASC");
+
     addPageRequestParams(pageRequest, query);
     List<Collection> result =
-        new ArrayList<>(
-            dbi.withHandle(
-                h ->
-                    h.createQuery(query.toString())
-                        .bind("uuid", uuid)
-                        .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
-                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                        .reduceRows(
-                            new LinkedHashMap<UUID, CollectionImpl>(),
-                            (map, rowView) -> {
-                              CollectionImpl collection =
-                                  map.computeIfAbsent(
-                                      rowView.getColumn("c_uuid", UUID.class),
-                                      fn -> {
-                                        return rowView.getRow(CollectionImpl.class);
-                                      });
+        dbi.withHandle(
+            h ->
+                h
+                    .createQuery(query.toString())
+                    .bind("uuid", uuid)
+                    .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
+                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
+                    .reduceRows(
+                        new LinkedHashMap<UUID, Collection>(),
+                        (map, rowView) -> {
+                          Collection collection =
+                              map.computeIfAbsent(
+                                  rowView.getColumn("c_uuid", UUID.class),
+                                  fn -> {
+                                    return rowView.getRow(CollectionImpl.class);
+                                  });
 
-                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                collection.setPreviewImage(
-                                    rowView.getRow(ImageFileResourceImpl.class));
-                              }
-                              return map;
-                            })
-                        .values()));
+                          if (rowView.getColumn("f_uuid", UUID.class) != null) {
+                            collection.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                          }
+                          return map;
+                        })
+                    .values()
+                    .stream()
+                    .collect(Collectors.toList()));
 
-    String countQuery =
-        "SELECT count(*) FROM collections AS c"
-            + " INNER JOIN collection_collections cc ON c.uuid = cc.child_collection_uuid"
-            + " WHERE cc.parent_collection_uuid = :uuid";
-    if (!filterClauses.isEmpty()) {
-      countQuery += " AND " + filterClauses;
-    }
-    final String sqlCount = countQuery;
+    StringBuilder countQuery =
+        new StringBuilder(
+            "SELECT count(*) FROM collections AS c"
+                + " INNER JOIN collection_collections cc ON c.uuid = cc.child_collection_uuid"
+                + " WHERE cc.parent_collection_uuid = :uuid");
+    addFiltering(pageRequest, countQuery);
     long total =
         dbi.withHandle(
-            h -> h.createQuery(sqlCount).bind("uuid", uuid).mapTo(Long.class).findOne().get());
+            h ->
+                h.createQuery(countQuery.toString())
+                    .bind("uuid", uuid)
+                    .mapTo(Long.class)
+                    .findOne()
+                    .get());
 
-    PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
-    return pageResponse;
+    return new PageResponseImpl<>(result, pageRequest, total);
   }
 
   @Override
@@ -539,24 +524,19 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   @Override
   public PageResponse<DigitalObject> getDigitalObjects(
       UUID collectionUuid, PageRequest pageRequest) {
-    final String innerSelect =
-        "SELECT * FROM digitalobjects as d"
-            + " LEFT JOIN collection_digitalobjects AS cd ON d.uuid = cd.digitalobject_uuid"
-            + " WHERE cd.collection_uuid = :uuid";
-    StringBuilder innerQuery = new StringBuilder(innerSelect);
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM digitalobjects as d"
+                + " LEFT JOIN collection_digitalobjects AS cd ON d.uuid = cd.digitalobject_uuid"
+                + " WHERE cd.collection_uuid = :uuid");
+    addFiltering(pageRequest, innerQuery);
 
-    // handle optional filtering params
-    String filterClauses = getFilterClauses(pageRequest.getFiltering());
-    if (!filterClauses.isEmpty()) {
-      innerQuery.append(" AND ").append(filterClauses);
-    }
-
-    innerQuery.append(" ORDER BY cd.sortIndex ASC");
-
-    // we add fix sorting in above query; otherwise we get in conflict with allowed sorting
-    // and column names of this repository (it is for collections, not sublists of
+    // we add fixed sorting; otherwise we get in conflict with allowed sorting
+    // and column names of this repository (as it is for collections, not sublists of
     // digitalobjects...)
     pageRequest.setSorting(null);
+    innerQuery.append(" ORDER BY cd.sortIndex ASC");
+
     addPageRequestParams(pageRequest, innerQuery);
 
     final String baseQuery =
@@ -571,57 +551,53 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + " LEFT JOIN fileresources_image AS file ON d.previewfileresource = file.uuid";
 
     List<DigitalObject> result =
-        dbi.withHandle(
-            h ->
-                h
-                    .createQuery(baseQuery)
-                    .bind("uuid", collectionUuid)
-                    .registerRowMapper(BeanMapper.factory(DigitalObjectImpl.class, "d"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
-                    .reduceRows(
-                        new LinkedHashMap<UUID, DigitalObjectImpl>(),
-                        (map, rowView) -> {
-                          DigitalObjectImpl digitalObject =
-                              map.computeIfAbsent(
-                                  rowView.getColumn("d_uuid", UUID.class),
-                                  fn -> {
-                                    return rowView.getRow(DigitalObjectImpl.class);
-                                  });
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(baseQuery)
+                        .bind("uuid", collectionUuid)
+                        .registerRowMapper(BeanMapper.factory(DigitalObjectImpl.class, "d"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, DigitalObject>(),
+                            (map, rowView) -> {
+                              DigitalObject digitalObject =
+                                  map.computeIfAbsent(
+                                      rowView.getColumn("d_uuid", UUID.class),
+                                      fn -> {
+                                        return rowView.getRow(DigitalObjectImpl.class);
+                                      });
 
-                          if (rowView.getColumn("pf_uuid", UUID.class) != null) {
-                            digitalObject.setPreviewImage(
-                                rowView.getRow(ImageFileResourceImpl.class));
-                          }
+                              if (rowView.getColumn("pf_uuid", UUID.class) != null) {
+                                digitalObject.setPreviewImage(
+                                    rowView.getRow(ImageFileResourceImpl.class));
+                              }
 
-                          if (rowView.getColumn("id_uuid", UUID.class) != null) {
-                            IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
-                            digitalObject.addIdentifier(dbIdentifier);
-                          }
-                          return map;
-                        })
-                    .values()
-                    .stream()
-                    .map(DigitalObject.class::cast)
-                    .collect(Collectors.toList()));
-    String countQuery =
-        "SELECT count(*) FROM digitalobjects AS d"
-            + " LEFT JOIN collection_digitalobjects AS cd ON d.uuid = cd.digitalobject_uuid"
-            + " WHERE cd.collection_uuid = :uuid";
-    if (!filterClauses.isEmpty()) {
-      countQuery += " AND " + filterClauses;
-    }
-    final String sqlCount = countQuery;
+                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
+                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                                digitalObject.addIdentifier(dbIdentifier);
+                              }
+                              return map;
+                            }))
+            .values()
+            .stream()
+            .collect(Collectors.toList());
+    StringBuilder countQuery =
+        new StringBuilder(
+            "SELECT count(*) FROM digitalobjects AS d"
+                + " LEFT JOIN collection_digitalobjects AS cd ON d.uuid = cd.digitalobject_uuid"
+                + " WHERE cd.collection_uuid = :uuid");
+    addFiltering(pageRequest, countQuery);
     long total =
         dbi.withHandle(
             h ->
-                h.createQuery(sqlCount)
+                h.createQuery(countQuery.toString())
                     .bind("uuid", collectionUuid)
                     .mapTo(Long.class)
                     .findOne()
                     .get());
-    PageResponse<DigitalObject> pageResponse = new PageResponseImpl<>(result, pageRequest, total);
-    return pageResponse;
+    return new PageResponseImpl<>(result, pageRequest, total);
   }
 
   @Override
@@ -676,9 +652,9 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                         .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
                         .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                         .reduceRows(
-                            new LinkedHashMap<UUID, CollectionImpl>(),
+                            new LinkedHashMap<UUID, Collection>(),
                             (map, rowView) -> {
-                              CollectionImpl parent =
+                              Collection parent =
                                   map.computeIfAbsent(
                                       rowView.getColumn("c_uuid", UUID.class),
                                       fn -> {
@@ -732,9 +708,9 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                         .registerRowMapper(BeanMapper.factory(CorporateBodyImpl.class, "cb"))
                         .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pf"))
                         .reduceRows(
-                            new LinkedHashMap<UUID, CorporateBodyImpl>(),
+                            new LinkedHashMap<UUID, CorporateBody>(),
                             (map, rowView) -> {
-                              CorporateBodyImpl related =
+                              CorporateBody related =
                                   map.computeIfAbsent(
                                       rowView.getColumn("cb_uuid", UUID.class),
                                       fn -> {
@@ -757,24 +733,20 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   public PageResponse<Collection> getTopCollections(PageRequest pageRequest) {
     // minimal data required (= identifiable fields) for creating text links/teasers in a list
     StringBuilder query = new StringBuilder(BASE_TOP_QUERY);
-    // handle optional filtering params
-    String filterClauses = getFilterClauses(pageRequest.getFiltering());
-    if (!filterClauses.isEmpty()) {
-      query.append(" AND ").append(filterClauses);
-    }
+    addFiltering(pageRequest, query);
     addPageRequestParams(pageRequest, query);
 
     List<Collection> result =
-        new ArrayList<>(
-            dbi.withHandle(
+        dbi
+            .withHandle(
                 h ->
                     h.createQuery(query.toString())
                         .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "c"))
                         .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
                         .reduceRows(
-                            new LinkedHashMap<UUID, CollectionImpl>(),
+                            new LinkedHashMap<UUID, Collection>(),
                             (map, rowView) -> {
-                              CollectionImpl collection =
+                              Collection collection =
                                   map.computeIfAbsent(
                                       rowView.getColumn("c_uuid", UUID.class),
                                       fn -> {
@@ -786,20 +758,20 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                                     rowView.getRow(ImageFileResourceImpl.class));
                               }
                               return map;
-                            })
-                        .values()));
+                            }))
+            .values()
+            .stream()
+            .collect(Collectors.toList());
 
-    String countQuery =
-        "SELECT count(*) FROM collections AS c"
-            + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = c.uuid)";
-    if (!filterClauses.isEmpty()) {
-      countQuery += " AND " + filterClauses;
-    }
-    final String sqlCount = countQuery;
-    long total = dbi.withHandle(h -> h.createQuery(sqlCount).mapTo(Long.class).findOne().get());
+    StringBuilder countQuery =
+        new StringBuilder(
+            "SELECT count(*) FROM collections AS c"
+                + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = c.uuid)");
+    addFiltering(pageRequest, countQuery);
+    long total =
+        dbi.withHandle(h -> h.createQuery(countQuery.toString()).mapTo(Long.class).findOne().get());
 
-    PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
-    return pageResponse;
+    return new PageResponseImpl<>(result, pageRequest, total);
   }
 
   @Override
