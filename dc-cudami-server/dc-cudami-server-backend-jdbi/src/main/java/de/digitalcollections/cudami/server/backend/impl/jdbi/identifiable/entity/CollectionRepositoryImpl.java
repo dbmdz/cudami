@@ -538,36 +538,42 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   @Override
   public PageResponse<DigitalObject> getDigitalObjects(
       UUID collectionUuid, PageRequest pageRequest) {
+    final String innerSelect =
+        "SELECT * FROM digitalobjects as d"
+            + " LEFT JOIN collection_digitalobjects AS cd ON d.uuid = cd.digitalobject_uuid"
+            + " WHERE cd.collection_uuid = :uuid";
+    StringBuilder innerQuery = new StringBuilder(innerSelect);
+
+    // handle optional filtering params
+    String filterClauses = getFilterClauses(pageRequest.getFiltering());
+    if (!filterClauses.isEmpty()) {
+      innerQuery.append(" AND ").append(filterClauses);
+    }
+
+    innerQuery.append(" ORDER BY cd.sortIndex ASC");
+
+    // we add fix sorting in above query; otherwise we get in conflict with allowed sorting
+    // and column names of this repository (it is for collections, not sublists of
+    // digitalobjects...)
+    pageRequest.setSorting(null);
+    addPageRequestParams(pageRequest, innerQuery);
+
     final String baseQuery =
         "SELECT d.uuid d_uuid, d.label d_label, d.refid d_refId, d.custom_attrs d_customAttributes,"
             + " d.created d_created, d.last_modified d_lastModified,"
             + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
             + " file.uuid pf_uuid, file.filename pf_filename, file.mimetype pf_mimeType, file.size_in_bytes pf_sizeInBytes, file.uri pf_uri, file.http_base_url pf_httpBaseUrl"
-            + " FROM digitalobjects AS d"
+            + " FROM ("
+            + innerQuery
+            + ") AS d"
             + " LEFT JOIN identifiers AS id ON d.uuid = id.identifiable"
-            + " LEFT JOIN fileresources_image AS file ON d.previewfileresource = file.uuid"
-            + " LEFT JOIN collection_digitalobjects AS cd ON d.uuid = cd.digitalobject_uuid"
-            + " WHERE cd.collection_uuid = :uuid";
-    StringBuilder query = new StringBuilder(baseQuery);
-
-    // handle optional filtering params
-    String filterClauses = getFilterClauses(pageRequest.getFiltering());
-    if (!filterClauses.isEmpty()) {
-      query.append(" AND ").append(filterClauses);
-    }
-
-    query.append(" ORDER BY cd.sortIndex ASC");
-    // we add fix sorting in above query; otherwise we get in conflict with allowed sorting
-    // and column names of this repository (it is for collections, not sublists of
-    // digitalobjects...)
-    pageRequest.setSorting(null);
-    addPageRequestParams(pageRequest, query);
+            + " LEFT JOIN fileresources_image AS file ON d.previewfileresource = file.uuid";
 
     List<DigitalObject> result =
         dbi.withHandle(
             h ->
                 h
-                    .createQuery(query.toString())
+                    .createQuery(baseQuery)
                     .bind("uuid", collectionUuid)
                     .registerRowMapper(BeanMapper.factory(DigitalObjectImpl.class, "d"))
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
