@@ -52,6 +52,9 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
   private static final Logger LOGGER =
       LoggerFactory.getLogger(FileResourceMetadataRepositoryImpl.class);
 
+  public static final String SQL_PREVIEW_IMAGE_FIELDS_PI =
+      " file.uuid pi_uuid, file.filename pi_filename, file.mimetype pi_mimeType, file.uri pi_uri, file.http_base_url pi_httpBaseUrl";
+
   // select all details shown/needed in single object details page
   private static final String FIND_ONE_BASE_SQL =
       "SELECT f.uuid f_uuid, f.label f_label, f.description f_description,"

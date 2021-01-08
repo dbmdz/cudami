@@ -28,9 +28,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
+import org.jdbi.v3.core.result.RowView;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +44,10 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     implements DigitalObjectRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectRepositoryImpl.class);
+
+  public static final String SQL_REDUCED_DIGITALOBJECT_FIELDS_DO =
+      " d.uuid do_uuid, d.refid do_refId, d.label do_label, d.custom_attrs do_customAttributes,"
+          + " d.created do_created, d.last_modified do_lastModified";
 
   // select all details shown/needed in single object details page
   private static final String FIND_ONE_BASE_SQL =
@@ -711,5 +717,34 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             .collect(Collectors.toList()));
 
     return true;
+  }
+
+  public static BiFunction<
+          LinkedHashMap<UUID, DigitalObject>, RowView, LinkedHashMap<UUID, DigitalObject>>
+      mapRowToDigitalObject() {
+    return mapRowToDigitalObject(false);
+  }
+
+  public static BiFunction<
+          LinkedHashMap<UUID, DigitalObject>, RowView, LinkedHashMap<UUID, DigitalObject>>
+      mapRowToDigitalObject(boolean withIdentifiers) {
+    return (map, rowView) -> {
+      DigitalObject digitalObject =
+          map.computeIfAbsent(
+              rowView.getColumn("do_uuid", UUID.class),
+              fn -> {
+                return rowView.getRow(DigitalObjectImpl.class);
+              });
+
+      if (rowView.getColumn("pi_uuid", UUID.class) != null) {
+        digitalObject.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+      }
+
+      if (withIdentifiers && rowView.getColumn("id_uuid", UUID.class) != null) {
+        IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+        digitalObject.addIdentifier(dbIdentifier);
+      }
+      return map;
+    };
   }
 }
