@@ -73,6 +73,7 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
           + " w.identifiable_type w_type,"
           + " w.created w_created, w.last_modified w_lastModified,"
           + " w.publication_start w_publicationStart, w.publication_end w_publicationEnd,"
+          + " w.rendering_hints w_renderingHints,"
           + " w.preview_hints w_previewImageRenderingHints,"
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
           + " FROM webpages as w INNER JOIN webpage_webpages ww ON w.uuid = ww.child_webpage_uuid"
