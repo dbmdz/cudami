@@ -25,21 +25,6 @@ Start application (repository server and management webapp) and test your change
 
 ## Format Javascript Files
 
-Install prettier:
-
-```
-$ npm install --save-dev --save-exact prettier
-```
-
-Format files:
-
-```
-$ npx prettier --write "src/**/*.js"
-$ npx prettier --write "src/**/*.jsx"
-```
-
-or
-
 ```
 npm install --only=dev && npm run format-check
 ```
