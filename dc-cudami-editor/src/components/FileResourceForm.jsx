@@ -13,6 +13,7 @@ const FileResourceForm = ({
   activeLanguage,
   canAddLanguage,
   existingLanguages,
+  formId,
   identifiable,
   onAddLanguage,
   onSubmit,
@@ -25,6 +26,7 @@ const FileResourceForm = ({
   }
   return (
     <Form
+      id={formId}
       onSubmit={(evt) => {
         evt.preventDefault()
         onSubmit()
@@ -35,7 +37,7 @@ const FileResourceForm = ({
           <h1>{t('editFileResource', {name: identifiable.filename})}</h1>
         </Col>
         <Col xs="6" sm="3">
-          <FormButtons />
+          <FormButtons formId={formId} />
         </Col>
       </Row>
       <Row>

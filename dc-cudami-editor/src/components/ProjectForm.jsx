@@ -22,6 +22,7 @@ const ProjectForm = ({
   activeLanguage,
   canAddLanguage,
   existingLanguages,
+  formId,
   identifiable,
   onAddLanguage,
   onSubmit,
@@ -31,6 +32,7 @@ const ProjectForm = ({
   const {t} = useTranslation()
   return (
     <Form
+      id={formId}
       onSubmit={(evt) => {
         evt.preventDefault()
         onSubmit()
@@ -41,7 +43,7 @@ const ProjectForm = ({
           <h1>{identifiable.uuid ? t('editProject') : t('createProject')}</h1>
         </Col>
         <Col xs="6" sm="3">
-          <FormButtons />
+          <FormButtons formId={formId} />
         </Col>
       </Row>
       <Row>
