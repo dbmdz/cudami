@@ -1,3 +1,4 @@
+import kebabCase from 'lodash/kebabCase'
 import React, {Component} from 'react'
 import {withTranslation} from 'react-i18next'
 
@@ -165,6 +166,7 @@ class IdentifiableForm extends Component {
         activeLanguage={this.state.activeLanguage}
         canAddLanguage={this.state.availableLanguages.length > 0}
         existingLanguages={this.state.existingLanguages}
+        formId={`${kebabCase(this.props.type)}-form`}
         identifiable={this.state.identifiable}
         onAddLanguage={() => this.toggleModal('languageAdder')}
         onSubmit={this.submitIdentifiable}

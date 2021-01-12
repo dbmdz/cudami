@@ -7,6 +7,9 @@ import {
   CardFooter,
   Col,
   Container,
+  Nav,
+  Navbar,
+  NavbarBrand,
   Row,
 } from 'reactstrap'
 import {
@@ -153,11 +156,12 @@ const App = () => {
   initI18n(uiLocale)
   return (
     <>
-      <Container className="mt-3">
-        <a href="/">
+      <Navbar color="light" expand="md" fixed="top" light>
+        <NavbarBrand href="/">
           <FaHome size="25" />
-        </a>
-      </Container>
+        </NavbarBrand>
+        <Nav className="ml-auto" navbar />
+      </Navbar>
       <Router>
         <Route component={StartPage} exact path="/" />
         <Route

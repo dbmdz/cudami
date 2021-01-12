@@ -26,6 +26,7 @@ const WebpageForm = ({
   activeLanguage,
   canAddLanguage,
   existingLanguages,
+  formId,
   identifiable,
   onAddLanguage,
   onSubmit,
@@ -48,6 +49,7 @@ const WebpageForm = ({
   return (
     <>
       <Form
+        id={formId}
         onSubmit={(evt) => {
           evt.preventDefault()
           onSubmit()
@@ -58,7 +60,7 @@ const WebpageForm = ({
             <h1>{uuid ? t('editWebpage') : t('createWebpage')}</h1>
           </Col>
           <Col xs="6" sm="3">
-            <FormButtons />
+            <FormButtons formId={formId} />
           </Col>
         </Row>
         <Row>

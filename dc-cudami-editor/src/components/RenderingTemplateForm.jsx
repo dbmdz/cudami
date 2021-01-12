@@ -67,8 +67,10 @@ const RenderingTemplateForm = ({
     return null
   }
   const {description, label, name} = template
+  const formId = 'rendering-template-form'
   return (
     <Form
+      id={formId}
       onSubmit={(evt) => {
         evt.preventDefault()
         submitData(apiContextPath, template, uuid)
@@ -83,7 +85,7 @@ const RenderingTemplateForm = ({
           </h1>
         </Col>
         <Col xs="6" sm="3">
-          <FormButtons />
+          <FormButtons formId={formId} />
         </Col>
       </Row>
       <Row>

@@ -12,6 +12,7 @@ const SubtopicForm = ({
   activeLanguage,
   canAddLanguage,
   existingLanguages,
+  formId,
   identifiable,
   onAddLanguage,
   onSubmit,
@@ -21,6 +22,7 @@ const SubtopicForm = ({
   const {t} = useTranslation()
   return (
     <Form
+      id={formId}
       onSubmit={(evt) => {
         evt.preventDefault()
         onSubmit()
@@ -31,7 +33,7 @@ const SubtopicForm = ({
           <h1>{identifiable.uuid ? t('editSubtopic') : t('createSubtopic')}</h1>
         </Col>
         <Col xs="6" sm="3">
-          <FormButtons />
+          <FormButtons formId={formId} />
         </Col>
       </Row>
       <Row>

@@ -12,6 +12,7 @@ const TopicForm = ({
   activeLanguage,
   canAddLanguage,
   existingLanguages,
+  formId,
   identifiable,
   onAddLanguage,
   onSubmit,
@@ -21,6 +22,7 @@ const TopicForm = ({
   const {t} = useTranslation()
   return (
     <Form
+      id={formId}
       onSubmit={(evt) => {
         evt.preventDefault()
         onSubmit()
@@ -31,7 +33,7 @@ const TopicForm = ({
           <h1>{identifiable.uuid ? t('editTopic') : t('createTopic')}</h1>
         </Col>
         <Col xs="6" sm="3">
-          <FormButtons />
+          <FormButtons formId={formId} />
         </Col>
       </Row>
       <Row>
