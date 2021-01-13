@@ -119,7 +119,7 @@ public class WebsiteController {
           NullHandling nullHandling)
       throws IdentifiableServiceException {
     Sorting sorting = null;
-    if (!StringUtils.isEmpty(sortField)) {
+    if (StringUtils.hasText(sortField)) {
       OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
       sorting = new SortingImpl(order);
     }

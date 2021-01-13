@@ -11,14 +11,13 @@ import org.springframework.context.MessageSourceAware;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.servlet.FlashMap;
 import org.springframework.web.servlet.FlashMapManager;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.servlet.view.RedirectView;
 
 /** Check if admin user exists before login (call to "/login") dialog. */
-public class CreateAdminUserInterceptor extends HandlerInterceptorAdapter
-    implements MessageSourceAware {
+public class CreateAdminUserInterceptor implements HandlerInterceptor, MessageSourceAware {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CreateAdminUserInterceptor.class);
 

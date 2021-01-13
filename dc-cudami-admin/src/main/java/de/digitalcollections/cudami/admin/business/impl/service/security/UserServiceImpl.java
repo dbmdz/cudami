@@ -192,11 +192,11 @@ public class UserServiceImpl implements UserService<UserImpl>, InitializingBean 
     final PasswordsValidatorParams passwordsValidatorParams =
         new PasswordsValidatorParams(password1, password2, user.getPasswordHash());
     String password = passwordsValidatorParams.getPassword1();
-    if (!StringUtils.isEmpty(password)) {
+    if (StringUtils.hasText(password)) {
       passwordsValidator.validate(passwordsValidatorParams, results);
     }
     if (!results.hasErrors()) {
-      if (!StringUtils.isEmpty(password)) {
+      if (StringUtils.hasText(password)) {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String passwordHash = passwordEncoder.encode(password);
         user.setPasswordHash(passwordHash);

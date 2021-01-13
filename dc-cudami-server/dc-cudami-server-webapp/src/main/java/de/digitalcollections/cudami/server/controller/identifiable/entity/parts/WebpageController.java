@@ -145,7 +145,7 @@ public class WebpageController {
       @RequestParam(name = "active", required = false) String active)
       throws IdentifiableServiceException {
     Sorting sorting = null;
-    if (!StringUtils.isEmpty(sortField)) {
+    if (StringUtils.hasText(sortField)) {
       OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
       sorting = new SortingImpl(order);
     }
