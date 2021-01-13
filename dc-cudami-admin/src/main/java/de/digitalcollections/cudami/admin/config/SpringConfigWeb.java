@@ -25,7 +25,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -114,11 +113,6 @@ public class SpringConfigWeb implements WebMvcConfigurer {
   @Bean
   public CreateAdminUserInterceptor createAdminUserInterceptor() {
     return new CreateAdminUserInterceptor();
-  }
-
-  @Override
-  public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
-    configurer.enable();
   }
 
   @Bean
