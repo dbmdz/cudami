@@ -46,12 +46,12 @@ public class PasswordsValidator implements Validator {
     }
 
     String passwordHash = passwords.getPasswordHash();
-    if (StringUtils.isEmpty(passwordHash) && StringUtils.isEmpty(password1)) {
+    if (!StringUtils.hasText(passwordHash) && !StringUtils.hasText(password1)) {
       errors.reject("error.passwords_must_be_filled");
       return;
     }
 
-    if (!StringUtils.isEmpty(password1) && password1.length() < PASSWORD_MIN_LENGTH) {
+    if (StringUtils.hasText(password1) && password1.length() < PASSWORD_MIN_LENGTH) {
       errors.reject(
           "error.password_min_length",
           new Object[] {PASSWORD_MIN_LENGTH},
@@ -59,7 +59,7 @@ public class PasswordsValidator implements Validator {
       return;
     }
 
-    if (!StringUtils.isEmpty(password1) && password1.length() > PASSWORD_MAX_LENGTH) {
+    if (StringUtils.hasText(password1) && password1.length() > PASSWORD_MAX_LENGTH) {
       errors.reject(
           "error.password_max_length",
           new Object[] {PASSWORD_MAX_LENGTH},

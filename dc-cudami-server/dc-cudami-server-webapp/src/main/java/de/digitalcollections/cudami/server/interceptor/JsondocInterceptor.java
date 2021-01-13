@@ -8,10 +8,10 @@ import org.jsondoc.spring.boot.starter.JSONDocProperties;
 import org.jsondoc.springmvc.controller.JSONDocController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
-public class JsondocInterceptor extends HandlerInterceptorAdapter {
+public class JsondocInterceptor implements HandlerInterceptor {
 
   @Autowired private JSONDocProperties jsonDocProperties;
 
@@ -30,6 +30,6 @@ public class JsondocInterceptor extends HandlerInterceptorAdapter {
     final Field basePath = jsonDocController.getClass().getDeclaredField("basePath");
     basePath.setAccessible(true);
     basePath.set(jsonDocController, jsonDocProperties.getBasePath());
-    return super.preHandle(request, response, handler);
+    return true;
   }
 }

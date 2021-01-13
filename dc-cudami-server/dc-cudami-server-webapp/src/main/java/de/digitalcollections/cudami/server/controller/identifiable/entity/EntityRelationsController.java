@@ -41,7 +41,7 @@ public class EntityRelationsController {
       @RequestParam(name = "predicate", required = false) String predicate) {
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
 
-    if (predicate != null && !StringUtils.isEmpty(predicate)) {
+    if (StringUtils.hasText(predicate)) {
       Filtering filtering =
           Filtering.defaultBuilder().filter("predicate").isEquals(predicate).build();
       pageRequest.add(filtering);

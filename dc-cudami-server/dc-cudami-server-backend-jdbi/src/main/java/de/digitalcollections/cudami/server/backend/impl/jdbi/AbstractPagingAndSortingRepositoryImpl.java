@@ -73,7 +73,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
                   })
               .collect(Collectors.joining(","));
 
-      if (!StringUtils.isEmpty(orderBy)) {
+      if (StringUtils.hasText(orderBy)) {
         query.append(" ORDER BY ").append(orderBy);
       }
     }

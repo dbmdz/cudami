@@ -339,7 +339,7 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
    * @return array of text parts
    */
   private String[] splitEqually(String text, int partLength) {
-    if (StringUtils.isEmpty(text) || partLength == 0) {
+    if (!StringUtils.hasText(text) || partLength == 0) {
       return new String[] {text};
     }
 
