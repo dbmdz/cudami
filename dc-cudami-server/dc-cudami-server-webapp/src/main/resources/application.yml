@@ -97,7 +97,9 @@ custom:
     port: 5432
 
 spring:
-  profiles: PROD
+  config:
+    activate:
+      on-profile: PROD
   thymeleaf:
     cache: true
 
@@ -111,8 +113,10 @@ spring:
       - org.springframework.boot.autoconfigure.data.jdbc.JdbcRepositoriesAutoConfiguration
       - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
       - org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration
+  config:
+    activate:
+      on-profile: TEST
   flyway:
     enabled: false
   main:
     allow-bean-definition-overriding: true
-  profiles: TEST
