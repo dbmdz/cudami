@@ -81,7 +81,6 @@
     <version.dc-model>8.1.0</version.dc-model>
     <version.flyway>6.5.7</version.flyway>
     <version.javax.servlet-api>4.0.1</version.javax.servlet-api>
-    <version.json>20200518</version.json>
     <version.junit>5.7.0</version.junit>
     <version.logstash-logback-encoder>6.6</version.logstash-logback-encoder>
     <version.mockito-core>3.7.0</version.mockito-core>
@@ -99,10 +98,16 @@
     <version.maven-surefire-plugin>3.0.0-M5</version.maven-surefire-plugin>
     <version.nexus-staging-maven-plugin>1.6.8</version.nexus-staging-maven-plugin>
     <version.spotbugs-maven-plugin>4.2.0</version.spotbugs-maven-plugin>
+    <version.openjson>1.0.12</version.openjson>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>com.github.openjson</groupId>
+        <artifactId>openjson</artifactId>
+        <version>${version.openjson}</version>
+      </dependency>
       <dependency>
         <groupId>com.github.spotbugs</groupId>
         <artifactId>spotbugs-annotations</artifactId>
@@ -208,11 +213,6 @@
         <groupId>org.flywaydb</groupId>
         <artifactId>flyway-core</artifactId>
         <version>${version.flyway}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.json</groupId>
-        <artifactId>json</artifactId>
-        <version>${version.json}</version>
       </dependency>
       <dependency>
         <groupId>org.junit.jupiter</groupId>
