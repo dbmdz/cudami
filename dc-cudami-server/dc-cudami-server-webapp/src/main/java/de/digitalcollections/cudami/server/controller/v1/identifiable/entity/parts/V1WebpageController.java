@@ -1,6 +1,8 @@
 package de.digitalcollections.cudami.server.controller.v1.identifiable.entity.parts;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.github.openjson.JSONArray;
+import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.WebpageService;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
@@ -17,8 +19,6 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiPathParam;

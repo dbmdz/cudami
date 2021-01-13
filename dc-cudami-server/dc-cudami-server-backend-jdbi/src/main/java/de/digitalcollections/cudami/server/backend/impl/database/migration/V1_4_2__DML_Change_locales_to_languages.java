@@ -1,12 +1,12 @@
 package de.digitalcollections.cudami.server.backend.impl.database.migration;
 
+import com.github.openjson.JSONObject;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.flywaydb.core.internal.jdbc.JdbcTemplate;
-import org.json.JSONObject;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 @SuppressWarnings("checkstyle:typename")

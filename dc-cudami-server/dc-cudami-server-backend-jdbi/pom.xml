@@ -20,6 +20,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.github.openjson</groupId>
+      <artifactId>openjson</artifactId>
+    </dependency>
+    <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-jdbi</artifactId>
       <version>${version.dc-commons-jdbi}</version>
@@ -59,10 +63,6 @@
       <groupId>org.jdbi</groupId>
       <artifactId>jdbi3-sqlobject</artifactId>
       <version>${version.jdbi}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>

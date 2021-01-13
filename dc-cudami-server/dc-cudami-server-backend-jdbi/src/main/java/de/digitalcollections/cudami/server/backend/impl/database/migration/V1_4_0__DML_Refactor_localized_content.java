@@ -1,13 +1,13 @@
 package de.digitalcollections.cudami.server.backend.impl.database.migration;
 
+import com.github.openjson.JSONArray;
+import com.github.openjson.JSONObject;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.flywaydb.core.internal.jdbc.JdbcTemplate;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
