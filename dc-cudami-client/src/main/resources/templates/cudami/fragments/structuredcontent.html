@@ -112,9 +112,11 @@
   </th:block>
 
   <th:block th:if="${block.class.simpleName == 'ParagraphImpl'}">
-    <p>
-      <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
-    </p>
+    <th:block th:if="${block.contentBlocks} AND ${block.contentBlocks.size()} > 0">
+      <p>
+        <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
+      </p>
+    </th:block>
   </th:block>
 
   <th:block th:if="${block.class.simpleName == 'TableCellImpl'}" th:with="attr=${block.attributes}">
