@@ -1,11 +1,14 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable;
 
+import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
+import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
+import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,21 +16,29 @@ public interface IdentifiableRepository<I extends Identifiable> {
 
   long count();
 
+  void delete(UUID uuid);
+
   PageResponse<I> find(PageRequest pageRequest);
 
   SearchPageResponse<I> find(SearchPageRequest searchPageRequest);
 
-  List<I> find(String searchTerm, int maxResults);
-
-  I findOneByIdentifier(String namespace, String id);
+  default List<I> find(String searchTerm, int maxResults) {
+    SearchPageRequestImpl request = new SearchPageRequestImpl(searchTerm, 0, maxResults, null);
+    SearchPageResponse<I> response = find(request);
+    return response.getContent();
+  }
 
   I findOne(Identifier identifier);
 
   I findOne(UUID uuid);
 
+  I findOne(UUID uuid, Filtering filtering);
+  
+  default I findOneByIdentifier(String namespace, String id) {
+    return findOne(new IdentifierImpl(null, namespace, id));
+  }
+
   I save(I identifiable);
 
   I update(I identifiable);
-
-  void delete(UUID uuid);
 }

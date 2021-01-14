@@ -1,67 +1,78 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
+import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierRepositoryImpl.SQL_FULL_IDENTIFIER_FIELDS_ID;
+import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl.SQL_PREVIEW_IMAGE_FIELDS_PI;
+
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSortingRepositoryImpl;
+import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.api.paging.enums.Direction;
 import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
-import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
 import de.digitalcollections.model.impl.paging.SearchPageResponseImpl;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
-import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
+import org.jdbi.v3.core.result.RowView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class IdentifiableRepositoryImpl<I extends Identifiable>
-    extends AbstractPagingAndSortingRepositoryImpl implements IdentifiableRepository<I> {
+public class IdentifiableRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl
+    implements IdentifiableRepository<Identifiable> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableRepositoryImpl.class);
 
-  // select all details shown/needed in single object details page
-  private static final String FIND_ONE_BASE_SQL =
-      "SELECT i.uuid i_uuid, i.label i_label, i.description i_description,"
-          + " i.identifiable_type i_type,"
-          + " i.created i_created, i.last_modified i_last_modified,"
-          + " i.preview_hints i_previewImageRenderingHints,"
-          + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
-          + " FROM identifiables as i"
-          + " LEFT JOIN identifiers as id on i.uuid = id.identifiable"
-          + " LEFT JOIN fileresources_image as file on i.previewfileresource = file.uuid";
+  public static final String SQL_REDUCED_IDENTIFIABLE_FIELDS_IDF =
+      " i.uuid idf_uuid, i.label idf_label,"
+          + " i.identifiable_type idf_type,"
+          + " i.created idf_created, i.last_modified idf_lastModified,"
+          + " i.preview_hints idf_previewImageRenderingHints";
 
-  // select only what is shown/needed in paged list (to avoid unnecessary payload/traffic):
-  private static final String REDUCED_FIND_ONE_BASE_SQL =
-      "SELECT i.uuid i_uuid, i.label i_label, i.description i_description,"
-          + " i.identifiable_type i_type,"
-          + " i.created i_created, i.last_modified i_lastModified,"
-          + " i.preview_hints i_previewImageRenderingHints,"
-          + " file.uuid f_uuid, file.uri f_uri, file.filename f_filename, file.http_base_url f_httpBaseUrl"
-          + " FROM identifiables as i"
-          + " LEFT JOIN fileresources_image as file on i.previewfileresource = file.uuid";
+  public static final String SQL_FULL_IDENTIFIABLE_FIELDS_IDF =
+      SQL_REDUCED_IDENTIFIABLE_FIELDS_IDF + ", i.description idf_description";
 
-  protected Jdbi dbi;
-  protected final IdentifierRepository identifierRepository;
+  public static BiFunction<
+          LinkedHashMap<UUID, Identifiable>, RowView, LinkedHashMap<UUID, Identifiable>>
+      mapRowToIdentifiable(boolean withIdentifiers, boolean withPreviewImage) {
+    return (map, rowView) -> {
+      Identifiable identifiable =
+          map.computeIfAbsent(
+              rowView.getColumn("idf_uuid", UUID.class),
+              fn -> {
+                return rowView.getRow(IdentifiableImpl.class);
+              });
+
+      if (withPreviewImage && rowView.getColumn("pi_uuid", UUID.class) != null) {
+        identifiable.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+      }
+      if (withIdentifiers && rowView.getColumn("id_uuid", UUID.class) != null) {
+        Identifier dbIdentifier = rowView.getRow(IdentifierImpl.class);
+        identifiable.addIdentifier(dbIdentifier);
+      }
+      return map;
+    };
+  }
+
+  private final Jdbi dbi;
+  private final IdentifierRepository identifierRepository;
 
   @Autowired
   public IdentifiableRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
@@ -71,288 +82,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
   @Override
   public long count() {
-    String sql = "SELECT count(*) FROM identifiables";
+    final String sql = "SELECT count(*) FROM identifiables";
     long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
     return count;
-  }
-
-  protected void deleteIdentifiers(Identifiable identifiable) {
-    dbi.withHandle(
-        h ->
-            h.createUpdate("DELETE FROM identifiers WHERE identifiable = :uuid")
-                .bind("uuid", identifiable.getUuid())
-                .execute());
-  }
-
-  @Override
-  public PageResponse<I> find(PageRequest pageRequest) {
-    StringBuilder query = new StringBuilder(REDUCED_FIND_ONE_BASE_SQL);
-    addPageRequestParams(pageRequest, query);
-
-    List<Identifiable> result =
-        new ArrayList(
-            dbi.withHandle(
-                h ->
-                    h.createQuery(query.toString())
-                        .registerRowMapper(BeanMapper.factory(IdentifiableImpl.class, "i"))
-                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                        .reduceRows(
-                            new LinkedHashMap<UUID, IdentifiableImpl>(),
-                            (map, rowView) -> {
-                              IdentifiableImpl identifiable =
-                                  map.computeIfAbsent(
-                                      rowView.getColumn("i_uuid", UUID.class),
-                                      fn -> {
-                                        return rowView.getRow(IdentifiableImpl.class);
-                                      });
-
-                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                identifiable.setPreviewImage(
-                                    rowView.getRow(ImageFileResourceImpl.class));
-                              }
-                              return map;
-                            })
-                        .values()));
-    long total = count();
-    PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
-    return pageResponse;
-  }
-
-  @Override
-  public SearchPageResponse<I> find(SearchPageRequest searchPageRequest) {
-    // TODO make dependend from language the user has chosen...
-    Sorting sorting =
-        Sorting.defaultBuilder().order(new OrderImpl(Direction.DESC, "lastModified")).build();
-    searchPageRequest.setSorting(sorting);
-
-    // select only what is shown/needed in paged result list:
-    StringBuilder query =
-        new StringBuilder(
-            "SELECT i.uuid i_uuid, i.label i_label, i.description i_description,"
-                + " i.identifiable_type i_identifiableType,"
-                + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
-                + " FROM identifiables as i"
-                + " LEFT JOIN fileresources_image as file on i.previewfileresource = file.uuid"
-                + " LEFT JOIN LATERAL jsonb_object_keys(i.label) l(keys) on i.label is not null"
-                + " LEFT JOIN LATERAL jsonb_object_keys(i.description) d(keys) on i.description is not null"
-                + " WHERE (i.label->>l.keys ilike '%' || :searchTerm || '%'"
-                + " OR i.description->>d.keys ilike '%' || :searchTerm || '%')");
-    // visible, yet...
-    addPageRequestParams(searchPageRequest, query);
-
-    List<Identifiable> result =
-        new ArrayList(
-            dbi.withHandle(
-                h ->
-                    h.createQuery(query.toString())
-                        .bind("searchTerm", searchPageRequest.getQuery())
-                        .registerRowMapper(BeanMapper.factory(IdentifiableImpl.class, "i"))
-                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                        .reduceRows(
-                            new LinkedHashMap<UUID, Identifiable>(),
-                            (map, rowView) -> {
-                              Identifiable identifiable =
-                                  map.computeIfAbsent(
-                                      rowView.getColumn("i_uuid", UUID.class),
-                                      uuid -> rowView.getRow(IdentifiableImpl.class));
-                              if (rowView.getColumn("f_uri", String.class) != null) {
-                                identifiable.setPreviewImage(
-                                    rowView.getRow(ImageFileResourceImpl.class));
-                              }
-                              return map;
-                            })
-                        .values()));
-
-    String countQuery =
-        "SELECT count(*) FROM identifiables as i"
-            + " LEFT JOIN LATERAL jsonb_object_keys(i.label) l(keys) on i.label is not null"
-            + " LEFT JOIN LATERAL jsonb_object_keys(i.description) d(keys) on i.description is not null"
-            + " WHERE (i.label->>l.keys ilike '%' || :searchTerm || '%'"
-            + " OR i.description->>d.keys ilike '%' || :searchTerm || '%')";
-    // yet...;
-    long total =
-        dbi.withHandle(
-            h ->
-                h.createQuery(countQuery)
-                    .bind("searchTerm", searchPageRequest.getQuery())
-                    .mapTo(Long.class)
-                    .findOne()
-                    .get());
-
-    SearchPageResponse pageResponse = new SearchPageResponseImpl(result, searchPageRequest, total);
-    return pageResponse;
-  }
-
-  @Override
-  public List<I> find(String searchTerm, int maxResults) {
-    // TODO: think about using GIN (but seems not to support like queries...)
-    // see: https://bitnine.net/blog-postgresql/postgresql-internals-jsonb-type-and-its-indexes/
-    // see: https://www.postgresql.org/docs/10/datatype-json.html
-    StringBuilder query =
-        new StringBuilder(
-            "SELECT uuid, label, description, identifiable_type FROM identifiables WHERE (label::text) ILIKE '%' || :searchTerm || '%'");
-    query.append(" LIMIT :maxResults");
-
-    List<I> result =
-        dbi.withHandle(
-            h ->
-                h
-                    .createQuery(query.toString())
-                    .bind("searchTerm", searchTerm)
-                    .bind("maxResults", maxResults)
-                    .mapToBean(IdentifiableImpl.class)
-                    .stream()
-                    .map(s -> (I) s)
-                    .collect(Collectors.toList()));
-    return result;
-  }
-
-  @Override
-  public I findOne(UUID uuid) {
-    String query = FIND_ONE_BASE_SQL + " WHERE i.uuid = :uuid";
-
-    IdentifiableImpl result =
-        dbi.withHandle(
-                h ->
-                    h.createQuery(query)
-                        .bind("uuid", uuid)
-                        .registerRowMapper(BeanMapper.factory(IdentifiableImpl.class, "i"))
-                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                        .reduceRows(
-                            new LinkedHashMap<UUID, IdentifiableImpl>(),
-                            (map, rowView) -> {
-                              IdentifiableImpl identifiable =
-                                  map.computeIfAbsent(
-                                      rowView.getColumn("i_uuid", UUID.class),
-                                      fn -> {
-                                        return rowView.getRow(IdentifiableImpl.class);
-                                      });
-
-                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                identifiable.setPreviewImage(
-                                    rowView.getRow(ImageFileResourceImpl.class));
-                              }
-
-                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
-                                IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
-                                identifiable.addIdentifier(identifier);
-                              }
-
-                              return map;
-                            }))
-            .get(uuid);
-    return (I) result;
-  }
-
-  @Override
-  public I findOne(Identifier identifier) {
-    if (identifier.getIdentifiable() != null) {
-      return findOne(identifier.getIdentifiable());
-    }
-
-    String namespace = identifier.getNamespace();
-    String identifierId = identifier.getId();
-
-    String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
-
-    Optional<IdentifiableImpl> result =
-        dbi
-            .withHandle(
-                h ->
-                    h.createQuery(query)
-                        .bind("id", identifierId)
-                        .bind("namespace", namespace)
-                        .registerRowMapper(BeanMapper.factory(IdentifiableImpl.class, "i"))
-                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                        .reduceRows(
-                            new LinkedHashMap<UUID, IdentifiableImpl>(),
-                            (map, rowView) -> {
-                              IdentifiableImpl identifiable =
-                                  map.computeIfAbsent(
-                                      rowView.getColumn("i_uuid", UUID.class),
-                                      fn -> {
-                                        return rowView.getRow(IdentifiableImpl.class);
-                                      });
-
-                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                identifiable.setPreviewImage(
-                                    rowView.getRow(ImageFileResourceImpl.class));
-                              }
-
-                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
-                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
-                                identifiable.addIdentifier(dbIdentifier);
-                              }
-
-                              return map;
-                            }))
-            .values()
-            .stream()
-            .findFirst();
-    return (I) result.orElse(null);
-  }
-
-  @Override
-  public I findOneByIdentifier(String namespace, String id) {
-    return findOne(new IdentifierImpl(null, namespace, id));
-  }
-
-  @Override
-  public I save(I identifiable) {
-    throw new UnsupportedOperationException(
-        "use save of specific/inherited identifiable repository");
-  }
-
-  protected void saveIdentifiers(Set<Identifier> identifiers, Identifiable identifiable) {
-    // we assume that identifiers (unique to object) are new (existing ones were deleted before
-    // (e.g. see update))
-    if (identifiers != null) {
-      for (Identifier identifier : identifiers) {
-        identifier.setIdentifiable(identifiable.getUuid());
-        identifierRepository.save(identifier);
-      }
-    }
-  }
-
-  @Override
-  public I update(I identifiable) {
-    throw new UnsupportedOperationException(
-        "use update of specific/inherited identifiable repository");
-  }
-
-  protected Integer selectNextSortIndexForParentChildren(
-      Jdbi dbi, String tableName, String columNameParentUuid, UUID parentUuid) {
-    // first child: max gets no results (= null)):
-    Integer sortIndex =
-        dbi.withHandle(
-            (Handle h) ->
-                h.createQuery(
-                        "SELECT MAX(sortIndex) + 1 FROM "
-                            + tableName
-                            + " WHERE "
-                            + columNameParentUuid
-                            + " = :parent_uuid")
-                    .bind("parent_uuid", parentUuid)
-                    .mapTo(Integer.class)
-                    .findOne()
-                    .orElse(null));
-    if (sortIndex == null) {
-      return 0;
-    }
-    return sortIndex;
-  }
-
-  protected int getIndex(List<? extends Identifiable> list, Identifiable identifiable) {
-    int pos = -1;
-    for (Identifiable idf : list) {
-      pos += 1;
-      if (idf.getUuid().equals(identifiable.getUuid())) {
-        return pos;
-      }
-    }
-    return -1;
   }
 
   @Override
@@ -362,6 +94,186 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
             h.createUpdate("DELETE FROM identifiables WHERE uuid = :uuid")
                 .bind("uuid", uuid)
                 .execute());
+  }
+
+  @Override
+  public PageResponse<Identifiable> find(PageRequest pageRequest) {
+    StringBuilder innerQuery = new StringBuilder("SELECT * FROM identifiables AS i");
+    addFiltering(pageRequest, innerQuery);
+    addPageRequestParams(pageRequest, innerQuery);
+
+    final String sql =
+        "SELECT"
+            + SQL_REDUCED_IDENTIFIABLE_FIELDS_IDF
+            + ","
+            + SQL_PREVIEW_IMAGE_FIELDS_PI
+            + " FROM ("
+            + innerQuery
+            + ") AS i"
+            + " LEFT JOIN fileresources_image AS file ON i.previewfileresource = file.uuid";
+
+    List<Identifiable> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(sql)
+                        .registerRowMapper(BeanMapper.factory(IdentifiableImpl.class, "idf"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, Identifiable>(),
+                            mapRowToIdentifiable(false, true)))
+            .values()
+            .stream()
+            .collect(Collectors.toList());
+
+    StringBuilder sqlCount = new StringBuilder("SELECT count(*) FROM identifiables AS i");
+    addFiltering(pageRequest, sqlCount);
+    long total =
+        dbi.withHandle(h -> h.createQuery(sqlCount.toString()).mapTo(Long.class).findOne().get());
+    return new PageResponseImpl<>(result, pageRequest, total);
+  }
+
+  @Override
+  public SearchPageResponse<Identifiable> find(SearchPageRequest searchPageRequest) {
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM identifiables AS i"
+                + " LEFT JOIN LATERAL jsonb_object_keys(i.label) l(keys) ON i.label IS NOT null"
+                + " LEFT JOIN LATERAL jsonb_object_keys(i.description) d(keys) on i.description is not null"
+                + " WHERE (i.label->>l.keys ILIKE '%' || :searchTerm || '%'"
+                + " OR i.description->>d.keys ilike '%' || :searchTerm || '%')");
+    addFiltering(searchPageRequest, innerQuery);
+    addPageRequestParams(searchPageRequest, innerQuery);
+
+    final String sql =
+        "SELECT"
+            + SQL_REDUCED_IDENTIFIABLE_FIELDS_IDF
+            + ","
+            + SQL_PREVIEW_IMAGE_FIELDS_PI
+            + " FROM ("
+            + innerQuery
+            + ") AS i"
+            + " LEFT JOIN fileresources_image AS file ON i.previewfileresource = file.uuid";
+
+    List<Identifiable> result =
+        dbi.withHandle(
+            h ->
+                h
+                    .createQuery(sql)
+                    .bind("searchTerm", searchPageRequest.getQuery())
+                    .registerRowMapper(BeanMapper.factory(IdentifiableImpl.class, "col"))
+                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
+                    .reduceRows(
+                        new LinkedHashMap<UUID, Identifiable>(), mapRowToIdentifiable(false, true))
+                    .values()
+                    .stream()
+                    .collect(Collectors.toList()));
+
+    StringBuilder countQuery =
+        new StringBuilder(
+            "SELECT count(*) FROM identifiables AS i"
+                + " LEFT JOIN LATERAL jsonb_object_keys(i.label) l(keys) ON i.label IS NOT null"
+                + " LEFT JOIN LATERAL jsonb_object_keys(i.description) d(keys) on i.description is not null"
+                + " WHERE (i.label->>l.keys ILIKE '%' || :searchTerm || '%'"
+                + " OR i.description->>d.keys ilike '%' || :searchTerm || '%')");
+    addFiltering(searchPageRequest, countQuery);
+    long total =
+        dbi.withHandle(
+            h ->
+                h.createQuery(countQuery.toString())
+                    .bind("searchTerm", searchPageRequest.getQuery())
+                    .mapTo(Long.class)
+                    .findOne()
+                    .get());
+
+    return new SearchPageResponseImpl<>(result, searchPageRequest, total);
+  }
+
+  @Override
+  public Identifiable findOne(UUID uuid) {
+    return findOne(uuid, null);
+  }
+
+  @Override
+  public Identifiable findOne(UUID uuid, Filtering filtering) {
+    StringBuilder innerQuery =
+        new StringBuilder("SELECT * FROM identifiables AS i" + " WHERE i.uuid = :uuid");
+    addFiltering(filtering, innerQuery);
+
+    final String sql =
+        "SELECT"
+            + SQL_FULL_IDENTIFIABLE_FIELDS_IDF
+            + ","
+            + SQL_FULL_IDENTIFIER_FIELDS_ID
+            + ","
+            + SQL_PREVIEW_IMAGE_FIELDS_PI
+            + " FROM ("
+            + innerQuery
+            + ") AS i"
+            + " LEFT JOIN identifiers AS id ON i.uuid = id.identifiable"
+            + " LEFT JOIN fileresources_image AS file ON i.previewfileresource = file.uuid";
+
+    Identifiable result =
+        dbi.withHandle(
+                h ->
+                    h.createQuery(sql)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(IdentifiableImpl.class, "idf"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, Identifiable>(),
+                            mapRowToIdentifiable(true, true)))
+            .get(uuid);
+
+    return result;
+  }
+
+  @Override
+  public Identifiable findOne(Identifier identifier) {
+    if (identifier.getIdentifiable() != null) {
+      return findOne(identifier.getIdentifiable());
+    }
+
+    String namespace = identifier.getNamespace();
+    String identifierId = identifier.getId();
+
+    String innerQuery =
+        "SELECT * FROM identifiables AS i"
+            + " LEFT JOIN identifiers AS id ON i.uuid = id.identifiable"
+            + " WHERE id.identifier = :id AND id.namespace = :namespace";
+
+    final String sql =
+        "SELECT"
+            + SQL_FULL_IDENTIFIABLE_FIELDS_IDF
+            + ","
+            + SQL_FULL_IDENTIFIER_FIELDS_ID
+            + ","
+            + SQL_PREVIEW_IMAGE_FIELDS_PI
+            + " FROM ("
+            + innerQuery
+            + ") AS i"
+            + " LEFT JOIN identifiers AS id ON i.uuid = id.identifiable"
+            + " LEFT JOIN fileresources_image AS file ON i.previewfileresource = file.uuid";
+
+    Optional<Identifiable> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(sql)
+                        .bind("id", identifierId)
+                        .bind("namespace", namespace)
+                        .registerRowMapper(BeanMapper.factory(IdentifiableImpl.class, "idf"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, Identifiable>(),
+                            mapRowToIdentifiable(true, true)))
+            .values()
+            .stream()
+            .findFirst();
+
+    return result.orElse(null);
   }
 
   @Override
@@ -384,5 +296,37 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
       default:
         return null;
     }
+  }
+
+  public int getIndex(List<? extends Identifiable> list, Identifiable identifiable) {
+    int pos = -1;
+    for (Identifiable idf : list) {
+      pos += 1;
+      if (idf.getUuid().equals(identifiable.getUuid())) {
+        return pos;
+      }
+    }
+    return -1;
+  }
+
+  @Override
+  public Identifiable save(Identifiable identifiable) {
+    throw new UnsupportedOperationException("Use save of specific identifiable repository!");
+  }
+
+  public void saveIdentifiers(Set<Identifier> identifiers, Identifiable identifiable) {
+    // we assume that identifiers (unique to object) are new (existing ones were deleted before
+    // (e.g. see update))
+    if (identifiers != null) {
+      for (Identifier identifier : identifiers) {
+        identifier.setIdentifiable(identifiable.getUuid());
+        identifierRepository.save(identifier);
+      }
+    }
+  }
+
+  @Override
+  public Identifiable update(Identifiable identifiable) {
+    throw new UnsupportedOperationException("Use update of specific identifiable repository!");
   }
 }

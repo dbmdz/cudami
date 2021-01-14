@@ -39,6 +39,15 @@ public class EntityRelationsRepositoryImpl extends AbstractPagingAndSortingRepos
   }
 
   @Override
+  public void deleteBySubject(UUID subjectEntityUuid) {
+    dbi.withHandle(
+        h ->
+            h.createUpdate("DELETE FROM rel_entity_entities WHERE subject_uuid = :uuid")
+                .bind("uuid", subjectEntityUuid)
+                .execute());
+  }
+
+  @Override
   public PageResponse<EntityRelation> find(PageRequest pageRequest) {
     StringBuilder query =
         new StringBuilder(
@@ -75,6 +84,34 @@ public class EntityRelationsRepositoryImpl extends AbstractPagingAndSortingRepos
   }
 
   @Override
+  public List<EntityRelation> findBySubject(UUID subjectEntityUuid) {
+    Entity subjectEntity = entityRepository.findOne(subjectEntityUuid);
+    if (subjectEntity == null) {
+      return null;
+    }
+    return findBySubject(subjectEntity);
+  }
+
+  @Override
+  public List<EntityRelation> findBySubject(Entity subjectEntity) {
+    // query predicate and object entity (subject entity is given)
+    String query =
+        "SELECT rel.predicate as predicate, e.uuid as uuid, e.refid e_refId, e.created as created, e.description as description, e.identifiable_type as identifiable_type, e.label as label, e.last_modified as last_modified, e.entity_type as entity_type"
+            + " FROM rel_entity_entities rel"
+            + " INNER JOIN entities e ON rel.object_uuid=e.uuid"
+            + " WHERE rel.subject_uuid = :uuid";
+
+    List<EntityRelation> result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(query)
+                    .bind("uuid", subjectEntity.getUuid())
+                    .map(new EntityRelationMapper(subjectEntity))
+                    .list());
+    return result;
+  }
+
+  @Override
   protected String[] getAllowedOrderByFields() {
     return new String[] {"subject", "predicate", "object"};
   }
@@ -94,6 +131,18 @@ public class EntityRelationsRepositoryImpl extends AbstractPagingAndSortingRepos
       default:
         return null;
     }
+  }
+
+  @Override
+  public void save(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid) {
+    dbi.withHandle(
+        h ->
+            h.createUpdate(
+                    "INSERT INTO rel_entity_entities(subject_uuid, predicate, object_uuid) VALUES (:subject_uuid, :predicate, :object_uuid)")
+                .bind("subject_uuid", subjectEntityUuid)
+                .bind("predicate", predicate)
+                .bind("object_uuid", objectEntityUuid)
+                .execute());
   }
 
   @Override
