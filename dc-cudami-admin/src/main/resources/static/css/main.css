@@ -7,8 +7,7 @@ a[href^="http"]:not(.no-external):after {
 }
 
 body {
-  min-height: 75rem;
-  padding-top: 4.5rem;
+  padding: 4.5rem 0 1rem;
 }
 
 .card-deck > .card {
