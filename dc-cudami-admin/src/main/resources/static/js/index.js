@@ -26,3 +26,32 @@ function addLanguageChangeHandler() {
     $('#edit-button').attr('href', editUrl.join('?'))
   })
 }
+
+function moveEditButtonToNavbar() {
+  var navbar = document.querySelector('.navbar')
+  var editButton = document.getElementById('edit-button')
+  var editButtonInNavbar = document.createElement('li')
+  editButtonInNavbar.classList.add('border-left', 'ml-2', 'nav-item', 'pl-3')
+  editButtonInNavbar.innerHTML = `<a class="btn btn-secondary" href="${editButton.getAttribute(
+    'href'
+  )}">${editButton.innerText}</a>`
+  var observer = new IntersectionObserver(
+    (entry, _) => {
+      var inView = entry[0].isIntersecting && entry[0].intersectionRatio >= 1
+      if (inView) {
+        editButton.classList.add('visible')
+        editButton.classList.remove('invisible')
+        editButtonInNavbar.remove()
+      } else {
+        editButton.classList.add('invisible')
+        editButton.classList.remove('visible')
+        navbar.querySelector('.navbar-nav').appendChild(editButtonInNavbar)
+      }
+    },
+    {
+      rootMargin: `-${navbar.offsetHeight}px 0px 0px 0px`,
+      threshold: 1,
+    }
+  )
+  observer.observe(editButton)
+}
