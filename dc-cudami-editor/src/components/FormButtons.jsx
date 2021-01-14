@@ -1,23 +1,27 @@
+import classNames from 'classnames'
 import React from 'react'
 import {Button, ButtonGroup, NavItem} from 'reactstrap'
 import {createPortal} from 'react-dom'
 import {useTranslation} from 'react-i18next'
 import {useInView} from 'react-intersection-observer'
 
-const FormButtonsInNavbar = ({buttons}) => {
+const FormButtonsInNavbar = ({buttons, navbar}) => {
   return createPortal(
     <NavItem className="border-left ml-2 pl-3">{buttons}</NavItem>,
-    document.querySelector('.navbar-nav')
+    navbar.querySelector('.navbar-nav')
   )
 }
 
 const FormButtons = ({formId}) => {
+  const navbar = document.querySelector('.navbar')
   const {inView, ref} = useInView({
     delay: 100,
     initialInView: true,
+    rootMargin: `-${navbar.offsetHeight}px 0px 0px 0px`,
     threshold: 1,
     trackVisibility: true,
   })
+
   const {t} = useTranslation()
   const buttons = (
     <ButtonGroup>
@@ -26,10 +30,15 @@ const FormButtons = ({formId}) => {
       </Button>
     </ButtonGroup>
   )
+  const classes = classNames({
+    'float-right': true,
+    invisible: !inView,
+    visible: inView,
+  })
   return (
     <>
-      {!inView && <FormButtonsInNavbar buttons={buttons} />}
-      <div className="float-right" ref={ref}>
+      {!inView && <FormButtonsInNavbar buttons={buttons} navbar={navbar} />}
+      <div className={classes} ref={ref}>
         {buttons}
       </div>
     </>
