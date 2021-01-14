@@ -48,8 +48,6 @@ public interface CollectionRepository
 
   boolean addDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects);
 
-  Collection findOne(UUID uuid, Filtering filtering);
-
   @Override
   default List<Collection> getChildren(Collection collection) {
     if (collection == null) {

@@ -9,6 +9,9 @@ import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CollectionRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSortingRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.filter.FilterCriterion;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.Identifier;
@@ -16,6 +19,7 @@ import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
@@ -39,6 +43,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.jdbi.v3.core.result.RowView;
@@ -49,7 +54,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
+public class CollectionRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl
     implements CollectionRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionRepositoryImpl.class);
@@ -66,13 +71,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
   public static BiFunction<
           LinkedHashMap<UUID, Collection>, RowView, LinkedHashMap<UUID, Collection>>
-      mapRowToCollection() {
-    return mapRowToCollection(false);
-  }
-
-  public static BiFunction<
-          LinkedHashMap<UUID, Collection>, RowView, LinkedHashMap<UUID, Collection>>
-      mapRowToCollection(boolean withIdentifiers) {
+      mapRowToCollection(boolean withIdentifiers, boolean withPreviewImage) {
     return (map, rowView) -> {
       Collection collection =
           map.computeIfAbsent(
@@ -81,7 +80,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                 return rowView.getRow(CollectionImpl.class);
               });
 
-      if (rowView.getColumn("pi_uuid", UUID.class) != null) {
+      if (withPreviewImage && rowView.getColumn("pi_uuid", UUID.class) != null) {
         collection.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
       }
       if (withIdentifiers && rowView.getColumn("id_uuid", UUID.class) != null) {
@@ -92,9 +91,21 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     };
   }
 
+  private final Jdbi dbi;
+  private final EntityRepository entityRepository;
+  private final IdentifierRepository identifierRepository;
+  private final IdentifiableRepositoryImpl identifiableRepositoryImpl;
+
   @Autowired
-  public CollectionRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(dbi, identifierRepository);
+  public CollectionRepositoryImpl(
+      Jdbi dbi,
+      IdentifierRepository identifierRepository,
+      IdentifiableRepositoryImpl identifiableRepositoryImpl,
+      EntityRepository entityRepository) {
+    this.dbi = dbi;
+    this.entityRepository = entityRepository;
+    this.identifierRepository = identifierRepository;
+    this.identifiableRepositoryImpl = identifiableRepositoryImpl;
   }
 
   @Override
@@ -103,8 +114,15 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
       return false;
     }
     Integer nextSortIndex =
-        selectNextSortIndexForParentChildren(
-            dbi, "collection_collections", "parent_collection_uuid", parentUuid);
+        dbi.withHandle(
+            (Handle h) ->
+                h.createQuery(
+                        "SELECT MAX(sortIndex) + 1 FROM collection_collections"
+                            + " WHERE parent_collection_uuid = :parent_uuid")
+                    .bind("parent_uuid", parentUuid)
+                    .mapTo(Integer.class)
+                    .findOne()
+                    .orElse(0));
     dbi.useHandle(
         handle -> {
           PreparedBatch preparedBatch =
@@ -116,7 +134,9 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                 preparedBatch
                     .bind("parentCollectionUuid", parentUuid)
                     .bind("childCollectionUuid", child.getUuid())
-                    .bind("sortIndex", nextSortIndex + getIndex(children, child))
+                    .bind(
+                        "sortIndex",
+                        nextSortIndex + identifiableRepositoryImpl.getIndex(children, child))
                     .add();
               });
           preparedBatch.execute();
@@ -127,10 +147,16 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   @Override
   public boolean addDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects) {
     if (collectionUuid != null && digitalObjects != null) {
-      // get max sortIndex of existing
       Integer nextSortIndex =
-          selectNextSortIndexForParentChildren(
-              dbi, "collection_digitalobjects", "collection_uuid", collectionUuid);
+          dbi.withHandle(
+              (Handle h) ->
+                  h.createQuery(
+                          "SELECT MAX(sortIndex) + 1 FROM collection_digitalobjects"
+                              + " WHERE collection_uuid = :parent_uuid")
+                      .bind("parent_uuid", collectionUuid)
+                      .mapTo(Integer.class)
+                      .findOne()
+                      .orElse(0));
 
       // save relation to collection
       dbi.useHandle(
@@ -143,7 +169,10 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                   preparedBatch
                       .bind("uuid", collectionUuid)
                       .bind("digitalObjectUuid", digitalObject.getUuid())
-                      .bind("sortIndex", nextSortIndex + getIndex(digitalObjects, digitalObject))
+                      .bind(
+                          "sortIndex",
+                          nextSortIndex
+                              + identifiableRepositoryImpl.getIndex(digitalObjects, digitalObject))
                       .add();
                 });
             preparedBatch.execute();
@@ -154,10 +183,24 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
+  public void addRelatedFileresource(UUID entityUuid, UUID fileResourceUuid) {
+    entityRepository.addRelatedFileresource(entityUuid, fileResourceUuid);
+  }
+
+  @Override
   public long count() {
     final String sql = "SELECT count(*) FROM collections";
     long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
     return count;
+  }
+
+  @Override
+  public void delete(UUID uuid) {
+    dbi.withHandle(
+        h ->
+            h.createUpdate("DELETE FROM collections WHERE uuid = :uuid")
+                .bind("uuid", uuid)
+                .execute());
   }
 
   @Override
@@ -175,6 +218,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + innerQuery
             + ") AS c"
             + " LEFT JOIN fileresources_image AS file ON c.previewfileresource = file.uuid";
+
     List<Collection> result =
         dbi
             .withHandle(
@@ -182,7 +226,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                     h.createQuery(sql)
                         .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "col"))
                         .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
-                        .reduceRows(new LinkedHashMap<UUID, Collection>(), mapRowToCollection()))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, Collection>(), mapRowToCollection(false, true)))
             .values()
             .stream()
             .collect(Collectors.toList());
@@ -223,7 +268,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                     .bind("searchTerm", searchPageRequest.getQuery())
                     .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "col"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
-                    .reduceRows(new LinkedHashMap<UUID, Collection>(), mapRowToCollection())
+                    .reduceRows(
+                        new LinkedHashMap<UUID, Collection>(), mapRowToCollection(false, true))
                     .values()
                     .stream()
                     .collect(Collectors.toList()));
@@ -247,8 +293,71 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
+  public List<Collection> findAllReduced() {
+    final String sql =
+        "SELECT"
+            + SQL_REDUCED_COLLECTION_FIELDS_COL
+            + ","
+            + SQL_FULL_IDENTIFIER_FIELDS_ID
+            + " FROM collections AS c"
+            + " LEFT JOIN identifiers AS id ON c.uuid = id.identifiable";
+
+    List<Collection> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(sql)
+                        .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "col"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, Collection>(), mapRowToCollection(true, false)))
+            .values()
+            .stream()
+            .collect(Collectors.toList());
+    return result;
+  }
+
+  @Override
   public Collection findOne(UUID uuid) {
     return findOne(uuid, null);
+  }
+
+  @Override
+  public Collection findOne(UUID uuid, Filtering filtering) {
+    StringBuilder innerQuery =
+        new StringBuilder("SELECT * FROM collections AS c" + " WHERE c.uuid = :uuid");
+    addFiltering(filtering, innerQuery);
+
+    final String sql =
+        "SELECT"
+            + SQL_FULL_COLLECTION_FIELDS_COL
+            + ","
+            + SQL_FULL_IDENTIFIER_FIELDS_ID
+            + ","
+            + SQL_PREVIEW_IMAGE_FIELDS_PI
+            + " FROM ("
+            + innerQuery
+            + ") AS c"
+            + " LEFT JOIN identifiers AS id ON c.uuid = id.identifiable"
+            + " LEFT JOIN fileresources_image AS file ON c.previewfileresource = file.uuid";
+
+    Collection result =
+        dbi.withHandle(
+                h ->
+                    h.createQuery(sql)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "col"))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, Collection>(), mapRowToCollection(true, true)))
+            .get(uuid);
+
+    if (result != null) {
+      // TODO could be replaced with another join in above query...
+      result.setChildren(getChildren(result));
+    }
+    return result;
   }
 
   @Override
@@ -289,7 +398,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                         .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                         .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
                         .reduceRows(
-                            new LinkedHashMap<UUID, Collection>(), mapRowToCollection(true)))
+                            new LinkedHashMap<UUID, Collection>(), mapRowToCollection(true, true)))
             .values()
             .stream()
             .findFirst();
@@ -303,10 +412,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public Collection findOne(UUID uuid, Filtering filtering) {
-    StringBuilder innerQuery =
-        new StringBuilder("SELECT * FROM collections AS c" + " WHERE c.uuid = :uuid");
-    addFiltering(filtering, innerQuery);
+  public Collection findOneByRefId(long refId) {
+    String innerQuery = "SELECT * FROM collections AS c" + " WHERE c.refid = :refId";
 
     final String sql =
         "SELECT"
@@ -322,16 +429,20 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + " LEFT JOIN fileresources_image AS file ON c.previewfileresource = file.uuid";
 
     Collection result =
-        dbi.withHandle(
+        dbi
+            .withHandle(
                 h ->
                     h.createQuery(sql)
-                        .bind("uuid", uuid)
+                        .bind("refId", refId)
                         .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "col"))
                         .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                         .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
                         .reduceRows(
-                            new LinkedHashMap<UUID, Collection>(), mapRowToCollection(true)))
-            .get(uuid);
+                            new LinkedHashMap<UUID, Collection>(), mapRowToCollection(true, true)))
+            .values()
+            .stream()
+            .findFirst()
+            .orElse(null);
 
     if (result != null) {
       // TODO could be replaced with another join in above query...
@@ -425,7 +536,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                     .bind("uuid", uuid)
                     .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "col"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
-                    .reduceRows(new LinkedHashMap<UUID, Collection>(), mapRowToCollection())
+                    .reduceRows(
+                        new LinkedHashMap<UUID, Collection>(), mapRowToCollection(false, true))
                     .values()
                     .stream()
                     .collect(Collectors.toList()));
@@ -462,7 +574,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                     .bind("uuid", uuid)
                     .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "col"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
-                    .reduceRows(new LinkedHashMap<UUID, Collection>(), mapRowToCollection())
+                    .reduceRows(
+                        new LinkedHashMap<UUID, Collection>(), mapRowToCollection(false, true))
                     .values()
                     .stream()
                     .collect(Collectors.toList()));
@@ -590,7 +703,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                         .bind("uuid", uuid)
                         .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "col"))
                         .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
-                        .reduceRows(new LinkedHashMap<UUID, Collection>(), mapRowToCollection()))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, Collection>(), mapRowToCollection(false, true)))
             .values()
             .stream()
             .findFirst();
@@ -622,7 +736,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                         .bind("uuid", uuid)
                         .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "col"))
                         .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
-                        .reduceRows(new LinkedHashMap<UUID, Collection>(), mapRowToCollection()))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, Collection>(), mapRowToCollection(false, true)))
             .values()
             .stream()
             .collect(Collectors.toList());
@@ -676,6 +791,11 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
+  public List<FileResource> getRelatedFileResources(UUID entityUuid) {
+    return entityRepository.getRelatedFileResources(entityUuid);
+  }
+
+  @Override
   public PageResponse<Collection> getTopCollections(PageRequest pageRequest) {
     StringBuilder innerQuery =
         new StringBuilder(
@@ -701,7 +821,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                     h.createQuery(sql)
                         .registerRowMapper(BeanMapper.factory(CollectionImpl.class, "col"))
                         .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
-                        .reduceRows(new LinkedHashMap<UUID, Collection>(), mapRowToCollection()))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, Collection>(), mapRowToCollection(false, true)))
             .values()
             .stream()
             .collect(Collectors.toList());
@@ -810,7 +931,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
     // save identifiers
     Set<Identifier> identifiers = collection.getIdentifiers();
-    saveIdentifiers(identifiers, collection);
+    identifiableRepositoryImpl.saveIdentifiers(identifiers, collection);
 
     Collection result = findOne(collection.getUuid());
     return result;
@@ -836,7 +957,9 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
               preparedBatch
                   .bind("uuid", collectionUuid)
                   .bind("digitalObjectUuid", digitalObject.getUuid())
-                  .bind("sortIndex", getIndex(digitalObjects, digitalObject))
+                  .bind(
+                      "sortIndex",
+                      identifiableRepositoryImpl.getIndex(digitalObjects, digitalObject))
                   .add();
             }
             preparedBatch.execute();
@@ -847,12 +970,34 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
+  public List<FileResource> saveRelatedFileResources(
+      Collection entity, List<FileResource> fileResources) {
+    return entityRepository.saveRelatedFileResources(entity, fileResources);
+  }
+
+  @Override
+  public List<FileResource> saveRelatedFileResources(
+      UUID entityUuid, List<FileResource> fileResources) {
+    return entityRepository.saveRelatedFileResources(entityUuid, fileResources);
+  }
+
+  @Override
   public Collection saveWithParentCollection(Collection collection, UUID parentUuid) {
     final UUID childUuid =
         collection.getUuid() == null ? save(collection).getUuid() : collection.getUuid();
-    Integer sortindex =
-        selectNextSortIndexForParentChildren(
-            dbi, "collection_collections", "parent_collection_uuid", parentUuid);
+
+    Integer nextSortIndex =
+        dbi.withHandle(
+            (Handle h) ->
+                h.createQuery(
+                        "SELECT MAX(sortIndex) + 1 FROM collection_collections"
+                            + " WHERE "
+                            + "parent_collection_uuid"
+                            + " = :parent_uuid")
+                    .bind("parent_uuid", parentUuid)
+                    .mapTo(Integer.class)
+                    .findOne()
+                    .orElse(0));
     dbi.withHandle(
         h ->
             h.createUpdate(
@@ -860,7 +1005,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                         + " VALUES (:parent_collection_uuid, :child_collection_uuid, :sortindex)")
                 .bind("parent_collection_uuid", parentUuid)
                 .bind("child_collection_uuid", childUuid)
-                .bind("sortindex", sortindex)
+                .bind("sortindex", nextSortIndex)
                 .execute());
 
     return findOne(childUuid);
@@ -891,9 +1036,9 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
     // save identifiers
     // as we store the whole list new: delete old entries
-    deleteIdentifiers(collection);
+    identifierRepository.deleteByIdentifiable(collection);
     Set<Identifier> identifiers = collection.getIdentifiers();
-    saveIdentifiers(identifiers, collection);
+    identifiableRepositoryImpl.saveIdentifiers(identifiers, collection);
 
     Collection result = findOne(collection.getUuid());
     return result;
