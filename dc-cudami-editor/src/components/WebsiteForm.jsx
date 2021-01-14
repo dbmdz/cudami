@@ -59,6 +59,7 @@ const WebsiteForm = ({
             îd="url"
             label="URL"
             onChange={(url) => onUpdate({...identifiable, url})}
+            required
             type="url"
             value={identifiable.url}
           />
