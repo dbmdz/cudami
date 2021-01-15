@@ -1,8 +1,5 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
-import de.digitalcollections.commons.springdata.domain.PageConverter;
-import de.digitalcollections.commons.springdata.domain.PageWrapper;
-import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -34,9 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -148,6 +143,16 @@ public class CollectionsController extends AbstractController {
     return "collections/edit";
   }
 
+  @GetMapping("/api/collections")
+  @ResponseBody
+  public PageResponse<CollectionImpl> findAllTop(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      throws HttpException {
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
+    return service.findTopCollections(pageRequest);
+  }
+
   @GetMapping({
     "/api/collections/identifier/{namespace}:{id}",
     "/api/subcollections/identifier/{namespace}:{id}"
@@ -185,18 +190,11 @@ public class CollectionsController extends AbstractController {
   }
 
   @GetMapping("/collections")
-  public String list(
-      Model model,
-      @PageableDefault(
-              sort = {"lastModified"},
-              direction = Sort.Direction.DESC,
-              size = 25)
-          Pageable pageable)
-      throws HttpException {
-    final PageRequest pageRequest = PageableConverter.convert(pageable);
-    final PageResponse pageResponse = service.findTopCollections(pageRequest);
-    Page page = PageConverter.convert(pageResponse, pageRequest);
-    model.addAttribute("page", new PageWrapper(page, "/collections"));
+  public String list(Model model) throws HttpException {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
+    model.addAttribute(
+        "existingLanguages",
+        languageSortingHelper.sortLanguages(displayLocale, service.getTopCollectionsLanguages()));
     return "collections/list";
   }
 

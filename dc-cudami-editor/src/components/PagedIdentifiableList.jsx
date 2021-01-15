@@ -11,6 +11,7 @@ import FeedbackMessage from './FeedbackMessage'
 import LanguageTab from './LanguageTab'
 import ListPagination from './ListPagination'
 import WebpageList from './WebpageList'
+import WebsiteList from './WebsiteList'
 import AddAttachedIdentifiablesModal from './modals/AddAttachedIdentifiablesModal'
 import RemoveAttachedIdentifiableModal from './modals/RemoveAttachedIdentifiableModal'
 import {
@@ -112,9 +113,11 @@ class PagedIdentifiableList extends Component {
 
   getListComponent = () => {
     const LIST_COMPONENT_MAPPING = {
+      collection: CollectionList,
       digitalObject: DigitalObjectList,
       subcollection: CollectionList,
       webpage: WebpageList,
+      website: WebsiteList,
     }
     const ListComponent = LIST_COMPONENT_MAPPING[this.props.type]
     const {enableMove, enableRemove, parentType, showEdit, type} = this.props

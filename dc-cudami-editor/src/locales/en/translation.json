@@ -45,6 +45,7 @@
     "chooseFile": "Choose file",
     "chooseLanguage": "Choose a language",
     "chooseRenderingTemplate": "Choose a design template",
+    "collections": "Collections",
     "confirmRemove": {
       "digitalObjectFromCollection": "Are you sure that you want to remove this digital object from the collection?",
       "digitalObjectFromProject": "Are you sure that you want to remove this digital object from the project?",
@@ -183,6 +184,8 @@
       "url": "embedding a file from the internet by using a valid URL"
     },
     "totalElements": {
+      "collections": "found {{ count }} collection",
+      "collections_plural": "found {{ count }} collections",
       "digitalObjects": "found {{ count }} digital object",
       "digitalObjects_plural": "found {{ count }} digital objects",
       "geoLocations": "found {{ count }} geolocation",
@@ -194,7 +197,9 @@
       "subcollections": "found {{ count }} collection",
       "subcollections_plural": "found {{ count }} collections",
       "webpages": "found {{ count }} webpage",
-      "webpages_plural": "found {{ count }} webpages"
+      "webpages_plural": "found {{ count }} webpages",
+      "websites": "found {{ count }} website",
+      "websites_plural": "found {{ count }} websites"
     },
     "uploadFileResource": "Upload a new file",
     "video": "video",
@@ -202,6 +207,7 @@
     "warning": "Warning",
     "webpages_webpage": "Sub webpages",
     "webpages_website": "Webpages",
+    "websites": "Websites",
     "width": "Width",
     "yes": "Yes"
   }
