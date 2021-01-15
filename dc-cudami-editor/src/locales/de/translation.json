@@ -45,6 +45,7 @@
     "chooseFile": "Datei auswählen",
     "chooseLanguage": "Sprache auswählen",
     "chooseRenderingTemplate": "Gestaltungsvorlage auswählen",
+    "collections": "Sammlungen",
     "confirmRemove": {
       "digitalObjectFromCollection": "Sind Sie sicher, dass Sie das Digitalisat aus der Sammlung entfernen wollen?",
       "digitalObjectFromProject": "Sind Sie sicher, dass Sie das Digitalisat aus dem Projekt entfernen wollen?",
@@ -183,6 +184,8 @@
       "url": "Einbinden einer Datei aus dem Internet durch Eingabe einer gültigen URL"
     },
     "totalElements": {
+      "collections": "{{ count }} Sammlung gefunden",
+      "collections_plural": "{{ count }} Sammlungen gefunden",
       "digitalObjects": "{{ count }} Digitalisat gefunden",
       "digitalObjects_plural": "{{ count }} Digitalisate gefunden",
       "geoLocations": "{{ count }} Ort gefunden",
@@ -194,7 +197,9 @@
       "subcollections": "{{ count }} Sammlung gefunden",
       "subcollections_plural": "{{ count }} Sammlungen gefunden",
       "webpages": "{{ count }} Webseite gefunden",
-      "webpages_plural": "{{ count }} Webseiten gefunden"
+      "webpages_plural": "{{ count }} Webseiten gefunden",
+      "websites": "{{ count }} Website gefunden",
+      "websites_plural": "{{ count }} Websites gefunden"
     },
     "uploadFileResource": "Neue Datei hochladen",
     "video": "Video",
@@ -202,6 +207,7 @@
     "warning": "Warnung",
     "webpages_webpage": "Untergeordnete Webseiten",
     "webpages_website": "Webseiten",
+    "websites": "Websites",
     "width": "Breite",
     "yes": "Ja"
   }
