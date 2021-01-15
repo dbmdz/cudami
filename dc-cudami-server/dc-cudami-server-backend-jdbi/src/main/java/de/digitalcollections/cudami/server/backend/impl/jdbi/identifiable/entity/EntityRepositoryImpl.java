@@ -467,6 +467,9 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   @Override
   public List<EntityRelation> getRelations(UUID subjectEntityUuid) {
     E subjectEntity = findOne(subjectEntityUuid);
+    if (subjectEntity == null) {
+      return null;
+    }
     return getRelations(subjectEntity);
   }
 
