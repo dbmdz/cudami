@@ -14,6 +14,7 @@ import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
@@ -76,6 +77,15 @@ public class WebsiteController {
   @ApiResponseObject
   public Website findById(@PathVariable UUID uuid) {
     return (Website) service.get(uuid);
+  }
+
+  @ApiMethod(description = "Get languages of all websites")
+  @GetMapping(
+      value = {"/latest/websites/languages", "/v2/websites/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public List<Locale> getLanguages() {
+    return service.getLanguages();
   }
 
   @ApiMethod(description = "Get paged root pages of a website")

@@ -10,6 +10,7 @@ import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import java.net.http.HttpClient;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class CudamiWebsitesClient extends CudamiBaseClient<WebsiteImpl> {
@@ -41,6 +42,10 @@ public class CudamiWebsitesClient extends CudamiBaseClient<WebsiteImpl> {
   public Website findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
         String.format("/latest/websites/identifier/%s:%s.json", namespace, id));
+  }
+
+  public List<Locale> getLanguages() throws HttpException {
+    return doGetRequestForObjectList("/latest/websites/languages", Locale.class);
   }
 
   public PageResponse<Webpage> getRootPages(UUID uuid, PageRequest pageRequest)

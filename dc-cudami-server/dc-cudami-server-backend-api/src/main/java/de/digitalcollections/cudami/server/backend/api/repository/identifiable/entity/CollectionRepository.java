@@ -9,6 +9,7 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 /** Repository for Collection persistence handling. */
@@ -72,6 +73,8 @@ public interface CollectionRepository
   List<CorporateBody> getRelatedCorporateBodies(UUID uuid, Filtering filtering);
 
   PageResponse<Collection> getTopCollections(PageRequest pageRequest);
+
+  List<Locale> getTopCollectionsLanguages();
 
   default boolean removeChild(Collection parent, Collection child) {
     if (parent == null || child == null) {

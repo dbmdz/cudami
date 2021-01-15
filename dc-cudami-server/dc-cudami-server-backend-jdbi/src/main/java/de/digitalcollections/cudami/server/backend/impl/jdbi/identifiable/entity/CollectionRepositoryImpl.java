@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -799,6 +800,16 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
     PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
     return pageResponse;
+  }
+
+  @Override
+  public List<Locale> getTopCollectionsLanguages() {
+    String query =
+        "SELECT DISTINCT languages"
+            + " FROM collections as c, jsonb_object_keys(c.label) as languages"
+            + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = c.uuid)";
+    List<Locale> result = dbi.withHandle(h -> h.createQuery(query).mapTo(Locale.class).list());
+    return result;
   }
 
   @Override
