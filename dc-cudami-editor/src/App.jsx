@@ -48,12 +48,14 @@ const availableFormTypes = [
 ]
 
 // this is a mapping of parent types to possible child types
-const availableListTypes = {
+const availableAttachedListTypes = {
   collection: ['subcollection', 'digitalObject'],
   project: ['digitalObject'],
   webpage: ['webpage'],
   website: ['webpage'],
 }
+
+const availableRootListTypes = ['website']
 
 const getUiLocale = (searchParams) => {
   const query = new URLSearchParams(searchParams)
@@ -132,17 +134,25 @@ const StartPage = () => (
       <FormCard type="renderingTemplate" />
     </Row>
     <h2>List</h2>
-    <h3>Identifiables</h3>
+    <h3>Root identifiables</h3>
     <Row>
-      {Object.keys(availableListTypes).map((parentType) => {
-        return availableListTypes[parentType].map((type) => (
-          <ListCard
-            key={`${parentType}-${type}`}
-            parentType={parentType}
-            type={type}
-          />
-        ))
-      })}
+      {availableRootListTypes.map((type) => (
+        <ListCard key={type} type={type} />
+      ))}
+    </Row>
+    <h3>Attached identifiables</h3>
+    <Row>
+      {Object.entries(availableAttachedListTypes).map(
+        ([parentType, childTypes]) => {
+          return childTypes.map((type) => (
+            <ListCard
+              key={`${parentType}-${type}`}
+              parentType={parentType}
+              type={type}
+            />
+          ))
+        }
+      )}
     </Row>
     <h3>Other</h3>
     <Row>
@@ -203,6 +213,20 @@ const App = () => {
                 enableRemove={true}
                 mockApi={true}
                 parentType={match.params.parentType}
+                showEdit={true}
+                showNew={true}
+                type={match.params.type}
+                uiLocale={uiLocale}
+              />
+            </Container>
+          )}
+        />
+        <Route
+          path={`/:type/list`}
+          render={({match}) => (
+            <Container>
+              <PagedIdentifiableList
+                mockApi={true}
                 showEdit={true}
                 showNew={true}
                 type={match.params.type}
