@@ -7,6 +7,7 @@ import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,11 @@ public class WebsiteServiceImpl extends EntityServiceImpl<Website> implements We
   @Autowired
   public WebsiteServiceImpl(WebsiteRepository repository) {
     super(repository);
+  }
+
+  @Override
+  public List<Locale> getLanguages() {
+    return ((WebsiteRepository) repository).getLanguages();
   }
 
   @Override

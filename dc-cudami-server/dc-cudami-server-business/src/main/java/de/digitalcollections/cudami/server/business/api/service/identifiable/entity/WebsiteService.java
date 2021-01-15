@@ -5,10 +5,13 @@ import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 /** Service for Website. */
 public interface WebsiteService extends EntityService<Website> {
+
+  List<Locale> getLanguages();
 
   List<Webpage> getRootPages(Website website);
 

@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -210,6 +211,14 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
       website.setRootPages(getRootPages(website));
     }
     return website;
+  }
+
+  @Override
+  public List<Locale> getLanguages() {
+    String query =
+        "SELECT DISTINCT languages FROM websites as w, jsonb_object_keys(w.label) as languages";
+    List<Locale> result = dbi.withHandle(h -> h.createQuery(query).mapTo(Locale.class).list());
+    return result;
   }
 
   @Override
@@ -409,5 +418,4 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
         return null;
     }
   }
-
 }

@@ -5,6 +5,7 @@ import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 /** Repository for Website persistence handling. */
@@ -15,6 +16,8 @@ public interface WebsiteRepository extends EntityRepository<Website> {
   List<Webpage> getRootPages(UUID uuid);
 
   PageResponse<Webpage> getRootPages(UUID uuid, PageRequest pageRequest);
+
+  List<Locale> getLanguages();
 
   default boolean updateRootPagesOrder(Website website, List<Webpage> rootPages) {
     if (website == null || rootPages == null) {

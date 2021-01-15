@@ -150,6 +150,11 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
+  public List<Locale> getTopCollectionsLanguages() {
+    return ((CollectionRepository) repository).getTopCollectionsLanguages();
+  }
+
+  @Override
   public boolean removeChild(Collection parent, Collection child) {
     return ((CollectionRepository) repository).removeChild(parent, child);
   }

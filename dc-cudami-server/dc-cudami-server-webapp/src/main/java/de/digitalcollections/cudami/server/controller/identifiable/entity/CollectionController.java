@@ -425,6 +425,15 @@ public class CollectionController {
     return collectionService.getChildren(collectionUuid, pageRequest);
   }
 
+  @ApiMethod(description = "Get languages of all top collections")
+  @GetMapping(
+      value = {"/latest/collections/top/languages", "/v2/collections/top/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public List<Locale> getTopCollectionsLanguages() {
+    return collectionService.getTopCollectionsLanguages();
+  }
+
   @ApiMethod(description = "Remove an existing digital object from an existing collection")
   @DeleteMapping(
       value = {

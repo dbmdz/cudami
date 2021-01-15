@@ -172,6 +172,10 @@ public class CudamiCollectionsClient extends CudamiBaseClient<CollectionImpl> {
         filtering);
   }
 
+  public List<Locale> getTopCollectionsLanguages() throws HttpException {
+    return doGetRequestForObjectList("/latest/collections/top/languages", Locale.class);
+  }
+
   public boolean removeDigitalObject(UUID collectionUuid, UUID digitalObjectUuid)
       throws HttpException {
     return Boolean.parseBoolean(

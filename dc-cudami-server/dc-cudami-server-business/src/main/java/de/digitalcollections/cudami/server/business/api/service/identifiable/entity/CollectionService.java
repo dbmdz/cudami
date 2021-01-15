@@ -44,6 +44,8 @@ public interface CollectionService extends NodeService<Collection>, EntityServic
 
   PageResponse<Collection> getTopCollections(PageRequest pageRequest);
 
+  List<Locale> getTopCollectionsLanguages();
+
   boolean removeChild(Collection parent, Collection child);
 
   boolean removeDigitalObject(Collection collection, DigitalObject digitalObject);
