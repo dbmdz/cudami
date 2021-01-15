@@ -43,8 +43,8 @@ public class WebsiteController {
 
   @ApiMethod(description = "Get count of content trees")
   @GetMapping(
-          value = {"/latest/websites/count", "/v2/websites/count"},
-          produces = MediaType.APPLICATION_JSON_VALUE)
+      value = {"/latest/websites/count", "/v2/websites/count"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public long count() {
     return service.count();
@@ -90,23 +90,23 @@ public class WebsiteController {
 
   @ApiMethod(description = "Get paged root pages of a website")
   @GetMapping(
-          value = {"/latest/websites/{uuid}/rootpages", "/v3/websites/{uuid}/rootpages"},
-          produces = MediaType.APPLICATION_JSON_VALUE)
+      value = {"/latest/websites/{uuid}/rootpages", "/v3/websites/{uuid}/rootpages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Webpage> getRootPages(
-          @ApiPathParam(
-                  description =
-                          "UUID of the parent webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+      @ApiPathParam(
+              description =
+                  "UUID of the parent webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
-                  UUID uuid,
-          @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-          @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-          @RequestParam(name = "sortField", required = false) String sortField,
-          @RequestParam(name = "sortDirection", required = false, defaultValue = "DESC")
-                  Direction sortDirection,
-          @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
-                  NullHandling nullHandling)
-          throws IdentifiableServiceException {
+          UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortField", required = false) String sortField,
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "DESC")
+          Direction sortDirection,
+      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
+          NullHandling nullHandling)
+      throws IdentifiableServiceException {
     Sorting sorting = null;
     if (StringUtils.hasText(sortField)) {
       OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
