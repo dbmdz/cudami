@@ -19,6 +19,7 @@ import {
   getIdentifierTypes,
   loadAttachedIdentifiables,
   loadDefaultLanguage,
+  loadRootIdentifiables,
   removeAttachedIdentifiable,
   typeToEndpointMapping,
   updateAttachedIdentifiablesOrder,
@@ -232,16 +233,24 @@ class PagedIdentifiableList extends Component {
 
   loadIdentifiables = async (pageNumber, pageSize = this.pageSize) => {
     const {apiContextPath, mockApi, parentType, parentUuid, type} = this.props
-    const identifiables = await loadAttachedIdentifiables(
+    if (parentType && parentUuid) {
+      return await loadAttachedIdentifiables(
+        apiContextPath,
+        mockApi,
+        parentType,
+        parentUuid,
+        type,
+        pageNumber,
+        pageSize
+      )
+    }
+    return await loadRootIdentifiables(
       apiContextPath,
       mockApi,
-      parentType,
-      parentUuid,
       type,
       pageNumber,
       pageSize
     )
-    return identifiables
   }
 
   removeIdentifiable = async (parentUuid, uuid) => {
@@ -338,22 +347,24 @@ class PagedIdentifiableList extends Component {
     } = this.state
     const showChangeOfOrder =
       enableChangeOfOrder && !changeOfOrderActive && totalElements > 1
+    let createUrl = `${apiContextPath}${typeToEndpointMapping[type]}/new`
+    if (parentType && parentUuid) {
+      createUrl = `${createUrl}?parentType=${parentType}&parentUuid=${parentUuid}`
+    }
     return (
       <AppContext.Provider
         value={{apiContextPath, defaultLanguage, mockApi, uiLocale}}
       >
         <Row>
           <Col>
-            <h2>{t(`${type}s`, {context: parentType})}</h2>
+            {parentType ? (
+              <h2>{t(`${type}s`, {context: parentType})}</h2>
+            ) : (
+              <h1>{t(`${type}s`)}</h1>
+            )}
           </Col>
           <Col className="text-right">
-            {showNew && (
-              <Button
-                href={`${apiContextPath}${typeToEndpointMapping[type]}/new?parentType=${parentType}&parentUuid=${parentUuid}`}
-              >
-                {t('new')}
-              </Button>
-            )}
+            {showNew && <Button href={createUrl}>{t('new')}</Button>}
             {enableAdd && (
               <Button
                 className={showNew ? 'ml-1' : ''}
