@@ -213,76 +213,6 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   }
 
   @Override
-  public Website save(Website website) {
-    website.setUuid(UUID.randomUUID());
-    website.setCreated(LocalDateTime.now());
-    website.setLastModified(LocalDateTime.now());
-    // refid is generated as serial, DO NOT SET!
-    final UUID previewImageUuid =
-        website.getPreviewImage() == null ? null : website.getPreviewImage().getUuid();
-
-    String query =
-        "INSERT INTO websites("
-            + "uuid, label, description, previewfileresource, preview_hints,"
-            + " identifiable_type, entity_type,"
-            + " created, last_modified,"
-            + " url, registration_date"
-            + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
-            + " :type, :entityType,"
-            + " :created, :lastModified,"
-            + " :url, :registrationDate"
-            + ")";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(website)
-                .execute());
-
-    // save identifiers
-    Set<Identifier> identifiers = website.getIdentifiers();
-    saveIdentifiers(identifiers, website);
-
-    Website result = findOne(website.getUuid());
-    return result;
-  }
-
-  @Override
-  public Website update(Website website) {
-    website.setLastModified(LocalDateTime.now());
-    // do not update/left out from statement (not changed since insert):
-    // uuid, created, identifiable_type, entity_type, refid
-    final UUID previewImageUuid =
-        website.getPreviewImage() == null ? null : website.getPreviewImage().getUuid();
-
-    String query =
-        "UPDATE websites SET"
-            + " label=:label::JSONB, description=:description::JSONB,"
-            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
-            + " last_modified=:lastModified,"
-            + " url=:url, registration_date=:registrationDate"
-            + " WHERE uuid=:uuid";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(website)
-                .execute());
-
-    // save identifiers
-    // as we store the whole list new: delete old entries
-    deleteIdentifiers(website);
-    Set<Identifier> identifiers = website.getIdentifiers();
-    saveIdentifiers(identifiers, website);
-
-    Website result = findOne(website.getUuid());
-    return result;
-  }
-
-  @Override
   public List<Webpage> getRootPages(Website website) {
     return getRootPages(website.getUuid());
   }
@@ -362,6 +292,101 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   }
 
   @Override
+  public Website save(Website website) {
+    website.setUuid(UUID.randomUUID());
+    website.setCreated(LocalDateTime.now());
+    website.setLastModified(LocalDateTime.now());
+    // refid is generated as serial, DO NOT SET!
+    final UUID previewImageUuid =
+            website.getPreviewImage() == null ? null : website.getPreviewImage().getUuid();
+
+    String query =
+            "INSERT INTO websites("
+            + "uuid, label, description, previewfileresource, preview_hints,"
+            + " identifiable_type, entity_type,"
+            + " created, last_modified,"
+            + " url, registration_date"
+            + ") VALUES ("
+            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
+            + " :type, :entityType,"
+            + " :created, :lastModified,"
+            + " :url, :registrationDate"
+            + ")";
+
+    dbi.withHandle(
+            h ->
+                    h.createUpdate(query)
+                            .bind("previewFileResource", previewImageUuid)
+                            .bindBean(website)
+                            .execute());
+
+    // save identifiers
+    Set<Identifier> identifiers = website.getIdentifiers();
+    saveIdentifiers(identifiers, website);
+
+    Website result = findOne(website.getUuid());
+    return result;
+  }
+
+  @Override
+  public Website update(Website website) {
+    website.setLastModified(LocalDateTime.now());
+    // do not update/left out from statement (not changed since insert):
+    // uuid, created, identifiable_type, entity_type, refid
+    final UUID previewImageUuid =
+            website.getPreviewImage() == null ? null : website.getPreviewImage().getUuid();
+
+    String query =
+            "UPDATE websites SET"
+            + " label=:label::JSONB, description=:description::JSONB,"
+            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
+            + " last_modified=:lastModified,"
+            + " url=:url, registration_date=:registrationDate"
+            + " WHERE uuid=:uuid";
+
+    dbi.withHandle(
+            h ->
+                    h.createUpdate(query)
+                            .bind("previewFileResource", previewImageUuid)
+                            .bindBean(website)
+                            .execute());
+
+    // save identifiers
+    // as we store the whole list new: delete old entries
+    deleteIdentifiers(website);
+    Set<Identifier> identifiers = website.getIdentifiers();
+    saveIdentifiers(identifiers, website);
+
+    Website result = findOne(website.getUuid());
+    return result;
+  }
+
+  @Override
+  public boolean updateRootPagesOrder(UUID websiteUuid, List<Webpage> rootPages) {
+    if (websiteUuid == null || rootPages == null) {
+      return false;
+    }
+    String query =
+            "UPDATE website_webpages"
+            + " SET sortindex = :idx"
+            + " WHERE website_uuid = :websiteUuid AND webpage_uuid = :webpageUuid;";
+    dbi.withHandle(
+            h -> {
+              PreparedBatch batch = h.prepareBatch(query);
+              int idx = 0;
+              for (Webpage webpage : rootPages) {
+                batch
+                        .bind("idx", idx++)
+                        .bind("webpageUuid", webpage.getUuid())
+                        .bind("websiteUuid", websiteUuid)
+                        .add();
+              }
+              return batch.execute();
+            });
+    return true;
+  }
+
+  @Override
   protected String[] getAllowedOrderByFields() {
     return new String[] {"created", "lastModified", "refId", "url"};
   }
@@ -385,28 +410,4 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     }
   }
 
-  @Override
-  public boolean updateRootPagesOrder(UUID websiteUuid, List<Webpage> rootPages) {
-    if (websiteUuid == null || rootPages == null) {
-      return false;
-    }
-    String query =
-        "UPDATE website_webpages"
-            + " SET sortindex = :idx"
-            + " WHERE website_uuid = :websiteUuid AND webpage_uuid = :webpageUuid;";
-    dbi.withHandle(
-        h -> {
-          PreparedBatch batch = h.prepareBatch(query);
-          int idx = 0;
-          for (Webpage webpage : rootPages) {
-            batch
-                .bind("idx", idx++)
-                .bind("webpageUuid", webpage.getUuid())
-                .bind("websiteUuid", websiteUuid)
-                .add();
-          }
-          return batch.execute();
-        });
-    return true;
-  }
 }

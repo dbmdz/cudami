@@ -40,6 +40,15 @@ public class WebsiteController {
 
   @Autowired private WebsiteService service;
 
+  @ApiMethod(description = "Get count of content trees")
+  @GetMapping(
+          value = {"/latest/websites/count", "/v2/websites/count"},
+          produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public long count() {
+    return service.count();
+  }
+
   @ApiMethod(description = "Get all websites")
   @GetMapping(
       value = {"/latest/websites", "/v2/websites"},
@@ -69,6 +78,34 @@ public class WebsiteController {
     return (Website) service.get(uuid);
   }
 
+  @ApiMethod(description = "Get paged root pages of a website")
+  @GetMapping(
+          value = {"/latest/websites/{uuid}/rootpages", "/v3/websites/{uuid}/rootpages"},
+          produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public PageResponse<Webpage> getRootPages(
+          @ApiPathParam(
+                  description =
+                          "UUID of the parent webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+                  UUID uuid,
+          @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+          @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+          @RequestParam(name = "sortField", required = false) String sortField,
+          @RequestParam(name = "sortDirection", required = false, defaultValue = "DESC")
+                  Direction sortDirection,
+          @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
+                  NullHandling nullHandling)
+          throws IdentifiableServiceException {
+    Sorting sorting = null;
+    if (StringUtils.hasText(sortField)) {
+      OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
+      sorting = new SortingImpl(order);
+    }
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
+    return service.getRootPages(uuid, pageRequest);
+  }
+
   @ApiMethod(description = "Save a newly created website")
   @PostMapping(
       value = {"/latest/websites", "/v2/websites"},
@@ -88,43 +125,6 @@ public class WebsiteController {
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, website.getUuid());
     return (Website) service.update(website);
-  }
-
-  @ApiMethod(description = "Get count of content trees")
-  @GetMapping(
-      value = {"/latest/websites/count", "/v2/websites/count"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
-  public long count() {
-    return service.count();
-  }
-
-  @ApiMethod(description = "Get paged root pages of a website")
-  @GetMapping(
-      value = {"/latest/websites/{uuid}/rootpages", "/v3/websites/{uuid}/rootpages"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
-  public PageResponse<Webpage> getRootPages(
-      @ApiPathParam(
-              description =
-                  "UUID of the parent webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
-          @PathVariable("uuid")
-          UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "sortField", required = false) String sortField,
-      @RequestParam(name = "sortDirection", required = false, defaultValue = "DESC")
-          Direction sortDirection,
-      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
-          NullHandling nullHandling)
-      throws IdentifiableServiceException {
-    Sorting sorting = null;
-    if (StringUtils.hasText(sortField)) {
-      OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
-      sorting = new SortingImpl(order);
-    }
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
-    return service.getRootPages(uuid, pageRequest);
   }
 
   @ApiMethod(description = "Update the order of a website's rootpages")
