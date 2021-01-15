@@ -169,7 +169,7 @@ export async function loadIdentifiable(contextPath, mock, type, uuid = 'new') {
   }
 }
 
-export async function loadIdentifiables(
+export async function loadRootIdentifiables(
   contextPath,
   mock,
   type,

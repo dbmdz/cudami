@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react'
 
-import {loadIdentifiables} from '../api'
+import {loadRootIdentifiables} from '../api'
 
 const usePagination = (apiContextPath, mockApi, type) => {
   const [content, setContent] = useState([])
@@ -9,7 +9,7 @@ const usePagination = (apiContextPath, mockApi, type) => {
   const [pageNumber, setPageNumber] = useState(0)
   const [totalElements, setTotalElements] = useState(0)
   const loadData = async (context, mock, pageNumber, pageSize = 20) => {
-    const {content, totalElements} = await loadIdentifiables(
+    const {content, totalElements} = await loadRootIdentifiables(
       context,
       mock,
       type,
