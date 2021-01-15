@@ -5,11 +5,11 @@ import {withTranslation} from 'react-i18next'
 
 import './common.css'
 import AppContext from './AppContext'
+import CollectionList from './CollectionList'
 import DigitalObjectList from './DigitalObjectList'
 import FeedbackMessage from './FeedbackMessage'
 import LanguageTab from './LanguageTab'
 import ListPagination from './ListPagination'
-import SubcollectionList from './SubcollectionList'
 import WebpageList from './WebpageList'
 import AddAttachedIdentifiablesModal from './modals/AddAttachedIdentifiablesModal'
 import RemoveAttachedIdentifiableModal from './modals/RemoveAttachedIdentifiableModal'
@@ -113,7 +113,7 @@ class PagedIdentifiableList extends Component {
   getListComponent = () => {
     const LIST_COMPONENT_MAPPING = {
       digitalObject: DigitalObjectList,
-      subcollection: SubcollectionList,
+      subcollection: CollectionList,
       webpage: WebpageList,
     }
     const ListComponent = LIST_COMPONENT_MAPPING[this.props.type]

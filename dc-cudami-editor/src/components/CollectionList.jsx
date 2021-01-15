@@ -10,7 +10,7 @@ import PublicationStatus from './PublicationStatus'
 import {formatDate} from './utils'
 import {typeToEndpointMapping} from '../api'
 
-const SubcollectionList = ({
+const CollectionList = ({
   enableMove,
   enableRemove,
   identifiables,
@@ -110,4 +110,4 @@ const SubcollectionList = ({
   )
 }
 
-export default SubcollectionList
+export default CollectionList
