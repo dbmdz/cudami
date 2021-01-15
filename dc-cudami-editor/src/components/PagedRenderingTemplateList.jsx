@@ -39,11 +39,7 @@ const PagedRenderingTemplateList = ({
           </Button>
         </Col>
       </Row>
-      <Row>
-        <Col>
-          <hr />
-        </Col>
-      </Row>
+      <hr />
       <Nav tabs>
         <LanguageTab
           activeLanguage={defaultLanguage}
