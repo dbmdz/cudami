@@ -375,6 +375,7 @@ class PagedIdentifiableList extends Component {
             )}
           </Col>
         </Row>
+        {!parentType && <hr />}
         {feedbackMessage && (
           <FeedbackMessage
             className="mb-2"
