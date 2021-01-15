@@ -148,12 +148,6 @@ public class CollectionsController extends AbstractController {
     return "collections/edit";
   }
 
-  @GetMapping("/api/collections/{uuid}")
-  @ResponseBody
-  public Collection get(@PathVariable UUID uuid) throws HttpException {
-    return service.findOne(uuid);
-  }
-
   @GetMapping({
     "/api/collections/identifier/{namespace}:{id}",
     "/api/subcollections/identifier/{namespace}:{id}"
@@ -162,6 +156,12 @@ public class CollectionsController extends AbstractController {
   public Collection findOneByIdentifier(@PathVariable String namespace, @PathVariable String id)
       throws HttpException {
     return service.findOneByIdentifier(namespace, id);
+  }
+
+  @GetMapping("/api/collections/{uuid}")
+  @ResponseBody
+  public Collection get(@PathVariable UUID uuid) throws HttpException {
+    return service.findOne(uuid);
   }
 
   @GetMapping("/api/collections/{uuid}/digitalobjects")
