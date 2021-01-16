@@ -14,7 +14,9 @@ public interface IdentifierRepository {
 
   long count();
 
-  void delete(UUID uuid);
+  default void delete(UUID uuid) {
+    delete(List.of(uuid)); // same performance as "where uuid = :uuid"
+  }
 
   void delete(List<UUID> uuids);
   

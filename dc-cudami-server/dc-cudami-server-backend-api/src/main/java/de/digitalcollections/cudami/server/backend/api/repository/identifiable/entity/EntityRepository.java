@@ -17,13 +17,6 @@ public interface EntityRepository<E extends Entity> extends IdentifiableReposito
 
   void addRelatedFileresource(UUID entityUuid, UUID fileResourceUuid);
 
-  /**
-   * Returns a list of all entities, reduced to their identifiers and last modification date
-   *
-   * @return partially filled complete list of all entities of implementing repository entity type
-   */
-  List<E> findAllReduced();
-
   E findOneByRefId(long refId);
 
   default List<FileResource> getRelatedFileResources(E entity) {

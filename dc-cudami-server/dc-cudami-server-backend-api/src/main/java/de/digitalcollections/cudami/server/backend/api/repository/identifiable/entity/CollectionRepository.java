@@ -12,34 +12,35 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-/** Repository for Collection persistence handling. */
-public interface CollectionRepository
-    extends NodeRepository<Collection>, EntityRepository<Collection> {
+/** Repository for Collection persistence handling.
+ * @param <C> instance implementing Collection */
+public interface CollectionRepository<C extends Collection>
+    extends NodeRepository<C>, EntityRepository<C> {
 
-  default boolean addChild(Collection parent, Collection child) {
+  default boolean addChild(C parent, C child) {
     if (parent == null || child == null) {
       return false;
     }
     return addChildren(parent.getUuid(), Arrays.asList(child));
   }
 
-  default boolean addChildren(Collection parent, List<Collection> children) {
+  default boolean addChildren(C parent, List<C> children) {
     if (parent == null || children == null) {
       return false;
     }
     return addChildren(parent.getUuid(), children);
   }
 
-  boolean addChildren(UUID parentUuid, List<Collection> collections);
+  boolean addChildren(UUID parentUuid, List<C> collections);
 
-  default boolean addDigitalObject(Collection collection, DigitalObject digitalObject) {
+  default boolean addDigitalObject(C collection, DigitalObject digitalObject) {
     if (collection == null || digitalObject == null) {
       return false;
     }
     return addDigitalObjects(collection.getUuid(), Arrays.asList(digitalObject));
   }
 
-  default boolean addDigitalObjects(Collection collection, List<DigitalObject> digitalObjects) {
+  default boolean addDigitalObjects(C collection, List<DigitalObject> digitalObjects) {
     if (collection == null || digitalObjects == null) {
       return false;
     }
@@ -49,7 +50,7 @@ public interface CollectionRepository
   boolean addDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects);
 
   @Override
-  default List<Collection> getChildren(Collection collection) {
+  default List<C> getChildren(C collection) {
     if (collection == null) {
       return null;
     }
@@ -57,7 +58,7 @@ public interface CollectionRepository
   }
 
   default PageResponse<DigitalObject> getDigitalObjects(
-      Collection collection, PageRequest pageRequest) {
+      C collection, PageRequest pageRequest) {
     if (collection == null) {
       return null;
     }
@@ -66,15 +67,15 @@ public interface CollectionRepository
 
   PageResponse<DigitalObject> getDigitalObjects(UUID collectionUuid, PageRequest pageRequest);
 
-  List<Collection> getParents(UUID uuid);
+  List<C> getParents(UUID uuid);
 
   List<CorporateBody> getRelatedCorporateBodies(UUID uuid, Filtering filtering);
 
-  PageResponse<Collection> getTopCollections(PageRequest pageRequest);
+  PageResponse<C> getTopCollections(PageRequest pageRequest);
 
   List<Locale> getTopCollectionsLanguages();
 
-  default boolean removeChild(Collection parent, Collection child) {
+  default boolean removeChild(C parent, C child) {
     if (parent == null || child == null) {
       return false;
     }
@@ -83,7 +84,7 @@ public interface CollectionRepository
 
   boolean removeChild(UUID parentUuid, UUID childUuid);
 
-  default boolean removeDigitalObject(Collection collection, DigitalObject digitalObject) {
+  default boolean removeDigitalObject(C collection, DigitalObject digitalObject) {
     if (collection == null || digitalObject == null) {
       return false;
     }
@@ -100,7 +101,7 @@ public interface CollectionRepository
    */
   boolean removeDigitalObjectFromAllCollections(DigitalObject digitalObject);
 
-  default boolean saveDigitalObjects(Collection collection, List<DigitalObject> digitalObjects) {
+  default boolean saveDigitalObjects(C collection, List<DigitalObject> digitalObjects) {
     if (collection == null || digitalObjects == null) {
       return false;
     }
@@ -109,5 +110,5 @@ public interface CollectionRepository
 
   boolean saveDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects);
 
-  Collection saveWithParentCollection(Collection collection, UUID parentUuid);
+  C saveWithParentCollection(C collection, UUID parentUuid);
 }

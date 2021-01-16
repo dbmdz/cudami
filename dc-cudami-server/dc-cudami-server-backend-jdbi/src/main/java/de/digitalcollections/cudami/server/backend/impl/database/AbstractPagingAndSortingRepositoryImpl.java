@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.server.backend.impl.jdbi;
+package de.digitalcollections.cudami.server.backend.impl.database;
 
 import de.digitalcollections.model.api.filter.FilterCriterion;
 import de.digitalcollections.model.api.filter.Filtering;

@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.view;
 
 import de.digitalcollections.cudami.server.backend.api.repository.view.RenderingTemplateRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractPagingAndSortingRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.database.AbstractPagingAndSortingRepositoryImpl;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;

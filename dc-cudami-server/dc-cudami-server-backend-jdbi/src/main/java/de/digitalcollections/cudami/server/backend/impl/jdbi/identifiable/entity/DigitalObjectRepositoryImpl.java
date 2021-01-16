@@ -3,6 +3,8 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
+import de.digitalcollections.cudami.server.backend.impl.database.AbstractPagingAndSortingRepositoryImpl;
+import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
@@ -40,14 +42,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObject>
+public class DigitalObjectRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl
     implements DigitalObjectRepository {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectRepositoryImpl.class);
-
-  public static final String SQL_REDUCED_DIGITALOBJECT_FIELDS_DO =
-      " d.uuid do_uuid, d.refid do_refId, d.label do_label, d.custom_attrs do_customAttributes,"
-          + " d.created do_created, d.last_modified do_lastModified";
 
   // select all details shown/needed in single object details page
   private static final String FIND_ONE_BASE_SQL =
@@ -65,6 +61,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
           + " LEFT JOIN fileresources_image as file on d.previewfileresource = file.uuid"
           + " LEFT JOIN digitalobject_fileresources as df on d.uuid = df.digitalobject_uuid"
           + " LEFT JOIN fileresources as fr on fr.uuid = df.fileresource_uuid";
+  private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectRepositoryImpl.class);
 
   // select only what is shown/needed in paged list (to avoid unnecessary payload/traffic):
   private static final String REDUCED_FIND_ONE_BASE_SQL =
@@ -75,6 +72,36 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
           + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
           + " FROM digitalobjects as d"
           + " LEFT JOIN fileresources_image as file on d.previewfileresource = file.uuid";
+  public static final String SQL_REDUCED_DIGITALOBJECT_FIELDS_DO =
+          " d.uuid do_uuid, d.refid do_refId, d.label do_label, d.custom_attrs do_customAttributes,"
+          + " d.created do_created, d.last_modified do_lastModified";
+  public static BiFunction<
+              LinkedHashMap<UUID, DigitalObject>, RowView, LinkedHashMap<UUID, DigitalObject>>
+              mapRowToDigitalObject() {
+                return mapRowToDigitalObject(false);
+              }
+              public static BiFunction<
+              LinkedHashMap<UUID, DigitalObject>, RowView, LinkedHashMap<UUID, DigitalObject>>
+              mapRowToDigitalObject(boolean withIdentifiers) {
+                return (map, rowView) -> {
+                  DigitalObject digitalObject =
+                          map.computeIfAbsent(
+                                  rowView.getColumn("do_uuid", UUID.class),
+                                  fn -> {
+                                    return rowView.getRow(DigitalObjectImpl.class);
+                                  });
+                  
+                  if (rowView.getColumn("pi_uuid", UUID.class) != null) {
+                    digitalObject.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+                  }
+                  
+                  if (withIdentifiers && rowView.getColumn("id_uuid", UUID.class) != null) {
+                    IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+                    digitalObject.addIdentifier(dbIdentifier);
+                  }
+                  return map;
+                };
+              }
 
   private final FileResourceMetadataRepository fileResourceMetadataRepository;
 
@@ -88,10 +115,43 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
+  public void addRelatedFileresource(UUID entityUuid, UUID fileResourceUuid) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
   public long count() {
     String sql = "SELECT count(*) FROM digitalobjects";
     long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
     return count;
+  }
+
+  @Override
+  public void delete(UUID uuid) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+  @Override
+  public void deleteFileResources(UUID digitalObjectUuid) {
+    dbi.withHandle(
+            h ->
+                    h.createUpdate(
+                            "DELETE FROM digitalobject_fileresources WHERE digitalobject_uuid = :uuid")
+                            .bind("uuid", digitalObjectUuid)
+                            .execute());
+  }
+  @Override
+  public boolean deleteIdentifiers(UUID digitalObjectUuid) {
+    DigitalObject digitalObject = findOne(digitalObjectUuid);
+    if (digitalObject == null) {
+      return false;
+    }
+    
+    identifierRepository.delete(
+            digitalObject.getIdentifiers().stream()
+                    .map(Identifier::getUuid)
+                    .collect(Collectors.toList()));
+    
+    return true;
   }
 
   @Override
@@ -181,6 +241,11 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
     SearchPageResponse pageResponse = new SearchPageResponseImpl(result, searchPageRequest, total);
     return pageResponse;
+  }
+
+  @Override
+  public List<DigitalObject> findAllReduced() {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
@@ -294,6 +359,20 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
+  public DigitalObject findOne(UUID uuid, Filtering filtering) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
+  public DigitalObject findOneByRefId(long refId) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+  @Override
+  protected String[] getAllowedOrderByFields() {
+    return new String[] {"created", "lastModified", "refId"};
+  }
+
+  @Override
   public PageResponse<Collection> getCollections(UUID digitalObjectUuid, PageRequest pageRequest) {
     final String baseQuery =
         "SELECT c.uuid c_uuid, c.label c_label, c.refid c_refId,"
@@ -369,6 +448,22 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                     .get());
     PageResponse<Collection> pageResponse = new PageResponseImpl<>(result, pageRequest, total);
     return pageResponse;
+  }
+  @Override
+  protected String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "created":
+        return "d.created";
+      case "lastModified":
+        return "d.last_modified";
+      case "refId":
+        return "d.refid";
+      default:
+        return null;
+    }
   }
 
   @Override
@@ -549,6 +644,11 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
+  public List<FileResource> getRelatedFileResources(UUID entityUuid) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
   public DigitalObject save(DigitalObject digitalObject) {
     digitalObject.setUuid(UUID.randomUUID());
     digitalObject.setCreated(LocalDateTime.now());
@@ -635,14 +735,15 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     return getFileResources(digitalObjectUuid);
   }
 
+
   @Override
-  public void deleteFileResources(UUID digitalObjectUuid) {
-    dbi.withHandle(
-        h ->
-            h.createUpdate(
-                    "DELETE FROM digitalobject_fileresources WHERE digitalobject_uuid = :uuid")
-                .bind("uuid", digitalObjectUuid)
-                .execute());
+  public List<FileResource> saveRelatedFileResources(DigitalObject entity, List<FileResource> fileResources) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
+  public List<FileResource> saveRelatedFileResources(UUID entityUuid, List<FileResource> fileResources) {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
@@ -676,75 +777,5 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
     DigitalObject result = findOne(digitalObject.getUuid());
     return result;
-  }
-
-  @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"created", "lastModified", "refId"};
-  }
-
-  @Override
-  protected String getColumnName(String modelProperty) {
-    if (modelProperty == null) {
-      return null;
-    }
-    switch (modelProperty) {
-      case "created":
-        return "d.created";
-      case "lastModified":
-        return "d.last_modified";
-      case "publicationEnd":
-        return "c.publication_end";
-      case "publicationStart":
-        return "c.publication_start";
-      case "refId":
-        return "d.refid";
-      default:
-        return null;
-    }
-  }
-
-  @Override
-  public boolean deleteIdentifiers(UUID digitalObjectUuid) {
-    DigitalObject digitalObject = findOne(digitalObjectUuid);
-    if (digitalObject == null) {
-      return false;
-    }
-
-    identifierRepository.delete(
-        digitalObject.getIdentifiers().stream()
-            .map(Identifier::getUuid)
-            .collect(Collectors.toList()));
-
-    return true;
-  }
-
-  public static BiFunction<
-          LinkedHashMap<UUID, DigitalObject>, RowView, LinkedHashMap<UUID, DigitalObject>>
-      mapRowToDigitalObject() {
-    return mapRowToDigitalObject(false);
-  }
-
-  public static BiFunction<
-          LinkedHashMap<UUID, DigitalObject>, RowView, LinkedHashMap<UUID, DigitalObject>>
-      mapRowToDigitalObject(boolean withIdentifiers) {
-    return (map, rowView) -> {
-      DigitalObject digitalObject =
-          map.computeIfAbsent(
-              rowView.getColumn("do_uuid", UUID.class),
-              fn -> {
-                return rowView.getRow(DigitalObjectImpl.class);
-              });
-
-      if (rowView.getColumn("pi_uuid", UUID.class) != null) {
-        digitalObject.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
-      }
-
-      if (withIdentifiers && rowView.getColumn("id_uuid", UUID.class) != null) {
-        IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
-        digitalObject.addIdentifier(dbIdentifier);
-      }
-      return map;
-    };
   }
 }

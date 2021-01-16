@@ -16,8 +16,12 @@ public interface IdentifiableRepository<I extends Identifiable> {
 
   long count();
 
-  void delete(UUID uuid);
+  default void delete(UUID uuid) {
+    delete(List.of(uuid)); // same performance as "where uuid = :uuid"
+  }
 
+  void delete(List<UUID> uuids);
+  
   PageResponse<I> find(PageRequest pageRequest);
 
   SearchPageResponse<I> find(SearchPageRequest searchPageRequest);
@@ -28,10 +32,20 @@ public interface IdentifiableRepository<I extends Identifiable> {
     return response.getContent();
   }
 
+  
+  /**
+   * Returns a list of all identifiables, reduced to their identifiers and last modification date
+   *
+   * @return partially filled complete list of all identifiables of implementing repository entity type
+   */
+  List<I> findAllReduced();
+  
   I findOne(Identifier identifier);
 
-  I findOne(UUID uuid);
-
+  default I findOne(UUID uuid) {
+    return findOne(uuid, null);
+  }
+  
   I findOne(UUID uuid, Filtering filtering);
   
   default I findOneByIdentifier(String namespace, String id) {
