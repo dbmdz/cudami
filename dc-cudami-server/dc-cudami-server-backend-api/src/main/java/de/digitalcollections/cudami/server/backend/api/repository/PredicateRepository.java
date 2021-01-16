@@ -8,6 +8,10 @@ import java.util.List;
  */
 public interface PredicateRepository {
 
+  long count();
+
+  void delete(String value);
+  
   /**
    * Return all predicates
    *

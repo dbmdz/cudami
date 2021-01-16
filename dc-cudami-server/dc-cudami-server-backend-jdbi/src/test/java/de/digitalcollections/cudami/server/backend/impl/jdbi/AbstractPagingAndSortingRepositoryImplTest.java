@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi;
 
+import de.digitalcollections.cudami.server.backend.impl.database.AbstractPagingAndSortingRepositoryImpl;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.digitalcollections.model.api.filter.FilterCriterion;
