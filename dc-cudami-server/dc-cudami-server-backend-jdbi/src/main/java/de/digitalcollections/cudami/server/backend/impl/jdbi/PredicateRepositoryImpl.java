@@ -14,17 +14,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class PredicateRepositoryImpl extends JdbiRepositoryImpl
-        implements PredicateRepository {
+public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements PredicateRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PredicateRepositoryImpl.class);
 
-  public static final String SQL_REDUCED_PREDICATE_FIELDS_PRED
-          = " p.value pred_value, p.label pred_label,"
+  public static final String SQL_REDUCED_FIELDS_PRED =
+      " p.value pred_value, p.label pred_label,"
           + " p.created pred_created, p.last_modified pred_lastModified";
 
-  public static final String SQL_FULL_PREDICATE_FIELDS_PRED
-          = SQL_REDUCED_PREDICATE_FIELDS_PRED + " , p.description pred_description";
+  public static final String SQL_FULL_FIELDS_PRED =
+      SQL_REDUCED_FIELDS_PRED + " , p.description pred_description";
 
   @Autowired
   public PredicateRepositoryImpl(Jdbi dbi) {
@@ -34,40 +33,40 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl
   @Override
   public void delete(String value) {
     dbi.withHandle(
-            h
-            -> h.createUpdate("DELETE FROM " + tableName + " WHERE value = :value")
-                    .bind("value", value)
-                    .execute());
+        h ->
+            h.createUpdate("DELETE FROM " + tableName + " WHERE value = :value")
+                .bind("value", value)
+                .execute());
   }
 
   @Override
   public List<Predicate> findAll() {
     final String sql = "SELECT * FROM predicates AS p";
 
-    List<Predicate> result
-            = dbi.withHandle(
-                    h
-                    -> h.createQuery(sql).mapToBean(PredicateImpl.class).stream()
-                            .map(Predicate.class::cast)
-                            .collect(Collectors.toList()));
+    List<Predicate> result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(sql).mapToBean(PredicateImpl.class).stream()
+                    .map(Predicate.class::cast)
+                    .collect(Collectors.toList()));
     return result;
   }
 
   @Override
   public Predicate findOneByValue(String value) {
     String query = "SELECT * FROM predicates WHERE value = :value";
-    Optional<Predicate> result
-            = dbi.withHandle(
-                    h
-                    -> h.createQuery(query).bind("value", value).mapToBean(PredicateImpl.class).stream()
-                            .map(Predicate.class::cast)
-                            .findFirst());
+    Optional<Predicate> result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(query).bind("value", value).mapToBean(PredicateImpl.class).stream()
+                    .map(Predicate.class::cast)
+                    .findFirst());
     return result.orElse(null);
   }
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[]{"created", "label", "lastModified", "value"};
+    return new String[] {"created", "label", "lastModified", "value"};
   }
 
   @Override
@@ -100,8 +99,8 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl
 
     if (existingPredicate != null) {
       // Update
-      String updateQuery
-              = "UPDATE predicates SET"
+      String updateQuery =
+          "UPDATE predicates SET"
               + " label=:label::JSONB, description=:description::JSONB,"
               + " last_modified=:lastModified"
               + " WHERE value=:value";
@@ -111,8 +110,8 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl
       // Creation
       predicate.setCreated(predicate.getLastModified());
 
-      String createQuery
-              = "INSERT INTO predicates("
+      String createQuery =
+          "INSERT INTO predicates("
               + "value, label, description,"
               + " created, last_modified"
               + ") VALUES ("

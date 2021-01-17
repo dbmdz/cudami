@@ -6,9 +6,7 @@ import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * @param <E> entity instance
- */
+/** @param <E> entity instance */
 public interface EntityRepository<E extends Entity> extends IdentifiableRepository<E> {
 
   default void addRelatedFileresource(E entity, FileResource fileResource) {
@@ -26,7 +24,8 @@ public interface EntityRepository<E extends Entity> extends IdentifiableReposito
   List<FileResource> getRelatedFileResources(UUID entityUuid);
 
   /**
-   * Save list of file resources related to an entity. Prerequisite: file resources have been saved before (exist already)
+   * Save list of file resources related to an entity. Prerequisite: file resources have been saved
+   * before (exist already)
    *
    * @param entity entity the fileresources are related to
    * @param fileResources the fileresources that are related to the entity

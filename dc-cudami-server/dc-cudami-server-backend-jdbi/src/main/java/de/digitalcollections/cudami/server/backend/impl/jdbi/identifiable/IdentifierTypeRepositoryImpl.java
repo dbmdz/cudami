@@ -17,7 +17,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
-        implements IdentifierTypeRepository {
+    implements IdentifierTypeRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifierTypeRepositoryImpl.class);
 
@@ -29,12 +29,12 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
   @Override
   public void delete(List<UUID> uuids) {
     dbi.withHandle(
-            h
-            -> h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
-                    .bindList("uuids", uuids)
-                    .execute());
+        h ->
+            h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
+                .bindList("uuids", uuids)
+                .execute());
   }
-  
+
   @Override
   public PageResponse<IdentifierType> find(PageRequest pageRequest) {
     StringBuilder innerQuery = new StringBuilder("SELECT * FROM " + tableName);
@@ -43,56 +43,57 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
 
     final String sql = innerQuery.toString();
 
-    List<IdentifierType> result
-            = dbi.withHandle(
-                    h -> h.createQuery(sql).mapToBean(IdentifierTypeImpl.class).map(IdentifierType.class::cast).list());
+    List<IdentifierType> result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(sql)
+                    .mapToBean(IdentifierTypeImpl.class)
+                    .map(IdentifierType.class::cast)
+                    .list());
 
     StringBuilder sqlCount = new StringBuilder("SELECT count(*) FROM " + tableName);
     addFiltering(pageRequest, sqlCount);
-    long total
-            = dbi.withHandle(h -> h.createQuery(sqlCount.toString()).mapTo(Long.class).findOne().get());
+    long total =
+        dbi.withHandle(h -> h.createQuery(sqlCount.toString()).mapTo(Long.class).findOne().get());
 
     return new PageResponseImpl<>(result, pageRequest, total);
   }
 
   @Override
   public IdentifierType findOne(UUID uuid) {
-    final String sql
-            = "SELECT * FROM " + tableName + " WHERE uuid = :uuid";
+    final String sql = "SELECT * FROM " + tableName + " WHERE uuid = :uuid";
 
-    IdentifierType identifierType
-            = dbi.withHandle(
-                    h
-                    -> h.createQuery(sql)
-                            .bind("uuid", uuid)
-                            .mapToBean(IdentifierTypeImpl.class)
-                            .findOne()
-                            .orElse(null));
+    IdentifierType identifierType =
+        dbi.withHandle(
+            h ->
+                h.createQuery(sql)
+                    .bind("uuid", uuid)
+                    .mapToBean(IdentifierTypeImpl.class)
+                    .findOne()
+                    .orElse(null));
 
     return identifierType;
   }
 
   @Override
   public IdentifierType findOneByNamespace(String namespace) {
-    final String sql
-            = "SELECT * FROM " + tableName + " WHERE namespace = :namespace";
+    final String sql = "SELECT * FROM " + tableName + " WHERE namespace = :namespace";
 
-    IdentifierType identifierType
-            = dbi.withHandle(
-                    h
-                    -> h
-                            .createQuery(sql)
-                            .bind("namespace", namespace)
-                            .mapToBean(IdentifierTypeImpl.class)
-                            .findOne()
-                            .orElse(null));
+    IdentifierType identifierType =
+        dbi.withHandle(
+            h ->
+                h.createQuery(sql)
+                    .bind("namespace", namespace)
+                    .mapToBean(IdentifierTypeImpl.class)
+                    .findOne()
+                    .orElse(null));
 
     return identifierType;
   }
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[]{"label", "namespace", "pattern"};
+    return new String[] {"label", "namespace", "pattern"};
   }
 
   @Override
@@ -116,34 +117,40 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
   public IdentifierType save(IdentifierType identifierType) {
     identifierType.setUuid(UUID.randomUUID());
 
-    final String sql = "INSERT INTO " + tableName + "(uuid, label, namespace, pattern)"
+    final String sql =
+        "INSERT INTO "
+            + tableName
+            + "(uuid, label, namespace, pattern)"
             + " VALUES (:uuid, :label, :namespace, :pattern)"
             + " RETURNING *";
 
-    IdentifierType result
-            = dbi.withHandle(
-                    h
-                    -> h.createQuery(sql)
-                            .bindBean(identifierType)
-                            .mapToBean(IdentifierTypeImpl.class)
-                            .findOne()
-                            .orElse(null));
+    IdentifierType result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(sql)
+                    .bindBean(identifierType)
+                    .mapToBean(IdentifierTypeImpl.class)
+                    .findOne()
+                    .orElse(null));
     return result;
   }
 
   @Override
   public IdentifierType update(IdentifierType identifierType) {
     // do not update/left out from statement (not changed since insert): uuid
-    final String sql = "UPDATE " + tableName + " SET label=:label, namespace=:namespace, pattern=:pattern WHERE uuid=:uuid RETURNING *";
+    final String sql =
+        "UPDATE "
+            + tableName
+            + " SET label=:label, namespace=:namespace, pattern=:pattern WHERE uuid=:uuid RETURNING *";
 
-    IdentifierType result
-            = dbi.withHandle(
-                    h
-                    -> h.createQuery(sql)
-                            .bindBean(identifierType)
-                            .mapToBean(IdentifierTypeImpl.class)
-                            .findOne()
-                            .orElse(null));
+    IdentifierType result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(sql)
+                    .bindBean(identifierType)
+                    .mapToBean(IdentifierTypeImpl.class)
+                    .findOne()
+                    .orElse(null));
     return result;
   }
 }

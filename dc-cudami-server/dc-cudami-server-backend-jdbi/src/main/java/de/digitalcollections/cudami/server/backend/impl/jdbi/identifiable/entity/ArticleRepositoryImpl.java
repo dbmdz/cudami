@@ -1,9 +1,10 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
+import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierRepositoryImpl.SQL_FULL_FIELDS_ID;
+import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl.SQL_PREVIEW_IMAGE_FIELDS_PI;
+
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ArticleRepository;
-import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierRepositoryImpl.SQL_FULL_IDENTIFIER_FIELDS_ID;
-import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl.SQL_PREVIEW_IMAGE_FIELDS_PI;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Article;
@@ -37,28 +38,37 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
-        implements ArticleRepository<ArticleImpl> {
+    implements ArticleRepository<ArticleImpl> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticleRepositoryImpl.class);
 
-  public static final String SQL_REDUCED_ARTICLE_FIELDS_AR
-          = " a.uuid ar_uuid, a.refid ar_refId, a.label ar_label, a.description ar_description,"
+  public static final String SQL_REDUCED_FIELDS_AR =
+      " a.uuid ar_uuid, a.refid ar_refId, a.label ar_label, a.description ar_description,"
           + " a.identifiable_type ar_type, a.entity_type ar_entityType,"
           + " a.created ar_created, a.last_modified ar_lastModified,"
           + " a.preview_hints ar_previewImageRenderingHints,"
           + " a.date_published ar_datePublished, a.timevalue_published ar_timeValuePublished";
 
-  public static final String SQL_FULL_ARTICLE_FIELDS_AR = SQL_REDUCED_ARTICLE_FIELDS_AR + ", a.text ar_text";
-  
+  public static final String SQL_FULL_FIELDS_AR = SQL_REDUCED_FIELDS_AR + ", a.text ar_text";
+
   public static final String TABLE_NAME = "articles";
-  
+
   private final EntityRepositoryImpl<EntityImpl> entityRepositoryImpl;
 
   @Autowired
-  public ArticleRepositoryImpl(Jdbi dbi,
-          IdentifierRepository identifierRepository,
-          @Qualifier("entityRepositoryImpl") EntityRepositoryImpl<EntityImpl> entityRepositoryImpl) {
-    super(dbi, identifierRepository, TABLE_NAME, "a", "ar", ArticleImpl.class, SQL_REDUCED_ARTICLE_FIELDS_AR, SQL_FULL_ARTICLE_FIELDS_AR);
+  public ArticleRepositoryImpl(
+      Jdbi dbi,
+      IdentifierRepository identifierRepository,
+      @Qualifier("entityRepositoryImpl") EntityRepositoryImpl<EntityImpl> entityRepositoryImpl) {
+    super(
+        dbi,
+        identifierRepository,
+        TABLE_NAME,
+        "a",
+        "ar",
+        ArticleImpl.class,
+        SQL_REDUCED_FIELDS_AR,
+        SQL_FULL_FIELDS_AR);
     this.entityRepositoryImpl = entityRepositoryImpl;
   }
 
@@ -95,7 +105,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[]{"created", "lastModified", "refId"};
+    return new String[] {"created", "lastModified", "refId"};
   }
 
   @Override
@@ -117,17 +127,19 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
 
   @Override
   public List<Agent> getCreators(UUID articleUuid) {
-    String innerQuery
-            = "SELECT * FROM " + EntityRepositoryImpl.TABLE_NAME + " AS e"
+    String innerQuery =
+        "SELECT * FROM "
+            + EntityRepositoryImpl.TABLE_NAME
+            + " AS e"
             + " LEFT JOIN article_creators AS ac ON e.uuid = ac.agent_uuid"
             + " WHERE ac.article_uuid = :uuid"
             + " ORDER BY ac.sortindex ASC";
 
-    final String sql
-            = "SELECT"
+    final String sql =
+        "SELECT"
             + EntityRepositoryImpl.SQL_REDUCED_ENTITY_FIELDS_E
             + ","
-            + SQL_FULL_IDENTIFIER_FIELDS_ID
+            + SQL_FULL_FIELDS_ID
             + ","
             + SQL_PREVIEW_IMAGE_FIELDS_PI
             + " FROM ("
@@ -136,47 +148,47 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
             + " LEFT JOIN identifiers AS id ON e.uuid = id.identifiable"
             + " LEFT JOIN fileresources_image AS file ON e.previewfileresource = file.uuid";
 
-    List<Agent> result
-            = dbi.withHandle(
-                    h
-                    -> h
-                            .createQuery(sql)
-                            .bind("uuid", articleUuid)
-                            .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
-                            .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                            .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
-                            .reduceRows(
-                                    new LinkedHashMap<UUID, EntityImpl>(),
-                                    entityRepositoryImpl.mapRowToIdentifiable(true, true))
-                            .values()
-                            .stream()
-                            .map(
-                                    (entity) -> {
-                                      EntityType entityType = entity.getEntityType();
-                                      switch (entityType) {
-                                        case CORPORATE_BODY:
-                                          CorporateBody corporateBody = new CorporateBodyImpl();
-                                          corporateBody.setLabel(entity.getLabel());
-                                          corporateBody.setRefId(entity.getRefId());
-                                          corporateBody.setUuid(entity.getUuid());
-                                          return corporateBody;
-                                        case FAMILY:
-                                          Family family = new FamilyImpl();
-                                          family.setLabel(entity.getLabel());
-                                          family.setRefId(entity.getRefId());
-                                          family.setUuid(entity.getUuid());
-                                          return family;
-                                        case PERSON:
-                                          Person person = new PersonImpl();
-                                          person.setLabel(entity.getLabel());
-                                          person.setRefId(entity.getRefId());
-                                          person.setUuid(entity.getUuid());
-                                          return person;
-                                        default:
-                                          return null;
-                                      }
-                                    })
-                            .collect(Collectors.toList()));
+    List<Agent> result =
+        dbi.withHandle(
+            h ->
+                h
+                    .createQuery(sql)
+                    .bind("uuid", articleUuid)
+                    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
+                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
+                    .reduceRows(
+                        new LinkedHashMap<UUID, EntityImpl>(),
+                        entityRepositoryImpl.mapRowToIdentifiable(true, true))
+                    .values()
+                    .stream()
+                    .map(
+                        (entity) -> {
+                          EntityType entityType = entity.getEntityType();
+                          switch (entityType) {
+                            case CORPORATE_BODY:
+                              CorporateBody corporateBody = new CorporateBodyImpl();
+                              corporateBody.setLabel(entity.getLabel());
+                              corporateBody.setRefId(entity.getRefId());
+                              corporateBody.setUuid(entity.getUuid());
+                              return corporateBody;
+                            case FAMILY:
+                              Family family = new FamilyImpl();
+                              family.setLabel(entity.getLabel());
+                              family.setRefId(entity.getRefId());
+                              family.setUuid(entity.getUuid());
+                              return family;
+                            case PERSON:
+                              Person person = new PersonImpl();
+                              person.setLabel(entity.getLabel());
+                              person.setRefId(entity.getRefId());
+                              person.setUuid(entity.getUuid());
+                              return person;
+                            default:
+                              return null;
+                          }
+                        })
+                    .collect(Collectors.toList()));
     return result;
   }
 
@@ -191,11 +203,13 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
     article.setCreated(LocalDateTime.now());
     article.setLastModified(LocalDateTime.now());
     // refid is generated as serial, DO NOT SET!
-    final UUID previewImageUuid
-            = article.getPreviewImage() == null ? null : article.getPreviewImage().getUuid();
+    final UUID previewImageUuid =
+        article.getPreviewImage() == null ? null : article.getPreviewImage().getUuid();
 
-    final String sql
-            = "INSERT INTO " + tableName + "("
+    final String sql =
+        "INSERT INTO "
+            + tableName
+            + "("
             + "uuid, label, description, previewfileresource, preview_hints,"
             + " identifiable_type, entity_type,"
             + " created, last_modified,"
@@ -210,11 +224,11 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
             + ")";
 
     dbi.withHandle(
-            h
-            -> h.createUpdate(sql)
-                    .bind("previewFileResource", previewImageUuid)
-                    .bindBean(article)
-                    .execute());
+        h ->
+            h.createUpdate(sql)
+                .bind("previewFileResource", previewImageUuid)
+                .bindBean(article)
+                .execute());
 
     // save identifiers
     Set<Identifier> identifiers = article.getIdentifiers();
@@ -233,27 +247,27 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
 
     // as we store the whole list new: delete old entries
     dbi.withHandle(
-            h
-            -> h.createUpdate("DELETE FROM article_creators WHERE article_uuid = :uuid")
-                    .bind("uuid", articleUuid)
-                    .execute());
+        h ->
+            h.createUpdate("DELETE FROM article_creators WHERE article_uuid = :uuid")
+                .bind("uuid", articleUuid)
+                .execute());
 
     if (creators != null) {
       // second: save relations
       dbi.useHandle(
-              handle -> {
-                PreparedBatch preparedBatch
-                = handle.prepareBatch(
-                        "INSERT INTO article_creators(work_uuid, agent_uuid, sortIndex) VALUES(:uuid, :agentUuid, :sortIndex)");
-                for (Agent agent : creators) {
-                  preparedBatch
-                          .bind("uuid", articleUuid)
-                          .bind("agentUuid", agent.getUuid())
-                          .bind("sortIndex", getIndex(creators, agent))
-                          .add();
-                }
-                preparedBatch.execute();
-              });
+          handle -> {
+            PreparedBatch preparedBatch =
+                handle.prepareBatch(
+                    "INSERT INTO article_creators(work_uuid, agent_uuid, sortIndex) VALUES(:uuid, :agentUuid, :sortIndex)");
+            for (Agent agent : creators) {
+              preparedBatch
+                  .bind("uuid", articleUuid)
+                  .bind("agentUuid", agent.getUuid())
+                  .bind("sortIndex", getIndex(creators, agent))
+                  .add();
+            }
+            preparedBatch.execute();
+          });
     }
   }
 
@@ -262,11 +276,13 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
     article.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, entity_type, refid
-    final UUID previewImageUuid
-            = article.getPreviewImage() == null ? null : article.getPreviewImage().getUuid();
+    final UUID previewImageUuid =
+        article.getPreviewImage() == null ? null : article.getPreviewImage().getUuid();
 
-    final String sql
-            = "UPDATE " + tableName + " SET"
+    final String sql =
+        "UPDATE "
+            + tableName
+            + " SET"
             + " label=:label::JSONB, description=:description::JSONB,"
             + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
             + " last_modified=:lastModified,"
@@ -275,11 +291,11 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
             + " WHERE uuid=:uuid";
 
     dbi.withHandle(
-            h
-            -> h.createUpdate(sql)
-                    .bind("previewFileResource", previewImageUuid)
-                    .bindBean(article)
-                    .execute());
+        h ->
+            h.createUpdate(sql)
+                .bind("previewFileResource", previewImageUuid)
+                .bindBean(article)
+                .execute());
 
     // save identifiers
     // as we store the whole list new: delete old entries
@@ -294,5 +310,4 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
     ArticleImpl result = findOne(article.getUuid());
     return result;
   }
-
 }

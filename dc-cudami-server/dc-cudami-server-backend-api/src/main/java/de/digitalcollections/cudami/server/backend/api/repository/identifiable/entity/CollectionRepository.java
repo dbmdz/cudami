@@ -12,8 +12,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-/** Repository for Collection persistence handling.
- * @param <C> instance implementing Collection */
+/**
+ * Repository for Collection persistence handling.
+ *
+ * @param <C> instance implementing Collection
+ */
 public interface CollectionRepository<C extends Collection>
     extends NodeRepository<C>, EntityRepository<C> {
 
@@ -57,8 +60,7 @@ public interface CollectionRepository<C extends Collection>
     return getChildren(collection.getUuid());
   }
 
-  default PageResponse<DigitalObject> getDigitalObjects(
-      C collection, PageRequest pageRequest) {
+  default PageResponse<DigitalObject> getDigitalObjects(C collection, PageRequest pageRequest) {
     if (collection == null) {
       return null;
     }

@@ -14,7 +14,7 @@ public interface EntityRelationsRepository {
   }
 
   void deleteBySubject(UUID subjectEntityUuid);
-  
+
   /**
    * Get paged, sorted, filtered relations
    *

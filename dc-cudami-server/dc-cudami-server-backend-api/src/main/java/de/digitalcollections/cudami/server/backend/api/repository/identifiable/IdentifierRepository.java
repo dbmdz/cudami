@@ -19,15 +19,15 @@ public interface IdentifierRepository {
   }
 
   void delete(List<UUID> uuids);
-  
+
   default void deleteByIdentifiable(Identifiable identifiable) {
     deleteByIdentifiable(identifiable.getUuid());
   }
-  
+
   void deleteByIdentifiable(UUID identifiableUuid);
 
   PageResponse<Identifier> find(PageRequest pageRequest);
-  
+
   SearchPageResponse<Identifier> find(SearchPageRequest searchPageRequest);
 
   default List<Identifier> find(String searchTerm, int maxResults) {
