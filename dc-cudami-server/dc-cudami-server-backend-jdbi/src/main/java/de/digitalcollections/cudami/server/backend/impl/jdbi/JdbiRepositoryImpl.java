@@ -22,4 +22,16 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
     long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
     return count;
   }
+
+  public String getMappingPrefix() {
+    return mappingPrefix;
+  }
+
+  public String getTableAlias() {
+    return tableAlias;
+  }
+
+  public String getTableName() {
+    return tableName;
+  }
 }

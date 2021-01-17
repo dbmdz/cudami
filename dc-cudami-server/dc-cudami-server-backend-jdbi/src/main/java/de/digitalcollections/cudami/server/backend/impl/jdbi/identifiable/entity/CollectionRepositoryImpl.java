@@ -1,8 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
-import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierRepositoryImpl.SQL_FULL_IDENTIFIER_FIELDS_ID;
-import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl.SQL_REDUCED_DIGITALOBJECT_FIELDS_DO;
-import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl.mapRowToDigitalObject;
+import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierRepositoryImpl.SQL_FULL_FIELDS_ID;
+import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl.SQL_REDUCED_FIELDS_DO;
 import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl.SQL_REDUCED_CORPORATEBODY_FIELDS_CB;
 import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl.mapRowToCorporateBody;
 import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl.SQL_PREVIEW_IMAGE_FIELDS_PI;
@@ -47,27 +46,38 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImpl>
-        implements CollectionRepository<CollectionImpl> {
+    implements CollectionRepository<CollectionImpl> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionRepositoryImpl.class);
 
-  public static final String SQL_REDUCED_COLLECTION_FIELDS_COL
-          = " c.uuid col_uuid, c.refid col_refId, c.label col_label, c.description col_description,"
+  public static final String SQL_REDUCED_FIELDS_COL =
+      " c.uuid col_uuid, c.refid col_refId, c.label col_label, c.description col_description,"
           + " c.identifiable_type col_type, c.entity_type col_entityType,"
           + " c.created col_created, c.last_modified col_lastModified,"
           + " c.publication_start col_publicationStart, c.publication_end col_publicationEnd,"
           + " c.preview_hints col_previewImageRenderingHints";
 
-  public static final String SQL_FULL_COLLECTION_FIELDS_COL
-          = SQL_REDUCED_COLLECTION_FIELDS_COL + ", c.text col_text";
+  public static final String SQL_FULL_FIELDS_COL = SQL_REDUCED_FIELDS_COL + ", c.text col_text";
 
   public static final String TABLE_NAME = "collections";
 
+  private final DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
+
   @Autowired
   public CollectionRepositoryImpl(
-          Jdbi dbi,
-          IdentifierRepository identifierRepository) {
-    super(dbi, identifierRepository, TABLE_NAME, "c", "col", CollectionImpl.class, SQL_REDUCED_COLLECTION_FIELDS_COL, SQL_FULL_COLLECTION_FIELDS_COL);
+      Jdbi dbi,
+      IdentifierRepository identifierRepository,
+      DigitalObjectRepositoryImpl digitalObjectRepositoryImpl) {
+    super(
+        dbi,
+        identifierRepository,
+        TABLE_NAME,
+        "c",
+        "col",
+        CollectionImpl.class,
+        SQL_REDUCED_FIELDS_COL,
+        SQL_FULL_FIELDS_COL);
+    this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
   }
 
   @Override
@@ -75,65 +85,65 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
     if (parentUuid == null || children == null) {
       return false;
     }
-    Integer nextSortIndex
-            = dbi.withHandle(
-                    (Handle h)
-                    -> h.createQuery(
-                            "SELECT MAX(sortIndex) + 1 FROM collection_collections"
+    Integer nextSortIndex =
+        dbi.withHandle(
+            (Handle h) ->
+                h.createQuery(
+                        "SELECT MAX(sortIndex) + 1 FROM collection_collections"
                             + " WHERE parent_collection_uuid = :parent_uuid")
-                            .bind("parent_uuid", parentUuid)
-                            .mapTo(Integer.class)
-                            .findOne()
-                            .orElse(0));
+                    .bind("parent_uuid", parentUuid)
+                    .mapTo(Integer.class)
+                    .findOne()
+                    .orElse(0));
     dbi.useHandle(
-            handle -> {
-              PreparedBatch preparedBatch
-              = handle.prepareBatch(
-                      "INSERT INTO collection_collections(parent_collection_uuid, child_collection_uuid, sortIndex)"
+        handle -> {
+          PreparedBatch preparedBatch =
+              handle.prepareBatch(
+                  "INSERT INTO collection_collections(parent_collection_uuid, child_collection_uuid, sortIndex)"
                       + " VALUES (:parentCollectionUuid, :childCollectionUuid, :sortIndex) ON CONFLICT (parent_collection_uuid, child_collection_uuid) DO NOTHING");
-              children.forEach(
-                      child -> {
-                        preparedBatch
-                                .bind("parentCollectionUuid", parentUuid)
-                                .bind("childCollectionUuid", child.getUuid())
-                                .bind("sortIndex", nextSortIndex + getIndex(children, child))
-                                .add();
-                      });
-              preparedBatch.execute();
-            });
+          children.forEach(
+              child -> {
+                preparedBatch
+                    .bind("parentCollectionUuid", parentUuid)
+                    .bind("childCollectionUuid", child.getUuid())
+                    .bind("sortIndex", nextSortIndex + getIndex(children, child))
+                    .add();
+              });
+          preparedBatch.execute();
+        });
     return true;
   }
 
   @Override
   public boolean addDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects) {
     if (collectionUuid != null && digitalObjects != null) {
-      Integer nextSortIndex
-              = dbi.withHandle(
-                      (Handle h)
-                      -> h.createQuery(
-                              "SELECT MAX(sortIndex) + 1 FROM collection_digitalobjects"
+      Integer nextSortIndex =
+          dbi.withHandle(
+              (Handle h) ->
+                  h.createQuery(
+                          "SELECT MAX(sortIndex) + 1 FROM collection_digitalobjects"
                               + " WHERE collection_uuid = :parent_uuid")
-                              .bind("parent_uuid", collectionUuid)
-                              .mapTo(Integer.class)
-                              .findOne()
-                              .orElse(0));
+                      .bind("parent_uuid", collectionUuid)
+                      .mapTo(Integer.class)
+                      .findOne()
+                      .orElse(0));
 
       // save relation to collection
       dbi.useHandle(
-              handle -> {
-                PreparedBatch preparedBatch
-                = handle.prepareBatch(
-                        "INSERT INTO collection_digitalobjects(collection_uuid, digitalobject_uuid, sortIndex) VALUES (:uuid, :digitalObjectUuid, :sortIndex) ON CONFLICT (collection_uuid, digitalobject_uuid) DO NOTHING");
-                digitalObjects.forEach(
-                        digitalObject -> {
-                          preparedBatch
-                                  .bind("uuid", collectionUuid)
-                                  .bind("digitalObjectUuid", digitalObject.getUuid())
-                                  .bind("sortIndex", nextSortIndex + getIndex(digitalObjects, digitalObject))
-                                  .add();
-                        });
-                preparedBatch.execute();
-              });
+          handle -> {
+            PreparedBatch preparedBatch =
+                handle.prepareBatch(
+                    "INSERT INTO collection_digitalobjects(collection_uuid, digitalobject_uuid, sortIndex) VALUES (:uuid, :digitalObjectUuid, :sortIndex) ON CONFLICT (collection_uuid, digitalobject_uuid) DO NOTHING");
+            digitalObjects.forEach(
+                digitalObject -> {
+                  preparedBatch
+                      .bind("uuid", collectionUuid)
+                      .bind("digitalObjectUuid", digitalObject.getUuid())
+                      .bind("sortIndex", nextSortIndex + getIndex(digitalObjects, digitalObject))
+                      .add();
+                });
+            preparedBatch.execute();
+          });
       return true;
     }
     return false;
@@ -145,7 +155,10 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
 
     if (collection != null) {
       // TODO could be replaced with another join in above query...
-      collection.setChildren(Stream.ofNullable(getChildren(collection)).map(Collection.class::cast).collect(Collectors.toList()));
+      collection.setChildren(
+          Stream.ofNullable(getChildren(collection))
+              .map(Collection.class::cast)
+              .collect(Collectors.toList()));
     }
     return collection;
   }
@@ -156,7 +169,10 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
 
     if (collection != null) {
       // TODO could be replaced with another join in above query...
-      collection.setChildren(Stream.ofNullable(getChildren(collection)).map(Collection.class::cast).collect(Collectors.toList()));
+      collection.setChildren(
+          Stream.ofNullable(getChildren(collection))
+              .map(Collection.class::cast)
+              .collect(Collectors.toList()));
     }
     return collection;
   }
@@ -167,14 +183,17 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
 
     if (collection != null) {
       // TODO could be replaced with another join in above query...
-      collection.setChildren(Stream.ofNullable(getChildren(collection)).map(Collection.class::cast).collect(Collectors.toList()));
+      collection.setChildren(
+          Stream.ofNullable(getChildren(collection))
+              .map(Collection.class::cast)
+              .collect(Collectors.toList()));
     }
     return collection;
   }
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[]{
+    return new String[] {
       "created", "label", "lastModified", "publicationEnd", "publicationStart", "refId"
     };
   }
@@ -182,11 +201,11 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
   @Override
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
 
-    List<NodeImpl> result
-            = dbi.withHandle(
-                    h
-                    -> h.createQuery(
-                            "WITH recursive breadcrumb (uuid,label,parent_uuid,depth)"
+    List<NodeImpl> result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(
+                        "WITH recursive breadcrumb (uuid,label,parent_uuid,depth)"
                             + " AS ("
                             + "        SELECT c.uuid AS uuid, c.label AS label, c.refid c_refId, cc.parent_collection_uuid AS parent_uuid, 99 AS depth"
                             + "        FROM collections c, collection_collections cc"
@@ -201,25 +220,25 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
                             + "    )"
                             + " SELECT * FROM breadcrumb"
                             + " ORDER BY depth ASC")
-                            .bind("uuid", nodeUuid)
-                            .registerRowMapper(BeanMapper.factory(NodeImpl.class))
-                            .mapTo(NodeImpl.class)
-                            .list());
+                    .bind("uuid", nodeUuid)
+                    .registerRowMapper(BeanMapper.factory(NodeImpl.class))
+                    .mapTo(NodeImpl.class)
+                    .list());
 
     if (result.isEmpty()) {
       // Special case: If we are on a top level collection, we have no parent, so
       // we must construct a breadcrumb more or less manually
-      result
-              = dbi.withHandle(
-                      h
-                      -> h.createQuery(
-                              "SELECT c.uuid AS uuid, c.label AS label"
+      result =
+          dbi.withHandle(
+              h ->
+                  h.createQuery(
+                          "SELECT c.uuid AS uuid, c.label AS label"
                               + "        FROM collections c"
                               + "        WHERE uuid= :uuid")
-                              .bind("uuid", nodeUuid)
-                              .registerRowMapper(BeanMapper.factory(NodeImpl.class))
-                              .mapTo(NodeImpl.class)
-                              .list());
+                      .bind("uuid", nodeUuid)
+                      .registerRowMapper(BeanMapper.factory(NodeImpl.class))
+                      .mapTo(NodeImpl.class)
+                      .list());
     }
 
     List<Node> nodes = result.stream().map(s -> (Node) s).collect(Collectors.toList());
@@ -233,88 +252,111 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
 
   @Override
   public List<CollectionImpl> getChildren(UUID uuid) {
-    String innerQuery
-            = "SELECT * FROM " + tableName + " AS " + tableAlias
-            + " INNER JOIN collection_collections cc ON " + tableAlias + ".uuid = cc.child_collection_uuid"
+    String innerQuery =
+        "SELECT * FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + " INNER JOIN collection_collections cc ON "
+            + tableAlias
+            + ".uuid = cc.child_collection_uuid"
             + " WHERE cc.parent_collection_uuid = :uuid"
             + " ORDER BY cc.sortIndex ASC";
 
-    final String sql
-            = "SELECT"
+    final String sql =
+        "SELECT"
             + reducedFieldsSql
             + ","
             + SQL_PREVIEW_IMAGE_FIELDS_PI
             + " FROM ("
             + innerQuery
-            + ") AS " + tableAlias
-            + " LEFT JOIN fileresources_image AS file ON " + tableAlias + ".previewfileresource = file.uuid";
+            + ") AS "
+            + tableAlias
+            + " LEFT JOIN fileresources_image AS file ON "
+            + tableAlias
+            + ".previewfileresource = file.uuid";
 
-    List<CollectionImpl> result
-            = dbi.withHandle(
-                    h
-                    -> h
-                            .createQuery(sql)
-                            .bind("uuid", uuid)
-                            .registerRowMapper(BeanMapper.factory(identifiableImplClass, mappingPrefix))
-                            .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
-                            .reduceRows(
-                                    new LinkedHashMap<UUID, CollectionImpl>(), mapRowToIdentifiable(false, true))
-                            .values()
-                            .stream()
-                            .collect(Collectors.toList()));
+    List<CollectionImpl> result =
+        dbi.withHandle(
+            h ->
+                h
+                    .createQuery(sql)
+                    .bind("uuid", uuid)
+                    .registerRowMapper(BeanMapper.factory(identifiableImplClass, mappingPrefix))
+                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
+                    .reduceRows(
+                        new LinkedHashMap<UUID, CollectionImpl>(),
+                        mapRowToIdentifiable(false, true))
+                    .values()
+                    .stream()
+                    .collect(Collectors.toList()));
     return result;
   }
 
   @Override
   public PageResponse<CollectionImpl> getChildren(UUID uuid, PageRequest pageRequest) {
-    StringBuilder innerQuery
-            = new StringBuilder(
-                    "SELECT * FROM " + tableName + " AS " + tableAlias
-                    + " INNER JOIN collection_collections cc ON " + tableAlias + ".uuid = cc.child_collection_uuid"
-                    + " WHERE cc.parent_collection_uuid = :uuid");
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + tableName
+                + " AS "
+                + tableAlias
+                + " INNER JOIN collection_collections cc ON "
+                + tableAlias
+                + ".uuid = cc.child_collection_uuid"
+                + " WHERE cc.parent_collection_uuid = :uuid");
     addFiltering(pageRequest, innerQuery);
     pageRequest.setSorting(null);
     innerQuery.append(" ORDER BY cc.sortIndex ASC");
     addPageRequestParams(pageRequest, innerQuery);
 
-    final String sql
-            = "SELECT"
+    final String sql =
+        "SELECT"
             + reducedFieldsSql
             + ","
             + SQL_PREVIEW_IMAGE_FIELDS_PI
             + " FROM ("
             + innerQuery
-            + ") AS " + tableAlias
-            + " LEFT JOIN fileresources_image AS file ON " + tableAlias + ".previewfileresource = file.uuid";
+            + ") AS "
+            + tableAlias
+            + " LEFT JOIN fileresources_image AS file ON "
+            + tableAlias
+            + ".previewfileresource = file.uuid";
 
-    List<CollectionImpl> result
-            = dbi.withHandle(
-                    h
-                    -> h
-                            .createQuery(sql)
-                            .bind("uuid", uuid)
-                            .registerRowMapper(BeanMapper.factory(identifiableImplClass, mappingPrefix))
-                            .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
-                            .reduceRows(
-                                    new LinkedHashMap<UUID, CollectionImpl>(), mapRowToIdentifiable(false, true))
-                            .values()
-                            .stream()
-                            .collect(Collectors.toList()));
+    List<CollectionImpl> result =
+        dbi.withHandle(
+            h ->
+                h
+                    .createQuery(sql)
+                    .bind("uuid", uuid)
+                    .registerRowMapper(BeanMapper.factory(identifiableImplClass, mappingPrefix))
+                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
+                    .reduceRows(
+                        new LinkedHashMap<UUID, CollectionImpl>(),
+                        mapRowToIdentifiable(false, true))
+                    .values()
+                    .stream()
+                    .collect(Collectors.toList()));
 
-    StringBuilder countQuery
-            = new StringBuilder(
-                    "SELECT count(*) FROM " + tableName + " AS " + tableAlias
-                    + " INNER JOIN collection_collections cc ON " + tableAlias + ".uuid = cc.child_collection_uuid"
-                    + " WHERE cc.parent_collection_uuid = :uuid");
+    StringBuilder countQuery =
+        new StringBuilder(
+            "SELECT count(*) FROM "
+                + tableName
+                + " AS "
+                + tableAlias
+                + " INNER JOIN collection_collections cc ON "
+                + tableAlias
+                + ".uuid = cc.child_collection_uuid"
+                + " WHERE cc.parent_collection_uuid = :uuid");
     addFiltering(pageRequest, countQuery);
-    long total
-            = dbi.withHandle(
-                    h
-                    -> h.createQuery(countQuery.toString())
-                            .bind("uuid", uuid)
-                            .mapTo(Long.class)
-                            .findOne()
-                            .get());
+    long total =
+        dbi.withHandle(
+            h ->
+                h.createQuery(countQuery.toString())
+                    .bind("uuid", uuid)
+                    .mapTo(Long.class)
+                    .findOne()
+                    .get());
 
     return new PageResponseImpl<>(result, pageRequest, total);
   }
@@ -344,125 +386,163 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
 
   @Override
   public PageResponse<DigitalObject> getDigitalObjects(
-          UUID collectionUuid, PageRequest pageRequest) {
-    StringBuilder innerQuery
-            = new StringBuilder(
-                    "SELECT * FROM digitalobjects as d"
-                    + " LEFT JOIN collection_digitalobjects AS cd ON d.uuid = cd.digitalobject_uuid"
-                    + " WHERE cd.collection_uuid = :uuid");
+      UUID collectionUuid, PageRequest pageRequest) {
+    String tableAliasDigitalObject = digitalObjectRepositoryImpl.getTableAlias();
+    String tableNameDigitalObject = digitalObjectRepositoryImpl.getTableName();
+    Class<DigitalObjectImpl> digitalObjectImplClass =
+        digitalObjectRepositoryImpl.getIdentifiableImplClass();
+    String digitalObjectMappingPrefix = digitalObjectRepositoryImpl.getMappingPrefix();
+
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + tableNameDigitalObject
+                + " AS "
+                + tableAliasDigitalObject
+                + " LEFT JOIN collection_digitalobjects AS cd ON "
+                + tableAliasDigitalObject
+                + ".uuid = cd.digitalobject_uuid"
+                + " WHERE cd.collection_uuid = :uuid");
     addFiltering(pageRequest, innerQuery);
     pageRequest.setSorting(null);
     innerQuery.append(" ORDER BY cd.sortIndex ASC");
     addPageRequestParams(pageRequest, innerQuery);
 
-    final String sql
-            = "SELECT"
-            + SQL_REDUCED_DIGITALOBJECT_FIELDS_DO
+    final String sql =
+        "SELECT"
+            + SQL_REDUCED_FIELDS_DO
             + ","
-            + SQL_FULL_IDENTIFIER_FIELDS_ID
+            + SQL_FULL_FIELDS_ID
             + ","
             + SQL_PREVIEW_IMAGE_FIELDS_PI
             + " FROM ("
             + innerQuery
-            + ") AS d"
-            + " LEFT JOIN identifiers AS id ON d.uuid = id.identifiable"
-            + " LEFT JOIN fileresources_image AS file ON d.previewfileresource = file.uuid";
+            + ") AS "
+            + tableAliasDigitalObject
+            + " LEFT JOIN identifiers AS id ON "
+            + tableAliasDigitalObject
+            + ".uuid = id.identifiable"
+            + " LEFT JOIN fileresources_image AS file ON "
+            + tableAliasDigitalObject
+            + ".previewfileresource = file.uuid";
 
-    List<DigitalObject> result
-            = dbi
-                    .withHandle(
-                            h
-                            -> h.createQuery(sql)
-                                    .bind("uuid", collectionUuid)
-                                    .registerRowMapper(BeanMapper.factory(DigitalObjectImpl.class, "do"))
-                                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
-                                    .reduceRows(
-                                            new LinkedHashMap<UUID, DigitalObject>(), mapRowToDigitalObject(true)))
-                    .values()
-                    .stream()
-                    .collect(Collectors.toList());
-    StringBuilder countQuery
-            = new StringBuilder(
-                    "SELECT count(*) FROM digitalobjects AS d"
-                    + " LEFT JOIN collection_digitalobjects AS cd ON d.uuid = cd.digitalobject_uuid"
-                    + " WHERE cd.collection_uuid = :uuid");
+    List<DigitalObject> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(sql)
+                        .bind("uuid", collectionUuid)
+                        .registerRowMapper(
+                            BeanMapper.factory(digitalObjectImplClass, digitalObjectMappingPrefix))
+                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, DigitalObjectImpl>(),
+                            digitalObjectRepositoryImpl.mapRowToIdentifiable(true, true)))
+            .values()
+            .stream()
+            .map(DigitalObject.class::cast)
+            .collect(Collectors.toList());
+    StringBuilder countQuery =
+        new StringBuilder(
+            "SELECT count(*) FROM digitalobjects AS d"
+                + " LEFT JOIN collection_digitalobjects AS cd ON d.uuid = cd.digitalobject_uuid"
+                + " WHERE cd.collection_uuid = :uuid");
     addFiltering(pageRequest, countQuery);
-    long total
-            = dbi.withHandle(
-                    h
-                    -> h.createQuery(countQuery.toString())
-                            .bind("uuid", collectionUuid)
-                            .mapTo(Long.class)
-                            .findOne()
-                            .get());
+    long total =
+        dbi.withHandle(
+            h ->
+                h.createQuery(countQuery.toString())
+                    .bind("uuid", collectionUuid)
+                    .mapTo(Long.class)
+                    .findOne()
+                    .get());
     return new PageResponseImpl<>(result, pageRequest, total);
   }
 
   @Override
   public CollectionImpl getParent(UUID uuid) {
-    String innerQuery
-            = "SELECT * FROM " + tableName + " AS " + tableAlias
-            + " INNER JOIN collection_collections cc ON " + tableAlias + ".uuid = cc.parent_collection_uuid"
+    String innerQuery =
+        "SELECT * FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + " INNER JOIN collection_collections cc ON "
+            + tableAlias
+            + ".uuid = cc.parent_collection_uuid"
             + " WHERE cc.child_collection_uuid = :uuid";
 
-    final String sql
-            = "SELECT"
+    final String sql =
+        "SELECT"
             + reducedFieldsSql
             + ","
             + SQL_PREVIEW_IMAGE_FIELDS_PI
             + " FROM ("
             + innerQuery
-            + ") AS " + tableAlias
-            + " LEFT JOIN fileresources_image AS file ON " + tableAlias + ".previewfileresource = file.uuid";
+            + ") AS "
+            + tableAlias
+            + " LEFT JOIN fileresources_image AS file ON "
+            + tableAlias
+            + ".previewfileresource = file.uuid";
 
-    CollectionImpl result
-            = dbi
-                    .withHandle(
-                            h
-                            -> h.createQuery(sql)
-                                    .bind("uuid", uuid)
-                                    .registerRowMapper(BeanMapper.factory(identifiableImplClass, mappingPrefix))
-                                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
-                                    .reduceRows(
-                                            new LinkedHashMap<UUID, CollectionImpl>(), mapRowToIdentifiable(false, true)))
-                    .values()
-                    .stream()
-                    .findFirst().orElse(null);
+    CollectionImpl result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(sql)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(identifiableImplClass, mappingPrefix))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, CollectionImpl>(),
+                            mapRowToIdentifiable(false, true)))
+            .values()
+            .stream()
+            .findFirst()
+            .orElse(null);
 
     return result;
   }
 
   @Override
   public List<CollectionImpl> getParents(UUID uuid) {
-    String innerQuery
-            = "SELECT * FROM " + tableName + " AS " + tableAlias
-            + " INNER JOIN collection_collections cc ON " + tableAlias + ".uuid = cc.parent_collection_uuid"
+    String innerQuery =
+        "SELECT * FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + " INNER JOIN collection_collections cc ON "
+            + tableAlias
+            + ".uuid = cc.parent_collection_uuid"
             + " WHERE cc.child_collection_uuid = :uuid";
 
-    final String sql
-            = "SELECT"
+    final String sql =
+        "SELECT"
             + reducedFieldsSql
             + ","
             + SQL_PREVIEW_IMAGE_FIELDS_PI
             + " FROM ("
             + innerQuery
-            + ") AS " + tableAlias
-            + " LEFT JOIN fileresources_image AS file ON " + tableAlias + ".previewfileresource = file.uuid";
+            + ") AS "
+            + tableAlias
+            + " LEFT JOIN fileresources_image AS file ON "
+            + tableAlias
+            + ".previewfileresource = file.uuid";
 
-    List<CollectionImpl> result
-            = dbi
-                    .withHandle(
-                            h
-                            -> h.createQuery(sql)
-                                    .bind("uuid", uuid)
-                                    .registerRowMapper(BeanMapper.factory(identifiableImplClass, mappingPrefix))
-                                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
-                                    .reduceRows(
-                                            new LinkedHashMap<UUID, CollectionImpl>(), mapRowToIdentifiable(false, true)))
-                    .values()
-                    .stream()
-                    .collect(Collectors.toList());
+    List<CollectionImpl> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(sql)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(identifiableImplClass, mappingPrefix))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, CollectionImpl>(),
+                            mapRowToIdentifiable(false, true)))
+            .values()
+            .stream()
+            .collect(Collectors.toList());
     return result;
   }
 
@@ -473,21 +553,21 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
     // - one is fix ("is_part_of"): defines the relation between collection and project
     // - the other one is given as part of the parameter "filtering" for defining relation
     //   between corporatebody and project
-    StringBuilder innerQuery
-            = new StringBuilder(
-                    "SELECT * FROM corporatebodies AS cb"
-                    + " LEFT JOIN rel_entity_entities AS r ON cb.uuid = r.object_uuid"
-                    + " LEFT JOIN rel_entity_entities AS rel ON r.subject_uuid = rel.subject_uuid"
-                    + " WHERE rel.object_uuid = :uuid"
-                    + " AND rel.predicate = 'is_part_of'");
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM corporatebodies AS cb"
+                + " LEFT JOIN rel_entity_entities AS r ON cb.uuid = r.object_uuid"
+                + " LEFT JOIN rel_entity_entities AS rel ON r.subject_uuid = rel.subject_uuid"
+                + " WHERE rel.object_uuid = :uuid"
+                + " AND rel.predicate = 'is_part_of'");
     FilterCriterion predicate = filtering.getFilterCriterionFor("predicate");
     if (predicate != null) {
       String predicateFilter = String.format(" AND r.predicate = '%s'", predicate.getValue());
       innerQuery.append(predicateFilter);
     }
 
-    final String sql
-            = "SELECT"
+    final String sql =
+        "SELECT"
             + SQL_REDUCED_CORPORATEBODY_FIELDS_CB
             + ","
             + SQL_PREVIEW_IMAGE_FIELDS_PI
@@ -496,61 +576,75 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
             + ") AS cb"
             + " LEFT JOIN fileresources_image AS file ON cb.previewfileresource = file.uuid";
 
-    List<CorporateBody> result
-            = dbi
-                    .withHandle(
-                            h
-                            -> h.createQuery(sql)
-                                    .bind("uuid", uuid)
-                                    .registerRowMapper(BeanMapper.factory(CorporateBodyImpl.class, "cb"))
-                                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
-                                    .reduceRows(
-                                            new LinkedHashMap<UUID, CorporateBody>(), mapRowToCorporateBody()))
-                    .values()
-                    .stream()
-                    .collect(Collectors.toList());
+    List<CorporateBody> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(sql)
+                        .bind("uuid", uuid)
+                        .registerRowMapper(BeanMapper.factory(CorporateBodyImpl.class, "cb"))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, CorporateBody>(), mapRowToCorporateBody()))
+            .values()
+            .stream()
+            .collect(Collectors.toList());
     return result;
   }
 
   @Override
   public PageResponse<CollectionImpl> getTopCollections(PageRequest pageRequest) {
-    StringBuilder innerQuery
-            = new StringBuilder(
-                    "SELECT * FROM " + tableName + " AS " + tableAlias
-                    + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = " + tableAlias + ".uuid)");
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + tableName
+                + " AS "
+                + tableAlias
+                + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = "
+                + tableAlias
+                + ".uuid)");
     addFiltering(pageRequest, innerQuery);
     addPageRequestParams(pageRequest, innerQuery);
 
-    final String sql
-            = "SELECT"
+    final String sql =
+        "SELECT"
             + reducedFieldsSql
             + ","
             + SQL_PREVIEW_IMAGE_FIELDS_PI
             + " FROM ("
             + innerQuery
-            + ") AS " + tableAlias
-            + " LEFT JOIN fileresources_image AS file ON " + tableAlias + ".previewfileresource = file.uuid";
+            + ") AS "
+            + tableAlias
+            + " LEFT JOIN fileresources_image AS file ON "
+            + tableAlias
+            + ".previewfileresource = file.uuid";
 
-    List<CollectionImpl> result
-            = dbi
-                    .withHandle(
-                            h
-                            -> h.createQuery(sql)
-                                    .registerRowMapper(BeanMapper.factory(identifiableImplClass, mappingPrefix))
-                                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
-                                    .reduceRows(
-                                            new LinkedHashMap<UUID, CollectionImpl>(), mapRowToIdentifiable(false, true)))
-                    .values()
-                    .stream()
-                    .collect(Collectors.toList());
+    List<CollectionImpl> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(sql)
+                        .registerRowMapper(BeanMapper.factory(identifiableImplClass, mappingPrefix))
+                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
+                        .reduceRows(
+                            new LinkedHashMap<UUID, CollectionImpl>(),
+                            mapRowToIdentifiable(false, true)))
+            .values()
+            .stream()
+            .collect(Collectors.toList());
 
-    StringBuilder countQuery
-            = new StringBuilder(
-                    "SELECT count(*) FROM " + tableName + " AS " + tableAlias
-                    + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = " + tableAlias + ".uuid)");
+    StringBuilder countQuery =
+        new StringBuilder(
+            "SELECT count(*) FROM "
+                + tableName
+                + " AS "
+                + tableAlias
+                + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = "
+                + tableAlias
+                + ".uuid)");
     addFiltering(pageRequest, countQuery);
-    long total
-            = dbi.withHandle(h -> h.createQuery(countQuery.toString()).mapTo(Long.class).findOne().get());
+    long total =
+        dbi.withHandle(h -> h.createQuery(countQuery.toString()).mapTo(Long.class).findOne().get());
 
     return new PageResponseImpl<>(result, pageRequest, total);
   }
@@ -570,15 +664,15 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
     if (parentUuid == null || childUuid == null) {
       return false;
     }
-    final String sql
-            = "DELETE FROM collection_collections WHERE parent_collection_uuid=:parentCollectionUuid AND child_collection_uuid=:childCollectionUuid";
+    final String sql =
+        "DELETE FROM collection_collections WHERE parent_collection_uuid=:parentCollectionUuid AND child_collection_uuid=:childCollectionUuid";
 
     dbi.withHandle(
-            h
-            -> h.createUpdate(sql)
-                    .bind("parentCollectionUuid", parentUuid)
-                    .bind("childCollectionUuid", childUuid)
-                    .execute());
+        h ->
+            h.createUpdate(sql)
+                .bind("parentCollectionUuid", parentUuid)
+                .bind("childCollectionUuid", childUuid)
+                .execute());
     return true;
   }
 
@@ -587,15 +681,15 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
     if (collectionUuid != null && digitalObjectUuid != null) {
       // delete relation to collection
 
-      final String sql
-              = "DELETE FROM collection_digitalobjects WHERE collection_uuid=:collectionUuid AND digitalobject_uuid=:digitalObjectUuid";
+      final String sql =
+          "DELETE FROM collection_digitalobjects WHERE collection_uuid=:collectionUuid AND digitalobject_uuid=:digitalObjectUuid";
 
       dbi.withHandle(
-              h
-              -> h.createUpdate(sql)
-                      .bind("collectionUuid", collectionUuid)
-                      .bind("digitalObjectUuid", digitalObjectUuid)
-                      .execute());
+          h ->
+              h.createUpdate(sql)
+                  .bind("collectionUuid", collectionUuid)
+                  .bind("digitalObjectUuid", digitalObjectUuid)
+                  .execute());
       return true;
     }
     return false;
@@ -607,11 +701,11 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
       return false;
     }
 
-    final String sql
-            = "DELETE FROM collection_digitalobjects WHERE digitalobject_uuid=:digitalObjectUuid";
+    final String sql =
+        "DELETE FROM collection_digitalobjects WHERE digitalobject_uuid=:digitalObjectUuid";
 
     dbi.withHandle(
-            h -> h.createUpdate(sql).bind("digitalObjectUuid", digitalObject.getUuid()).execute());
+        h -> h.createUpdate(sql).bind("digitalObjectUuid", digitalObject.getUuid()).execute());
     return true;
   }
 
@@ -621,11 +715,13 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
     collection.setCreated(LocalDateTime.now());
     collection.setLastModified(LocalDateTime.now());
     // refid is generated as serial, DO NOT SET!
-    final UUID previewImageUuid
-            = collection.getPreviewImage() == null ? null : collection.getPreviewImage().getUuid();
+    final UUID previewImageUuid =
+        collection.getPreviewImage() == null ? null : collection.getPreviewImage().getUuid();
 
-    final String sql
-            = "INSERT INTO " + tableName + "("
+    final String sql =
+        "INSERT INTO "
+            + tableName
+            + "("
             + "uuid, label, description, previewfileresource, preview_hints,"
             + " identifiable_type, entity_type,"
             + " created, last_modified,"
@@ -638,11 +734,11 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
             + ")";
 
     dbi.withHandle(
-            h
-            -> h.createUpdate(sql)
-                    .bind("previewFileResource", previewImageUuid)
-                    .bindBean(collection)
-                    .execute());
+        h ->
+            h.createUpdate(sql)
+                .bind("previewFileResource", previewImageUuid)
+                .bindBean(collection)
+                .execute());
 
     // save identifiers
     Set<Identifier> identifiers = collection.getIdentifiers();
@@ -656,27 +752,27 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
   public boolean saveDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects) {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
-            h
-            -> h.createUpdate("DELETE FROM collection_digitalobjects WHERE collection_uuid = :uuid")
-                    .bind("uuid", collectionUuid)
-                    .execute());
+        h ->
+            h.createUpdate("DELETE FROM collection_digitalobjects WHERE collection_uuid = :uuid")
+                .bind("uuid", collectionUuid)
+                .execute());
 
     if (digitalObjects != null) {
       // save relation to collection
       dbi.useHandle(
-              handle -> {
-                PreparedBatch preparedBatch
-                = handle.prepareBatch(
-                        "INSERT INTO collection_digitalobjects(collection_uuid, digitalobject_uuid, sortIndex) VALUES (:uuid, :digitalObjectUuid, :sortIndex)");
-                for (DigitalObject digitalObject : digitalObjects) {
-                  preparedBatch
-                          .bind("uuid", collectionUuid)
-                          .bind("digitalObjectUuid", digitalObject.getUuid())
-                          .bind("sortIndex", getIndex(digitalObjects, digitalObject))
-                          .add();
-                }
-                preparedBatch.execute();
-              });
+          handle -> {
+            PreparedBatch preparedBatch =
+                handle.prepareBatch(
+                    "INSERT INTO collection_digitalobjects(collection_uuid, digitalobject_uuid, sortIndex) VALUES (:uuid, :digitalObjectUuid, :sortIndex)");
+            for (DigitalObject digitalObject : digitalObjects) {
+              preparedBatch
+                  .bind("uuid", collectionUuid)
+                  .bind("digitalObjectUuid", digitalObject.getUuid())
+                  .bind("sortIndex", getIndex(digitalObjects, digitalObject))
+                  .add();
+            }
+            preparedBatch.execute();
+          });
       return true;
     }
     return false;
@@ -684,30 +780,30 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
 
   @Override
   public CollectionImpl saveWithParentCollection(CollectionImpl collection, UUID parentUuid) {
-    final UUID childUuid
-            = collection.getUuid() == null ? save(collection).getUuid() : collection.getUuid();
+    final UUID childUuid =
+        collection.getUuid() == null ? save(collection).getUuid() : collection.getUuid();
 
-    Integer nextSortIndex
-            = dbi.withHandle(
-                    (Handle h)
-                    -> h.createQuery(
-                            "SELECT MAX(sortIndex) + 1 FROM collection_collections"
+    Integer nextSortIndex =
+        dbi.withHandle(
+            (Handle h) ->
+                h.createQuery(
+                        "SELECT MAX(sortIndex) + 1 FROM collection_collections"
                             + " WHERE "
                             + "parent_collection_uuid"
                             + " = :parent_uuid")
-                            .bind("parent_uuid", parentUuid)
-                            .mapTo(Integer.class)
-                            .findOne()
-                            .orElse(0));
+                    .bind("parent_uuid", parentUuid)
+                    .mapTo(Integer.class)
+                    .findOne()
+                    .orElse(0));
     dbi.withHandle(
-            h
-            -> h.createUpdate(
+        h ->
+            h.createUpdate(
                     "INSERT INTO collection_collections(parent_collection_uuid, child_collection_uuid, sortindex)"
-                    + " VALUES (:parent_collection_uuid, :child_collection_uuid, :sortindex)")
-                    .bind("parent_collection_uuid", parentUuid)
-                    .bind("child_collection_uuid", childUuid)
-                    .bind("sortindex", nextSortIndex)
-                    .execute());
+                        + " VALUES (:parent_collection_uuid, :child_collection_uuid, :sortindex)")
+                .bind("parent_collection_uuid", parentUuid)
+                .bind("child_collection_uuid", childUuid)
+                .bind("sortindex", nextSortIndex)
+                .execute());
 
     return findOne(childUuid);
   }
@@ -717,11 +813,13 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
     collection.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, entity_type, refid
-    final UUID previewImageUuid
-            = collection.getPreviewImage() == null ? null : collection.getPreviewImage().getUuid();
+    final UUID previewImageUuid =
+        collection.getPreviewImage() == null ? null : collection.getPreviewImage().getUuid();
 
-    final String sql
-            = "UPDATE " + tableName + " SET"
+    final String sql =
+        "UPDATE "
+            + tableName
+            + " SET"
             + " label=:label::JSONB, description=:description::JSONB,"
             + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
             + " last_modified=:lastModified,"
@@ -729,11 +827,11 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
             + " WHERE uuid=:uuid";
 
     dbi.withHandle(
-            h
-            -> h.createUpdate(sql)
-                    .bind("previewFileResource", previewImageUuid)
-                    .bindBean(collection)
-                    .execute());
+        h ->
+            h.createUpdate(sql)
+                .bind("previewFileResource", previewImageUuid)
+                .bindBean(collection)
+                .execute());
 
     // save identifiers
     // as we store the whole list new: delete old entries

@@ -5,8 +5,11 @@ import de.digitalcollections.model.api.identifiable.entity.agent.Agent;
 import java.util.List;
 import java.util.UUID;
 
-/** Repository for Article persistence handling.
- * @param <A> instance implementing Article */
+/**
+ * Repository for Article persistence handling.
+ *
+ * @param <A> instance implementing Article
+ */
 public interface ArticleRepository<A extends Article> extends EntityRepository<A> {
 
   List<Agent> getCreators(UUID articleUuid);

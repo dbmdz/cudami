@@ -29,10 +29,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
-    implements ProjectRepository {
+public class ProjectRepositoryImpl extends EntityRepositoryImpl<ProjectImpl>
+    implements ProjectRepository<ProjectImpl> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProjectRepositoryImpl.class);
+
+  public static final String SQL_REDUCED_FIELDS_PR = "";
+  public static final String SQL_FULL_FIELDS_PR = SQL_REDUCED_FIELDS_PR + "";
 
   // select all details shown/needed in single object details page
   private static final String FIND_ONE_BASE_SQL =
