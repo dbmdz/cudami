@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
+package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation;
 
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.EntityRelation;

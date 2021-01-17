@@ -1,7 +1,8 @@
-package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
+package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRelationsRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.AbstractPagingAndSortingRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
 import de.digitalcollections.model.api.paging.PageRequest;
