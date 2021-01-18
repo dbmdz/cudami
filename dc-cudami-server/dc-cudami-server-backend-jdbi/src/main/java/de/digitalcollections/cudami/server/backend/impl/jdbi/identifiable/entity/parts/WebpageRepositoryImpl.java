@@ -491,7 +491,7 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
     Webpage savedWebpage = save(webpage);
 
     Integer sortIndex =
-        selectNextSortIndexForParentChildren(
+        retrieveNextSortIndexForParentChildren(
             dbi, "webpage_webpages", "parent_webpage_uuid", parentWebpageUuid);
 
     String query =
@@ -513,8 +513,9 @@ public class WebpageRepositoryImpl<E extends Entity, C extends Comparable<C>>
     Webpage savedWebpage = save(webpage);
 
     Integer sortIndex =
-        selectNextSortIndexForParentChildren(
+        retrieveNextSortIndexForParentChildren(
             dbi, "website_webpages", "website_uuid", parentWebsiteUuid);
+    
     String query =
         "INSERT INTO website_webpages(website_uuid, webpage_uuid, sortIndex)"
             + " VALUES (:parent_website_uuid, :uuid, :sortIndex)";

@@ -54,7 +54,5 @@ public interface ProjectRepository<P extends Project> extends EntityRepository<P
 
   boolean saveDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects);
 
-  List<P> getAll();
-
   boolean removeDigitalObjectFromAllProjects(UUID digitalObjectUuid);
 }

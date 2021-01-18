@@ -632,8 +632,9 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
     final UUID childSubtopicUuid =
         subtopic.getUuid() == null ? save(subtopic).getUuid() : subtopic.getUuid();
     Integer sortindex =
-        selectNextSortIndexForParentChildren(
+        retrieveNextSortIndexForParentChildren(
             dbi, "subtopic_subtopics", "parent_subtopic_uuid", parentSubtopicUuid);
+    
     dbi.withHandle(
         h ->
             h.createUpdate(
@@ -665,7 +666,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, E
     final UUID childSubtopicUuid =
         subtopic.getUuid() == null ? save(subtopic).getUuid() : subtopic.getUuid();
     Integer sortindex =
-        selectNextSortIndexForParentChildren(dbi, "topic_subtopics", "topic_uuid", parentTopicUuid);
+        retrieveNextSortIndexForParentChildren(dbi, "topic_subtopics", "topic_uuid", parentTopicUuid);
 
     dbi.withHandle(
         h ->
