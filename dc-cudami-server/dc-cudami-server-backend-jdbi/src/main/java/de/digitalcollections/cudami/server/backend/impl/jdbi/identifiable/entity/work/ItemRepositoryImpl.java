@@ -444,7 +444,7 @@ public class ItemRepositoryImpl extends IdentifiableRepositoryImpl<Item> impleme
   @Override
   public boolean addWork(UUID itemUuid, UUID workUuid) {
     Integer nextSortIndex =
-        selectNextSortIndexForParentChildren(dbi, "item_works", "item_uuid", itemUuid);
+        retrieveNextSortIndexForParentChildren(dbi, "item_works", "item_uuid", itemUuid);
     String query =
         "INSERT INTO item_works ("
             + "item_uuid, work_uuid, sortindex"
@@ -465,7 +465,8 @@ public class ItemRepositoryImpl extends IdentifiableRepositoryImpl<Item> impleme
   @Override
   public boolean addDigitalObject(UUID itemUuid, UUID digitalObjectUuid) {
     Integer nextSortIndex =
-        selectNextSortIndexForParentChildren(dbi, "item_digitalobjects", "item_uuid", itemUuid);
+        retrieveNextSortIndexForParentChildren(dbi, "item_digitalobjects", "item_uuid", itemUuid);
+    
     String query =
         "INSERT INTO item_digitalobjects ("
             + "item_uuid, digitalobject_uuid, sortindex"

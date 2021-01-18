@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.jdbi.v3.core.result.RowView;
@@ -173,6 +174,11 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Jdbi
     return new SearchPageResponseImpl<>(result, searchPageRequest, total);
   }
 
+  @Override
+  public List<I> findAllFull() {
+    return retrieveList(fullFieldsSql, null, null);
+  }
+  
   @Override
   public List<I> findAllReduced() {
     return retrieveList(reducedFieldsSql, null, null);
@@ -334,6 +340,28 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Jdbi
     return result;
   }
 
+  protected Integer retrieveNextSortIndexForParentChildren(
+      Jdbi dbi, String tableName, String columNameParentUuid, UUID parentUuid) {
+    // first child: max gets no results (= null)):
+    Integer sortIndex =
+        dbi.withHandle(
+            (Handle h) ->
+                h.createQuery(
+                        "SELECT MAX(sortIndex) + 1 FROM "
+                            + tableName
+                            + " WHERE "
+                            + columNameParentUuid
+                            + " = :parent_uuid")
+                    .bind("parent_uuid", parentUuid)
+                    .mapTo(Integer.class)
+                    .findOne()
+                    .orElse(null));
+    if (sortIndex == null) {
+      return 0;
+    }
+    return sortIndex;
+  }
+  
   public I retrieveOne(
       String fieldsSql, StringBuilder innerQuery, final Map<String, Object> argumentMappings) {
     final String sql =

@@ -78,7 +78,7 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
 
   @Override
   public List<Project> getAll() {
-    return ((ProjectRepository) repository).getAll();
+    return ((ProjectRepository) repository).findAllFull();
   }
 
   @Override
