@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
@@ -23,27 +24,31 @@ public class EntityRepositoryImpl<E extends EntityImpl> extends IdentifiableRepo
 
   private static final Logger LOGGER = LoggerFactory.getLogger(EntityRepositoryImpl.class);
 
-  public static final String SQL_REDUCED_ENTITY_FIELDS_E
+  public static final String SQL_REDUCED_FIELDS_E
           = " e.uuid e_uuid, e.refid e_refId, e.label e_label, e.description e_description,"
           + " e.identifiable_type e_type, e.entity_type e_entityType,"
           + " e.created e_created, e.last_modified e_lastModified,"
           + " e.preview_hints e_previewImageRenderingHints";
 
-  public static final String SQL_FULL_ENTITY_FIELDS_E = SQL_REDUCED_ENTITY_FIELDS_E;
+  public static final String SQL_FULL_FIELDS_E = SQL_REDUCED_FIELDS_E;
 
   public static final String TABLE_NAME = "entities";
 
+  private FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
+
   @Autowired
-  private EntityRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    this(
-            dbi,
+  private EntityRepositoryImpl(Jdbi dbi,
+          IdentifierRepository identifierRepository,
+          FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl) {
+    this(dbi,
             identifierRepository,
             TABLE_NAME,
             "e",
             "e",
             (Class<E>) EntityImpl.class,
-            SQL_REDUCED_ENTITY_FIELDS_E,
-            SQL_FULL_ENTITY_FIELDS_E);
+            SQL_REDUCED_FIELDS_E,
+            SQL_FULL_FIELDS_E);
+    this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
   }
 
   protected EntityRepositoryImpl(
@@ -124,24 +129,23 @@ public class EntityRepositoryImpl<E extends EntityImpl> extends IdentifiableRepo
 
   @Override
   public List<FileResource> getRelatedFileResources(UUID entityUuid) {
-    String query
-            = "SELECT * FROM fileresources f"
-            + " INNER JOIN rel_entity_fileresources ref ON f.uuid=ref.fileresource_uuid"
-            + " WHERE ref.entity_uuid = :entityUuid"
-            + " ORDER BY ref.sortindex";
+    final String frTableAlias = fileResourceMetadataRepositoryImpl.getTableAlias();
+    final String frTableName = fileResourceMetadataRepositoryImpl.getTableName();
 
-    List<FileResource> result
-            = dbi.withHandle(
-                    h
-                    -> h
-                            .createQuery(query)
-                            .bind("entityUuid", entityUuid)
-                            .mapToBean(FileResourceImpl.class)
-                            .list()
-                            .stream()
-                            .map(FileResource.class::cast)
-                            .collect(Collectors.toList()));
-    return result;
+    StringBuilder innerQuery
+            = new StringBuilder("SELECT * FROM "
+                    + frTableName
+                    + " AS "
+                    + frTableAlias
+                    + " INNER JOIN rel_entity_fileresources ref ON "
+                    + frTableAlias
+                    + ".uuid = ref.fileresource_uuid"
+                    + " WHERE ref.entity_uuid = :entityUuid"
+                    + " ORDER BY ref.sortindex ASC");
+
+    List<FileResourceImpl> result = fileResourceMetadataRepositoryImpl.retrieveList(FileResourceMetadataRepositoryImpl.SQL_FULL_FIELDS_FR, innerQuery, Map.of("entityUuid", entityUuid));
+
+    return result.stream().map(FileResource.class::cast).collect(Collectors.toList());
   }
 
   @Override

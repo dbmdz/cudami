@@ -37,11 +37,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic, Entity>
-    implements SubtopicRepository {
+public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<SubtopicImpl>
+    implements SubtopicRepository<SubtopicImpl> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SubtopicRepositoryImpl.class);
 
+  public static final String SQL_REDUCED_FIELDS_ST = "";
+  
   // select all details shown/needed in single object details page
   private static final String FIND_ONE_BASE_SQL =
       "SELECT s.uuid s_uuid, s.label s_label, s.description s_description,"

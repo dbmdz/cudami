@@ -133,7 +133,6 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
     CollectionImpl collection = super.findOne(uuid, filtering);
 
     if (collection != null) {
-      // TODO could be replaced with another join in above query...
       collection.setChildren(
               Stream.ofNullable(getChildren(collection))
                       .map(Collection.class::cast)
@@ -147,7 +146,6 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
     CollectionImpl collection = super.findOne(identifier);
 
     if (collection != null) {
-      // TODO could be replaced with another join in above query...
       collection.setChildren(
               Stream.ofNullable(getChildren(collection))
                       .map(Collection.class::cast)
@@ -161,7 +159,6 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
     CollectionImpl collection = super.findOneByRefId(refId);
 
     if (collection != null) {
-      // TODO could be replaced with another join in above query...
       collection.setChildren(
               Stream.ofNullable(getChildren(collection))
                       .map(Collection.class::cast)
@@ -388,7 +385,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
     }
 
     List<CorporateBodyImpl> result
-            = corporateBodyRepositoryImpl.retrieveList(corporateBodyRepositoryImpl.getReducedFieldsSql(), innerQuery, Map.of("uuid", uuid));
+            = corporateBodyRepositoryImpl.retrieveList(CorporateBodyRepositoryImpl.SQL_REDUCED_FIELDS_CB, innerQuery, Map.of("uuid", uuid));
 
     return result.stream().map(CorporateBody.class::cast).collect(Collectors.toList());
   }

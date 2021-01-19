@@ -29,7 +29,7 @@ import org.springframework.stereotype.Repository;
 public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateBodyImpl>
     implements CorporateBodyRepository<CorporateBodyImpl> {
 
-  public static final String SQL_REDUCED_CORPORATEBODY_FIELDS_CB =
+  public static final String SQL_REDUCED_FIELDS_CB =
       " cb.uuid cb_uuid, cb.label cb_label, cb.refid cb_refId,"
           + " cb.created cb_created, cb.last_modified cb_lastModified,"
           + " cb.homepage_url cb_homepageUrl";

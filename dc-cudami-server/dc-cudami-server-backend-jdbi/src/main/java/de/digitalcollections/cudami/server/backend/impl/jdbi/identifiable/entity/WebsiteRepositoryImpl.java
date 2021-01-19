@@ -2,26 +2,25 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.parts.WebpageRepositoryImpl;
+import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
-import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,188 +28,82 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
-    implements WebsiteRepository {
+public class WebsiteRepositoryImpl extends EntityRepositoryImpl<WebsiteImpl>
+        implements WebsiteRepository<WebsiteImpl> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsiteRepositoryImpl.class);
 
-  private static final String BASE_ROOTPAGES_QUERY =
-      "SELECT w.uuid w_uuid, w.label w_label, w.description w_description,"
-          + " w.identifiable_type w_type,"
-          + " w.created w_created, w.last_modified w_lastModified,"
-          + " w.publication_start w_publicationStart, w.publication_end w_publicationEnd,"
-          + " w.rendering_hints w_renderingHints,"
-          + " w.preview_hints w_previewImageRenderingHints,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
-          + " FROM webpages as w INNER JOIN website_webpages ww ON w.uuid = ww.webpage_uuid"
-          + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid"
-          + " WHERE ww.website_uuid = :uuid";
+  public static final String SQL_REDUCED_FIELDS_WS
+          = " w.uuid ws_uuid, w.refid ws_refId, w.label ws_label, w.description ws_description,"
+          + " w.identifiable_type ws_type, w.entity_type ws_entityType,"
+          + " w.created ws_created, w.last_modified ws_lastModified,"
+          + " w.url ws_url, w.registration_date ws_registrationDate,"
+          + " w.previews_hints ws_previewImageRenderingHints";
 
-  // select all details shown/needed in single object details page
-  private static final String FIND_ONE_BASE_SQL =
-      "SELECT w.uuid w_uuid, w.refid w_refId, w.label w_label, w.description w_description,"
-          + " w.identifiable_type w_type, w.entity_type w_entityType,"
-          + " w.created w_created, w.last_modified w_lastModified,"
-          + " w.url w_url, w.registration_date w_registrationDate,"
-          + " w.preview_hints w_previewImageRenderingHints,"
-          + " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
-          + " FROM websites as w"
-          + " LEFT JOIN identifiers as id on w.uuid = id.identifiable"
-          + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid";
+  public static final String SQL_FULL_FIELDS_WS = SQL_REDUCED_FIELDS_WS;
 
-  // select only what is shown/needed in paged list (to avoid unnecessary payload/traffic):
-  private static final String REDUCED_FIND_ONE_BASE_SQL =
-      "SELECT w.uuid w_uuid, w.refid w_refId, w.label w_label, w.description w_description,"
-          + " w.identifiable_type w_type, w.entity_type w_entityType,"
-          + " w.created w_created, w.last_modified w_lastModified,"
-          + " w.url w_url, w.registration_date w_registrationDate,"
-          + " w.preview_hints w_previewImageRenderingHints,"
-          + " file.uuid f_uuid, file.filename f_filename, file.mimetype f_mimeType, file.size_in_bytes f_sizeInBytes, file.uri f_uri, file.http_base_url f_httpBaseUrl"
-          + " FROM websites as w"
-          + " LEFT JOIN fileresources_image as file on w.previewfileresource = file.uuid";
+  public static final String TABLE_NAME = "websites";
+
+  private final WebpageRepositoryImpl webpageRepositoryImpl;
 
   @Autowired
-  public WebsiteRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(dbi, identifierRepository);
+  public WebsiteRepositoryImpl(Jdbi dbi,
+          IdentifierRepository identifierRepository,
+          WebpageRepositoryImpl webpageRepositoryImpl) {
+    super(
+            dbi,
+            identifierRepository,
+            TABLE_NAME,
+            "w",
+            "ws",
+            WebsiteImpl.class,
+            SQL_REDUCED_FIELDS_WS,
+            SQL_FULL_FIELDS_WS);
+    this.webpageRepositoryImpl = webpageRepositoryImpl;
   }
 
   @Override
-  public long count() {
-    String sql = "SELECT count(*) FROM websites";
-    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
-    return count;
-  }
+  public WebsiteImpl findOne(UUID uuid, Filtering filtering) {
+    WebsiteImpl website = super.findOne(uuid, filtering);
 
-  @Override
-  public PageResponse<Website> find(PageRequest pageRequest) {
-    StringBuilder query = new StringBuilder(REDUCED_FIND_ONE_BASE_SQL);
-    addPageRequestParams(pageRequest, query);
-
-    List<WebsiteImpl> result =
-        new ArrayList(
-            dbi.withHandle(
-                h ->
-                    h.createQuery(query.toString())
-                        .registerRowMapper(BeanMapper.factory(WebsiteImpl.class, "w"))
-                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                        .reduceRows(
-                            new LinkedHashMap<UUID, WebsiteImpl>(),
-                            (map, rowView) -> {
-                              WebsiteImpl website =
-                                  map.computeIfAbsent(
-                                      rowView.getColumn("w_uuid", UUID.class),
-                                      fn -> {
-                                        return rowView.getRow(WebsiteImpl.class);
-                                      });
-
-                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                website.setPreviewImage(
-                                    rowView.getRow(ImageFileResourceImpl.class));
-                              }
-                              return map;
-                            })
-                        .values()));
-
-    long total = count();
-    PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
-    return pageResponse;
-  }
-
-  @Override
-  public Website findOne(UUID uuid) {
-    String query = FIND_ONE_BASE_SQL + " WHERE w.uuid = :uuid";
-
-    WebsiteImpl result =
-        dbi.withHandle(
-                h ->
-                    h.createQuery(query)
-                        .bind("uuid", uuid)
-                        .registerRowMapper(BeanMapper.factory(WebsiteImpl.class, "w"))
-                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                        .reduceRows(
-                            new LinkedHashMap<UUID, WebsiteImpl>(),
-                            (map, rowView) -> {
-                              WebsiteImpl website =
-                                  map.computeIfAbsent(
-                                      rowView.getColumn("w_uuid", UUID.class),
-                                      fn -> {
-                                        return rowView.getRow(WebsiteImpl.class);
-                                      });
-
-                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                website.setPreviewImage(
-                                    rowView.getRow(ImageFileResourceImpl.class));
-                              }
-
-                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
-                                IdentifierImpl identifier = rowView.getRow(IdentifierImpl.class);
-                                website.addIdentifier(identifier);
-                              }
-
-                              return map;
-                            }))
-            .get(uuid);
-
-    if (result != null) {
-      result.setRootPages(getRootPages(result));
-    }
-    return result;
-  }
-
-  @Override
-  public Website findOne(Identifier identifier) {
-    if (identifier.getIdentifiable() != null) {
-      return findOne(identifier.getIdentifiable());
-    }
-
-    String namespace = identifier.getNamespace();
-    String identifierId = identifier.getId();
-
-    String query = FIND_ONE_BASE_SQL + " WHERE id.identifier = :id AND id.namespace = :namespace";
-
-    Optional<WebsiteImpl> result =
-        dbi
-            .withHandle(
-                h ->
-                    h.createQuery(query)
-                        .bind("id", identifierId)
-                        .bind("namespace", namespace)
-                        .registerRowMapper(BeanMapper.factory(WebsiteImpl.class, "w"))
-                        .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                        .reduceRows(
-                            new LinkedHashMap<UUID, WebsiteImpl>(),
-                            (map, rowView) -> {
-                              WebsiteImpl website =
-                                  map.computeIfAbsent(
-                                      rowView.getColumn("w_uuid", UUID.class),
-                                      fn -> {
-                                        return rowView.getRow(WebsiteImpl.class);
-                                      });
-
-                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                website.setPreviewImage(
-                                    rowView.getRow(ImageFileResourceImpl.class));
-                              }
-
-                              if (rowView.getColumn("id_uuid", UUID.class) != null) {
-                                IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
-                                website.addIdentifier(dbIdentifier);
-                              }
-
-                              return map;
-                            }))
-            .values()
-            .stream()
-            .findFirst();
-
-    Website website = result.orElse(null);
     if (website != null) {
       website.setRootPages(getRootPages(website));
     }
     return website;
+  }
+
+  @Override
+  public WebsiteImpl findOne(Identifier identifier) {
+    WebsiteImpl website = super.findOne(identifier);
+
+    if (website != null) {
+      website.setRootPages(getRootPages(website));
+    }
+    return website;
+  }
+
+  @Override
+  protected String[] getAllowedOrderByFields() {
+    return new String[]{"created", "lastModified", "refId", "url"};
+  }
+
+  @Override
+  protected String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "created":
+        return tableAlias + ".created";
+      case "lastModified":
+        return tableAlias + ".last_modified";
+      case "refId":
+        return tableAlias + ".refid";
+      case "url":
+        return tableAlias + ".url";
+      default:
+        return null;
+    }
   }
 
   @Override
@@ -220,7 +113,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     List<Locale> result = dbi.withHandle(h -> h.createQuery(query).mapTo(Locale.class).list());
     return result;
   }
-
+  
   @Override
   public List<Webpage> getRootPages(Website website) {
     return getRootPages(website.getUuid());
@@ -228,89 +121,73 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
 
   @Override
   public List<Webpage> getRootPages(UUID uuid) {
-    List<Webpage> list =
-        new ArrayList(
-            dbi.withHandle(
-                h ->
-                    h.createQuery(BASE_ROOTPAGES_QUERY)
-                        .bind("uuid", uuid)
-                        .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
-                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                        .reduceRows(
-                            new LinkedHashMap<UUID, WebpageImpl>(),
-                            (map, rowView) -> {
-                              WebpageImpl webpage =
-                                  map.computeIfAbsent(
-                                      rowView.getColumn("w_uuid", UUID.class),
-                                      fn -> {
-                                        return rowView.getRow(WebpageImpl.class);
-                                      });
+    final String wpTableAlias = webpageRepositoryImpl.getTableAlias();
+    final String wpTableName = webpageRepositoryImpl.getTableName();
 
-                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                webpage.setPreviewImage(
-                                    rowView.getRow(ImageFileResourceImpl.class));
-                              }
-                              return map;
-                            })
-                        .values()));
-    return list;
+    StringBuilder innerQuery
+            = new StringBuilder("SELECT * FROM "
+                    + wpTableName
+                    + " AS "
+                    + wpTableAlias
+                    + " INNER JOIN website_webpages ww ON "
+                    + wpTableAlias
+                    + ".uuid = ww.webpage_uuid"
+                    + " WHERE ww.website_uuid = :uuid");
+
+    List<WebpageImpl> result = webpageRepositoryImpl.retrieveList(WebpageRepositoryImpl.SQL_REDUCED_FIELDS_WP, innerQuery, Map.of("uuid", uuid));
+    return result.stream().map(Webpage.class::cast).collect(Collectors.toList());
   }
 
   @Override
   public PageResponse<Webpage> getRootPages(UUID uuid, PageRequest pageRequest) {
-    // minimal data required (= identifiable fields) for creating text links/teasers in a list
-    StringBuilder query = new StringBuilder(BASE_ROOTPAGES_QUERY);
-    if (pageRequest.getSorting() == null) {
-      query.append(" ORDER BY ww.sortIndex ASC");
-    }
-    addPageRequestParams(pageRequest, query);
-    List<Webpage> result =
-        new ArrayList(
-            dbi.withHandle(
-                h ->
-                    h.createQuery(query.toString())
-                        .bind("uuid", uuid)
-                        .registerRowMapper(BeanMapper.factory(WebpageImpl.class, "w"))
-                        .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "f"))
-                        .reduceRows(
-                            new LinkedHashMap<UUID, WebpageImpl>(),
-                            (map, rowView) -> {
-                              WebpageImpl webpage =
-                                  map.computeIfAbsent(
-                                      rowView.getColumn("w_uuid", UUID.class),
-                                      fn -> {
-                                        return rowView.getRow(WebpageImpl.class);
-                                      });
+    final String wpTableAlias = webpageRepositoryImpl.getTableAlias();
+    final String wpTableName = webpageRepositoryImpl.getTableName();
 
-                              if (rowView.getColumn("f_uuid", UUID.class) != null) {
-                                webpage.setPreviewImage(
-                                    rowView.getRow(ImageFileResourceImpl.class));
-                              }
-                              return map;
-                            })
-                        .values()));
-    String sql =
-        "SELECT count(*) FROM webpages as w"
-            + " INNER JOIN website_webpages ww ON w.uuid = ww.webpage_uuid"
+    String commonSql = " FROM "
+            + wpTableName
+            + " AS "
+            + wpTableAlias
+            + " INNER JOIN website_webpages ww ON "
+            + wpTableAlias
+            + ".uuid = ww.webpage_uuid"
             + " WHERE ww.website_uuid = :uuid";
-    long total =
-        dbi.withHandle(
-            h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Long.class).findOne().get());
-    PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
-    return pageResponse;
+
+    StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
+    addFiltering(pageRequest, innerQuery);
+    if (pageRequest.getSorting() == null) {
+      innerQuery.append(" ORDER BY ww.sortIndex ASC");
+    }
+    addPageRequestParams(pageRequest, innerQuery);
+
+    List<Webpage> result
+            = webpageRepositoryImpl
+                    .retrieveList(
+                            WebpageRepositoryImpl.SQL_REDUCED_FIELDS_WP,
+                            innerQuery,
+                            Map.of("uuid", uuid))
+                    .stream()
+                    .map(Webpage.class::cast)
+                    .collect(Collectors.toList());
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    addFiltering(pageRequest, countQuery);
+    long total = retrieveCount(countQuery, Map.of("uuid", uuid));
+
+    return new PageResponseImpl<>(result, pageRequest, total);
   }
 
-  @Override
-  public Website save(Website website) {
+  public WebsiteImpl save(WebsiteImpl website) {
     website.setUuid(UUID.randomUUID());
     website.setCreated(LocalDateTime.now());
     website.setLastModified(LocalDateTime.now());
     // refid is generated as serial, DO NOT SET!
-    final UUID previewImageUuid =
-        website.getPreviewImage() == null ? null : website.getPreviewImage().getUuid();
+    final UUID previewImageUuid
+            = website.getPreviewImage() == null ? null : website.getPreviewImage().getUuid();
 
-    String query =
-        "INSERT INTO websites("
+    String query
+            = "INSERT INTO "
+            + tableName
+            + "("
             + "uuid, label, description, previewfileresource, preview_hints,"
             + " identifiable_type, entity_type,"
             + " created, last_modified,"
@@ -323,30 +200,32 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
             + ")";
 
     dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(website)
-                .execute());
+            h
+            -> h.createUpdate(query)
+                    .bind("previewFileResource", previewImageUuid)
+                    .bindBean(website)
+                    .execute());
 
     // save identifiers
     Set<Identifier> identifiers = website.getIdentifiers();
     saveIdentifiers(identifiers, website);
 
-    Website result = findOne(website.getUuid());
+    WebsiteImpl result = findOne(website.getUuid());
     return result;
   }
 
   @Override
-  public Website update(Website website) {
+  public WebsiteImpl update(WebsiteImpl website) {
     website.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, entity_type, refid
-    final UUID previewImageUuid =
-        website.getPreviewImage() == null ? null : website.getPreviewImage().getUuid();
+    final UUID previewImageUuid
+            = website.getPreviewImage() == null ? null : website.getPreviewImage().getUuid();
 
-    String query =
-        "UPDATE websites SET"
+    String query
+            = "UPDATE "
+            + tableName
+            + " SET"
             + " label=:label::JSONB, description=:description::JSONB,"
             + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
             + " last_modified=:lastModified,"
@@ -354,19 +233,19 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
             + " WHERE uuid=:uuid";
 
     dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(website)
-                .execute());
+            h
+            -> h.createUpdate(query)
+                    .bind("previewFileResource", previewImageUuid)
+                    .bindBean(website)
+                    .execute());
 
     // save identifiers
     // as we store the whole list new: delete old entries
-    deleteIdentifiers(website);
+    identifierRepository.deleteByIdentifiable(website);
     Set<Identifier> identifiers = website.getIdentifiers();
     saveIdentifiers(identifiers, website);
 
-    Website result = findOne(website.getUuid());
+    WebsiteImpl result = findOne(website.getUuid());
     return result;
   }
 
@@ -375,23 +254,23 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     if (websiteUuid == null || rootPages == null) {
       return false;
     }
-    String query =
-        "UPDATE website_webpages"
+    String query
+            = "UPDATE website_webpages"
             + " SET sortindex = :idx"
             + " WHERE website_uuid = :websiteUuid AND webpage_uuid = :webpageUuid;";
     dbi.withHandle(
-        h -> {
-          PreparedBatch batch = h.prepareBatch(query);
-          int idx = 0;
-          for (Webpage webpage : rootPages) {
-            batch
-                .bind("idx", idx++)
-                .bind("webpageUuid", webpage.getUuid())
-                .bind("websiteUuid", websiteUuid)
-                .add();
-          }
-          return batch.execute();
-        });
+            h -> {
+              PreparedBatch batch = h.prepareBatch(query);
+              int idx = 0;
+              for (Webpage webpage : rootPages) {
+                batch
+                        .bind("idx", idx++)
+                        .bind("webpageUuid", webpage.getUuid())
+                        .bind("websiteUuid", websiteUuid)
+                        .add();
+              }
+              return batch.execute();
+            });
     return true;
   }
 

@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.server.backend.api.repository.identifiable.
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import java.util.List;
@@ -10,27 +9,26 @@ import java.util.UUID;
 
 /**
  * Repository for Webpage persistence handling.
- *
- * @param <E> entity type
+ * @param <W> instance of webpage implementation
  */
-public interface WebpageRepository<E extends Entity>
-    extends NodeRepository<Webpage>, EntityPartRepository<Webpage, E> {
+public interface WebpageRepository<W extends Webpage>
+        extends NodeRepository<W>, EntityPartRepository<W> {
 
-  Webpage findOne(UUID uuid, Filtering filtering);
+  W findOne(UUID uuid, Filtering filtering);
 
   /**
    * @param webpage newly created webpage to be saved
    * @param parentWebsiteUUID website the (root) webpage belongs to
    * @return saved webpage
    */
-  Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUUID);
+  W saveWithParentWebsite(W webpage, UUID parentWebsiteUUID);
 
   /**
    * @param webpage newly created webpage to be saved
    * @param parentWebpageUUID parent webpage the new webpage is child of
    * @return saved webpage
    */
-  Webpage saveWithParentWebpage(Webpage webpage, UUID parentWebpageUUID);
+  W saveWithParentWebpage(W webpage, UUID parentWebpageUUID);
 
   /**
    * @param rootWebpageUuid uuid of a webpage (webpage must be a top level webpage of the website)
@@ -38,12 +36,12 @@ public interface WebpageRepository<E extends Entity>
    */
   Website getWebsite(UUID rootWebpageUuid);
 
-  default boolean updateChildrenOrder(Webpage webpage, List<Webpage> children) {
+  default boolean updateChildrenOrder(W webpage, List<W> children) {
     if (webpage == null || children == null) {
       return false;
     }
     return updateChildrenOrder(webpage.getUuid(), children);
   }
 
-  boolean updateChildrenOrder(UUID parentUuid, List<Webpage> children);
+  boolean updateChildrenOrder(UUID parentUuid, List<W> children);
 }
