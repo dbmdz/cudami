@@ -8,8 +8,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-/** Repository for Website persistence handling. */
-public interface WebsiteRepository extends EntityRepository<Website> {
+/** Repository for Website persistence handling.
+ * @param <W> instance of website implementation */
+public interface WebsiteRepository<W extends Website> extends EntityRepository<W> {
 
   List<Webpage> getRootPages(Website website);
 
@@ -19,7 +20,7 @@ public interface WebsiteRepository extends EntityRepository<Website> {
 
   List<Locale> getLanguages();
 
-  default boolean updateRootPagesOrder(Website website, List<Webpage> rootPages) {
+  default boolean updateRootPagesOrder(W website, List<Webpage> rootPages) {
     if (website == null || rootPages == null) {
       return false;
     }

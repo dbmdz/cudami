@@ -7,28 +7,27 @@ import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import java.util.List;
 import java.util.UUID;
 
-public interface EntityPartRepository<P extends EntityPart, E extends Entity>
-    extends IdentifiableRepository<P> {
+public interface EntityPartRepository<P extends EntityPart>
+        extends IdentifiableRepository<P> {
 
-  void addRelatedEntity(P entityPart, E entity);
+  void addRelatedEntity(P entityPart, Entity entity);
 
   void addRelatedEntity(UUID entityPartUuid, UUID entityUuid);
 
-  List<E> getRelatedEntities(P entityPart);
+  List<Entity> getRelatedEntities(P entityPart);
 
-  List<E> getRelatedEntities(UUID entityPartUuid);
+  List<Entity> getRelatedEntities(UUID entityPartUuid);
 
   /**
-   * Save list of entities related to an entity part.Prerequisite: entities have been saved before
-   * (exist already)
+   * Save list of entities related to an entity part.Prerequisite: entities have been saved before (exist already)
    *
    * @param entityPart entity part the entities are related to
    * @param entities the entities that are related to the entity part
    * @return the list of the related entities
    */
-  List<E> saveRelatedEntities(P entityPart, List<E> entities);
+  List<Entity> saveRelatedEntities(P entityPart, List<Entity> entities);
 
-  List<E> saveRelatedEntities(UUID entityPartUuid, List<E> entities);
+  List<Entity> saveRelatedEntities(UUID entityPartUuid, List<Entity> entities);
 
   void addRelatedFileresource(P entityPart, FileResource fileResource);
 
@@ -39,8 +38,7 @@ public interface EntityPartRepository<P extends EntityPart, E extends Entity>
   List<FileResource> getRelatedFileResources(UUID entityPartUuid);
 
   /**
-   * Save list of file resources related to an entity. Prerequisite: file resources have been saved
-   * before (exist already)
+   * Save list of file resources related to an entity. Prerequisite: file resources have been saved before (exist already)
    *
    * @param entityPart entity part the file resources are related to
    * @param fileResources the file resources that are related to the entity part
@@ -49,5 +47,5 @@ public interface EntityPartRepository<P extends EntityPart, E extends Entity>
   List<FileResource> saveRelatedFileResources(P entityPart, List<FileResource> fileResources);
 
   List<FileResource> saveRelatedFileResources(
-      UUID entityPartUuid, List<FileResource> fileResources);
+          UUID entityPartUuid, List<FileResource> fileResources);
 }

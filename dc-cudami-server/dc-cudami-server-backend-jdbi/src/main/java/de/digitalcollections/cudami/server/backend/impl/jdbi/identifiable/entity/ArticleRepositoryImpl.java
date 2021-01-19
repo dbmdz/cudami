@@ -137,7 +137,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
 
     final String sql =
         "SELECT"
-            + EntityRepositoryImpl.SQL_REDUCED_ENTITY_FIELDS_E
+            + EntityRepositoryImpl.SQL_REDUCED_FIELDS_E
             + ","
             + SQL_FULL_FIELDS_ID
             + ","

@@ -26,7 +26,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<TopicImpl> impleme
   private static final Logger LOGGER = LoggerFactory.getLogger(TopicRepositoryImpl.class);
 
   public static final String SQL_REDUCED_FIELDS_TO
-          = "t.uuid to_uuid, t.refid to_refId, t.label to_label, t.description to_description,"
+          = " t.uuid to_uuid, t.refid to_refId, t.label to_label, t.description to_description,"
           + " t.identifiable_type to_type, t.entity_type to_entityType,"
           + " t.created to_created, t.last_modified to_lastModified,"
           + " t.preview_hints to_previewImageRenderingHints";
@@ -92,11 +92,11 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<TopicImpl> impleme
     }
     switch (modelProperty) {
       case "created":
-        return "t.created";
+        return tableAlias + ".created";
       case "lastModified":
-        return "t.last_modified";
+        return tableAlias + ".last_modified";
       case "refId":
-        return "t.refid";
+        return tableAlias + ".refid";
       default:
         return null;
     }
@@ -124,7 +124,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<TopicImpl> impleme
                     + " WHERE ts.topic_uuid = :uuid"
                     + " ORDER BY ts.sortIndex ASC");
 
-    List<Subtopic> result = subtopicRepositoryImpl.retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
+    List<Subtopic> result = subtopicRepositoryImpl.retrieveList(SubtopicRepositoryImpl.SQL_REDUCED_FIELDS_ST, innerQuery, Map.of("uuid", uuid));
     return result;
   }
 

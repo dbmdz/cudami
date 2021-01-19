@@ -3,31 +3,45 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.EntityPartRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
-import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
-import de.digitalcollections.model.api.identifiable.entity.parts.EntityPart;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
+import de.digitalcollections.model.impl.identifiable.entity.parts.EntityPartImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Repository
-public class EntityPartRepositoryImpl<P extends EntityPart, E extends Entity>
-        extends IdentifiableRepositoryImpl<P> implements EntityPartRepository<P, E> {
+public abstract class EntityPartRepositoryImpl<P extends EntityPartImpl>
+        extends IdentifiableRepositoryImpl<P> implements EntityPartRepository<P> {
 
-  @Autowired
-  public EntityPartRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(dbi, identifierRepository);
+  private static final Logger LOGGER = LoggerFactory.getLogger(EntityPartRepositoryImpl.class);
+
+  protected EntityPartRepositoryImpl(Jdbi dbi,
+          IdentifierRepository identifierRepository,
+          String tableName,
+          String tableAlias,
+          String mappingPrefix,
+          Class<P> entityPartImplClass,
+          String reducedFieldsSql,
+          String fullFieldsSql) {
+    super(
+            dbi,
+            identifierRepository,
+            tableName,
+            tableAlias,
+            mappingPrefix,
+            entityPartImplClass,
+            reducedFieldsSql,
+            fullFieldsSql);
   }
 
   @Override
-  public void addRelatedEntity(P entityPart, E entity) {
+  public void addRelatedEntity(P entityPart, Entity entity) {
     addRelatedEntity(entityPart.getUuid(), entity.getUuid());
   }
 
@@ -53,9 +67,9 @@ public class EntityPartRepositoryImpl<P extends EntityPart, E extends Entity>
 
   @Override
   public void addRelatedFileresource(UUID entityPartUuid, UUID fileResourceUuid) {
-    Integer sortIndex            = retrieveNextSortIndexForParentChildren(
-                    dbi, "rel_entitypart_fileresources", "entitypart_uuid", entityPartUuid);
-    
+    Integer sortIndex = retrieveNextSortIndexForParentChildren(
+            dbi, "rel_entitypart_fileresources", "entitypart_uuid", entityPartUuid);
+
     dbi.withHandle(
             h
             -> h.createUpdate(
@@ -67,17 +81,12 @@ public class EntityPartRepositoryImpl<P extends EntityPart, E extends Entity>
   }
 
   @Override
-  public P findOne(Identifier identifier) {
-    throw new UnsupportedOperationException("Not supported yet.");
-  }
-
-  @Override
-  public List<E> getRelatedEntities(P entityPart) {
+  public List<Entity> getRelatedEntities(P entityPart) {
     return getRelatedEntities(entityPart.getUuid());
   }
 
   @Override
-  public List<E> getRelatedEntities(UUID entityPartUuid) {
+  public List<Entity> getRelatedEntities(UUID entityPartUuid) {
     String query
             = "SELECT * FROM entities e"
             + " INNER JOIN rel_entitypart_entities ref ON e.uuid=ref.entity_uuid"
@@ -91,7 +100,7 @@ public class EntityPartRepositoryImpl<P extends EntityPart, E extends Entity>
                             .bind("entityPartUuid", entityPartUuid)
                             .mapToBean(EntityImpl.class)
                             .list());
-    List<E> result = list.stream().map(s -> (E) s).collect(Collectors.toList());
+    List<Entity> result = list.stream().map(s -> (Entity) s).collect(Collectors.toList());
     return result;
   }
 
@@ -120,12 +129,12 @@ public class EntityPartRepositoryImpl<P extends EntityPart, E extends Entity>
   }
 
   @Override
-  public List<E> saveRelatedEntities(P entityPart, List<E> entities) {
+  public List<Entity> saveRelatedEntities(P entityPart, List<Entity> entities) {
     return saveRelatedEntities(entityPart.getUuid(), entities);
   }
 
   @Override
-  public List<E> saveRelatedEntities(UUID entityPartUuid, List<E> entities) {
+  public List<Entity> saveRelatedEntities(UUID entityPartUuid, List<Entity> entities) {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
             h

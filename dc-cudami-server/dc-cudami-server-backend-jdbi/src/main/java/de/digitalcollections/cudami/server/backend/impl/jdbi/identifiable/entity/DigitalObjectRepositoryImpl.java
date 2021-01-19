@@ -1,7 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
-import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.CollectionRepositoryImpl.SQL_REDUCED_FIELDS_COL;
-
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
@@ -116,7 +114,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
     List<Collection> result =
         collectionRepositoryImpl
-            .retrieveList(SQL_REDUCED_FIELDS_COL, innerQuery, Map.of("uuid", digitalObjectUuid))
+            .retrieveList(CollectionRepositoryImpl.SQL_REDUCED_FIELDS_COL, innerQuery, Map.of("uuid", digitalObjectUuid))
             .stream()
             .map(Collection.class::cast)
             .collect(Collectors.toList());
