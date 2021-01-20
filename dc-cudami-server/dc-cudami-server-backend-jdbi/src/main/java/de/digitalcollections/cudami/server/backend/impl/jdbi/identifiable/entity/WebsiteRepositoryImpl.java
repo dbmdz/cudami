@@ -38,7 +38,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<WebsiteImpl>
           + " w.identifiable_type ws_type, w.entity_type ws_entityType,"
           + " w.created ws_created, w.last_modified ws_lastModified,"
           + " w.url ws_url, w.registration_date ws_registrationDate,"
-          + " w.previews_hints ws_previewImageRenderingHints";
+          + " w.preview_hints ws_previewImageRenderingHints";
 
   public static final String SQL_FULL_FIELDS_WS = SQL_REDUCED_FIELDS_WS;
 

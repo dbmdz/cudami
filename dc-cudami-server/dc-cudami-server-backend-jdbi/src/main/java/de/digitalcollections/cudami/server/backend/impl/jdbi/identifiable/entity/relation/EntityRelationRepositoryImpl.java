@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRelationsRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.AbstractPagingAndSortingRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
@@ -18,19 +17,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityRelationRepository;
 
 @Repository
 // FIXME: added Spring JDBC-Template framework, because I couldn't get JDBI get to work with double
 // join on entities... sorry. Solutions welcome
-public class EntityRelationsRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl
-    implements EntityRelationsRepository {
+public class EntityRelationRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl
+    implements EntityRelationRepository {
 
   private final Jdbi dbi;
   private final EntityRepositoryImpl entityRepository;
   private final JdbcTemplate jdbcTemplate;
 
   @Autowired
-  public EntityRelationsRepositoryImpl(
+  public EntityRelationRepositoryImpl(
       DataSource dataSource,
       Jdbi dbi,
       @Qualifier("entityRepositoryImpl") EntityRepositoryImpl entityRepository) {

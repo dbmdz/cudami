@@ -159,7 +159,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
                     .reduceRows(
                         new LinkedHashMap<UUID, EntityImpl>(),
-                        entityRepositoryImpl.mapRowToIdentifiable(true, true))
+                        entityRepositoryImpl.basicReduceRowsBiFunction)
                     .values()
                     .stream()
                     .map(

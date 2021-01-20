@@ -197,6 +197,15 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
                   .append(convertToSqlString(fc.getValue()))
                   .append("%')");
           break;
+        case STARTS_WITH:
+          // @see https://www.postgresql.org/docs/11/functions-matching.html
+          query
+              .append("(")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" ILIKE ")
+              .append(convertToSqlString(fc.getValue()))
+              .append(" || '%')");
+          break;
         case EQUALS:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query

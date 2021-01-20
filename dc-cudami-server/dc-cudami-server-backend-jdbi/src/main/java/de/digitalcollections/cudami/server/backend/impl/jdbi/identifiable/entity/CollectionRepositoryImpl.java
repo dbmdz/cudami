@@ -340,7 +340,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
             + tableAlias
             + ".uuid = cc.parent_collection_uuid"
             + " WHERE cc.child_collection_uuid = :uuid");
-    CollectionImpl result = retrieveOne(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
+    CollectionImpl result = retrieveOne(reducedFieldsSql, innerQuery, null, Map.of("uuid", uuid));
 
     return result;
   }

@@ -11,6 +11,9 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
+import de.digitalcollections.model.api.paging.Sorting;
+import de.digitalcollections.model.api.paging.enums.Direction;
+import de.digitalcollections.model.impl.paging.OrderImpl;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -43,11 +46,13 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
 
   @Override
   public PageResponse<I> find(PageRequest pageRequest) {
+    setDefaultSorting(pageRequest);
     return repository.find(pageRequest);
   }
 
   @Override
   public SearchPageResponse<I> find(SearchPageRequest searchPageRequest) {
+    setDefaultSorting(searchPageRequest);
     return repository.find(searchPageRequest);
   }
 
@@ -73,6 +78,11 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     return reduceMultilanguageFieldsToGivenLocale(identifiable, locale);
   }
 
+
+  @Override
+  public I getByIdentifier(String namespace, String id) {
+    return (I) repository.findOneByIdentifier(namespace, id);
+  }
   protected I reduceMultilanguageFieldsToGivenLocale(I identifiable, Locale locale) {
     if (identifiable == null) {
       return null;
@@ -108,11 +118,6 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-  public I getByIdentifier(String namespace, String id) {
-    return (I) repository.findOneByIdentifier(namespace, id);
-  }
-
-  @Override
   //  @Transactional(readOnly = false)
   public I save(I identifiable) throws IdentifiableServiceException {
     try {
@@ -120,6 +125,16 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     } catch (Exception e) {
       LOGGER.error("Cannot save identifiable " + identifiable + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
+    }
+  }
+  protected void setDefaultSorting(PageRequest pageRequest) {
+    // business logic: default sorting if no other sorting given: german label ascending
+    // TODO or make dependend from language the user has chosen...?
+    if (pageRequest.getSorting() == null || pageRequest.getSorting().getOrders() == null || pageRequest.getSorting().getOrders().isEmpty()) {
+      final OrderImpl labelOrder = new OrderImpl(Direction.ASC, "label");
+      labelOrder.setSubProperty("de");
+      Sorting sorting = Sorting.defaultBuilder().order(labelOrder).build();
+      pageRequest.setSorting(sorting);
     }
   }
 

@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity;
+package de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation;
 
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
@@ -7,7 +7,7 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.List;
 import java.util.UUID;
 
-public interface EntityRelationsRepository {
+public interface EntityRelationRepository {
 
   default void deleteBySubject(Entity subjectEntity) {
     deleteBySubject(subjectEntity.getUuid());
