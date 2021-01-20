@@ -105,4 +105,6 @@ public interface SubtopicRepository<S extends Subtopic>
    * @return the topic the given root-subtopic belongs to (subtopic is top level subtopic)
    */
   Topic getTopic(UUID rootSubtopicUuid);
+  
+  boolean updateChildrenOrder(UUID parentUuid, List<S> children);
 }

@@ -47,6 +47,9 @@ public interface IdentifiableRepository<I extends Identifiable> {
    */
   List<I> findAllReduced();
 
+  PageResponse<I> findByLanguageAndInitial(
+          PageRequest pageRequest, String language, String initial);
+  
   I findOne(Identifier identifier);
 
   default I findOne(UUID uuid) {

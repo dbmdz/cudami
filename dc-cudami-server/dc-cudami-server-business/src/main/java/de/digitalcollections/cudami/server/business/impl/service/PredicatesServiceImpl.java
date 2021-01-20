@@ -6,7 +6,7 @@ import de.digitalcollections.model.api.relations.Predicate;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import de.digitalcollections.cudami.server.backend.api.repository.PredicateRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.PredicateRepository;
 
 @Service
 public class PredicatesServiceImpl implements PredicatesService {

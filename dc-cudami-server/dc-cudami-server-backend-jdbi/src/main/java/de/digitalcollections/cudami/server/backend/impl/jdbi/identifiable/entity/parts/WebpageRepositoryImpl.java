@@ -42,7 +42,7 @@ public class WebpageRepositoryImpl
           + " w.created wp_created, w.last_modified wp_lastModified,"
           + " w.publication_start wp_publicationStart, w.publication_end wp_publicationEnd,"
           + " w.rendering_hints wp_renderingHints,"
-          + " w.previewp_hints wp_previewImageRenderingHints";
+          + " w.preview_hints wp_previewImageRenderingHints";
 
   public static final String SQL_FULL_FIELDS_WP = SQL_REDUCED_FIELDS_WP + ", w.text wp_text";
 
@@ -219,7 +219,7 @@ public class WebpageRepositoryImpl
             + tableAlias
             + ".uuid = ww.parent_webpage_uuid"
             + " WHERE ww.child_webpage_uuid = :uuid");
-    WebpageImpl result = retrieveOne(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
+    WebpageImpl result = retrieveOne(reducedFieldsSql, innerQuery, null, Map.of("uuid", uuid));
 
     return result;
   }

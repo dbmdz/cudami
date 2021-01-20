@@ -7,6 +7,7 @@ import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
 import de.digitalcollections.model.impl.identifiable.entity.TopicImpl;
+import de.digitalcollections.model.impl.identifiable.entity.parts.SubtopicImpl;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -124,8 +125,9 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<TopicImpl> impleme
                     + " WHERE ts.topic_uuid = :uuid"
                     + " ORDER BY ts.sortIndex ASC");
 
-    List<Subtopic> result = subtopicRepositoryImpl.retrieveList(SubtopicRepositoryImpl.SQL_REDUCED_FIELDS_ST, innerQuery, Map.of("uuid", uuid));
-    return result;
+    List<SubtopicImpl> result = subtopicRepositoryImpl.retrieveList(SubtopicRepositoryImpl.SQL_REDUCED_FIELDS_ST, innerQuery, Map.of("uuid", uuid));
+    return result.stream().map(Subtopic.class::cast)
+            .collect(Collectors.toList());
   }
 
   @Override

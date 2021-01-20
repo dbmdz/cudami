@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.server.backend.api.repository;
+package de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation;
 
 import de.digitalcollections.model.api.relations.Predicate;
 import java.util.List;

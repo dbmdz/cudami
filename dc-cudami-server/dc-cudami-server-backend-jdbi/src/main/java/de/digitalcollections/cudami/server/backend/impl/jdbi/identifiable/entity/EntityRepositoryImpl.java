@@ -7,11 +7,14 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resour
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.result.RowView;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +63,7 @@ public class EntityRepositoryImpl<E extends EntityImpl> extends IdentifiableRepo
           Class<E> entityImplClass,
           String reducedFieldsSql,
           String fullFieldsSql) {
-    super(
+    this(
             dbi,
             identifierRepository,
             tableName,
@@ -68,9 +71,55 @@ public class EntityRepositoryImpl<E extends EntityImpl> extends IdentifiableRepo
             mappingPrefix,
             entityImplClass,
             reducedFieldsSql,
-            fullFieldsSql);
+            fullFieldsSql, null);
+  }
+  
+  protected EntityRepositoryImpl(
+          Jdbi dbi,
+          IdentifierRepository identifierRepository,
+          String tableName,
+          String tableAlias,
+          String mappingPrefix,
+          Class<E> entityImplClass,
+          String reducedFieldsSql,
+          String fullFieldsSql,
+          String fullFieldsJoinsSql) {
+    this(
+            dbi,
+            identifierRepository,
+            tableName,
+            tableAlias,
+            mappingPrefix,
+            entityImplClass,
+            reducedFieldsSql,
+            fullFieldsSql,
+            fullFieldsJoinsSql,
+            null);
   }
 
+  protected EntityRepositoryImpl(
+          Jdbi dbi,
+          IdentifierRepository identifierRepository,
+          String tableName,
+          String tableAlias,
+          String mappingPrefix,
+          Class<E> entityImplClass,
+          String reducedFieldsSql,
+          String fullFieldsSql,
+          String fullFieldsJoinsSql,
+          BiFunction<LinkedHashMap<UUID, E>, RowView, LinkedHashMap<UUID, E>> additionalReduceRowsBiFunction) {
+    super(dbi,
+            identifierRepository,
+            tableName,
+            tableAlias,
+            mappingPrefix,
+            entityImplClass,
+            reducedFieldsSql,
+            fullFieldsSql,
+            fullFieldsJoinsSql,
+            additionalReduceRowsBiFunction);
+  }
+  
   @Override
   public void addRelatedFileresource(UUID entityUuid, UUID fileResourceUuid) {
     Integer nextSortIndex = retrieveNextSortIndexForParentChildren(
@@ -97,7 +146,7 @@ public class EntityRepositoryImpl<E extends EntityImpl> extends IdentifiableRepo
                     + tableAlias
                     + ".refid = :refId");
 
-    E result = retrieveOne(fullFieldsSql, innerQuery, Map.of("refId", refId));
+    E result = retrieveOne(fullFieldsSql, innerQuery, fullFieldsJoinsSql, Map.of("refId", refId));
     return result;
   }
 

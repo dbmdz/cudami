@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRelationsRepository;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityRelationsService;
 import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -8,14 +7,15 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityRelationRepository;
 
 @Service
 public class EntityRelationsServiceImpl implements EntityRelationsService {
 
-  private final EntityRelationsRepository repository;
+  private final EntityRelationRepository repository;
 
   @Autowired
-  public EntityRelationsServiceImpl(EntityRelationsRepository repository) {
+  public EntityRelationsServiceImpl(EntityRelationRepository repository) {
     this.repository = repository;
   }
 
