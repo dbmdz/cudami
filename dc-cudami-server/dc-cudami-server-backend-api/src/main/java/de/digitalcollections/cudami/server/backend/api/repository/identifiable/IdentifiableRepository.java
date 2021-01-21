@@ -35,10 +35,11 @@ public interface IdentifiableRepository<I extends Identifiable> {
   }
 
   /**
-   * @return list of ALL identifiables with FULL data. USE WITH CARE (only for internal workflow, NOT FOR USER INTERACTION!)!!!
+   * @return list of ALL identifiables with FULL data. USE WITH CARE (only for internal workflow,
+   *     NOT FOR USER INTERACTION!)!!!
    */
   List<I> findAllFull();
-  
+
   /**
    * Returns a list of all identifiables, reduced to their identifiers and last modification date
    *
@@ -48,8 +49,8 @@ public interface IdentifiableRepository<I extends Identifiable> {
   List<I> findAllReduced();
 
   PageResponse<I> findByLanguageAndInitial(
-          PageRequest pageRequest, String language, String initial);
-  
+      PageRequest pageRequest, String language, String initial);
+
   I findOne(Identifier identifier);
 
   default I findOne(UUID uuid) {

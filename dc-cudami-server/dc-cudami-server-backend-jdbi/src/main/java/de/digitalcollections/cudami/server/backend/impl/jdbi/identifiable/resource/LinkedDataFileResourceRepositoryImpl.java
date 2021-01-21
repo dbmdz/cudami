@@ -33,6 +33,8 @@ public class LinkedDataFileResourceRepositoryImpl
   public static final String SQL_FULL_FIELDS_FR =
       SQL_REDUCED_FIELDS_FR + ", f.context fr_context, f.object_type fr_objectType";
 
+  public static final String MAPPING_PREFIX = "fr";
+  public static final String TABLE_ALIAS = "f";
   public static final String TABLE_NAME = "fileresources_linkeddata";
 
   private final FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
@@ -46,8 +48,8 @@ public class LinkedDataFileResourceRepositoryImpl
         dbi,
         identifierRepository,
         TABLE_NAME,
-        "f",
-        "fr",
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
         LinkedDataFileResourceImpl.class,
         SQL_REDUCED_FIELDS_FR,
         SQL_FULL_FIELDS_FR);

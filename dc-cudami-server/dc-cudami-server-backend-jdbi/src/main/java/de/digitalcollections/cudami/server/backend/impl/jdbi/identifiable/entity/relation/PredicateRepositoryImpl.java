@@ -26,9 +26,13 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
   public static final String SQL_FULL_FIELDS_PRED =
       SQL_REDUCED_FIELDS_PRED + " , p.description pred_description";
 
+  public static final String MAPPING_PREFIX = "pred";
+  public static final String TABLE_ALIAS = "p";
+  public static final String TABLE_NAME = "predicates";
+
   @Autowired
   public PredicateRepositoryImpl(Jdbi dbi) {
-    super(dbi, "predicates", "p", "pred");
+    super(dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX);
   }
 
   @Override

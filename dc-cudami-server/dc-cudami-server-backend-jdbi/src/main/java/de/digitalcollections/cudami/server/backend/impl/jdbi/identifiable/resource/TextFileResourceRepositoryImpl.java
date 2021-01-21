@@ -31,6 +31,8 @@ public class TextFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<T
 
   public static final String SQL_FULL_FIELDS_FR = SQL_REDUCED_FIELDS_FR;
 
+  public static final String MAPPING_PREFIX = "fr";
+  public static final String TABLE_ALIAS = "f";
   public static final String TABLE_NAME = "fileresources_text";
 
   private final FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
@@ -44,8 +46,8 @@ public class TextFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<T
         dbi,
         identifierRepository,
         TABLE_NAME,
-        "f",
-        "fr",
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
         TextFileResourceImpl.class,
         SQL_REDUCED_FIELDS_FR,
         SQL_FULL_FIELDS_FR);

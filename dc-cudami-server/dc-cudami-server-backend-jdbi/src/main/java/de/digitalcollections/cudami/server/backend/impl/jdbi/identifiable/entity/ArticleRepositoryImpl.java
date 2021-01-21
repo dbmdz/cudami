@@ -51,6 +51,8 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
 
   public static final String SQL_FULL_FIELDS_AR = SQL_REDUCED_FIELDS_AR + ", a.text ar_text";
 
+  public static final String MAPPING_PREFIX = "ar";
+  public static final String TABLE_ALIAS = "a";
   public static final String TABLE_NAME = "articles";
 
   private final EntityRepositoryImpl<EntityImpl> entityRepositoryImpl;
@@ -64,8 +66,8 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
         dbi,
         identifierRepository,
         TABLE_NAME,
-        "a",
-        "ar",
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
         ArticleImpl.class,
         SQL_REDUCED_FIELDS_AR,
         SQL_FULL_FIELDS_AR);

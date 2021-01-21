@@ -33,6 +33,8 @@ public class VideoFileResourceRepositoryImpl
   public static final String SQL_FULL_FIELDS_FR =
       SQL_REDUCED_FIELDS_FR + ", f.duration fr_duration";
 
+  public static final String MAPPING_PREFIX = "fr";
+  public static final String TABLE_ALIAS = "f";
   public static final String TABLE_NAME = "fileresources_video";
 
   private final FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
@@ -46,8 +48,8 @@ public class VideoFileResourceRepositoryImpl
         dbi,
         identifierRepository,
         TABLE_NAME,
-        "f",
-        "fr",
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
         VideoFileResourceImpl.class,
         SQL_REDUCED_FIELDS_FR,
         SQL_FULL_FIELDS_FR);

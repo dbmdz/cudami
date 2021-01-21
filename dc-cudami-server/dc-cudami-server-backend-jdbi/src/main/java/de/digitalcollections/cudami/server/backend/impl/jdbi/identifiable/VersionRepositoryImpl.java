@@ -17,9 +17,13 @@ public class VersionRepositoryImpl extends JdbiRepositoryImpl implements Version
 
   private static final Logger LOGGER = LoggerFactory.getLogger(VersionRepositoryImpl.class);
 
+  public static final String MAPPING_PREFIX = "ver";
+  public static final String TABLE_ALIAS = "v";
+  public static final String TABLE_NAME = "versions";
+
   @Autowired
   public VersionRepositoryImpl(Jdbi dbi) {
-    super(dbi, "versions", "v", "ver");
+    super(dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX);
   }
 
   @Override
@@ -55,14 +59,12 @@ public class VersionRepositoryImpl extends JdbiRepositoryImpl implements Version
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    throw new UnsupportedOperationException(
-        "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
+    throw new UnsupportedOperationException("Not supported yet.");
   }
 
   @Override
   protected String getColumnName(String modelProperty) {
-    throw new UnsupportedOperationException(
-        "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
+    throw new UnsupportedOperationException("Not supported yet.");
   }
 
   @Override

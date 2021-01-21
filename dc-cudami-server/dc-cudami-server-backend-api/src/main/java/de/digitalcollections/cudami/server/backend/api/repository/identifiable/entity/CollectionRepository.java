@@ -20,22 +20,6 @@ import java.util.UUID;
 public interface CollectionRepository<C extends Collection>
     extends NodeRepository<C>, EntityRepository<C> {
 
-  default boolean addChild(C parent, C child) {
-    if (parent == null || child == null) {
-      return false;
-    }
-    return addChildren(parent.getUuid(), Arrays.asList(child));
-  }
-
-  default boolean addChildren(C parent, List<C> children) {
-    if (parent == null || children == null) {
-      return false;
-    }
-    return addChildren(parent.getUuid(), children);
-  }
-
-  boolean addChildren(UUID parentUuid, List<C> collections);
-
   default boolean addDigitalObject(C collection, DigitalObject digitalObject) {
     if (collection == null || digitalObject == null) {
       return false;
@@ -52,14 +36,6 @@ public interface CollectionRepository<C extends Collection>
 
   boolean addDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects);
 
-  @Override
-  default List<C> getChildren(C collection) {
-    if (collection == null) {
-      return null;
-    }
-    return getChildren(collection.getUuid());
-  }
-
   default PageResponse<DigitalObject> getDigitalObjects(C collection, PageRequest pageRequest) {
     if (collection == null) {
       return null;
@@ -69,22 +45,11 @@ public interface CollectionRepository<C extends Collection>
 
   PageResponse<DigitalObject> getDigitalObjects(UUID collectionUuid, PageRequest pageRequest);
 
-  List<C> getParents(UUID uuid);
-
   List<CorporateBody> getRelatedCorporateBodies(UUID uuid, Filtering filtering);
 
   PageResponse<C> getTopCollections(PageRequest pageRequest);
 
   List<Locale> getTopCollectionsLanguages();
-
-  default boolean removeChild(C parent, C child) {
-    if (parent == null || child == null) {
-      return false;
-    }
-    return removeChild(parent.getUuid(), child.getUuid());
-  }
-
-  boolean removeChild(UUID parentUuid, UUID childUuid);
 
   default boolean removeDigitalObject(C collection, DigitalObject digitalObject) {
     if (collection == null || digitalObject == null) {

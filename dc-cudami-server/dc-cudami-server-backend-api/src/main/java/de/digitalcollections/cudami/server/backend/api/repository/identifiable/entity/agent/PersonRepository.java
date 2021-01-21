@@ -11,9 +11,6 @@ import java.util.UUID;
 
 public interface PersonRepository<P extends Person> extends EntityRepository<P> {
 
-  PageResponse<P> findByLanguageAndInitial(
-          PageRequest pageRequest, String language, String initial);
-
   PageResponse<P> findByLocationOfBirth(PageRequest pageRequest, UUID uuidGeoLocation);
 
   PageResponse<P> findByLocationOfDeath(PageRequest pageRequest, UUID uuidGeoLocation);

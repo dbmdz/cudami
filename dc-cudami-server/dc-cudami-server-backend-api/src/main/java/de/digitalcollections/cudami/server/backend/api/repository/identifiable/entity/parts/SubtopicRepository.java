@@ -10,10 +10,11 @@ import java.util.UUID;
 
 /**
  * Repository for Subtopic persistence handling.
+ *
  * @param <S> instance of subtopic implementation
  */
 public interface SubtopicRepository<S extends Subtopic>
-        extends NodeRepository<S>, EntityPartRepository<S> {
+    extends NodeRepository<S>, EntityPartRepository<S> {
 
   @Override
   default List<S> getChildren(S subtopic) {
@@ -50,8 +51,7 @@ public interface SubtopicRepository<S extends Subtopic>
 
   List<FileResource> getFileResources(UUID subtopicUuid);
 
-  default List<FileResource> saveFileResources(
-          S subtopic, List<FileResource> fileResources) {
+  default List<FileResource> saveFileResources(S subtopic, List<FileResource> fileResources) {
     if (subtopic == null) {
       return null;
     }
@@ -101,10 +101,11 @@ public interface SubtopicRepository<S extends Subtopic>
   Integer deleteFromParentTopic(UUID subtopicUuid, UUID topicUuid);
 
   /**
-   * @param rootSubtopicUuid uuid of a subtopic (subtopic must be a top level subtopic under a topic)
+   * @param rootSubtopicUuid uuid of a subtopic (subtopic must be a top level subtopic under a
+   *     topic)
    * @return the topic the given root-subtopic belongs to (subtopic is top level subtopic)
    */
   Topic getTopic(UUID rootSubtopicUuid);
-  
+
   boolean updateChildrenOrder(UUID parentUuid, List<S> children);
 }

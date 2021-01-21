@@ -21,9 +21,13 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifierTypeRepositoryImpl.class);
 
+  public static final String MAPPING_PREFIX = "idt";
+  public static final String TABLE_ALIAS = "idt";
+  public static final String TABLE_NAME = "identifiertypes";
+
   @Autowired
   public IdentifierTypeRepositoryImpl(Jdbi dbi) {
-    super(dbi, "identifiertypes", "idt", "idt");
+    super(dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX);
   }
 
   @Override

@@ -33,6 +33,8 @@ public class ImageFileResourceRepositoryImpl
   public static final String SQL_FULL_FIELDS_FR =
       SQL_REDUCED_FIELDS_FR + ", f.height fr_height, f.width fr_width";
 
+  public static final String MAPPING_PREFIX = "fr";
+  public static final String TABLE_ALIAS = "f";
   public static final String TABLE_NAME = "fileresources_audio";
 
   private final FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
@@ -46,8 +48,8 @@ public class ImageFileResourceRepositoryImpl
         dbi,
         identifierRepository,
         TABLE_NAME,
-        "f",
-        "fr",
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
         ImageFileResourceImpl.class,
         SQL_REDUCED_FIELDS_FR,
         SQL_FULL_FIELDS_FR);

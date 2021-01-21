@@ -23,12 +23,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class ProjectRepositoryImpl extends EntityRepositoryImpl<ProjectImpl>
-        implements ProjectRepository<ProjectImpl> {
+    implements ProjectRepository<ProjectImpl> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProjectRepositoryImpl.class);
 
-  public static final String SQL_REDUCED_FIELDS_PR
-          = " p.uuid pr_uuid, p.refid pr_refId, p.label pr_label, p.description pr_description,"
+  public static final String SQL_REDUCED_FIELDS_PR =
+      " p.uuid pr_uuid, p.refid pr_refId, p.label pr_label, p.description pr_description,"
           + " p.identifiable_type pr_type, p.entity_type pr_entityType,"
           + " p.created pr_created, p.last_modified pr_lastModified,"
           + " p.start_date pr_startDate, p.end_date pr_endDate,"
@@ -36,22 +36,26 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<ProjectImpl>
 
   public static final String SQL_FULL_FIELDS_PR = SQL_REDUCED_FIELDS_PR + ", p.text pr_text";
 
+  public static final String MAPPING_PREFIX = "pr";
+  public static final String TABLE_ALIAS = "p";
   public static final String TABLE_NAME = "projects";
 
   private final DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
 
   @Autowired
-  public ProjectRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository,
-          DigitalObjectRepositoryImpl digitalObjectRepositoryImpl) {
+  public ProjectRepositoryImpl(
+      Jdbi dbi,
+      IdentifierRepository identifierRepository,
+      DigitalObjectRepositoryImpl digitalObjectRepositoryImpl) {
     super(
-            dbi,
-            identifierRepository,
-            TABLE_NAME,
-            "p",
-            "pr",
-            ProjectImpl.class,
-            SQL_REDUCED_FIELDS_PR,
-            SQL_FULL_FIELDS_PR);
+        dbi,
+        identifierRepository,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        ProjectImpl.class,
+        SQL_REDUCED_FIELDS_PR,
+        SQL_FULL_FIELDS_PR);
     this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
   }
 
@@ -59,25 +63,26 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<ProjectImpl>
   public boolean addDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects) {
     if (projectUuid != null && digitalObjects != null) {
       // get max sortIndex of existing
-      Integer nextSortIndex = retrieveNextSortIndexForParentChildren(
+      Integer nextSortIndex =
+          retrieveNextSortIndexForParentChildren(
               dbi, "project_digitalobjects", "project_uuid", projectUuid);
 
       // save relation to project
       dbi.useHandle(
-              handle -> {
-                PreparedBatch preparedBatch
-                = handle.prepareBatch(
-                        "INSERT INTO project_digitalobjects(project_uuid, digitalobject_uuid, sortIndex) VALUES (:uuid, :digitalObjectUuid, :sortIndex) ON CONFLICT (project_uuid, digitalobject_uuid) DO NOTHING");
-                digitalObjects.forEach(
-                        digitalObject -> {
-                          preparedBatch
-                                  .bind("uuid", projectUuid)
-                                  .bind("digitalObjectUuid", digitalObject.getUuid())
-                                  .bind("sortIndex", nextSortIndex + getIndex(digitalObjects, digitalObject))
-                                  .add();
-                        });
-                preparedBatch.execute();
-              });
+          handle -> {
+            PreparedBatch preparedBatch =
+                handle.prepareBatch(
+                    "INSERT INTO project_digitalobjects(project_uuid, digitalobject_uuid, sortIndex) VALUES (:uuid, :digitalObjectUuid, :sortIndex) ON CONFLICT (project_uuid, digitalobject_uuid) DO NOTHING");
+            digitalObjects.forEach(
+                digitalObject -> {
+                  preparedBatch
+                      .bind("uuid", projectUuid)
+                      .bind("digitalObjectUuid", digitalObject.getUuid())
+                      .bind("sortIndex", nextSortIndex + getIndex(digitalObjects, digitalObject))
+                      .add();
+                });
+            preparedBatch.execute();
+          });
       return true;
     }
     return false;
@@ -85,7 +90,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<ProjectImpl>
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[]{"created", "lastModified", "refId"};
+    return new String[] {"created", "lastModified", "refId"};
   }
 
   @Override
@@ -110,8 +115,8 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<ProjectImpl>
     final String doTableAlias = digitalObjectRepositoryImpl.getTableAlias();
     final String doTableName = digitalObjectRepositoryImpl.getTableName();
 
-    String commonSql
-            = " FROM "
+    String commonSql =
+        " FROM "
             + doTableName
             + " AS "
             + doTableAlias
@@ -126,15 +131,15 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<ProjectImpl>
     innerQuery.append(" ORDER BY pd.sortIndex ASC");
     addPageRequestParams(pageRequest, innerQuery);
 
-    List<DigitalObject> result
-            = digitalObjectRepositoryImpl
-                    .retrieveList(
-                            DigitalObjectRepositoryImpl.SQL_REDUCED_FIELDS_DO,
-                            innerQuery,
-                            Map.of("uuid", projectUuid))
-                    .stream()
-                    .map(DigitalObject.class::cast)
-                    .collect(Collectors.toList());
+    List<DigitalObject> result =
+        digitalObjectRepositoryImpl
+            .retrieveList(
+                DigitalObjectRepositoryImpl.SQL_REDUCED_FIELDS_DO,
+                innerQuery,
+                Map.of("uuid", projectUuid))
+            .stream()
+            .map(DigitalObject.class::cast)
+            .collect(Collectors.toList());
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -147,15 +152,15 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<ProjectImpl>
   public boolean removeDigitalObject(UUID projectUuid, UUID digitalObjectUuid) {
     if (projectUuid != null && digitalObjectUuid != null) {
       // delete relation to project
-      String query
-              = "DELETE FROM project_digitalobjects WHERE project_uuid=:projectUuid AND digitalobject_uuid=:digitalObjectUuid";
+      String query =
+          "DELETE FROM project_digitalobjects WHERE project_uuid=:projectUuid AND digitalobject_uuid=:digitalObjectUuid";
 
       dbi.withHandle(
-              h
-              -> h.createUpdate(query)
-                      .bind("projectUuid", projectUuid)
-                      .bind("digitalObjectUuid", digitalObjectUuid)
-                      .execute());
+          h ->
+              h.createUpdate(query)
+                  .bind("projectUuid", projectUuid)
+                  .bind("digitalObjectUuid", digitalObjectUuid)
+                  .execute());
       return true;
     }
     return false;
@@ -170,7 +175,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<ProjectImpl>
     String query = "DELETE FROM project_digitalobjects WHERE digitalobject_uuid=:digitalObjectUuid";
 
     dbi.withHandle(
-            h -> h.createUpdate(query).bind("digitalObjectUuid", digitalObjectUuid).execute());
+        h -> h.createUpdate(query).bind("digitalObjectUuid", digitalObjectUuid).execute());
     return true;
   }
 
@@ -180,11 +185,11 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<ProjectImpl>
     project.setCreated(LocalDateTime.now());
     project.setLastModified(LocalDateTime.now());
     // refid is generated as serial, DO NOT SET!
-    final UUID previewImageUuid
-            = project.getPreviewImage() == null ? null : project.getPreviewImage().getUuid();
+    final UUID previewImageUuid =
+        project.getPreviewImage() == null ? null : project.getPreviewImage().getUuid();
 
-    String query
-            = "INSERT INTO "
+    String query =
+        "INSERT INTO "
             + tableName
             + "("
             + "uuid, label, description, previewfileresource, preview_hints,"
@@ -199,11 +204,11 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<ProjectImpl>
             + ")";
 
     dbi.withHandle(
-            h
-            -> h.createUpdate(query)
-                    .bind("previewFileResource", previewImageUuid)
-                    .bindBean(project)
-                    .execute());
+        h ->
+            h.createUpdate(query)
+                .bind("previewFileResource", previewImageUuid)
+                .bindBean(project)
+                .execute());
 
     // save identifiers
     Set<Identifier> identifiers = project.getIdentifiers();
@@ -217,27 +222,27 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<ProjectImpl>
   public boolean saveDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects) {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
-            h
-            -> h.createUpdate("DELETE FROM project_digitalobjects WHERE project_uuid = :uuid")
-                    .bind("uuid", projectUuid)
-                    .execute());
+        h ->
+            h.createUpdate("DELETE FROM project_digitalobjects WHERE project_uuid = :uuid")
+                .bind("uuid", projectUuid)
+                .execute());
 
     if (digitalObjects != null) {
       // save relation to project
       dbi.useHandle(
-              handle -> {
-                PreparedBatch preparedBatch
-                = handle.prepareBatch(
-                        "INSERT INTO project_digitalobjects(project_uuid, digitalobject_uuid, sortIndex) VALUES (:uuid, :digitalObjectUuid, :sortIndex)");
-                for (DigitalObject digitalObject : digitalObjects) {
-                  preparedBatch
-                          .bind("uuid", projectUuid)
-                          .bind("digitalObjectUuid", digitalObject.getUuid())
-                          .bind("sortIndex", getIndex(digitalObjects, digitalObject))
-                          .add();
-                }
-                preparedBatch.execute();
-              });
+          handle -> {
+            PreparedBatch preparedBatch =
+                handle.prepareBatch(
+                    "INSERT INTO project_digitalobjects(project_uuid, digitalobject_uuid, sortIndex) VALUES (:uuid, :digitalObjectUuid, :sortIndex)");
+            for (DigitalObject digitalObject : digitalObjects) {
+              preparedBatch
+                  .bind("uuid", projectUuid)
+                  .bind("digitalObjectUuid", digitalObject.getUuid())
+                  .bind("sortIndex", getIndex(digitalObjects, digitalObject))
+                  .add();
+            }
+            preparedBatch.execute();
+          });
       return true;
     }
     return false;
@@ -248,11 +253,11 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<ProjectImpl>
     project.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, entity_type, refid
-    final UUID previewImageUuid
-            = project.getPreviewImage() == null ? null : project.getPreviewImage().getUuid();
+    final UUID previewImageUuid =
+        project.getPreviewImage() == null ? null : project.getPreviewImage().getUuid();
 
-    final String sql
-            = "UPDATE "
+    final String sql =
+        "UPDATE "
             + tableName
             + " SET"
             + " label=:label::JSONB, description=:description::JSONB,"
@@ -262,11 +267,11 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<ProjectImpl>
             + " WHERE uuid=:uuid";
 
     dbi.withHandle(
-            h
-            -> h.createUpdate(sql)
-                    .bind("previewFileResource", previewImageUuid)
-                    .bindBean(project)
-                    .execute());
+        h ->
+            h.createUpdate(sql)
+                .bind("previewFileResource", previewImageUuid)
+                .bindBean(project)
+                .execute());
 
     // save identifiers
     // as we store the whole list new: delete old entries

@@ -39,6 +39,8 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
 
   public static final String SQL_FULL_FIELDS_FR = SQL_REDUCED_FIELDS_FR;
 
+  public static final String MAPPING_PREFIX = "fr";
+  public static final String TABLE_ALIAS = "f";
   public static final String TABLE_NAME = "fileresources";
 
   @Autowired
@@ -47,8 +49,8 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
         dbi,
         identifierRepository,
         TABLE_NAME,
-        "f",
-        "fr",
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
         FileResourceImpl.class,
         SQL_REDUCED_FIELDS_FR,
         SQL_FULL_FIELDS_FR);

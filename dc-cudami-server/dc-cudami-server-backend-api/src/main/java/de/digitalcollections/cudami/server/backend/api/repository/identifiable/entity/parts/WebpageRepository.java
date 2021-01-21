@@ -9,10 +9,11 @@ import java.util.UUID;
 
 /**
  * Repository for Webpage persistence handling.
+ *
  * @param <W> instance of webpage implementation
  */
 public interface WebpageRepository<W extends Webpage>
-        extends NodeRepository<W>, EntityPartRepository<W> {
+    extends NodeRepository<W>, EntityPartRepository<W> {
 
   W findOne(UUID uuid, Filtering filtering);
 

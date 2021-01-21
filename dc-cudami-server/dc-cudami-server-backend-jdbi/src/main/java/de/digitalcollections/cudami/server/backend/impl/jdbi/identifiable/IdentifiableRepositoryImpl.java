@@ -1,10 +1,11 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
+import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierRepositoryImpl.SQL_FULL_FIELDS_ID;
+import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl.SQL_PREVIEW_IMAGE_FIELDS_PI;
+
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
-import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierRepositoryImpl.SQL_FULL_FIELDS_ID;
-import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl.SQL_PREVIEW_IMAGE_FIELDS_PI;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.Identifier;
@@ -38,97 +39,129 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends JdbiRepositoryImpl
-        implements IdentifiableRepository<I> {
+    implements IdentifiableRepository<I> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableRepositoryImpl.class);
 
-  public static final String SQL_REDUCED_FIELDS_IDF
-          = " i.uuid idf_uuid, i.label idf_label,"
+  public static final String SQL_REDUCED_FIELDS_IDF =
+      " i.uuid idf_uuid, i.label idf_label,"
           + " i.identifiable_type idf_type,"
           + " i.created idf_created, i.last_modified idf_lastModified,"
           + " i.preview_hints idf_previewImageRenderingHints";
 
-  public static final String SQL_FULL_FIELDS_IDF
-          = SQL_REDUCED_FIELDS_IDF + ", i.description idf_description";
+  public static final String SQL_FULL_FIELDS_IDF =
+      SQL_REDUCED_FIELDS_IDF + ", i.description idf_description";
 
   /* BiFunction for reducing rows (related objects) of joins not already part of identifiable (Identifier, preview image ImageFileResource). */
-  public BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>> additionalReduceRowsBiFunction = (map, rowView) -> {
-    return map;
-  };
-  public final BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>> basicReduceRowsBiFunction;
+  public BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>>
+      additionalReduceRowsBiFunction =
+          (map, rowView) -> {
+            return map;
+          };
+  public final BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>>
+      basicReduceRowsBiFunction;
   protected final String fullFieldsJoinsSql;
   protected final String fullFieldsSql;
-  public final BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>> fullReduceRowsBiFunction;
+  public final BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>>
+      fullReduceRowsBiFunction;
   protected final Class<I> identifiableImplClass;
   protected final IdentifierRepository identifierRepository;
   protected final String reducedFieldsSql;
 
+  public static final String MAPPING_PREFIX = "idf";
+  public static final String TABLE_ALIAS = "i";
+  public static final String TABLE_NAME = "identifiables";
+
   @Autowired
   private IdentifiableRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     this(
-            dbi,
-            identifierRepository,
-            "identifiables",
-            "i",
-            "idf",
-            (Class<I>) IdentifiableImpl.class,
-            SQL_REDUCED_FIELDS_IDF,
-            SQL_FULL_FIELDS_IDF);
-    // register row mappers for always joined classes and mapping prefix. as it is in autowired constructor, this will be done only once at instantiation done by Spring
-    dbi.registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"));
+        dbi,
+        identifierRepository,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        (Class<I>) IdentifiableImpl.class,
+        SQL_REDUCED_FIELDS_IDF,
+        SQL_FULL_FIELDS_IDF);
+    // register row mappers for always joined classes and mapping prefix. as it is in autowired
+    // constructor, this will be done only once at instantiation done by Spring
     dbi.registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"));
   }
 
   protected IdentifiableRepositoryImpl(
-          Jdbi dbi,
-          IdentifierRepository identifierRepository,
-          String tableName,
-          String tableAlias,
-          String mappingPrefix,
-          Class<I> identifiableImplClass,
-          String reducedFieldsSql,
-          String fullFieldsSql) {
-    this(dbi, identifierRepository, tableName, tableAlias, mappingPrefix, identifiableImplClass, reducedFieldsSql, fullFieldsSql, null, null);
-  }
-  
-  protected IdentifiableRepositoryImpl(
-          Jdbi dbi,
-          IdentifierRepository identifierRepository,
-          String tableName,
-          String tableAlias,
-          String mappingPrefix,
-          Class<I> identifiableImplClass,
-          String reducedFieldsSql,
-          String fullFieldsSql,
-          String fullFieldsJoinsSql) {
-    this(dbi, identifierRepository, tableName, tableAlias, mappingPrefix, identifiableImplClass, reducedFieldsSql, fullFieldsSql, fullFieldsJoinsSql, null);
+      Jdbi dbi,
+      IdentifierRepository identifierRepository,
+      String tableName,
+      String tableAlias,
+      String mappingPrefix,
+      Class<I> identifiableImplClass,
+      String reducedFieldsSql,
+      String fullFieldsSql) {
+    this(
+        dbi,
+        identifierRepository,
+        tableName,
+        tableAlias,
+        mappingPrefix,
+        identifiableImplClass,
+        reducedFieldsSql,
+        fullFieldsSql,
+        null,
+        null);
   }
 
   protected IdentifiableRepositoryImpl(
-          Jdbi dbi,
-          IdentifierRepository identifierRepository,
-          String tableName,
-          String tableAlias,
-          String mappingPrefix,
-          Class<I> identifiableImplClass,
-          String reducedFieldsSql,
-          String fullFieldsSql,
-          String fullFieldsJoinsSql,
-          BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>> additionalReduceRowsBiFunction) {
+      Jdbi dbi,
+      IdentifierRepository identifierRepository,
+      String tableName,
+      String tableAlias,
+      String mappingPrefix,
+      Class<I> identifiableImplClass,
+      String reducedFieldsSql,
+      String fullFieldsSql,
+      String fullFieldsJoinsSql) {
+    this(
+        dbi,
+        identifierRepository,
+        tableName,
+        tableAlias,
+        mappingPrefix,
+        identifiableImplClass,
+        reducedFieldsSql,
+        fullFieldsSql,
+        fullFieldsJoinsSql,
+        null);
+  }
+
+  protected IdentifiableRepositoryImpl(
+      Jdbi dbi,
+      IdentifierRepository identifierRepository,
+      String tableName,
+      String tableAlias,
+      String mappingPrefix,
+      Class<I> identifiableImplClass,
+      String reducedFieldsSql,
+      String fullFieldsSql,
+      String fullFieldsJoinsSql,
+      BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>>
+          additionalReduceRowsBiFunction) {
     super(dbi, tableName, tableAlias, mappingPrefix);
 
     // register row mapper for given class and mapping prefix
-    // (until now everywhere BeanMapper.factory... was used. If this changes, row mapper registration may be moved back into each repository impl?)
+    // (until now everywhere BeanMapper.factory... was used. If this changes, row mapper
+    // registration may be moved back into each repository impl?)
     dbi.registerRowMapper(BeanMapper.factory(identifiableImplClass, mappingPrefix));
 
     // set basic reduce rows bifunction for reduced selects (lists, paging)
-    // note: it turned out, that we also want identifiers and previewimage for reduced selects. So currently there is no difference to full.
+    // note: it turned out, that we also want identifiers and previewimage for reduced selects. So
+    // currently there is no difference to full.
     this.basicReduceRowsBiFunction = createReduceRowsBiFunction(true, true);
 
     // set full reduce rows bifunction for full selects (find one)
     this.fullReduceRowsBiFunction = createReduceRowsBiFunction(true, true);
 
-    // for detailes select (only used in find one, not lists): if additional objects should be "joined" into instance, set bi function for doing this:
+    // for detailes select (only used in find one, not lists): if additional objects should be
+    // "joined" into instance, set bi function for doing this:
     if (additionalReduceRowsBiFunction != null) {
       this.additionalReduceRowsBiFunction = additionalReduceRowsBiFunction;
     }
@@ -139,16 +172,17 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Jdbi
     this.identifierRepository = identifierRepository;
     this.reducedFieldsSql = reducedFieldsSql;
   }
-  private BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>> createReduceRowsBiFunction(
-          boolean withIdentifiers, boolean withPreviewImage) {
+
+  private BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>>
+      createReduceRowsBiFunction(boolean withIdentifiers, boolean withPreviewImage) {
     return (map, rowView) -> {
-      I identifiable
-              = map.computeIfAbsent(
-                      rowView.getColumn(mappingPrefix + "_uuid", UUID.class),
-                      fn -> {
-                        return rowView.getRow(identifiableImplClass);
-                      });
-      
+      I identifiable =
+          map.computeIfAbsent(
+              rowView.getColumn(mappingPrefix + "_uuid", UUID.class),
+              fn -> {
+                return rowView.getRow(identifiableImplClass);
+              });
+
       if (withPreviewImage && rowView.getColumn("pi_uuid", UUID.class) != null) {
         identifiable.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
       }
@@ -164,16 +198,16 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Jdbi
   public void delete(List<UUID> uuids) {
     // delete related data
     uuids.stream()
-            .forEach(
-                    (u) -> {
-                      deleteIdentifiers(u);
-                    });
+        .forEach(
+            (u) -> {
+              deleteIdentifiers(u);
+            });
 
     dbi.withHandle(
-            h
-            -> h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
-                    .bindList("uuids", uuids)
-                    .execute());
+        h ->
+            h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
+                .bindList("uuids", uuids)
+                .execute());
   }
 
   @Override
@@ -184,9 +218,9 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Jdbi
     }
 
     identifierRepository.delete(
-            identifiable.getIdentifiers().stream()
-                    .map(Identifier::getUuid)
-                    .collect(Collectors.toList()));
+        identifiable.getIdentifiers().stream()
+            .map(Identifier::getUuid)
+            .collect(Collectors.toList()));
 
     return true;
   }
@@ -197,7 +231,7 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Jdbi
   }
 
   protected PageResponse<I> find(
-          PageRequest pageRequest, String commonSql, Map<String, Object> argumentMappings) {
+      PageRequest pageRequest, String commonSql, Map<String, Object> argumentMappings) {
     if (commonSql == null) {
       commonSql = " FROM " + tableName + " AS " + tableAlias;
     }
@@ -215,8 +249,8 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Jdbi
 
   @Override
   public SearchPageResponse<I> find(SearchPageRequest searchPageRequest) {
-    String commonSql
-            = " FROM "
+    String commonSql =
+        " FROM "
             + tableName
             + " AS "
             + tableAlias
@@ -240,7 +274,7 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Jdbi
   }
 
   protected SearchPageResponse<I> find(
-          SearchPageRequest searchPageRequest, String commonSql, Map<String, Object> argumentMappings) {
+      SearchPageRequest searchPageRequest, String commonSql, Map<String, Object> argumentMappings) {
     StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
     addFiltering(searchPageRequest, innerQuery);
     addPageRequestParams(searchPageRequest, innerQuery);
@@ -265,40 +299,50 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Jdbi
 
   @Override
   public PageResponse<I> findByLanguageAndInitial(
-          PageRequest pageRequest, String language, String initial) {
+      PageRequest pageRequest, String language, String initial) {
     // add special filter
     Filtering filtering = pageRequest.getFiltering();
     if (filtering == null) {
       filtering = Filtering.defaultBuilder().build();
       pageRequest.setFiltering(filtering);
     }
-    // TODO: test if binding works (because of single quotes done by filter expandion) or we have to put here values direktly, not passing Map.of....
-    Filtering.defaultBuilder().filter(tableAlias + ".label ->> :language").startsWith(":initial").build();
+    // TODO: test if binding works (because of single quotes done by filter expandion) or we have to
+    // put here values direktly, not passing Map.of....
+    Filtering.defaultBuilder()
+        .filter(tableAlias + ".label ->> :language")
+        .startsWith(":initial")
+        .build();
     filtering.add(filtering);
-    
+
     // add special ordering
     Sorting sorting = pageRequest.getSorting();
     if (sorting == null) {
       sorting = Sorting.defaultBuilder().build();
       pageRequest.setSorting(sorting);
     }
-    Sorting.defaultBuilder().order(Order.defaultBuilder().property("label").subProperty(language).direction(Direction.ASC).build());
+    Sorting.defaultBuilder()
+        .order(
+            Order.defaultBuilder()
+                .property("label")
+                .subProperty(language)
+                .direction(Direction.ASC)
+                .build());
     sorting.and(sorting);
-    
+
     return this.find(pageRequest, null, Map.of("language", language, "initial", initial));
   }
-  
+
   @Override
   public I findOne(UUID uuid, Filtering filtering) {
-    StringBuilder innerQuery
-            = new StringBuilder(
-                    "SELECT * FROM "
-                    + tableName
-                    + " AS "
-                    + tableAlias
-                    + " WHERE "
-                    + tableAlias
-                    + ".uuid = :uuid");
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + tableName
+                + " AS "
+                + tableAlias
+                + " WHERE "
+                + tableAlias
+                + ".uuid = :uuid");
     addFiltering(filtering, innerQuery);
 
     I result = retrieveOne(fullFieldsSql, innerQuery, fullFieldsJoinsSql, Map.of("uuid", uuid));
@@ -315,26 +359,30 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Jdbi
     String namespace = identifier.getNamespace();
     String identifierId = identifier.getId();
 
-    StringBuilder innerQuery
-            = new StringBuilder(
-                    "SELECT * FROM "
-                    + tableName
-                    + " AS "
-                    + tableAlias
-                    + " LEFT JOIN identifiers AS id ON "
-                    + tableAlias
-                    + ".uuid = id.identifiable"
-                    + " WHERE id.identifier = :id AND id.namespace = :namespace");
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + tableName
+                + " AS "
+                + tableAlias
+                + " LEFT JOIN identifiers AS id ON "
+                + tableAlias
+                + ".uuid = id.identifiable"
+                + " WHERE id.identifier = :id AND id.namespace = :namespace");
 
-    I result
-            = retrieveOne(fullFieldsSql, innerQuery, fullFieldsJoinsSql, Map.of("id", identifierId, "namespace", namespace));
+    I result =
+        retrieveOne(
+            fullFieldsSql,
+            innerQuery,
+            fullFieldsJoinsSql,
+            Map.of("id", identifierId, "namespace", namespace));
 
     return result;
   }
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[]{"created", "lastModified", "type"};
+    return new String[] {"created", "lastModified", "type"};
   }
 
   @Override
@@ -377,23 +425,22 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Jdbi
     return reducedFieldsSql;
   }
 
-
   public long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {
-    long total
-            = dbi.withHandle(
-                    h
-                    -> h.createQuery(sqlCount.toString())
-                            .bindMap(argumentMappings)
-                            .mapTo(Long.class)
-                            .findOne()
-                            .get());
+    long total =
+        dbi.withHandle(
+            h ->
+                h.createQuery(sqlCount.toString())
+                    .bindMap(argumentMappings)
+                    .mapTo(Long.class)
+                    .findOne()
+                    .get());
     return total;
   }
 
   public List<I> retrieveList(
-          String fieldsSql, StringBuilder innerQuery, final Map<String, Object> argumentMappings) {
-    final String sql
-            = "SELECT"
+      String fieldsSql, StringBuilder innerQuery, final Map<String, Object> argumentMappings) {
+    final String sql =
+        "SELECT"
             + fieldsSql
             + ","
             + SQL_FULL_FIELDS_ID
@@ -409,38 +456,40 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Jdbi
             + " LEFT JOIN fileresources_image AS file ON "
             + tableAlias
             + ".previewfileresource = file.uuid";
-    List<I> result
-            = dbi
-                    .withHandle(
-                            h
-                            -> h.createQuery(sql).bindMap(argumentMappings)
-                                    .reduceRows(new LinkedHashMap<UUID, I>(),
-                                            (map, rowView) -> {
-                                              basicReduceRowsBiFunction.apply(map, rowView);
-                                              return map;
-                                            }))
-                    .values()
-                    .stream()
-                    .collect(Collectors.toList());
+    List<I> result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(sql)
+                        .bindMap(argumentMappings)
+                        .reduceRows(
+                            new LinkedHashMap<UUID, I>(),
+                            (map, rowView) -> {
+                              basicReduceRowsBiFunction.apply(map, rowView);
+                              return map;
+                            }))
+            .values()
+            .stream()
+            .collect(Collectors.toList());
     return result;
   }
 
   protected Integer retrieveNextSortIndexForParentChildren(
-          Jdbi dbi, String tableName, String columNameParentUuid, UUID parentUuid) {
+      Jdbi dbi, String tableName, String columNameParentUuid, UUID parentUuid) {
     // first child: max gets no results (= null)):
-    Integer sortIndex
-            = dbi.withHandle(
-                    (Handle h)
-                    -> h.createQuery(
-                            "SELECT MAX(sortIndex) + 1 FROM "
+    Integer sortIndex =
+        dbi.withHandle(
+            (Handle h) ->
+                h.createQuery(
+                        "SELECT MAX(sortIndex) + 1 FROM "
                             + tableName
                             + " WHERE "
                             + columNameParentUuid
                             + " = :parent_uuid")
-                            .bind("parent_uuid", parentUuid)
-                            .mapTo(Integer.class)
-                            .findOne()
-                            .orElse(null));
+                    .bind("parent_uuid", parentUuid)
+                    .mapTo(Integer.class)
+                    .findOne()
+                    .orElse(null));
     if (sortIndex == null) {
       return 0;
     }
@@ -448,9 +497,12 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Jdbi
   }
 
   public I retrieveOne(
-          String fieldsSql, StringBuilder innerQuery, String fullFieldsJoinsSql, final Map<String, Object> argumentMappings) {
-    final String sql
-            = "SELECT"
+      String fieldsSql,
+      StringBuilder innerQuery,
+      String fullFieldsJoinsSql,
+      final Map<String, Object> argumentMappings) {
+    final String sql =
+        "SELECT"
             + fieldsSql
             + ","
             + SQL_FULL_FIELDS_ID
@@ -468,22 +520,23 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Jdbi
             + tableAlias
             + ".previewfileresource = file.uuid";
 
-    I result
-            = dbi
-                    .withHandle(
-                            h
-                            -> h.createQuery(sql)
-                                    .bindMap(argumentMappings)
-                                    .reduceRows(new LinkedHashMap<UUID, I>(),
-                                            (map, rowView) -> {
-                                              fullReduceRowsBiFunction.apply(map, rowView);
-                                              additionalReduceRowsBiFunction.apply(map, rowView);
-                                              return map;
-                                            }))
-                    .values()
-                    .stream()
-                    .findFirst()
-                    .orElse(null);
+    I result =
+        dbi
+            .withHandle(
+                h ->
+                    h.createQuery(sql)
+                        .bindMap(argumentMappings)
+                        .reduceRows(
+                            new LinkedHashMap<UUID, I>(),
+                            (map, rowView) -> {
+                              fullReduceRowsBiFunction.apply(map, rowView);
+                              additionalReduceRowsBiFunction.apply(map, rowView);
+                              return map;
+                            }))
+            .values()
+            .stream()
+            .findFirst()
+            .orElse(null);
     return result;
   }
 

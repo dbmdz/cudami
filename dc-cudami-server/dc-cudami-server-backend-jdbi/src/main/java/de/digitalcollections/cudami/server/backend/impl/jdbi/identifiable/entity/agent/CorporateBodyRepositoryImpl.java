@@ -16,36 +16,39 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateBodyImpl>
-        implements CorporateBodyRepository<CorporateBodyImpl> {
+    implements CorporateBodyRepository<CorporateBodyImpl> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CorporateBodyRepositoryImpl.class);
 
-  public static final String SQL_REDUCED_FIELDS_CB
-          = " c.uuid cb_uuid, c.refid cb_refId, c.label cb_label, c.description cb_description,"
+  public static final String SQL_REDUCED_FIELDS_CB =
+      " c.uuid cb_uuid, c.refid cb_refId, c.label cb_label, c.description cb_description,"
           + " c.identifiable_type cb_type, c.entity_type cb_entityType,"
           + " c.created cb_created, c.last_modified cb_lastModified,"
           + " c.preview_hints cb_previewImageRenderingHints";
 
-  public static final String SQL_FULL_FIELDS_CB = SQL_REDUCED_FIELDS_CB + ", c.text cb_text, c.homepage_url cb_homepageUrl";
+  public static final String SQL_FULL_FIELDS_CB =
+      SQL_REDUCED_FIELDS_CB + ", c.text cb_text, c.homepage_url cb_homepageUrl";
 
+  public static final String MAPPING_PREFIX = "cb";
+  public static final String TABLE_ALIAS = "c";
   public static final String TABLE_NAME = "corporatebodies";
 
   @Autowired
   public CorporateBodyRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     super(
-            dbi,
-            identifierRepository,
-            TABLE_NAME,
-            "c",
-            "cb",
-            CorporateBodyImpl.class,
-            SQL_REDUCED_FIELDS_CB,
-            SQL_FULL_FIELDS_CB);
+        dbi,
+        identifierRepository,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        CorporateBodyImpl.class,
+        SQL_REDUCED_FIELDS_CB,
+        SQL_FULL_FIELDS_CB);
   }
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[]{"created", "lastModified", "refId"};
+    return new String[] {"created", "lastModified", "refId"};
   }
 
   @Override
@@ -71,11 +74,11 @@ public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateB
     corporateBody.setCreated(LocalDateTime.now());
     corporateBody.setLastModified(LocalDateTime.now());
     // refid is generated as serial, DO NOT SET!
-    final UUID previewImageUuid
-            = corporateBody.getPreviewImage() == null ? null : corporateBody.getPreviewImage().getUuid();
+    final UUID previewImageUuid =
+        corporateBody.getPreviewImage() == null ? null : corporateBody.getPreviewImage().getUuid();
 
-    String query
-            = "INSERT INTO "
+    String query =
+        "INSERT INTO "
             + tableName
             + "("
             + "uuid, label, description, previewfileresource, preview_hints,"
@@ -90,11 +93,11 @@ public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateB
             + ")";
 
     dbi.withHandle(
-            h
-            -> h.createUpdate(query)
-                    .bind("previewFileResource", previewImageUuid)
-                    .bindBean(corporateBody)
-                    .execute());
+        h ->
+            h.createUpdate(query)
+                .bind("previewFileResource", previewImageUuid)
+                .bindBean(corporateBody)
+                .execute());
 
     // save identifiers
     Set<Identifier> identifiers = corporateBody.getIdentifiers();
@@ -109,11 +112,11 @@ public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateB
     corporateBody.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, entity_type, refid
-    final UUID previewImageUuid
-            = corporateBody.getPreviewImage() == null ? null : corporateBody.getPreviewImage().getUuid();
+    final UUID previewImageUuid =
+        corporateBody.getPreviewImage() == null ? null : corporateBody.getPreviewImage().getUuid();
 
-    String query
-            = "UPDATE "
+    String query =
+        "UPDATE "
             + tableName
             + " SET"
             + " label=:label::JSONB, description=:description::JSONB,"
@@ -123,11 +126,11 @@ public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateB
             + " WHERE uuid=:uuid";
 
     dbi.withHandle(
-            h
-            -> h.createUpdate(query)
-                    .bind("previewFileResource", previewImageUuid)
-                    .bindBean(corporateBody)
-                    .execute());
+        h ->
+            h.createUpdate(query)
+                .bind("previewFileResource", previewImageUuid)
+                .bindBean(corporateBody)
+                .execute());
 
     // save identifiers
     // as we store the whole list new: delete old entries
