@@ -8,8 +8,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-/** Repository for Website persistence handling.
- * @param <W> instance of website implementation */
+/**
+ * Repository for Website persistence handling.
+ *
+ * @param <W> instance of website implementation
+ */
 public interface WebsiteRepository<W extends Website> extends EntityRepository<W> {
 
   List<Webpage> getRootPages(Website website);

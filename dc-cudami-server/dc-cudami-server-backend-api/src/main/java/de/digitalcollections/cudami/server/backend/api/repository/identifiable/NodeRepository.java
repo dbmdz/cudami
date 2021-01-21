@@ -4,14 +4,36 @@ import de.digitalcollections.model.api.identifiable.Node;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 public interface NodeRepository<N extends Node> extends IdentifiableRepository<N> {
 
+  default boolean addChild(N parent, N child) {
+    if (parent == null || child == null) {
+      return false;
+    }
+    return addChildren(parent.getUuid(), Arrays.asList(child));
+  }
+
+  default boolean addChildren(N parent, List<N> children) {
+    if (parent == null || children == null) {
+      return false;
+    }
+    return addChildren(parent.getUuid(), children);
+  }
+
+  boolean addChildren(UUID parentUuid, List<N> collections);
+
   N getParent(UUID nodeUuid);
 
-  List<N> getChildren(N node);
+  default List<N> getChildren(N node) {
+    if (node == null) {
+      return null;
+    }
+    return getChildren(node.getUuid());
+  }
 
   List<N> getChildren(UUID nodeUuid);
 
@@ -22,4 +44,17 @@ public interface NodeRepository<N extends Node> extends IdentifiableRepository<N
    * @return the breadcrumb navigation
    */
   BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid);
+
+  List<N> getParents(UUID uuid);
+
+  PageResponse<N> getRootNodes(PageRequest pageRequest);
+
+  default boolean removeChild(N parent, N child) {
+    if (parent == null || child == null) {
+      return false;
+    }
+    return removeChild(parent.getUuid(), child.getUuid());
+  }
+
+  boolean removeChild(UUID parentUuid, UUID childUuid);
 }

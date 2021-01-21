@@ -15,6 +15,10 @@ import org.springframework.stereotype.Repository;
 public class RenderingTemplateRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl
     implements RenderingTemplateRepository {
 
+  public static final String MAPPING_PREFIX = "r";
+  public static final String TABLE_ALIAS = "rt";
+  public static final String TABLE_NAME = "rendering_templates";
+
   private final Jdbi dbi;
 
   public RenderingTemplateRepositoryImpl(Jdbi dbi) {

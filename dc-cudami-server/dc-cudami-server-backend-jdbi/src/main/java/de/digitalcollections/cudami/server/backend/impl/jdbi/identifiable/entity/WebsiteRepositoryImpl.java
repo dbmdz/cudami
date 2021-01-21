@@ -29,12 +29,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class WebsiteRepositoryImpl extends EntityRepositoryImpl<WebsiteImpl>
-        implements WebsiteRepository<WebsiteImpl> {
+    implements WebsiteRepository<WebsiteImpl> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsiteRepositoryImpl.class);
 
-  public static final String SQL_REDUCED_FIELDS_WS
-          = " w.uuid ws_uuid, w.refid ws_refId, w.label ws_label, w.description ws_description,"
+  public static final String SQL_REDUCED_FIELDS_WS =
+      " w.uuid ws_uuid, w.refid ws_refId, w.label ws_label, w.description ws_description,"
           + " w.identifiable_type ws_type, w.entity_type ws_entityType,"
           + " w.created ws_created, w.last_modified ws_lastModified,"
           + " w.url ws_url, w.registration_date ws_registrationDate,"
@@ -42,23 +42,26 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<WebsiteImpl>
 
   public static final String SQL_FULL_FIELDS_WS = SQL_REDUCED_FIELDS_WS;
 
+  public static final String MAPPING_PREFIX = "ws";
+  public static final String TABLE_ALIAS = "w";
   public static final String TABLE_NAME = "websites";
 
   private final WebpageRepositoryImpl webpageRepositoryImpl;
 
   @Autowired
-  public WebsiteRepositoryImpl(Jdbi dbi,
-          IdentifierRepository identifierRepository,
-          WebpageRepositoryImpl webpageRepositoryImpl) {
+  public WebsiteRepositoryImpl(
+      Jdbi dbi,
+      IdentifierRepository identifierRepository,
+      WebpageRepositoryImpl webpageRepositoryImpl) {
     super(
-            dbi,
-            identifierRepository,
-            TABLE_NAME,
-            "w",
-            "ws",
-            WebsiteImpl.class,
-            SQL_REDUCED_FIELDS_WS,
-            SQL_FULL_FIELDS_WS);
+        dbi,
+        identifierRepository,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        WebsiteImpl.class,
+        SQL_REDUCED_FIELDS_WS,
+        SQL_FULL_FIELDS_WS);
     this.webpageRepositoryImpl = webpageRepositoryImpl;
   }
 
@@ -84,7 +87,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<WebsiteImpl>
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[]{"created", "lastModified", "refId", "url"};
+    return new String[] {"created", "lastModified", "refId", "url"};
   }
 
   @Override
@@ -124,17 +127,20 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<WebsiteImpl>
     final String wpTableAlias = webpageRepositoryImpl.getTableAlias();
     final String wpTableName = webpageRepositoryImpl.getTableName();
 
-    StringBuilder innerQuery
-            = new StringBuilder("SELECT * FROM "
-                    + wpTableName
-                    + " AS "
-                    + wpTableAlias
-                    + " INNER JOIN website_webpages ww ON "
-                    + wpTableAlias
-                    + ".uuid = ww.webpage_uuid"
-                    + " WHERE ww.website_uuid = :uuid");
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + wpTableName
+                + " AS "
+                + wpTableAlias
+                + " INNER JOIN website_webpages ww ON "
+                + wpTableAlias
+                + ".uuid = ww.webpage_uuid"
+                + " WHERE ww.website_uuid = :uuid");
 
-    List<WebpageImpl> result = webpageRepositoryImpl.retrieveList(WebpageRepositoryImpl.SQL_REDUCED_FIELDS_WP, innerQuery, Map.of("uuid", uuid));
+    List<WebpageImpl> result =
+        webpageRepositoryImpl.retrieveList(
+            WebpageRepositoryImpl.SQL_REDUCED_FIELDS_WP, innerQuery, Map.of("uuid", uuid));
     return result.stream().map(Webpage.class::cast).collect(Collectors.toList());
   }
 
@@ -143,7 +149,8 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<WebsiteImpl>
     final String wpTableAlias = webpageRepositoryImpl.getTableAlias();
     final String wpTableName = webpageRepositoryImpl.getTableName();
 
-    String commonSql = " FROM "
+    String commonSql =
+        " FROM "
             + wpTableName
             + " AS "
             + wpTableAlias
@@ -159,15 +166,13 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<WebsiteImpl>
     }
     addPageRequestParams(pageRequest, innerQuery);
 
-    List<Webpage> result
-            = webpageRepositoryImpl
-                    .retrieveList(
-                            WebpageRepositoryImpl.SQL_REDUCED_FIELDS_WP,
-                            innerQuery,
-                            Map.of("uuid", uuid))
-                    .stream()
-                    .map(Webpage.class::cast)
-                    .collect(Collectors.toList());
+    List<Webpage> result =
+        webpageRepositoryImpl
+            .retrieveList(
+                WebpageRepositoryImpl.SQL_REDUCED_FIELDS_WP, innerQuery, Map.of("uuid", uuid))
+            .stream()
+            .map(Webpage.class::cast)
+            .collect(Collectors.toList());
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -181,11 +186,11 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<WebsiteImpl>
     website.setCreated(LocalDateTime.now());
     website.setLastModified(LocalDateTime.now());
     // refid is generated as serial, DO NOT SET!
-    final UUID previewImageUuid
-            = website.getPreviewImage() == null ? null : website.getPreviewImage().getUuid();
+    final UUID previewImageUuid =
+        website.getPreviewImage() == null ? null : website.getPreviewImage().getUuid();
 
-    String query
-            = "INSERT INTO "
+    String query =
+        "INSERT INTO "
             + tableName
             + "("
             + "uuid, label, description, previewfileresource, preview_hints,"
@@ -200,11 +205,11 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<WebsiteImpl>
             + ")";
 
     dbi.withHandle(
-            h
-            -> h.createUpdate(query)
-                    .bind("previewFileResource", previewImageUuid)
-                    .bindBean(website)
-                    .execute());
+        h ->
+            h.createUpdate(query)
+                .bind("previewFileResource", previewImageUuid)
+                .bindBean(website)
+                .execute());
 
     // save identifiers
     Set<Identifier> identifiers = website.getIdentifiers();
@@ -219,11 +224,11 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<WebsiteImpl>
     website.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, entity_type, refid
-    final UUID previewImageUuid
-            = website.getPreviewImage() == null ? null : website.getPreviewImage().getUuid();
+    final UUID previewImageUuid =
+        website.getPreviewImage() == null ? null : website.getPreviewImage().getUuid();
 
-    String query
-            = "UPDATE "
+    String query =
+        "UPDATE "
             + tableName
             + " SET"
             + " label=:label::JSONB, description=:description::JSONB,"
@@ -233,11 +238,11 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<WebsiteImpl>
             + " WHERE uuid=:uuid";
 
     dbi.withHandle(
-            h
-            -> h.createUpdate(query)
-                    .bind("previewFileResource", previewImageUuid)
-                    .bindBean(website)
-                    .execute());
+        h ->
+            h.createUpdate(query)
+                .bind("previewFileResource", previewImageUuid)
+                .bindBean(website)
+                .execute());
 
     // save identifiers
     // as we store the whole list new: delete old entries
@@ -254,23 +259,23 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<WebsiteImpl>
     if (websiteUuid == null || rootPages == null) {
       return false;
     }
-    String query
-            = "UPDATE website_webpages"
+    String query =
+        "UPDATE website_webpages"
             + " SET sortindex = :idx"
             + " WHERE website_uuid = :websiteUuid AND webpage_uuid = :webpageUuid;";
     dbi.withHandle(
-            h -> {
-              PreparedBatch batch = h.prepareBatch(query);
-              int idx = 0;
-              for (Webpage webpage : rootPages) {
-                batch
-                        .bind("idx", idx++)
-                        .bind("webpageUuid", webpage.getUuid())
-                        .bind("websiteUuid", websiteUuid)
-                        .add();
-              }
-              return batch.execute();
-            });
+        h -> {
+          PreparedBatch batch = h.prepareBatch(query);
+          int idx = 0;
+          for (Webpage webpage : rootPages) {
+            batch
+                .bind("idx", idx++)
+                .bind("webpageUuid", webpage.getUuid())
+                .bind("websiteUuid", websiteUuid)
+                .add();
+          }
+          return batch.execute();
+        });
     return true;
   }
 

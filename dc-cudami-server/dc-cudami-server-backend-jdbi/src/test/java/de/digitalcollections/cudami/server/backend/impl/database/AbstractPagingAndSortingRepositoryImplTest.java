@@ -1,8 +1,7 @@
-package de.digitalcollections.cudami.server.backend.impl.jdbi;
+package de.digitalcollections.cudami.server.backend.impl.database;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.digitalcollections.cudami.server.backend.impl.database.AbstractPagingAndSortingRepositoryImpl;
 import de.digitalcollections.model.api.filter.FilterCriterion;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.paging.PageRequest;

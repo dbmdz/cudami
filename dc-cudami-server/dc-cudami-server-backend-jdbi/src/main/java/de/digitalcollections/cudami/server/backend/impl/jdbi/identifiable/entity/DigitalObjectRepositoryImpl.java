@@ -44,8 +44,10 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   public static final String SQL_FULL_FIELDS_DO =
       SQL_REDUCED_FIELDS_DO
           + ", d.description do_description"; // TODO: add d.license do_license, d.version
-                                              // do_version, when features added
+  // do_version, when features added
 
+  public static final String MAPPING_PREFIX = "do";
+  public static final String TABLE_ALIAS = "d";
   public static final String TABLE_NAME = "digitalobjects";
 
   private final CollectionRepositoryImpl collectionRepositoryImpl;
@@ -65,8 +67,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         dbi,
         identifierRepository,
         TABLE_NAME,
-        "d",
-        "do",
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
         DigitalObjectImpl.class,
         SQL_REDUCED_FIELDS_DO,
         SQL_FULL_FIELDS_DO);
@@ -114,7 +116,10 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
     List<Collection> result =
         collectionRepositoryImpl
-            .retrieveList(CollectionRepositoryImpl.SQL_REDUCED_FIELDS_COL, innerQuery, Map.of("uuid", digitalObjectUuid))
+            .retrieveList(
+                CollectionRepositoryImpl.SQL_REDUCED_FIELDS_COL,
+                innerQuery,
+                Map.of("uuid", digitalObjectUuid))
             .stream()
             .map(Collection.class::cast)
             .collect(Collectors.toList());

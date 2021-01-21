@@ -27,9 +27,13 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
   public static final String SQL_FULL_FIELDS_ID =
       " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id";
 
+  public static final String MAPPING_PREFIX = "id";
+  public static final String TABLE_ALIAS = "id";
+  public static final String TABLE_NAME = "identifiers";
+
   @Autowired
   public IdentifierRepositoryImpl(Jdbi dbi) {
-    super(dbi, "identifiers", "id", "id");
+    super(dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX);
   }
 
   @Override

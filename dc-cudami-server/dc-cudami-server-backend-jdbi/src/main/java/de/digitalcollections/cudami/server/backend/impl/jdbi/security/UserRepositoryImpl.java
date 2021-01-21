@@ -17,6 +17,10 @@ import org.springframework.stereotype.Repository;
 public class UserRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl
     implements UserRepository<UserImpl> {
 
+  public static final String MAPPING_PREFIX = "u";
+  public static final String TABLE_ALIAS = "u";
+  public static final String TABLE_NAME = "users";
+
   @Autowired private Jdbi dbi;
 
   @Override

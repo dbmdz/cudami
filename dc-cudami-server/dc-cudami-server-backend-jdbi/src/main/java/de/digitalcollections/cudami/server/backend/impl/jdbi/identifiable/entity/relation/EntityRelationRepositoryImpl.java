@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation;
 
-import de.digitalcollections.cudami.server.backend.impl.database.AbstractPagingAndSortingRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityRelationRepository;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
@@ -17,25 +18,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityRelationRepository;
 
 @Repository
-// FIXME: added Spring JDBC-Template framework, because I couldn't get JDBI get to work with double
+// TODO: added Spring JDBC-Template framework, because I couldn't get JDBI get to work with double
 // join on entities... sorry. Solutions welcome
-public class EntityRelationRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl
+public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
     implements EntityRelationRepository {
 
-  private final Jdbi dbi;
-  private final EntityRepositoryImpl entityRepository;
+  public static final String MAPPING_PREFIX = "rel";
+  public static final String TABLE_ALIAS = "rel";
+  public static final String TABLE_NAME = "rel_entity_entities";
+
+  private final EntityRepositoryImpl entityRepositoryImpl;
   private final JdbcTemplate jdbcTemplate;
 
   @Autowired
   public EntityRelationRepositoryImpl(
       DataSource dataSource,
       Jdbi dbi,
-      @Qualifier("entityRepositoryImpl") EntityRepositoryImpl entityRepository) {
-    this.dbi = dbi;
-    this.entityRepository = entityRepository;
+      @Qualifier("entityRepositoryImpl") EntityRepositoryImpl entityRepositoryImpl) {
+    super(dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX);
+    this.entityRepositoryImpl = entityRepositoryImpl;
     this.jdbcTemplate = new JdbcTemplate(dataSource);
   }
 
@@ -69,8 +72,8 @@ public class EntityRelationRepositoryImpl extends AbstractPagingAndSortingReposi
               String predicate = rs.getString("rel_predicate");
               String objectUuid = rs.getString("rel_object");
 
-              Entity subject = entityRepository.findOne(UUID.fromString(subjectUuid));
-              Entity object = entityRepository.findOne(UUID.fromString(objectUuid));
+              Entity subject = (Entity) entityRepositoryImpl.findOne(UUID.fromString(subjectUuid));
+              Entity object = (Entity) entityRepositoryImpl.findOne(UUID.fromString(objectUuid));
 
               return new EntityRelationImpl(subject, predicate, object);
             });
@@ -86,7 +89,7 @@ public class EntityRelationRepositoryImpl extends AbstractPagingAndSortingReposi
 
   @Override
   public List<EntityRelation> findBySubject(UUID subjectEntityUuid) {
-    Entity subjectEntity = entityRepository.findOne(subjectEntityUuid);
+    Entity subjectEntity = (Entity) entityRepositoryImpl.findOne(subjectEntityUuid);
     if (subjectEntity == null) {
       return null;
     }
@@ -124,11 +127,11 @@ public class EntityRelationRepositoryImpl extends AbstractPagingAndSortingReposi
     }
     switch (modelProperty) {
       case "object":
-        return "rel.object_uuid";
+        return tableAlias + ".object_uuid";
       case "predicate":
-        return "rel.predicate";
+        return tableAlias + ".predicate";
       case "subject":
-        return "rel.subject_uuid";
+        return tableAlias + ".subject_uuid";
       default:
         return null;
     }

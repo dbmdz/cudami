@@ -37,12 +37,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImpl>
-        implements CollectionRepository<CollectionImpl> {
+    implements CollectionRepository<CollectionImpl> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionRepositoryImpl.class);
 
-  public static final String SQL_REDUCED_FIELDS_COL
-          = " c.uuid col_uuid, c.refid col_refId, c.label col_label, c.description col_description,"
+  public static final String SQL_REDUCED_FIELDS_COL =
+      " c.uuid col_uuid, c.refid col_refId, c.label col_label, c.description col_description,"
           + " c.identifiable_type col_type, c.entity_type col_entityType,"
           + " c.created col_created, c.last_modified col_lastModified,"
           + " c.publication_start col_publicationStart, c.publication_end col_publicationEnd,"
@@ -50,6 +50,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
 
   public static final String SQL_FULL_FIELDS_COL = SQL_REDUCED_FIELDS_COL + ", c.text col_text";
 
+  public static final String MAPPING_PREFIX = "col";
+  public static final String TABLE_ALIAS = "c";
   public static final String TABLE_NAME = "collections";
 
   private final CorporateBodyRepositoryImpl corporateBodyRepositoryImpl;
@@ -57,19 +59,19 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
 
   @Autowired
   public CollectionRepositoryImpl(
-          Jdbi dbi,
-          IdentifierRepository identifierRepository,
-          DigitalObjectRepositoryImpl digitalObjectRepositoryImpl,
-          CorporateBodyRepositoryImpl corporateBodyRepositoryImpl) {
+      Jdbi dbi,
+      IdentifierRepository identifierRepository,
+      DigitalObjectRepositoryImpl digitalObjectRepositoryImpl,
+      CorporateBodyRepositoryImpl corporateBodyRepositoryImpl) {
     super(
-            dbi,
-            identifierRepository,
-            TABLE_NAME,
-            "c",
-            "col",
-            CollectionImpl.class,
-            SQL_REDUCED_FIELDS_COL,
-            SQL_FULL_FIELDS_COL);
+        dbi,
+        identifierRepository,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        CollectionImpl.class,
+        SQL_REDUCED_FIELDS_COL,
+        SQL_FULL_FIELDS_COL);
     this.corporateBodyRepositoryImpl = corporateBodyRepositoryImpl;
     this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
   }
@@ -79,50 +81,52 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
     if (parentUuid == null || children == null) {
       return false;
     }
-    Integer nextSortIndex = retrieveNextSortIndexForParentChildren(
+    Integer nextSortIndex =
+        retrieveNextSortIndexForParentChildren(
             dbi, "collection_collections", "parent_collection_uuid", parentUuid);
 
     dbi.useHandle(
-            handle -> {
-              PreparedBatch preparedBatch
-              = handle.prepareBatch(
-                      "INSERT INTO collection_collections(parent_collection_uuid, child_collection_uuid, sortIndex)"
+        handle -> {
+          PreparedBatch preparedBatch =
+              handle.prepareBatch(
+                  "INSERT INTO collection_collections(parent_collection_uuid, child_collection_uuid, sortIndex)"
                       + " VALUES (:parentCollectionUuid, :childCollectionUuid, :sortIndex) ON CONFLICT (parent_collection_uuid, child_collection_uuid) DO NOTHING");
-              children.forEach(
-                      child -> {
-                        preparedBatch
-                                .bind("parentCollectionUuid", parentUuid)
-                                .bind("childCollectionUuid", child.getUuid())
-                                .bind("sortIndex", nextSortIndex + getIndex(children, child))
-                                .add();
-                      });
-              preparedBatch.execute();
-            });
+          children.forEach(
+              child -> {
+                preparedBatch
+                    .bind("parentCollectionUuid", parentUuid)
+                    .bind("childCollectionUuid", child.getUuid())
+                    .bind("sortIndex", nextSortIndex + getIndex(children, child))
+                    .add();
+              });
+          preparedBatch.execute();
+        });
     return true;
   }
 
   @Override
   public boolean addDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects) {
     if (collectionUuid != null && digitalObjects != null) {
-      Integer nextSortIndex = retrieveNextSortIndexForParentChildren(
+      Integer nextSortIndex =
+          retrieveNextSortIndexForParentChildren(
               dbi, "collection_digitalobjects", "collection_uuid", collectionUuid);
 
       // save relation to collection
       dbi.useHandle(
-              handle -> {
-                PreparedBatch preparedBatch
-                = handle.prepareBatch(
-                        "INSERT INTO collection_digitalobjects(collection_uuid, digitalobject_uuid, sortIndex) VALUES (:uuid, :digitalObjectUuid, :sortIndex) ON CONFLICT (collection_uuid, digitalobject_uuid) DO NOTHING");
-                digitalObjects.forEach(
-                        digitalObject -> {
-                          preparedBatch
-                                  .bind("uuid", collectionUuid)
-                                  .bind("digitalObjectUuid", digitalObject.getUuid())
-                                  .bind("sortIndex", nextSortIndex + getIndex(digitalObjects, digitalObject))
-                                  .add();
-                        });
-                preparedBatch.execute();
-              });
+          handle -> {
+            PreparedBatch preparedBatch =
+                handle.prepareBatch(
+                    "INSERT INTO collection_digitalobjects(collection_uuid, digitalobject_uuid, sortIndex) VALUES (:uuid, :digitalObjectUuid, :sortIndex) ON CONFLICT (collection_uuid, digitalobject_uuid) DO NOTHING");
+            digitalObjects.forEach(
+                digitalObject -> {
+                  preparedBatch
+                      .bind("uuid", collectionUuid)
+                      .bind("digitalObjectUuid", digitalObject.getUuid())
+                      .bind("sortIndex", nextSortIndex + getIndex(digitalObjects, digitalObject))
+                      .add();
+                });
+            preparedBatch.execute();
+          });
       return true;
     }
     return false;
@@ -134,9 +138,9 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
 
     if (collection != null) {
       collection.setChildren(
-              Stream.ofNullable(getChildren(collection))
-                      .map(Collection.class::cast)
-                      .collect(Collectors.toList()));
+          Stream.ofNullable(getChildren(collection))
+              .map(Collection.class::cast)
+              .collect(Collectors.toList()));
     }
     return collection;
   }
@@ -147,9 +151,9 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
 
     if (collection != null) {
       collection.setChildren(
-              Stream.ofNullable(getChildren(collection))
-                      .map(Collection.class::cast)
-                      .collect(Collectors.toList()));
+          Stream.ofNullable(getChildren(collection))
+              .map(Collection.class::cast)
+              .collect(Collectors.toList()));
     }
     return collection;
   }
@@ -160,16 +164,16 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
 
     if (collection != null) {
       collection.setChildren(
-              Stream.ofNullable(getChildren(collection))
-                      .map(Collection.class::cast)
-                      .collect(Collectors.toList()));
+          Stream.ofNullable(getChildren(collection))
+              .map(Collection.class::cast)
+              .collect(Collectors.toList()));
     }
     return collection;
   }
 
   @Override
   protected String[] getAllowedOrderByFields() {
-    return new String[]{
+    return new String[] {
       "created", "label", "lastModified", "publicationEnd", "publicationStart", "refId"
     };
   }
@@ -177,11 +181,11 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
   @Override
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
 
-    List<NodeImpl> result
-            = dbi.withHandle(
-                    h
-                    -> h.createQuery(
-                            "WITH recursive breadcrumb (uuid,label,parent_uuid,depth)"
+    List<NodeImpl> result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(
+                        "WITH recursive breadcrumb (uuid,label,parent_uuid,depth)"
                             + " AS ("
                             + "        SELECT c.uuid AS uuid, c.label AS label, c.refid c_refId, cc.parent_collection_uuid AS parent_uuid, 99 AS depth"
                             + "        FROM collections c, collection_collections cc"
@@ -196,25 +200,25 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
                             + "    )"
                             + " SELECT * FROM breadcrumb"
                             + " ORDER BY depth ASC")
-                            .bind("uuid", nodeUuid)
-                            .registerRowMapper(BeanMapper.factory(NodeImpl.class))
-                            .mapTo(NodeImpl.class)
-                            .list());
+                    .bind("uuid", nodeUuid)
+                    .registerRowMapper(BeanMapper.factory(NodeImpl.class))
+                    .mapTo(NodeImpl.class)
+                    .list());
 
     if (result.isEmpty()) {
       // Special case: If we are on a top level collection, we have no parent, so
       // we must construct a breadcrumb more or less manually
-      result
-              = dbi.withHandle(
-                      h
-                      -> h.createQuery(
-                              "SELECT c.uuid AS uuid, c.label AS label"
+      result =
+          dbi.withHandle(
+              h ->
+                  h.createQuery(
+                          "SELECT c.uuid AS uuid, c.label AS label"
                               + "        FROM collections c"
                               + "        WHERE uuid= :uuid")
-                              .bind("uuid", nodeUuid)
-                              .registerRowMapper(BeanMapper.factory(NodeImpl.class))
-                              .mapTo(NodeImpl.class)
-                              .list());
+                      .bind("uuid", nodeUuid)
+                      .registerRowMapper(BeanMapper.factory(NodeImpl.class))
+                      .mapTo(NodeImpl.class)
+                      .list());
     }
 
     List<Node> nodes = result.stream().map(s -> (Node) s).collect(Collectors.toList());
@@ -228,16 +232,17 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
 
   @Override
   public List<CollectionImpl> getChildren(UUID uuid) {
-    StringBuilder innerQuery
-            = new StringBuilder("SELECT * FROM "
-                    + tableName
-                    + " AS "
-                    + tableAlias
-                    + " INNER JOIN collection_collections cc ON "
-                    + tableAlias
-                    + ".uuid = cc.child_collection_uuid"
-                    + " WHERE cc.parent_collection_uuid = :uuid"
-                    + " ORDER BY cc.sortIndex ASC");
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + tableName
+                + " AS "
+                + tableAlias
+                + " INNER JOIN collection_collections cc ON "
+                + tableAlias
+                + ".uuid = cc.child_collection_uuid"
+                + " WHERE cc.parent_collection_uuid = :uuid"
+                + " ORDER BY cc.sortIndex ASC");
 
     List<CollectionImpl> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
     return result;
@@ -245,7 +250,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
 
   @Override
   public PageResponse<CollectionImpl> getChildren(UUID uuid, PageRequest pageRequest) {
-    String commonSql = " FROM "
+    String commonSql =
+        " FROM "
             + tableName
             + " AS "
             + tableAlias
@@ -294,11 +300,12 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
 
   @Override
   public PageResponse<DigitalObject> getDigitalObjects(
-          UUID collectionUuid, PageRequest pageRequest) {
+      UUID collectionUuid, PageRequest pageRequest) {
     final String doTableAlias = digitalObjectRepositoryImpl.getTableAlias();
     final String doTableName = digitalObjectRepositoryImpl.getTableName();
 
-    String commonSql = " FROM "
+    String commonSql =
+        " FROM "
             + doTableName
             + " AS "
             + doTableAlias
@@ -313,15 +320,15 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
     innerQuery.append(" ORDER BY cd.sortIndex ASC");
     addPageRequestParams(pageRequest, innerQuery);
 
-    List<DigitalObject> result
-            = digitalObjectRepositoryImpl
-                    .retrieveList(
-                            DigitalObjectRepositoryImpl.SQL_REDUCED_FIELDS_DO,
-                            innerQuery,
-                            Map.of("uuid", collectionUuid))
-                    .stream()
-                    .map(DigitalObject.class::cast)
-                    .collect(Collectors.toList());
+    List<DigitalObject> result =
+        digitalObjectRepositoryImpl
+            .retrieveList(
+                DigitalObjectRepositoryImpl.SQL_REDUCED_FIELDS_DO,
+                innerQuery,
+                Map.of("uuid", collectionUuid))
+            .stream()
+            .map(DigitalObject.class::cast)
+            .collect(Collectors.toList());
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -332,14 +339,16 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
 
   @Override
   public CollectionImpl getParent(UUID uuid) {
-    StringBuilder innerQuery = new StringBuilder("SELECT * FROM "
-            + tableName
-            + " AS "
-            + tableAlias
-            + " INNER JOIN collection_collections cc ON "
-            + tableAlias
-            + ".uuid = cc.parent_collection_uuid"
-            + " WHERE cc.child_collection_uuid = :uuid");
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + tableName
+                + " AS "
+                + tableAlias
+                + " INNER JOIN collection_collections cc ON "
+                + tableAlias
+                + ".uuid = cc.parent_collection_uuid"
+                + " WHERE cc.child_collection_uuid = :uuid");
     CollectionImpl result = retrieveOne(reducedFieldsSql, innerQuery, null, Map.of("uuid", uuid));
 
     return result;
@@ -347,15 +356,16 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
 
   @Override
   public List<CollectionImpl> getParents(UUID uuid) {
-    StringBuilder innerQuery
-            = new StringBuilder("SELECT * FROM "
-                    + tableName
-                    + " AS "
-                    + tableAlias
-                    + " INNER JOIN collection_collections cc ON "
-                    + tableAlias
-                    + ".uuid = cc.parent_collection_uuid"
-                    + " WHERE cc.child_collection_uuid = :uuid");
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + tableName
+                + " AS "
+                + tableAlias
+                + " INNER JOIN collection_collections cc ON "
+                + tableAlias
+                + ".uuid = cc.parent_collection_uuid"
+                + " WHERE cc.child_collection_uuid = :uuid");
 
     List<CollectionImpl> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
     return result;
@@ -371,30 +381,41 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
     // - one is fix ("is_part_of"): defines the relation between collection and project
     // - the other one is given as part of the parameter "filtering" for defining relation
     //   between corporatebody and project
-    StringBuilder innerQuery
-            = new StringBuilder(
-                    "SELECT * FROM " + cbTableName + " AS " + cbTableAlias
-                    + " LEFT JOIN rel_entity_entities AS r ON " + cbTableAlias + ".uuid = r.object_uuid"
-                    + " LEFT JOIN rel_entity_entities AS rel ON r.subject_uuid = rel.subject_uuid"
-                    + " WHERE rel.object_uuid = :uuid"
-                    + " AND rel.predicate = 'is_part_of'");
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + cbTableName
+                + " AS "
+                + cbTableAlias
+                + " LEFT JOIN rel_entity_entities AS r ON "
+                + cbTableAlias
+                + ".uuid = r.object_uuid"
+                + " LEFT JOIN rel_entity_entities AS rel ON r.subject_uuid = rel.subject_uuid"
+                + " WHERE rel.object_uuid = :uuid"
+                + " AND rel.predicate = 'is_part_of'");
     FilterCriterion predicate = filtering.getFilterCriterionFor("predicate");
     if (predicate != null) {
       String predicateFilter = String.format(" AND r.predicate = '%s'", predicate.getValue());
       innerQuery.append(predicateFilter);
     }
 
-    List<CorporateBodyImpl> result
-            = corporateBodyRepositoryImpl.retrieveList(CorporateBodyRepositoryImpl.SQL_REDUCED_FIELDS_CB, innerQuery, Map.of("uuid", uuid));
+    List<CorporateBodyImpl> result =
+        corporateBodyRepositoryImpl.retrieveList(
+            CorporateBodyRepositoryImpl.SQL_REDUCED_FIELDS_CB, innerQuery, Map.of("uuid", uuid));
 
     return result.stream().map(CorporateBody.class::cast).collect(Collectors.toList());
   }
 
   @Override
-  public PageResponse<CollectionImpl> getTopCollections(PageRequest pageRequest) {
-    String commonSql
-            = " FROM " + tableName + " AS " + tableAlias
-            + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = " + tableAlias + ".uuid)";
+  public PageResponse<CollectionImpl> getRootNodes(PageRequest pageRequest) {
+    String commonSql =
+        " FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = "
+            + tableAlias
+            + ".uuid)";
     return find(pageRequest, commonSql, null);
   }
 
@@ -413,15 +434,15 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
     if (parentUuid == null || childUuid == null) {
       return false;
     }
-    final String sql
-            = "DELETE FROM collection_collections WHERE parent_collection_uuid=:parentCollectionUuid AND child_collection_uuid=:childCollectionUuid";
+    final String sql =
+        "DELETE FROM collection_collections WHERE parent_collection_uuid=:parentCollectionUuid AND child_collection_uuid=:childCollectionUuid";
 
     dbi.withHandle(
-            h
-            -> h.createUpdate(sql)
-                    .bind("parentCollectionUuid", parentUuid)
-                    .bind("childCollectionUuid", childUuid)
-                    .execute());
+        h ->
+            h.createUpdate(sql)
+                .bind("parentCollectionUuid", parentUuid)
+                .bind("childCollectionUuid", childUuid)
+                .execute());
     return true;
   }
 
@@ -430,15 +451,15 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
     if (collectionUuid != null && digitalObjectUuid != null) {
       // delete relation to collection
 
-      final String sql
-              = "DELETE FROM collection_digitalobjects WHERE collection_uuid=:collectionUuid AND digitalobject_uuid=:digitalObjectUuid";
+      final String sql =
+          "DELETE FROM collection_digitalobjects WHERE collection_uuid=:collectionUuid AND digitalobject_uuid=:digitalObjectUuid";
 
       dbi.withHandle(
-              h
-              -> h.createUpdate(sql)
-                      .bind("collectionUuid", collectionUuid)
-                      .bind("digitalObjectUuid", digitalObjectUuid)
-                      .execute());
+          h ->
+              h.createUpdate(sql)
+                  .bind("collectionUuid", collectionUuid)
+                  .bind("digitalObjectUuid", digitalObjectUuid)
+                  .execute());
       return true;
     }
     return false;
@@ -450,11 +471,11 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
       return false;
     }
 
-    final String sql
-            = "DELETE FROM collection_digitalobjects WHERE digitalobject_uuid=:digitalObjectUuid";
+    final String sql =
+        "DELETE FROM collection_digitalobjects WHERE digitalobject_uuid=:digitalObjectUuid";
 
     dbi.withHandle(
-            h -> h.createUpdate(sql).bind("digitalObjectUuid", digitalObject.getUuid()).execute());
+        h -> h.createUpdate(sql).bind("digitalObjectUuid", digitalObject.getUuid()).execute());
     return true;
   }
 
@@ -464,11 +485,11 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
     collection.setCreated(LocalDateTime.now());
     collection.setLastModified(LocalDateTime.now());
     // refid is generated as serial, DO NOT SET!
-    final UUID previewImageUuid
-            = collection.getPreviewImage() == null ? null : collection.getPreviewImage().getUuid();
+    final UUID previewImageUuid =
+        collection.getPreviewImage() == null ? null : collection.getPreviewImage().getUuid();
 
-    final String sql
-            = "INSERT INTO "
+    final String sql =
+        "INSERT INTO "
             + tableName
             + "("
             + "uuid, label, description, previewfileresource, preview_hints,"
@@ -483,11 +504,11 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
             + ")";
 
     dbi.withHandle(
-            h
-            -> h.createUpdate(sql)
-                    .bind("previewFileResource", previewImageUuid)
-                    .bindBean(collection)
-                    .execute());
+        h ->
+            h.createUpdate(sql)
+                .bind("previewFileResource", previewImageUuid)
+                .bindBean(collection)
+                .execute());
 
     // save identifiers
     Set<Identifier> identifiers = collection.getIdentifiers();
@@ -501,27 +522,27 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
   public boolean saveDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects) {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
-            h
-            -> h.createUpdate("DELETE FROM collection_digitalobjects WHERE collection_uuid = :uuid")
-                    .bind("uuid", collectionUuid)
-                    .execute());
+        h ->
+            h.createUpdate("DELETE FROM collection_digitalobjects WHERE collection_uuid = :uuid")
+                .bind("uuid", collectionUuid)
+                .execute());
 
     if (digitalObjects != null) {
       // save relation to collection
       dbi.useHandle(
-              handle -> {
-                PreparedBatch preparedBatch
-                = handle.prepareBatch(
-                        "INSERT INTO collection_digitalobjects(collection_uuid, digitalobject_uuid, sortIndex) VALUES (:uuid, :digitalObjectUuid, :sortIndex)");
-                for (DigitalObject digitalObject : digitalObjects) {
-                  preparedBatch
-                          .bind("uuid", collectionUuid)
-                          .bind("digitalObjectUuid", digitalObject.getUuid())
-                          .bind("sortIndex", getIndex(digitalObjects, digitalObject))
-                          .add();
-                }
-                preparedBatch.execute();
-              });
+          handle -> {
+            PreparedBatch preparedBatch =
+                handle.prepareBatch(
+                    "INSERT INTO collection_digitalobjects(collection_uuid, digitalobject_uuid, sortIndex) VALUES (:uuid, :digitalObjectUuid, :sortIndex)");
+            for (DigitalObject digitalObject : digitalObjects) {
+              preparedBatch
+                  .bind("uuid", collectionUuid)
+                  .bind("digitalObjectUuid", digitalObject.getUuid())
+                  .bind("sortIndex", getIndex(digitalObjects, digitalObject))
+                  .add();
+            }
+            preparedBatch.execute();
+          });
       return true;
     }
     return false;
@@ -529,21 +550,22 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
 
   @Override
   public CollectionImpl saveWithParentCollection(CollectionImpl collection, UUID parentUuid) {
-    final UUID childUuid
-            = collection.getUuid() == null ? save(collection).getUuid() : collection.getUuid();
+    final UUID childUuid =
+        collection.getUuid() == null ? save(collection).getUuid() : collection.getUuid();
 
-    Integer nextSortIndex = retrieveNextSortIndexForParentChildren(
+    Integer nextSortIndex =
+        retrieveNextSortIndexForParentChildren(
             dbi, "collection_collections", "parent_collection_uuid", parentUuid);
 
     dbi.withHandle(
-            h
-            -> h.createUpdate(
+        h ->
+            h.createUpdate(
                     "INSERT INTO collection_collections(parent_collection_uuid, child_collection_uuid, sortindex)"
-                    + " VALUES (:parent_collection_uuid, :child_collection_uuid, :sortindex)")
-                    .bind("parent_collection_uuid", parentUuid)
-                    .bind("child_collection_uuid", childUuid)
-                    .bind("sortindex", nextSortIndex)
-                    .execute());
+                        + " VALUES (:parent_collection_uuid, :child_collection_uuid, :sortindex)")
+                .bind("parent_collection_uuid", parentUuid)
+                .bind("child_collection_uuid", childUuid)
+                .bind("sortindex", nextSortIndex)
+                .execute());
 
     return findOne(childUuid);
   }
@@ -553,11 +575,11 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
     collection.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, entity_type, refid
-    final UUID previewImageUuid
-            = collection.getPreviewImage() == null ? null : collection.getPreviewImage().getUuid();
+    final UUID previewImageUuid =
+        collection.getPreviewImage() == null ? null : collection.getPreviewImage().getUuid();
 
-    final String sql
-            = "UPDATE "
+    final String sql =
+        "UPDATE "
             + tableName
             + " SET"
             + " label=:label::JSONB, description=:description::JSONB,"
@@ -567,11 +589,11 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
             + " WHERE uuid=:uuid";
 
     dbi.withHandle(
-            h
-            -> h.createUpdate(sql)
-                    .bind("previewFileResource", previewImageUuid)
-                    .bindBean(collection)
-                    .execute());
+        h ->
+            h.createUpdate(sql)
+                .bind("previewFileResource", previewImageUuid)
+                .bindBean(collection)
+                .execute());
 
     // save identifiers
     // as we store the whole list new: delete old entries
