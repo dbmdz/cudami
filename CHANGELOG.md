@@ -4,9 +4,90 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.0.0]
+## [4.3.0](https://github.com/dbmdz/cudami/releases/tag/4.3.0) - 2021-01-22
 
-- Rename "corporation" to "corporate body"
+### Added
+
+- Made the edit and save buttons sticky
+- Added endpoints for retrieval of websites' and top collections' languages
+
+### Changed
+
+- Refactored list of top collections and websites to react
+- Fixed the query for a digital objects' active collections
+
+## [4.2.0](https://github.com/dbmdz/cudami/releases/tag/4.2.0) - 2021-01-11
+
+### Added
+
+- Added a new endpoint to retrieve all related corporate bodies to a collection
+- Added publication date and creators to article
+- Added possibility to enter the url of a corporate body
+- Added endpoints to change the order of (sub) webpages
+- Added support for sorting by multiple fields and subfields
+- Added functionality for adding a rendering template to a webpage
+- Added a switch to the webpage form to activate/deactivate the in-page navigation
+- Added person birth and death locations, geo locations and humansettlements
+
+### Removed
+
+- Removed the field `description` from the search for collections and digital objects
+
+## [4.1.1](https://github.com/dbmdz/cudami/releases/tag/4.1.1) - 2020-11-10
+
+### Changed
+
+- Add pattern for url validation to also allow relative urls
+
+## [4.1.0](https://github.com/dbmdz/cudami/releases/tag/4.1.0) - 2020-11-03
+
+### Added
+
+- Added paged retrieval of a website's rootpages
+
+### Changed
+
+- Refactored list of webpages to React
+
+## [4.0.0](https://github.com/dbmdz/cudami/releases/tag/4.0.0) - 2020-10-27
+
+### Added
+
+- Added custom attributes to entity
+- Added filtering possibilities for active webpages
+- Added functionality to retrieve a children tree for a webpage
+- Added functionality to get relations by predicate
+
+### Changed
+
+- Renamed "corporation" to "corporate body"
+
+### Removed
+
+## [3.7.0](https://github.com/dbmdz/cudami/releases/tag/3.7.0) - 2020-10-05
+
+### Added
+
+- Added an endpoint that returns a reduced digitalobjects list
+- Added handling of items and works
+- Added functionality to edit links
+- Added GND fetch and save endpoint
+- Added get by identifier and refid
+- Made form fields optional
+- Added handling of entity relations
+- Added functionality to insert videos
+- Introduced GitHub Actions
+- Added functionality to delete a digital object with its dependencies
+- Added spinner when autocomplete is loading
+- Added publication dates for collections
+- Added parent collections and publication status to collection view
+
+### Changed
+
+- Fixed the removal of iframe, image and link attributes
+- Added unique constraint to identifiers
+
+### Removed
 
 ## [3.6.0](https://github.com/dbmdz/cudami/releases/tag/3.6.0) - 2020-09-09
 
