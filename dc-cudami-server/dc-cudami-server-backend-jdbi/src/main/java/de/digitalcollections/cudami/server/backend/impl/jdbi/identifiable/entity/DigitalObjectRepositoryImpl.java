@@ -687,6 +687,10 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         return "d.created";
       case "lastModified":
         return "d.last_modified";
+      case "publicationEnd":
+        return "c.publication_end";
+      case "publicationStart":
+        return "c.publication_start";
       case "refId":
         return "d.refid";
       default:
