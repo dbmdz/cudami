@@ -4,24 +4,61 @@ import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.Project;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 public interface ProjectService extends EntityService<Project> {
 
-  boolean addDigitalObject(Project project, DigitalObject digitalObject);
+  default boolean addDigitalObject(Project project, DigitalObject digitalObject) {
+    if (project == null || digitalObject == null) {
+      return false;
+    }
+    return addDigitalObjects(project.getUuid(), Arrays.asList(digitalObject));
+  }
 
-  boolean addDigitalObjects(Project project, List<DigitalObject> digitalObjects);
+  default boolean addDigitalObjects(Project project, List<DigitalObject> digitalObjects) {
+    if (project == null || digitalObjects == null) {
+      return false;
+    }
+    return addDigitalObjects(project.getUuid(), digitalObjects);
+  }
 
-  PageResponse<DigitalObject> getDigitalObjects(Project project, PageRequest pageRequest);
+  boolean addDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects);
 
-  boolean removeDigitalObject(Project project, DigitalObject digitalObject);
+  default PageResponse<DigitalObject> getDigitalObjects(Project project, PageRequest pageRequest) {
+    if (project == null) {
+      return null;
+    }
+    return getDigitalObjects(project.getUuid(), pageRequest);
+  }
 
-  boolean saveDigitalObjects(Project project, List<DigitalObject> digitalObjects);
+  PageResponse<DigitalObject> getDigitalObjects(UUID projectUuid, PageRequest pageRequest);
 
-  void delete(UUID uuid);
+  default boolean removeDigitalObject(Project project, DigitalObject digitalObject) {
+    if (project == null || digitalObject == null) {
+      return false;
+    }
+    return removeDigitalObject(project.getUuid(), digitalObject.getUuid());
+  }
 
-  List<Project> getAll();
+  boolean removeDigitalObject(UUID projectUuid, UUID digitalObjectUuid);
 
-  boolean removeDigitalObjectFromAllProjects(DigitalObject digitalObject);
+  default boolean removeDigitalObjectFromAllProjects(DigitalObject digitalObject) {
+    if (digitalObject == null) {
+      return false;
+    }
+    return removeDigitalObjectFromAllProjects(digitalObject.getUuid());
+  }
+
+  boolean removeDigitalObjectFromAllProjects(UUID digitalObjectUuid);
+
+  default boolean saveDigitalObjects(Project project, List<DigitalObject> digitalObjects) {
+    if (project == null || digitalObjects == null) {
+      return false;
+    }
+    return saveDigitalObjects(project.getUuid(), digitalObjects);
+  }
+
+  boolean saveDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects);
 }

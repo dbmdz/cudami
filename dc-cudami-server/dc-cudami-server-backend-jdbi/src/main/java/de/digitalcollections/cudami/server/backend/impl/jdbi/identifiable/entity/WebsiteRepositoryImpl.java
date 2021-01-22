@@ -10,16 +10,13 @@ import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
-import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
@@ -28,10 +25,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class WebsiteRepositoryImpl extends EntityRepositoryImpl<WebsiteImpl>
-    implements WebsiteRepository<WebsiteImpl> {
+public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
+    implements WebsiteRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsiteRepositoryImpl.class);
+  public static final String MAPPING_PREFIX = "ws";
 
   public static final String SQL_REDUCED_FIELDS_WS =
       " w.uuid ws_uuid, w.refid ws_refId, w.label ws_label, w.description ws_description,"
@@ -42,7 +40,6 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<WebsiteImpl>
 
   public static final String SQL_FULL_FIELDS_WS = SQL_REDUCED_FIELDS_WS;
 
-  public static final String MAPPING_PREFIX = "ws";
   public static final String TABLE_ALIAS = "w";
   public static final String TABLE_NAME = "websites";
 
@@ -66,8 +63,8 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<WebsiteImpl>
   }
 
   @Override
-  public WebsiteImpl findOne(UUID uuid, Filtering filtering) {
-    WebsiteImpl website = super.findOne(uuid, filtering);
+  public Website findOne(UUID uuid, Filtering filtering) {
+    Website website = super.findOne(uuid, filtering);
 
     if (website != null) {
       website.setRootPages(getRootPages(website));
@@ -76,8 +73,8 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<WebsiteImpl>
   }
 
   @Override
-  public WebsiteImpl findOne(Identifier identifier) {
-    WebsiteImpl website = super.findOne(identifier);
+  public Website findOne(Identifier identifier) {
+    Website website = super.findOne(identifier);
 
     if (website != null) {
       website.setRootPages(getRootPages(website));
@@ -118,11 +115,6 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<WebsiteImpl>
   }
   
   @Override
-  public List<Webpage> getRootPages(Website website) {
-    return getRootPages(website.getUuid());
-  }
-
-  @Override
   public List<Webpage> getRootPages(UUID uuid) {
     final String wpTableAlias = webpageRepositoryImpl.getTableAlias();
     final String wpTableName = webpageRepositoryImpl.getTableName();
@@ -138,10 +130,10 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<WebsiteImpl>
                 + ".uuid = ww.webpage_uuid"
                 + " WHERE ww.website_uuid = :uuid");
 
-    List<WebpageImpl> result =
+    List<Webpage> result =
         webpageRepositoryImpl.retrieveList(
             WebpageRepositoryImpl.SQL_REDUCED_FIELDS_WP, innerQuery, Map.of("uuid", uuid));
-    return result.stream().map(Webpage.class::cast).collect(Collectors.toList());
+    return result;
   }
 
   @Override
@@ -167,12 +159,8 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<WebsiteImpl>
     addPageRequestParams(pageRequest, innerQuery);
 
     List<Webpage> result =
-        webpageRepositoryImpl
-            .retrieveList(
-                WebpageRepositoryImpl.SQL_REDUCED_FIELDS_WP, innerQuery, Map.of("uuid", uuid))
-            .stream()
-            .map(Webpage.class::cast)
-            .collect(Collectors.toList());
+        webpageRepositoryImpl.retrieveList(
+            WebpageRepositoryImpl.SQL_REDUCED_FIELDS_WP, innerQuery, Map.of("uuid", uuid));
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -181,7 +169,8 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<WebsiteImpl>
     return new PageResponseImpl<>(result, pageRequest, total);
   }
 
-  public WebsiteImpl save(WebsiteImpl website) {
+  @Override
+  public Website save(Website website) {
     website.setUuid(UUID.randomUUID());
     website.setCreated(LocalDateTime.now());
     website.setLastModified(LocalDateTime.now());
@@ -215,12 +204,12 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<WebsiteImpl>
     Set<Identifier> identifiers = website.getIdentifiers();
     saveIdentifiers(identifiers, website);
 
-    WebsiteImpl result = findOne(website.getUuid());
+    Website result = findOne(website.getUuid());
     return result;
   }
 
   @Override
-  public WebsiteImpl update(WebsiteImpl website) {
+  public Website update(Website website) {
     website.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, entity_type, refid
@@ -250,7 +239,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<WebsiteImpl>
     Set<Identifier> identifiers = website.getIdentifiers();
     saveIdentifiers(identifiers, website);
 
-    WebsiteImpl result = findOne(website.getUuid());
+    Website result = findOne(website.getUuid());
     return result;
   }
 

@@ -7,18 +7,14 @@ import de.digitalcollections.model.api.identifiable.entity.work.Work;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * Repository for Item persistence handling.
- *
- * @param <I> instance of item implementation
- */
-public interface ItemRepository<I extends Item> extends EntityRepository<I> {
+/** Repository for Item persistence handling. */
+public interface ItemRepository extends EntityRepository<Item> {
+
+  boolean addDigitalObject(UUID itemUuid, UUID digitalObjectUuid);
+
+  boolean addWork(UUID itemUuid, UUID workUuid);
 
   Set<DigitalObject> getDigitalObjects(UUID itemUuid);
 
   Set<Work> getWorks(UUID itemUuid);
-
-  boolean addWork(UUID itemUuid, UUID workUuid);
-
-  boolean addDigitalObject(UUID itemUuid, UUID digitalObjectUuid);
 }

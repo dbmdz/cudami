@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.parts;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.EntityPartService;
-import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.EntityPart;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import java.util.List;
@@ -18,11 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Api(description = "The entitypart controller", name = "EntityPart controller")
-public class EntityPartController<P extends EntityPart, E extends Entity> {
+public class EntityPartController<P extends EntityPart> {
 
   @Autowired
   @Qualifier("entityPartServiceImpl")
-  private EntityPartService<P, E> service;
+  private EntityPartService<P> service;
 
   @ApiMethod(description = "Get related file resources of entity part")
   @GetMapping(

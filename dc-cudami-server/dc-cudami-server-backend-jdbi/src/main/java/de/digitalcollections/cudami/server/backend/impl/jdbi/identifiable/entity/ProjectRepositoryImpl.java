@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ProjectRepository;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.api.identifiable.entity.Project;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.ProjectImpl;
@@ -13,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
@@ -22,10 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ProjectRepositoryImpl extends EntityRepositoryImpl<ProjectImpl>
-    implements ProjectRepository<ProjectImpl> {
+public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
+    implements ProjectRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProjectRepositoryImpl.class);
+  public static final String MAPPING_PREFIX = "pr";
 
   public static final String SQL_REDUCED_FIELDS_PR =
       " p.uuid pr_uuid, p.refid pr_refId, p.label pr_label, p.description pr_description,"
@@ -36,7 +37,6 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<ProjectImpl>
 
   public static final String SQL_FULL_FIELDS_PR = SQL_REDUCED_FIELDS_PR + ", p.text pr_text";
 
-  public static final String MAPPING_PREFIX = "pr";
   public static final String TABLE_ALIAS = "p";
   public static final String TABLE_NAME = "projects";
 
@@ -132,14 +132,10 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<ProjectImpl>
     addPageRequestParams(pageRequest, innerQuery);
 
     List<DigitalObject> result =
-        digitalObjectRepositoryImpl
-            .retrieveList(
-                DigitalObjectRepositoryImpl.SQL_REDUCED_FIELDS_DO,
-                innerQuery,
-                Map.of("uuid", projectUuid))
-            .stream()
-            .map(DigitalObject.class::cast)
-            .collect(Collectors.toList());
+        digitalObjectRepositoryImpl.retrieveList(
+            DigitalObjectRepositoryImpl.SQL_REDUCED_FIELDS_DO,
+            innerQuery,
+            Map.of("uuid", projectUuid));
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -180,7 +176,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<ProjectImpl>
   }
 
   @Override
-  public ProjectImpl save(ProjectImpl project) {
+  public Project save(Project project) {
     project.setUuid(UUID.randomUUID());
     project.setCreated(LocalDateTime.now());
     project.setLastModified(LocalDateTime.now());
@@ -214,7 +210,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<ProjectImpl>
     Set<Identifier> identifiers = project.getIdentifiers();
     saveIdentifiers(identifiers, project);
 
-    ProjectImpl result = findOne(project.getUuid());
+    Project result = findOne(project.getUuid());
     return result;
   }
 
@@ -249,7 +245,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<ProjectImpl>
   }
 
   @Override
-  public ProjectImpl update(ProjectImpl project) {
+  public Project update(Project project) {
     project.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, entity_type, refid
@@ -279,7 +275,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<ProjectImpl>
     Set<Identifier> identifiers = project.getIdentifiers();
     saveIdentifiers(identifiers, project);
 
-    ProjectImpl result = findOne(project.getUuid());
+    Project result = findOne(project.getUuid());
     return result;
   }
 }

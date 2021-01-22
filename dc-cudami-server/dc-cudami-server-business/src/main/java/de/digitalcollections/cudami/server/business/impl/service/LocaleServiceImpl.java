@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 /** Service for Locale handling. */
 @Service
-// @Transactional(readOnly = true)
 public class LocaleServiceImpl implements LocaleService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LocaleServiceImpl.class);

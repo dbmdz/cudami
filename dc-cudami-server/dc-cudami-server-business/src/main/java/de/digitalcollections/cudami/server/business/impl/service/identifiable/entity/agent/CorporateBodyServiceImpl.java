@@ -4,7 +4,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.ExternalCorporateBodyRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ImageFileResourceService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
 import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
@@ -20,16 +20,16 @@ public class CorporateBodyServiceImpl extends EntityServiceImpl<CorporateBody>
   private static final Logger LOGGER = LoggerFactory.getLogger(CorporateBodyServiceImpl.class);
 
   private final ExternalCorporateBodyRepository externalRepository;
-  private final FileResourceMetadataService fileResourceMetadataService;
+  private final ImageFileResourceService imageFileResourceService;
 
   @Autowired
   public CorporateBodyServiceImpl(
       CorporateBodyRepository repository,
       ExternalCorporateBodyRepository externalRepository,
-      FileResourceMetadataService fileResourceMetadataService) {
+      ImageFileResourceService imageFileResourceService) {
     super(repository);
     this.externalRepository = externalRepository;
-    this.fileResourceMetadataService = fileResourceMetadataService;
+    this.imageFileResourceService = imageFileResourceService;
   }
 
   @Override
@@ -42,7 +42,7 @@ public class CorporateBodyServiceImpl extends EntityServiceImpl<CorporateBody>
     if (corporateBody.getPreviewImage() != null) {
       try {
         ImageFileResource previewImage =
-            (ImageFileResource) fileResourceMetadataService.save(corporateBody.getPreviewImage());
+            imageFileResourceService.save(corporateBody.getPreviewImage());
         corporateBody.setPreviewImage(previewImage);
       } catch (IdentifiableServiceException ex) {
         LOGGER.warn(

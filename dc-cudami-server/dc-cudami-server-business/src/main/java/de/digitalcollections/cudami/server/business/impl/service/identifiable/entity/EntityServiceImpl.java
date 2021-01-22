@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
-import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import java.time.LocalDate;
 import java.util.List;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
-// @Transactional(readOnly = true)
 public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl<E>
     implements EntityService<E> {
 
@@ -26,22 +24,12 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
 
   @Override
   public void addRelatedFileresource(E entity, FileResource fileResource) {
-    ((EntityRepository) repository).addRelatedFileresource(entity, fileResource);
+    ((EntityRepository<E>) repository).addRelatedFileresource(entity, fileResource);
   }
 
   @Override
   public void addRelatedFileresource(UUID entityUuid, UUID fileResourceUuid) {
-    ((EntityRepository) repository).addRelatedFileresource(entityUuid, fileResourceUuid);
-  }
-
-  @Override
-  public void addRelation(EntityRelation relation) {
-    ((EntityRepository) repository).addRelation(relation);
-  }
-
-  @Override
-  public void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid) {
-    ((EntityRepository) repository).addRelation(subjectEntityUuid, predicate, objectEntityUuid);
+    ((EntityRepository<E>) repository).addRelatedFileresource(entityUuid, fileResourceUuid);
   }
 
   protected Filtering filteringForActive() {
@@ -59,42 +47,27 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
 
   @Override
   public E getByRefId(long refId) {
-    return (E) ((EntityRepository) repository).findOneByRefId(refId);
+    return ((EntityRepository<E>) repository).findOneByRefId(refId);
   }
 
   @Override
   public List<FileResource> getRelatedFileResources(E entity) {
-    return ((EntityRepository) repository).getRelatedFileResources(entity);
+    return ((EntityRepository<E>) repository).getRelatedFileResources(entity);
   }
 
   @Override
   public List<FileResource> getRelatedFileResources(UUID entityUuid) {
-    return ((EntityRepository) repository).getRelatedFileResources(entityUuid);
-  }
-
-  @Override
-  public List<EntityRelation> getRelations(E subjectEntity) {
-    return ((EntityRepository) repository).getRelations(subjectEntity);
-  }
-
-  @Override
-  public List<EntityRelation> getRelations(UUID subjectEntityUuid) {
-    return ((EntityRepository) repository).getRelations(subjectEntityUuid);
+    return ((EntityRepository<E>) repository).getRelatedFileResources(entityUuid);
   }
 
   @Override
   public List<FileResource> saveRelatedFileResources(E entity, List<FileResource> fileResources) {
-    return ((EntityRepository) repository).saveRelatedFileResources(entity, fileResources);
+    return ((EntityRepository<E>) repository).saveRelatedFileResources(entity, fileResources);
   }
 
   @Override
   public List<FileResource> saveRelatedFileResources(
       UUID entityUuid, List<FileResource> fileResources) {
-    return ((EntityRepository) repository).saveRelatedFileResources(entityUuid, fileResources);
-  }
-
-  @Override
-  public List<EntityRelation> saveRelations(List<EntityRelation> relations) {
-    return ((EntityRepository) repository).saveRelations(relations);
+    return ((EntityRepository<E>) repository).saveRelatedFileResources(entityUuid, fileResources);
   }
 }

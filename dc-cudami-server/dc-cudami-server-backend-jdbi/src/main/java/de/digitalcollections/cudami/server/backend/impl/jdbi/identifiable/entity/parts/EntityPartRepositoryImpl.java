@@ -4,19 +4,18 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.EntityPartRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
+import de.digitalcollections.model.api.identifiable.entity.parts.EntityPart;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
-import de.digitalcollections.model.impl.identifiable.entity.parts.EntityPartImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class EntityPartRepositoryImpl<P extends EntityPartImpl>
+public abstract class EntityPartRepositoryImpl<P extends EntityPart>
     extends IdentifiableRepositoryImpl<P> implements EntityPartRepository<P> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(EntityPartRepositoryImpl.class);
@@ -27,7 +26,7 @@ public abstract class EntityPartRepositoryImpl<P extends EntityPartImpl>
       String tableName,
       String tableAlias,
       String mappingPrefix,
-      Class<P> entityPartImplClass,
+      Class entityPartImplClass,
       String reducedFieldsSql,
       String fullFieldsSql) {
     super(
@@ -39,11 +38,6 @@ public abstract class EntityPartRepositoryImpl<P extends EntityPartImpl>
         entityPartImplClass,
         reducedFieldsSql,
         fullFieldsSql);
-  }
-
-  @Override
-  public void addRelatedEntity(P entityPart, Entity entity) {
-    addRelatedEntity(entityPart.getUuid(), entity.getUuid());
   }
 
   @Override
@@ -63,11 +57,6 @@ public abstract class EntityPartRepositoryImpl<P extends EntityPartImpl>
   }
 
   @Override
-  public void addRelatedFileresource(P entityPart, FileResource fileResource) {
-    addRelatedFileresource(entityPart.getUuid(), fileResource.getUuid());
-  }
-
-  @Override
   public void addRelatedFileresource(UUID entityPartUuid, UUID fileResourceUuid) {
     Integer sortIndex =
         retrieveNextSortIndexForParentChildren(
@@ -84,11 +73,6 @@ public abstract class EntityPartRepositoryImpl<P extends EntityPartImpl>
   }
 
   @Override
-  public List<Entity> getRelatedEntities(P entityPart) {
-    return getRelatedEntities(entityPart.getUuid());
-  }
-
-  @Override
   public List<Entity> getRelatedEntities(UUID entityPartUuid) {
     String query =
         "SELECT * FROM entities e"
@@ -96,20 +80,15 @@ public abstract class EntityPartRepositoryImpl<P extends EntityPartImpl>
             + " WHERE ref.entitypart_uuid = :entityPartUuid"
             + " ORDER BY ref.sortindex";
 
-    List<EntityImpl> list =
+    List<Entity> list =
         dbi.withHandle(
             h ->
                 h.createQuery(query)
                     .bind("entityPartUuid", entityPartUuid)
                     .mapToBean(EntityImpl.class)
+                    .map(Entity.class::cast)
                     .list());
-    List<Entity> result = list.stream().map(s -> (Entity) s).collect(Collectors.toList());
-    return result;
-  }
-
-  @Override
-  public List<FileResource> getRelatedFileResources(P entityPart) {
-    return getRelatedFileResources(entityPart.getUuid());
+    return list;
   }
 
   @Override
@@ -129,11 +108,6 @@ public abstract class EntityPartRepositoryImpl<P extends EntityPartImpl>
                     .map(FileResource.class::cast)
                     .list());
     return result;
-  }
-
-  @Override
-  public List<Entity> saveRelatedEntities(P entityPart, List<Entity> entities) {
-    return saveRelatedEntities(entityPart.getUuid(), entities);
   }
 
   @Override
@@ -163,12 +137,6 @@ public abstract class EntityPartRepositoryImpl<P extends EntityPartImpl>
           });
     }
     return getRelatedEntities(entityPartUuid);
-  }
-
-  @Override
-  public List<FileResource> saveRelatedFileResources(
-      P entityPart, List<FileResource> fileResources) {
-    return saveRelatedFileResources(entityPart.getUuid(), fileResources);
   }
 
   @Override

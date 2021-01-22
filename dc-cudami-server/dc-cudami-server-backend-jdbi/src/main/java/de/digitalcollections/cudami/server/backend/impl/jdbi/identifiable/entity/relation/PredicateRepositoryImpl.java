@@ -18,6 +18,7 @@ import org.springframework.stereotype.Repository;
 public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements PredicateRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PredicateRepositoryImpl.class);
+  public static final String MAPPING_PREFIX = "pred";
 
   public static final String SQL_REDUCED_FIELDS_PRED =
       " p.value pred_value, p.label pred_label,"
@@ -26,7 +27,6 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
   public static final String SQL_FULL_FIELDS_PRED =
       SQL_REDUCED_FIELDS_PRED + " , p.description pred_description";
 
-  public static final String MAPPING_PREFIX = "pred";
   public static final String TABLE_ALIAS = "p";
   public static final String TABLE_NAME = "predicates";
 
@@ -46,12 +46,13 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
 
   @Override
   public List<Predicate> findAll() {
-    final String sql = "SELECT * FROM predicates AS p";
+    final String sql = "SELECT * FROM " + tableName + " AS " + tableAlias;
 
     List<Predicate> result =
         dbi.withHandle(
             h ->
-                h.createQuery(sql).mapToBean(PredicateImpl.class).stream()
+                h.createQuery(sql)
+                    .mapToBean(PredicateImpl.class)
                     .map(Predicate.class::cast)
                     .collect(Collectors.toList()));
     return result;
@@ -59,11 +60,13 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
 
   @Override
   public Predicate findOneByValue(String value) {
-    String query = "SELECT * FROM predicates WHERE value = :value";
+    String query = "SELECT * FROM " + tableName + " WHERE value = :value";
     Optional<Predicate> result =
         dbi.withHandle(
             h ->
-                h.createQuery(query).bind("value", value).mapToBean(PredicateImpl.class).stream()
+                h.createQuery(query)
+                    .bind("value", value)
+                    .mapToBean(PredicateImpl.class)
                     .map(Predicate.class::cast)
                     .findFirst());
     return result.orElse(null);
@@ -81,13 +84,13 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
     }
     switch (modelProperty) {
       case "created":
-        return "p.created";
+        return tableAlias + ".created";
       case "label":
-        return "p.label";
+        return tableAlias + ".label";
       case "lastModified":
-        return "p.last_modified";
+        return tableAlias + ".last_modified";
       case "value":
-        return "p.value";
+        return tableAlias + ".value";
       default:
         return null;
     }
@@ -105,7 +108,9 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
     if (existingPredicate != null) {
       // Update
       String updateQuery =
-          "UPDATE predicates SET"
+          "UPDATE "
+              + tableName
+              + " SET"
               + " label=:label::JSONB, description=:description::JSONB,"
               + " last_modified=:lastModified"
               + " WHERE value=:value";
@@ -116,7 +121,9 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
       predicate.setCreated(predicate.getLastModified());
 
       String createQuery =
-          "INSERT INTO predicates("
+          "INSERT INTO "
+              + tableName
+              + "("
               + "value, label, description,"
               + " created, last_modified"
               + ") VALUES ("

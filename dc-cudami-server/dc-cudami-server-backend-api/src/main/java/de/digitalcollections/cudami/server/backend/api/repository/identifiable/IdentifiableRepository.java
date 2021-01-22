@@ -20,7 +20,7 @@ public interface IdentifiableRepository<I extends Identifiable> {
     delete(List.of(uuid)); // same performance as "where uuid = :uuid"
   }
 
-  void delete(List<UUID> uuids);
+  boolean delete(List<UUID> uuids);
 
   boolean deleteIdentifiers(UUID identifiableUuid);
 

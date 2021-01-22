@@ -5,16 +5,14 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.parts.SubtopicRepositoryImpl;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.Identifier;
+import de.digitalcollections.model.api.identifiable.entity.Topic;
 import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
 import de.digitalcollections.model.impl.identifiable.entity.TopicImpl;
-import de.digitalcollections.model.impl.identifiable.entity.parts.SubtopicImpl;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class TopicRepositoryImpl extends EntityRepositoryImpl<TopicImpl>
-    implements TopicRepository<TopicImpl> {
+public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements TopicRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TopicRepositoryImpl.class);
+  public static final String MAPPING_PREFIX = "to";
 
   public static final String SQL_REDUCED_FIELDS_TO =
       " t.uuid to_uuid, t.refid to_refId, t.label to_label, t.description to_description,"
@@ -35,7 +33,6 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<TopicImpl>
 
   public static final String SQL_FULL_FIELDS_TO = SQL_REDUCED_FIELDS_TO;
 
-  public static final String MAPPING_PREFIX = "to";
   public static final String TABLE_ALIAS = "t";
   public static final String TABLE_NAME = "topics";
 
@@ -59,28 +56,21 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<TopicImpl>
   }
 
   @Override
-  public TopicImpl findOne(UUID uuid, Filtering filtering) {
-    TopicImpl topic = super.findOne(uuid, filtering);
+  public Topic findOne(UUID uuid, Filtering filtering) {
+    Topic topic = super.findOne(uuid, filtering);
 
     if (topic != null) {
-      topic.setSubtopics(
-          Stream.ofNullable(getSubtopics(topic))
-              .map(Subtopic.class::cast)
-              .collect(Collectors.toList()));
+      topic.setSubtopics(getSubtopics(topic));
     }
     return topic;
   }
 
   @Override
-  public TopicImpl findOne(Identifier identifier) {
-    TopicImpl topic = super.findOne(identifier);
+  public Topic findOne(Identifier identifier) {
+    Topic topic = super.findOne(identifier);
 
     if (topic != null) {
-      // TODO could be replaced with another join in above query...
-      topic.setSubtopics(
-          Stream.ofNullable(getSubtopics(topic))
-              .map(Subtopic.class::cast)
-              .collect(Collectors.toList()));
+      topic.setSubtopics(getSubtopics(topic));
     }
     return topic;
   }
@@ -108,12 +98,6 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<TopicImpl>
   }
 
   @Override
-  public List<Subtopic> getSubtopics(TopicImpl topic) {
-    UUID uuid = topic.getUuid();
-    return getSubtopics(uuid);
-  }
-
-  @Override
   public List<Subtopic> getSubtopics(UUID uuid) {
     final String stTableAlias = subtopicRepositoryImpl.getTableAlias();
     final String stTableName = subtopicRepositoryImpl.getTableName();
@@ -130,14 +114,14 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<TopicImpl>
                 + " WHERE ts.topic_uuid = :uuid"
                 + " ORDER BY ts.sortIndex ASC");
 
-    List<SubtopicImpl> result =
+    List<Subtopic> result =
         subtopicRepositoryImpl.retrieveList(
             SubtopicRepositoryImpl.SQL_REDUCED_FIELDS_ST, innerQuery, Map.of("uuid", uuid));
-    return result.stream().map(Subtopic.class::cast).collect(Collectors.toList());
+    return result;
   }
 
   @Override
-  public TopicImpl save(TopicImpl topic) {
+  public Topic save(Topic topic) {
     topic.setUuid(UUID.randomUUID());
     topic.setCreated(LocalDateTime.now());
     topic.setLastModified(LocalDateTime.now());
@@ -169,12 +153,12 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<TopicImpl>
     Set<Identifier> identifiers = topic.getIdentifiers();
     saveIdentifiers(identifiers, topic);
 
-    TopicImpl result = findOne(topic.getUuid());
+    Topic result = findOne(topic.getUuid());
     return result;
   }
 
   @Override
-  public TopicImpl update(TopicImpl topic) {
+  public Topic update(Topic topic) {
     topic.setLastModified(LocalDateTime.now());
 
     // do not update/left out from statement (not changed since insert):
@@ -204,7 +188,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<TopicImpl>
     Set<Identifier> identifiers = topic.getIdentifiers();
     saveIdentifiers(identifiers, topic);
 
-    TopicImpl result = findOne(topic.getUuid());
+    Topic result = findOne(topic.getUuid());
     return result;
   }
 }

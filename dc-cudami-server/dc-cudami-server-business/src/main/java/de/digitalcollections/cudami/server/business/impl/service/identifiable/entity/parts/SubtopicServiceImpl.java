@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 
 /** Service for Subtopic handling. */
 @Service
-public class SubtopicServiceImpl extends EntityPartServiceImpl<Subtopic, Entity>
+public class SubtopicServiceImpl extends EntityPartServiceImpl<Subtopic>
     implements SubtopicService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SubtopicServiceImpl.class);
@@ -32,105 +32,24 @@ public class SubtopicServiceImpl extends EntityPartServiceImpl<Subtopic, Entity>
   }
 
   @Override
-  public List<Subtopic> getChildren(Subtopic subtopic) {
-    return ((SubtopicRepository) repository).getChildren(subtopic);
+  public boolean addChildren(UUID parentUuid, List<Subtopic> collections) {
+    return ((NodeRepository<Subtopic>) repository).addChildren(parentUuid, collections);
   }
 
   @Override
-  public List<Subtopic> getChildren(UUID uuid) {
-    return ((SubtopicRepository) repository).getChildren(uuid);
-  }
-
-  @Override
-  public PageResponse<Subtopic> getChildren(UUID uuid, PageRequest pageRequest) {
-    return ((NodeRepository) repository).getChildren(uuid, pageRequest);
-  }
-
-  @Override
-  public List<Entity> getEntities(Subtopic subtopic) {
-    return getEntities(subtopic.getUuid());
-  }
-
-  @Override
-  public List<Entity> getEntities(UUID subtopicUuid) {
-    return ((SubtopicRepository) repository).getEntities(subtopicUuid);
-  }
-
-  @Override
-  public Subtopic getParent(Subtopic node) {
-    return getParent(node.getUuid());
-  }
-
-  @Override
-  public Subtopic getParent(UUID nodeUuid) {
-    return (Subtopic) ((SubtopicRepository) repository).getParent(nodeUuid);
-  }
-
-  @Override
-  public List<Subtopic> getSubtopicsOfEntity(UUID entityUuid) {
-    return ((SubtopicRepository) repository).getSubtopicsOfEntity(entityUuid);
-  }
-
-  @Override
-  public List<Subtopic> getSubtopicsOfFileResource(UUID fileResourceUuid) {
-    return ((SubtopicRepository) repository).getSubtopicsOfEntity(fileResourceUuid);
-  }
-
-  @Override
-  public List<Entity> saveEntities(Subtopic subtopic, List<Entity> entities) {
-    return saveEntities(subtopic.getUuid(), entities);
-  }
-
-  @Override
-  public List<Entity> saveEntities(UUID subtopicUuid, List<Entity> entities) {
-    return ((SubtopicRepository) repository).saveEntities(subtopicUuid, entities);
-  }
-
-  @Override
-  public Subtopic saveWithParentTopic(Subtopic subtopic, UUID parentTopicUuid)
+  public Subtopic addSubtopicToParentSubtopic(UUID subtopicUuid, UUID parentSubtopicUuid)
       throws IdentifiableServiceException {
-    try {
-      return ((SubtopicRepository) repository).saveWithParentTopic(subtopic, parentTopicUuid);
-    } catch (Exception e) {
-      LOGGER.error("Cannot save top-level subtopic " + subtopic + ": ", e);
-      throw new IdentifiableServiceException(e.getMessage());
-    }
+    SubtopicImpl subtopic = new SubtopicImpl();
+    subtopic.setUuid(subtopicUuid);
+    return saveWithParent(subtopic, parentSubtopicUuid);
   }
 
   @Override
-  public Subtopic saveWithParentSubtopic(Subtopic subtopic, UUID parentSubtopicUuid)
+  public Subtopic addSubtopicToParentTopic(UUID subtopicUuid, UUID parentTopicUuid)
       throws IdentifiableServiceException {
-    try {
-      return ((SubtopicRepository) repository).saveWithParentSubtopic(subtopic, parentSubtopicUuid);
-    } catch (Exception e) {
-      LOGGER.error("Cannot save subtopic " + subtopic + ": ", e);
-      throw new IdentifiableServiceException(e.getMessage());
-    }
-  }
-
-  @Override
-  public List<FileResource> getFileResources(Subtopic subtopic) {
-    return getFileResources(subtopic.getUuid());
-  }
-
-  @Override
-  public List<FileResource> getFileResources(UUID subtopicUuid) {
-    return ((SubtopicRepository) repository).getFileResources(subtopicUuid);
-  }
-
-  @Override
-  public List<FileResource> saveFileResources(Subtopic subtopic, List<FileResource> fileResources) {
-    return saveFileResources(subtopic.getUuid(), fileResources);
-  }
-
-  @Override
-  public List<FileResource> saveFileResources(UUID subtopicUuid, List<FileResource> fileResources) {
-    return ((SubtopicRepository) repository).saveFileResources(subtopicUuid, fileResources);
-  }
-
-  @Override
-  public Integer deleteFromParentSubtopic(Subtopic subtopic, UUID parentSubtopicUuid) {
-    return ((SubtopicRepository) repository).deleteFromParentSubtopic(subtopic, parentSubtopicUuid);
+    SubtopicImpl subtopic = new SubtopicImpl();
+    subtopic.setUuid(subtopicUuid);
+    return saveWithParentTopic(subtopic, parentTopicUuid);
   }
 
   @Override
@@ -150,24 +69,53 @@ public class SubtopicServiceImpl extends EntityPartServiceImpl<Subtopic, Entity>
   }
 
   @Override
-  public Subtopic addSubtopicToParentTopic(UUID subtopicUuid, UUID parentTopicUuid)
-      throws IdentifiableServiceException {
-    SubtopicImpl subtopic = new SubtopicImpl();
-    subtopic.setUuid(subtopicUuid);
-    return saveWithParentTopic(subtopic, parentTopicUuid);
-  }
-
-  @Override
-  public Subtopic addSubtopicToParentSubtopic(UUID subtopicUuid, UUID parentSubtopicUuid)
-      throws IdentifiableServiceException {
-    SubtopicImpl subtopic = new SubtopicImpl();
-    subtopic.setUuid(subtopicUuid);
-    return saveWithParentSubtopic(subtopic, parentSubtopicUuid);
-  }
-
-  @Override
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
-    return ((SubtopicRepository) repository).getBreadcrumbNavigation(nodeUuid);
+    return ((NodeRepository<Subtopic>) repository).getBreadcrumbNavigation(nodeUuid);
+  }
+
+  @Override
+  public List<Subtopic> getChildren(UUID uuid) {
+    return ((SubtopicRepository) repository).getChildren(uuid);
+  }
+
+  @Override
+  public PageResponse<Subtopic> getChildren(UUID uuid, PageRequest pageRequest) {
+    return ((NodeRepository<Subtopic>) repository).getChildren(uuid, pageRequest);
+  }
+
+  @Override
+  public List<Entity> getEntities(UUID subtopicUuid) {
+    return ((SubtopicRepository) repository).getEntities(subtopicUuid);
+  }
+
+  @Override
+  public List<FileResource> getFileResources(UUID subtopicUuid) {
+    return ((SubtopicRepository) repository).getFileResources(subtopicUuid);
+  }
+
+  @Override
+  public Subtopic getParent(UUID nodeUuid) {
+    return ((SubtopicRepository) repository).getParent(nodeUuid);
+  }
+
+  @Override
+  public List<Subtopic> getParents(UUID uuid) {
+    return ((NodeRepository<Subtopic>) repository).getParents(uuid);
+  }
+
+  @Override
+  public PageResponse<Subtopic> getRootNodes(PageRequest pageRequest) {
+    return ((NodeRepository<Subtopic>) repository).getRootNodes(pageRequest);
+  }
+
+  @Override
+  public List<Subtopic> getSubtopicsOfEntity(UUID entityUuid) {
+    return ((SubtopicRepository) repository).getSubtopicsOfEntity(entityUuid);
+  }
+
+  @Override
+  public List<Subtopic> getSubtopicsOfFileResource(UUID fileResourceUuid) {
+    return ((SubtopicRepository) repository).getSubtopicsOfEntity(fileResourceUuid);
   }
 
   @Override
@@ -180,5 +128,47 @@ public class SubtopicServiceImpl extends EntityPartServiceImpl<Subtopic, Entity>
     }
     // root subtopic under a topic
     return ((SubtopicRepository) repository).getTopic(rootSubtopicUuid);
+  }
+
+  @Override
+  public boolean removeChild(UUID parentUuid, UUID childUuid) {
+    return ((NodeRepository<Subtopic>) repository).removeChild(parentUuid, childUuid);
+  }
+
+  @Override
+  public List<Entity> saveEntities(UUID subtopicUuid, List<Entity> entities) {
+    return ((SubtopicRepository) repository).saveEntities(subtopicUuid, entities);
+  }
+
+  @Override
+  public List<FileResource> saveFileResources(UUID subtopicUuid, List<FileResource> fileResources) {
+    return ((SubtopicRepository) repository).saveFileResources(subtopicUuid, fileResources);
+  }
+
+  @Override
+  public Subtopic saveWithParent(Subtopic child, UUID parentSubtopicUuid)
+      throws IdentifiableServiceException {
+    try {
+      return ((SubtopicRepository) repository).saveWithParent(child, parentSubtopicUuid);
+    } catch (Exception e) {
+      LOGGER.error("Cannot save subtopic " + child + ": ", e);
+      throw new IdentifiableServiceException(e.getMessage());
+    }
+  }
+
+  @Override
+  public Subtopic saveWithParentTopic(Subtopic subtopic, UUID parentTopicUuid)
+      throws IdentifiableServiceException {
+    try {
+      return ((SubtopicRepository) repository).saveWithParentTopic(subtopic, parentTopicUuid);
+    } catch (Exception e) {
+      LOGGER.error("Cannot save top-level subtopic " + subtopic + ": ", e);
+      throw new IdentifiableServiceException(e.getMessage());
+    }
+  }
+
+  @Override
+  public boolean updateChildrenOrder(UUID parentUuid, List<Subtopic> children) {
+    return ((NodeRepository<Subtopic>) repository).updateChildrenOrder(parentUuid, children);
   }
 }

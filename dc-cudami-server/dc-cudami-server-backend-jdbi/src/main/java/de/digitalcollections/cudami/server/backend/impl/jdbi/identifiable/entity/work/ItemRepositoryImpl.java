@@ -6,10 +6,9 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.api.identifiable.entity.work.Item;
 import de.digitalcollections.model.api.identifiable.entity.work.Work;
-import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
 import de.digitalcollections.model.impl.identifiable.entity.work.ItemImpl;
-import de.digitalcollections.model.impl.identifiable.entity.work.WorkImpl;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ItemRepositoryImpl extends EntityRepositoryImpl<ItemImpl>
-    implements ItemRepository<ItemImpl> {
+public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements ItemRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ItemRepositoryImpl.class);
   public static final String MAPPING_PREFIX = "it";
@@ -146,12 +144,12 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<ItemImpl>
                 + " WHERE ido.item_uuid = :uuid"
                 + " ORDER BY ido.sortIndex ASC");
 
-    List<DigitalObjectImpl> result =
+    List<DigitalObject> result =
         digitalObjectRepositoryImpl.retrieveList(
             DigitalObjectRepositoryImpl.SQL_REDUCED_FIELDS_DO,
             innerQuery,
             Map.of("uuid", itemUuid));
-    return result.stream().map(DigitalObject.class::cast).collect(Collectors.toSet());
+    return result.stream().collect(Collectors.toSet());
   }
 
   @Override
@@ -198,14 +196,14 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<ItemImpl>
                 + " WHERE iw.item_uuid = :uuid"
                 + " ORDER BY iw.sortIndex ASC");
 
-    List<WorkImpl> result =
+    List<Work> result =
         workRepositoryImpl.retrieveList(
             WorkRepositoryImpl.SQL_REDUCED_FIELDS_WO, innerQuery, Map.of("uuid", itemUuid));
-    return result.stream().map(Work.class::cast).collect(Collectors.toSet());
+    return result.stream().collect(Collectors.toSet());
   }
 
   @Override
-  public ItemImpl save(ItemImpl item) {
+  public Item save(Item item) {
     item.setUuid(UUID.randomUUID());
     item.setCreated(LocalDateTime.now());
     item.setLastModified(LocalDateTime.now());
@@ -239,12 +237,12 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<ItemImpl>
     Set<Identifier> identifiers = item.getIdentifiers();
     saveIdentifiers(identifiers, item);
 
-    ItemImpl result = findOne(item.getUuid());
+    Item result = findOne(item.getUuid());
     return result;
   }
 
   @Override
-  public ItemImpl update(ItemImpl item) {
+  public Item update(Item item) {
     item.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, entity_type, refid
@@ -273,7 +271,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<ItemImpl>
     Set<Identifier> identifiers = item.getIdentifiers();
     saveIdentifiers(identifiers, item);
 
-    ItemImpl result = findOne(item.getUuid());
+    Item result = findOne(item.getUuid());
     return result;
   }
 }

@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resour
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
+import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.Project;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
@@ -13,14 +14,12 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
-import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
@@ -29,11 +28,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObjectImpl>
-    implements DigitalObjectRepository<DigitalObjectImpl> {
+public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObject>
+    implements DigitalObjectRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectRepositoryImpl.class);
   // select only what is shown/needed in paged list (to avoid unnecessary payload/traffic):
+  public static final String MAPPING_PREFIX = "do";
 
   public static final String SQL_REDUCED_FIELDS_DO =
       " d.uuid do_uuid, d.refid do_refId, d.label do_label,"
@@ -45,8 +45,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       SQL_REDUCED_FIELDS_DO
           + ", d.description do_description"; // TODO: add d.license do_license, d.version
   // do_version, when features added
-
-  public static final String MAPPING_PREFIX = "do";
   public static final String TABLE_ALIAS = "d";
   public static final String TABLE_NAME = "digitalobjects";
 
@@ -115,14 +113,10 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     addPageRequestParams(pageRequest, innerQuery);
 
     List<Collection> result =
-        collectionRepositoryImpl
-            .retrieveList(
-                CollectionRepositoryImpl.SQL_REDUCED_FIELDS_COL,
-                innerQuery,
-                Map.of("uuid", digitalObjectUuid))
-            .stream()
-            .map(Collection.class::cast)
-            .collect(Collectors.toList());
+        collectionRepositoryImpl.retrieveList(
+            CollectionRepositoryImpl.SQL_REDUCED_FIELDS_COL,
+            innerQuery,
+            Map.of("uuid", digitalObjectUuid));
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -166,10 +160,10 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                 + " ORDER BY df.sortIndex ASC");
     Map<String, Object> argumentMappings = Map.of("uuid", digitalObjectUuid);
 
-    List<FileResourceImpl> fileResources =
+    List<FileResource> fileResources =
         fileResourceMetadataRepositoryImpl.retrieveList(fieldsSql, innerQuery, argumentMappings);
 
-    return fileResources.stream().map(FileResource.class::cast).collect(Collectors.toList());
+    return fileResources;
   }
 
   @Override
@@ -190,10 +184,10 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                 + " ORDER BY df.sortIndex ASC");
     Map<String, Object> argumentMappings = Map.of("uuid", digitalObjectUuid);
 
-    List<ImageFileResourceImpl> fileResources =
+    List<ImageFileResource> fileResources =
         imageFileResourceRepositoryImpl.retrieveList(fieldsSql, innerQuery, argumentMappings);
 
-    return fileResources.stream().map(ImageFileResource.class::cast).collect(Collectors.toList());
+    return fileResources;
   }
 
   @Override
@@ -218,14 +212,10 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     addPageRequestParams(pageRequest, innerQuery);
 
     List<Project> result =
-        projectRepositoryImpl
-            .retrieveList(
-                ProjectRepositoryImpl.SQL_REDUCED_FIELDS_PR,
-                innerQuery,
-                Map.of("uuid", digitalObjectUuid))
-            .stream()
-            .map(Project.class::cast)
-            .collect(Collectors.toList());
+        projectRepositoryImpl.retrieveList(
+            ProjectRepositoryImpl.SQL_REDUCED_FIELDS_PR,
+            innerQuery,
+            Map.of("uuid", digitalObjectUuid));
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -235,7 +225,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public DigitalObjectImpl save(DigitalObjectImpl digitalObject) {
+  public DigitalObject save(DigitalObject digitalObject) {
     digitalObject.setUuid(UUID.randomUUID());
     digitalObject.setCreated(LocalDateTime.now());
     digitalObject.setLastModified(LocalDateTime.now());
@@ -271,17 +261,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     Set<Identifier> identifiers = digitalObject.getIdentifiers();
     saveIdentifiers(identifiers, digitalObject);
 
-    DigitalObjectImpl result = findOne(digitalObject.getUuid());
+    DigitalObject result = findOne(digitalObject.getUuid());
     return result;
-  }
-
-  @Override
-  public List<FileResource> saveFileResources(
-      DigitalObjectImpl digitalObject, List<FileResource> fileResources) {
-    if (fileResources == null) {
-      return null;
-    }
-    return saveFileResources(digitalObject.getUuid(), fileResources);
   }
 
   @Override
@@ -324,7 +305,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public DigitalObjectImpl update(DigitalObjectImpl digitalObject) {
+  public DigitalObject update(DigitalObject digitalObject) {
     digitalObject.setLastModified(LocalDateTime.now());
 
     // do not update/left out from statement (not changed since insert):
@@ -354,7 +335,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     Set<Identifier> identifiers = digitalObject.getIdentifiers();
     saveIdentifiers(identifiers, digitalObject);
 
-    DigitalObjectImpl result = findOne(digitalObject.getUuid());
+    DigitalObject result = findOne(digitalObject.getUuid());
     return result;
   }
 }

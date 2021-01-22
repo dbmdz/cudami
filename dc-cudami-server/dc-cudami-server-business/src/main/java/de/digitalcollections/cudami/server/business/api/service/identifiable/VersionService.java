@@ -6,15 +6,15 @@ import java.util.UUID;
 
 public interface VersionService {
 
+  Version create(String instancekey, String instanceVersionkey);
+
+  String extractInstanceVersionkey(Identifiable identifiable);
+
   Version get(UUID uuid);
 
-  Version get(String externalKey);
-
-  Version create(String instancekey, String instanceVersionkey);
+  Version getByInstanceversionKey(String instanceVersionkey);
 
   Version save(Version version) throws Exception;
 
   Version update(Version version) throws Exception;
-
-  String extractInstanceVersionkey(Identifiable identifiable);
 }

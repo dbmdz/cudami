@@ -220,7 +220,7 @@ public class CollectionController {
     OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
     Sorting sorting = new SortingImpl(order);
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
-    return collectionService.getTopCollections(pageRequest);
+    return collectionService.getRootNodes(pageRequest);
   }
 
   @ApiMethod(description = "Get collection by namespace and id")
@@ -535,7 +535,7 @@ public class CollectionController {
           UUID parentUuid,
       @RequestBody Collection collection)
       throws IdentifiableServiceException {
-    return collectionService.saveWithParentCollection(collection, parentUuid);
+    return collectionService.saveWithParent(collection, parentUuid);
   }
 
   @ApiMethod(description = "Update an collection")

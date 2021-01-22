@@ -26,7 +26,11 @@ public interface NodeRepository<N extends Node> extends IdentifiableRepository<N
 
   boolean addChildren(UUID parentUuid, List<N> collections);
 
-  N getParent(UUID nodeUuid);
+  /**
+   * @param nodeUuid the uuid of the current node
+   * @return the breadcrumb navigation
+   */
+  BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid);
 
   default List<N> getChildren(N node) {
     if (node == null) {
@@ -39,11 +43,7 @@ public interface NodeRepository<N extends Node> extends IdentifiableRepository<N
 
   PageResponse<N> getChildren(UUID nodeUuid, PageRequest pageRequest);
 
-  /**
-   * @param nodeUuid the uuid of the current node
-   * @return the breadcrumb navigation
-   */
-  BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid);
+  N getParent(UUID nodeUuid);
 
   List<N> getParents(UUID uuid);
 
@@ -57,4 +57,13 @@ public interface NodeRepository<N extends Node> extends IdentifiableRepository<N
   }
 
   boolean removeChild(UUID parentUuid, UUID childUuid);
+
+  /**
+   * @param child newly created child node to be saved
+   * @param parentUUID parent node the new node is child of
+   * @return saved child node
+   */
+  N saveWithParent(N child, UUID parentUUID);
+
+  boolean updateChildrenOrder(UUID parentUuid, List<N> children);
 }

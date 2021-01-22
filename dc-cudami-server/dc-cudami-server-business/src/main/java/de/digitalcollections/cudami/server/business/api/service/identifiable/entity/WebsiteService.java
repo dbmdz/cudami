@@ -13,11 +13,23 @@ public interface WebsiteService extends EntityService<Website> {
 
   List<Locale> getLanguages();
 
-  List<Webpage> getRootPages(Website website);
+  default List<Webpage> getRootPages(Website website) {
+    if (website == null) {
+      return null;
+    }
+    return getRootPages(website.getUuid());
+  }
 
   List<Webpage> getRootPages(UUID uuid);
 
   PageResponse<Webpage> getRootPages(UUID uuid, PageRequest pageRequest);
 
-  boolean updateRootPagesOrder(Website website, List<Webpage> rootPages);
+  default boolean updateRootPagesOrder(Website website, List<Webpage> rootPages) {
+    if (website == null || rootPages == null) {
+      return false;
+    }
+    return updateRootPagesOrder(website.getUuid(), rootPages);
+  }
+
+  boolean updateRootPagesOrder(UUID websiteUuid, List<Webpage> rootPages);
 }

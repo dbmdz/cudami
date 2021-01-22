@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.WebpageService;
 import de.digitalcollections.model.api.filter.FilterCriterion;
 import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
@@ -15,7 +14,6 @@ import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.paging.enums.Direction;
 import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
-import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
@@ -48,9 +46,21 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The webpage controller", name = "Webpage controller")
 public class WebpageController {
 
-  @Autowired private WebpageService<Entity> webpageService;
-
   @Autowired private LocaleService localeService;
+
+  @Autowired private WebpageService webpageService;
+
+  @ApiMethod(description = "Add file resource related to webpage")
+  @PostMapping(
+      value = {
+        "/latest/webpages/{uuid}/related/fileresources/{fileResourceUuid}",
+        "/v2/webpages/{uuid}/related/fileresources/{fileResourceUuid}"
+      })
+  @ResponseStatus(value = HttpStatus.OK)
+  @ApiResponseObject
+  public void addRelatedFileResource(@PathVariable UUID uuid, @PathVariable UUID fileResourceUuid) {
+    webpageService.addRelatedFileresource(uuid, fileResourceUuid);
+  }
 
   @ApiMethod(description = "Get all webpages")
   @GetMapping(
@@ -79,6 +89,52 @@ public class WebpageController {
             .build();
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting, filtering);
     return webpageService.find(pageRequest);
+  }
+
+  @ApiMethod(description = "Get the breadcrumb for a webpage")
+  @GetMapping(
+      value = {"/latest/webpages/{uuid}/breadcrumb", "/v3/webpages/{uuid}/breadcrumb"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public ResponseEntity<BreadcrumbNavigation> getBreadcrumb(
+      @ApiPathParam(
+              description =
+                  "UUID of the webpage, e.g. <tt>6119d8e9-9c92-4091-8dcb-bc4053385406</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @ApiQueryParam(
+              name = "pLocale",
+              description =
+                  "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+          @RequestParam(name = "pLocale", required = false)
+          Locale pLocale) {
+
+    BreadcrumbNavigation breadcrumbNavigation;
+
+    if (pLocale == null) {
+      breadcrumbNavigation = webpageService.getBreadcrumbNavigation(uuid);
+    } else {
+      breadcrumbNavigation =
+          webpageService.getBreadcrumbNavigation(uuid, pLocale, localeService.getDefaultLocale());
+    }
+
+    if (breadcrumbNavigation == null || breadcrumbNavigation.getNavigationItems().isEmpty()) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    return new ResponseEntity<>(breadcrumbNavigation, HttpStatus.OK);
+  }
+
+  @ApiMethod(description = "Get file resources related to webpage")
+  @GetMapping(
+      value = {
+        "/latest/webpages/{uuid}/related/fileresources",
+        "/v2/webpages/{uuid}/related/fileresources"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
+    return webpageService.getRelatedFileResources(uuid);
   }
 
   // Test-URL: http://localhost:9000/latest/webpages/599a120c-2dd5-11e8-b467-0ed5f89f718b
@@ -212,6 +268,20 @@ public class WebpageController {
     return webpageService.getWebsite(uuid);
   }
 
+  @ApiMethod(description = "Save a newly created webpage")
+  @PostMapping(
+      value = {
+        "/latest/webpages/{parentWebpageUuid}/webpage",
+        "/v2/webpages/{parentWebpageUuid}/webpage"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public Webpage saveWithParentWebpage(
+      @PathVariable UUID parentWebpageUuid, @RequestBody Webpage webpage, BindingResult errors)
+      throws IdentifiableServiceException {
+    return webpageService.saveWithParent(webpage, parentWebpageUuid);
+  }
+
   @ApiMethod(description = "Save a newly created top-level webpage")
   @PostMapping(
       value = {
@@ -226,20 +296,6 @@ public class WebpageController {
     return webpageService.saveWithParentWebsite(webpage, parentWebsiteUuid);
   }
 
-  @ApiMethod(description = "Save a newly created webpage")
-  @PostMapping(
-      value = {
-        "/latest/webpages/{parentWebpageUuid}/webpage",
-        "/v2/webpages/{parentWebpageUuid}/webpage"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
-  public Webpage saveWithParentWebpage(
-      @PathVariable UUID parentWebpageUuid, @RequestBody Webpage webpage, BindingResult errors)
-      throws IdentifiableServiceException {
-    return webpageService.saveWithParentWebpage(webpage, parentWebpageUuid);
-  }
-
   @ApiMethod(description = "Update a webpage")
   @PutMapping(
       value = {"/latest/webpages/{uuid}", "/v2/webpages/{uuid}"},
@@ -251,64 +307,6 @@ public class WebpageController {
     return webpageService.update(webpage);
   }
 
-  @ApiMethod(description = "Get file resources related to webpage")
-  @GetMapping(
-      value = {
-        "/latest/webpages/{uuid}/related/fileresources",
-        "/v2/webpages/{uuid}/related/fileresources"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
-  public List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
-    return webpageService.getRelatedFileResources(uuid);
-  }
-
-  @ApiMethod(description = "Add file resource related to webpage")
-  @PostMapping(
-      value = {
-        "/latest/webpages/{uuid}/related/fileresources/{fileResourceUuid}",
-        "/v2/webpages/{uuid}/related/fileresources/{fileResourceUuid}"
-      })
-  @ResponseStatus(value = HttpStatus.OK)
-  @ApiResponseObject
-  public void addRelatedFileResource(@PathVariable UUID uuid, @PathVariable UUID fileResourceUuid) {
-    webpageService.addRelatedFileresource(uuid, fileResourceUuid);
-  }
-
-  @ApiMethod(description = "Get the breadcrumb for a webpage")
-  @GetMapping(
-      value = {"/latest/webpages/{uuid}/breadcrumb", "/v3/webpages/{uuid}/breadcrumb"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
-  public ResponseEntity<BreadcrumbNavigation> getBreadcrumb(
-      @ApiPathParam(
-              description =
-                  "UUID of the webpage, e.g. <tt>6119d8e9-9c92-4091-8dcb-bc4053385406</tt>")
-          @PathVariable("uuid")
-          UUID uuid,
-      @ApiQueryParam(
-              name = "pLocale",
-              description =
-                  "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
-          @RequestParam(name = "pLocale", required = false)
-          Locale pLocale) {
-
-    BreadcrumbNavigation breadcrumbNavigation;
-
-    if (pLocale == null) {
-      breadcrumbNavigation = webpageService.getBreadcrumbNavigation(uuid);
-    } else {
-      breadcrumbNavigation =
-          webpageService.getBreadcrumbNavigation(uuid, pLocale, localeService.getDefaultLocale());
-    }
-
-    if (breadcrumbNavigation == null || breadcrumbNavigation.getNavigationItems().isEmpty()) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    return new ResponseEntity<>(breadcrumbNavigation, HttpStatus.OK);
-  }
-
   @ApiMethod(description = "Update the order of a webpage's children")
   @PutMapping(
       value = {"/latest/webpages/{uuid}/children", "/v3/webpages/{uuid}/children"},
@@ -317,10 +315,7 @@ public class WebpageController {
   public ResponseEntity updateChildrenOrder(
       @ApiPathParam(description = "UUID of the webpage") @PathVariable("uuid") UUID uuid,
       @ApiPathParam(description = "List of the children") @RequestBody List<Webpage> rootPages) {
-    Webpage webpage = new WebpageImpl();
-    webpage.setUuid(uuid);
-
-    boolean successful = webpageService.updateChildrenOrder(webpage, rootPages);
+    boolean successful = webpageService.updateChildrenOrder(uuid, rootPages);
 
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);

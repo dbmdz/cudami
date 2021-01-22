@@ -12,22 +12,18 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-/**
- * Repository for Collection persistence handling.
- *
- * @param <C> instance implementing Collection
- */
-public interface CollectionRepository<C extends Collection>
-    extends NodeRepository<C>, EntityRepository<C> {
+/** Repository for Collection persistence handling. */
+public interface CollectionRepository
+    extends NodeRepository<Collection>, EntityRepository<Collection> {
 
-  default boolean addDigitalObject(C collection, DigitalObject digitalObject) {
+  default boolean addDigitalObject(Collection collection, DigitalObject digitalObject) {
     if (collection == null || digitalObject == null) {
       return false;
     }
     return addDigitalObjects(collection.getUuid(), Arrays.asList(digitalObject));
   }
 
-  default boolean addDigitalObjects(C collection, List<DigitalObject> digitalObjects) {
+  default boolean addDigitalObjects(Collection collection, List<DigitalObject> digitalObjects) {
     if (collection == null || digitalObjects == null) {
       return false;
     }
@@ -36,7 +32,8 @@ public interface CollectionRepository<C extends Collection>
 
   boolean addDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects);
 
-  default PageResponse<DigitalObject> getDigitalObjects(C collection, PageRequest pageRequest) {
+  default PageResponse<DigitalObject> getDigitalObjects(
+      Collection collection, PageRequest pageRequest) {
     if (collection == null) {
       return null;
     }
@@ -47,11 +44,11 @@ public interface CollectionRepository<C extends Collection>
 
   List<CorporateBody> getRelatedCorporateBodies(UUID uuid, Filtering filtering);
 
-  PageResponse<C> getTopCollections(PageRequest pageRequest);
+  PageResponse<Collection> getTopCollections(PageRequest pageRequest);
 
   List<Locale> getTopCollectionsLanguages();
 
-  default boolean removeDigitalObject(C collection, DigitalObject digitalObject) {
+  default boolean removeDigitalObject(Collection collection, DigitalObject digitalObject) {
     if (collection == null || digitalObject == null) {
       return false;
     }
@@ -68,7 +65,7 @@ public interface CollectionRepository<C extends Collection>
    */
   boolean removeDigitalObjectFromAllCollections(DigitalObject digitalObject);
 
-  default boolean saveDigitalObjects(C collection, List<DigitalObject> digitalObjects) {
+  default boolean saveDigitalObjects(Collection collection, List<DigitalObject> digitalObjects) {
     if (collection == null || digitalObjects == null) {
       return false;
     }
@@ -76,6 +73,4 @@ public interface CollectionRepository<C extends Collection>
   }
 
   boolean saveDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects);
-
-  C saveWithParentCollection(C collection, UUID parentUuid);
 }

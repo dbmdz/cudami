@@ -7,12 +7,8 @@ import de.digitalcollections.model.api.identifiable.entity.work.Work;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Repository for Work persistence handling.
- *
- * @param <W> instance of work implementation
- */
-public interface WorkRepository<W extends Work> extends EntityRepository<W> {
+/** Repository for Work persistence handling. */
+public interface WorkRepository extends EntityRepository<Work> {
 
   List<Agent> getCreators(UUID workUuid);
 

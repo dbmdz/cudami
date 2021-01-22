@@ -9,6 +9,13 @@ import java.util.UUID;
 
 public interface EntityRelationRepository {
 
+  default void addRelation(EntityRelation relation) {
+    addRelation(
+        relation.getSubject().getUuid(), relation.getPredicate(), relation.getObject().getUuid());
+  }
+
+  void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid);
+
   default void deleteBySubject(Entity subjectEntity) {
     deleteBySubject(subjectEntity.getUuid());
   }
@@ -23,7 +30,9 @@ public interface EntityRelationRepository {
    */
   PageResponse<EntityRelation> find(PageRequest pageRequest);
 
-  List<EntityRelation> findBySubject(Entity subjectEntity);
+  default List<EntityRelation> findBySubject(Entity subjectEntity) {
+    return findBySubject(subjectEntity.getUuid());
+  }
 
   List<EntityRelation> findBySubject(UUID subjectEntityUuid);
 

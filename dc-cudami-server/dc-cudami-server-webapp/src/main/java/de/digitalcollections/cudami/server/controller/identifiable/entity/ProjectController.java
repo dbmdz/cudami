@@ -73,8 +73,9 @@ public class ProjectController {
       value = {"/latest/projectlist", "/v2/projectlist"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
-  public List<Project> findAllAsList() {
-    return projectService.getAll();
+  public List<Project> findAllReducedAsList() {
+    // TODO test if reduced is sufficient for use cases...
+    return projectService.findAllReduced();
   }
 
   @ApiMethod(description = "Get project by namespace and id")

@@ -31,32 +31,12 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
   }
 
   @Override
-  public boolean addDigitalObject(Project project, DigitalObject digitalObject) {
-    return ((ProjectRepository) repository).addDigitalObject(project, digitalObject);
+  public boolean addDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects) {
+    return ((ProjectRepository) repository).addDigitalObjects(projectUuid, digitalObjects);
   }
 
   @Override
-  public boolean addDigitalObjects(Project project, List<DigitalObject> digitalObjects) {
-    return ((ProjectRepository) repository).addDigitalObjects(project, digitalObjects);
-  }
-
-  @Override
-  public PageResponse<DigitalObject> getDigitalObjects(Project project, PageRequest pageRequest) {
-    return ((ProjectRepository) repository).getDigitalObjects(project, pageRequest);
-  }
-
-  @Override
-  public boolean removeDigitalObject(Project project, DigitalObject digitalObject) {
-    return ((ProjectRepository) repository).removeDigitalObject(project, digitalObject);
-  }
-
-  @Override
-  public boolean saveDigitalObjects(Project project, List<DigitalObject> digitalObjects) {
-    return ((ProjectRepository) repository).saveDigitalObjects(project, digitalObjects);
-  }
-
-  @Override
-  public void delete(UUID uuid) {
+  public boolean delete(UUID uuid) {
     // Step 1: Retrieve all identifiers for the project
     Set<Identifier> identifiers;
 
@@ -74,19 +54,26 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
     for (Identifier identifier : identifiers) {
       identifierRepository.delete(identifier.getUuid());
     }
+    return true;
   }
 
   @Override
-  public List<Project> getAll() {
-    return ((ProjectRepository) repository).findAllFull();
+  public PageResponse<DigitalObject> getDigitalObjects(UUID projectUuid, PageRequest pageRequest) {
+    return ((ProjectRepository) repository).getDigitalObjects(projectUuid, pageRequest);
   }
 
   @Override
-  public boolean removeDigitalObjectFromAllProjects(DigitalObject digitalObject) {
-    if (digitalObject == null) {
-      return false;
-    }
-    return ((ProjectRepository) repository)
-        .removeDigitalObjectFromAllProjects(digitalObject.getUuid());
+  public boolean removeDigitalObject(UUID projectUuid, UUID digitalObjectUuid) {
+    return ((ProjectRepository) repository).removeDigitalObject(projectUuid, digitalObjectUuid);
+  }
+
+  @Override
+  public boolean removeDigitalObjectFromAllProjects(UUID digitalObjectUuid) {
+    return ((ProjectRepository) repository).removeDigitalObjectFromAllProjects(digitalObjectUuid);
+  }
+
+  @Override
+  public boolean saveDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects) {
+    return ((ProjectRepository) repository).saveDigitalObjects(projectUuid, digitalObjects);
   }
 }

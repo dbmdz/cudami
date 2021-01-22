@@ -1,9 +1,10 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ApplicationFileResourceRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifier;
+import de.digitalcollections.model.api.identifiable.resource.ApplicationFileResource;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
@@ -21,8 +22,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class ApplicationFileResourceRepositoryImpl
-    extends IdentifiableRepositoryImpl<ApplicationFileResourceImpl>
-    implements FileResourceMetadataRepository<ApplicationFileResourceImpl> {
+    extends IdentifiableRepositoryImpl<ApplicationFileResource>
+    implements ApplicationFileResourceRepository {
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(ApplicationFileResourceRepositoryImpl.class);
@@ -56,7 +57,7 @@ public class ApplicationFileResourceRepositoryImpl
   }
 
   @Override
-  public SearchPageResponse<ApplicationFileResourceImpl> find(SearchPageRequest searchPageRequest) {
+  public SearchPageResponse<ApplicationFileResource> find(SearchPageRequest searchPageRequest) {
     String commonSql =
         fileResourceMetadataRepositoryImpl.getCommonFileResourceSearchSql(tableName, tableAlias);
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchPageRequest.getQuery()));
@@ -87,7 +88,7 @@ public class ApplicationFileResourceRepositoryImpl
   }
 
   @Override
-  public ApplicationFileResourceImpl save(ApplicationFileResourceImpl fileResource) {
+  public ApplicationFileResource save(ApplicationFileResource fileResource) {
     if (fileResource.getUuid() == null) {
       fileResource.setUuid(UUID.randomUUID());
     }
@@ -120,12 +121,12 @@ public class ApplicationFileResourceRepositoryImpl
     Set<Identifier> identifiers = fileResource.getIdentifiers();
     saveIdentifiers(identifiers, fileResource);
 
-    ApplicationFileResourceImpl result = findOne(fileResource.getUuid());
+    ApplicationFileResource result = findOne(fileResource.getUuid());
     return result;
   }
 
   @Override
-  public ApplicationFileResourceImpl update(ApplicationFileResourceImpl fileResource) {
+  public ApplicationFileResource update(ApplicationFileResource fileResource) {
     fileResource.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type
@@ -151,7 +152,7 @@ public class ApplicationFileResourceRepositoryImpl
     Set<Identifier> identifiers = fileResource.getIdentifiers();
     saveIdentifiers(identifiers, fileResource);
 
-    ApplicationFileResourceImpl result = findOne(fileResource.getUuid());
+    ApplicationFileResource result = findOne(fileResource.getUuid());
     return result;
   }
 }

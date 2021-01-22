@@ -1,9 +1,10 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.VideoFileResourceRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifier;
+import de.digitalcollections.model.api.identifiable.resource.VideoFileResource;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
@@ -20,12 +21,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class VideoFileResourceRepositoryImpl
-    extends IdentifiableRepositoryImpl<VideoFileResourceImpl>
-    implements FileResourceMetadataRepository<VideoFileResourceImpl> {
+public class VideoFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<VideoFileResource>
+    implements VideoFileResourceRepository {
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(VideoFileResourceRepositoryImpl.class);
+  public static final String MAPPING_PREFIX = "fr";
 
   public static final String SQL_REDUCED_FIELDS_FR =
       FileResourceMetadataRepositoryImpl.SQL_REDUCED_FIELDS_FR;
@@ -33,7 +34,6 @@ public class VideoFileResourceRepositoryImpl
   public static final String SQL_FULL_FIELDS_FR =
       SQL_REDUCED_FIELDS_FR + ", f.duration fr_duration";
 
-  public static final String MAPPING_PREFIX = "fr";
   public static final String TABLE_ALIAS = "f";
   public static final String TABLE_NAME = "fileresources_video";
 
@@ -57,7 +57,7 @@ public class VideoFileResourceRepositoryImpl
   }
 
   @Override
-  public SearchPageResponse<VideoFileResourceImpl> find(SearchPageRequest searchPageRequest) {
+  public SearchPageResponse<VideoFileResource> find(SearchPageRequest searchPageRequest) {
     String commonSql =
         fileResourceMetadataRepositoryImpl.getCommonFileResourceSearchSql(tableName, tableAlias);
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchPageRequest.getQuery()));
@@ -90,7 +90,7 @@ public class VideoFileResourceRepositoryImpl
   }
 
   @Override
-  public VideoFileResourceImpl save(VideoFileResourceImpl fileResource) {
+  public VideoFileResource save(VideoFileResource fileResource) {
     if (fileResource.getUuid() == null) {
       fileResource.setUuid(UUID.randomUUID());
     }
@@ -123,12 +123,12 @@ public class VideoFileResourceRepositoryImpl
     Set<Identifier> identifiers = fileResource.getIdentifiers();
     saveIdentifiers(identifiers, fileResource);
 
-    VideoFileResourceImpl result = findOne(fileResource.getUuid());
+    VideoFileResource result = findOne(fileResource.getUuid());
     return result;
   }
 
   @Override
-  public VideoFileResourceImpl update(VideoFileResourceImpl fileResource) {
+  public VideoFileResource update(VideoFileResource fileResource) {
     fileResource.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type
@@ -154,7 +154,7 @@ public class VideoFileResourceRepositoryImpl
     Set<Identifier> identifiers = fileResource.getIdentifiers();
     saveIdentifiers(identifiers, fileResource);
 
-    VideoFileResourceImpl result = findOne(fileResource.getUuid());
+    VideoFileResource result = findOne(fileResource.getUuid());
     return result;
   }
 }

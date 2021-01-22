@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.geo.HumanSettlementRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifier;
+import de.digitalcollections.model.api.identifiable.entity.geo.HumanSettlement;
 import de.digitalcollections.model.impl.identifiable.entity.geo.HumanSettlementImpl;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -15,8 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class HumanSettlementRepositoryImpl extends EntityRepositoryImpl<HumanSettlementImpl>
-    implements HumanSettlementRepository<HumanSettlementImpl> {
+public class HumanSettlementRepositoryImpl extends EntityRepositoryImpl<HumanSettlement>
+    implements HumanSettlementRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HumanSettlementRepositoryImpl.class);
 
@@ -49,7 +50,7 @@ public class HumanSettlementRepositoryImpl extends EntityRepositoryImpl<HumanSet
   }
 
   @Override
-  public HumanSettlementImpl save(HumanSettlementImpl humanSettlement) {
+  public HumanSettlement save(HumanSettlement humanSettlement) {
     if (humanSettlement.getUuid() == null) {
       humanSettlement.setUuid(UUID.randomUUID());
     }
@@ -86,12 +87,12 @@ public class HumanSettlementRepositoryImpl extends EntityRepositoryImpl<HumanSet
     Set<Identifier> identifiers = humanSettlement.getIdentifiers();
     saveIdentifiers(identifiers, humanSettlement);
 
-    HumanSettlementImpl result = findOne(humanSettlement.getUuid());
+    HumanSettlement result = findOne(humanSettlement.getUuid());
     return result;
   }
 
   @Override
-  public HumanSettlementImpl update(HumanSettlementImpl humanSettlement) {
+  public HumanSettlement update(HumanSettlement humanSettlement) {
     // uuid and created stay unchanged, update last modified
     humanSettlement.setLastModified(LocalDateTime.now());
     final UUID previewImageUuid =
@@ -121,7 +122,7 @@ public class HumanSettlementRepositoryImpl extends EntityRepositoryImpl<HumanSet
     Set<Identifier> identifiers = humanSettlement.getIdentifiers();
     saveIdentifiers(identifiers, humanSettlement);
 
-    HumanSettlementImpl result = findOne(humanSettlement.getUuid());
+    HumanSettlement result = findOne(humanSettlement.getUuid());
     return result;
   }
 }

@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.geo.GeoLocationRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifier;
+import de.digitalcollections.model.api.identifiable.entity.geo.GeoLocation;
 import de.digitalcollections.model.impl.identifiable.entity.geo.GeoLocationImpl;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -15,8 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class GeoLocationRepositoryImpl extends EntityRepositoryImpl<GeoLocationImpl>
-    implements GeoLocationRepository<GeoLocationImpl> {
+public class GeoLocationRepositoryImpl extends EntityRepositoryImpl<GeoLocation>
+    implements GeoLocationRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationRepositoryImpl.class);
 
@@ -48,7 +49,7 @@ public class GeoLocationRepositoryImpl extends EntityRepositoryImpl<GeoLocationI
   }
 
   @Override
-  public GeoLocationImpl save(GeoLocationImpl geoLocation) {
+  public GeoLocation save(GeoLocation geoLocation) {
     if (geoLocation.getUuid() == null) {
       geoLocation.setUuid(UUID.randomUUID());
     }
@@ -83,12 +84,12 @@ public class GeoLocationRepositoryImpl extends EntityRepositoryImpl<GeoLocationI
     Set<Identifier> identifiers = geoLocation.getIdentifiers();
     saveIdentifiers(identifiers, geoLocation);
 
-    GeoLocationImpl result = findOne(geoLocation.getUuid());
+    GeoLocation result = findOne(geoLocation.getUuid());
     return result;
   }
 
   @Override
-  public GeoLocationImpl update(GeoLocationImpl geoLocation) {
+  public GeoLocation update(GeoLocation geoLocation) {
     // uuid and created stay unchanged, update last modified
     geoLocation.setLastModified(LocalDateTime.now());
     final UUID previewImageUuid =
@@ -115,7 +116,7 @@ public class GeoLocationRepositoryImpl extends EntityRepositoryImpl<GeoLocationI
     Set<Identifier> identifiers = geoLocation.getIdentifiers();
     saveIdentifiers(identifiers, geoLocation);
 
-    GeoLocationImpl result = findOne(geoLocation.getUuid());
+    GeoLocation result = findOne(geoLocation.getUuid());
     return result;
   }
 }

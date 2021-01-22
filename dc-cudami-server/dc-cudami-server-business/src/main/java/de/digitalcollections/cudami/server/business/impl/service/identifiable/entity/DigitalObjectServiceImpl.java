@@ -1,16 +1,13 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
 import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.Project;
-import de.digitalcollections.model.api.identifiable.entity.enums.EntityType;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -57,10 +54,10 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     projectService.removeDigitalObjectFromAllProjects(existingDigitalObject);
 
     // Remove preview images
-    ((DigitalObjectRepository) repository).deleteFileResources(existingDigitalObject.getUuid());
+    deleteFileResources(existingDigitalObject.getUuid());
 
     // Remove identifiers
-    ((DigitalObjectRepository) repository).deleteIdentifiers(existingDigitalObject.getUuid());
+    repository.deleteIdentifiers(existingDigitalObject.getUuid());
 
     // Remove the digitalObject itself
     repository.delete(uuid);
@@ -69,8 +66,8 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
-  public List<DigitalObject> findAllReduced() {
-    return ((EntityRepository) repository).findAllReduced(EntityType.DIGITAL_OBJECT);
+  public void deleteFileResources(UUID digitalObjectUuid) {
+    ((DigitalObjectRepository) repository).deleteFileResources(digitalObjectUuid);
   }
 
   @Override
@@ -82,19 +79,8 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
-  public DigitalObject getByIdentifier(String namespace, String id) {
-    return ((DigitalObjectRepository) repository).findByIdentifier(namespace, id);
-  }
-
-  @Override
-  public PageResponse<Collection> getCollections(
-      DigitalObject digitalObject, PageRequest pageRequest) {
-    return ((DigitalObjectRepository) repository).getCollections(digitalObject, pageRequest);
-  }
-
-  @Override
-  public List<FileResource> getFileResources(DigitalObject digitalObject) {
-    return getFileResources(digitalObject.getUuid());
+  public PageResponse<Collection> getCollections(UUID digitalObjectUuid, PageRequest pageRequest) {
+    return ((DigitalObjectRepository) repository).getCollections(digitalObjectUuid, pageRequest);
   }
 
   @Override
@@ -103,33 +89,13 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
-  public List<ImageFileResource> getImageFileResources(DigitalObject digitalObject) {
-    return getImageFileResources(digitalObject.getUuid());
-  }
-
-  @Override
   public List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid) {
     return ((DigitalObjectRepository) repository).getImageFileResources(digitalObjectUuid);
   }
 
   @Override
-  public PageResponse<Project> getProjects(DigitalObject digitalObject, PageRequest pageRequest) {
-    return ((DigitalObjectRepository) repository).getProjects(digitalObject, pageRequest);
-  }
-
-  Identifier getidentifer(DigitalObject digitalObject, String name) {
-    for (Identifier identifier : digitalObject.getIdentifiers()) {
-      if (name.equals(identifier.getNamespace())) {
-        return identifier;
-      }
-    }
-    return null;
-  }
-
-  @Override
-  public List<FileResource> saveFileResources(
-      DigitalObject digitalObject, List<FileResource> fileResources) {
-    return saveFileResources(digitalObject.getUuid(), fileResources);
+  public PageResponse<Project> getProjects(UUID digitalObjectUuid, PageRequest pageRequest) {
+    return ((DigitalObjectRepository) repository).getProjects(digitalObjectUuid, pageRequest);
   }
 
   @Override

@@ -4,6 +4,8 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ArticleService;
 import de.digitalcollections.model.api.identifiable.entity.Article;
+import de.digitalcollections.model.api.identifiable.entity.agent.Agent;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -14,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 /** Service for Article handling. */
 @Service
-// @Transactional(readOnly = true)
 public class ArticleServiceImpl extends EntityServiceImpl<Article> implements ArticleService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticleServiceImpl.class);
@@ -36,5 +37,10 @@ public class ArticleServiceImpl extends EntityServiceImpl<Article> implements Ar
       article.getText().entrySet().removeIf((Map.Entry entry) -> !entry.getKey().equals(locale));
     }
     return article;
+  }
+
+  @Override
+  public List<Agent> getCreators(UUID articleUuid) {
+    return ((ArticleRepository) repository).getCreators(articleUuid);
   }
 }

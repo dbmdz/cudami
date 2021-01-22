@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.controller;
 
-import de.digitalcollections.cudami.server.business.api.service.PredicatesService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.PredicatesServiceException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.PredicateService;
 import de.digitalcollections.model.api.relations.Predicate;
 import java.util.List;
 import org.jsondoc.core.annotation.Api;
@@ -19,13 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The predicates controller", name = "Predicates controller")
 public class PredicatesController {
 
-  @Autowired private PredicatesService service;
+  @Autowired private PredicateService service;
 
   @ApiMethod(description = "Get all predicates")
   @GetMapping(value = {"/latest/predicates", "/v3/predicates"})
   @ApiResponseObject
   public List<Predicate> getPredicates() {
-    return service.getPredicates();
+    return service.findAll();
   }
 
   @ApiMethod(description = "create or update a predicate, identified by its value")

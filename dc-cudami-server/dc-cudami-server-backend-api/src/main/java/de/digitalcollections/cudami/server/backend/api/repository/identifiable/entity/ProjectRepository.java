@@ -9,16 +9,16 @@ import java.util.List;
 import java.util.UUID;
 
 /** Repository for Project persistence handling. */
-public interface ProjectRepository<P extends Project> extends EntityRepository<P> {
+public interface ProjectRepository extends EntityRepository<Project> {
 
-  default boolean addDigitalObject(P project, DigitalObject digitalObject) {
+  default boolean addDigitalObject(Project project, DigitalObject digitalObject) {
     if (project == null || digitalObject == null) {
       return false;
     }
     return addDigitalObjects(project.getUuid(), Arrays.asList(digitalObject));
   }
 
-  default boolean addDigitalObjects(P project, List<DigitalObject> digitalObjects) {
+  default boolean addDigitalObjects(Project project, List<DigitalObject> digitalObjects) {
     if (project == null || digitalObjects == null) {
       return false;
     }
@@ -36,7 +36,7 @@ public interface ProjectRepository<P extends Project> extends EntityRepository<P
 
   PageResponse<DigitalObject> getDigitalObjects(UUID projectUuid, PageRequest pageRequest);
 
-  default boolean removeDigitalObject(P project, DigitalObject digitalObject) {
+  default boolean removeDigitalObject(Project project, DigitalObject digitalObject) {
     if (project == null || digitalObject == null) {
       return false;
     }
@@ -45,7 +45,9 @@ public interface ProjectRepository<P extends Project> extends EntityRepository<P
 
   boolean removeDigitalObject(UUID projectUuid, UUID digitalObjectUuid);
 
-  default boolean saveDigitalObjects(P project, List<DigitalObject> digitalObjects) {
+  boolean removeDigitalObjectFromAllProjects(UUID digitalObjectUuid);
+
+  default boolean saveDigitalObjects(Project project, List<DigitalObject> digitalObjects) {
     if (project == null || digitalObjects == null) {
       return false;
     }
@@ -53,6 +55,4 @@ public interface ProjectRepository<P extends Project> extends EntityRepository<P
   }
 
   boolean saveDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects);
-
-  boolean removeDigitalObjectFromAllProjects(UUID digitalObjectUuid);
 }

@@ -1,9 +1,10 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ImageFileResourceRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifier;
+import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
@@ -20,12 +21,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ImageFileResourceRepositoryImpl
-    extends IdentifiableRepositoryImpl<ImageFileResourceImpl>
-    implements FileResourceMetadataRepository<ImageFileResourceImpl> {
+public class ImageFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<ImageFileResource>
+    implements ImageFileResourceRepository {
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(ImageFileResourceRepositoryImpl.class);
+  public static final String MAPPING_PREFIX = "fr";
 
   public static final String SQL_REDUCED_FIELDS_FR =
       FileResourceMetadataRepositoryImpl.SQL_REDUCED_FIELDS_FR;
@@ -33,7 +34,6 @@ public class ImageFileResourceRepositoryImpl
   public static final String SQL_FULL_FIELDS_FR =
       SQL_REDUCED_FIELDS_FR + ", f.height fr_height, f.width fr_width";
 
-  public static final String MAPPING_PREFIX = "fr";
   public static final String TABLE_ALIAS = "f";
   public static final String TABLE_NAME = "fileresources_audio";
 
@@ -57,7 +57,7 @@ public class ImageFileResourceRepositoryImpl
   }
 
   @Override
-  public SearchPageResponse<ImageFileResourceImpl> find(SearchPageRequest searchPageRequest) {
+  public SearchPageResponse<ImageFileResource> find(SearchPageRequest searchPageRequest) {
     String commonSql =
         fileResourceMetadataRepositoryImpl.getCommonFileResourceSearchSql(tableName, tableAlias);
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchPageRequest.getQuery()));
@@ -92,7 +92,7 @@ public class ImageFileResourceRepositoryImpl
   }
 
   @Override
-  public ImageFileResourceImpl save(ImageFileResourceImpl fileResource) {
+  public ImageFileResource save(ImageFileResource fileResource) {
     if (fileResource.getUuid() == null) {
       fileResource.setUuid(UUID.randomUUID());
     }
@@ -125,12 +125,12 @@ public class ImageFileResourceRepositoryImpl
     Set<Identifier> identifiers = fileResource.getIdentifiers();
     saveIdentifiers(identifiers, fileResource);
 
-    ImageFileResourceImpl result = findOne(fileResource.getUuid());
+    ImageFileResource result = findOne(fileResource.getUuid());
     return result;
   }
 
   @Override
-  public ImageFileResourceImpl update(ImageFileResourceImpl fileResource) {
+  public ImageFileResource update(ImageFileResource fileResource) {
     fileResource.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type
@@ -156,7 +156,7 @@ public class ImageFileResourceRepositoryImpl
     Set<Identifier> identifiers = fileResource.getIdentifiers();
     saveIdentifiers(identifiers, fileResource);
 
-    ImageFileResourceImpl result = findOne(fileResource.getUuid());
+    ImageFileResource result = findOne(fileResource.getUuid());
     return result;
   }
 }

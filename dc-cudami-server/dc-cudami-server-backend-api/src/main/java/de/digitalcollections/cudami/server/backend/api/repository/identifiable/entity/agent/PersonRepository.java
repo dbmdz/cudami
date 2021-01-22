@@ -9,15 +9,15 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.Set;
 import java.util.UUID;
 
-public interface PersonRepository<P extends Person> extends EntityRepository<P> {
+public interface PersonRepository extends EntityRepository<Person> {
 
-  PageResponse<P> findByLocationOfBirth(PageRequest pageRequest, UUID uuidGeoLocation);
+  PageResponse<Person> findByLocationOfBirth(PageRequest pageRequest, UUID uuidGeoLocation);
 
-  PageResponse<P> findByLocationOfDeath(PageRequest pageRequest, UUID uuidGeoLocation);
+  PageResponse<Person> findByLocationOfDeath(PageRequest pageRequest, UUID uuidGeoLocation);
 
   Set<DigitalObject> getDigitalObjects(UUID uuidPerson);
 
-  default Set<Work> getWorks(P person) {
+  default Set<Work> getWorks(Person person) {
     if (person == null) {
       return null;
     }
