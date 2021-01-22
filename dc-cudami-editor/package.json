@@ -1,6 +1,6 @@
 {
   "name": "cudami-editor",
-  "version": "4.1.1",
+  "version": "4.3.0",
   "private": true,
   "scripts": {
     "build": "react-scripts build",
