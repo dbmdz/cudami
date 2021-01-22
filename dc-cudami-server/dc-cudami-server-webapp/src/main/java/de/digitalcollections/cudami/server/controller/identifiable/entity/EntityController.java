@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
@@ -36,6 +37,8 @@ public class EntityController<E extends Entity> {
   @Autowired
   @Qualifier("entityServiceImpl")
   private EntityService<Entity> service;
+
+  @Autowired private EntityRelationService entityRelationService;
 
   @ApiMethod(description = "Get count of entities")
   @GetMapping(
@@ -149,6 +152,6 @@ public class EntityController<E extends Entity> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   List<EntityRelation> getRelations(@PathVariable UUID uuid) {
-    return service.getRelations(uuid);
+    return entityRelationService.getBySubject(uuid);
   }
 }

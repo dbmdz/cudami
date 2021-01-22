@@ -29,24 +29,38 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
   public static final String TABLE_ALIAS = "rel";
   public static final String TABLE_NAME = "rel_entity_entities";
 
-  private final EntityRepositoryImpl entityRepositoryImpl;
+  private final EntityRepositoryImpl<Entity> entityRepositoryImpl;
   private final JdbcTemplate jdbcTemplate;
 
   @Autowired
   public EntityRelationRepositoryImpl(
       DataSource dataSource,
       Jdbi dbi,
-      @Qualifier("entityRepositoryImpl") EntityRepositoryImpl entityRepositoryImpl) {
+      @Qualifier("entityRepositoryImpl") EntityRepositoryImpl<Entity> entityRepositoryImpl) {
     super(dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX);
     this.entityRepositoryImpl = entityRepositoryImpl;
     this.jdbcTemplate = new JdbcTemplate(dataSource);
   }
 
   @Override
+  public void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid) {
+    dbi.withHandle(
+        h ->
+            h.createUpdate(
+                    "INSERT INTO "
+                        + tableName
+                        + "(subject_uuid, predicate, object_uuid) VALUES (:subject_uuid, :predicate, :object_uuid)")
+                .bind("subject_uuid", subjectEntityUuid)
+                .bind("predicate", predicate)
+                .bind("object_uuid", objectEntityUuid)
+                .execute());
+  }
+
+  @Override
   public void deleteBySubject(UUID subjectEntityUuid) {
     dbi.withHandle(
         h ->
-            h.createUpdate("DELETE FROM rel_entity_entities WHERE subject_uuid = :uuid")
+            h.createUpdate("DELETE FROM " + tableName + " WHERE subject_uuid = :uuid")
                 .bind("uuid", subjectEntityUuid)
                 .execute());
   }
@@ -56,7 +70,10 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
     StringBuilder query =
         new StringBuilder(
             "SELECT rel.subject_uuid rel_subject, rel.predicate rel_predicate, rel.object_uuid rel_object"
-                + " FROM rel_entity_entities as rel");
+                + " FROM "
+                + tableName
+                + " AS "
+                + tableAlias);
     // handle optional filtering params
     String filterClauses = getFilterClauses(pageRequest.getFiltering());
     if (!filterClauses.isEmpty()) {
@@ -72,12 +89,12 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
               String predicate = rs.getString("rel_predicate");
               String objectUuid = rs.getString("rel_object");
 
-              Entity subject = (Entity) entityRepositoryImpl.findOne(UUID.fromString(subjectUuid));
-              Entity object = (Entity) entityRepositoryImpl.findOne(UUID.fromString(objectUuid));
+              Entity subject = entityRepositoryImpl.findOne(UUID.fromString(subjectUuid));
+              Entity object = entityRepositoryImpl.findOne(UUID.fromString(objectUuid));
 
               return new EntityRelationImpl(subject, predicate, object);
             });
-    String countQuery = "SELECT count(*) FROM rel_entity_entities as rel";
+    String countQuery = "SELECT count(*) FROM " + tableName + " AS " + tableAlias;
     if (!filterClauses.isEmpty()) {
       countQuery += " WHERE " + filterClauses;
     }
@@ -89,7 +106,7 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
 
   @Override
   public List<EntityRelation> findBySubject(UUID subjectEntityUuid) {
-    Entity subjectEntity = (Entity) entityRepositoryImpl.findOne(subjectEntityUuid);
+    Entity subjectEntity = entityRepositoryImpl.findOne(subjectEntityUuid);
     if (subjectEntity == null) {
       return null;
     }
@@ -101,7 +118,10 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
     // query predicate and object entity (subject entity is given)
     String query =
         "SELECT rel.predicate as predicate, e.uuid as uuid, e.refid e_refId, e.created as created, e.description as description, e.identifiable_type as identifiable_type, e.label as label, e.last_modified as last_modified, e.entity_type as entity_type"
-            + " FROM rel_entity_entities rel"
+            + " FROM "
+            + tableName
+            + " AS "
+            + tableAlias
             + " INNER JOIN entities e ON rel.object_uuid=e.uuid"
             + " WHERE rel.subject_uuid = :uuid";
 
@@ -142,7 +162,9 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
     dbi.withHandle(
         h ->
             h.createUpdate(
-                    "INSERT INTO rel_entity_entities(subject_uuid, predicate, object_uuid) VALUES (:subject_uuid, :predicate, :object_uuid)")
+                    "INSERT INTO "
+                        + tableName
+                        + "(subject_uuid, predicate, object_uuid) VALUES (:subject_uuid, :predicate, :object_uuid)")
                 .bind("subject_uuid", subjectEntityUuid)
                 .bind("predicate", predicate)
                 .bind("object_uuid", objectEntityUuid)
@@ -159,7 +181,9 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
         handle -> {
           PreparedBatch preparedBatch =
               handle.prepareBatch(
-                  "INSERT INTO rel_entity_entities(subject_uuid, predicate, object_uuid) "
+                  "INSERT INTO "
+                      + tableName
+                      + "(subject_uuid, predicate, object_uuid) "
                       + "VALUES(:subjectUuid, :predicate, :objectUuid) "
                       + "ON CONFLICT ON CONSTRAINT rel_entity_entities_pkey DO NOTHING");
           for (EntityRelation relation : entityRelations) {

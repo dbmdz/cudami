@@ -13,7 +13,7 @@ import java.util.UUID;
 /** Service for Digital Object. */
 public interface DigitalObjectService extends EntityService<DigitalObject> {
 
-  boolean delete(UUID uuid);
+  void deleteFileResources(UUID digitalObjectUuid);
 
   /**
    * Returns a list of all DigitalObjects, reduced to their identifiers and last modified date
@@ -25,20 +25,38 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
   PageResponse<Collection> getActiveCollections(
       DigitalObject digitalObject, PageRequest pageRequest);
 
-  PageResponse<Collection> getCollections(DigitalObject digitalObject, PageRequest pageRequest);
+  default PageResponse<Collection> getCollections(
+      DigitalObject digitalObject, PageRequest pageRequest) {
+    return getCollections(digitalObject.getUuid(), pageRequest);
+  }
 
-  List<FileResource> getFileResources(DigitalObject digitalObject);
+  PageResponse<Collection> getCollections(UUID digitalObjectUuid, PageRequest pageRequest);
+
+  default List<FileResource> getFileResources(DigitalObject digitalObject) {
+    return getFileResources(digitalObject.getUuid());
+  }
 
   List<FileResource> getFileResources(UUID digitalObjectUuid);
 
-  List<ImageFileResource> getImageFileResources(DigitalObject digitalObject);
+  default List<ImageFileResource> getImageFileResources(DigitalObject digitalObject) {
+    return getImageFileResources(digitalObject.getUuid());
+  }
 
   List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid);
 
-  PageResponse<Project> getProjects(DigitalObject digitalObject, PageRequest pageRequest);
+  default PageResponse<Project> getProjects(DigitalObject digitalObject, PageRequest pageRequest) {
+    return getProjects(digitalObject.getUuid(), pageRequest);
+  }
 
-  List<FileResource> saveFileResources(
-      DigitalObject digitalObject, List<FileResource> fileResources);
+  PageResponse<Project> getProjects(UUID digitalObjectUuid, PageRequest pageRequest);
+
+  default List<FileResource> saveFileResources(
+      DigitalObject digitalObject, List<FileResource> fileResources) {
+    if (fileResources == null) {
+      return null;
+    }
+    return saveFileResources(digitalObject.getUuid(), fileResources);
+  }
 
   List<FileResource> saveFileResources(UUID digitalObjectUuid, List<FileResource> fileResources);
 }

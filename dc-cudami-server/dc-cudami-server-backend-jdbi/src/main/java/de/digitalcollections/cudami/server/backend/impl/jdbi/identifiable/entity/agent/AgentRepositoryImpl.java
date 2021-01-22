@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.AgentRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.api.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.api.identifiable.entity.work.Work;
 import de.digitalcollections.model.impl.identifiable.entity.agent.AgentImpl;
 import java.util.Set;
@@ -14,8 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /** Repository for Agent persistence handling. No own table, using entities table. */
-public class AgentRepositoryImpl extends EntityRepositoryImpl<AgentImpl>
-    implements AgentRepository<AgentImpl> {
+public class AgentRepositoryImpl extends EntityRepositoryImpl<Agent> implements AgentRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AgentRepositoryImpl.class);
 

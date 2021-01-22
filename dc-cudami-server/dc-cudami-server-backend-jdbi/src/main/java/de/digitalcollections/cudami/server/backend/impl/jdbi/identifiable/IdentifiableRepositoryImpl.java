@@ -38,10 +38,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends JdbiRepositoryImpl
+public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepositoryImpl
     implements IdentifiableRepository<I> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableRepositoryImpl.class);
+  public static final String MAPPING_PREFIX = "idf";
 
   public static final String SQL_REDUCED_FIELDS_IDF =
       " i.uuid idf_uuid, i.label idf_label,"
@@ -51,6 +52,8 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Jdbi
 
   public static final String SQL_FULL_FIELDS_IDF =
       SQL_REDUCED_FIELDS_IDF + ", i.description idf_description";
+  public static final String TABLE_ALIAS = "i";
+  public static final String TABLE_NAME = "identifiables";
 
   /* BiFunction for reducing rows (related objects) of joins not already part of identifiable (Identifier, preview image ImageFileResource). */
   public BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>>
@@ -64,13 +67,9 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Jdbi
   protected final String fullFieldsSql;
   public final BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>>
       fullReduceRowsBiFunction;
-  protected final Class<I> identifiableImplClass;
+  protected final Class identifiableImplClass;
   protected final IdentifierRepository identifierRepository;
   protected final String reducedFieldsSql;
-
-  public static final String MAPPING_PREFIX = "idf";
-  public static final String TABLE_ALIAS = "i";
-  public static final String TABLE_NAME = "identifiables";
 
   @Autowired
   private IdentifiableRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
@@ -80,7 +79,7 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Jdbi
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        (Class<I>) IdentifiableImpl.class,
+        IdentifiableImpl.class,
         SQL_REDUCED_FIELDS_IDF,
         SQL_FULL_FIELDS_IDF);
     // register row mappers for always joined classes and mapping prefix. as it is in autowired
@@ -94,7 +93,7 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Jdbi
       String tableName,
       String tableAlias,
       String mappingPrefix,
-      Class<I> identifiableImplClass,
+      Class identifiableImplClass,
       String reducedFieldsSql,
       String fullFieldsSql) {
     this(
@@ -116,7 +115,7 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Jdbi
       String tableName,
       String tableAlias,
       String mappingPrefix,
-      Class<I> identifiableImplClass,
+      Class identifiableImplClass,
       String reducedFieldsSql,
       String fullFieldsSql,
       String fullFieldsJoinsSql) {
@@ -139,7 +138,7 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Jdbi
       String tableName,
       String tableAlias,
       String mappingPrefix,
-      Class<I> identifiableImplClass,
+      Class identifiableImplClass,
       String reducedFieldsSql,
       String fullFieldsSql,
       String fullFieldsJoinsSql,
@@ -180,7 +179,7 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Jdbi
           map.computeIfAbsent(
               rowView.getColumn(mappingPrefix + "_uuid", UUID.class),
               fn -> {
-                return rowView.getRow(identifiableImplClass);
+                return (I) rowView.getRow(identifiableImplClass);
               });
 
       if (withPreviewImage && rowView.getColumn("pi_uuid", UUID.class) != null) {
@@ -195,7 +194,7 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Jdbi
   }
 
   @Override
-  public void delete(List<UUID> uuids) {
+  public boolean delete(List<UUID> uuids) {
     // delete related data
     uuids.stream()
         .forEach(
@@ -208,6 +207,7 @@ public class IdentifiableRepositoryImpl<I extends IdentifiableImpl> extends Jdbi
             h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
                 .bindList("uuids", uuids)
                 .execute());
+    return true;
   }
 
   @Override

@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 /** Service for Website handling. */
 @Service
-// @Transactional(readOnly = true)
 public class WebsiteServiceImpl extends EntityServiceImpl<Website> implements WebsiteService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsiteServiceImpl.class);
@@ -32,11 +31,6 @@ public class WebsiteServiceImpl extends EntityServiceImpl<Website> implements We
   }
 
   @Override
-  public List<Webpage> getRootPages(Website website) {
-    return ((WebsiteRepository) repository).getRootPages(website);
-  }
-
-  @Override
   public List<Webpage> getRootPages(UUID uuid) {
     return ((WebsiteRepository) repository).getRootPages(uuid);
   }
@@ -49,5 +43,10 @@ public class WebsiteServiceImpl extends EntityServiceImpl<Website> implements We
   @Override
   public boolean updateRootPagesOrder(Website website, List<Webpage> rootPages) {
     return ((WebsiteRepository) repository).updateRootPagesOrder(website, rootPages);
+  }
+
+  @Override
+  public boolean updateRootPagesOrder(UUID websiteUuid, List<Webpage> rootPages) {
+    return ((WebsiteRepository) repository).updateRootPagesOrder(websiteUuid, rootPages);
   }
 }

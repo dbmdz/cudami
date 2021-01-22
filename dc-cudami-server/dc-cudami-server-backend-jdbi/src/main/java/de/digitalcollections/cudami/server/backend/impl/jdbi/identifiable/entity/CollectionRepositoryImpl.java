@@ -15,7 +15,6 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.NodeImpl;
 import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
-import de.digitalcollections.model.impl.identifiable.entity.agent.CorporateBodyImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
 import java.time.LocalDateTime;
@@ -25,8 +24,6 @@ import java.util.Optional;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.jdbi.v3.core.statement.PreparedBatch;
@@ -36,10 +33,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImpl>
-    implements CollectionRepository<CollectionImpl> {
+public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
+    implements CollectionRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionRepositoryImpl.class);
+  public static final String MAPPING_PREFIX = "col";
 
   public static final String SQL_REDUCED_FIELDS_COL =
       " c.uuid col_uuid, c.refid col_refId, c.label col_label, c.description col_description,"
@@ -50,7 +48,6 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
 
   public static final String SQL_FULL_FIELDS_COL = SQL_REDUCED_FIELDS_COL + ", c.text col_text";
 
-  public static final String MAPPING_PREFIX = "col";
   public static final String TABLE_ALIAS = "c";
   public static final String TABLE_NAME = "collections";
 
@@ -77,7 +74,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
   }
 
   @Override
-  public boolean addChildren(UUID parentUuid, List<CollectionImpl> children) {
+  public boolean addChildren(UUID parentUuid, List<Collection> children) {
     if (parentUuid == null || children == null) {
       return false;
     }
@@ -133,40 +130,31 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
   }
 
   @Override
-  public CollectionImpl findOne(UUID uuid, Filtering filtering) {
-    CollectionImpl collection = super.findOne(uuid, filtering);
+  public Collection findOne(UUID uuid, Filtering filtering) {
+    Collection collection = super.findOne(uuid, filtering);
 
     if (collection != null) {
-      collection.setChildren(
-          Stream.ofNullable(getChildren(collection))
-              .map(Collection.class::cast)
-              .collect(Collectors.toList()));
+      collection.setChildren(getChildren(collection));
     }
     return collection;
   }
 
   @Override
-  public CollectionImpl findOne(Identifier identifier) {
-    CollectionImpl collection = super.findOne(identifier);
+  public Collection findOne(Identifier identifier) {
+    Collection collection = super.findOne(identifier);
 
     if (collection != null) {
-      collection.setChildren(
-          Stream.ofNullable(getChildren(collection))
-              .map(Collection.class::cast)
-              .collect(Collectors.toList()));
+      collection.setChildren(getChildren(collection));
     }
     return collection;
   }
 
   @Override
-  public CollectionImpl findOneByRefId(long refId) {
-    CollectionImpl collection = super.findOneByRefId(refId);
+  public Collection findOneByRefId(long refId) {
+    Collection collection = super.findOneByRefId(refId);
 
     if (collection != null) {
-      collection.setChildren(
-          Stream.ofNullable(getChildren(collection))
-              .map(Collection.class::cast)
-              .collect(Collectors.toList()));
+      collection.setChildren(getChildren(collection));
     }
     return collection;
   }
@@ -181,7 +169,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
   @Override
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
 
-    List<NodeImpl> result =
+    List<Node> result =
         dbi.withHandle(
             h ->
                 h.createQuery(
@@ -203,6 +191,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
                     .bind("uuid", nodeUuid)
                     .registerRowMapper(BeanMapper.factory(NodeImpl.class))
                     .mapTo(NodeImpl.class)
+                    .map(Node.class::cast)
                     .list());
 
     if (result.isEmpty()) {
@@ -218,20 +207,20 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
                       .bind("uuid", nodeUuid)
                       .registerRowMapper(BeanMapper.factory(NodeImpl.class))
                       .mapTo(NodeImpl.class)
+                      .map(Node.class::cast)
                       .list());
     }
 
-    List<Node> nodes = result.stream().map(s -> (Node) s).collect(Collectors.toList());
-    return new BreadcrumbNavigationImpl(nodes);
+    return new BreadcrumbNavigationImpl(result);
   }
 
   @Override
-  public List<CollectionImpl> getChildren(CollectionImpl collection) {
+  public List<Collection> getChildren(Collection collection) {
     return CollectionRepository.super.getChildren(collection);
   }
 
   @Override
-  public List<CollectionImpl> getChildren(UUID uuid) {
+  public List<Collection> getChildren(UUID uuid) {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -244,12 +233,12 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
                 + " WHERE cc.parent_collection_uuid = :uuid"
                 + " ORDER BY cc.sortIndex ASC");
 
-    List<CollectionImpl> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
+    List<Collection> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
     return result;
   }
 
   @Override
-  public PageResponse<CollectionImpl> getChildren(UUID uuid, PageRequest pageRequest) {
+  public PageResponse<Collection> getChildren(UUID uuid, PageRequest pageRequest) {
     String commonSql =
         " FROM "
             + tableName
@@ -266,7 +255,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
     innerQuery.append(" ORDER BY cc.sortIndex ASC");
     addPageRequestParams(pageRequest, innerQuery);
 
-    List<CollectionImpl> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
+    List<Collection> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -321,14 +310,10 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
     addPageRequestParams(pageRequest, innerQuery);
 
     List<DigitalObject> result =
-        digitalObjectRepositoryImpl
-            .retrieveList(
-                DigitalObjectRepositoryImpl.SQL_REDUCED_FIELDS_DO,
-                innerQuery,
-                Map.of("uuid", collectionUuid))
-            .stream()
-            .map(DigitalObject.class::cast)
-            .collect(Collectors.toList());
+        digitalObjectRepositoryImpl.retrieveList(
+            DigitalObjectRepositoryImpl.SQL_REDUCED_FIELDS_DO,
+            innerQuery,
+            Map.of("uuid", collectionUuid));
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -338,7 +323,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
   }
 
   @Override
-  public CollectionImpl getParent(UUID uuid) {
+  public Collection getParent(UUID uuid) {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -349,13 +334,13 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
                 + tableAlias
                 + ".uuid = cc.parent_collection_uuid"
                 + " WHERE cc.child_collection_uuid = :uuid");
-    CollectionImpl result = retrieveOne(reducedFieldsSql, innerQuery, null, Map.of("uuid", uuid));
+    Collection result = retrieveOne(reducedFieldsSql, innerQuery, null, Map.of("uuid", uuid));
 
     return result;
   }
 
   @Override
-  public List<CollectionImpl> getParents(UUID uuid) {
+  public List<Collection> getParents(UUID uuid) {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -367,7 +352,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
                 + ".uuid = cc.parent_collection_uuid"
                 + " WHERE cc.child_collection_uuid = :uuid");
 
-    List<CollectionImpl> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
+    List<Collection> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
     return result;
   }
 
@@ -399,15 +384,15 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
       innerQuery.append(predicateFilter);
     }
 
-    List<CorporateBodyImpl> result =
+    List<CorporateBody> result =
         corporateBodyRepositoryImpl.retrieveList(
             CorporateBodyRepositoryImpl.SQL_REDUCED_FIELDS_CB, innerQuery, Map.of("uuid", uuid));
 
-    return result.stream().map(CorporateBody.class::cast).collect(Collectors.toList());
+    return result;
   }
 
   @Override
-  public PageResponse<CollectionImpl> getRootNodes(PageRequest pageRequest) {
+  public PageResponse<Collection> getRootNodes(PageRequest pageRequest) {
     String commonSql =
         " FROM "
             + tableName
@@ -480,7 +465,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
   }
 
   @Override
-  public CollectionImpl save(CollectionImpl collection) {
+  public Collection save(Collection collection) {
     collection.setUuid(UUID.randomUUID());
     collection.setCreated(LocalDateTime.now());
     collection.setLastModified(LocalDateTime.now());
@@ -514,7 +499,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
     Set<Identifier> identifiers = collection.getIdentifiers();
     saveIdentifiers(identifiers, collection);
 
-    CollectionImpl result = findOne(collection.getUuid());
+    Collection result = findOne(collection.getUuid());
     return result;
   }
 
@@ -549,7 +534,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
   }
 
   @Override
-  public CollectionImpl saveWithParentCollection(CollectionImpl collection, UUID parentUuid) {
+  public Collection saveWithParent(Collection collection, UUID parentUuid) {
     final UUID childUuid =
         collection.getUuid() == null ? save(collection).getUuid() : collection.getUuid();
 
@@ -571,7 +556,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
   }
 
   @Override
-  public CollectionImpl update(CollectionImpl collection) {
+  public Collection update(Collection collection) {
     collection.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, entity_type, refid
@@ -601,7 +586,32 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<CollectionImp
     Set<Identifier> identifiers = collection.getIdentifiers();
     saveIdentifiers(identifiers, collection);
 
-    CollectionImpl result = findOne(collection.getUuid());
+    Collection result = findOne(collection.getUuid());
     return result;
+  }
+
+  @Override
+  public boolean updateChildrenOrder(UUID parentUuid, List<Collection> children) {
+    if (parentUuid == null || children == null) {
+      return false;
+    }
+    String query =
+        "UPDATE collection_collections"
+            + " SET sortindex = :idx"
+            + " WHERE child_collection_uuid = :childUuid AND parent_collection_uuid = :parentUuid;";
+    dbi.withHandle(
+        h -> {
+          PreparedBatch batch = h.prepareBatch(query);
+          int idx = 0;
+          for (Collection collection : children) {
+            batch
+                .bind("idx", idx++)
+                .bind("childUuid", collection.getUuid())
+                .bind("parentUuid", parentUuid)
+                .add();
+          }
+          return batch.execute();
+        });
+    return true;
   }
 }

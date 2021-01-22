@@ -6,26 +6,22 @@ import de.digitalcollections.model.api.security.User;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Repository for User persistence handling.
- *
- * @param <U> entity instance
- */
-public interface UserRepository<U extends User> {
+/** Repository for User persistence handling. */
+public interface UserRepository {
 
   long count();
 
-  U create();
+  User create();
 
-  PageResponse<U> find(PageRequest pageRequest);
+  PageResponse<User> find(PageRequest pageRequest);
 
-  U findByEmail(String email);
+  List<User> findActiveAdminUsers();
 
-  U findOne(UUID uuid);
+  User findByEmail(String email);
 
-  List<U> findActiveAdminUsers();
+  User findOne(UUID uuid);
 
-  U save(U user);
+  User save(User user);
 
-  U update(U user);
+  User update(User user);
 }

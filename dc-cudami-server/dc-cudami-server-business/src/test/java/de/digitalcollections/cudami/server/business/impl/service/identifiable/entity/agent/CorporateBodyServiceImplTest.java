@@ -11,9 +11,8 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.ExternalCorporateBodyRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ImageFileResourceService;
 import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.impl.identifiable.entity.agent.CorporateBodyImpl;
 import java.net.MalformedURLException;
@@ -28,7 +27,7 @@ class CorporateBodyServiceImplTest {
   private CorporateBodyServiceImpl corporateBodyService;
   private CorporateBodyRepository corporateBodyRepository;
   private ExternalCorporateBodyRepository externalCorporateBodyRepository;
-  private FileResourceMetadataService fileResourceMetadataService;
+  private ImageFileResourceService imageFileResourceService;
 
   @BeforeEach
   void setUp() throws IdentifiableServiceException {
@@ -38,12 +37,12 @@ class CorporateBodyServiceImplTest {
     when(corporateBodyRepository.save(eq(null))).thenThrow(new NullPointerException());
 
     externalCorporateBodyRepository = mock(ExternalCorporateBodyRepository.class);
-    fileResourceMetadataService = mock(FileResourceMetadataService.class);
-    when(fileResourceMetadataService.save(eq(null))).thenThrow(new NullPointerException());
+    imageFileResourceService = mock(ImageFileResourceService.class);
+    when(imageFileResourceService.save(eq(null))).thenThrow(new NullPointerException());
 
     corporateBodyService =
         new CorporateBodyServiceImpl(
-            corporateBodyRepository, externalCorporateBodyRepository, fileResourceMetadataService);
+            corporateBodyRepository, externalCorporateBodyRepository, imageFileResourceService);
   }
 
   @Test
@@ -56,7 +55,7 @@ class CorporateBodyServiceImplTest {
     when(externalCorporateBodyRepository.getByGndId(any(String.class))).thenReturn(corporateBody);
 
     assertThat(corporateBodyService.fetchAndSaveByGndId("12345")).isNotNull();
-    verify(fileResourceMetadataService, times(1)).save(any(FileResource.class));
+    verify(imageFileResourceService, times(1)).save(any(ImageFileResource.class));
   }
 
   @Test

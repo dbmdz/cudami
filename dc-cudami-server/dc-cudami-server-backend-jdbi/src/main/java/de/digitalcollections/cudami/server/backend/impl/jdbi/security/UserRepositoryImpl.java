@@ -1,9 +1,10 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.security;
 
 import de.digitalcollections.cudami.server.backend.api.repository.security.UserRepository;
-import de.digitalcollections.cudami.server.backend.impl.database.AbstractPagingAndSortingRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.security.User;
 import de.digitalcollections.model.api.security.enums.Role;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.security.UserImpl;
@@ -14,56 +15,58 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class UserRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl
-    implements UserRepository<UserImpl> {
+public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserRepository {
 
   public static final String MAPPING_PREFIX = "u";
   public static final String TABLE_ALIAS = "u";
   public static final String TABLE_NAME = "users";
 
-  @Autowired private Jdbi dbi;
-
-  @Override
-  public long count() {
-    String sql = "SELECT count(*) FROM users";
-    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
-    return count;
+  @Autowired
+  public UserRepositoryImpl(Jdbi dbi, String tableName, String tableAlias, String mappingPrefix) {
+    super(dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX);
   }
 
   @Override
-  public UserImpl create() {
+  public User create() {
     return new UserImpl();
   }
 
   @Override
-  public PageResponse<UserImpl> find(PageRequest pageRequest) {
+  public PageResponse<User> find(PageRequest pageRequest) {
     StringBuilder query = new StringBuilder("SELECT * FROM users");
 
     addPageRequestParams(pageRequest, query);
-    List<UserImpl> result =
-        dbi.withHandle(h -> h.createQuery(query.toString()).mapToBean(UserImpl.class).list());
+    List<User> result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(query.toString())
+                    .mapToBean(UserImpl.class)
+                    .map(User.class::cast)
+                    .list());
     long total = count();
-    PageResponse pageResponse = new PageResponseImpl(result, pageRequest, total);
+    PageResponse<User> pageResponse = new PageResponseImpl<>(result, pageRequest, total);
     return pageResponse;
   }
 
   @Override
-  public List<UserImpl> findActiveAdminUsers() {
+  public List<User> findActiveAdminUsers() {
     return dbi.withHandle(
         h ->
             h.createQuery("SELECT * FROM users WHERE '" + Role.ADMIN.name() + "' = any(roles)")
                 .mapToBean(UserImpl.class)
+                .map(User.class::cast)
                 .list());
   }
 
   @Override
-  public UserImpl findByEmail(String email) {
-    List<UserImpl> users =
+  public User findByEmail(String email) {
+    List<User> users =
         dbi.withHandle(
             h ->
                 h.createQuery("SELECT * FROM users WHERE email = :email")
                     .bind("email", email)
                     .mapToBean(UserImpl.class)
+                    .map(User.class::cast)
                     .list());
     if (users.isEmpty()) {
       return null;
@@ -72,13 +75,14 @@ public class UserRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl
   }
 
   @Override
-  public UserImpl findOne(UUID uuid) {
-    List<UserImpl> users =
+  public User findOne(UUID uuid) {
+    List<User> users =
         dbi.withHandle(
             h ->
                 h.createQuery("SELECT * FROM users WHERE uuid = :uuid")
                     .bind("uuid", uuid)
                     .mapToBean(UserImpl.class)
+                    .map(User.class::cast)
                     .list());
     if (users.isEmpty()) {
       return null;
@@ -87,7 +91,29 @@ public class UserRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl
   }
 
   @Override
-  public UserImpl save(UserImpl user) {
+  protected String[] getAllowedOrderByFields() {
+    return new String[] {"email", "lastname", "firstname"};
+  }
+
+  @Override
+  protected String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "email":
+        return "email";
+      case "lastname":
+        return "lastname";
+      case "firstname":
+        return "firstname";
+      default:
+        return null;
+    }
+  }
+
+  @Override
+  public User save(User user) {
     user.setUuid(UUID.randomUUID());
     //    UserImpl result = dbi.withHandle(h -> h.createQuery(
     //            "INSERT INTO users(email, enabled, firstname, lastname, passwordHash, roles)
@@ -112,8 +138,8 @@ public class UserRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl
   }
 
   @Override
-  public UserImpl update(UserImpl user) {
-    UserImpl result =
+  public User update(User user) {
+    User result =
         dbi.withHandle(
             h ->
                 h.registerArrayType(Role.class, "varchar")
@@ -121,30 +147,9 @@ public class UserRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl
                         "UPDATE users SET email=:email, enabled=:enabled, firstname=:firstname, lastname=:lastname, passwordHash=:passwordHash, roles=:roles, uuid=:uuid WHERE uuid=:uuid RETURNING *")
                     .bindBean(user)
                     .mapToBean(UserImpl.class)
+                    .map(User.class::cast)
                     .findOne()
                     .orElse(null));
     return result;
-  }
-
-  @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"email", "lastname", "firstname"};
-  }
-
-  @Override
-  protected String getColumnName(String modelProperty) {
-    if (modelProperty == null) {
-      return null;
-    }
-    switch (modelProperty) {
-      case "email":
-        return "email";
-      case "lastname":
-        return "lastname";
-      case "firstname":
-        return "firstname";
-      default:
-        return null;
-    }
   }
 }

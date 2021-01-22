@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.WebpageService;
 import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -14,46 +13,45 @@ import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/**
- * Service for Webpage handling.
- *
- * @param <E> entity type
- */
+/** Service for Webpage handling. */
 @Service
-// @Transactional(readOnly = true)
-public class WebpageServiceImpl<E extends Entity> extends EntityPartServiceImpl<Webpage, E>
-    implements WebpageService<E> {
+public class WebpageServiceImpl extends EntityPartServiceImpl<Webpage> implements WebpageService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpageServiceImpl.class);
 
   @Autowired
-  public WebpageServiceImpl(WebpageRepository<E> repository) {
+  public WebpageServiceImpl(WebpageRepository repository) {
     super(repository);
   }
 
   @Override
-  public Webpage get(UUID uuid, Locale locale) throws IdentifiableServiceException {
-    Webpage webpage = super.get(uuid, locale);
-    if (webpage == null) {
-      return null;
-    }
-
-    // get the already filtered language to compare with
-    Locale fLocale = webpage.getLabel().entrySet().iterator().next().getKey();
-    // filter out not requested translations of fields not already filtered
-    if (webpage.getText() != null) {
-      webpage.getText().entrySet().removeIf((Map.Entry entry) -> !entry.getKey().equals(fLocale));
-    }
-    return webpage;
+  public boolean addChildren(UUID parentUuid, List<Webpage> collections) {
+    return ((NodeRepository<Webpage>) repository).addChildren(parentUuid, collections);
   }
 
+  // TODO: test if webpages work as expected (using now IdentifiableServiceImpl logic)
+  //  @Override
+  //  public Webpage get(UUID uuid, Locale locale) throws IdentifiableServiceException {
+  //    Webpage webpage = super.get(uuid, locale);
+  //    if (webpage == null) {
+  //      return null;
+  //    }
+  //
+  //    // get the already filtered language to compare with
+  //    Locale fLocale = webpage.getLabel().entrySet().iterator().next().getKey();
+  //    // filter out not requested translations of fields not already filtered
+  //    if (webpage.getText() != null) {
+  //      webpage.getText().entrySet().removeIf((Map.Entry entry) ->
+  // !entry.getKey().equals(fLocale));
+  //    }
+  //    return webpage;
+  //  }
   @Override
   public Webpage getActive(UUID uuid) {
     Filtering filtering = filteringForActive();
@@ -106,13 +104,18 @@ public class WebpageServiceImpl<E extends Entity> extends EntityPartServiceImpl<
   }
 
   @Override
-  public Webpage getParent(Webpage webpage) {
-    return getParent(webpage.getUuid());
+  public Webpage getParent(UUID webpageUuid) {
+    return ((NodeRepository<Webpage>) repository).getParent(webpageUuid);
   }
 
   @Override
-  public Webpage getParent(UUID webpageUuid) {
-    return ((NodeRepository<Webpage>) repository).getParent(webpageUuid);
+  public List<Webpage> getParents(UUID uuid) {
+    return ((NodeRepository<Webpage>) repository).getParents(uuid);
+  }
+
+  @Override
+  public PageResponse<Webpage> getRootNodes(PageRequest pageRequest) {
+    return ((NodeRepository<Webpage>) repository).getRootNodes(pageRequest);
   }
 
   @Override
@@ -128,7 +131,22 @@ public class WebpageServiceImpl<E extends Entity> extends EntityPartServiceImpl<
   }
 
   @Override
-  //  @Transactional(readOnly = false)
+  public boolean removeChild(UUID parentUuid, UUID childUuid) {
+    return ((NodeRepository<Webpage>) repository).removeChild(parentUuid, childUuid);
+  }
+
+  @Override
+  public Webpage saveWithParent(Webpage child, UUID parentUuid)
+      throws IdentifiableServiceException {
+    try {
+      return ((NodeRepository<Webpage>) repository).saveWithParent(child, parentUuid);
+    } catch (Exception e) {
+      LOGGER.error("Cannot save webpage " + child + ": ", e);
+      throw new IdentifiableServiceException(e.getMessage());
+    }
+  }
+
+  @Override
   public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid)
       throws IdentifiableServiceException {
     try {
@@ -140,19 +158,7 @@ public class WebpageServiceImpl<E extends Entity> extends EntityPartServiceImpl<
   }
 
   @Override
-  //  @Transactional(readOnly = false)
-  public Webpage saveWithParentWebpage(Webpage webpage, UUID parentWebpageUuid)
-      throws IdentifiableServiceException {
-    try {
-      return ((WebpageRepository) repository).saveWithParentWebpage(webpage, parentWebpageUuid);
-    } catch (Exception e) {
-      LOGGER.error("Cannot save webpage " + webpage + ": ", e);
-      throw new IdentifiableServiceException(e.getMessage());
-    }
-  }
-
-  @Override
-  public boolean updateChildrenOrder(Webpage webpage, List<Webpage> children) {
-    return ((WebpageRepository) repository).updateChildrenOrder(webpage, children);
+  public boolean updateChildrenOrder(UUID parentUuid, List<Webpage> children) {
+    return ((NodeRepository<Webpage>) repository).updateChildrenOrder(parentUuid, children);
   }
 }

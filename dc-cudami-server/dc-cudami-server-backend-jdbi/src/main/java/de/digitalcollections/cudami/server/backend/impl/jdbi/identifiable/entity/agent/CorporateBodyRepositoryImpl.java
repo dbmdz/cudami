@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifier;
+import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.impl.identifiable.entity.agent.CorporateBodyImpl;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -15,10 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateBodyImpl>
-    implements CorporateBodyRepository<CorporateBodyImpl> {
+public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateBody>
+    implements CorporateBodyRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CorporateBodyRepositoryImpl.class);
+  public static final String MAPPING_PREFIX = "cb";
 
   public static final String SQL_REDUCED_FIELDS_CB =
       " c.uuid cb_uuid, c.refid cb_refId, c.label cb_label, c.description cb_description,"
@@ -29,7 +31,6 @@ public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateB
   public static final String SQL_FULL_FIELDS_CB =
       SQL_REDUCED_FIELDS_CB + ", c.text cb_text, c.homepage_url cb_homepageUrl";
 
-  public static final String MAPPING_PREFIX = "cb";
   public static final String TABLE_ALIAS = "c";
   public static final String TABLE_NAME = "corporatebodies";
 
@@ -69,7 +70,7 @@ public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateB
   }
 
   @Override
-  public CorporateBodyImpl save(CorporateBodyImpl corporateBody) {
+  public CorporateBody save(CorporateBody corporateBody) {
     corporateBody.setUuid(UUID.randomUUID());
     corporateBody.setCreated(LocalDateTime.now());
     corporateBody.setLastModified(LocalDateTime.now());
@@ -103,12 +104,12 @@ public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateB
     Set<Identifier> identifiers = corporateBody.getIdentifiers();
     saveIdentifiers(identifiers, corporateBody);
 
-    CorporateBodyImpl result = findOne(corporateBody.getUuid());
+    CorporateBody result = findOne(corporateBody.getUuid());
     return result;
   }
 
   @Override
-  public CorporateBodyImpl update(CorporateBodyImpl corporateBody) {
+  public CorporateBody update(CorporateBody corporateBody) {
     corporateBody.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, entity_type, refid
@@ -138,7 +139,7 @@ public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateB
     Set<Identifier> identifiers = corporateBody.getIdentifiers();
     saveIdentifiers(identifiers, corporateBody);
 
-    CorporateBodyImpl result = findOne(corporateBody.getUuid());
+    CorporateBody result = findOne(corporateBody.getUuid());
     return result;
   }
 }

@@ -34,23 +34,13 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public boolean addChild(Collection parent, Collection child) {
-    return ((CollectionRepository) repository).addChild(parent, child);
+  public boolean addChildren(UUID parentUuid, List<Collection> children) {
+    return ((NodeRepository<Collection>) repository).addChildren(parentUuid, children);
   }
 
   @Override
-  public boolean addChildren(Collection parent, List<Collection> children) {
-    return ((CollectionRepository) repository).addChildren(parent, children);
-  }
-
-  @Override
-  public boolean addDigitalObject(Collection collection, DigitalObject digitalObject) {
-    return ((CollectionRepository) repository).addDigitalObject(collection, digitalObject);
-  }
-
-  @Override
-  public boolean addDigitalObjects(Collection collection, List<DigitalObject> digitalObjects) {
-    return ((CollectionRepository) repository).addDigitalObjects(collection, digitalObjects);
+  public boolean addDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects) {
+    return ((CollectionRepository) repository).addDigitalObjects(collectionUuid, digitalObjects);
   }
 
   @Override
@@ -104,11 +94,6 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public List<Collection> getChildren(Collection collection) {
-    return ((NodeRepository<Collection>) repository).getChildren(collection);
-  }
-
-  @Override
   public List<Collection> getChildren(UUID uuid) {
     return ((NodeRepository<Collection>) repository).getChildren(uuid);
   }
@@ -120,13 +105,8 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
 
   @Override
   public PageResponse<DigitalObject> getDigitalObjects(
-      Collection collection, PageRequest pageRequest) {
-    return ((CollectionRepository) repository).getDigitalObjects(collection, pageRequest);
-  }
-
-  @Override
-  public Collection getParent(Collection node) {
-    return getParent(node.getUuid());
+      UUID collectionUuid, PageRequest pageRequest) {
+    return ((CollectionRepository) repository).getDigitalObjects(collectionUuid, pageRequest);
   }
 
   @Override
@@ -145,8 +125,8 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public PageResponse<Collection> getTopCollections(PageRequest pageRequest) {
-    return ((CollectionRepository) repository).getTopCollections(pageRequest);
+  public PageResponse<Collection> getRootNodes(PageRequest pageRequest) {
+    return ((NodeRepository<Collection>) repository).getRootNodes(pageRequest);
   }
 
   @Override
@@ -155,13 +135,14 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public boolean removeChild(Collection parent, Collection child) {
-    return ((CollectionRepository) repository).removeChild(parent, child);
+  public boolean removeChild(UUID parentUuid, UUID childUuid) {
+    return ((NodeRepository<Collection>) repository).removeChild(parentUuid, childUuid);
   }
 
   @Override
-  public boolean removeDigitalObject(Collection collection, DigitalObject digitalObject) {
-    return ((CollectionRepository) repository).removeDigitalObject(collection, digitalObject);
+  public boolean removeDigitalObject(UUID collectionUuid, UUID digitalObjectUuid) {
+    return ((CollectionRepository) repository)
+        .removeDigitalObject(collectionUuid, digitalObjectUuid);
   }
 
   @Override
@@ -170,18 +151,23 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public boolean saveDigitalObjects(Collection collection, List<DigitalObject> digitalObjects) {
-    return ((CollectionRepository) repository).saveDigitalObjects(collection, digitalObjects);
+  public boolean saveDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects) {
+    return ((CollectionRepository) repository).saveDigitalObjects(collectionUuid, digitalObjects);
   }
 
   @Override
-  public Collection saveWithParentCollection(Collection collection, UUID parentUuid)
+  public Collection saveWithParent(Collection child, UUID parentUuid)
       throws IdentifiableServiceException {
     try {
-      return ((CollectionRepository) repository).saveWithParentCollection(collection, parentUuid);
+      return ((CollectionRepository) repository).saveWithParent(child, parentUuid);
     } catch (Exception e) {
-      LOGGER.error("Cannot save collection " + collection + ": ", e);
+      LOGGER.error("Cannot save collection " + child + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
     }
+  }
+
+  @Override
+  public boolean updateChildrenOrder(UUID parentUuid, List<Collection> children) {
+    return ((NodeRepository<Collection>) repository).updateChildrenOrder(parentUuid, children);
   }
 }

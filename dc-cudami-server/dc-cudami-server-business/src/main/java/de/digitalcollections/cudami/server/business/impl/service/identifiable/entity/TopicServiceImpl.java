@@ -23,11 +23,6 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
-  public List<Subtopic> getSubtopics(Topic topic) {
-    return ((TopicRepository) repository).getSubtopics(topic);
-  }
-
-  @Override
   public List<Subtopic> getSubtopics(UUID uuid) {
     return ((TopicRepository) repository).getSubtopics(uuid);
   }

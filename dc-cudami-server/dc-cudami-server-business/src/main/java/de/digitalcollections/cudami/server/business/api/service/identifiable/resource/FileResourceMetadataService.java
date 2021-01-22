@@ -4,7 +4,8 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.MimeType;
 
-public interface FileResourceMetadataService extends IdentifiableService<FileResource> {
+public interface FileResourceMetadataService<F extends FileResource>
+    extends IdentifiableService<F> {
 
   default FileResource createByContentTypeAndFilename(String contentType, String filename) {
     return createByMimeTypeAndFilename(MimeType.fromTypename(contentType), filename);

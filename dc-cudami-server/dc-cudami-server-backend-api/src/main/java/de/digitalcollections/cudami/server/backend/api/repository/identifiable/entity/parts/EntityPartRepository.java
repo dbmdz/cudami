@@ -9,13 +9,41 @@ import java.util.UUID;
 
 public interface EntityPartRepository<P extends EntityPart> extends IdentifiableRepository<P> {
 
-  void addRelatedEntity(P entityPart, Entity entity);
+  default void addRelatedEntity(P entityPart, Entity entity) {
+    if (entityPart == null || entity == null) {
+      return;
+    }
+    addRelatedEntity(entityPart.getUuid(), entity.getUuid());
+  }
 
   void addRelatedEntity(UUID entityPartUuid, UUID entityUuid);
 
-  List<Entity> getRelatedEntities(P entityPart);
+  default void addRelatedFileresource(P entityPart, FileResource fileResource) {
+    if (entityPart == null || fileResource == null) {
+      return;
+    }
+    addRelatedFileresource(entityPart.getUuid(), fileResource.getUuid());
+  }
+
+  void addRelatedFileresource(UUID entityPartUuid, UUID fileResourceUuid);
+
+  default List<Entity> getRelatedEntities(P entityPart) {
+    if (entityPart == null) {
+      return null;
+    }
+    return getRelatedEntities(entityPart.getUuid());
+  }
 
   List<Entity> getRelatedEntities(UUID entityPartUuid);
+
+  default List<FileResource> getRelatedFileResources(P entityPart) {
+    if (entityPart == null) {
+      return null;
+    }
+    return getRelatedFileResources(entityPart.getUuid());
+  }
+
+  List<FileResource> getRelatedFileResources(UUID entityPartUuid);
 
   /**
    * Save list of entities related to an entity part.Prerequisite: entities have been saved before
@@ -25,17 +53,14 @@ public interface EntityPartRepository<P extends EntityPart> extends Identifiable
    * @param entities the entities that are related to the entity part
    * @return the list of the related entities
    */
-  List<Entity> saveRelatedEntities(P entityPart, List<Entity> entities);
+  default List<Entity> saveRelatedEntities(P entityPart, List<Entity> entities) {
+    if (entityPart == null || entities == null) {
+      return null;
+    }
+    return saveRelatedEntities(entityPart.getUuid(), entities);
+  }
 
   List<Entity> saveRelatedEntities(UUID entityPartUuid, List<Entity> entities);
-
-  void addRelatedFileresource(P entityPart, FileResource fileResource);
-
-  void addRelatedFileresource(UUID entityPartUuid, UUID fileResourceUuid);
-
-  List<FileResource> getRelatedFileResources(P entityPart);
-
-  List<FileResource> getRelatedFileResources(UUID entityPartUuid);
 
   /**
    * Save list of file resources related to an entity. Prerequisite: file resources have been saved
@@ -45,7 +70,13 @@ public interface EntityPartRepository<P extends EntityPart> extends Identifiable
    * @param fileResources the file resources that are related to the entity part
    * @return the list of the related file resources
    */
-  List<FileResource> saveRelatedFileResources(P entityPart, List<FileResource> fileResources);
+  default List<FileResource> saveRelatedFileResources(
+      P entityPart, List<FileResource> fileResources) {
+    if (entityPart == null || fileResources == null) {
+      return null;
+    }
+    return saveRelatedFileResources(entityPart.getUuid(), fileResources);
+  }
 
   List<FileResource> saveRelatedFileResources(
       UUID entityPartUuid, List<FileResource> fileResources);

@@ -15,26 +15,6 @@ import java.util.UUID;
 
 public interface IdentifiableService<I extends Identifiable> {
 
-  long count();
-
-  PageResponse<I> find(PageRequest pageRequest);
-
-  SearchPageResponse<I> find(SearchPageRequest searchPageRequest);
-
-  List<I> find(String searchTerm, int maxResults);
-
-  I get(Identifier identifier);
-
-  I get(UUID uuid);
-
-  I get(UUID uuid, Locale locale) throws IdentifiableServiceException;
-
-  I getByIdentifier(String namespace, String id);
-
-  I save(I identifiable) throws IdentifiableServiceException;
-
-  I update(I identifiable) throws IdentifiableServiceException;
-
   default void cleanupLabelFromUnwantedLocales(Locale locale, Locale fallbackLocale, Node n) {
     LocalizedText label = n.getLabel();
 
@@ -44,7 +24,6 @@ public interface IdentifiableService<I extends Identifiable> {
     }
 
     // Prepare the fallback solutions, when no label for the desired locale exists.
-
     // Retrieve the value for the fallback locale and bypass a "feature" of the
     // LocalizedText class, which would return the "first" value, if no value for the
     // given locale exists. This is NOT what we want here!
@@ -70,4 +49,47 @@ public interface IdentifiableService<I extends Identifiable> {
       }
     }
   }
+
+  long count();
+
+  default boolean delete(UUID uuid) {
+    return delete(List.of(uuid)); // same performance as "where uuid = :uuid"
+  }
+
+  boolean delete(List<UUID> uuids);
+
+  PageResponse<I> find(PageRequest pageRequest);
+
+  SearchPageResponse<I> find(SearchPageRequest searchPageRequest);
+
+  List<I> find(String searchTerm, int maxResults);
+
+  /**
+   * @return list of ALL identifiables with FULL data. USE WITH CARE (only for internal workflow,
+   *     NOT FOR USER INTERACTION!)!!!
+   */
+  List<I> findAllFull();
+
+  /**
+   * Returns a list of all identifiables, reduced to their identifiers and last modification date
+   *
+   * @return partially filled complete list of all identifiables of implementing repository entity
+   *     type
+   */
+  List<I> findAllReduced();
+
+  PageResponse<I> findByLanguageAndInitial(
+      PageRequest pageRequest, String language, String initial);
+
+  I get(Identifier identifier);
+
+  I get(UUID uuid);
+
+  I get(UUID uuid, Locale locale) throws IdentifiableServiceException;
+
+  I getByIdentifier(String namespace, String id);
+
+  I save(I identifiable) throws IdentifiableServiceException;
+
+  I update(I identifiable) throws IdentifiableServiceException;
 }

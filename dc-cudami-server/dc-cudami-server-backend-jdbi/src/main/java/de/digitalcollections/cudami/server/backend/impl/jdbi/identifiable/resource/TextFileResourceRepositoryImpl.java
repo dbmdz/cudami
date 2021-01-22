@@ -1,9 +1,10 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.TextFileResourceRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifier;
+import de.digitalcollections.model.api.identifiable.resource.TextFileResource;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
@@ -20,18 +21,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class TextFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<TextFileResourceImpl>
-    implements FileResourceMetadataRepository<TextFileResourceImpl> {
+public class TextFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<TextFileResource>
+    implements TextFileResourceRepository {
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(TextFileResourceRepositoryImpl.class);
+  public static final String MAPPING_PREFIX = "fr";
 
   public static final String SQL_REDUCED_FIELDS_FR =
       FileResourceMetadataRepositoryImpl.SQL_REDUCED_FIELDS_FR;
 
   public static final String SQL_FULL_FIELDS_FR = SQL_REDUCED_FIELDS_FR;
 
-  public static final String MAPPING_PREFIX = "fr";
   public static final String TABLE_ALIAS = "f";
   public static final String TABLE_NAME = "fileresources_text";
 
@@ -55,7 +56,7 @@ public class TextFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<T
   }
 
   @Override
-  public SearchPageResponse<TextFileResourceImpl> find(SearchPageRequest searchPageRequest) {
+  public SearchPageResponse<TextFileResource> find(SearchPageRequest searchPageRequest) {
     String commonSql =
         fileResourceMetadataRepositoryImpl.getCommonFileResourceSearchSql(tableName, tableAlias);
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchPageRequest.getQuery()));
@@ -86,7 +87,7 @@ public class TextFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<T
   }
 
   @Override
-  public TextFileResourceImpl save(TextFileResourceImpl fileResource) {
+  public TextFileResource save(TextFileResource fileResource) {
     if (fileResource.getUuid() == null) {
       fileResource.setUuid(UUID.randomUUID());
     }
@@ -119,12 +120,12 @@ public class TextFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<T
     Set<Identifier> identifiers = fileResource.getIdentifiers();
     saveIdentifiers(identifiers, fileResource);
 
-    TextFileResourceImpl result = findOne(fileResource.getUuid());
+    TextFileResource result = findOne(fileResource.getUuid());
     return result;
   }
 
   @Override
-  public TextFileResourceImpl update(TextFileResourceImpl fileResource) {
+  public TextFileResource update(TextFileResource fileResource) {
     fileResource.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type
@@ -150,7 +151,7 @@ public class TextFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<T
     Set<Identifier> identifiers = fileResource.getIdentifiers();
     saveIdentifiers(identifiers, fileResource);
 
-    TextFileResourceImpl result = findOne(fileResource.getUuid());
+    TextFileResource result = findOne(fileResource.getUuid());
     return result;
   }
 }

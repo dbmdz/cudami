@@ -28,6 +28,7 @@ import org.jsondoc.core.annotation.ApiResponseObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -47,9 +48,11 @@ public class FileResourceMetadataController {
   private static final Logger LOGGER =
       LoggerFactory.getLogger(FileResourceMetadataController.class);
 
-  @Autowired FileResourceMetadataService fileResourceService;
+  @Autowired
+  @Qualifier("fileResourceMetadataServiceImpl")
+  private FileResourceMetadataService<FileResource> fileResourceService;
 
-  @Autowired LocaleService localeService;
+  @Autowired private LocaleService localeService;
 
   @ApiMethod(description = "Get all fileresources")
   @GetMapping(

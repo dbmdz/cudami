@@ -15,33 +15,23 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EntityPartServiceImpl<P extends EntityPart, E extends Entity>
-    extends IdentifiableServiceImpl<P> implements EntityPartService<P, E> {
+public class EntityPartServiceImpl<P extends EntityPart> extends IdentifiableServiceImpl<P>
+    implements EntityPartService<P> {
 
   @Autowired
   public EntityPartServiceImpl(
-      @Qualifier("entityPartRepositoryImpl") EntityPartRepository<P, E> repository) {
+      @Qualifier("entityPartRepositoryImpl") EntityPartRepository<P> repository) {
     super(repository);
   }
 
   @Override
-  public void addRelatedEntity(P entityPart, E entity) {
-    ((EntityPartRepository) repository).addRelatedEntity(entityPart, entity);
-  }
-
-  @Override
   public void addRelatedEntity(UUID entityPartUuid, UUID entityUuid) {
-    ((EntityPartRepository) repository).addRelatedEntity(entityPartUuid, entityUuid);
-  }
-
-  @Override
-  public void addRelatedFileresource(P entityPart, FileResource fileResource) {
-    ((EntityPartRepository) repository).addRelatedFileresource(entityPart, fileResource);
+    ((EntityPartRepository<P>) repository).addRelatedEntity(entityPartUuid, entityUuid);
   }
 
   @Override
   public void addRelatedFileresource(UUID entityPartUuid, UUID fileResourceUuid) {
-    ((EntityPartRepository) repository).addRelatedFileresource(entityPartUuid, fileResourceUuid);
+    ((EntityPartRepository<P>) repository).addRelatedFileresource(entityPartUuid, fileResourceUuid);
   }
 
   protected Filtering filteringForActive() {
@@ -58,45 +48,24 @@ public class EntityPartServiceImpl<P extends EntityPart, E extends Entity>
   }
 
   @Override
-  public List<E> getRelatedEntities(P entityPart) {
-    return ((EntityPartRepository) repository).getRelatedEntities(entityPart);
-  }
-
-  @Override
-  public List<E> getRelatedEntities(UUID entityPartUuid) {
-    return ((EntityPartRepository) repository).getRelatedEntities(entityPartUuid);
-  }
-
-  @Override
-  public List<FileResource> getRelatedFileResources(P entityPart) {
-    return ((EntityPartRepository) repository).getRelatedFileResources(entityPart);
+  public List<Entity> getRelatedEntities(UUID entityPartUuid) {
+    return ((EntityPartRepository<P>) repository).getRelatedEntities(entityPartUuid);
   }
 
   @Override
   public List<FileResource> getRelatedFileResources(UUID entityPartUuid) {
-    return ((EntityPartRepository) repository).getRelatedFileResources(entityPartUuid);
+    return ((EntityPartRepository<P>) repository).getRelatedFileResources(entityPartUuid);
   }
 
   @Override
-  public List<E> saveRelatedEntities(P entityPart, List<E> entities) {
-    return ((EntityPartRepository) repository).saveRelatedEntities(entityPart, entities);
-  }
-
-  @Override
-  public List<E> saveRelatedEntities(UUID entityPartUuid, List<E> entities) {
-    return ((EntityPartRepository) repository).saveRelatedEntities(entityPartUuid, entities);
-  }
-
-  @Override
-  public List<FileResource> saveRelatedFileResources(
-      P entityPart, List<FileResource> fileResources) {
-    return ((EntityPartRepository) repository).saveRelatedFileResources(entityPart, fileResources);
+  public List<Entity> saveRelatedEntities(UUID entityPartUuid, List<Entity> entities) {
+    return ((EntityPartRepository<P>) repository).saveRelatedEntities(entityPartUuid, entities);
   }
 
   @Override
   public List<FileResource> saveRelatedFileResources(
       UUID entityPartUuid, List<FileResource> fileResources) {
-    return ((EntityPartRepository) repository)
+    return ((EntityPartRepository<P>) repository)
         .saveRelatedFileResources(entityPartUuid, fileResources);
   }
 }

@@ -8,81 +8,11 @@ import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Repository for Subtopic persistence handling.
- *
- * @param <S> instance of subtopic implementation
- */
-public interface SubtopicRepository<S extends Subtopic>
-    extends NodeRepository<S>, EntityPartRepository<S> {
+/** Repository for Subtopic persistence handling. */
+public interface SubtopicRepository
+    extends NodeRepository<Subtopic>, EntityPartRepository<Subtopic> {
 
-  @Override
-  default List<S> getChildren(S subtopic) {
-    if (subtopic == null) {
-      return null;
-    }
-    return getChildren(subtopic.getUuid());
-  }
-
-  default List<Entity> getEntities(S subtopic) {
-    if (subtopic == null) {
-      return null;
-    }
-    return getEntities(subtopic.getUuid());
-  }
-
-  List<Entity> getEntities(UUID subtopicUuid);
-
-  default List<Entity> saveEntities(S subtopic, List<Entity> entities) {
-    if (subtopic == null) {
-      return null;
-    }
-    return saveEntities(subtopic.getUuid(), entities);
-  }
-
-  List<Entity> saveEntities(UUID subtopicUuid, List<Entity> entities);
-
-  default List<FileResource> getFileResources(S subtopic) {
-    if (subtopic == null) {
-      return null;
-    }
-    return getFileResources(subtopic.getUuid());
-  }
-
-  List<FileResource> getFileResources(UUID subtopicUuid);
-
-  default List<FileResource> saveFileResources(S subtopic, List<FileResource> fileResources) {
-    if (subtopic == null) {
-      return null;
-    }
-    return saveFileResources(subtopic.getUuid(), fileResources);
-  }
-
-  List<FileResource> saveFileResources(UUID subtopicUuid, List<FileResource> fileResources);
-
-  S saveWithParentTopic(S subtopic, UUID parentTopicUuid);
-
-  S saveWithParentSubtopic(S subtopic, UUID parentSubtopicUuid);
-
-  default List<S> getSubtopicsOfEntity(Entity entity) {
-    if (entity == null) {
-      return null;
-    }
-    return getSubtopicsOfEntity(entity.getUuid());
-  }
-
-  List<S> getSubtopicsOfEntity(UUID entityUuid);
-
-  default List<S> getSubtopicsOfFileResource(FileResource fileResource) {
-    if (fileResource == null) {
-      return null;
-    }
-    return getSubtopicsOfEntity(fileResource.getUuid());
-  }
-
-  List<S> getSubtopicsOfFileResource(UUID fileResourceUuid);
-
-  default Integer deleteFromParentSubtopic(S subtopic, UUID parentSubtopicUuid) {
+  default Integer deleteFromParentSubtopic(Subtopic subtopic, UUID parentSubtopicUuid) {
     if (subtopic == null) {
       return null;
     }
@@ -91,7 +21,7 @@ public interface SubtopicRepository<S extends Subtopic>
 
   Integer deleteFromParentSubtopic(UUID subtopicUuid, UUID parentSubtopicUuid);
 
-  default Integer deleteFromParentTopic(S subtopic, UUID topicUuid) {
+  default Integer deleteFromParentTopic(Subtopic subtopic, UUID topicUuid) {
     if (subtopic == null) {
       return null;
     }
@@ -100,6 +30,50 @@ public interface SubtopicRepository<S extends Subtopic>
 
   Integer deleteFromParentTopic(UUID subtopicUuid, UUID topicUuid);
 
+  @Override
+  default List<Subtopic> getChildren(Subtopic subtopic) {
+    if (subtopic == null) {
+      return null;
+    }
+    return getChildren(subtopic.getUuid());
+  }
+
+  default List<Entity> getEntities(Subtopic subtopic) {
+    if (subtopic == null) {
+      return null;
+    }
+    return getEntities(subtopic.getUuid());
+  }
+
+  List<Entity> getEntities(UUID subtopicUuid);
+
+  default List<FileResource> getFileResources(Subtopic subtopic) {
+    if (subtopic == null) {
+      return null;
+    }
+    return getFileResources(subtopic.getUuid());
+  }
+
+  List<FileResource> getFileResources(UUID subtopicUuid);
+
+  default List<Subtopic> getSubtopicsOfEntity(Entity entity) {
+    if (entity == null) {
+      return null;
+    }
+    return getSubtopicsOfEntity(entity.getUuid());
+  }
+
+  List<Subtopic> getSubtopicsOfEntity(UUID entityUuid);
+
+  default List<Subtopic> getSubtopicsOfFileResource(FileResource fileResource) {
+    if (fileResource == null) {
+      return null;
+    }
+    return getSubtopicsOfEntity(fileResource.getUuid());
+  }
+
+  List<Subtopic> getSubtopicsOfFileResource(UUID fileResourceUuid);
+
   /**
    * @param rootSubtopicUuid uuid of a subtopic (subtopic must be a top level subtopic under a
    *     topic)
@@ -107,5 +81,24 @@ public interface SubtopicRepository<S extends Subtopic>
    */
   Topic getTopic(UUID rootSubtopicUuid);
 
-  boolean updateChildrenOrder(UUID parentUuid, List<S> children);
+  default List<Entity> saveEntities(Subtopic subtopic, List<Entity> entities) {
+    if (subtopic == null) {
+      return null;
+    }
+    return saveEntities(subtopic.getUuid(), entities);
+  }
+
+  List<Entity> saveEntities(UUID subtopicUuid, List<Entity> entities);
+
+  default List<FileResource> saveFileResources(
+      Subtopic subtopic, List<FileResource> fileResources) {
+    if (subtopic == null) {
+      return null;
+    }
+    return saveFileResources(subtopic.getUuid(), fileResources);
+  }
+
+  List<FileResource> saveFileResources(UUID subtopicUuid, List<FileResource> fileResources);
+
+  Subtopic saveWithParentTopic(Subtopic subtopic, UUID parentTopicUuid);
 }

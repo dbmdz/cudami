@@ -37,10 +37,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
-    implements ArticleRepository<ArticleImpl> {
+public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
+    implements ArticleRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticleRepositoryImpl.class);
+
+  public static final String MAPPING_PREFIX = "ar";
 
   public static final String SQL_REDUCED_FIELDS_AR =
       " a.uuid ar_uuid, a.refid ar_refId, a.label ar_label, a.description ar_description,"
@@ -51,7 +53,6 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
 
   public static final String SQL_FULL_FIELDS_AR = SQL_REDUCED_FIELDS_AR + ", a.text ar_text";
 
-  public static final String MAPPING_PREFIX = "ar";
   public static final String TABLE_ALIAS = "a";
   public static final String TABLE_NAME = "articles";
 
@@ -75,8 +76,8 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
   }
 
   @Override
-  public ArticleImpl findOne(UUID uuid, Filtering filtering) {
-    ArticleImpl article = super.findOne(uuid, filtering);
+  public Article findOne(UUID uuid, Filtering filtering) {
+    Article article = super.findOne(uuid, filtering);
 
     if (article != null) {
       List<Agent> creators = getCreators(uuid);
@@ -86,8 +87,8 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
   }
 
   @Override
-  public ArticleImpl findOne(Identifier identifier) {
-    ArticleImpl article = super.findOne(identifier);
+  public Article findOne(Identifier identifier) {
+    Article article = super.findOne(identifier);
 
     if (article != null) {
       article.setCreators(getCreators(article.getUuid()));
@@ -96,8 +97,8 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
   }
 
   @Override
-  public ArticleImpl findOneByRefId(long refId) {
-    ArticleImpl article = super.findOneByRefId(refId);
+  public Article findOneByRefId(long refId) {
+    Article article = super.findOneByRefId(refId);
 
     if (article != null) {
       article.setCreators(getCreators(article.getUuid()));
@@ -166,6 +167,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
                     .stream()
                     .map(
                         (entity) -> {
+                          // FIXME: use new agentrepositoryimpl (see workrepositoryimpl)
                           EntityType entityType = entity.getEntityType();
                           switch (entityType) {
                             case CORPORATE_BODY:
@@ -200,7 +202,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
   }
 
   @Override
-  public ArticleImpl save(ArticleImpl article) {
+  public Article save(Article article) {
     article.setUuid(UUID.randomUUID());
     article.setCreated(LocalDateTime.now());
     article.setLastModified(LocalDateTime.now());
@@ -240,7 +242,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
     List<Agent> creators = article.getCreators();
     saveCreatorsList(article, creators);
 
-    ArticleImpl result = findOne(article.getUuid());
+    Article result = findOne(article.getUuid());
     return result;
   }
 
@@ -274,7 +276,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
   }
 
   @Override
-  public ArticleImpl update(ArticleImpl article) {
+  public Article update(Article article) {
     article.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, entity_type, refid
@@ -309,7 +311,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<ArticleImpl>
     List<Agent> creators = article.getCreators();
     saveCreatorsList(article, creators);
 
-    ArticleImpl result = findOne(article.getUuid());
+    Article result = findOne(article.getUuid());
     return result;
   }
 }

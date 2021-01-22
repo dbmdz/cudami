@@ -31,7 +31,9 @@ public interface EntityRepository<E extends Entity> extends IdentifiableReposito
    * @param fileResources the fileresources that are related to the entity
    * @return the list of the related fileresources
    */
-  List<FileResource> saveRelatedFileResources(E entity, List<FileResource> fileResources);
+  default List<FileResource> saveRelatedFileResources(E entity, List<FileResource> fileResources) {
+    return saveRelatedFileResources(entity.getUuid(), fileResources);
+  }
 
   List<FileResource> saveRelatedFileResources(UUID entityUuid, List<FileResource> fileResources);
 }

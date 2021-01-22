@@ -24,7 +24,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
-// @Transactional(readOnly = true)
 public class IdentifiableServiceImpl<I extends Identifiable> implements IdentifiableService<I> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableServiceImpl.class);
@@ -45,6 +44,11 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
+  public boolean delete(List<UUID> uuids) {
+    return repository.delete(uuids);
+  }
+
+  @Override
   public PageResponse<I> find(PageRequest pageRequest) {
     setDefaultSorting(pageRequest);
     return repository.find(pageRequest);
@@ -62,13 +66,30 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
+  public List<I> findAllFull() {
+    return repository.findAllFull();
+  }
+
+  @Override
+  public List<I> findAllReduced() {
+    return repository.findAllReduced();
+  }
+
+  @Override
+  public PageResponse<I> findByLanguageAndInitial(
+      PageRequest pageRequest, String language, String initial) {
+    PageResponse<I> result = repository.findByLanguageAndInitial(pageRequest, language, initial);
+    return result;
+  }
+
+  @Override
   public I get(Identifier identifier) {
-    return (I) repository.findOne(identifier);
+    return repository.findOne(identifier);
   }
 
   @Override
   public I get(UUID uuid) {
-    return (I) repository.findOne(uuid);
+    return repository.findOne(uuid);
   }
 
   @Override
@@ -78,11 +99,11 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     return reduceMultilanguageFieldsToGivenLocale(identifiable, locale);
   }
 
-
   @Override
   public I getByIdentifier(String namespace, String id) {
-    return (I) repository.findOneByIdentifier(namespace, id);
+    return repository.findOneByIdentifier(namespace, id);
   }
+
   protected I reduceMultilanguageFieldsToGivenLocale(I identifiable, Locale locale) {
     if (identifiable == null) {
       return null;
@@ -121,16 +142,19 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   //  @Transactional(readOnly = false)
   public I save(I identifiable) throws IdentifiableServiceException {
     try {
-      return (I) repository.save(identifiable);
+      return repository.save(identifiable);
     } catch (Exception e) {
       LOGGER.error("Cannot save identifiable " + identifiable + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
     }
   }
+
   protected void setDefaultSorting(PageRequest pageRequest) {
     // business logic: default sorting if no other sorting given: german label ascending
     // TODO or make dependend from language the user has chosen...?
-    if (pageRequest.getSorting() == null || pageRequest.getSorting().getOrders() == null || pageRequest.getSorting().getOrders().isEmpty()) {
+    if (pageRequest.getSorting() == null
+        || pageRequest.getSorting().getOrders() == null
+        || pageRequest.getSorting().getOrders().isEmpty()) {
       final OrderImpl labelOrder = new OrderImpl(Direction.ASC, "label");
       labelOrder.setSubProperty("de");
       Sorting sorting = Sorting.defaultBuilder().order(labelOrder).build();
@@ -142,7 +166,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   //  @Transactional(readOnly = false)
   public I update(I identifiable) throws IdentifiableServiceException {
     try {
-      return (I) repository.update(identifiable);
+      return repository.update(identifiable);
     } catch (Exception e) {
       LOGGER.error("Cannot update identifiable " + identifiable + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());

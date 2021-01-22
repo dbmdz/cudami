@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityRelationsService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -28,7 +28,7 @@ public class EntityRelationsController {
 
   @Autowired private DigitalObjectService digitalObjectService;
 
-  @Autowired private EntityRelationsService service;
+  @Autowired private EntityRelationService service;
 
   @ApiMethod(description = "Get paged, sorted, filtered relations")
   @GetMapping(
@@ -65,7 +65,7 @@ public class EntityRelationsController {
       throw new IllegalArgumentException(
           "Mismatching arguments. SubjectUuid must match the Uuid of the subject of the first item");
     }
-    return digitalObjectService.saveRelations(entityRelations);
+    return service.save(entityRelations);
   }
 
   @ApiMethod(description = "Connect a list of entity pairs with a predicate each")
@@ -74,6 +74,6 @@ public class EntityRelationsController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   List<EntityRelation> saveEntityRelations(@RequestBody List<EntityRelation> entityRelations) {
-    return service.saveEntityRelations(entityRelations);
+    return service.save(entityRelations);
   }
 }

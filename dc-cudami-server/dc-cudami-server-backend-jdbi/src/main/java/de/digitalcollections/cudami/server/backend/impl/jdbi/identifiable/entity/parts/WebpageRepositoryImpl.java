@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.jdbi.v3.core.statement.PreparedBatch;
@@ -31,8 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<WebpageImpl>
-    implements WebpageRepository<WebpageImpl> {
+public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
+    implements WebpageRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpageRepositoryImpl.class);
   public static final String MAPPING_PREFIX = "wp";
@@ -64,32 +62,26 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<WebpageImpl>
   }
 
   @Override
-  public boolean addChildren(UUID parentUuid, List<WebpageImpl> collections) {
+  public boolean addChildren(UUID parentUuid, List<Webpage> collections) {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
   @Override
-  public WebpageImpl findOne(UUID uuid, Filtering filtering) {
-    WebpageImpl webpage = super.findOne(uuid, filtering);
+  public Webpage findOne(UUID uuid, Filtering filtering) {
+    Webpage webpage = super.findOne(uuid, filtering);
 
     if (webpage != null) {
-      webpage.setChildren(
-          Stream.ofNullable(getChildren(webpage))
-              .map(Webpage.class::cast)
-              .collect(Collectors.toList()));
+      webpage.setChildren(getChildren(webpage));
     }
     return webpage;
   }
 
   @Override
-  public WebpageImpl findOne(Identifier identifier) {
-    WebpageImpl webpage = super.findOne(identifier);
+  public Webpage findOne(Identifier identifier) {
+    Webpage webpage = super.findOne(identifier);
 
     if (webpage != null) {
-      webpage.setChildren(
-          Stream.ofNullable(getChildren(webpage))
-              .map(Webpage.class::cast)
-              .collect(Collectors.toList()));
+      webpage.setChildren(getChildren(webpage));
     }
     return webpage;
   }
@@ -102,7 +94,7 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<WebpageImpl>
   @Override
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) {
 
-    List<NodeImpl> result =
+    List<Node> result =
         dbi.withHandle(
             h ->
                 h.createQuery(
@@ -128,6 +120,7 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<WebpageImpl>
                     .bind("uuid", uuid)
                     .registerRowMapper(BeanMapper.factory(NodeImpl.class))
                     .mapTo(NodeImpl.class)
+                    .map(Node.class::cast)
                     .list());
 
     if (result.isEmpty()) {
@@ -143,21 +136,20 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<WebpageImpl>
                       .bind("uuid", uuid)
                       .registerRowMapper(BeanMapper.factory(NodeImpl.class))
                       .mapTo(NodeImpl.class)
+                      .map(Node.class::cast)
                       .list());
     }
 
-    List<Node> nodes = result.stream().map(s -> (Node) s).collect(Collectors.toList());
-
-    return new BreadcrumbNavigationImpl(nodes);
+    return new BreadcrumbNavigationImpl(result);
   }
 
   @Override
-  public List<WebpageImpl> getChildren(WebpageImpl webpage) {
+  public List<Webpage> getChildren(Webpage webpage) {
     return getChildren(webpage.getUuid());
   }
 
   @Override
-  public List<WebpageImpl> getChildren(UUID uuid) {
+  public List<Webpage> getChildren(UUID uuid) {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -170,12 +162,12 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<WebpageImpl>
                 + " WHERE ww.parent_webpage_uuid = :uuid"
                 + " ORDER BY ww.sortIndex ASC");
 
-    List<WebpageImpl> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
+    List<Webpage> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
     return result;
   }
 
   @Override
-  public PageResponse<WebpageImpl> getChildren(UUID uuid, PageRequest pageRequest) {
+  public PageResponse<Webpage> getChildren(UUID uuid, PageRequest pageRequest) {
     String commonSql =
         " FROM "
             + tableName
@@ -193,7 +185,7 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<WebpageImpl>
     }
     addPageRequestParams(pageRequest, innerQuery);
 
-    List<WebpageImpl> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
+    List<Webpage> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -222,7 +214,7 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<WebpageImpl>
   }
 
   @Override
-  public WebpageImpl getParent(UUID uuid) {
+  public Webpage getParent(UUID uuid) {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -233,18 +225,18 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<WebpageImpl>
                 + tableAlias
                 + ".uuid = ww.parent_webpage_uuid"
                 + " WHERE ww.child_webpage_uuid = :uuid");
-    WebpageImpl result = retrieveOne(reducedFieldsSql, innerQuery, null, Map.of("uuid", uuid));
+    Webpage result = retrieveOne(reducedFieldsSql, innerQuery, null, Map.of("uuid", uuid));
 
     return result;
   }
 
   @Override
-  public List<WebpageImpl> getParents(UUID uuid) {
+  public List<Webpage> getParents(UUID uuid) {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
   @Override
-  public PageResponse<WebpageImpl> getRootNodes(PageRequest pageRequest) {
+  public PageResponse<Webpage> getRootNodes(PageRequest pageRequest) {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
@@ -256,7 +248,7 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<WebpageImpl>
             + " INNER JOIN website_webpages ww ON uuid = ww.website_uuid"
             + " WHERE ww.webpage_uuid = :uuid";
 
-    WebsiteImpl result =
+    Website result =
         dbi.withHandle(
             h ->
                 h.createQuery(query)
@@ -272,7 +264,7 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<WebpageImpl>
   }
 
   @Override
-  public WebpageImpl save(WebpageImpl webpage) {
+  public Webpage save(Webpage webpage) {
     webpage.setUuid(UUID.randomUUID());
     webpage.setCreated(LocalDateTime.now());
     webpage.setLastModified(LocalDateTime.now());
@@ -307,12 +299,12 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<WebpageImpl>
     Set<Identifier> identifiers = webpage.getIdentifiers();
     saveIdentifiers(identifiers, webpage);
 
-    WebpageImpl result = findOne(webpage.getUuid());
+    Webpage result = findOne(webpage.getUuid());
     return result;
   }
 
   @Override
-  public WebpageImpl saveWithParentWebpage(WebpageImpl webpage, UUID parentWebpageUuid) {
+  public Webpage saveWithParent(Webpage webpage, UUID parentWebpageUuid) {
     final UUID childUuid = webpage.getUuid() == null ? save(webpage).getUuid() : webpage.getUuid();
 
     Integer nextSortIndex =
@@ -334,7 +326,7 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<WebpageImpl>
   }
 
   @Override
-  public WebpageImpl saveWithParentWebsite(WebpageImpl webpage, UUID parentWebsiteUuid) {
+  public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid) {
     final UUID webpageUuid =
         webpage.getUuid() == null ? save(webpage).getUuid() : webpage.getUuid();
 
@@ -357,7 +349,7 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<WebpageImpl>
   }
 
   @Override
-  public WebpageImpl update(WebpageImpl webpage) {
+  public Webpage update(Webpage webpage) {
     webpage.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type
@@ -388,12 +380,12 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<WebpageImpl>
     Set<Identifier> identifiers = webpage.getIdentifiers();
     saveIdentifiers(identifiers, webpage);
 
-    WebpageImpl result = findOne(webpage.getUuid());
+    Webpage result = findOne(webpage.getUuid());
     return result;
   }
 
   @Override
-  public boolean updateChildrenOrder(UUID parentUuid, List<WebpageImpl> children) {
+  public boolean updateChildrenOrder(UUID parentUuid, List<Webpage> children) {
     if (parentUuid == null || children == null) {
       return false;
     }

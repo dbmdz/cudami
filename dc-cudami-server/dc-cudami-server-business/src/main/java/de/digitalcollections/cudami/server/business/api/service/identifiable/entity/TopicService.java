@@ -8,7 +8,12 @@ import java.util.UUID;
 /** Service for Topic. */
 public interface TopicService extends EntityService<Topic> {
 
-  List<Subtopic> getSubtopics(Topic topic);
+  default List<Subtopic> getSubtopics(Topic topic) {
+    if (topic == null) {
+      return null;
+    }
+    return getSubtopics(topic.getUuid());
+  }
 
   List<Subtopic> getSubtopics(UUID uuid);
 }

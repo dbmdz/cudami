@@ -18,16 +18,6 @@ public class VersionServiceImpl implements VersionService {
   @Autowired private VersionRepository repository;
 
   @Override
-  public Version get(UUID uuid) {
-    return repository.findOne(uuid);
-  }
-
-  @Override
-  public Version get(String externalKey) {
-    return repository.findOneByInstanceversionKey(externalKey);
-  }
-
-  @Override
   public Version create(String instanceKey, String instanceVersionkey) {
     VersionImpl version = new VersionImpl();
     version.setInstanceVersionKey(instanceVersionkey);
@@ -35,6 +25,27 @@ public class VersionServiceImpl implements VersionService {
     version.setStatus(Status.INITIAL);
     version.setTypeKey(TypeKey.DIGITALOBJECT);
     return repository.save(version);
+  }
+
+  @Override
+  public String extractInstanceVersionkey(Identifiable identifiable) {
+    for (Identifier identifier : identifiable.getIdentifiers()) {
+      if ("instanceVersionkey".equals(identifier.getNamespace())) {
+        return identifier.getId();
+      }
+    }
+    return null;
+    // return "dummy_instance_version_key_7";
+  }
+
+  @Override
+  public Version get(UUID uuid) {
+    return repository.findOne(uuid);
+  }
+
+  @Override
+  public Version getByInstanceversionKey(String instanceVersionkey) {
+    return repository.findOneByInstanceversionKey(instanceVersionkey);
   }
 
   @Override
@@ -48,16 +59,5 @@ public class VersionServiceImpl implements VersionService {
       throw new Exception("Version must have a uuid and a status: " + version);
     }
     return repository.update(version);
-  }
-
-  @Override
-  public String extractInstanceVersionkey(Identifiable identifiable) {
-    for (Identifier identifier : identifiable.getIdentifiers()) {
-      if ("instanceVersionkey".equals(identifier.getNamespace())) {
-        return identifier.getId();
-      }
-    }
-    return null;
-    // return "dummy_instance_version_key_7";
   }
 }

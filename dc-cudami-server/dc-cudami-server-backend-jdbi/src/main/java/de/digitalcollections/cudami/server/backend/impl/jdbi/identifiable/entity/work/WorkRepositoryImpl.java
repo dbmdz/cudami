@@ -9,15 +9,12 @@ import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.api.identifiable.entity.work.Item;
 import de.digitalcollections.model.api.identifiable.entity.work.Work;
-import de.digitalcollections.model.impl.identifiable.entity.agent.AgentImpl;
-import de.digitalcollections.model.impl.identifiable.entity.work.ItemImpl;
 import de.digitalcollections.model.impl.identifiable.entity.work.WorkImpl;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
@@ -26,8 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class WorkRepositoryImpl extends EntityRepositoryImpl<WorkImpl>
-    implements WorkRepository<WorkImpl> {
+public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements WorkRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WorkRepositoryImpl.class);
   public static final String MAPPING_PREFIX = "wo";
@@ -66,8 +62,8 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<WorkImpl>
   }
 
   @Override
-  public WorkImpl findOne(UUID uuid, Filtering filtering) {
-    WorkImpl work = super.findOne(uuid, filtering);
+  public Work findOne(UUID uuid, Filtering filtering) {
+    Work work = super.findOne(uuid, filtering);
 
     if (work != null) {
       List<Agent> creators = getCreators(uuid);
@@ -77,8 +73,8 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<WorkImpl>
   }
 
   @Override
-  public WorkImpl findOne(Identifier identifier) {
-    WorkImpl work = super.findOne(identifier);
+  public Work findOne(Identifier identifier) {
+    Work work = super.findOne(identifier);
 
     if (work != null) {
       List<Agent> creators = getCreators(work.getUuid());
@@ -126,10 +122,10 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<WorkImpl>
                 + " WHERE wc.work_uuid = :uuid"
                 + " ORDER BY wc.sortIndex ASC");
 
-    List<AgentImpl> result =
+    List<Agent> result =
         agentRepositoryImpl.retrieveList(
             AgentRepositoryImpl.SQL_REDUCED_FIELDS_AG, innerQuery, Map.of("uuid", workUuid));
-    return result.stream().map(Agent.class::cast).collect(Collectors.toList());
+    return result;
   }
 
   @Override
@@ -149,14 +145,14 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<WorkImpl>
                 + " WHERE iw.work_uuid = :uuid"
                 + " ORDER BY iw.sortIndex ASC");
 
-    List<ItemImpl> result =
+    List<Item> result =
         itemRepositoryImpl.retrieveList(
             ItemRepositoryImpl.SQL_REDUCED_FIELDS_IT, innerQuery, Map.of("uuid", workUuid));
-    return result.stream().map(Item.class::cast).collect(Collectors.toList());
+    return result;
   }
 
   @Override
-  public WorkImpl save(WorkImpl work) {
+  public Work save(Work work) {
     work.setUuid(UUID.randomUUID());
     work.setCreated(LocalDateTime.now());
     work.setLastModified(LocalDateTime.now());
@@ -194,7 +190,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<WorkImpl>
     List<Agent> creators = work.getCreators();
     saveCreatorsList(work, creators);
 
-    WorkImpl result = findOne(work.getUuid());
+    Work result = findOne(work.getUuid());
     return result;
   }
 
@@ -228,7 +224,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<WorkImpl>
   }
 
   @Override
-  public WorkImpl update(WorkImpl work) {
+  public Work update(Work work) {
     work.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, entity_type, refid
@@ -261,7 +257,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<WorkImpl>
     List<Agent> creators = work.getCreators();
     saveCreatorsList(work, creators);
 
-    WorkImpl result = findOne(work.getUuid());
+    Work result = findOne(work.getUuid());
     return result;
   }
 }

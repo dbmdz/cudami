@@ -4,15 +4,14 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
+import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
-import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.RowView;
 import org.jdbi.v3.core.statement.PreparedBatch;
@@ -22,10 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class EntityRepositoryImpl<E extends EntityImpl> extends IdentifiableRepositoryImpl<E>
+public class EntityRepositoryImpl<E extends Entity> extends IdentifiableRepositoryImpl<E>
     implements EntityRepository<E> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(EntityRepositoryImpl.class);
+  public static final String MAPPING_PREFIX = "e";
 
   public static final String SQL_REDUCED_FIELDS_E =
       " e.uuid e_uuid, e.refid e_refId, e.label e_label, e.description e_description,"
@@ -35,7 +35,6 @@ public class EntityRepositoryImpl<E extends EntityImpl> extends IdentifiableRepo
 
   public static final String SQL_FULL_FIELDS_E = SQL_REDUCED_FIELDS_E;
 
-  public static final String MAPPING_PREFIX = "e";
   public static final String TABLE_ALIAS = "e";
   public static final String TABLE_NAME = "entities";
 
@@ -52,7 +51,7 @@ public class EntityRepositoryImpl<E extends EntityImpl> extends IdentifiableRepo
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        (Class<E>) EntityImpl.class,
+        EntityImpl.class,
         SQL_REDUCED_FIELDS_E,
         SQL_FULL_FIELDS_E);
     this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
@@ -64,7 +63,7 @@ public class EntityRepositoryImpl<E extends EntityImpl> extends IdentifiableRepo
       String tableName,
       String tableAlias,
       String mappingPrefix,
-      Class<E> entityImplClass,
+      Class entityImplClass,
       String reducedFieldsSql,
       String fullFieldsSql) {
     this(
@@ -85,7 +84,7 @@ public class EntityRepositoryImpl<E extends EntityImpl> extends IdentifiableRepo
       String tableName,
       String tableAlias,
       String mappingPrefix,
-      Class<E> entityImplClass,
+      Class entityImplClass,
       String reducedFieldsSql,
       String fullFieldsSql,
       String fullFieldsJoinsSql) {
@@ -108,7 +107,7 @@ public class EntityRepositoryImpl<E extends EntityImpl> extends IdentifiableRepo
       String tableName,
       String tableAlias,
       String mappingPrefix,
-      Class<E> entityImplClass,
+      Class entityImplClass,
       String reducedFieldsSql,
       String fullFieldsSql,
       String fullFieldsJoinsSql,
@@ -202,23 +201,18 @@ public class EntityRepositoryImpl<E extends EntityImpl> extends IdentifiableRepo
                 + " WHERE ref.entity_uuid = :entityUuid"
                 + " ORDER BY ref.sortindex ASC");
 
-    List<FileResourceImpl> result =
+    List<FileResource> result =
         fileResourceMetadataRepositoryImpl.retrieveList(
             FileResourceMetadataRepositoryImpl.SQL_FULL_FIELDS_FR,
             innerQuery,
             Map.of("entityUuid", entityUuid));
 
-    return result.stream().map(FileResource.class::cast).collect(Collectors.toList());
+    return result;
   }
 
   @Override
   public E save(E entity) {
     throw new UnsupportedOperationException("Use save method of specific entity repository!");
-  }
-
-  @Override
-  public List<FileResource> saveRelatedFileResources(E entity, List<FileResource> fileResources) {
-    return saveRelatedFileResources(entity.getUuid(), fileResources);
   }
 
   @Override

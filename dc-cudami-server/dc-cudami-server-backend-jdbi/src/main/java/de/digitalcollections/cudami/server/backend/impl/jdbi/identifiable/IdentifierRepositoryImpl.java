@@ -24,10 +24,9 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifierRepositoryImpl.class);
 
+  public static final String MAPPING_PREFIX = "id";
   public static final String SQL_FULL_FIELDS_ID =
       " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id";
-
-  public static final String MAPPING_PREFIX = "id";
   public static final String TABLE_ALIAS = "id";
   public static final String TABLE_NAME = "identifiers";
 
@@ -122,11 +121,9 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
     List<Identifier> result =
         dbi.withHandle(
             h ->
-                h
-                    .createQuery(sql)
+                h.createQuery(sql)
                     .bind("uuid", uuidIdentifiable)
                     .mapToBean(IdentifierImpl.class)
-                    .stream()
                     .map(Identifier.class::cast)
                     .collect(Collectors.toList()));
     return result;

@@ -1,9 +1,10 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.LinkedDataFileResourceRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifier;
+import de.digitalcollections.model.api.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
@@ -21,11 +22,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class LinkedDataFileResourceRepositoryImpl
-    extends IdentifiableRepositoryImpl<LinkedDataFileResourceImpl>
-    implements FileResourceMetadataRepository<LinkedDataFileResourceImpl> {
+    extends IdentifiableRepositoryImpl<LinkedDataFileResource>
+    implements LinkedDataFileResourceRepository {
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(LinkedDataFileResourceRepositoryImpl.class);
+  public static final String MAPPING_PREFIX = "fr";
 
   public static final String SQL_REDUCED_FIELDS_FR =
       FileResourceMetadataRepositoryImpl.SQL_REDUCED_FIELDS_FR;
@@ -33,7 +35,6 @@ public class LinkedDataFileResourceRepositoryImpl
   public static final String SQL_FULL_FIELDS_FR =
       SQL_REDUCED_FIELDS_FR + ", f.context fr_context, f.object_type fr_objectType";
 
-  public static final String MAPPING_PREFIX = "fr";
   public static final String TABLE_ALIAS = "f";
   public static final String TABLE_NAME = "fileresources_linkeddata";
 
@@ -57,7 +58,7 @@ public class LinkedDataFileResourceRepositoryImpl
   }
 
   @Override
-  public SearchPageResponse<LinkedDataFileResourceImpl> find(SearchPageRequest searchPageRequest) {
+  public SearchPageResponse<LinkedDataFileResource> find(SearchPageRequest searchPageRequest) {
     String commonSql =
         fileResourceMetadataRepositoryImpl.getCommonFileResourceSearchSql(tableName, tableAlias);
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchPageRequest.getQuery()));
@@ -94,7 +95,7 @@ public class LinkedDataFileResourceRepositoryImpl
   }
 
   @Override
-  public LinkedDataFileResourceImpl save(LinkedDataFileResourceImpl fileResource) {
+  public LinkedDataFileResource save(LinkedDataFileResource fileResource) {
     if (fileResource.getUuid() == null) {
       fileResource.setUuid(UUID.randomUUID());
     }
@@ -127,12 +128,12 @@ public class LinkedDataFileResourceRepositoryImpl
     Set<Identifier> identifiers = fileResource.getIdentifiers();
     saveIdentifiers(identifiers, fileResource);
 
-    LinkedDataFileResourceImpl result = findOne(fileResource.getUuid());
+    LinkedDataFileResource result = findOne(fileResource.getUuid());
     return result;
   }
 
   @Override
-  public LinkedDataFileResourceImpl update(LinkedDataFileResourceImpl fileResource) {
+  public LinkedDataFileResource update(LinkedDataFileResource fileResource) {
     fileResource.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type
@@ -158,7 +159,7 @@ public class LinkedDataFileResourceRepositoryImpl
     Set<Identifier> identifiers = fileResource.getIdentifiers();
     saveIdentifiers(identifiers, fileResource);
 
-    LinkedDataFileResourceImpl result = findOne(fileResource.getUuid());
+    LinkedDataFileResource result = findOne(fileResource.getUuid());
     return result;
   }
 }

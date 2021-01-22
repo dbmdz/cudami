@@ -15,10 +15,8 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.NodeImpl;
-import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
 import de.digitalcollections.model.impl.identifiable.entity.TopicImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.SubtopicImpl;
-import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
 import java.time.LocalDateTime;
@@ -26,8 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.jdbi.v3.core.statement.PreparedBatch;
@@ -37,8 +33,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<SubtopicImpl>
-    implements SubtopicRepository<SubtopicImpl> {
+public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
+    implements SubtopicRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SubtopicRepositoryImpl.class);
   public static final String MAPPING_PREFIX = "st";
@@ -77,7 +73,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<SubtopicImp
   }
 
   @Override
-  public boolean addChildren(UUID parentUuid, List<SubtopicImpl> collections) {
+  public boolean addChildren(UUID parentUuid, List<Subtopic> collections) {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
@@ -108,27 +104,21 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<SubtopicImp
   }
 
   @Override
-  public SubtopicImpl findOne(UUID uuid, Filtering filtering) {
-    SubtopicImpl subtopic = super.findOne(uuid, filtering);
+  public Subtopic findOne(UUID uuid, Filtering filtering) {
+    Subtopic subtopic = super.findOne(uuid, filtering);
 
     if (subtopic != null) {
-      subtopic.setChildren(
-          Stream.ofNullable(getChildren(subtopic))
-              .map(Subtopic.class::cast)
-              .collect(Collectors.toList()));
+      subtopic.setChildren(getChildren(subtopic));
     }
     return subtopic;
   }
 
   @Override
-  public SubtopicImpl findOne(Identifier identifier) {
-    SubtopicImpl subtopic = super.findOne(identifier);
+  public Subtopic findOne(Identifier identifier) {
+    Subtopic subtopic = super.findOne(identifier);
 
     if (subtopic != null) {
-      subtopic.setChildren(
-          Stream.ofNullable(getChildren(subtopic))
-              .map(Subtopic.class::cast)
-              .collect(Collectors.toList()));
+      subtopic.setChildren(getChildren(subtopic));
     }
     return subtopic;
   }
@@ -141,7 +131,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<SubtopicImp
   @Override
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
 
-    List<NodeImpl> result =
+    List<Node> result =
         dbi.withHandle(
             h ->
                 h.createQuery(
@@ -167,6 +157,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<SubtopicImp
                     .bind("uuid", nodeUuid)
                     .registerRowMapper(BeanMapper.factory(NodeImpl.class))
                     .mapTo(NodeImpl.class)
+                    .map(Node.class::cast)
                     .list());
 
     if (result.isEmpty()) {
@@ -182,15 +173,15 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<SubtopicImp
                       .bind("uuid", nodeUuid)
                       .registerRowMapper(BeanMapper.factory(NodeImpl.class))
                       .mapTo(NodeImpl.class)
+                      .map(Node.class::cast)
                       .list());
     }
 
-    List<Node> nodes = result.stream().map(s -> (Node) s).collect(Collectors.toList());
-    return new BreadcrumbNavigationImpl(nodes);
+    return new BreadcrumbNavigationImpl(result);
   }
 
   @Override
-  public List<SubtopicImpl> getChildren(UUID uuid) {
+  public List<Subtopic> getChildren(UUID uuid) {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -203,12 +194,12 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<SubtopicImp
                 + " WHERE ss.parent_subtopic_uuid = :uuid"
                 + " ORDER BY ss.sortIndex ASC");
 
-    List<SubtopicImpl> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
+    List<Subtopic> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
     return result;
   }
 
   @Override
-  public PageResponse<SubtopicImpl> getChildren(UUID uuid, PageRequest pageRequest) {
+  public PageResponse<Subtopic> getChildren(UUID uuid, PageRequest pageRequest) {
     String commonSql =
         " FROM "
             + tableName
@@ -226,7 +217,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<SubtopicImp
     }
     addPageRequestParams(pageRequest, innerQuery);
 
-    List<SubtopicImpl> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
+    List<Subtopic> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -251,11 +242,6 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<SubtopicImp
   }
 
   @Override
-  public List<Entity> getEntities(SubtopicImpl subtopic) {
-    return getEntities(subtopic.getUuid());
-  }
-
-  @Override
   public List<Entity> getEntities(UUID subtopicUuid) {
     final String entityTableAlias = entityRepositoryImpl.getTableAlias();
     final String entityTableName = entityRepositoryImpl.getTableName();
@@ -272,11 +258,11 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<SubtopicImp
                 + " WHERE se.subtopic_uuid = :uuid"
                 + " ORDER BY se.sortIndex ASC");
 
-    List<EntityImpl> result =
+    List<Entity> result =
         entityRepositoryImpl.retrieveList(
             EntityRepositoryImpl.SQL_REDUCED_FIELDS_E, innerQuery, Map.of("uuid", subtopicUuid));
 
-    return result.stream().map(Entity.class::cast).collect(Collectors.toList());
+    return result;
   }
 
   @Override
@@ -296,17 +282,17 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<SubtopicImp
                 + " WHERE sf.subtopic_uuid = :uuid"
                 + " ORDER BY sf.sortIndex ASC");
 
-    List<FileResourceImpl> result =
+    List<FileResource> result =
         fileResourceMetadataRepositoryImpl.retrieveList(
             FileResourceMetadataRepositoryImpl.SQL_REDUCED_FIELDS_FR,
             innerQuery,
             Map.of("uuid", subtopicUuid));
 
-    return result.stream().map(FileResource.class::cast).collect(Collectors.toList());
+    return result;
   }
 
   @Override
-  public SubtopicImpl getParent(UUID uuid) {
+  public Subtopic getParent(UUID uuid) {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -317,23 +303,23 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<SubtopicImp
                 + tableAlias
                 + ".uuid = ss.parent_subtopic_uuid"
                 + " WHERE ss.child_subtopic_uuid = :uuid");
-    SubtopicImpl result = retrieveOne(reducedFieldsSql, innerQuery, null, Map.of("uuid", uuid));
+    Subtopic result = retrieveOne(reducedFieldsSql, innerQuery, null, Map.of("uuid", uuid));
 
     return result;
   }
 
   @Override
-  public List<SubtopicImpl> getParents(UUID uuid) {
+  public List<Subtopic> getParents(UUID uuid) {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
   @Override
-  public PageResponse<SubtopicImpl> getRootNodes(PageRequest pageRequest) {
+  public PageResponse<Subtopic> getRootNodes(PageRequest pageRequest) {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
   @Override
-  public List<SubtopicImpl> getSubtopicsOfEntity(UUID entityUuid) {
+  public List<Subtopic> getSubtopicsOfEntity(UUID entityUuid) {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -345,13 +331,12 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<SubtopicImp
                 + ".uuid = se.subtopic_uuid"
                 + " WHERE se.entity_uuid = :uuid");
 
-    List<SubtopicImpl> result =
-        retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", entityUuid));
+    List<Subtopic> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", entityUuid));
     return result;
   }
 
   @Override
-  public List<SubtopicImpl> getSubtopicsOfFileResource(UUID fileResourceUuid) {
+  public List<Subtopic> getSubtopicsOfFileResource(UUID fileResourceUuid) {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -363,7 +348,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<SubtopicImp
                 + ".uuid = sf.subtopic_uuid"
                 + " WHERE sf.fileresource_uuid = :uuid");
 
-    List<SubtopicImpl> result =
+    List<Subtopic> result =
         retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", fileResourceUuid));
     return result;
   }
@@ -376,7 +361,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<SubtopicImp
             + " INNER JOIN topic_subtopics ts ON uuid = ts.topic_uuid"
             + " WHERE ts.subtopic_uuid = :uuid";
 
-    TopicImpl result =
+    Topic result =
         dbi.withHandle(
             h ->
                 h.createQuery(query)
@@ -392,7 +377,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<SubtopicImp
   }
 
   @Override
-  public SubtopicImpl save(SubtopicImpl subtopic) {
+  public Subtopic save(Subtopic subtopic) {
     subtopic.setUuid(UUID.randomUUID());
     subtopic.setCreated(LocalDateTime.now());
     subtopic.setLastModified(LocalDateTime.now());
@@ -423,7 +408,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<SubtopicImp
     Set<Identifier> identifiers = subtopic.getIdentifiers();
     saveIdentifiers(identifiers, subtopic);
 
-    SubtopicImpl result = findOne(subtopic.getUuid());
+    Subtopic result = findOne(subtopic.getUuid());
     return result;
   }
 
@@ -486,7 +471,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<SubtopicImp
   }
 
   @Override
-  public SubtopicImpl saveWithParentSubtopic(SubtopicImpl subtopic, UUID parentSubtopicUuid) {
+  public Subtopic saveWithParent(Subtopic subtopic, UUID parentSubtopicUuid) {
     final UUID childSubtopicUuid =
         subtopic.getUuid() == null ? save(subtopic).getUuid() : subtopic.getUuid();
     Integer nextSortindex =
@@ -508,7 +493,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<SubtopicImp
   }
 
   @Override
-  public SubtopicImpl saveWithParentTopic(SubtopicImpl subtopic, UUID parentTopicUuid) {
+  public Subtopic saveWithParentTopic(Subtopic subtopic, UUID parentTopicUuid) {
     final UUID childSubtopicUuid =
         subtopic.getUuid() == null ? save(subtopic).getUuid() : subtopic.getUuid();
 
@@ -531,7 +516,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<SubtopicImp
   }
 
   @Override
-  public SubtopicImpl update(SubtopicImpl subtopic) {
+  public Subtopic update(Subtopic subtopic) {
     subtopic.setLastModified(LocalDateTime.now());
 
     // do not update/left out from statement (not changed since insert):
@@ -561,12 +546,12 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<SubtopicImp
     Set<Identifier> identifiers = subtopic.getIdentifiers();
     saveIdentifiers(identifiers, subtopic);
 
-    SubtopicImpl result = findOne(subtopic.getUuid());
+    Subtopic result = findOne(subtopic.getUuid());
     return result;
   }
 
   @Override
-  public boolean updateChildrenOrder(UUID parentUuid, List<SubtopicImpl> children) {
+  public boolean updateChildrenOrder(UUID parentUuid, List<Subtopic> children) {
     if (parentUuid == null || children == null) {
       return false;
     }

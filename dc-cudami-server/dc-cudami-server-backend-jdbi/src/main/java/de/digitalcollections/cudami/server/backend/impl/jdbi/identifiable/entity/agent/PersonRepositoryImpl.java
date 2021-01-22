@@ -7,15 +7,15 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work.WorkRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.api.identifiable.entity.agent.Person;
+import de.digitalcollections.model.api.identifiable.entity.geo.GeoLocation;
 import de.digitalcollections.model.api.identifiable.entity.geo.enums.GeoLocationType;
 import de.digitalcollections.model.api.identifiable.entity.work.Work;
 import de.digitalcollections.model.api.identifiable.parts.LocalizedText;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
 import de.digitalcollections.model.impl.identifiable.entity.agent.PersonImpl;
 import de.digitalcollections.model.impl.identifiable.entity.geo.GeoLocationImpl;
-import de.digitalcollections.model.impl.identifiable.entity.work.WorkImpl;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,8 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class PersonRepositoryImpl extends EntityRepositoryImpl<PersonImpl>
-    implements PersonRepository<PersonImpl> {
+public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implements PersonRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PersonRepositoryImpl.class);
 
@@ -59,19 +58,18 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<PersonImpl>
   public static final String TABLE_ALIAS = "p";
   public static final String TABLE_NAME = "persons";
 
-  private static BiFunction<
-          LinkedHashMap<UUID, PersonImpl>, RowView, LinkedHashMap<UUID, PersonImpl>>
+  private static BiFunction<LinkedHashMap<UUID, Person>, RowView, LinkedHashMap<UUID, Person>>
       createAdditionalReduceRowsBiFunction() {
     return (map, rowView) -> {
       // entity should be already in map, as we here just add additional data
-      PersonImpl person = map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
+      Person person = map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
 
       if (rowView.getColumn("glbirth_uuid", UUID.class) != null) {
         UUID glBirthUuid = rowView.getColumn("glbirth_uuid", UUID.class);
         LocalizedText label = rowView.getColumn("glbirth_label", LocalizedText.class);
         GeoLocationType geoLocationType =
             rowView.getColumn("glbirth_geoLocationType", GeoLocationType.class);
-        final GeoLocationImpl placeOfBirth = new GeoLocationImpl();
+        final GeoLocation placeOfBirth = new GeoLocationImpl();
         placeOfBirth.setUuid(glBirthUuid);
         placeOfBirth.setLabel(label);
         placeOfBirth.setGeoLocationType(geoLocationType);
@@ -83,7 +81,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<PersonImpl>
         LocalizedText label = rowView.getColumn("gldeath_label", LocalizedText.class);
         GeoLocationType geoLocationType =
             rowView.getColumn("gldeath_geoLocationType", GeoLocationType.class);
-        final GeoLocationImpl placeOfDeath = new GeoLocationImpl();
+        final GeoLocation placeOfDeath = new GeoLocationImpl();
         placeOfDeath.setUuid(glDeathUuid);
         placeOfDeath.setLabel(label);
         placeOfDeath.setGeoLocationType(geoLocationType);
@@ -119,14 +117,12 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<PersonImpl>
   }
 
   @Override
-  public PageResponse<PersonImpl> findByLocationOfBirth(
-      PageRequest pageRequest, UUID uuidGeoLocation) {
+  public PageResponse<Person> findByLocationOfBirth(PageRequest pageRequest, UUID uuidGeoLocation) {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
   @Override
-  public PageResponse<PersonImpl> findByLocationOfDeath(
-      PageRequest pageRequest, UUID uuidGeoLocation) {
+  public PageResponse<Person> findByLocationOfDeath(PageRequest pageRequest, UUID uuidGeoLocation) {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
@@ -148,13 +144,13 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<PersonImpl>
                 + " LEFT JOIN work_creators AS wocr ON itwo.work_uuid = wocr.work_uuid"
                 + " WHERE wocr.agent_uuid = :uuid");
 
-    List<DigitalObjectImpl> list =
+    List<DigitalObject> list =
         digitalObjectRepositoryImpl.retrieveList(
             DigitalObjectRepositoryImpl.SQL_REDUCED_FIELDS_DO,
             innerQuery,
             Map.of("uuid", uuidPerson));
 
-    return list.stream().map(DigitalObject.class::cast).collect(Collectors.toSet());
+    return list.stream().collect(Collectors.toSet());
   }
 
   @Override
@@ -201,15 +197,15 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<PersonImpl>
                 + " WHERE wc.agent_uuid = :uuid"
                 + " ORDER BY wc.sortIndex ASC");
 
-    List<WorkImpl> list =
+    List<Work> list =
         workRepositoryImpl.retrieveList(
             WorkRepositoryImpl.SQL_REDUCED_FIELDS_WO, innerQuery, Map.of("uuid", uuidPerson));
 
-    return list.stream().map(Work.class::cast).collect(Collectors.toSet());
+    return list.stream().collect(Collectors.toSet());
   }
 
   @Override
-  public PersonImpl save(PersonImpl person) {
+  public Person save(Person person) {
     if (person.getUuid() == null) {
       person.setUuid(UUID.randomUUID());
     }
@@ -264,7 +260,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<PersonImpl>
     // save family names
     //    List<FamilyName> familyNames = person.getFamilyNames();
     //    saveRelatedFamilyNames(familyNames, person);
-    PersonImpl result = findOne(person.getUuid());
+    Person result = findOne(person.getUuid());
     return result;
   }
 
@@ -307,7 +303,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<PersonImpl>
   //    }
   //  }
   @Override
-  public PersonImpl update(PersonImpl person) {
+  public Person update(Person person) {
     person.setLastModified(LocalDateTime.now());
     final UUID previewImageUuid =
         person.getPreviewImage() == null ? null : person.getPreviewImage().getUuid();
@@ -356,7 +352,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<PersonImpl>
     //    dbi.withHandle(h -> h.createUpdate("DELETE FROM rel_person_familynames WHERE person_uuid =
     // :uuid").bind("uuid", person.getUuid()).execute());
     //    saveRelatedFamilyNames(familyNames, person);
-    PersonImpl result = findOne(person.getUuid());
+    Person result = findOne(person.getUuid());
     return result;
   }
 }

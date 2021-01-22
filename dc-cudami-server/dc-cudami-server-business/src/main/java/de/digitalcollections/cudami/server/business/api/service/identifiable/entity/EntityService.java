@@ -2,37 +2,24 @@ package de.digitalcollections.cudami.server.business.api.service.identifiable.en
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
-import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import java.util.List;
 import java.util.UUID;
 
+/** @param <E> entity instance */
 public interface EntityService<E extends Entity> extends IdentifiableService<E> {
 
-  void addRelation(EntityRelation relation);
-
-  void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid);
-
-  E getByRefId(long refId);
-
-  List<EntityRelation> getRelations(E subjectEntity);
-
-  List<EntityRelation> getRelations(UUID subjectEntityUuid);
-
-  /**
-   * Save list of entities related to an entity.Prerequisites: entities have been saved before
-   * (exist already) and subject is for all relations the same
-   *
-   * @param relations a list of entity-predicate-entity relations
-   * @return the list of the relations for the same subject-entity
-   */
-  List<EntityRelation> saveRelations(List<EntityRelation> relations);
-
-  void addRelatedFileresource(E entity, FileResource fileResource);
+  default void addRelatedFileresource(E entity, FileResource fileResource) {
+    addRelatedFileresource(entity.getUuid(), fileResource.getUuid());
+  }
 
   void addRelatedFileresource(UUID entityUuid, UUID fileResourceUuid);
 
-  List<FileResource> getRelatedFileResources(E entity);
+  E getByRefId(long refId);
+
+  default List<FileResource> getRelatedFileResources(E entity) {
+    return getRelatedFileResources(entity.getUuid());
+  }
 
   List<FileResource> getRelatedFileResources(UUID entityUuid);
 
@@ -44,7 +31,9 @@ public interface EntityService<E extends Entity> extends IdentifiableService<E> 
    * @param fileResources the fileresources that are related to the entity
    * @return the list of the related fileresources
    */
-  List<FileResource> saveRelatedFileResources(E entity, List<FileResource> fileResources);
+  default List<FileResource> saveRelatedFileResources(E entity, List<FileResource> fileResources) {
+    return saveRelatedFileResources(entity.getUuid(), fileResources);
+  }
 
   List<FileResource> saveRelatedFileResources(UUID entityUuid, List<FileResource> fileResources);
 }
