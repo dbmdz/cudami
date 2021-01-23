@@ -22,29 +22,22 @@ public class AgentRepositoryImpl extends EntityRepositoryImpl<Agent> implements 
   private static final Logger LOGGER = LoggerFactory.getLogger(AgentRepositoryImpl.class);
 
   public static final String MAPPING_PREFIX = "ag";
-
-  public static final String SQL_REDUCED_FIELDS_AG =
-      " e.uuid ag_uuid, e.refid ag_refId, e.label ag_label, e.description ag_description,"
-          + " e.identifiable_type ag_type, e.entity_type ag_entityType,"
-          + " e.created ag_created, e.last_modified ag_lastModified,"
-          + " e.preview_hints ag_previewImageRenderingHints";
-
-  public static final String SQL_FULL_FIELDS_AG = SQL_REDUCED_FIELDS_AG;
-
   public static final String TABLE_ALIAS = "e";
   public static final String TABLE_NAME = "entities";
 
+  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix);
+  }
+
   @Autowired
   public AgentRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(
-        dbi,
-        identifierRepository,
-        TABLE_NAME,
-        TABLE_ALIAS,
-        MAPPING_PREFIX,
-        AgentImpl.class,
-        SQL_REDUCED_FIELDS_AG,
-        SQL_FULL_FIELDS_AG);
+    super(dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, AgentImpl.class);
+    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
+    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override

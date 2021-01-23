@@ -42,18 +42,46 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     implements IdentifiableRepository<I> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableRepositoryImpl.class);
+
   public static final String MAPPING_PREFIX = "idf";
-
-  public static final String SQL_REDUCED_FIELDS_IDF =
-      " i.uuid idf_uuid, i.label idf_label,"
-          + " i.identifiable_type idf_type,"
-          + " i.created idf_created, i.last_modified idf_lastModified,"
-          + " i.preview_hints idf_previewImageRenderingHints";
-
-  public static final String SQL_FULL_FIELDS_IDF =
-      SQL_REDUCED_FIELDS_IDF + ", i.description idf_description";
   public static final String TABLE_ALIAS = "i";
   public static final String TABLE_NAME = "identifiables";
+
+  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
+    return " "
+        + tableAlias
+        + ".uuid "
+        + mappingPrefix
+        + "_uuid, "
+        + tableAlias
+        + ".created "
+        + mappingPrefix
+        + "_created, "
+        + tableAlias
+        + ".description "
+        + mappingPrefix
+        + "_description, "
+        + tableAlias
+        + ".identifiable_type "
+        + mappingPrefix
+        + "_type, "
+        + tableAlias
+        + ".label "
+        + mappingPrefix
+        + "_label, "
+        + tableAlias
+        + ".last_modified "
+        + mappingPrefix
+        + "_lastModified, "
+        + tableAlias
+        + ".preview_hints "
+        + mappingPrefix
+        + "_previewImageRenderingHints";
+  }
 
   /* BiFunction for reducing rows (related objects) of joins not already part of identifiable (Identifier, preview image ImageFileResource). */
   public BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>>
@@ -64,27 +92,23 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   public final BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>>
       basicReduceRowsBiFunction;
   protected final String fullFieldsJoinsSql;
-  protected final String fullFieldsSql;
   public final BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>>
       fullReduceRowsBiFunction;
   protected final Class identifiableImplClass;
   protected final IdentifierRepository identifierRepository;
-  protected final String reducedFieldsSql;
+  protected String sqlAllFields;
+  protected String sqlReducedFields;
 
   @Autowired
   private IdentifiableRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     this(
-        dbi,
-        identifierRepository,
-        TABLE_NAME,
-        TABLE_ALIAS,
-        MAPPING_PREFIX,
-        IdentifiableImpl.class,
-        SQL_REDUCED_FIELDS_IDF,
-        SQL_FULL_FIELDS_IDF);
+        dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, IdentifiableImpl.class);
     // register row mappers for always joined classes and mapping prefix. as it is in autowired
     // constructor, this will be done only once at instantiation done by Spring
     dbi.registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"));
+    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
+    this.sqlReducedFields =
+        IdentifiableRepositoryImpl.this.getSqlReducedFields(tableAlias, mappingPrefix);
   }
 
   protected IdentifiableRepositoryImpl(
@@ -93,9 +117,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       String tableName,
       String tableAlias,
       String mappingPrefix,
-      Class identifiableImplClass,
-      String reducedFieldsSql,
-      String fullFieldsSql) {
+      Class identifiableImplClass) {
     this(
         dbi,
         identifierRepository,
@@ -103,8 +125,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         tableAlias,
         mappingPrefix,
         identifiableImplClass,
-        reducedFieldsSql,
-        fullFieldsSql,
         null,
         null);
   }
@@ -116,8 +136,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       String tableAlias,
       String mappingPrefix,
       Class identifiableImplClass,
-      String reducedFieldsSql,
-      String fullFieldsSql,
       String fullFieldsJoinsSql) {
     this(
         dbi,
@@ -126,8 +144,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         tableAlias,
         mappingPrefix,
         identifiableImplClass,
-        reducedFieldsSql,
-        fullFieldsSql,
         fullFieldsJoinsSql,
         null);
   }
@@ -139,8 +155,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       String tableAlias,
       String mappingPrefix,
       Class identifiableImplClass,
-      String reducedFieldsSql,
-      String fullFieldsSql,
       String fullFieldsJoinsSql,
       BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>>
           additionalReduceRowsBiFunction) {
@@ -168,10 +182,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     }
 
     this.fullFieldsJoinsSql = fullFieldsJoinsSql;
-    this.fullFieldsSql = fullFieldsSql;
     this.identifiableImplClass = identifiableImplClass;
     this.identifierRepository = identifierRepository;
-    this.reducedFieldsSql = reducedFieldsSql;
   }
 
   private BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>>
@@ -240,7 +252,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
     addFiltering(pageRequest, innerQuery);
     addPageRequestParams(pageRequest, innerQuery);
-    List<I> result = retrieveList(reducedFieldsSql, innerQuery, argumentMappings);
+    List<I> result = retrieveList(sqlReducedFields, innerQuery, argumentMappings);
 
     StringBuilder sqlCount = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, sqlCount);
@@ -280,7 +292,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
     addFiltering(searchPageRequest, innerQuery);
     addPageRequestParams(searchPageRequest, innerQuery);
-    List<I> result = retrieveList(reducedFieldsSql, innerQuery, argumentMappings);
+    List<I> result = retrieveList(sqlReducedFields, innerQuery, argumentMappings);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(searchPageRequest, countQuery);
@@ -291,12 +303,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   @Override
   public List<I> findAllFull() {
-    return retrieveList(fullFieldsSql, null, null);
+    return retrieveList(sqlAllFields, null, null);
   }
 
   @Override
   public List<I> findAllReduced() {
-    return retrieveList(reducedFieldsSql, null, null);
+    return retrieveList(sqlReducedFields, null, null);
   }
 
   @Override
@@ -347,7 +359,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                 + ".uuid = :uuid");
     addFiltering(filtering, innerQuery);
 
-    I result = retrieveOne(fullFieldsSql, innerQuery, fullFieldsJoinsSql, Map.of("uuid", uuid));
+    I result = retrieveOne(sqlAllFields, innerQuery, fullFieldsJoinsSql, Map.of("uuid", uuid));
 
     return result;
   }
@@ -374,7 +386,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
     I result =
         retrieveOne(
-            fullFieldsSql,
+            sqlAllFields,
             innerQuery,
             fullFieldsJoinsSql,
             Map.of("id", identifierId, "namespace", namespace));
@@ -404,14 +416,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     }
   }
 
-  public String getFullFieldsSql() {
-    return fullFieldsSql;
-  }
-
-  public Class<I> getIdentifiableImplClass() {
-    return identifiableImplClass;
-  }
-
   public int getIndex(List<? extends Identifiable> list, Identifiable identifiable) {
     int pos = -1;
     for (Identifiable idf : list) {
@@ -423,8 +427,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     return -1;
   }
 
-  public String getReducedFieldsSql() {
-    return reducedFieldsSql;
+  public String getSqlAllFields() {
+    return sqlAllFields;
+  }
+
+  public String getSqlReducedFields() {
+    return sqlReducedFields;
   }
 
   public long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {

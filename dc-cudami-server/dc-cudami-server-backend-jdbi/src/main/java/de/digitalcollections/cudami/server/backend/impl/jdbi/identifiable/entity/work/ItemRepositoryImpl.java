@@ -26,19 +26,43 @@ import org.springframework.stereotype.Repository;
 public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements ItemRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ItemRepositoryImpl.class);
+
   public static final String MAPPING_PREFIX = "it";
-
-  public static final String SQL_REDUCED_FIELDS_IT =
-      " i.uuid it_uuid, i.refid it_refId, i.label it_label, i.description it_description,"
-          + " i.identifiable_type it_type, i.entity_type it_entityType,"
-          + " i.created it_created, i.last_modified it_lastModified";
-
-  public static final String SQL_FULL_FIELDS_IT =
-      SQL_REDUCED_FIELDS_IT
-          + ", i.language it_language, i.publication_date it_publicationDate, i.publication_place it_publicationPlace, i.publisher it_publisher, i.version it_version";
-
   public static final String TABLE_ALIAS = "i";
   public static final String TABLE_NAME = "items";
+
+  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".text "
+        + mappingPrefix
+        + "_text"
+        + tableAlias
+        + ".language "
+        + mappingPrefix
+        + "_language, "
+        + tableAlias
+        + ".publication_date "
+        + mappingPrefix
+        + "_publicationDate, "
+        + tableAlias
+        + ".publication_place "
+        + mappingPrefix
+        + "_publicationPlace, "
+        + tableAlias
+        + ".publisher "
+        + mappingPrefix
+        + "_publisher, "
+        + tableAlias
+        + ".version "
+        + mappingPrefix
+        + "_version";
+  }
+
+  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix);
+  }
 
   private final DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
   private final WorkRepositoryImpl workRepositoryImpl;
@@ -49,16 +73,10 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
       IdentifierRepository identifierRepository,
       @Lazy DigitalObjectRepositoryImpl digitalObjectRepositoryImpl,
       @Lazy WorkRepositoryImpl workRepositoryImpl) {
-    super(
-        dbi,
-        identifierRepository,
-        TABLE_NAME,
-        TABLE_ALIAS,
-        MAPPING_PREFIX,
-        ItemImpl.class,
-        SQL_REDUCED_FIELDS_IT,
-        SQL_FULL_FIELDS_IT);
+    super(dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, ItemImpl.class);
     this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
+    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
+    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
     this.workRepositoryImpl = workRepositoryImpl;
   }
 
@@ -147,7 +165,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
 
     List<DigitalObject> result =
         digitalObjectRepositoryImpl.retrieveList(
-            DigitalObjectRepositoryImpl.SQL_REDUCED_FIELDS_DO,
+            digitalObjectRepositoryImpl.getSqlReducedFields(),
             innerQuery,
             Map.of("uuid", itemUuid));
     return result.stream().collect(Collectors.toSet());
@@ -199,7 +217,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
 
     List<Work> result =
         workRepositoryImpl.retrieveList(
-            WorkRepositoryImpl.SQL_REDUCED_FIELDS_WO, innerQuery, Map.of("uuid", itemUuid));
+            workRepositoryImpl.getSqlReducedFields(), innerQuery, Map.of("uuid", itemUuid));
     return result.stream().collect(Collectors.toSet());
   }
 
@@ -216,12 +234,12 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
         "INSERT INTO "
             + tableName
             + "("
-            + "uuid, label, description, previewfileresource,"
+            + "uuid, label, description, previewfileresource, preview_hints, custom_attrs,"
             + " identifiable_type, entity_type,"
             + " created, last_modified,"
             + " language, publication_date, publication_place, publisher, version"
             + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource,"
+            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
             + " :type, :entityType,"
             + " :created, :lastModified,"
             + " :language, :publicationDate, :publicationPlace, :publisher, :version"
@@ -254,7 +272,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
         "UPDATE "
             + tableName
             + " SET"
-            + " label=:label::JSONB, description=:description::JSONB, previewfileresource=:previewFileResource,"
+            + " label=:label::JSONB, description=:description::JSONB, previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
             + " last_modified=:lastModified,"
             + " language=:language, publication_date=:publicationDate, publication_place=:publicationPlace, publisher=:publisher, version=:version"
             + " WHERE uuid=:uuid";

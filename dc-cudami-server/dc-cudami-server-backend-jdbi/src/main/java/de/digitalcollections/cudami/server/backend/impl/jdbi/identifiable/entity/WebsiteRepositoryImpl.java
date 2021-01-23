@@ -29,19 +29,27 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     implements WebsiteRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsiteRepositoryImpl.class);
+
   public static final String MAPPING_PREFIX = "ws";
-
-  public static final String SQL_REDUCED_FIELDS_WS =
-      " w.uuid ws_uuid, w.refid ws_refId, w.label ws_label, w.description ws_description,"
-          + " w.identifiable_type ws_type, w.entity_type ws_entityType,"
-          + " w.created ws_created, w.last_modified ws_lastModified,"
-          + " w.url ws_url, w.registration_date ws_registrationDate,"
-          + " w.preview_hints ws_previewImageRenderingHints";
-
-  public static final String SQL_FULL_FIELDS_WS = SQL_REDUCED_FIELDS_WS;
-
   public static final String TABLE_ALIAS = "w";
   public static final String TABLE_NAME = "websites";
+
+  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".url "
+        + mappingPrefix
+        + "_url, "
+        + tableAlias
+        + ".registration_date "
+        + mappingPrefix
+        + "_registrationDate";
+  }
 
   private final WebpageRepositoryImpl webpageRepositoryImpl;
 
@@ -50,15 +58,9 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
       Jdbi dbi,
       IdentifierRepository identifierRepository,
       WebpageRepositoryImpl webpageRepositoryImpl) {
-    super(
-        dbi,
-        identifierRepository,
-        TABLE_NAME,
-        TABLE_ALIAS,
-        MAPPING_PREFIX,
-        WebsiteImpl.class,
-        SQL_REDUCED_FIELDS_WS,
-        SQL_FULL_FIELDS_WS);
+    super(dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, WebsiteImpl.class);
+    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
+    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
     this.webpageRepositoryImpl = webpageRepositoryImpl;
   }
 
@@ -132,7 +134,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
 
     List<Webpage> result =
         webpageRepositoryImpl.retrieveList(
-            WebpageRepositoryImpl.SQL_REDUCED_FIELDS_WP, innerQuery, Map.of("uuid", uuid));
+            webpageRepositoryImpl.getSqlReducedFields(), innerQuery, Map.of("uuid", uuid));
     return result;
   }
 
@@ -160,7 +162,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
 
     List<Webpage> result =
         webpageRepositoryImpl.retrieveList(
-            WebpageRepositoryImpl.SQL_REDUCED_FIELDS_WP, innerQuery, Map.of("uuid", uuid));
+            webpageRepositoryImpl.getSqlReducedFields(), innerQuery, Map.of("uuid", uuid));
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -182,12 +184,12 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
         "INSERT INTO "
             + tableName
             + "("
-            + "uuid, label, description, previewfileresource, preview_hints,"
+            + "uuid, label, description, previewfileresource, preview_hints, custom_attrs,"
             + " identifiable_type, entity_type,"
             + " created, last_modified,"
             + " url, registration_date"
             + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
+            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
             + " :type, :entityType,"
             + " :created, :lastModified,"
             + " :url, :registrationDate"
@@ -221,7 +223,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
             + tableName
             + " SET"
             + " label=:label::JSONB, description=:description::JSONB,"
-            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
+            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
             + " last_modified=:lastModified,"
             + " url=:url, registration_date=:registrationDate"
             + " WHERE uuid=:uuid";

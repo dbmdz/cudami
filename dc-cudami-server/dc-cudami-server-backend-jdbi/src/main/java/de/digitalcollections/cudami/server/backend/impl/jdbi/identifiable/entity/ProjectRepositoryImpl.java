@@ -27,33 +27,40 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
     implements ProjectRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProjectRepositoryImpl.class);
+
   public static final String MAPPING_PREFIX = "pr";
-
-  public static final String SQL_REDUCED_FIELDS_PR =
-      " p.uuid pr_uuid, p.refid pr_refId, p.label pr_label, p.description pr_description,"
-          + " p.identifiable_type pr_type, p.entity_type pr_entityType,"
-          + " p.created pr_created, p.last_modified pr_lastModified,"
-          + " p.start_date pr_startDate, p.end_date pr_endDate,"
-          + " p.preview_hints pr_previewImageRenderingHints";
-
-  public static final String SQL_FULL_FIELDS_PR = SQL_REDUCED_FIELDS_PR + ", p.text pr_text";
-
   public static final String TABLE_ALIAS = "p";
   public static final String TABLE_NAME = "projects";
+
+  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".text "
+        + mappingPrefix
+        + "_text";
+  }
+
+  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".start_date "
+        + mappingPrefix
+        + "_startDate, "
+        + tableAlias
+        + ".end_date "
+        + mappingPrefix
+        + "_endDate";
+  }
 
   @Lazy @Autowired private DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
 
   @Autowired
   public ProjectRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(
-        dbi,
-        identifierRepository,
-        TABLE_NAME,
-        TABLE_ALIAS,
-        MAPPING_PREFIX,
-        ProjectImpl.class,
-        SQL_REDUCED_FIELDS_PR,
-        SQL_FULL_FIELDS_PR);
+    super(dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, ProjectImpl.class);
+    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
+    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override
@@ -130,7 +137,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
 
     List<DigitalObject> result =
         digitalObjectRepositoryImpl.retrieveList(
-            DigitalObjectRepositoryImpl.SQL_REDUCED_FIELDS_DO,
+            digitalObjectRepositoryImpl.getSqlReducedFields(),
             innerQuery,
             Map.of("uuid", projectUuid));
 
@@ -185,12 +192,12 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
         "INSERT INTO "
             + tableName
             + "("
-            + "uuid, label, description, previewfileresource, preview_hints,"
+            + "uuid, label, description, previewfileresource, preview_hints, custom_attrs,"
             + " identifiable_type, entity_type,"
             + " created, last_modified,"
             + " text, start_date, end_date"
             + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
+            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
             + " :type, :entityType,"
             + " :created, :lastModified,"
             + " :text::JSONB, :startDate, :endDate"
@@ -254,7 +261,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
             + tableName
             + " SET"
             + " label=:label::JSONB, description=:description::JSONB,"
-            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
+            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
             + " last_modified=:lastModified,"
             + " text=:text::JSONB, start_date=:startDate, end_date=:endDate"
             + " WHERE uuid=:uuid";

@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.api.repository.identifiable.
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.Project;
+import de.digitalcollections.model.api.identifiable.entity.work.Item;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -33,6 +34,15 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
   }
 
   List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid);
+
+  default Item getItem(DigitalObject digitalObject) {
+    if (digitalObject == null) {
+      return null;
+    }
+    return getItem(digitalObject.getUuid());
+  }
+
+  Item getItem(UUID digitalObjectUuid);
 
   default PageResponse<Project> getProjects(DigitalObject digitalObject, PageRequest pageRequest) {
     return getProjects(digitalObject.getUuid(), pageRequest);

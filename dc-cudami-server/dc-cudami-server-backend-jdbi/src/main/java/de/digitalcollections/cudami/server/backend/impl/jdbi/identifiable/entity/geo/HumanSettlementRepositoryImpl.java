@@ -22,19 +22,26 @@ public class HumanSettlementRepositoryImpl extends EntityRepositoryImpl<HumanSet
   private static final Logger LOGGER = LoggerFactory.getLogger(HumanSettlementRepositoryImpl.class);
 
   public static final String MAPPING_PREFIX = "hs";
-
-  public static final String SQL_REDUCED_FIELDS_HS =
-      " h.uuid hs_uuid, h.refid hs_refId, h.label hs_label, h.description hs_description,"
-          + " h.identifiable_type hs_type, h.entity_type hs_entityType,"
-          + " h.geolocation_type hs_geoLocationType, h.settlement_type hs_humanSettlementType,"
-          + " h.created hs_created, h.last_modified hs_lastModified,"
-          + " h.preview_hints hs_previewImageRenderingHints";
-
-  public static final String SQL_FULL_FIELDS_HS =
-      SQL_REDUCED_FIELDS_HS + ", h.coordinate_location hs_coordinateLocation";
-
   public static final String TABLE_ALIAS = "h";
   public static final String TABLE_NAME = "humansettlements";
+
+  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".coordinate_location "
+        + mappingPrefix
+        + "_coordinateLocation";
+  }
+
+  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
+    return GeoLocationRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".settlement_type "
+        + mappingPrefix
+        + "_humanSettlementType";
+  }
 
   @Autowired
   public HumanSettlementRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
@@ -44,9 +51,9 @@ public class HumanSettlementRepositoryImpl extends EntityRepositoryImpl<HumanSet
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        HumanSettlementImpl.class,
-        SQL_REDUCED_FIELDS_HS,
-        SQL_FULL_FIELDS_HS);
+        HumanSettlementImpl.class);
+    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
+    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override
@@ -66,12 +73,12 @@ public class HumanSettlementRepositoryImpl extends EntityRepositoryImpl<HumanSet
         "INSERT INTO "
             + tableName
             + "("
-            + "uuid, previewFileResource, label, description,"
+            + "uuid, previewFileResource, label, description, preview_hints, custom_attrs,"
             + " identifiable_type, entity_type, geolocation_type,"
             + " created, last_modified,"
             + " coordinate_location, settlement_type"
             + ") VALUES ("
-            + ":uuid, :previewFileResource, :label::JSONB, :description::JSONB,"
+            + ":uuid, :previewFileResource, :label::JSONB, :description::JSONB, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
             + " :type, :entityType, :geoLocationType,"
             + " :created, :lastModified,"
             + " :coordinateLocation::JSONB, :humanSettlementType"
@@ -104,7 +111,7 @@ public class HumanSettlementRepositoryImpl extends EntityRepositoryImpl<HumanSet
         "UPDATE "
             + tableName
             + " SET"
-            + " previewFileResource=:previewFileResource, label=:label::JSONB, description=:description::JSONB,"
+            + " previewFileResource=:previewFileResource, label=:label::JSONB, description=:description::JSONB, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
             + " geolocation_type=:geoLocationType,"
             + " last_modified=:lastModified,"
             + " coordinate_location=:coordinateLocation::JSONB, settlement_type=:humanSettlementType"

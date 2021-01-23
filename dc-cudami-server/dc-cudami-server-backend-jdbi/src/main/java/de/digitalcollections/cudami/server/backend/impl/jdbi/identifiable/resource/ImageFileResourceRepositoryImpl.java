@@ -26,16 +26,27 @@ public class ImageFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(ImageFileResourceRepositoryImpl.class);
+
   public static final String MAPPING_PREFIX = "fr";
-
-  public static final String SQL_REDUCED_FIELDS_FR =
-      FileResourceMetadataRepositoryImpl.SQL_REDUCED_FIELDS_FR;
-
-  public static final String SQL_FULL_FIELDS_FR =
-      SQL_REDUCED_FIELDS_FR + ", f.height fr_height, f.width fr_width";
-
   public static final String TABLE_ALIAS = "f";
   public static final String TABLE_NAME = "fileresources_audio";
+
+  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".height "
+        + mappingPrefix
+        + "_height, "
+        + tableAlias
+        + ".width "
+        + mappingPrefix
+        + "_width";
+  }
+
+  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
+    return FileResourceMetadataRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix);
+  }
 
   private final FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
 
@@ -50,10 +61,10 @@ public class ImageFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        ImageFileResourceImpl.class,
-        SQL_REDUCED_FIELDS_FR,
-        SQL_FULL_FIELDS_FR);
+        ImageFileResourceImpl.class);
     this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
+    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
+    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override

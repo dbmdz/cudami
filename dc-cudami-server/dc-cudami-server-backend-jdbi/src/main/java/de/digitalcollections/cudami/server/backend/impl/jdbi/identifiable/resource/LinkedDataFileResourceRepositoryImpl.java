@@ -27,16 +27,27 @@ public class LinkedDataFileResourceRepositoryImpl
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(LinkedDataFileResourceRepositoryImpl.class);
+
   public static final String MAPPING_PREFIX = "fr";
-
-  public static final String SQL_REDUCED_FIELDS_FR =
-      FileResourceMetadataRepositoryImpl.SQL_REDUCED_FIELDS_FR;
-
-  public static final String SQL_FULL_FIELDS_FR =
-      SQL_REDUCED_FIELDS_FR + ", f.context fr_context, f.object_type fr_objectType";
-
   public static final String TABLE_ALIAS = "f";
   public static final String TABLE_NAME = "fileresources_linkeddata";
+
+  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".context "
+        + mappingPrefix
+        + "_context, "
+        + tableAlias
+        + ".object_type "
+        + mappingPrefix
+        + "_objectType";
+  }
+
+  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
+    return FileResourceMetadataRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix);
+  }
 
   private final FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
 
@@ -51,10 +62,10 @@ public class LinkedDataFileResourceRepositoryImpl
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        LinkedDataFileResourceImpl.class,
-        SQL_REDUCED_FIELDS_FR,
-        SQL_FULL_FIELDS_FR);
+        LinkedDataFileResourceImpl.class);
     this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
+    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
+    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override

@@ -25,18 +25,31 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     implements EntityRepository<E> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(EntityRepositoryImpl.class);
+
   public static final String MAPPING_PREFIX = "e";
-
-  public static final String SQL_REDUCED_FIELDS_E =
-      " e.uuid e_uuid, e.refid e_refId, e.label e_label, e.description e_description,"
-          + " e.identifiable_type e_type, e.entity_type e_entityType,"
-          + " e.created e_created, e.last_modified e_lastModified,"
-          + " e.preview_hints e_previewImageRenderingHints";
-
-  public static final String SQL_FULL_FIELDS_E = SQL_REDUCED_FIELDS_E;
-
   public static final String TABLE_ALIAS = "e";
   public static final String TABLE_NAME = "entities";
+
+  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
+    return IdentifiableRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".custom_attrs "
+        + mappingPrefix
+        + "_customAttributes, "
+        + tableAlias
+        + ".entity_type "
+        + mappingPrefix
+        + "_entityType, "
+        + tableAlias
+        + ".refid "
+        + mappingPrefix
+        + "_refId";
+  }
 
   private FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
 
@@ -45,16 +58,20 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       Jdbi dbi,
       IdentifierRepository identifierRepository,
       FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl) {
-    this(
-        dbi,
-        identifierRepository,
-        TABLE_NAME,
-        TABLE_ALIAS,
-        MAPPING_PREFIX,
-        EntityImpl.class,
-        SQL_REDUCED_FIELDS_E,
-        SQL_FULL_FIELDS_E);
+    this(dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, EntityImpl.class);
     this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
+    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
+    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
+  }
+
+  protected EntityRepositoryImpl(
+      Jdbi dbi,
+      IdentifierRepository identifierRepository,
+      String tableName,
+      String tableAlias,
+      String mappingPrefix,
+      Class entityImplClass) {
+    this(dbi, identifierRepository, tableName, tableAlias, mappingPrefix, entityImplClass, null);
   }
 
   protected EntityRepositoryImpl(
@@ -64,29 +81,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       String tableAlias,
       String mappingPrefix,
       Class entityImplClass,
-      String reducedFieldsSql,
-      String fullFieldsSql) {
-    this(
-        dbi,
-        identifierRepository,
-        tableName,
-        tableAlias,
-        mappingPrefix,
-        entityImplClass,
-        reducedFieldsSql,
-        fullFieldsSql,
-        null);
-  }
-
-  protected EntityRepositoryImpl(
-      Jdbi dbi,
-      IdentifierRepository identifierRepository,
-      String tableName,
-      String tableAlias,
-      String mappingPrefix,
-      Class entityImplClass,
-      String reducedFieldsSql,
-      String fullFieldsSql,
       String fullFieldsJoinsSql) {
     this(
         dbi,
@@ -95,8 +89,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         tableAlias,
         mappingPrefix,
         entityImplClass,
-        reducedFieldsSql,
-        fullFieldsSql,
         fullFieldsJoinsSql,
         null);
   }
@@ -108,8 +100,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       String tableAlias,
       String mappingPrefix,
       Class entityImplClass,
-      String reducedFieldsSql,
-      String fullFieldsSql,
       String fullFieldsJoinsSql,
       BiFunction<LinkedHashMap<UUID, E>, RowView, LinkedHashMap<UUID, E>>
           additionalReduceRowsBiFunction) {
@@ -120,8 +110,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         tableAlias,
         mappingPrefix,
         entityImplClass,
-        reducedFieldsSql,
-        fullFieldsSql,
         fullFieldsJoinsSql,
         additionalReduceRowsBiFunction);
   }
@@ -154,7 +142,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
                 + tableAlias
                 + ".refid = :refId");
 
-    E result = retrieveOne(fullFieldsSql, innerQuery, fullFieldsJoinsSql, Map.of("refId", refId));
+    E result = retrieveOne(sqlAllFields, innerQuery, fullFieldsJoinsSql, Map.of("refId", refId));
     return result;
   }
 
@@ -203,7 +191,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
     List<FileResource> result =
         fileResourceMetadataRepositoryImpl.retrieveList(
-            FileResourceMetadataRepositoryImpl.SQL_FULL_FIELDS_FR,
+            fileResourceMetadataRepositoryImpl.getSqlReducedFields(),
             innerQuery,
             Map.of("entityUuid", entityUuid));
 

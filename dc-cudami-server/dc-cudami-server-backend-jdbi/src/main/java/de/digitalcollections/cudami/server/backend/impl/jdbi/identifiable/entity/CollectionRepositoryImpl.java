@@ -38,19 +38,32 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     implements CollectionRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionRepositoryImpl.class);
+
   public static final String MAPPING_PREFIX = "col";
-
-  public static final String SQL_REDUCED_FIELDS_COL =
-      " c.uuid col_uuid, c.refid col_refId, c.label col_label, c.description col_description,"
-          + " c.identifiable_type col_type, c.entity_type col_entityType,"
-          + " c.created col_created, c.last_modified col_lastModified,"
-          + " c.publication_start col_publicationStart, c.publication_end col_publicationEnd,"
-          + " c.preview_hints col_previewImageRenderingHints";
-
-  public static final String SQL_FULL_FIELDS_COL = SQL_REDUCED_FIELDS_COL + ", c.text col_text";
-
   public static final String TABLE_ALIAS = "c";
   public static final String TABLE_NAME = "collections";
+
+  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".text "
+        + mappingPrefix
+        + "_text";
+  }
+
+  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".publication_start "
+        + mappingPrefix
+        + "_publicationStart, "
+        + tableAlias
+        + ".publication_end "
+        + mappingPrefix
+        + "_publicationEnd";
+  }
 
   @Lazy @Autowired private CorporateBodyRepositoryImpl corporateBodyRepositoryImpl;
 
@@ -58,15 +71,9 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
   @Autowired
   public CollectionRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(
-        dbi,
-        identifierRepository,
-        TABLE_NAME,
-        TABLE_ALIAS,
-        MAPPING_PREFIX,
-        CollectionImpl.class,
-        SQL_REDUCED_FIELDS_COL,
-        SQL_FULL_FIELDS_COL);
+    super(dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, CollectionImpl.class);
+    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
+    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override
@@ -229,7 +236,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                 + " WHERE cc.parent_collection_uuid = :uuid"
                 + " ORDER BY cc.sortIndex ASC");
 
-    List<Collection> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
+    List<Collection> result = retrieveList(sqlReducedFields, innerQuery, Map.of("uuid", uuid));
     return result;
   }
 
@@ -251,7 +258,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     innerQuery.append(" ORDER BY cc.sortIndex ASC");
     addPageRequestParams(pageRequest, innerQuery);
 
-    List<Collection> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
+    List<Collection> result = retrieveList(sqlReducedFields, innerQuery, Map.of("uuid", uuid));
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -307,7 +314,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
     List<DigitalObject> result =
         digitalObjectRepositoryImpl.retrieveList(
-            DigitalObjectRepositoryImpl.SQL_REDUCED_FIELDS_DO,
+            digitalObjectRepositoryImpl.getSqlReducedFields(),
             innerQuery,
             Map.of("uuid", collectionUuid));
 
@@ -330,7 +337,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                 + tableAlias
                 + ".uuid = cc.parent_collection_uuid"
                 + " WHERE cc.child_collection_uuid = :uuid");
-    Collection result = retrieveOne(reducedFieldsSql, innerQuery, null, Map.of("uuid", uuid));
+    Collection result = retrieveOne(sqlReducedFields, innerQuery, null, Map.of("uuid", uuid));
 
     return result;
   }
@@ -348,7 +355,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                 + ".uuid = cc.parent_collection_uuid"
                 + " WHERE cc.child_collection_uuid = :uuid");
 
-    List<Collection> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
+    List<Collection> result = retrieveList(sqlReducedFields, innerQuery, Map.of("uuid", uuid));
     return result;
   }
 
@@ -382,7 +389,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
     List<CorporateBody> result =
         corporateBodyRepositoryImpl.retrieveList(
-            CorporateBodyRepositoryImpl.SQL_REDUCED_FIELDS_CB, innerQuery, Map.of("uuid", uuid));
+            corporateBodyRepositoryImpl.getSqlReducedFields(), innerQuery, Map.of("uuid", uuid));
 
     return result;
   }
@@ -473,12 +480,12 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
         "INSERT INTO "
             + tableName
             + "("
-            + "uuid, label, description, previewfileresource, preview_hints,"
+            + "uuid, label, description, previewfileresource, preview_hints, custom_attrs,"
             + " identifiable_type, entity_type,"
             + " created, last_modified,"
             + " text, publication_start, publication_end"
             + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
+            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
             + " :type, :entityType,"
             + " :created, :lastModified,"
             + " :text::JSONB, :publicationStart, :publicationEnd"
@@ -564,7 +571,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + tableName
             + " SET"
             + " label=:label::JSONB, description=:description::JSONB,"
-            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
+            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
             + " last_modified=:lastModified,"
             + " text=:text::JSONB, publication_start=:publicationStart, publication_end=:publicationEnd"
             + " WHERE uuid=:uuid";

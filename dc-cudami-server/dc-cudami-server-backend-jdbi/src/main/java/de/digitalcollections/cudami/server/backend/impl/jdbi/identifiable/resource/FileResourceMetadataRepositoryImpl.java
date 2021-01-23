@@ -27,34 +27,46 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
   private static final Logger LOGGER =
       LoggerFactory.getLogger(FileResourceMetadataRepositoryImpl.class);
   public static final String MAPPING_PREFIX = "fr";
-
   public static final String SQL_PREVIEW_IMAGE_FIELDS_PI =
       " file.uuid pi_uuid, file.filename pi_filename, file.mimetype pi_mimeType, file.uri pi_uri, file.http_base_url pi_httpBaseUrl";
-
-  public static final String SQL_REDUCED_FIELDS_FR =
-      " f.uuid fr_uuid, f.label fr_label, f.description fr_description,"
-          + " f.identifiable_type fr_type,"
-          + " f.created fr_created, f.last_modified fr_lastModified,"
-          + " f.filename fr_filename, f.mimetype fr_mimetype, f.size_in_bytes fr_sizeInBytes, f.uri fr_uri,"
-          + " f.http_base_url fr_httpBaseUrl,"
-          + " f.preview_hints fr_previewImageRenderingHints";
-
-  public static final String SQL_FULL_FIELDS_FR = SQL_REDUCED_FIELDS_FR;
-
   public static final String TABLE_ALIAS = "f";
   public static final String TABLE_NAME = "fileresources";
+
+  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
+    return IdentifiableRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".filename "
+        + mappingPrefix
+        + "_filename, "
+        + tableAlias
+        + ".http_base_url "
+        + mappingPrefix
+        + "_httpBaseUrl, "
+        + tableAlias
+        + ".mimetype "
+        + mappingPrefix
+        + "_mimeType, "
+        + tableAlias
+        + ".size_in_bytes "
+        + mappingPrefix
+        + "_sizeInBytes, "
+        + tableAlias
+        + ".uri "
+        + mappingPrefix
+        + "_uri";
+  }
 
   @Autowired
   public FileResourceMetadataRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     super(
-        dbi,
-        identifierRepository,
-        TABLE_NAME,
-        TABLE_ALIAS,
-        MAPPING_PREFIX,
-        FileResourceImpl.class,
-        SQL_REDUCED_FIELDS_FR,
-        SQL_FULL_FIELDS_FR);
+        dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, FileResourceImpl.class);
+    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
+    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override
@@ -88,11 +100,11 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
   }
 
   protected String getCommonFileResourceColumnsSql() {
-    return "uuid, label, description, previewfileresource, preview_hints, identifiable_type, created, last_modified, filename, mimetype, size_in_bytes, uri, http_base_url";
+    return "uuid, label, description, previewfileresource, preview_hints, custom_attrs, identifiable_type, created, last_modified, filename, mimetype, size_in_bytes, uri, http_base_url";
   }
 
   protected String getCommonFileResourcePropertiesSql() {
-    return ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :type, :created, :lastModified, :filename, :mimeType, :sizeInBytes, :uri, :httpBaseUrl";
+    return ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :customAttributes::JSONB, :type, :created, :lastModified, :filename, :mimeType, :sizeInBytes, :uri, :httpBaseUrl";
   }
 
   public String getCommonFileResourceSearchSql(String tableName, String tableAlias) {
@@ -125,7 +137,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
 
   protected String getCommonFileResourceUpdateSql() {
     return "label=:label::JSONB, description=:description::JSONB,"
-        + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
+        + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
         + " last_modified=:lastModified, http_base_url=:httpBaseUrl";
   }
 

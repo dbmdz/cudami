@@ -8,6 +8,7 @@ import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.Project;
+import de.digitalcollections.model.api.identifiable.entity.work.Item;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -91,6 +92,11 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   @Override
   public List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid) {
     return ((DigitalObjectRepository) repository).getImageFileResources(digitalObjectUuid);
+  }
+
+  @Override
+  public Item getItem(UUID digitalObjectUuid) {
+    return ((DigitalObjectRepository) repository).getItem(digitalObjectUuid);
   }
 
   @Override

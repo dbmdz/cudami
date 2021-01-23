@@ -22,30 +22,33 @@ public class GeoLocationRepositoryImpl extends EntityRepositoryImpl<GeoLocation>
   private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationRepositoryImpl.class);
 
   public static final String MAPPING_PREFIX = "gl";
-
-  public static final String SQL_REDUCED_FIELDS_GL =
-      " g.uuid gl_uuid, g.refid gl_refId, g.label gl_label, g.description gl_description,"
-          + " g.identifiable_type gl_type, g.entity_type gl_entityType,"
-          + " g.created gl_created, g.last_modified gl_lastModified,"
-          + " g.preview_hints gl_previewImageRenderingHints";
-
-  public static final String SQL_FULL_FIELDS_GL =
-      SQL_REDUCED_FIELDS_GL + ", g.coordinate_location gl_coordinateLocation";
-
   public static final String TABLE_ALIAS = "g";
   public static final String TABLE_NAME = "geolocations";
+
+  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".coordinate_location "
+        + mappingPrefix
+        + "_coordinateLocation";
+  }
+
+  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".geolocation_type "
+        + mappingPrefix
+        + "_geoLocationType";
+  }
 
   @Autowired
   public GeoLocationRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     super(
-        dbi,
-        identifierRepository,
-        TABLE_NAME,
-        TABLE_ALIAS,
-        MAPPING_PREFIX,
-        GeoLocationImpl.class,
-        SQL_REDUCED_FIELDS_GL,
-        SQL_FULL_FIELDS_GL);
+        dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, GeoLocationImpl.class);
+    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
+    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override
@@ -63,12 +66,12 @@ public class GeoLocationRepositoryImpl extends EntityRepositoryImpl<GeoLocation>
         "INSERT INTO "
             + tableName
             + "("
-            + "uuid, previewFileResource, label, description,"
+            + "uuid, previewFileResource, label, description, preview_hints, custom_attrs,"
             + " identifiable_type, entity_type, geolocation_type,"
             + " created, last_modified,"
             + " coordinate_location"
             + ") VALUES ("
-            + ":uuid, :previewFileResource, :label::JSONB, :description::JSONB,"
+            + ":uuid, :previewFileResource, :label::JSONB, :description::JSONB, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
             + " :type, :entityType, :geoLocationType,"
             + " :created, :lastModified,"
             + " :coordinateLocation::JSONB"
@@ -99,7 +102,7 @@ public class GeoLocationRepositoryImpl extends EntityRepositoryImpl<GeoLocation>
         "UPDATE "
             + tableName
             + " SET"
-            + " previewFileResource=:previewFileResource, label=:label::JSONB, description=:description::JSONB,"
+            + " previewFileResource=:previewFileResource, label=:label::JSONB, description=:description::JSONB, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
             + " last_modified=:lastModified,"
             + " coordinate_location=:coordinateLocation::JSONB"
             + " WHERE uuid=:uuid";
