@@ -13,8 +13,10 @@ import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 /** Repository for Agent persistence handling. No own table, using entities table. */
+@Repository
 public class AgentRepositoryImpl extends EntityRepositoryImpl<Agent> implements AgentRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AgentRepositoryImpl.class);

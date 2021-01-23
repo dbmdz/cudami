@@ -22,7 +22,7 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
   public static final String TABLE_NAME = "users";
 
   @Autowired
-  public UserRepositoryImpl(Jdbi dbi, String tableName, String tableAlias, String mappingPrefix) {
+  public UserRepositoryImpl(Jdbi dbi) {
     super(dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX);
   }
 
