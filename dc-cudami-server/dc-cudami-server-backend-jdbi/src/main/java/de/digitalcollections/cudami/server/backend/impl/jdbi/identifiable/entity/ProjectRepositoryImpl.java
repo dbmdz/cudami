@@ -19,6 +19,7 @@ import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -40,13 +41,10 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   public static final String TABLE_ALIAS = "p";
   public static final String TABLE_NAME = "projects";
 
-  private final DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
+  @Lazy @Autowired private DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
 
   @Autowired
-  public ProjectRepositoryImpl(
-      Jdbi dbi,
-      IdentifierRepository identifierRepository,
-      DigitalObjectRepositoryImpl digitalObjectRepositoryImpl) {
+  public ProjectRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     super(
         dbi,
         identifierRepository,
@@ -56,7 +54,6 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
         ProjectImpl.class,
         SQL_REDUCED_FIELDS_PR,
         SQL_FULL_FIELDS_PR);
-    this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
   }
 
   @Override

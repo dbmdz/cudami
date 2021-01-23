@@ -19,6 +19,7 @@ import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -46,8 +47,8 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   public ItemRepositoryImpl(
       Jdbi dbi,
       IdentifierRepository identifierRepository,
-      DigitalObjectRepositoryImpl digitalObjectRepositoryImpl,
-      WorkRepositoryImpl workRepositoryImpl) {
+      @Lazy DigitalObjectRepositoryImpl digitalObjectRepositoryImpl,
+      @Lazy WorkRepositoryImpl workRepositoryImpl) {
     super(
         dbi,
         identifierRepository,

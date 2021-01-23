@@ -30,6 +30,7 @@ import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -51,15 +52,12 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   public static final String TABLE_ALIAS = "c";
   public static final String TABLE_NAME = "collections";
 
-  private final CorporateBodyRepositoryImpl corporateBodyRepositoryImpl;
-  private final DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
+  @Lazy @Autowired private CorporateBodyRepositoryImpl corporateBodyRepositoryImpl;
+
+  @Lazy @Autowired private DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
 
   @Autowired
-  public CollectionRepositoryImpl(
-      Jdbi dbi,
-      IdentifierRepository identifierRepository,
-      DigitalObjectRepositoryImpl digitalObjectRepositoryImpl,
-      CorporateBodyRepositoryImpl corporateBodyRepositoryImpl) {
+  public CollectionRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     super(
         dbi,
         identifierRepository,
@@ -69,8 +67,6 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
         CollectionImpl.class,
         SQL_REDUCED_FIELDS_COL,
         SQL_FULL_FIELDS_COL);
-    this.corporateBodyRepositoryImpl = corporateBodyRepositoryImpl;
-    this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
   }
 
   @Override

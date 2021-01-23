@@ -32,7 +32,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
       " file.uuid pi_uuid, file.filename pi_filename, file.mimetype pi_mimeType, file.uri pi_uri, file.http_base_url pi_httpBaseUrl";
 
   public static final String SQL_REDUCED_FIELDS_FR =
-      "f.uuid fr_uuid, f.label fr_label, f.description fr_description,"
+      " f.uuid fr_uuid, f.label fr_label, f.description fr_description,"
           + " f.identifiable_type fr_type,"
           + " f.created fr_created, f.last_modified fr_lastModified,"
           + " f.filename fr_filename, f.mimetype fr_mimetype, f.size_in_bytes fr_sizeInBytes, f.uri fr_uri,"

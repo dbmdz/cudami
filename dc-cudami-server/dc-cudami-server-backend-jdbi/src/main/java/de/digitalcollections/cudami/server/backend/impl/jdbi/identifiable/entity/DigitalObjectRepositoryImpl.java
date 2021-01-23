@@ -25,6 +25,7 @@ import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -48,19 +49,16 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   public static final String TABLE_ALIAS = "d";
   public static final String TABLE_NAME = "digitalobjects";
 
-  private final CollectionRepositoryImpl collectionRepositoryImpl;
-  private final FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
-  private final ImageFileResourceRepositoryImpl imageFileResourceRepositoryImpl;
-  private final ProjectRepositoryImpl projectRepositoryImpl;
+  @Lazy @Autowired private CollectionRepositoryImpl collectionRepositoryImpl;
+
+  @Lazy @Autowired private FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
+
+  @Lazy @Autowired private ImageFileResourceRepositoryImpl imageFileResourceRepositoryImpl;
+
+  @Lazy @Autowired private ProjectRepositoryImpl projectRepositoryImpl;
 
   @Autowired
-  public DigitalObjectRepositoryImpl(
-      Jdbi dbi,
-      IdentifierRepository identifierRepository,
-      CollectionRepositoryImpl collectionRepositoryImpl,
-      FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl,
-      ImageFileResourceRepositoryImpl imageFileResourceRepositoryImpl,
-      ProjectRepositoryImpl projectRepositoryImpl) {
+  public DigitalObjectRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     super(
         dbi,
         identifierRepository,
@@ -70,10 +68,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         DigitalObjectImpl.class,
         SQL_REDUCED_FIELDS_DO,
         SQL_FULL_FIELDS_DO);
-    this.collectionRepositoryImpl = collectionRepositoryImpl;
-    this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
-    this.imageFileResourceRepositoryImpl = imageFileResourceRepositoryImpl;
-    this.projectRepositoryImpl = projectRepositoryImpl;
   }
 
   @Override

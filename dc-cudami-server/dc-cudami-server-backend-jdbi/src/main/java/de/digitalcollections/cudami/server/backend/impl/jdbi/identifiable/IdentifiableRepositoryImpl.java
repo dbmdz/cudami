@@ -150,6 +150,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     // (until now everywhere BeanMapper.factory... was used. If this changes, row mapper
     // registration may be moved back into each repository impl?)
     dbi.registerRowMapper(BeanMapper.factory(identifiableImplClass, mappingPrefix));
+    dbi.registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"));
+    dbi.registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"));
 
     // set basic reduce rows bifunction for reduced selects (lists, paging)
     // note: it turned out, that we also want identifiers and previewimage for reduced selects. So
@@ -440,7 +442,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   public List<I> retrieveList(
       String fieldsSql, StringBuilder innerQuery, final Map<String, Object> argumentMappings) {
     final String sql =
-        "SELECT"
+        "SELECT "
             + fieldsSql
             + ","
             + SQL_FULL_FIELDS_ID

@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.resource;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceBinaryService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
+import de.digitalcollections.cudami.server.business.impl.service.identifiable.resource.FileResourceMetadataServiceImpl;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.MimeType;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
@@ -32,7 +32,7 @@ public class FileResourceBinaryController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FileResourceBinaryController.class);
 
-  @Autowired FileResourceMetadataService fileResourceService;
+  @Autowired FileResourceMetadataServiceImpl fileResourceService;
 
   @Autowired FileResourceBinaryService fileUploadService;
 
