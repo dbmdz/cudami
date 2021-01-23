@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.WebpageRepository;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.Node;
@@ -33,32 +34,42 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
     implements WebpageRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpageRepositoryImpl.class);
+
   public static final String MAPPING_PREFIX = "wp";
-
-  public static final String SQL_REDUCED_FIELDS_WP =
-      " w.uuid wp_uuid, w.label wp_label, w.description wp_description,"
-          + " w.identifiable_type wp_type,"
-          + " w.created wp_created, w.last_modified wp_lastModified,"
-          + " w.publication_start wp_publicationStart, w.publication_end wp_publicationEnd,"
-          + " w.rendering_hints wp_renderingHints,"
-          + " w.preview_hints wp_previewImageRenderingHints";
-
-  public static final String SQL_FULL_FIELDS_WP = SQL_REDUCED_FIELDS_WP + ", w.text wp_text";
-
   public static final String TABLE_ALIAS = "w";
   public static final String TABLE_NAME = "webpages";
 
+  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".text "
+        + mappingPrefix
+        + "_text";
+  }
+
+  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
+    return IdentifiableRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".publication_end "
+        + mappingPrefix
+        + "_publicationEnd, "
+        + tableAlias
+        + ".publication_start "
+        + mappingPrefix
+        + "_publicationStart, "
+        + tableAlias
+        + ".rendering_hints "
+        + mappingPrefix
+        + "_renderingHints";
+  }
+
   @Autowired
   public WebpageRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(
-        dbi,
-        identifierRepository,
-        TABLE_NAME,
-        TABLE_ALIAS,
-        MAPPING_PREFIX,
-        WebpageImpl.class,
-        SQL_REDUCED_FIELDS_WP,
-        SQL_FULL_FIELDS_WP);
+    super(dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, WebpageImpl.class);
+    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
+    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override
@@ -162,7 +173,7 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
                 + " WHERE ww.parent_webpage_uuid = :uuid"
                 + " ORDER BY ww.sortIndex ASC");
 
-    List<Webpage> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
+    List<Webpage> result = retrieveList(sqlReducedFields, innerQuery, Map.of("uuid", uuid));
     return result;
   }
 
@@ -185,7 +196,7 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
     }
     addPageRequestParams(pageRequest, innerQuery);
 
-    List<Webpage> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
+    List<Webpage> result = retrieveList(sqlReducedFields, innerQuery, Map.of("uuid", uuid));
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -225,7 +236,7 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
                 + tableAlias
                 + ".uuid = ww.parent_webpage_uuid"
                 + " WHERE ww.child_webpage_uuid = :uuid");
-    Webpage result = retrieveOne(reducedFieldsSql, innerQuery, null, Map.of("uuid", uuid));
+    Webpage result = retrieveOne(sqlReducedFields, innerQuery, null, Map.of("uuid", uuid));
 
     return result;
   }
@@ -275,13 +286,13 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
         "INSERT INTO "
             + tableName
             + "("
-            + "uuid, label, description, previewfileresource, preview_hints,"
+            + "uuid, label, description, previewfileresource, preview_hints, custom_attrs,"
             + " identifiable_type,"
             + " created, last_modified,"
             + " text, publication_start, publication_end,"
             + " rendering_hints"
             + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
+            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
             + " :type,"
             + " :created, :lastModified,"
             + " :text::JSONB, :publicationStart, :publicationEnd,"
@@ -361,7 +372,7 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
             + tableName
             + " SET"
             + " label=:label::JSONB, description=:description::JSONB,"
-            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
+            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
             + " last_modified=:lastModified,"
             + " text=:text::JSONB, publication_start=:publicationStart, publication_end=:publicationEnd,"
             + " rendering_hints=:renderingHints::JSONB"

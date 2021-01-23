@@ -37,25 +37,14 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
   private static final Logger LOGGER = LoggerFactory.getLogger(PersonRepositoryImpl.class);
 
   public static final String MAPPING_PREFIX = "pe";
-
-  private static final String SQL_FULL_FIELDS_JOINS =
-      " LEFT JOIN geolocations AS glbirth ON glbirth.uuid = p.locationofbirth"
-          + " LEFT JOIN geolocations AS gldeath ON gldeath.uuid = p.locationofdeath";
-
-  public static final String SQL_REDUCED_FIELDS_PE =
-      " p.uuid pe_uuid, p.label pe_label, p.description pe_description, p.refid pe_refId,"
-          + " p.identifiable_type pe_type, p.entity_type pe_entityType,"
-          + " p.created pe_created, p.last_modified pe_lastModified,"
-          + " p.dateOfBirth pe_dateOfBirth, p.timevalueofbirth pe_timeValueOfBirth,"
-          + " p.dateOfDeath pe_dateOfDeath, p.timevalueofdeath pe_timeValueOfDeath,"
-          + " p.gender pe_gender";
-
-  public static final String SQL_FULL_FIELDS_PE =
-      SQL_REDUCED_FIELDS_PE
-          + ", glbirth.uuid glbirth_uuid, glbirth.label glbirth_label, glbirth.geolocation_type glbirth_geoLocationType,"
-          + " gldeath.uuid gldeath_uuid, gldeath.label gldeath_label, gldeath.geolocation_type gldeath_geoLocationType";
-
   public static final String TABLE_ALIAS = "p";
+  private static final String SQL_FULL_FIELDS_JOINS =
+      " LEFT JOIN geolocations AS glbirth ON glbirth.uuid = "
+          + TABLE_ALIAS
+          + ".locationofbirth"
+          + " LEFT JOIN geolocations AS gldeath ON gldeath.uuid = "
+          + TABLE_ALIAS
+          + ".locationofdeath";
   public static final String TABLE_NAME = "persons";
 
   private static BiFunction<LinkedHashMap<UUID, Person>, RowView, LinkedHashMap<UUID, Person>>
@@ -92,6 +81,46 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
     };
   }
 
+  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + "glbirth.uuid glbirth_uuid, glbirth.label glbirth_label, glbirth.geolocation_type glbirth_geoLocationType, "
+        + "gldeath.uuid gldeath_uuid, gldeath.label gldeath_label, gldeath.geolocation_type gldeath_geoLocationType";
+  }
+
+  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".date_published "
+        + mappingPrefix
+        + "_datePublished, "
+        + tableAlias
+        + ".dateofbirth "
+        + mappingPrefix
+        + "_dateOfBirth, "
+        + tableAlias
+        + ".dateofdeath "
+        + mappingPrefix
+        + "_dateOfDeath, "
+        + tableAlias
+        + ".gender "
+        + mappingPrefix
+        + "_gender, "
+        + tableAlias
+        + ".timevalue_published "
+        + mappingPrefix
+        + "_timeValuePublished, "
+        + tableAlias
+        + ".timevalueofbirth "
+        + mappingPrefix
+        + "_timeValueOfBirth, "
+        + tableAlias
+        + ".timevalueofdeath "
+        + mappingPrefix
+        + "_timeValueOfDeath";
+  }
+
   private final DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
   private final WorkRepositoryImpl workRepositoryImpl;
 
@@ -108,8 +137,6 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         TABLE_ALIAS,
         MAPPING_PREFIX,
         PersonImpl.class,
-        SQL_REDUCED_FIELDS_PE,
-        SQL_FULL_FIELDS_PE,
         SQL_FULL_FIELDS_JOINS,
         createAdditionalReduceRowsBiFunction());
     this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
@@ -146,7 +173,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
 
     List<DigitalObject> list =
         digitalObjectRepositoryImpl.retrieveList(
-            DigitalObjectRepositoryImpl.SQL_REDUCED_FIELDS_DO,
+            digitalObjectRepositoryImpl.getSqlReducedFields(),
             innerQuery,
             Map.of("uuid", uuidPerson));
 
@@ -199,7 +226,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
 
     List<Work> list =
         workRepositoryImpl.retrieveList(
-            WorkRepositoryImpl.SQL_REDUCED_FIELDS_WO, innerQuery, Map.of("uuid", uuidPerson));
+            workRepositoryImpl.getSqlReducedFields(), innerQuery, Map.of("uuid", uuidPerson));
 
     return list.stream().collect(Collectors.toSet());
   }
@@ -223,7 +250,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         "INSERT INTO "
             + tableName
             + "("
-            + "uuid, previewFileResource, label, description,"
+            + "uuid, previewFileResource, label, description, preview_hints, custom_attrs,"
             + " identifiable_type, entity_type,"
             + " created, last_modified,"
             + " dateOfBirth, timeValueOfBirth,"
@@ -232,7 +259,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
             + " locationOfDeath,"
             + " gender"
             + ") VALUES ("
-            + ":uuid, :previewFileResource, :label::JSONB, :description::JSONB,"
+            + ":uuid, :previewFileResource, :label::JSONB, :description::JSONB, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
             + " :type, :entityType,"
             + " :created, :lastModified,"
             + " :dateOfBirth, :timeValueOfBirth::JSONB,"
@@ -316,7 +343,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         "UPDATE "
             + tableName
             + " SET"
-            + " previewFileResource=:previewFileResource, label=:label::JSONB, description=:description::JSONB,"
+            + " previewFileResource=:previewFileResource, label=:label::JSONB, description=:description::JSONB, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
             + " last_modified=:lastModified,"
             + " dateOfBirth=:dateOfBirth, timeValueOfBirth=:timeValueOfBirth::JSONB,"
             + " locationOfBirth=:locationOfBirth,"

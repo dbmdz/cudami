@@ -23,18 +23,18 @@ import org.springframework.stereotype.Repository;
 public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements TopicRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TopicRepositoryImpl.class);
+
   public static final String MAPPING_PREFIX = "to";
-
-  public static final String SQL_REDUCED_FIELDS_TO =
-      " t.uuid to_uuid, t.refid to_refId, t.label to_label, t.description to_description,"
-          + " t.identifiable_type to_type, t.entity_type to_entityType,"
-          + " t.created to_created, t.last_modified to_lastModified,"
-          + " t.preview_hints to_previewImageRenderingHints";
-
-  public static final String SQL_FULL_FIELDS_TO = SQL_REDUCED_FIELDS_TO;
-
   public static final String TABLE_ALIAS = "t";
   public static final String TABLE_NAME = "topics";
+
+  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix);
+  }
 
   private final SubtopicRepositoryImpl subtopicRepositoryImpl;
 
@@ -43,15 +43,9 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
       Jdbi dbi,
       IdentifierRepository identifierRepository,
       SubtopicRepositoryImpl subtopicRepositoryImpl) {
-    super(
-        dbi,
-        identifierRepository,
-        TABLE_NAME,
-        TABLE_ALIAS,
-        MAPPING_PREFIX,
-        TopicImpl.class,
-        SQL_REDUCED_FIELDS_TO,
-        SQL_FULL_FIELDS_TO);
+    super(dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, TopicImpl.class);
+    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
+    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
     this.subtopicRepositoryImpl = subtopicRepositoryImpl;
   }
 
@@ -116,7 +110,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
     List<Subtopic> result =
         subtopicRepositoryImpl.retrieveList(
-            SubtopicRepositoryImpl.SQL_REDUCED_FIELDS_ST, innerQuery, Map.of("uuid", uuid));
+            subtopicRepositoryImpl.getSqlReducedFields(), innerQuery, Map.of("uuid", uuid));
     return result;
   }
 
@@ -133,11 +127,11 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
         "INSERT INTO "
             + tableName
             + "("
-            + "uuid, label, description, previewfileresource, preview_hints,"
+            + "uuid, label, description, previewfileresource, preview_hints, custom_attrs,"
             + " identifiable_type, entity_type,"
             + " created, last_modified"
             + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
+            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
             + " :type, :entityType,"
             + " :created, :lastModified"
             + ")";
@@ -171,7 +165,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
             + tableName
             + " SET"
             + " label=:label::JSONB, description=:description::JSONB,"
-            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
+            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
             + " last_modified=:lastModified"
             + " WHERE uuid=:uuid";
 

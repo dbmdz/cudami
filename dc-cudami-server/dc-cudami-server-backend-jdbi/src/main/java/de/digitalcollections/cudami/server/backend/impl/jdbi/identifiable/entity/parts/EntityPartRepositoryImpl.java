@@ -26,18 +26,8 @@ public abstract class EntityPartRepositoryImpl<P extends EntityPart>
       String tableName,
       String tableAlias,
       String mappingPrefix,
-      Class entityPartImplClass,
-      String reducedFieldsSql,
-      String fullFieldsSql) {
-    super(
-        dbi,
-        identifierRepository,
-        tableName,
-        tableAlias,
-        mappingPrefix,
-        entityPartImplClass,
-        reducedFieldsSql,
-        fullFieldsSql);
+      Class entityPartImplClass) {
+    super(dbi, identifierRepository, tableName, tableAlias, mappingPrefix, entityPartImplClass);
   }
 
   @Override

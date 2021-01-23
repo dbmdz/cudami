@@ -20,19 +20,27 @@ public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateB
     implements CorporateBodyRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CorporateBodyRepositoryImpl.class);
+
   public static final String MAPPING_PREFIX = "cb";
-
-  public static final String SQL_REDUCED_FIELDS_CB =
-      " c.uuid cb_uuid, c.refid cb_refId, c.label cb_label, c.description cb_description,"
-          + " c.identifiable_type cb_type, c.entity_type cb_entityType,"
-          + " c.created cb_created, c.last_modified cb_lastModified,"
-          + " c.preview_hints cb_previewImageRenderingHints";
-
-  public static final String SQL_FULL_FIELDS_CB =
-      SQL_REDUCED_FIELDS_CB + ", c.text cb_text, c.homepage_url cb_homepageUrl";
-
   public static final String TABLE_ALIAS = "c";
   public static final String TABLE_NAME = "corporatebodies";
+
+  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".text "
+        + mappingPrefix
+        + "_text, "
+        + tableAlias
+        + ".homepage_url "
+        + mappingPrefix
+        + "_homepageUrl";
+  }
+
+  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix);
+  }
 
   @Autowired
   public CorporateBodyRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
@@ -42,9 +50,9 @@ public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateB
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        CorporateBodyImpl.class,
-        SQL_REDUCED_FIELDS_CB,
-        SQL_FULL_FIELDS_CB);
+        CorporateBodyImpl.class);
+    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
+    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override
@@ -82,12 +90,12 @@ public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateB
         "INSERT INTO "
             + tableName
             + "("
-            + "uuid, label, description, previewfileresource, preview_hints,"
+            + "uuid, label, description, previewfileresource, preview_hints, custom_attrs,"
             + " identifiable_type, entity_type,"
             + " created, last_modified,"
             + " text, homepage_url"
             + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
+            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
             + " :type, :entityType,"
             + " :created, :lastModified,"
             + " :text::JSONB, :homepageUrl"
@@ -121,7 +129,7 @@ public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateB
             + tableName
             + " SET"
             + " label=:label::JSONB, description=:description::JSONB,"
-            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
+            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
             + " last_modified=:lastModified,"
             + " text=:text::JSONB, homepage_url=:homepageUrl"
             + " WHERE uuid=:uuid";

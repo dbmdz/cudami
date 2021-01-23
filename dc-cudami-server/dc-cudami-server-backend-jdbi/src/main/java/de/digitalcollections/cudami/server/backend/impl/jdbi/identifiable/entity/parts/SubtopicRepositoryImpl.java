@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.SubtopicRepository;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.model.api.filter.Filtering;
@@ -37,18 +38,18 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
     implements SubtopicRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SubtopicRepositoryImpl.class);
+
   public static final String MAPPING_PREFIX = "st";
-
-  public static final String SQL_REDUCED_FIELDS_ST =
-      " s.uuid st_uuid, s.label st_label, s.description st_description,"
-          + " s.identifiable_type st_type,"
-          + " s.created st_created, s.last_modified st_lastModified,"
-          + " s.preview_hints st_previewImageRenderingHints";
-
-  public static final String SQL_FULL_FIELDS_ST = SQL_REDUCED_FIELDS_ST + ", w.text wp_text";
-
   public static final String TABLE_ALIAS = "s";
   public static final String TABLE_NAME = "subtopics";
+
+  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
+    return IdentifiableRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix);
+  }
 
   private final EntityRepositoryImpl entityRepositoryImpl;
   private final FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
@@ -59,17 +60,11 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
       IdentifierRepository identifierRepository,
       EntityRepositoryImpl entityRepositoryImpl,
       FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl) {
-    super(
-        dbi,
-        identifierRepository,
-        TABLE_NAME,
-        TABLE_ALIAS,
-        MAPPING_PREFIX,
-        SubtopicImpl.class,
-        SQL_REDUCED_FIELDS_ST,
-        SQL_FULL_FIELDS_ST);
+    super(dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, SubtopicImpl.class);
     this.entityRepositoryImpl = entityRepositoryImpl;
     this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
+    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
+    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override
@@ -194,7 +189,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
                 + " WHERE ss.parent_subtopic_uuid = :uuid"
                 + " ORDER BY ss.sortIndex ASC");
 
-    List<Subtopic> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
+    List<Subtopic> result = retrieveList(sqlReducedFields, innerQuery, Map.of("uuid", uuid));
     return result;
   }
 
@@ -217,7 +212,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
     }
     addPageRequestParams(pageRequest, innerQuery);
 
-    List<Subtopic> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", uuid));
+    List<Subtopic> result = retrieveList(sqlReducedFields, innerQuery, Map.of("uuid", uuid));
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -260,7 +255,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
 
     List<Entity> result =
         entityRepositoryImpl.retrieveList(
-            EntityRepositoryImpl.SQL_REDUCED_FIELDS_E, innerQuery, Map.of("uuid", subtopicUuid));
+            entityRepositoryImpl.getSqlReducedFields(), innerQuery, Map.of("uuid", subtopicUuid));
 
     return result;
   }
@@ -284,7 +279,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
 
     List<FileResource> result =
         fileResourceMetadataRepositoryImpl.retrieveList(
-            FileResourceMetadataRepositoryImpl.SQL_REDUCED_FIELDS_FR,
+            fileResourceMetadataRepositoryImpl.getSqlReducedFields(),
             innerQuery,
             Map.of("uuid", subtopicUuid));
 
@@ -303,7 +298,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
                 + tableAlias
                 + ".uuid = ss.parent_subtopic_uuid"
                 + " WHERE ss.child_subtopic_uuid = :uuid");
-    Subtopic result = retrieveOne(reducedFieldsSql, innerQuery, null, Map.of("uuid", uuid));
+    Subtopic result = retrieveOne(sqlReducedFields, innerQuery, null, Map.of("uuid", uuid));
 
     return result;
   }
@@ -331,7 +326,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
                 + ".uuid = se.subtopic_uuid"
                 + " WHERE se.entity_uuid = :uuid");
 
-    List<Subtopic> result = retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", entityUuid));
+    List<Subtopic> result = retrieveList(sqlReducedFields, innerQuery, Map.of("uuid", entityUuid));
     return result;
   }
 
@@ -349,7 +344,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
                 + " WHERE sf.fileresource_uuid = :uuid");
 
     List<Subtopic> result =
-        retrieveList(reducedFieldsSql, innerQuery, Map.of("uuid", fileResourceUuid));
+        retrieveList(sqlReducedFields, innerQuery, Map.of("uuid", fileResourceUuid));
     return result;
   }
 
@@ -388,11 +383,11 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
         "INSERT INTO "
             + tableName
             + "("
-            + "uuid, label, description, previewfileresource, preview_hints,"
+            + "uuid, label, description, previewfileresource, preview_hints, custom_attrs,"
             + " identifiable_type,"
             + " created, last_modified"
             + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
+            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
             + " :type,"
             + " :created, :lastModified"
             + ")";
@@ -529,7 +524,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
             + tableName
             + " SET"
             + " label=:label::JSONB, description=:description::JSONB,"
-            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
+            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
             + " last_modified=:lastModified"
             + " WHERE uuid=:uuid";
 

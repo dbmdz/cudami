@@ -2,12 +2,14 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work.ItemRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.Project;
+import de.digitalcollections.model.api.identifiable.entity.work.Item;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -33,27 +35,29 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     implements DigitalObjectRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectRepositoryImpl.class);
-  // select only what is shown/needed in paged list (to avoid unnecessary payload/traffic):
+
   public static final String MAPPING_PREFIX = "do";
-
-  public static final String SQL_REDUCED_FIELDS_DO =
-      " d.uuid do_uuid, d.refid do_refId, d.label do_label,"
-          + " d.identifiable_type do_type, d.entity_type do_entityType,"
-          + " d.created do_created, d.last_modified do_lastModified,"
-          + " d.preview_hints do_previewImageRenderingHints, d.custom_attrs do_customAttributes";
-
-  public static final String SQL_FULL_FIELDS_DO =
-      SQL_REDUCED_FIELDS_DO
-          + ", d.description do_description"; // TODO: add d.license do_license, d.version
-  // do_version, when features added
   public static final String TABLE_ALIAS = "d";
   public static final String TABLE_NAME = "digitalobjects";
+
+  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
+    // TODO: add license, version
+    //    return getSqlReducedFields(tableAlias, mappingPrefix) + ", "
+    //            + tableAlias + ".version " + mappingPrefix + "_version";
+    return getSqlReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix);
+  }
 
   @Lazy @Autowired private CollectionRepositoryImpl collectionRepositoryImpl;
 
   @Lazy @Autowired private FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
 
   @Lazy @Autowired private ImageFileResourceRepositoryImpl imageFileResourceRepositoryImpl;
+
+  @Lazy @Autowired private ItemRepositoryImpl itemRepositoryImpl;
 
   @Lazy @Autowired private ProjectRepositoryImpl projectRepositoryImpl;
 
@@ -65,9 +69,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        DigitalObjectImpl.class,
-        SQL_REDUCED_FIELDS_DO,
-        SQL_FULL_FIELDS_DO);
+        DigitalObjectImpl.class);
+    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
+    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override
@@ -108,7 +112,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
     List<Collection> result =
         collectionRepositoryImpl.retrieveList(
-            CollectionRepositoryImpl.SQL_REDUCED_FIELDS_COL,
+            collectionRepositoryImpl.getSqlReducedFields(),
             innerQuery,
             Map.of("uuid", digitalObjectUuid));
 
@@ -140,7 +144,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   public List<FileResource> getFileResources(UUID digitalObjectUuid) {
     final String frTableAlias = fileResourceMetadataRepositoryImpl.getTableAlias();
     final String frTableName = fileResourceMetadataRepositoryImpl.getTableName();
-    final String fieldsSql = FileResourceMetadataRepositoryImpl.SQL_REDUCED_FIELDS_FR;
+    final String fieldsSql = fileResourceMetadataRepositoryImpl.getSqlReducedFields();
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -164,7 +168,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   public List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid) {
     final String frTableAlias = imageFileResourceRepositoryImpl.getTableAlias();
     final String frTableName = imageFileResourceRepositoryImpl.getTableName();
-    final String fieldsSql = ImageFileResourceRepositoryImpl.SQL_FULL_FIELDS_FR;
+    final String fieldsSql = imageFileResourceRepositoryImpl.getSqlAllFields();
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -182,6 +186,31 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         imageFileResourceRepositoryImpl.retrieveList(fieldsSql, innerQuery, argumentMappings);
 
     return fileResources;
+  }
+
+  @Override
+  public Item getItem(UUID digitalObjectUuid) {
+    final String itTableAlias = itemRepositoryImpl.getTableAlias();
+    final String itTableName = itemRepositoryImpl.getTableName();
+
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + itTableName
+                + " AS "
+                + itTableAlias
+                + " LEFT JOIN item_digitalobjects AS ido ON "
+                + itTableAlias
+                + ".uuid = ido.item_uuid"
+                + " WHERE ido.digitalobject_uuid = :uuid");
+
+    Item result =
+        itemRepositoryImpl.retrieveOne(
+            itemRepositoryImpl.getSqlReducedFields(),
+            innerQuery,
+            null,
+            Map.of("uuid", digitalObjectUuid));
+    return result;
   }
 
   @Override
@@ -207,7 +236,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
     List<Project> result =
         projectRepositoryImpl.retrieveList(
-            ProjectRepositoryImpl.SQL_REDUCED_FIELDS_PR,
+            projectRepositoryImpl.getSqlReducedFields(),
             innerQuery,
             Map.of("uuid", digitalObjectUuid));
 

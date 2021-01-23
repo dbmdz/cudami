@@ -43,18 +43,30 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticleRepositoryImpl.class);
 
   public static final String MAPPING_PREFIX = "ar";
-
-  public static final String SQL_REDUCED_FIELDS_AR =
-      " a.uuid ar_uuid, a.refid ar_refId, a.label ar_label, a.description ar_description,"
-          + " a.identifiable_type ar_type, a.entity_type ar_entityType,"
-          + " a.created ar_created, a.last_modified ar_lastModified,"
-          + " a.preview_hints ar_previewImageRenderingHints,"
-          + " a.date_published ar_datePublished, a.timevalue_published ar_timeValuePublished";
-
-  public static final String SQL_FULL_FIELDS_AR = SQL_REDUCED_FIELDS_AR + ", a.text ar_text";
-
   public static final String TABLE_ALIAS = "a";
   public static final String TABLE_NAME = "articles";
+
+  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".text "
+        + mappingPrefix
+        + "_text";
+  }
+
+  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".date_published "
+        + mappingPrefix
+        + "_datePublished, "
+        + tableAlias
+        + ".timevalue_published "
+        + mappingPrefix
+        + "_timeValuePublished";
+  }
 
   private final EntityRepositoryImpl<EntityImpl> entityRepositoryImpl;
 
@@ -63,16 +75,10 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
       Jdbi dbi,
       IdentifierRepository identifierRepository,
       @Qualifier("entityRepositoryImpl") EntityRepositoryImpl<EntityImpl> entityRepositoryImpl) {
-    super(
-        dbi,
-        identifierRepository,
-        TABLE_NAME,
-        TABLE_ALIAS,
-        MAPPING_PREFIX,
-        ArticleImpl.class,
-        SQL_REDUCED_FIELDS_AR,
-        SQL_FULL_FIELDS_AR);
+    super(dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, ArticleImpl.class);
     this.entityRepositoryImpl = entityRepositoryImpl;
+    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
+    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override
@@ -140,7 +146,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
 
     final String sql =
         "SELECT"
-            + EntityRepositoryImpl.SQL_REDUCED_FIELDS_E
+            + entityRepositoryImpl.getSqlReducedFields()
             + ","
             + SQL_FULL_FIELDS_ID
             + ","
@@ -214,13 +220,13 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
         "INSERT INTO "
             + tableName
             + "("
-            + "uuid, label, description, previewfileresource, preview_hints,"
+            + "uuid, label, description, previewfileresource, preview_hints, custom_attrs,"
             + " identifiable_type, entity_type,"
             + " created, last_modified,"
             + " date_published, timevalue_published,"
             + " text"
             + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB,"
+            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
             + " :type, :entityType,"
             + " :created, :lastModified,"
             + " :datePublished, :timeValuePublished::JSONB,"
@@ -288,7 +294,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
             + tableName
             + " SET"
             + " label=:label::JSONB, description=:description::JSONB,"
-            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB,"
+            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
             + " last_modified=:lastModified,"
             + " date_published=:datePublished, timevalue_published=:timeValuePublished::JSONB,"
             + " text=:text::JSONB"

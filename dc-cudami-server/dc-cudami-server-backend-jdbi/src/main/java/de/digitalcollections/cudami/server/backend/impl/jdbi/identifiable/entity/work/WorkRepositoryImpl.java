@@ -26,18 +26,27 @@ import org.springframework.stereotype.Repository;
 public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements WorkRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WorkRepositoryImpl.class);
+
   public static final String MAPPING_PREFIX = "wo";
-
-  public static final String SQL_REDUCED_FIELDS_WO =
-      " w.uuid wo_uuid, w.refid wo_refId, w.label wo_label, w.description wo_description,"
-          + " w.identifiable_type wo_type, w.entity_type wo_entityType,"
-          + " w.created wo_created, w.last_modified wo_lastModified,"
-          + " w.date_published wo_datePublished, w.timevalue_published wo_timeValuePublished";
-
-  public static final String SQL_FULL_FIELDS_WO = SQL_REDUCED_FIELDS_WO;
-
   public static final String TABLE_ALIAS = "w";
   public static final String TABLE_NAME = "works";
+
+  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".date_published "
+        + mappingPrefix
+        + "_datePublished, "
+        + tableAlias
+        + ".timevalue_published "
+        + mappingPrefix
+        + "_timeValuePublished";
+  }
 
   private final AgentRepositoryImpl agentRepositoryImpl;
   private final ItemRepositoryImpl itemRepositoryImpl;
@@ -48,17 +57,11 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
       IdentifierRepository identifierRepository,
       AgentRepositoryImpl agentRepositoryImpl,
       ItemRepositoryImpl itemRepositoryImpl) {
-    super(
-        dbi,
-        identifierRepository,
-        TABLE_NAME,
-        TABLE_ALIAS,
-        MAPPING_PREFIX,
-        WorkImpl.class,
-        SQL_REDUCED_FIELDS_WO,
-        SQL_FULL_FIELDS_WO);
+    super(dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, WorkImpl.class);
     this.agentRepositoryImpl = agentRepositoryImpl;
     this.itemRepositoryImpl = itemRepositoryImpl;
+    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
+    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override
@@ -124,7 +127,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
 
     List<Agent> result =
         agentRepositoryImpl.retrieveList(
-            AgentRepositoryImpl.SQL_REDUCED_FIELDS_AG, innerQuery, Map.of("uuid", workUuid));
+            agentRepositoryImpl.getSqlReducedFields(), innerQuery, Map.of("uuid", workUuid));
     return result;
   }
 
@@ -147,7 +150,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
 
     List<Item> result =
         itemRepositoryImpl.retrieveList(
-            ItemRepositoryImpl.SQL_REDUCED_FIELDS_IT, innerQuery, Map.of("uuid", workUuid));
+            itemRepositoryImpl.getSqlReducedFields(), innerQuery, Map.of("uuid", workUuid));
     return result;
   }
 
@@ -164,12 +167,12 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
         "INSERT INTO "
             + tableName
             + "("
-            + "uuid, label, description, previewfileresource,"
+            + "uuid, label, description, previewfileresource, preview_hints, custom_attrs,"
             + " identifiable_type, entity_type,"
             + " created, last_modified,"
             + " date_published , timevalue_published"
             + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource,"
+            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
             + " :type, :entityType,"
             + " :created, :lastModified,"
             + " :datePublished, :timeValuePublished::JSONB"
@@ -235,7 +238,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
         "UPDATE "
             + tableName
             + " SET"
-            + " label=:label::JSONB, description=:description::JSONB, previewfileresource=:previewFileResource,"
+            + " label=:label::JSONB, description=:description::JSONB, previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
             + " last_modified=:lastModified,"
             + " date_published=:datePublished , timevalue_published=:timeValuePublished::JSONB"
             + " WHERE uuid=:uuid";

@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.business.api.service.identifiable.en
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.Project;
+import de.digitalcollections.model.api.identifiable.entity.work.Item;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -14,13 +15,6 @@ import java.util.UUID;
 public interface DigitalObjectService extends EntityService<DigitalObject> {
 
   void deleteFileResources(UUID digitalObjectUuid);
-
-  /**
-   * Returns a list of all DigitalObjects, reduced to their identifiers and last modified date
-   *
-   * @return partially (see above) filled list of all DigitalObjects
-   */
-  List<DigitalObject> findAllReduced();
 
   PageResponse<Collection> getActiveCollections(
       DigitalObject digitalObject, PageRequest pageRequest);
@@ -43,6 +37,15 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
   }
 
   List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid);
+
+  default Item getItem(DigitalObject digitalObject) {
+    if (digitalObject == null) {
+      return null;
+    }
+    return getItem(digitalObject.getUuid());
+  }
+
+  Item getItem(UUID digitalObjectUuid);
 
   default PageResponse<Project> getProjects(DigitalObject digitalObject, PageRequest pageRequest) {
     return getProjects(digitalObject.getUuid(), pageRequest);

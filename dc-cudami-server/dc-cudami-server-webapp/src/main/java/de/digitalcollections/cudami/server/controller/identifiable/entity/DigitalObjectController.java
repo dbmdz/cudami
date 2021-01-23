@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.Project;
+import de.digitalcollections.model.api.identifiable.entity.work.Item;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
@@ -185,6 +186,15 @@ public class DigitalObjectController {
   @ApiResponseObject
   public List<FileResource> getFileResources(@PathVariable UUID uuid) {
     return service.getFileResources(uuid);
+  }
+
+  @ApiMethod(description = "Get item for digital object by digital object uuid")
+  @GetMapping(
+      value = {"/latest/digitalobjects/{uuid}/item", "/v2/digitalobjects/{uuid}/item"},
+      produces = "application/json")
+  @ApiResponseObject
+  public Item findItemOfDigitalObject(@PathVariable UUID uuid) {
+    return service.getItem(uuid);
   }
 
   @ApiMethod(description = "Get paged projects of a digital objects")
