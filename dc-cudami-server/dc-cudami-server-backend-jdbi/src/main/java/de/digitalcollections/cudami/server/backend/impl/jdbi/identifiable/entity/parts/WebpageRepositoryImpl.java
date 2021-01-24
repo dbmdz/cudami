@@ -16,10 +16,8 @@ import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
@@ -39,8 +37,19 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
   public static final String TABLE_ALIAS = "w";
   public static final String TABLE_NAME = "webpages";
 
-  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlReducedFields(tableAlias, mappingPrefix)
+  public static String getSqlInsertFields() {
+    return IdentifiableRepositoryImpl.getSqlInsertFields()
+        + ", publication_end, publication_start, rendering_hints, text";
+  }
+
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  public static String getSqlInsertValues() {
+    return IdentifiableRepositoryImpl.getSqlInsertValues()
+        + ", :publicationEnd, :publicationStart, :renderingHints::JSONB, :text::JSONB";
+  }
+
+  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".text "
@@ -48,8 +57,8 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
         + "_text";
   }
 
-  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
-    return IdentifiableRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix)
+  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return IdentifiableRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".publication_end "
@@ -65,11 +74,25 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
         + "_renderingHints";
   }
 
+  public static String getSqlUpdateFieldValues() {
+    return IdentifiableRepositoryImpl.getSqlUpdateFieldValues()
+        + ", publication_end=:publicationEnd, publication_start=:publicationStart, rendering_hints=:renderingHints::JSONB, text=:text::JSONB";
+  }
+
   @Autowired
   public WebpageRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, WebpageImpl.class);
-    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
-    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
+    super(
+        dbi,
+        identifierRepository,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        WebpageImpl.class,
+        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlInsertFields(),
+        getSqlInsertValues(),
+        getSqlUpdateFieldValues());
   }
 
   @Override
@@ -173,7 +196,7 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
                 + " WHERE ww.parent_webpage_uuid = :uuid"
                 + " ORDER BY ww.sortIndex ASC");
 
-    List<Webpage> result = retrieveList(sqlReducedFields, innerQuery, Map.of("uuid", uuid));
+    List<Webpage> result = retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid));
     return result;
   }
 
@@ -196,7 +219,7 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
     }
     addPageRequestParams(pageRequest, innerQuery);
 
-    List<Webpage> result = retrieveList(sqlReducedFields, innerQuery, Map.of("uuid", uuid));
+    List<Webpage> result = retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid));
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -236,7 +259,7 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
                 + tableAlias
                 + ".uuid = ww.parent_webpage_uuid"
                 + " WHERE ww.child_webpage_uuid = :uuid");
-    Webpage result = retrieveOne(sqlReducedFields, innerQuery, null, Map.of("uuid", uuid));
+    Webpage result = retrieveOne(sqlSelectReducedFields, innerQuery, null, Map.of("uuid", uuid));
 
     return result;
   }
@@ -276,40 +299,7 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
 
   @Override
   public Webpage save(Webpage webpage) {
-    webpage.setUuid(UUID.randomUUID());
-    webpage.setCreated(LocalDateTime.now());
-    webpage.setLastModified(LocalDateTime.now());
-    final UUID previewImageUuid =
-        webpage.getPreviewImage() == null ? null : webpage.getPreviewImage().getUuid();
-
-    String query =
-        "INSERT INTO "
-            + tableName
-            + "("
-            + "uuid, label, description, previewfileresource, preview_hints, custom_attrs,"
-            + " identifiable_type,"
-            + " created, last_modified,"
-            + " text, publication_start, publication_end,"
-            + " rendering_hints"
-            + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
-            + " :type,"
-            + " :created, :lastModified,"
-            + " :text::JSONB, :publicationStart, :publicationEnd,"
-            + " :renderingHints::JSONB"
-            + ")";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(webpage)
-                .execute());
-
-    // save identifiers
-    Set<Identifier> identifiers = webpage.getIdentifiers();
-    saveIdentifiers(identifiers, webpage);
-
+    super.save(webpage);
     Webpage result = findOne(webpage.getUuid());
     return result;
   }
@@ -361,36 +351,7 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
 
   @Override
   public Webpage update(Webpage webpage) {
-    webpage.setLastModified(LocalDateTime.now());
-    // do not update/left out from statement (not changed since insert):
-    // uuid, created, identifiable_type
-    final UUID previewImageUuid =
-        webpage.getPreviewImage() == null ? null : webpage.getPreviewImage().getUuid();
-
-    String query =
-        "UPDATE "
-            + tableName
-            + " SET"
-            + " label=:label::JSONB, description=:description::JSONB,"
-            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
-            + " last_modified=:lastModified,"
-            + " text=:text::JSONB, publication_start=:publicationStart, publication_end=:publicationEnd,"
-            + " rendering_hints=:renderingHints::JSONB"
-            + " WHERE uuid=:uuid";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(webpage)
-                .execute());
-
-    // save identifiers
-    // as we store the whole list new: delete old entries
-    identifierRepository.deleteByIdentifiable(webpage);
-    Set<Identifier> identifiers = webpage.getIdentifiers();
-    saveIdentifiers(identifiers, webpage);
-
+    super.update(webpage);
     Webpage result = findOne(webpage.getUuid());
     return result;
   }

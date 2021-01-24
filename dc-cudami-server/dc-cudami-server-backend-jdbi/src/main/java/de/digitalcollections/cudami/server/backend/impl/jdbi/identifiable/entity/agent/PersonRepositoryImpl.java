@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work.WorkRepositoryImpl;
-import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.agent.Person;
 import de.digitalcollections.model.api.identifiable.entity.geo.GeoLocation;
@@ -16,7 +15,6 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.agent.PersonImpl;
 import de.digitalcollections.model.impl.identifiable.entity.geo.GeoLocationImpl;
-import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,20 +79,27 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
     };
   }
 
-  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlReducedFields(tableAlias, mappingPrefix)
+  public static String getSqlInsertFields() {
+    return EntityRepositoryImpl.getSqlInsertFields()
+        + ", dateofbirth, dateofdeath, gender, locationofbirth, locationofdeath, timevalueofbirth, timevalueofdeath";
+  }
+
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  public static String getSqlInsertValues() {
+    return EntityRepositoryImpl.getSqlInsertValues()
+        + ", :dateOfBirth, :dateOfDeath, :gender, :locationOfBirth, :locationOfDeath, :timeValueOfBirth::JSONB, :timeValueOfDeath::JSONB";
+  }
+
+  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + "glbirth.uuid glbirth_uuid, glbirth.label glbirth_label, glbirth.geolocation_type glbirth_geoLocationType, "
         + "gldeath.uuid gldeath_uuid, gldeath.label gldeath_label, gldeath.geolocation_type gldeath_geoLocationType";
   }
 
-  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix)
+  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
-        + tableAlias
-        + ".date_published "
-        + mappingPrefix
-        + "_datePublished, "
         + tableAlias
         + ".dateofbirth "
         + mappingPrefix
@@ -108,10 +113,6 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         + mappingPrefix
         + "_gender, "
         + tableAlias
-        + ".timevalue_published "
-        + mappingPrefix
-        + "_timeValuePublished, "
-        + tableAlias
         + ".timevalueofbirth "
         + mappingPrefix
         + "_timeValueOfBirth, "
@@ -119,6 +120,11 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         + ".timevalueofdeath "
         + mappingPrefix
         + "_timeValueOfDeath";
+  }
+
+  public static String getSqlUpdateFieldValues() {
+    return EntityRepositoryImpl.getSqlUpdateFieldValues()
+        + ", dateofbirth=:dateOfBirth, dateofdeath=:dateOfDeath, gender=:gender, locationofbirth=:locationOfBirth, locationofdeath=:locationOfDeath, timevalueofbirth=:timeValueOfBirth::JSONB, timevalueofdeath=:timeValueOfDeath::JSONB";
   }
 
   private final DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
@@ -137,6 +143,11 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         TABLE_ALIAS,
         MAPPING_PREFIX,
         PersonImpl.class,
+        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlInsertFields(),
+        getSqlInsertValues(),
+        getSqlUpdateFieldValues(),
         SQL_FULL_FIELDS_JOINS,
         createAdditionalReduceRowsBiFunction());
     this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
@@ -173,7 +184,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
 
     List<DigitalObject> list =
         digitalObjectRepositoryImpl.retrieveList(
-            digitalObjectRepositoryImpl.getSqlReducedFields(),
+            digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             Map.of("uuid", uuidPerson));
 
@@ -226,60 +237,20 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
 
     List<Work> list =
         workRepositoryImpl.retrieveList(
-            workRepositoryImpl.getSqlReducedFields(), innerQuery, Map.of("uuid", uuidPerson));
+            workRepositoryImpl.getSqlSelectReducedFields(), innerQuery, Map.of("uuid", uuidPerson));
 
     return list.stream().collect(Collectors.toSet());
   }
 
   @Override
   public Person save(Person person) {
-    if (person.getUuid() == null) {
-      person.setUuid(UUID.randomUUID());
-    }
-    person.setCreated(LocalDateTime.now());
-    person.setLastModified(LocalDateTime.now());
-    // refid is generated as serial, DO NOT SET!
-    final UUID previewImageUuid =
-        person.getPreviewImage() == null ? null : person.getPreviewImage().getUuid();
     final UUID locationOfBirthUuid =
         person.getPlaceOfBirth() == null ? null : person.getPlaceOfBirth().getUuid();
     final UUID locationOfDeathUuid =
         person.getPlaceOfDeath() == null ? null : person.getPlaceOfDeath().getUuid();
-
-    String query =
-        "INSERT INTO "
-            + tableName
-            + "("
-            + "uuid, previewFileResource, label, description, preview_hints, custom_attrs,"
-            + " identifiable_type, entity_type,"
-            + " created, last_modified,"
-            + " dateOfBirth, timeValueOfBirth,"
-            + " locationOfBirth,"
-            + " dateOfDeath, timeValueOfDeath,"
-            + " locationOfDeath,"
-            + " gender"
-            + ") VALUES ("
-            + ":uuid, :previewFileResource, :label::JSONB, :description::JSONB, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
-            + " :type, :entityType,"
-            + " :created, :lastModified,"
-            + " :dateOfBirth, :timeValueOfBirth::JSONB,"
-            + " :locationOfBirth,"
-            + " :dateOfDeath, :timeValueOfDeath::JSONB,"
-            + " :locationOfDeath,"
-            + " :gender"
-            + ")";
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bind("locationOfBirth", locationOfBirthUuid)
-                .bind("locationOfDeath", locationOfDeathUuid)
-                .bindBean(person)
-                .execute());
-
-    // save identifiers
-    Set<Identifier> identifiers = person.getIdentifiers();
-    saveIdentifiers(identifiers, person);
+    Map<String, Object> bindings =
+        Map.of("locationOfBirth", locationOfBirthUuid, "locationOfDeath", locationOfDeathUuid);
+    super.save(person, bindings);
 
     // save given names
     //    List<GivenName> givenNames = person.getGivenNames();
@@ -331,41 +302,13 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
   //  }
   @Override
   public Person update(Person person) {
-    person.setLastModified(LocalDateTime.now());
-    final UUID previewImageUuid =
-        person.getPreviewImage() == null ? null : person.getPreviewImage().getUuid();
     final UUID locationOfBirthUuid =
         person.getPlaceOfBirth() == null ? null : person.getPlaceOfBirth().getUuid();
     final UUID locationOfDeathUuid =
         person.getPlaceOfDeath() == null ? null : person.getPlaceOfDeath().getUuid();
-
-    String query =
-        "UPDATE "
-            + tableName
-            + " SET"
-            + " previewFileResource=:previewFileResource, label=:label::JSONB, description=:description::JSONB, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
-            + " last_modified=:lastModified,"
-            + " dateOfBirth=:dateOfBirth, timeValueOfBirth=:timeValueOfBirth::JSONB,"
-            + " locationOfBirth=:locationOfBirth,"
-            + " dateOfDeath=:dateOfDeath, timeValueOfDeath=:timeValueOfDeath::JSONB,"
-            + " locationOfDeath=:locationOfDeath,"
-            + " gender=:gender"
-            + " WHERE uuid=:uuid";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bind("locationOfBirth", locationOfBirthUuid)
-                .bind("locationOfDeath", locationOfDeathUuid)
-                .bindBean(person)
-                .execute());
-
-    // save identifiers
-    // as we store the whole list new: delete old entries
-    identifierRepository.deleteByIdentifiable(person);
-    Set<Identifier> identifiers = person.getIdentifiers();
-    saveIdentifiers(identifiers, person);
+    Map<String, Object> bindings =
+        Map.of("locationOfBirth", locationOfBirthUuid, "locationOfDeath", locationOfDeathUuid);
+    super.update(person, bindings);
 
     // save given names
     //    List<GivenName> givenNames = person.getGivenNames();

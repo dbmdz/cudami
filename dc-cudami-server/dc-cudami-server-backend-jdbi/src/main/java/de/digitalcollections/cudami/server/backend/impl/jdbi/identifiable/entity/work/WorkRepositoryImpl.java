@@ -10,10 +10,8 @@ import de.digitalcollections.model.api.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.api.identifiable.entity.work.Item;
 import de.digitalcollections.model.api.identifiable.entity.work.Work;
 import de.digitalcollections.model.impl.identifiable.entity.work.WorkImpl;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
@@ -31,12 +29,22 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   public static final String TABLE_ALIAS = "w";
   public static final String TABLE_NAME = "works";
 
-  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlReducedFields(tableAlias, mappingPrefix);
+  public static String getSqlInsertFields() {
+    return EntityRepositoryImpl.getSqlInsertFields() + ", date_published, timevalue_published";
   }
 
-  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix)
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  public static String getSqlInsertValues() {
+    return EntityRepositoryImpl.getSqlInsertValues()
+        + ", :datePublished, :timeValuePublished::JSONB";
+  }
+
+  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".date_published "
@@ -48,6 +56,11 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
         + "_timeValuePublished";
   }
 
+  public static String getSqlUpdateFieldValues() {
+    return EntityRepositoryImpl.getSqlUpdateFieldValues()
+        + ", date_published=:datePublished, timevalue_published=:timeValuePublished::JSONB";
+  }
+
   private final AgentRepositoryImpl agentRepositoryImpl;
   private final ItemRepositoryImpl itemRepositoryImpl;
 
@@ -57,11 +70,20 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
       IdentifierRepository identifierRepository,
       AgentRepositoryImpl agentRepositoryImpl,
       ItemRepositoryImpl itemRepositoryImpl) {
-    super(dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, WorkImpl.class);
+    super(
+        dbi,
+        identifierRepository,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        WorkImpl.class,
+        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlInsertFields(),
+        getSqlInsertValues(),
+        getSqlUpdateFieldValues());
     this.agentRepositoryImpl = agentRepositoryImpl;
     this.itemRepositoryImpl = itemRepositoryImpl;
-    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
-    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override
@@ -127,7 +149,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
 
     List<Agent> result =
         agentRepositoryImpl.retrieveList(
-            agentRepositoryImpl.getSqlReducedFields(), innerQuery, Map.of("uuid", workUuid));
+            agentRepositoryImpl.getSqlSelectReducedFields(), innerQuery, Map.of("uuid", workUuid));
     return result;
   }
 
@@ -150,44 +172,13 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
 
     List<Item> result =
         itemRepositoryImpl.retrieveList(
-            itemRepositoryImpl.getSqlReducedFields(), innerQuery, Map.of("uuid", workUuid));
+            itemRepositoryImpl.getSqlSelectReducedFields(), innerQuery, Map.of("uuid", workUuid));
     return result;
   }
 
   @Override
   public Work save(Work work) {
-    work.setUuid(UUID.randomUUID());
-    work.setCreated(LocalDateTime.now());
-    work.setLastModified(LocalDateTime.now());
-    // refid is generated as serial, DO NOT SET!
-    final UUID previewImageUuid =
-        work.getPreviewImage() == null ? null : work.getPreviewImage().getUuid();
-
-    String query =
-        "INSERT INTO "
-            + tableName
-            + "("
-            + "uuid, label, description, previewfileresource, preview_hints, custom_attrs,"
-            + " identifiable_type, entity_type,"
-            + " created, last_modified,"
-            + " date_published , timevalue_published"
-            + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
-            + " :type, :entityType,"
-            + " :created, :lastModified,"
-            + " :datePublished, :timeValuePublished::JSONB"
-            + ")";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(work)
-                .execute());
-
-    // save identifiers
-    Set<Identifier> identifiers = work.getIdentifiers();
-    saveIdentifiers(identifiers, work);
+    super.save(work);
 
     // save creators
     List<Agent> creators = work.getCreators();
@@ -228,33 +219,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
 
   @Override
   public Work update(Work work) {
-    work.setLastModified(LocalDateTime.now());
-    // do not update/left out from statement (not changed since insert):
-    // uuid, created, identifiable_type, entity_type, refid
-    final UUID previewImageUuid =
-        work.getPreviewImage() == null ? null : work.getPreviewImage().getUuid();
-
-    String query =
-        "UPDATE "
-            + tableName
-            + " SET"
-            + " label=:label::JSONB, description=:description::JSONB, previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
-            + " last_modified=:lastModified,"
-            + " date_published=:datePublished , timevalue_published=:timeValuePublished::JSONB"
-            + " WHERE uuid=:uuid";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(work)
-                .execute());
-
-    // save identifiers
-    // as we store the whole list new: delete old entries
-    identifierRepository.deleteByIdentifiable(work);
-    Set<Identifier> identifiers = work.getIdentifiers();
-    saveIdentifiers(identifiers, work);
+    super.update(work);
 
     // save creators
     List<Agent> creators = work.getCreators();

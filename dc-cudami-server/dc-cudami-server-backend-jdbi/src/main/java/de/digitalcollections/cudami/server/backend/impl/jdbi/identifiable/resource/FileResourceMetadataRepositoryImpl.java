@@ -3,17 +3,13 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resou
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
-import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
-import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,18 +22,30 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(FileResourceMetadataRepositoryImpl.class);
+
   public static final String MAPPING_PREFIX = "fr";
   public static final String SQL_PREVIEW_IMAGE_FIELDS_PI =
       " file.uuid pi_uuid, file.filename pi_filename, file.mimetype pi_mimeType, file.uri pi_uri, file.http_base_url pi_httpBaseUrl";
   public static final String TABLE_ALIAS = "f";
   public static final String TABLE_NAME = "fileresources";
 
-  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlReducedFields(tableAlias, mappingPrefix);
+  public static String getSqlInsertFields() {
+    return IdentifiableRepositoryImpl.getSqlInsertFields()
+        + ", filename, http_base_url, mimetype, size_in_bytes, uri";
   }
 
-  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
-    return IdentifiableRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix)
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  public static String getSqlInsertValues() {
+    return IdentifiableRepositoryImpl.getSqlInsertValues()
+        + ", :filename, :httpBaseUrl, :mimeType, :sizeInBytes, :uri";
+  }
+
+  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return IdentifiableRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".filename "
@@ -61,12 +69,25 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
         + "_uri";
   }
 
+  public static String getSqlUpdateFieldValues() {
+    return IdentifiableRepositoryImpl.getSqlUpdateFieldValues()
+        + ", filename=:filename, http_base_url=:httpBaseUrl, mimetype=:mimeType, size_in_bytes=:sizeInBytes, uri=:uri";
+  }
+
   @Autowired
   public FileResourceMetadataRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     super(
-        dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, FileResourceImpl.class);
-    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
-    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
+        dbi,
+        identifierRepository,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        FileResourceImpl.class,
+        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlInsertFields(),
+        getSqlInsertValues(),
+        getSqlUpdateFieldValues());
   }
 
   @Override
@@ -99,14 +120,6 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
     }
   }
 
-  protected String getCommonFileResourceColumnsSql() {
-    return "uuid, label, description, previewfileresource, preview_hints, custom_attrs, identifiable_type, created, last_modified, filename, mimetype, size_in_bytes, uri, http_base_url";
-  }
-
-  protected String getCommonFileResourcePropertiesSql() {
-    return ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :customAttributes::JSONB, :type, :created, :lastModified, :filename, :mimeType, :sizeInBytes, :uri, :httpBaseUrl";
-  }
-
   public String getCommonFileResourceSearchSql(String tableName, String tableAlias) {
     String commonSql =
         " FROM "
@@ -135,73 +148,20 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
     return commonSql;
   }
 
-  protected String getCommonFileResourceUpdateSql() {
-    return "label=:label::JSONB, description=:description::JSONB,"
-        + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
-        + " last_modified=:lastModified, http_base_url=:httpBaseUrl";
-  }
-
   @Override
   public FileResource save(FileResource fileResource) {
-    if (fileResource.getUuid() == null) {
-      fileResource.setUuid(UUID.randomUUID());
-    }
     if (fileResource.getLabel() == null && fileResource.getFilename() != null) {
       // set a default label = filename (an empty label violates constraint)
       fileResource.setLabel(new LocalizedTextImpl(Locale.ROOT, fileResource.getFilename()));
     }
-    fileResource.setCreated(LocalDateTime.now());
-    fileResource.setLastModified(LocalDateTime.now());
-    final UUID previewImageUuid =
-        fileResource.getPreviewImage() == null ? null : fileResource.getPreviewImage().getUuid();
-
-    final String sql =
-        "INSERT INTO "
-            + tableName
-            + "("
-            + getCommonFileResourceColumnsSql()
-            + ") VALUES ("
-            + getCommonFileResourcePropertiesSql()
-            + ")";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(sql)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(fileResource)
-                .execute());
-
-    // save identifiers
-    Set<Identifier> identifiers = fileResource.getIdentifiers();
-    saveIdentifiers(identifiers, fileResource);
-
+    super.save(fileResource);
     FileResource result = findOne(fileResource.getUuid());
     return result;
   }
 
   @Override
   public FileResource update(FileResource fileResource) {
-    fileResource.setLastModified(LocalDateTime.now());
-    // do not update/left out from statement (not changed since insert):
-    // uuid, created, identifiable_type
-    final UUID previewImageUuid =
-        fileResource.getPreviewImage() == null ? null : fileResource.getPreviewImage().getUuid();
-
-    String query =
-        "UPDATE " + tableName + " SET " + getCommonFileResourceUpdateSql() + " WHERE uuid=:uuid";
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(fileResource)
-                .execute());
-
-    // save identifiers
-    // as we store the whole list new: delete old entries
-    deleteIdentifiers(fileResource.getUuid());
-    Set<Identifier> identifiers = fileResource.getIdentifiers();
-    saveIdentifiers(identifiers, fileResource);
-
+    super.update(fileResource);
     FileResource result = findOne(fileResource.getUuid());
     return result;
   }

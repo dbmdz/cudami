@@ -25,19 +25,41 @@ public class AgentRepositoryImpl extends EntityRepositoryImpl<Agent> implements 
   public static final String TABLE_ALIAS = "e";
   public static final String TABLE_NAME = "entities";
 
-  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlReducedFields(tableAlias, mappingPrefix);
+  public static String getSqlInsertFields() {
+    return EntityRepositoryImpl.getSqlInsertFields();
   }
 
-  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix);
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  public static String getSqlInsertValues() {
+    return EntityRepositoryImpl.getSqlInsertValues();
+  }
+
+  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlUpdateFieldValues() {
+    return EntityRepositoryImpl.getSqlUpdateFieldValues();
   }
 
   @Autowired
   public AgentRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, AgentImpl.class);
-    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
-    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
+    super(
+        dbi,
+        identifierRepository,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        AgentImpl.class,
+        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlInsertFields(),
+        getSqlInsertValues(),
+        getSqlUpdateFieldValues());
   }
 
   @Override
@@ -48,5 +70,19 @@ public class AgentRepositoryImpl extends EntityRepositoryImpl<Agent> implements 
   @Override
   public Set<Work> getWorks(UUID uuidAgent) {
     throw new UnsupportedOperationException("Not supported yet.");
+  }
+
+  @Override
+  public Agent save(Agent agent) {
+    super.save(agent);
+    Agent result = findOne(agent.getUuid());
+    return result;
+  }
+
+  @Override
+  public Agent update(Agent agent) {
+    super.update(agent);
+    Agent result = findOne(agent.getUuid());
+    return result;
   }
 }

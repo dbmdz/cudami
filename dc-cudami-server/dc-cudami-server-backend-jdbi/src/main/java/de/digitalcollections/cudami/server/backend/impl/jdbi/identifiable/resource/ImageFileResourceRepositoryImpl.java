@@ -3,17 +3,13 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resou
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ImageFileResourceRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
-import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
-import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +25,19 @@ public class ImageFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<
 
   public static final String MAPPING_PREFIX = "fr";
   public static final String TABLE_ALIAS = "f";
-  public static final String TABLE_NAME = "fileresources_audio";
+  public static final String TABLE_NAME = "fileresources_image";
 
-  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlReducedFields(tableAlias, mappingPrefix)
+  public static String getSqlInsertFields() {
+    return FileResourceMetadataRepositoryImpl.getSqlInsertFields() + ", height, width";
+  }
+
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  public static String getSqlInsertValues() {
+    return FileResourceMetadataRepositoryImpl.getSqlInsertValues() + ", :height, :width";
+  }
+
+  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".height "
@@ -44,8 +49,13 @@ public class ImageFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<
         + "_width";
   }
 
-  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
-    return FileResourceMetadataRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix);
+  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return FileResourceMetadataRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlUpdateFieldValues() {
+    return FileResourceMetadataRepositoryImpl.getSqlUpdateFieldValues()
+        + ", height=:height, width=:width";
   }
 
   private final FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
@@ -61,10 +71,13 @@ public class ImageFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        ImageFileResourceImpl.class);
+        ImageFileResourceImpl.class,
+        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlInsertFields(),
+        getSqlInsertValues(),
+        getSqlUpdateFieldValues());
     this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
-    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
-    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override
@@ -104,69 +117,18 @@ public class ImageFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<
 
   @Override
   public ImageFileResource save(ImageFileResource fileResource) {
-    if (fileResource.getUuid() == null) {
-      fileResource.setUuid(UUID.randomUUID());
-    }
     if (fileResource.getLabel() == null && fileResource.getFilename() != null) {
       // set a default label = filename (an empty label violates constraint)
       fileResource.setLabel(new LocalizedTextImpl(Locale.ROOT, fileResource.getFilename()));
     }
-    fileResource.setCreated(LocalDateTime.now());
-    fileResource.setLastModified(LocalDateTime.now());
-    final UUID previewImageUuid =
-        fileResource.getPreviewImage() == null ? null : fileResource.getPreviewImage().getUuid();
-
-    final String sql =
-        "INSERT INTO "
-            + tableName
-            + "("
-            + fileResourceMetadataRepositoryImpl.getCommonFileResourceColumnsSql()
-            + ", width, height) VALUES ("
-            + fileResourceMetadataRepositoryImpl.getCommonFileResourcePropertiesSql()
-            + ", :width, :height)";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(sql)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(fileResource)
-                .execute());
-
-    // save identifiers
-    Set<Identifier> identifiers = fileResource.getIdentifiers();
-    saveIdentifiers(identifiers, fileResource);
-
+    super.save(fileResource);
     ImageFileResource result = findOne(fileResource.getUuid());
     return result;
   }
 
   @Override
   public ImageFileResource update(ImageFileResource fileResource) {
-    fileResource.setLastModified(LocalDateTime.now());
-    // do not update/left out from statement (not changed since insert):
-    // uuid, created, identifiable_type
-    final UUID previewImageUuid =
-        fileResource.getPreviewImage() == null ? null : fileResource.getPreviewImage().getUuid();
-
-    String query =
-        "UPDATE "
-            + tableName
-            + " SET "
-            + fileResourceMetadataRepositoryImpl.getCommonFileResourceUpdateSql()
-            + ", width=:width, height=:height WHERE uuid=:uuid";
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(fileResource)
-                .execute());
-
-    // save identifiers
-    // as we store the whole list new: delete old entries
-    deleteIdentifiers(fileResource.getUuid());
-    Set<Identifier> identifiers = fileResource.getIdentifiers();
-    saveIdentifiers(identifiers, fileResource);
-
+    super.update(fileResource);
     ImageFileResource result = findOne(fileResource.getUuid());
     return result;
   }

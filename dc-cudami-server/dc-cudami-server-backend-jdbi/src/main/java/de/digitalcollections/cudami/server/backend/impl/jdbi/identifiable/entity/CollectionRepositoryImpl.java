@@ -17,12 +17,10 @@ import de.digitalcollections.model.impl.identifiable.NodeImpl;
 import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
@@ -43,8 +41,18 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   public static final String TABLE_ALIAS = "c";
   public static final String TABLE_NAME = "collections";
 
-  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlReducedFields(tableAlias, mappingPrefix)
+  public static String getSqlInsertFields() {
+    return EntityRepositoryImpl.getSqlInsertFields() + ", publication_end, publication_start, text";
+  }
+
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  public static String getSqlInsertValues() {
+    return EntityRepositoryImpl.getSqlInsertValues()
+        + ", :publicationEnd, :publicationStart, :text::JSONB";
+  }
+
+  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".text "
@@ -52,8 +60,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
         + "_text";
   }
 
-  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix)
+  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".publication_start "
@@ -65,15 +73,29 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
         + "_publicationEnd";
   }
 
+  public static String getSqlUpdateFieldValues() {
+    return EntityRepositoryImpl.getSqlUpdateFieldValues()
+        + ", publication_end=:publicationEnd, publication_start=:publicationStart, text=:text::JSONB";
+  }
+
   @Lazy @Autowired private CorporateBodyRepositoryImpl corporateBodyRepositoryImpl;
 
   @Lazy @Autowired private DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
 
   @Autowired
   public CollectionRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, CollectionImpl.class);
-    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
-    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
+    super(
+        dbi,
+        identifierRepository,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        CollectionImpl.class,
+        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlInsertFields(),
+        getSqlInsertValues(),
+        getSqlUpdateFieldValues());
   }
 
   @Override
@@ -236,7 +258,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                 + " WHERE cc.parent_collection_uuid = :uuid"
                 + " ORDER BY cc.sortIndex ASC");
 
-    List<Collection> result = retrieveList(sqlReducedFields, innerQuery, Map.of("uuid", uuid));
+    List<Collection> result =
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid));
     return result;
   }
 
@@ -258,7 +281,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     innerQuery.append(" ORDER BY cc.sortIndex ASC");
     addPageRequestParams(pageRequest, innerQuery);
 
-    List<Collection> result = retrieveList(sqlReducedFields, innerQuery, Map.of("uuid", uuid));
+    List<Collection> result =
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid));
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -314,7 +338,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
     List<DigitalObject> result =
         digitalObjectRepositoryImpl.retrieveList(
-            digitalObjectRepositoryImpl.getSqlReducedFields(),
+            digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             Map.of("uuid", collectionUuid));
 
@@ -337,7 +361,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                 + tableAlias
                 + ".uuid = cc.parent_collection_uuid"
                 + " WHERE cc.child_collection_uuid = :uuid");
-    Collection result = retrieveOne(sqlReducedFields, innerQuery, null, Map.of("uuid", uuid));
+    Collection result = retrieveOne(sqlSelectReducedFields, innerQuery, null, Map.of("uuid", uuid));
 
     return result;
   }
@@ -355,7 +379,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                 + ".uuid = cc.parent_collection_uuid"
                 + " WHERE cc.child_collection_uuid = :uuid");
 
-    List<Collection> result = retrieveList(sqlReducedFields, innerQuery, Map.of("uuid", uuid));
+    List<Collection> result =
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid));
     return result;
   }
 
@@ -389,7 +414,9 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
     List<CorporateBody> result =
         corporateBodyRepositoryImpl.retrieveList(
-            corporateBodyRepositoryImpl.getSqlReducedFields(), innerQuery, Map.of("uuid", uuid));
+            corporateBodyRepositoryImpl.getSqlSelectReducedFields(),
+            innerQuery,
+            Map.of("uuid", uuid));
 
     return result;
   }
@@ -469,39 +496,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
   @Override
   public Collection save(Collection collection) {
-    collection.setUuid(UUID.randomUUID());
-    collection.setCreated(LocalDateTime.now());
-    collection.setLastModified(LocalDateTime.now());
-    // refid is generated as serial, DO NOT SET!
-    final UUID previewImageUuid =
-        collection.getPreviewImage() == null ? null : collection.getPreviewImage().getUuid();
-
-    final String sql =
-        "INSERT INTO "
-            + tableName
-            + "("
-            + "uuid, label, description, previewfileresource, preview_hints, custom_attrs,"
-            + " identifiable_type, entity_type,"
-            + " created, last_modified,"
-            + " text, publication_start, publication_end"
-            + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
-            + " :type, :entityType,"
-            + " :created, :lastModified,"
-            + " :text::JSONB, :publicationStart, :publicationEnd"
-            + ")";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(sql)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(collection)
-                .execute());
-
-    // save identifiers
-    Set<Identifier> identifiers = collection.getIdentifiers();
-    saveIdentifiers(identifiers, collection);
-
+    super.save(collection);
     Collection result = findOne(collection.getUuid());
     return result;
   }
@@ -560,35 +555,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
   @Override
   public Collection update(Collection collection) {
-    collection.setLastModified(LocalDateTime.now());
-    // do not update/left out from statement (not changed since insert):
-    // uuid, created, identifiable_type, entity_type, refid
-    final UUID previewImageUuid =
-        collection.getPreviewImage() == null ? null : collection.getPreviewImage().getUuid();
-
-    final String sql =
-        "UPDATE "
-            + tableName
-            + " SET"
-            + " label=:label::JSONB, description=:description::JSONB,"
-            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
-            + " last_modified=:lastModified,"
-            + " text=:text::JSONB, publication_start=:publicationStart, publication_end=:publicationEnd"
-            + " WHERE uuid=:uuid";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(sql)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(collection)
-                .execute());
-
-    // save identifiers
-    // as we store the whole list new: delete old entries
-    identifierRepository.deleteByIdentifiable(collection);
-    Set<Identifier> identifiers = collection.getIdentifiers();
-    saveIdentifiers(identifiers, collection);
-
+    super.update(collection);
     Collection result = findOne(collection.getUuid());
     return result;
   }

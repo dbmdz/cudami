@@ -16,15 +16,15 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.NodeImpl;
+import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
 import de.digitalcollections.model.impl.identifiable.entity.TopicImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.SubtopicImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.jdbi.v3.core.statement.PreparedBatch;
@@ -43,15 +43,28 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
   public static final String TABLE_ALIAS = "s";
   public static final String TABLE_NAME = "subtopics";
 
-  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlReducedFields(tableAlias, mappingPrefix);
+  public static String getSqlInsertFields() {
+    return IdentifiableRepositoryImpl.getSqlInsertFields();
   }
 
-  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
-    return IdentifiableRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix);
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  public static String getSqlInsertValues() {
+    return IdentifiableRepositoryImpl.getSqlInsertValues();
   }
 
-  private final EntityRepositoryImpl entityRepositoryImpl;
+  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return IdentifiableRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlUpdateFieldValues() {
+    return IdentifiableRepositoryImpl.getSqlUpdateFieldValues();
+  }
+
+  private final EntityRepositoryImpl<EntityImpl> entityRepositoryImpl;
   private final FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
 
   @Autowired
@@ -60,11 +73,20 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
       IdentifierRepository identifierRepository,
       EntityRepositoryImpl entityRepositoryImpl,
       FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl) {
-    super(dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, SubtopicImpl.class);
+    super(
+        dbi,
+        identifierRepository,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        SubtopicImpl.class,
+        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlInsertFields(),
+        getSqlInsertValues(),
+        getSqlUpdateFieldValues());
     this.entityRepositoryImpl = entityRepositoryImpl;
     this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
-    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
-    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override
@@ -189,7 +211,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
                 + " WHERE ss.parent_subtopic_uuid = :uuid"
                 + " ORDER BY ss.sortIndex ASC");
 
-    List<Subtopic> result = retrieveList(sqlReducedFields, innerQuery, Map.of("uuid", uuid));
+    List<Subtopic> result = retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid));
     return result;
   }
 
@@ -212,7 +234,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
     }
     addPageRequestParams(pageRequest, innerQuery);
 
-    List<Subtopic> result = retrieveList(sqlReducedFields, innerQuery, Map.of("uuid", uuid));
+    List<Subtopic> result = retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid));
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -254,8 +276,14 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
                 + " ORDER BY se.sortIndex ASC");
 
     List<Entity> result =
-        entityRepositoryImpl.retrieveList(
-            entityRepositoryImpl.getSqlReducedFields(), innerQuery, Map.of("uuid", subtopicUuid));
+        entityRepositoryImpl
+            .retrieveList(
+                entityRepositoryImpl.getSqlSelectReducedFields(),
+                innerQuery,
+                Map.of("uuid", subtopicUuid))
+            .stream()
+            .map(Entity.class::cast)
+            .collect(Collectors.toList());
 
     return result;
   }
@@ -279,7 +307,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
 
     List<FileResource> result =
         fileResourceMetadataRepositoryImpl.retrieveList(
-            fileResourceMetadataRepositoryImpl.getSqlReducedFields(),
+            fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             Map.of("uuid", subtopicUuid));
 
@@ -298,7 +326,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
                 + tableAlias
                 + ".uuid = ss.parent_subtopic_uuid"
                 + " WHERE ss.child_subtopic_uuid = :uuid");
-    Subtopic result = retrieveOne(sqlReducedFields, innerQuery, null, Map.of("uuid", uuid));
+    Subtopic result = retrieveOne(sqlSelectReducedFields, innerQuery, null, Map.of("uuid", uuid));
 
     return result;
   }
@@ -326,7 +354,8 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
                 + ".uuid = se.subtopic_uuid"
                 + " WHERE se.entity_uuid = :uuid");
 
-    List<Subtopic> result = retrieveList(sqlReducedFields, innerQuery, Map.of("uuid", entityUuid));
+    List<Subtopic> result =
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", entityUuid));
     return result;
   }
 
@@ -344,7 +373,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
                 + " WHERE sf.fileresource_uuid = :uuid");
 
     List<Subtopic> result =
-        retrieveList(sqlReducedFields, innerQuery, Map.of("uuid", fileResourceUuid));
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", fileResourceUuid));
     return result;
   }
 
@@ -373,36 +402,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
 
   @Override
   public Subtopic save(Subtopic subtopic) {
-    subtopic.setUuid(UUID.randomUUID());
-    subtopic.setCreated(LocalDateTime.now());
-    subtopic.setLastModified(LocalDateTime.now());
-    final UUID previewImageUuid =
-        subtopic.getPreviewImage() == null ? null : subtopic.getPreviewImage().getUuid();
-
-    String query =
-        "INSERT INTO "
-            + tableName
-            + "("
-            + "uuid, label, description, previewfileresource, preview_hints, custom_attrs,"
-            + " identifiable_type,"
-            + " created, last_modified"
-            + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
-            + " :type,"
-            + " :created, :lastModified"
-            + ")";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(subtopic)
-                .execute());
-
-    // save identifiers
-    Set<Identifier> identifiers = subtopic.getIdentifiers();
-    saveIdentifiers(identifiers, subtopic);
-
+    super.save(subtopic);
     Subtopic result = findOne(subtopic.getUuid());
     return result;
   }
@@ -512,35 +512,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
 
   @Override
   public Subtopic update(Subtopic subtopic) {
-    subtopic.setLastModified(LocalDateTime.now());
-
-    // do not update/left out from statement (not changed since insert):
-    // uuid, created, identifiable_type
-    final UUID previewImageUuid =
-        subtopic.getPreviewImage() == null ? null : subtopic.getPreviewImage().getUuid();
-
-    String query =
-        "UPDATE "
-            + tableName
-            + " SET"
-            + " label=:label::JSONB, description=:description::JSONB,"
-            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
-            + " last_modified=:lastModified"
-            + " WHERE uuid=:uuid";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(subtopic)
-                .execute());
-
-    // save identifiers
-    // as we store the whole list new: delete old entries
-    identifierRepository.deleteByIdentifiable(subtopic);
-    Set<Identifier> identifiers = subtopic.getIdentifiers();
-    saveIdentifiers(identifiers, subtopic);
-
+    super.update(subtopic);
     Subtopic result = findOne(subtopic.getUuid());
     return result;
   }
