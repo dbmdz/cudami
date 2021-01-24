@@ -4,12 +4,10 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ItemRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
-import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.work.Item;
 import de.digitalcollections.model.api.identifiable.entity.work.Work;
 import de.digitalcollections.model.impl.identifiable.entity.work.ItemImpl;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,13 +29,20 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   public static final String TABLE_ALIAS = "i";
   public static final String TABLE_NAME = "items";
 
-  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlReducedFields(tableAlias, mappingPrefix)
+  public static String getSqlInsertFields() {
+    return EntityRepositoryImpl.getSqlInsertFields()
+        + ", language, publication_date, publication_place, publisher, version";
+  }
+
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  public static String getSqlInsertValues() {
+    return EntityRepositoryImpl.getSqlInsertValues()
+        + ", :language, :publicationDate, :publicationPlace, :publisher, :version";
+  }
+
+  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
-        + tableAlias
-        + ".text "
-        + mappingPrefix
-        + "_text"
         + tableAlias
         + ".language "
         + mappingPrefix
@@ -60,8 +65,13 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
         + "_version";
   }
 
-  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix);
+  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlUpdateFieldValues() {
+    return EntityRepositoryImpl.getSqlUpdateFieldValues()
+        + ", language=:language, publication_date=:publicationDate, publication_place=:publicationPlace, publisher=:publisher, version=:version";
   }
 
   private final DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
@@ -73,10 +83,19 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
       IdentifierRepository identifierRepository,
       @Lazy DigitalObjectRepositoryImpl digitalObjectRepositoryImpl,
       @Lazy WorkRepositoryImpl workRepositoryImpl) {
-    super(dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, ItemImpl.class);
+    super(
+        dbi,
+        identifierRepository,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        ItemImpl.class,
+        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlInsertFields(),
+        getSqlInsertValues(),
+        getSqlUpdateFieldValues());
     this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
-    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
-    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
     this.workRepositoryImpl = workRepositoryImpl;
   }
 
@@ -165,7 +184,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
 
     List<DigitalObject> result =
         digitalObjectRepositoryImpl.retrieveList(
-            digitalObjectRepositoryImpl.getSqlReducedFields(),
+            digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             Map.of("uuid", itemUuid));
     return result.stream().collect(Collectors.toSet());
@@ -217,79 +236,20 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
 
     List<Work> result =
         workRepositoryImpl.retrieveList(
-            workRepositoryImpl.getSqlReducedFields(), innerQuery, Map.of("uuid", itemUuid));
+            workRepositoryImpl.getSqlSelectReducedFields(), innerQuery, Map.of("uuid", itemUuid));
     return result.stream().collect(Collectors.toSet());
   }
 
   @Override
   public Item save(Item item) {
-    item.setUuid(UUID.randomUUID());
-    item.setCreated(LocalDateTime.now());
-    item.setLastModified(LocalDateTime.now());
-    // refid is generated as serial, DO NOT SET!
-    final UUID previewImageUuid =
-        item.getPreviewImage() == null ? null : item.getPreviewImage().getUuid();
-
-    String query =
-        "INSERT INTO "
-            + tableName
-            + "("
-            + "uuid, label, description, previewfileresource, preview_hints, custom_attrs,"
-            + " identifiable_type, entity_type,"
-            + " created, last_modified,"
-            + " language, publication_date, publication_place, publisher, version"
-            + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
-            + " :type, :entityType,"
-            + " :created, :lastModified,"
-            + " :language, :publicationDate, :publicationPlace, :publisher, :version"
-            + ")";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(item)
-                .execute());
-
-    // save identifiers
-    Set<Identifier> identifiers = item.getIdentifiers();
-    saveIdentifiers(identifiers, item);
-
+    super.save(item);
     Item result = findOne(item.getUuid());
     return result;
   }
 
   @Override
   public Item update(Item item) {
-    item.setLastModified(LocalDateTime.now());
-    // do not update/left out from statement (not changed since insert):
-    // uuid, created, identifiable_type, entity_type, refid
-    final UUID previewImageUuid =
-        item.getPreviewImage() == null ? null : item.getPreviewImage().getUuid();
-
-    String query =
-        "UPDATE "
-            + tableName
-            + " SET"
-            + " label=:label::JSONB, description=:description::JSONB, previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
-            + " last_modified=:lastModified,"
-            + " language=:language, publication_date=:publicationDate, publication_place=:publicationPlace, publisher=:publisher, version=:version"
-            + " WHERE uuid=:uuid";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(item)
-                .execute());
-
-    // save identifiers
-    // as we store the whole list new: delete old entries
-    identifierRepository.deleteByIdentifiable(item);
-    Set<Identifier> identifiers = item.getIdentifiers();
-    saveIdentifiers(identifiers, item);
-
+    super.update(item);
     Item result = findOne(item.getUuid());
     return result;
   }

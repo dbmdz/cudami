@@ -8,10 +8,8 @@ import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Topic;
 import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
 import de.digitalcollections.model.impl.identifiable.entity.TopicImpl;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
@@ -28,12 +26,25 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   public static final String TABLE_ALIAS = "t";
   public static final String TABLE_NAME = "topics";
 
-  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlReducedFields(tableAlias, mappingPrefix);
+  public static String getSqlInsertFields() {
+    return EntityRepositoryImpl.getSqlInsertFields();
   }
 
-  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix);
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  public static String getSqlInsertValues() {
+    return EntityRepositoryImpl.getSqlInsertValues();
+  }
+
+  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlUpdateFieldValues() {
+    return EntityRepositoryImpl.getSqlUpdateFieldValues();
   }
 
   private final SubtopicRepositoryImpl subtopicRepositoryImpl;
@@ -43,9 +54,18 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
       Jdbi dbi,
       IdentifierRepository identifierRepository,
       SubtopicRepositoryImpl subtopicRepositoryImpl) {
-    super(dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, TopicImpl.class);
-    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
-    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
+    super(
+        dbi,
+        identifierRepository,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        TopicImpl.class,
+        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlInsertFields(),
+        getSqlInsertValues(),
+        getSqlUpdateFieldValues());
     this.subtopicRepositoryImpl = subtopicRepositoryImpl;
   }
 
@@ -110,78 +130,20 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
     List<Subtopic> result =
         subtopicRepositoryImpl.retrieveList(
-            subtopicRepositoryImpl.getSqlReducedFields(), innerQuery, Map.of("uuid", uuid));
+            subtopicRepositoryImpl.getSqlSelectReducedFields(), innerQuery, Map.of("uuid", uuid));
     return result;
   }
 
   @Override
   public Topic save(Topic topic) {
-    topic.setUuid(UUID.randomUUID());
-    topic.setCreated(LocalDateTime.now());
-    topic.setLastModified(LocalDateTime.now());
-    // refid is generated as serial, DO NOT SET!
-    final UUID previewImageUuid =
-        topic.getPreviewImage() == null ? null : topic.getPreviewImage().getUuid();
-
-    final String sql =
-        "INSERT INTO "
-            + tableName
-            + "("
-            + "uuid, label, description, previewfileresource, preview_hints, custom_attrs,"
-            + " identifiable_type, entity_type,"
-            + " created, last_modified"
-            + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
-            + " :type, :entityType,"
-            + " :created, :lastModified"
-            + ")";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(sql)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(topic)
-                .execute());
-
-    // save identifiers
-    Set<Identifier> identifiers = topic.getIdentifiers();
-    saveIdentifiers(identifiers, topic);
-
+    super.save(topic);
     Topic result = findOne(topic.getUuid());
     return result;
   }
 
   @Override
   public Topic update(Topic topic) {
-    topic.setLastModified(LocalDateTime.now());
-
-    // do not update/left out from statement (not changed since insert):
-    // uuid, created, identifiable_type, entity_type, refid
-    final UUID previewImageUuid =
-        topic.getPreviewImage() == null ? null : topic.getPreviewImage().getUuid();
-
-    String query =
-        "UPDATE "
-            + tableName
-            + " SET"
-            + " label=:label::JSONB, description=:description::JSONB,"
-            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
-            + " last_modified=:lastModified"
-            + " WHERE uuid=:uuid";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(topic)
-                .execute());
-
-    // save identifiers
-    // as we store the whole list new: delete old entries
-    identifierRepository.deleteByIdentifiable(topic);
-    Set<Identifier> identifiers = topic.getIdentifiers();
-    saveIdentifiers(identifiers, topic);
-
+    super.update(topic);
     Topic result = findOne(topic.getUuid());
     return result;
   }

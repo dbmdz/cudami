@@ -10,6 +10,7 @@ import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public interface IdentifiableRepository<I extends Identifiable> {
@@ -63,7 +64,15 @@ public interface IdentifiableRepository<I extends Identifiable> {
     return findOne(new IdentifierImpl(null, namespace, id));
   }
 
-  I save(I identifiable);
+  default I save(I identifiable) {
+    return save(identifiable, null);
+  }
 
-  I update(I identifiable);
+  I save(I identifiable, Map<String, Object> bindings);
+
+  default I update(I identifiable) {
+    return update(identifiable, null);
+  }
+
+  I update(I identifiable, Map<String, Object> bindings);
 }

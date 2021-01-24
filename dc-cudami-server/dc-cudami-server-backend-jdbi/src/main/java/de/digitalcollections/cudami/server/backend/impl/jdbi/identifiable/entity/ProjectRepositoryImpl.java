@@ -2,17 +2,14 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ProjectRepository;
-import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.Project;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.ProjectImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
@@ -32,8 +29,17 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   public static final String TABLE_ALIAS = "p";
   public static final String TABLE_NAME = "projects";
 
-  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlReducedFields(tableAlias, mappingPrefix)
+  public static String getSqlInsertFields() {
+    return EntityRepositoryImpl.getSqlInsertFields() + ", end_date, start_date, text";
+  }
+
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  public static String getSqlInsertValues() {
+    return EntityRepositoryImpl.getSqlInsertValues() + ", :endDate, :startDate, :text::JSONB";
+  }
+
+  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".text "
@@ -41,26 +47,40 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
         + "_text";
   }
 
-  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix)
+  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
-        + tableAlias
-        + ".start_date "
-        + mappingPrefix
-        + "_startDate, "
         + tableAlias
         + ".end_date "
         + mappingPrefix
-        + "_endDate";
+        + "_endDate, "
+        + tableAlias
+        + ".start_date "
+        + mappingPrefix
+        + "_startDate";
+  }
+
+  public static String getSqlUpdateFieldValues() {
+    return EntityRepositoryImpl.getSqlUpdateFieldValues()
+        + ", end_date=:endDate, start_date=:startDate, text=:text::JSONB";
   }
 
   @Lazy @Autowired private DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
 
   @Autowired
   public ProjectRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, ProjectImpl.class);
-    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
-    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
+    super(
+        dbi,
+        identifierRepository,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        ProjectImpl.class,
+        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlInsertFields(),
+        getSqlInsertValues(),
+        getSqlUpdateFieldValues());
   }
 
   @Override
@@ -137,7 +157,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
 
     List<DigitalObject> result =
         digitalObjectRepositoryImpl.retrieveList(
-            digitalObjectRepositoryImpl.getSqlReducedFields(),
+            digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             Map.of("uuid", projectUuid));
 
@@ -181,39 +201,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
 
   @Override
   public Project save(Project project) {
-    project.setUuid(UUID.randomUUID());
-    project.setCreated(LocalDateTime.now());
-    project.setLastModified(LocalDateTime.now());
-    // refid is generated as serial, DO NOT SET!
-    final UUID previewImageUuid =
-        project.getPreviewImage() == null ? null : project.getPreviewImage().getUuid();
-
-    String query =
-        "INSERT INTO "
-            + tableName
-            + "("
-            + "uuid, label, description, previewfileresource, preview_hints, custom_attrs,"
-            + " identifiable_type, entity_type,"
-            + " created, last_modified,"
-            + " text, start_date, end_date"
-            + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
-            + " :type, :entityType,"
-            + " :created, :lastModified,"
-            + " :text::JSONB, :startDate, :endDate"
-            + ")";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(project)
-                .execute());
-
-    // save identifiers
-    Set<Identifier> identifiers = project.getIdentifiers();
-    saveIdentifiers(identifiers, project);
-
+    super.save(project);
     Project result = findOne(project.getUuid());
     return result;
   }
@@ -250,35 +238,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
 
   @Override
   public Project update(Project project) {
-    project.setLastModified(LocalDateTime.now());
-    // do not update/left out from statement (not changed since insert):
-    // uuid, created, identifiable_type, entity_type, refid
-    final UUID previewImageUuid =
-        project.getPreviewImage() == null ? null : project.getPreviewImage().getUuid();
-
-    final String sql =
-        "UPDATE "
-            + tableName
-            + " SET"
-            + " label=:label::JSONB, description=:description::JSONB,"
-            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
-            + " last_modified=:lastModified,"
-            + " text=:text::JSONB, start_date=:startDate, end_date=:endDate"
-            + " WHERE uuid=:uuid";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(sql)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(project)
-                .execute());
-
-    // save identifiers
-    // as we store the whole list new: delete old entries
-    identifierRepository.deleteByIdentifiable(project);
-    Set<Identifier> identifiers = project.getIdentifiers();
-    saveIdentifiers(identifiers, project);
-
+    super.update(project);
     Project result = findOne(project.getUuid());
     return result;
   }

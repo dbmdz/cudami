@@ -11,11 +11,9 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
@@ -34,12 +32,21 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   public static final String TABLE_ALIAS = "w";
   public static final String TABLE_NAME = "websites";
 
-  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlReducedFields(tableAlias, mappingPrefix);
+  public static String getSqlInsertFields() {
+    return EntityRepositoryImpl.getSqlInsertFields() + ", registration_date, url";
   }
 
-  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix)
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  public static String getSqlInsertValues() {
+    return EntityRepositoryImpl.getSqlInsertValues() + ", :registrationDate, :url";
+  }
+
+  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".url "
@@ -51,6 +58,11 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
         + "_registrationDate";
   }
 
+  public static String getSqlUpdateFieldValues() {
+    return EntityRepositoryImpl.getSqlUpdateFieldValues()
+        + ", registration_date=:registrationDate, url=:url";
+  }
+
   private final WebpageRepositoryImpl webpageRepositoryImpl;
 
   @Autowired
@@ -58,9 +70,18 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
       Jdbi dbi,
       IdentifierRepository identifierRepository,
       WebpageRepositoryImpl webpageRepositoryImpl) {
-    super(dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, WebsiteImpl.class);
-    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
-    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
+    super(
+        dbi,
+        identifierRepository,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        WebsiteImpl.class,
+        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlInsertFields(),
+        getSqlInsertValues(),
+        getSqlUpdateFieldValues());
     this.webpageRepositoryImpl = webpageRepositoryImpl;
   }
 
@@ -134,7 +155,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
 
     List<Webpage> result =
         webpageRepositoryImpl.retrieveList(
-            webpageRepositoryImpl.getSqlReducedFields(), innerQuery, Map.of("uuid", uuid));
+            webpageRepositoryImpl.getSqlSelectReducedFields(), innerQuery, Map.of("uuid", uuid));
     return result;
   }
 
@@ -162,7 +183,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
 
     List<Webpage> result =
         webpageRepositoryImpl.retrieveList(
-            webpageRepositoryImpl.getSqlReducedFields(), innerQuery, Map.of("uuid", uuid));
+            webpageRepositoryImpl.getSqlSelectReducedFields(), innerQuery, Map.of("uuid", uuid));
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -173,74 +194,14 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
 
   @Override
   public Website save(Website website) {
-    website.setUuid(UUID.randomUUID());
-    website.setCreated(LocalDateTime.now());
-    website.setLastModified(LocalDateTime.now());
-    // refid is generated as serial, DO NOT SET!
-    final UUID previewImageUuid =
-        website.getPreviewImage() == null ? null : website.getPreviewImage().getUuid();
-
-    String query =
-        "INSERT INTO "
-            + tableName
-            + "("
-            + "uuid, label, description, previewfileresource, preview_hints, custom_attrs,"
-            + " identifiable_type, entity_type,"
-            + " created, last_modified,"
-            + " url, registration_date"
-            + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
-            + " :type, :entityType,"
-            + " :created, :lastModified,"
-            + " :url, :registrationDate"
-            + ")";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(website)
-                .execute());
-
-    // save identifiers
-    Set<Identifier> identifiers = website.getIdentifiers();
-    saveIdentifiers(identifiers, website);
-
+    super.save(website);
     Website result = findOne(website.getUuid());
     return result;
   }
 
   @Override
   public Website update(Website website) {
-    website.setLastModified(LocalDateTime.now());
-    // do not update/left out from statement (not changed since insert):
-    // uuid, created, identifiable_type, entity_type, refid
-    final UUID previewImageUuid =
-        website.getPreviewImage() == null ? null : website.getPreviewImage().getUuid();
-
-    String query =
-        "UPDATE "
-            + tableName
-            + " SET"
-            + " label=:label::JSONB, description=:description::JSONB,"
-            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
-            + " last_modified=:lastModified,"
-            + " url=:url, registration_date=:registrationDate"
-            + " WHERE uuid=:uuid";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(website)
-                .execute());
-
-    // save identifiers
-    // as we store the whole list new: delete old entries
-    identifierRepository.deleteByIdentifiable(website);
-    Set<Identifier> identifiers = website.getIdentifiers();
-    saveIdentifiers(identifiers, website);
-
+    super.update(website);
     Website result = findOne(website.getUuid());
     return result;
   }

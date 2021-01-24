@@ -30,12 +30,23 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   public static final String TABLE_ALIAS = "e";
   public static final String TABLE_NAME = "entities";
 
-  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlReducedFields(tableAlias, mappingPrefix);
+  public static String getSqlInsertFields() {
+    return IdentifiableRepositoryImpl.getSqlInsertFields() + ", custom_attrs, entity_type";
   }
 
-  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
-    return IdentifiableRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix)
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  public static String getSqlInsertValues() {
+    // refid is generated as serial, DO NOT SET!
+    return IdentifiableRepositoryImpl.getSqlInsertValues()
+        + ", :customAttributes::JSONB, :entityType";
+  }
+
+  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return IdentifiableRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".custom_attrs "
@@ -51,6 +62,13 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         + "_refId";
   }
 
+  public static String getSqlUpdateFieldValues() {
+    // do not update/left out from statement (not changed since insert):
+    // uuid, created, identifiable_type, entity_type, refid
+    return IdentifiableRepositoryImpl.getSqlUpdateFieldValues()
+        + ", custom_attrs=:customAttributes::JSONB";
+  }
+
   private FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
 
   @Autowired
@@ -58,20 +76,19 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       Jdbi dbi,
       IdentifierRepository identifierRepository,
       FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl) {
-    this(dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, EntityImpl.class);
+    this(
+        dbi,
+        identifierRepository,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        EntityImpl.class,
+        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlInsertFields(),
+        getSqlInsertValues(),
+        getSqlUpdateFieldValues());
     this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
-    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
-    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
-  }
-
-  protected EntityRepositoryImpl(
-      Jdbi dbi,
-      IdentifierRepository identifierRepository,
-      String tableName,
-      String tableAlias,
-      String mappingPrefix,
-      Class entityImplClass) {
-    this(dbi, identifierRepository, tableName, tableAlias, mappingPrefix, entityImplClass, null);
   }
 
   protected EntityRepositoryImpl(
@@ -81,7 +98,11 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       String tableAlias,
       String mappingPrefix,
       Class entityImplClass,
-      String fullFieldsJoinsSql) {
+      String sqlSelectAllFields,
+      String sqlSelectReducedFields,
+      String sqlInsertFields,
+      String sqlInsertValues,
+      String sqlUpdateFieldValues) {
     this(
         dbi,
         identifierRepository,
@@ -89,7 +110,11 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         tableAlias,
         mappingPrefix,
         entityImplClass,
-        fullFieldsJoinsSql,
+        sqlSelectAllFields,
+        sqlSelectReducedFields,
+        sqlInsertFields,
+        sqlInsertValues,
+        sqlUpdateFieldValues,
         null);
   }
 
@@ -100,7 +125,41 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       String tableAlias,
       String mappingPrefix,
       Class entityImplClass,
-      String fullFieldsJoinsSql,
+      String sqlSelectAllFields,
+      String sqlSelectReducedFields,
+      String sqlInsertFields,
+      String sqlInsertValues,
+      String sqlUpdateFieldValues,
+      String sqlSelectAllFieldsJoins) {
+    this(
+        dbi,
+        identifierRepository,
+        tableName,
+        tableAlias,
+        mappingPrefix,
+        entityImplClass,
+        sqlSelectAllFields,
+        sqlSelectReducedFields,
+        sqlInsertFields,
+        sqlInsertValues,
+        sqlUpdateFieldValues,
+        sqlSelectAllFieldsJoins,
+        null);
+  }
+
+  protected EntityRepositoryImpl(
+      Jdbi dbi,
+      IdentifierRepository identifierRepository,
+      String tableName,
+      String tableAlias,
+      String mappingPrefix,
+      Class entityImplClass,
+      String sqlSelectAllFields,
+      String sqlSelectReducedFields,
+      String sqlInsertFields,
+      String sqlInsertValues,
+      String sqlUpdateFieldValues,
+      String sqlSelectAllFieldsJoins,
       BiFunction<LinkedHashMap<UUID, E>, RowView, LinkedHashMap<UUID, E>>
           additionalReduceRowsBiFunction) {
     super(
@@ -110,7 +169,12 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         tableAlias,
         mappingPrefix,
         entityImplClass,
-        fullFieldsJoinsSql,
+        sqlSelectAllFields,
+        sqlSelectReducedFields,
+        sqlInsertFields,
+        sqlInsertValues,
+        sqlUpdateFieldValues,
+        sqlSelectAllFieldsJoins,
         additionalReduceRowsBiFunction);
   }
 
@@ -142,7 +206,9 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
                 + tableAlias
                 + ".refid = :refId");
 
-    E result = retrieveOne(sqlAllFields, innerQuery, fullFieldsJoinsSql, Map.of("refId", refId));
+    E result =
+        retrieveOne(
+            sqlSelectAllFields, innerQuery, sqlSelectAllFieldsJoins, Map.of("refId", refId));
     return result;
   }
 
@@ -191,7 +257,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
     List<FileResource> result =
         fileResourceMetadataRepositoryImpl.retrieveList(
-            fileResourceMetadataRepositoryImpl.getSqlReducedFields(),
+            fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             Map.of("entityUuid", entityUuid));
 
@@ -199,8 +265,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public E save(E entity) {
-    throw new UnsupportedOperationException("Use save method of specific entity repository!");
+  public E save(E entity, Map<String, Object> bindings) {
+    return super.save(entity, bindings);
   }
 
   @Override
@@ -234,7 +300,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public E update(E entity) {
-    throw new UnsupportedOperationException("Use update method of specific entity repo!");
+  public E update(E entity, Map<String, Object> bindings) {
+    return super.update(entity, bindings);
   }
 }

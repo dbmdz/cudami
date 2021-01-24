@@ -21,10 +21,8 @@ import de.digitalcollections.model.impl.identifiable.entity.agent.CorporateBodyI
 import de.digitalcollections.model.impl.identifiable.entity.agent.FamilyImpl;
 import de.digitalcollections.model.impl.identifiable.entity.agent.PersonImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
-import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
@@ -46,8 +44,19 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   public static final String TABLE_ALIAS = "a";
   public static final String TABLE_NAME = "articles";
 
-  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlReducedFields(tableAlias, mappingPrefix)
+  public static String getSqlInsertFields() {
+    return EntityRepositoryImpl.getSqlInsertFields()
+        + ", date_published, text, timevalue_published";
+  }
+
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  public static String getSqlInsertValues() {
+    return EntityRepositoryImpl.getSqlInsertValues()
+        + ", :datePublished, :text::JSONB, :timeValuePublished::JSONB";
+  }
+
+  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".text "
@@ -55,8 +64,8 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
         + "_text";
   }
 
-  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix)
+  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".date_published "
@@ -68,6 +77,11 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
         + "_timeValuePublished";
   }
 
+  public static String getSqlUpdateFieldValues() {
+    return EntityRepositoryImpl.getSqlUpdateFieldValues()
+        + ", date_published=:datePublished, text=:text::JSONB, timevalue_published=:timeValuePublished::JSONB";
+  }
+
   private final EntityRepositoryImpl<EntityImpl> entityRepositoryImpl;
 
   @Autowired
@@ -75,10 +89,19 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
       Jdbi dbi,
       IdentifierRepository identifierRepository,
       @Qualifier("entityRepositoryImpl") EntityRepositoryImpl<EntityImpl> entityRepositoryImpl) {
-    super(dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, ArticleImpl.class);
+    super(
+        dbi,
+        identifierRepository,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        ArticleImpl.class,
+        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlInsertFields(),
+        getSqlInsertValues(),
+        getSqlUpdateFieldValues());
     this.entityRepositoryImpl = entityRepositoryImpl;
-    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
-    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override
@@ -146,7 +169,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
 
     final String sql =
         "SELECT"
-            + entityRepositoryImpl.getSqlReducedFields()
+            + entityRepositoryImpl.getSqlSelectReducedFields()
             + ","
             + SQL_FULL_FIELDS_ID
             + ","
@@ -209,40 +232,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
 
   @Override
   public Article save(Article article) {
-    article.setUuid(UUID.randomUUID());
-    article.setCreated(LocalDateTime.now());
-    article.setLastModified(LocalDateTime.now());
-    // refid is generated as serial, DO NOT SET!
-    final UUID previewImageUuid =
-        article.getPreviewImage() == null ? null : article.getPreviewImage().getUuid();
-
-    final String sql =
-        "INSERT INTO "
-            + tableName
-            + "("
-            + "uuid, label, description, previewfileresource, preview_hints, custom_attrs,"
-            + " identifiable_type, entity_type,"
-            + " created, last_modified,"
-            + " date_published, timevalue_published,"
-            + " text"
-            + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
-            + " :type, :entityType,"
-            + " :created, :lastModified,"
-            + " :datePublished, :timeValuePublished::JSONB,"
-            + " :text::JSONB"
-            + ")";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(sql)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(article)
-                .execute());
-
-    // save identifiers
-    Set<Identifier> identifiers = article.getIdentifiers();
-    saveIdentifiers(identifiers, article);
+    super.save(article);
 
     // save creators
     List<Agent> creators = article.getCreators();
@@ -283,35 +273,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
 
   @Override
   public Article update(Article article) {
-    article.setLastModified(LocalDateTime.now());
-    // do not update/left out from statement (not changed since insert):
-    // uuid, created, identifiable_type, entity_type, refid
-    final UUID previewImageUuid =
-        article.getPreviewImage() == null ? null : article.getPreviewImage().getUuid();
-
-    final String sql =
-        "UPDATE "
-            + tableName
-            + " SET"
-            + " label=:label::JSONB, description=:description::JSONB,"
-            + " previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
-            + " last_modified=:lastModified,"
-            + " date_published=:datePublished, timevalue_published=:timeValuePublished::JSONB,"
-            + " text=:text::JSONB"
-            + " WHERE uuid=:uuid";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(sql)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(article)
-                .execute());
-
-    // save identifiers
-    // as we store the whole list new: delete old entries
-    identifierRepository.deleteByIdentifiable(article);
-    Set<Identifier> identifiers = article.getIdentifiers();
-    saveIdentifiers(identifiers, article);
+    super.update(article);
 
     // save creators
     List<Agent> creators = article.getCreators();

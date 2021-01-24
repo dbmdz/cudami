@@ -21,6 +21,8 @@ import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.paging.SearchPageResponseImpl;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,11 +49,20 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   public static final String TABLE_ALIAS = "i";
   public static final String TABLE_NAME = "identifiables";
 
-  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlReducedFields(tableAlias, mappingPrefix);
+  public static String getSqlInsertFields() {
+    return " uuid, created, description, identifiable_type, label, last_modified, previewfileresource, preview_hints";
   }
 
-  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  public static String getSqlInsertValues() {
+    return " :uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :previewFileResource, :previewImageRenderingHints::JSONB";
+  }
+
+  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
     return " "
         + tableAlias
         + ".uuid "
@@ -83,6 +94,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         + "_previewImageRenderingHints";
   }
 
+  public static String getSqlUpdateFieldValues() {
+    // do not update/left out from statement (not changed since insert):
+    // uuid, created, identifiable_type
+    return " description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB";
+  }
+
   /* BiFunction for reducing rows (related objects) of joins not already part of identifiable (Identifier, preview image ImageFileResource). */
   public BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>>
       additionalReduceRowsBiFunction =
@@ -91,24 +108,34 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
           };
   public final BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>>
       basicReduceRowsBiFunction;
-  protected final String fullFieldsJoinsSql;
   public final BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>>
       fullReduceRowsBiFunction;
   protected final Class identifiableImplClass;
   protected final IdentifierRepository identifierRepository;
-  protected String sqlAllFields;
-  protected String sqlReducedFields;
+  private final String sqlInsertFields;
+  private final String sqlInsertValues;
+  protected String sqlSelectAllFields;
+  protected final String sqlSelectAllFieldsJoins;
+  protected String sqlSelectReducedFields;
+  private final String sqlUpdateFieldValues;
 
   @Autowired
   private IdentifiableRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     this(
-        dbi, identifierRepository, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, IdentifiableImpl.class);
+        dbi,
+        identifierRepository,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        IdentifiableImpl.class,
+        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlInsertFields(),
+        getSqlInsertValues(),
+        getSqlUpdateFieldValues());
     // register row mappers for always joined classes and mapping prefix. as it is in autowired
     // constructor, this will be done only once at instantiation done by Spring
     dbi.registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"));
-    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
-    this.sqlReducedFields =
-        IdentifiableRepositoryImpl.this.getSqlReducedFields(tableAlias, mappingPrefix);
   }
 
   protected IdentifiableRepositoryImpl(
@@ -117,7 +144,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       String tableName,
       String tableAlias,
       String mappingPrefix,
-      Class identifiableImplClass) {
+      Class identifiableImplClass,
+      String sqlSelectAllFields,
+      String sqlSelectReducedFields,
+      String sqlInsertFields,
+      String sqlInsertValues,
+      String sqlUpdateFieldValues) {
     this(
         dbi,
         identifierRepository,
@@ -125,7 +157,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         tableAlias,
         mappingPrefix,
         identifiableImplClass,
-        null,
+        sqlSelectAllFields,
+        sqlSelectReducedFields,
+        sqlInsertFields,
+        sqlInsertValues,
+        sqlUpdateFieldValues,
         null);
   }
 
@@ -136,7 +172,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       String tableAlias,
       String mappingPrefix,
       Class identifiableImplClass,
-      String fullFieldsJoinsSql) {
+      String sqlSelectAllFields,
+      String sqlSelectReducedFields,
+      String sqlInsertFields,
+      String sqlInsertValues,
+      String sqlUpdateFieldValues,
+      String sqlSelectAllFieldsJoins) {
     this(
         dbi,
         identifierRepository,
@@ -144,7 +185,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         tableAlias,
         mappingPrefix,
         identifiableImplClass,
-        fullFieldsJoinsSql,
+        sqlSelectAllFields,
+        sqlSelectReducedFields,
+        sqlInsertFields,
+        sqlInsertValues,
+        sqlUpdateFieldValues,
+        sqlSelectAllFieldsJoins,
         null);
   }
 
@@ -155,7 +201,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       String tableAlias,
       String mappingPrefix,
       Class identifiableImplClass,
-      String fullFieldsJoinsSql,
+      String sqlSelectAllFields,
+      String sqlSelectReducedFields,
+      String sqlInsertFields,
+      String sqlInsertValues,
+      String sqlUpdateFieldValues,
+      String sqlSelectAllFieldsJoins,
       BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>>
           additionalReduceRowsBiFunction) {
     super(dbi, tableName, tableAlias, mappingPrefix);
@@ -181,9 +232,14 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       this.additionalReduceRowsBiFunction = additionalReduceRowsBiFunction;
     }
 
-    this.fullFieldsJoinsSql = fullFieldsJoinsSql;
     this.identifiableImplClass = identifiableImplClass;
     this.identifierRepository = identifierRepository;
+    this.sqlInsertFields = sqlInsertFields;
+    this.sqlInsertValues = sqlInsertValues;
+    this.sqlSelectAllFields = sqlSelectAllFields;
+    this.sqlSelectAllFieldsJoins = sqlSelectAllFieldsJoins;
+    this.sqlSelectReducedFields = sqlSelectReducedFields;
+    this.sqlUpdateFieldValues = sqlUpdateFieldValues;
   }
 
   private BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>>
@@ -252,7 +308,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
     addFiltering(pageRequest, innerQuery);
     addPageRequestParams(pageRequest, innerQuery);
-    List<I> result = retrieveList(sqlReducedFields, innerQuery, argumentMappings);
+    List<I> result = retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings);
 
     StringBuilder sqlCount = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, sqlCount);
@@ -292,7 +348,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
     addFiltering(searchPageRequest, innerQuery);
     addPageRequestParams(searchPageRequest, innerQuery);
-    List<I> result = retrieveList(sqlReducedFields, innerQuery, argumentMappings);
+    List<I> result = retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(searchPageRequest, countQuery);
@@ -303,12 +359,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   @Override
   public List<I> findAllFull() {
-    return retrieveList(sqlAllFields, null, null);
+    return retrieveList(sqlSelectAllFields, null, null);
   }
 
   @Override
   public List<I> findAllReduced() {
-    return retrieveList(sqlReducedFields, null, null);
+    return retrieveList(sqlSelectReducedFields, null, null);
   }
 
   @Override
@@ -359,7 +415,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                 + ".uuid = :uuid");
     addFiltering(filtering, innerQuery);
 
-    I result = retrieveOne(sqlAllFields, innerQuery, fullFieldsJoinsSql, Map.of("uuid", uuid));
+    I result =
+        retrieveOne(sqlSelectAllFields, innerQuery, sqlSelectAllFieldsJoins, Map.of("uuid", uuid));
 
     return result;
   }
@@ -386,9 +443,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
     I result =
         retrieveOne(
-            sqlAllFields,
+            sqlSelectAllFields,
             innerQuery,
-            fullFieldsJoinsSql,
+            sqlSelectAllFieldsJoins,
             Map.of("id", identifierId, "namespace", namespace));
 
     return result;
@@ -427,12 +484,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     return -1;
   }
 
-  public String getSqlAllFields() {
-    return sqlAllFields;
+  public String getSqlSelectAllFields() {
+    return sqlSelectAllFields;
   }
 
-  public String getSqlReducedFields() {
-    return sqlReducedFields;
+  public String getSqlSelectReducedFields() {
+    return sqlSelectReducedFields;
   }
 
   public long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {
@@ -460,6 +517,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             + (innerQuery != null ? "(" + innerQuery + ")" : tableName)
             + " AS "
             + tableAlias
+            + (sqlSelectAllFieldsJoins != null ? sqlSelectAllFieldsJoins : "")
             + " LEFT JOIN identifiers AS id ON "
             + tableAlias
             + ".uuid = id.identifiable"
@@ -509,7 +567,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   public I retrieveOne(
       String fieldsSql,
       StringBuilder innerQuery,
-      String fullFieldsJoinsSql,
+      String sqlSelectAllFieldsJoins,
       final Map<String, Object> argumentMappings) {
     final String sql =
         "SELECT"
@@ -522,7 +580,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             + (innerQuery != null ? "(" + innerQuery + ")" : tableName)
             + " AS "
             + tableAlias
-            + (fullFieldsJoinsSql != null ? fullFieldsJoinsSql : "")
+            + (sqlSelectAllFieldsJoins != null ? sqlSelectAllFieldsJoins : "")
             + " LEFT JOIN identifiers AS id ON "
             + tableAlias
             + ".uuid = id.identifiable"
@@ -551,8 +609,35 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   @Override
-  public I save(I identifiable) {
-    throw new UnsupportedOperationException("Use save of specific identifiable repository!");
+  public I save(I identifiable, Map<String, Object> bindings) {
+    if (bindings == null) {
+      bindings = new HashMap<>();
+    }
+    // add preview image uuid
+    final UUID previewImageUuid =
+        identifiable.getPreviewImage() == null ? null : identifiable.getPreviewImage().getUuid();
+    bindings.put("previewFileResource", previewImageUuid);
+    final Map<String, Object> finalBindings = new HashMap<>(bindings);
+
+    if (identifiable.getUuid() == null) {
+      // in case of fileresource the uuid is created on binary upload (before metadata save)
+      // to make saving on storage using uuid is possible
+      identifiable.setUuid(UUID.randomUUID());
+    }
+    identifiable.setCreated(LocalDateTime.now());
+    identifiable.setLastModified(LocalDateTime.now());
+
+    final String sql =
+        "INSERT INTO " + tableName + "(" + sqlInsertFields + ") VALUES (" + sqlInsertValues + ")";
+
+    dbi.withHandle(
+        h -> h.createUpdate(sql).bindMap(finalBindings).bindBean(identifiable).execute());
+
+    // save identifiers
+    Set<Identifier> identifiers = identifiable.getIdentifiers();
+    saveIdentifiers(identifiers, identifiable);
+
+    return identifiable;
   }
 
   public void saveIdentifiers(Set<Identifier> identifiers, Identifiable identifiable) {
@@ -567,7 +652,30 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   @Override
-  public I update(I identifiable) {
-    throw new UnsupportedOperationException("Use update of specific identifiable repository!");
+  public I update(I identifiable, Map<String, Object> bindings) {
+    if (bindings == null) {
+      bindings = new HashMap<>();
+    }
+    final UUID previewImageUuid =
+        identifiable.getPreviewImage() == null ? null : identifiable.getPreviewImage().getUuid();
+    bindings.put("previewFileResource", previewImageUuid);
+    final Map<String, Object> finalBindings = new HashMap<>(bindings);
+
+    identifiable.setLastModified(LocalDateTime.now());
+    // do not update/left out from statement (not changed since insert):
+    // uuid, created, identifiable_type, entity_type, refid
+
+    final String sql = "UPDATE " + tableName + " SET" + sqlUpdateFieldValues + " WHERE uuid=:uuid";
+
+    dbi.withHandle(
+        h -> h.createUpdate(sql).bindMap(finalBindings).bindBean(identifiable).execute());
+
+    // save identifiers
+    // as we store the whole list new: delete old entries
+    identifierRepository.deleteByIdentifiable(identifiable);
+    Set<Identifier> identifiers = identifiable.getIdentifiers();
+    saveIdentifiers(identifiers, identifiable);
+
+    return identifiable;
   }
 }

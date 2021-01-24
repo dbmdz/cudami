@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work.ItemRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
-import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.Project;
@@ -17,10 +16,8 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
@@ -40,15 +37,28 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   public static final String TABLE_ALIAS = "d";
   public static final String TABLE_NAME = "digitalobjects";
 
-  public static String getSqlAllFields(String tableAlias, String mappingPrefix) {
-    // TODO: add license, version
-    //    return getSqlReducedFields(tableAlias, mappingPrefix) + ", "
-    //            + tableAlias + ".version " + mappingPrefix + "_version";
-    return getSqlReducedFields(tableAlias, mappingPrefix);
+  public static String getSqlInsertFields() {
+    return EntityRepositoryImpl.getSqlInsertFields();
   }
 
-  public static String getSqlReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlReducedFields(tableAlias, mappingPrefix);
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  public static String getSqlInsertValues() {
+    return EntityRepositoryImpl.getSqlInsertValues();
+  }
+
+  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    // TODO: add license, version
+    //    return getSqlSelectReducedFields(tableAlias, mappingPrefix) + ", "
+    //            + tableAlias + ".version " + mappingPrefix + "_version";
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlUpdateFieldValues() {
+    return EntityRepositoryImpl.getSqlUpdateFieldValues();
   }
 
   @Lazy @Autowired private CollectionRepositoryImpl collectionRepositoryImpl;
@@ -69,9 +79,12 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        DigitalObjectImpl.class);
-    this.sqlAllFields = getSqlAllFields(tableAlias, mappingPrefix);
-    this.sqlReducedFields = getSqlReducedFields(tableAlias, mappingPrefix);
+        DigitalObjectImpl.class,
+        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlInsertFields(),
+        getSqlInsertValues(),
+        getSqlUpdateFieldValues());
   }
 
   @Override
@@ -112,7 +125,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
     List<Collection> result =
         collectionRepositoryImpl.retrieveList(
-            collectionRepositoryImpl.getSqlReducedFields(),
+            collectionRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             Map.of("uuid", digitalObjectUuid));
 
@@ -144,7 +157,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   public List<FileResource> getFileResources(UUID digitalObjectUuid) {
     final String frTableAlias = fileResourceMetadataRepositoryImpl.getTableAlias();
     final String frTableName = fileResourceMetadataRepositoryImpl.getTableName();
-    final String fieldsSql = fileResourceMetadataRepositoryImpl.getSqlReducedFields();
+    final String fieldsSql = fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields();
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -168,7 +181,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   public List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid) {
     final String frTableAlias = imageFileResourceRepositoryImpl.getTableAlias();
     final String frTableName = imageFileResourceRepositoryImpl.getTableName();
-    final String fieldsSql = imageFileResourceRepositoryImpl.getSqlAllFields();
+    final String fieldsSql = imageFileResourceRepositoryImpl.getSqlSelectAllFields();
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -206,7 +219,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
     Item result =
         itemRepositoryImpl.retrieveOne(
-            itemRepositoryImpl.getSqlReducedFields(),
+            itemRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             null,
             Map.of("uuid", digitalObjectUuid));
@@ -236,7 +249,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
     List<Project> result =
         projectRepositoryImpl.retrieveList(
-            projectRepositoryImpl.getSqlReducedFields(),
+            projectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             Map.of("uuid", digitalObjectUuid));
 
@@ -249,40 +262,11 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   @Override
   public DigitalObject save(DigitalObject digitalObject) {
-    digitalObject.setUuid(UUID.randomUUID());
-    digitalObject.setCreated(LocalDateTime.now());
-    digitalObject.setLastModified(LocalDateTime.now());
-    // refid is generated as serial, DO NOT SET!
-    final UUID previewImageUuid =
-        digitalObject.getPreviewImage() == null ? null : digitalObject.getPreviewImage().getUuid();
-
-    String query =
-        "INSERT INTO "
-            + tableName
-            + "("
-            + "uuid, label, description, previewFileResource, preview_hints, custom_attrs,"
-            + " identifiable_type, entity_type,"
-            + " created, last_modified"
-            + ") VALUES ("
-            + ":uuid, :label::JSONB, :description::JSONB, :previewFileResource, :previewImageRenderingHints::JSONB, :customAttributes::JSONB,"
-            + " :type, :entityType,"
-            + " :created, :lastModified"
-            + ")";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(digitalObject)
-                .execute());
+    super.save(digitalObject);
 
     // for now we implement first interesting use case: new digital object with new fileresources...
     final List<FileResource> fileResources = digitalObject.getFileResources();
     saveFileResources(digitalObject, fileResources);
-
-    // save identifiers
-    Set<Identifier> identifiers = digitalObject.getIdentifiers();
-    saveIdentifiers(identifiers, digitalObject);
 
     DigitalObject result = findOne(digitalObject.getUuid());
     return result;
@@ -329,35 +313,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   @Override
   public DigitalObject update(DigitalObject digitalObject) {
-    digitalObject.setLastModified(LocalDateTime.now());
-
-    // do not update/left out from statement (not changed since insert):
-    // uuid, created, identifiable_type, entity_type, refid
-    final UUID previewImageUuid =
-        digitalObject.getPreviewImage() == null ? null : digitalObject.getPreviewImage().getUuid();
-
-    String query =
-        "UPDATE "
-            + tableName
-            + " SET"
-            + " label=:label::JSONB, description=:description::JSONB,"
-            + " previewFileResource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB, custom_attrs=:customAttributes::JSONB,"
-            + " last_modified=:lastModified"
-            + " WHERE uuid=:uuid";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("previewFileResource", previewImageUuid)
-                .bindBean(digitalObject)
-                .execute());
-
-    // save identifiers
-    // as we store the whole list new: delete old entries
-    identifierRepository.deleteByIdentifiable(digitalObject);
-    Set<Identifier> identifiers = digitalObject.getIdentifiers();
-    saveIdentifiers(identifiers, digitalObject);
-
+    super.update(digitalObject);
     DigitalObject result = findOne(digitalObject.getUuid());
     return result;
   }
