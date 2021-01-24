@@ -1,12 +1,12 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation;
 
 import de.digitalcollections.model.api.identifiable.entity.Entity;
-import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
 import de.digitalcollections.model.api.identifiable.entity.enums.EntityType;
+import de.digitalcollections.model.api.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.api.identifiable.parts.LocalizedText;
 import de.digitalcollections.model.api.identifiable.parts.structuredcontent.LocalizedStructuredContent;
 import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
-import de.digitalcollections.model.impl.identifiable.entity.EntityRelationImpl;
+import de.digitalcollections.model.impl.identifiable.entity.relation.EntityRelationImpl;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;

@@ -2,8 +2,8 @@ package de.digitalcollections.cudami.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.relations.Predicate;
-import de.digitalcollections.model.impl.relations.PredicateImpl;
+import de.digitalcollections.model.api.identifiable.entity.relation.Predicate;
+import de.digitalcollections.model.impl.identifiable.entity.relation.PredicateImpl;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;

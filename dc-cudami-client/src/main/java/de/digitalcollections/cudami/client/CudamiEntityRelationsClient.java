@@ -2,11 +2,11 @@ package de.digitalcollections.cudami.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
+import de.digitalcollections.model.api.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.entity.EntityRelationImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.EntityPartImpl;
+import de.digitalcollections.model.impl.identifiable.entity.relation.EntityRelationImpl;
 import java.net.http.HttpClient;
 import java.util.List;
 

@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.controller;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.PredicatesServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.PredicateService;
-import de.digitalcollections.model.api.relations.Predicate;
+import de.digitalcollections.model.api.identifiable.entity.relation.Predicate;
 import java.util.List;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;

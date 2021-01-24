@@ -2,8 +2,8 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.PredicateRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
-import de.digitalcollections.model.api.relations.Predicate;
-import de.digitalcollections.model.impl.relations.PredicateImpl;
+import de.digitalcollections.model.api.identifiable.entity.relation.Predicate;
+import de.digitalcollections.model.impl.identifiable.entity.relation.PredicateImpl;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
