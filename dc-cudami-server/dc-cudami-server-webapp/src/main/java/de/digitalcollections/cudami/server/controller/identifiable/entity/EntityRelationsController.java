@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
 import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.entity.EntityRelation;
+import de.digitalcollections.model.api.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
