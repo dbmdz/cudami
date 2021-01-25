@@ -8,6 +8,7 @@ import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ApplicationFileResourceImpl;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.jdbi.v3.core.Jdbi;
@@ -79,8 +80,10 @@ public class ApplicationFileResourceRepositoryImpl
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"created", "filename", "lastModified", "sizeInBytes"};
+  protected List<String> getAllowedOrderByFields() {
+    List<String> allowedOrderByFields =
+        fileResourceMetadataRepositoryImpl.getAllowedOrderByFields();
+    return allowedOrderByFields;
   }
 
   @Override
@@ -88,18 +91,10 @@ public class ApplicationFileResourceRepositoryImpl
     if (modelProperty == null) {
       return null;
     }
-    switch (modelProperty) {
-      case "created":
-        return tableAlias + ".created";
-      case "filename":
-        return tableAlias + ".filename";
-      case "lastModified":
-        return tableAlias + ".last_modified";
-      case "sizeInBytes":
-        return tableAlias + ".size_in_bytes";
-      default:
-        return null;
+    if (fileResourceMetadataRepositoryImpl.getColumnName(modelProperty) != null) {
+      return fileResourceMetadataRepositoryImpl.getColumnName(modelProperty);
     }
+    return null;
   }
 
   @Override

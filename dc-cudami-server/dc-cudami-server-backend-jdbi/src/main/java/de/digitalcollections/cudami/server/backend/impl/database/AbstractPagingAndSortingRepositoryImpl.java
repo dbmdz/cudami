@@ -9,20 +9,25 @@ import de.digitalcollections.model.api.paging.enums.Direction;
 import java.time.LocalDate;
 import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 /**
  * Convenience repository implementation to be inherited from if applicable.
  *
- * <p>
- * Tries best to translate paging and sorting params into valid SQL.<br>
- * If result does not fit your use case: implement it yourself and do not use these convenience methods.
+ * <p>Tries best to translate paging and sorting params into valid SQL.<br>
+ * If result does not fit your use case: implement it yourself and do not use these convenience
+ * methods.
  */
 public abstract class AbstractPagingAndSortingRepositoryImpl {
+
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(AbstractPagingAndSortingRepositoryImpl.class);
 
   public void addFiltering(Filtering filtering, StringBuilder innerQuery) {
     if (filtering != null) {
@@ -66,40 +71,45 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
 
   public void addOrderBy(PageRequest pageRequest, StringBuilder query) {
     if (pageRequest != null) {
-      String[] allowedOrderByFields = getAllowedOrderByFields();
+      List<String> allowedOrderByFields = getAllowedOrderByFields();
 
       // Sorting
       Sorting sorting = pageRequest.getSorting();
       if (sorting != null) {
-        String orderBy
-                = Optional.ofNullable(sorting.getOrders()).orElse(Collections.emptyList()).stream()
-                        .filter(
-                                o -> {
-                                  String sortField = o.getProperty();
-                                  return sortField != null
-                                  && allowedOrderByFields != null
-                                  && Arrays.asList(allowedOrderByFields).contains(sortField);
-                                })
-                        .map(
-                                o -> {
-                                  String sortDirection = null;
-                                  Direction direction = o.getDirection();
-                                  if (direction != null && direction.isDescending()) {
-                                    sortDirection = "DESC";
-                                  } else {
-                                    sortDirection = "ASC";
-                                  }
-                                  String sortField = o.getProperty();
-                                  Optional<String> subSortField = o.getSubProperty();
-                                  String fullQualifiedColumnName = getColumnName(sortField);
-                                  if (subSortField.isEmpty()) {
-                                    return String.format("%s %s", fullQualifiedColumnName, sortDirection);
-                                  }
-                                  return String.format(
-                                          "%s->>'%s' %s",
-                                          fullQualifiedColumnName, subSortField.get(), sortDirection);
-                                })
-                        .collect(Collectors.joining(","));
+        String orderBy =
+            Optional.ofNullable(sorting.getOrders()).orElse(Collections.emptyList()).stream()
+                .filter(
+                    o -> {
+                      String sortField = o.getProperty();
+                      final boolean allowedSortField =
+                          sortField != null
+                              && allowedOrderByFields != null
+                              && allowedOrderByFields.contains(sortField);
+                      if (!allowedSortField) {
+                        LOGGER.warn("'" + sortField + "' not in allowed sort fields! Ignoring it.");
+                      }
+                      return allowedSortField;
+                    })
+                .map(
+                    o -> {
+                      String sortDirection = null;
+                      Direction direction = o.getDirection();
+                      if (direction != null && direction.isDescending()) {
+                        sortDirection = "DESC";
+                      } else {
+                        sortDirection = "ASC";
+                      }
+                      String sortField = o.getProperty();
+                      Optional<String> subSortField = o.getSubProperty();
+                      String fullQualifiedColumnName = getColumnName(sortField);
+                      if (subSortField.isEmpty()) {
+                        return String.format("%s %s", fullQualifiedColumnName, sortDirection);
+                      }
+                      return String.format(
+                          "%s->>'%s' %s",
+                          fullQualifiedColumnName, subSortField.get(), sortDirection);
+                    })
+                .collect(Collectors.joining(","));
 
         if (StringUtils.hasText(orderBy)) {
           query.append(" ORDER BY ").append(orderBy);
@@ -131,13 +141,15 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
   }
 
   /**
-   * @return model properties names that are applicable for sorting, will be mapped to database column names using @see #getColumnName
+   * @return model properties names that are applicable for sorting, will be mapped to database
+   *     column names using @see #getColumnName
    */
-  protected abstract String[] getAllowedOrderByFields();
+  protected abstract List<String> getAllowedOrderByFields();
 
   /**
    * @param modelProperty name of model property passed as String, e.g. "lastModified"
-   * @return full qualified column name as used in sql queries ("last_modified" or e.g. "w.last_modified" if prefix used in queries)
+   * @return full qualified column name as used in sql queries ("last_modified" or e.g.
+   *     "w.last_modified" if prefix used in queries)
    */
   protected abstract String getColumnName(String modelProperty);
 
@@ -145,15 +157,15 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
     if (filtering == null || filtering.getFilterCriteria().isEmpty()) {
       return "";
     }
-    String filterClauses
-            = filtering.getFilterCriteria().stream()
-                    .map(this::getWhereClause)
-                    .collect(Collectors.joining(" AND "));
+    String filterClauses =
+        filtering.getFilterCriteria().stream()
+            .map(this::getWhereClause)
+            .collect(Collectors.joining(" AND "));
     return filterClauses;
   }
 
   protected String getWhereClause(FilterCriterion<?> fc)
-          throws IllegalArgumentException, UnsupportedOperationException {
+      throws IllegalArgumentException, UnsupportedOperationException {
     StringBuilder query = new StringBuilder();
     if (fc != null) {
       FilterOperation filterOperation = fc.getOperation();
@@ -165,13 +177,13 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
           } else {
             // example: BETWEEN '2015-01-01' AND '2015-12-31'
             query
-                    .append("(")
-                    .append(getColumnName(fc.getFieldName()))
-                    .append(" BETWEEN ")
-                    .append(convertToSqlString(fc.getMinValue()))
-                    .append(" AND ")
-                    .append(convertToSqlString(fc.getMaxValue()))
-                    .append(")");
+                .append("(")
+                .append(getColumnName(fc.getFieldName()))
+                .append(" BETWEEN ")
+                .append(convertToSqlString(fc.getMinValue()))
+                .append(" AND ")
+                .append(convertToSqlString(fc.getMaxValue()))
+                .append(")");
           }
           break;
         case IN:
@@ -183,19 +195,19 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
           }
           query.append(" IN (");
           query.append(
-                  fc.getValues().stream()
-                          .map(this::convertToSqlString)
-                          .collect(Collectors.joining(",")));
+              fc.getValues().stream()
+                  .map(this::convertToSqlString)
+                  .collect(Collectors.joining(",")));
           query.append("))");
           break;
         case CONTAINS:
           // @see https://www.postgresql.org/docs/11/functions-matching.html
           query
-                  .append("(")
-                  .append(getColumnName(fc.getFieldName()))
-                  .append(" ILIKE '%")
-                  .append(convertToSqlString(fc.getValue()))
-                  .append("%')");
+              .append("(")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" ILIKE '%")
+              .append(convertToSqlString(fc.getValue()))
+              .append("%')");
           break;
         case STARTS_WITH:
           // @see https://www.postgresql.org/docs/11/functions-matching.html
@@ -209,112 +221,112 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
         case EQUALS:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
-                  .append("(")
-                  .append(getColumnName(fc.getFieldName()))
-                  .append(" = ")
-                  .append(convertToSqlString(fc.getValue()))
-                  .append(")");
+              .append("(")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" = ")
+              .append(convertToSqlString(fc.getValue()))
+              .append(")");
           break;
         case NOT_EQUALS:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
-                  .append("(")
-                  .append(getColumnName(fc.getFieldName()))
-                  .append(" != ")
-                  .append(convertToSqlString(fc.getValue()))
-                  .append(")");
+              .append("(")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" != ")
+              .append(convertToSqlString(fc.getValue()))
+              .append(")");
           break;
         case GREATER_THAN:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
-                  .append("(")
-                  .append(getColumnName(fc.getFieldName()))
-                  .append(" > ")
-                  .append(convertToSqlString(fc.getValue()))
-                  .append(")");
+              .append("(")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" > ")
+              .append(convertToSqlString(fc.getValue()))
+              .append(")");
           break;
         case GREATER_THAN_OR_NOT_SET:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
-                  .append("(")
-                  .append(getColumnName(fc.getFieldName()))
-                  .append(" > ")
-                  .append(convertToSqlString(fc.getValue()))
-                  .append(" OR ")
-                  .append(getColumnName(fc.getFieldName()))
-                  .append(" IS NULL")
-                  .append(")");
+              .append("(")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" > ")
+              .append(convertToSqlString(fc.getValue()))
+              .append(" OR ")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" IS NULL")
+              .append(")");
           break;
         case GREATER_THAN_OR_EQUAL_TO:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
-                  .append("(")
-                  .append(getColumnName(fc.getFieldName()))
-                  .append(" >= ")
-                  .append(convertToSqlString(fc.getValue()))
-                  .append(")");
+              .append("(")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" >= ")
+              .append(convertToSqlString(fc.getValue()))
+              .append(")");
           break;
         case LESS_THAN:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
-                  .append("(")
-                  .append(getColumnName(fc.getFieldName()))
-                  .append(" < ")
-                  .append(convertToSqlString(fc.getValue()))
-                  .append(")");
+              .append("(")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" < ")
+              .append(convertToSqlString(fc.getValue()))
+              .append(")");
           break;
         case LESS_THAN_AND_SET:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
-                  .append("(")
-                  .append(getColumnName(fc.getFieldName()))
-                  .append(" < ")
-                  .append(convertToSqlString(fc.getValue()))
-                  .append(" AND ")
-                  .append(getColumnName(fc.getFieldName()))
-                  .append(" IS NOT NULL")
-                  .append(")");
+              .append("(")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" < ")
+              .append(convertToSqlString(fc.getValue()))
+              .append(" AND ")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" IS NOT NULL")
+              .append(")");
           break;
         case LESS_THAN_OR_EQUAL_TO:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
-                  .append("(")
-                  .append(getColumnName(fc.getFieldName()))
-                  .append(" <= ")
-                  .append(convertToSqlString(fc.getValue()))
-                  .append(")");
+              .append("(")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" <= ")
+              .append(convertToSqlString(fc.getValue()))
+              .append(")");
           break;
         case LESS_THAN_OR_EQUAL_TO_AND_SET:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
-                  .append("(")
-                  .append(getColumnName(fc.getFieldName()))
-                  .append(" <= ")
-                  .append(convertToSqlString(fc.getValue()))
-                  .append(" AND ")
-                  .append(getColumnName(fc.getFieldName()))
-                  .append(" IS NOT NULL")
-                  .append(")");
+              .append("(")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" <= ")
+              .append(convertToSqlString(fc.getValue()))
+              .append(" AND ")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" IS NOT NULL")
+              .append(")");
           break;
         case LESS_THAN_OR_EQUAL_TO_OR_NOT_SET:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
-                  .append("(")
-                  .append(getColumnName(fc.getFieldName()))
-                  .append(" <= ")
-                  .append(convertToSqlString(fc.getValue()))
-                  .append(" OR ")
-                  .append(getColumnName(fc.getFieldName()))
-                  .append(" IS NULL")
-                  .append(")");
+              .append("(")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" <= ")
+              .append(convertToSqlString(fc.getValue()))
+              .append(" OR ")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" IS NULL")
+              .append(")");
           break;
         case SET:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
-                  .append("(")
-                  .append(getColumnName(fc.getFieldName()))
-                  .append(" IS NOT NULL")
-                  .append(")");
+              .append("(")
+              .append(getColumnName(fc.getFieldName()))
+              .append(" IS NOT NULL")
+              .append(")");
           break;
         case NOT_SET:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html

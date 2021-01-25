@@ -56,10 +56,6 @@ public interface CollectionService extends NodeService<Collection>, EntityServic
 
   List<CorporateBody> getRelatedCorporateBodies(UUID uuid, Filtering filtering);
 
-  PageResponse<Collection> getTopCollections(PageRequest pageRequest);
-
-  List<Locale> getTopCollectionsLanguages();
-
   default boolean removeDigitalObject(Collection collection, DigitalObject digitalObject) {
     if (collection == null || digitalObject == null) {
       return false;

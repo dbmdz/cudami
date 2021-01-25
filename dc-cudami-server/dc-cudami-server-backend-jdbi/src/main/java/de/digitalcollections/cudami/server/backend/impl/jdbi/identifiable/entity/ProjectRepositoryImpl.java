@@ -113,28 +113,6 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"created", "lastModified", "refId"};
-  }
-
-  @Override
-  protected String getColumnName(String modelProperty) {
-    if (modelProperty == null) {
-      return null;
-    }
-    switch (modelProperty) {
-      case "created":
-        return "p.created";
-      case "lastModified":
-        return "p.last_modified";
-      case "refId":
-        return "p.refid";
-      default:
-        return null;
-    }
-  }
-
-  @Override
   public PageResponse<DigitalObject> getDigitalObjects(UUID projectUuid, PageRequest pageRequest) {
     final String doTableAlias = digitalObjectRepositoryImpl.getTableAlias();
     final String doTableName = digitalObjectRepositoryImpl.getTableName();

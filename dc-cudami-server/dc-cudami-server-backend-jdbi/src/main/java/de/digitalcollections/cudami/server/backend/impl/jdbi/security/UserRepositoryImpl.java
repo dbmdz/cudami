@@ -8,6 +8,7 @@ import de.digitalcollections.model.api.security.User;
 import de.digitalcollections.model.api.security.enums.Role;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.security.UserImpl;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
@@ -91,8 +92,8 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"email", "lastname", "firstname"};
+  protected List<String> getAllowedOrderByFields() {
+    return Arrays.asList("email", "firstname", "lastname");
   }
 
   @Override

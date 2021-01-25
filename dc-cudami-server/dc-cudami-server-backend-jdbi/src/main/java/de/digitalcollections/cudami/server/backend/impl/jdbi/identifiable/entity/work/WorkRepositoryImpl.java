@@ -109,28 +109,6 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"created", "lastModified", "refId"};
-  }
-
-  @Override
-  protected String getColumnName(String modelProperty) {
-    if (modelProperty == null) {
-      return null;
-    }
-    switch (modelProperty) {
-      case "created":
-        return tableAlias + ".created";
-      case "lastModified":
-        return tableAlias + ".last_modified";
-      case "refId":
-        return tableAlias + ".refid";
-      default:
-        return null;
-    }
-  }
-
-  @Override
   public List<Agent> getCreators(UUID workUuid) {
     final String agTableAlias = agentRepositoryImpl.getTableAlias();
     final String agTableName = agentRepositoryImpl.getTableName();

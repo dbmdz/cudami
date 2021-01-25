@@ -12,6 +12,8 @@ import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class AbstractPagingAndSortingRepositoryImplTest {
@@ -21,7 +23,7 @@ public class AbstractPagingAndSortingRepositoryImplTest {
   @Test
   public void testAddOrderBy() {
     PagingAndSortingRepositoryImpl repository = new PagingAndSortingRepositoryImpl();
-    repository.setAllowedOrderByFields(new String[] {"foo", "bar"});
+    repository.setAllowedOrderByFields(Arrays.asList("foo", "bar"));
     repository.setColumnName("foo");
 
     StringBuilder query = new StringBuilder("");
@@ -102,11 +104,11 @@ public class AbstractPagingAndSortingRepositoryImplTest {
   }
 
   private class PagingAndSortingRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl {
-    String[] allowedOrderByFields = null;
+    List<String> allowedOrderByFields = null;
     String columnName = null;
 
     @Override
-    protected String[] getAllowedOrderByFields() {
+    protected List<String> getAllowedOrderByFields() {
       return allowedOrderByFields;
     }
 
@@ -115,7 +117,7 @@ public class AbstractPagingAndSortingRepositoryImplTest {
       return columnName;
     }
 
-    protected void setAllowedOrderByFields(String[] fields) {
+    protected void setAllowedOrderByFields(List<String> fields) {
       allowedOrderByFields = fields;
     }
 

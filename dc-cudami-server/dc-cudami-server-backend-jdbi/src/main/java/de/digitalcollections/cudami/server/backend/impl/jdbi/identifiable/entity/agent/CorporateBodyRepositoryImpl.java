@@ -69,11 +69,6 @@ public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateB
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"created", "lastModified", "refId"};
-  }
-
-  @Override
   protected String getColumnName(String modelProperty) {
     if (modelProperty == null) {
       return null;

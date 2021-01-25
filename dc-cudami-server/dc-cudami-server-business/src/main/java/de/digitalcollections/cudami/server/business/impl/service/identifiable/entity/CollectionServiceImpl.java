@@ -45,6 +45,7 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
 
   @Override
   public PageResponse<Collection> findActive(PageRequest pageRequest) {
+    setDefaultSorting(pageRequest);
     Filtering filtering = filteringForActive();
     pageRequest.add(filtering);
     return find(pageRequest);
@@ -126,12 +127,13 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
 
   @Override
   public PageResponse<Collection> getRootNodes(PageRequest pageRequest) {
+    setDefaultSorting(pageRequest);
     return ((NodeRepository<Collection>) repository).getRootNodes(pageRequest);
   }
 
   @Override
-  public List<Locale> getTopCollectionsLanguages() {
-    return ((CollectionRepository) repository).getTopCollectionsLanguages();
+  public List<Locale> getRootNodesLanguages() {
+    return ((NodeRepository<Collection>) repository).getRootNodesLanguages();
   }
 
   @Override

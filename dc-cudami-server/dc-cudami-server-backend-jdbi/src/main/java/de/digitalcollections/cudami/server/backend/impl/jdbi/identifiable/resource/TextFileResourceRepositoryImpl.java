@@ -8,6 +8,7 @@ import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.resource.TextFileResourceImpl;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.jdbi.v3.core.Jdbi;
@@ -78,27 +79,9 @@ public class TextFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<T
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"created", "filename", "lastModified", "sizeInBytes"};
-  }
-
-  @Override
-  protected String getColumnName(String modelProperty) {
-    if (modelProperty == null) {
-      return null;
-    }
-    switch (modelProperty) {
-      case "created":
-        return tableAlias + ".created";
-      case "filename":
-        return tableAlias + ".filename";
-      case "lastModified":
-        return tableAlias + ".last_modified";
-      case "sizeInBytes":
-        return tableAlias + ".size_in_bytes";
-      default:
-        return null;
-    }
+  protected List<String> getAllowedOrderByFields() {
+    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
+    return allowedOrderByFields;
   }
 
   @Override

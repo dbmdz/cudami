@@ -10,6 +10,7 @@ import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.paging.SearchPageResponseImpl;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -147,8 +148,9 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"identifiable", "namespace", "id"};
+  protected List<String> getAllowedOrderByFields() {
+    List<String> allowedOrderByFields = Arrays.asList("id", "identifiable", "namespace");
+    return allowedOrderByFields;
   }
 
   @Override
@@ -157,12 +159,12 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
       return null;
     }
     switch (modelProperty) {
+      case "id":
+        return "id";
       case "identifiable":
         return "identifiable";
       case "namespace":
         return "namespace";
-      case "id":
-        return "id";
       default:
         return null;
     }

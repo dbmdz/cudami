@@ -16,7 +16,9 @@ import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
@@ -121,8 +123,10 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"created", "label", "lastModified", "publicationEnd", "publicationStart"};
+  protected List<String> getAllowedOrderByFields() {
+    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
+    allowedOrderByFields.addAll(Arrays.asList("publicationEnd", "publicationStart"));
+    return allowedOrderByFields;
   }
 
   @Override
@@ -233,11 +237,10 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
     if (modelProperty == null) {
       return null;
     }
+    if (super.getColumnName(modelProperty) != null) {
+      return super.getColumnName(modelProperty);
+    }
     switch (modelProperty) {
-      case "created":
-        return tableAlias + ".created";
-      case "lastModified":
-        return tableAlias + ".last_modified";
       case "publicationEnd":
         return tableAlias + ".publication_end";
       case "publicationStart":
@@ -266,12 +269,50 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
 
   @Override
   public List<Webpage> getParents(UUID uuid) {
-    throw new UnsupportedOperationException("Not supported yet.");
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + tableName
+                + " AS "
+                + tableAlias
+                + " INNER JOIN webpage_webpages ww ON "
+                + tableAlias
+                + ".uuid = ww.parent_webpage_uuid"
+                + " WHERE ww.child_webpage_uuid = :uuid");
+
+    List<Webpage> result = retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid));
+    return result;
   }
 
   @Override
   public PageResponse<Webpage> getRootNodes(PageRequest pageRequest) {
-    throw new UnsupportedOperationException("Not supported yet.");
+    String commonSql =
+        " FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + " WHERE NOT EXISTS (SELECT FROM webpage_webpages WHERE child_webpage_uuid = "
+            + tableAlias
+            + ".uuid)";
+    return find(pageRequest, commonSql, null);
+  }
+
+  @Override
+  public List<Locale> getRootNodesLanguages() {
+    String query =
+        "SELECT DISTINCT languages"
+            + " FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + ", jsonb_object_keys("
+            + tableAlias
+            + ".label) AS languages"
+            + " WHERE NOT EXISTS (SELECT FROM webpage_webpages WHERE child_webpage_uuid = "
+            + tableAlias
+            + ".uuid)";
+    List<Locale> result = dbi.withHandle(h -> h.createQuery(query).mapTo(Locale.class).list());
+    return result;
   }
 
   @Override

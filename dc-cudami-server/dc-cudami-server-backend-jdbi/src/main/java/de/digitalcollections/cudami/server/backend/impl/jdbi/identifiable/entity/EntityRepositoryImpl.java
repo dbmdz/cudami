@@ -7,6 +7,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resour
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -213,8 +214,10 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"created", "entityType", "lastModified", "refId", "type"};
+  protected List<String> getAllowedOrderByFields() {
+    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
+    allowedOrderByFields.addAll(Arrays.asList("entityType", "refId"));
+    return allowedOrderByFields;
   }
 
   @Override
@@ -222,17 +225,14 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     if (modelProperty == null) {
       return null;
     }
+    if (super.getColumnName(modelProperty) != null) {
+      return super.getColumnName(modelProperty);
+    }
     switch (modelProperty) {
-      case "created":
-        return tableAlias + ".created";
       case "entityType":
         return tableAlias + ".entity_type";
-      case "lastModified":
-        return tableAlias + ".last_modified";
       case "refId":
         return tableAlias + ".refid";
-      case "type":
-        return tableAlias + ".identifiable_type";
       default:
         return null;
     }

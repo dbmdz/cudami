@@ -22,6 +22,8 @@ import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceI
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.paging.SearchPageResponseImpl;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -452,8 +454,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"created", "lastModified", "type"};
+  protected List<String> getAllowedOrderByFields() {
+    return new ArrayList<>(Arrays.asList("created", "label", "lastModified", "type"));
   }
 
   @Override
@@ -464,6 +466,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     switch (modelProperty) {
       case "created":
         return tableAlias + ".created";
+      case "label":
+        return tableAlias + ".label";
       case "lastModified":
         return tableAlias + ".last_modified";
       case "type":

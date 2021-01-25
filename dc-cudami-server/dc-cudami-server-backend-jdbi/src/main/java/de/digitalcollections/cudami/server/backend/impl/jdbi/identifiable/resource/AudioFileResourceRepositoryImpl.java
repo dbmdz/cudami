@@ -8,6 +8,8 @@ import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.resource.AudioFileResourceImpl;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.jdbi.v3.core.Jdbi;
@@ -83,8 +85,10 @@ public class AudioFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"created", "duration", "filename", "lastModified", "sizeInBytes"};
+  protected List<String> getAllowedOrderByFields() {
+    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
+    allowedOrderByFields.addAll(Arrays.asList("duration"));
+    return allowedOrderByFields;
   }
 
   @Override
@@ -92,17 +96,12 @@ public class AudioFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<
     if (modelProperty == null) {
       return null;
     }
+    if (fileResourceMetadataRepositoryImpl.getColumnName(modelProperty) != null) {
+      return fileResourceMetadataRepositoryImpl.getColumnName(modelProperty);
+    }
     switch (modelProperty) {
-      case "created":
-        return tableAlias + ".created";
       case "duration":
         return tableAlias + ".duration";
-      case "filename":
-        return tableAlias + ".filename";
-      case "lastModified":
-        return tableAlias + ".last_modified";
-      case "sizeInBytes":
-        return tableAlias + ".size_in_bytes";
       default:
         return null;
     }
