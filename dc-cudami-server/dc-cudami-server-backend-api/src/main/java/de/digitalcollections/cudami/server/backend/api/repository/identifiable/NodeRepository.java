@@ -6,6 +6,7 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public interface NodeRepository<N extends Node> extends IdentifiableRepository<N> {
@@ -48,6 +49,8 @@ public interface NodeRepository<N extends Node> extends IdentifiableRepository<N
   List<N> getParents(UUID uuid);
 
   PageResponse<N> getRootNodes(PageRequest pageRequest);
+
+  List<Locale> getRootNodesLanguages();
 
   default boolean removeChild(N parent, N child) {
     if (parent == null || child == null) {

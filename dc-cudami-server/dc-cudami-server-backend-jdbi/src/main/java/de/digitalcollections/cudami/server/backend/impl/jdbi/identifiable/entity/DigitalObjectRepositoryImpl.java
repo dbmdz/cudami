@@ -98,11 +98,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"created", "lastModified", "refId"};
-  }
-
-  @Override
   public PageResponse<Collection> getCollections(UUID digitalObjectUuid, PageRequest pageRequest) {
     final String tableAliasCollection = collectionRepositoryImpl.getTableAlias();
     final String tableNameCollection = collectionRepositoryImpl.getTableName();
@@ -134,23 +129,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     long total = retrieveCount(countQuery, Map.of("uuid", digitalObjectUuid));
 
     return new PageResponseImpl<>(result, pageRequest, total);
-  }
-
-  @Override
-  protected String getColumnName(String modelProperty) {
-    if (modelProperty == null) {
-      return null;
-    }
-    switch (modelProperty) {
-      case "created":
-        return tableAlias + ".created";
-      case "lastModified":
-        return tableAlias + ".last_modified";
-      case "refId":
-        return tableAlias + ".refid";
-      default:
-        return null;
-    }
   }
 
   @Override

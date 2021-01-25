@@ -8,6 +8,8 @@ import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.jdbi.v3.core.Jdbi;
@@ -97,8 +99,10 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"created", "filename", "lastModified", "sizeInBytes"};
+  protected List<String> getAllowedOrderByFields() {
+    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
+    allowedOrderByFields.addAll(Arrays.asList("filename", "mimeType", "sizeInBytes"));
+    return allowedOrderByFields;
   }
 
   @Override
@@ -106,13 +110,14 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
     if (modelProperty == null) {
       return null;
     }
+    if (super.getColumnName(modelProperty) != null) {
+      return super.getColumnName(modelProperty);
+    }
     switch (modelProperty) {
-      case "created":
-        return tableAlias + ".created";
       case "filename":
         return tableAlias + ".filename";
-      case "lastModified":
-        return tableAlias + ".last_modified";
+      case "mimeType":
+        return tableAlias + ".mimetype";
       case "sizeInBytes":
         return tableAlias + ".size_in_bytes";
       default:

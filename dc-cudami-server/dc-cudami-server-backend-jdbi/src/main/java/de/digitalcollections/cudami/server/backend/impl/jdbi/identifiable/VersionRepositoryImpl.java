@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.Version;
 import de.digitalcollections.model.impl.identifiable.VersionImpl;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
@@ -58,7 +59,7 @@ public class VersionRepositoryImpl extends JdbiRepositoryImpl implements Version
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
+  protected List<String> getAllowedOrderByFields() {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 

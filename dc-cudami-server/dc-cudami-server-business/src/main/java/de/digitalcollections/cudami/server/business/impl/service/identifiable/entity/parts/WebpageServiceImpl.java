@@ -119,6 +119,11 @@ public class WebpageServiceImpl extends EntityPartServiceImpl<Webpage> implement
   }
 
   @Override
+  public List<Locale> getRootNodesLanguages() {
+    return ((NodeRepository<Webpage>) repository).getRootNodesLanguages();
+  }
+
+  @Override
   public Website getWebsite(UUID webpageUuid) {
     UUID rootWebpageUuid = webpageUuid;
     Webpage parent = getParent(webpageUuid);

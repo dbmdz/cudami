@@ -144,28 +144,6 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"created", "lastModified", "refId"};
-  }
-
-  @Override
-  protected String getColumnName(String modelProperty) {
-    if (modelProperty == null) {
-      return null;
-    }
-    switch (modelProperty) {
-      case "created":
-        return tableAlias + ".created";
-      case "lastModified":
-        return tableAlias + ".last_modified";
-      case "refId":
-        return tableAlias + ".refid";
-      default:
-        return null;
-    }
-  }
-
-  @Override
   public Set<DigitalObject> getDigitalObjects(UUID itemUuid) {
     final String doTableAlias = digitalObjectRepositoryImpl.getTableAlias();
     final String doTableName = digitalObjectRepositoryImpl.getTableName();

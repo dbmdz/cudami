@@ -155,9 +155,12 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     if (pageRequest.getSorting() == null
         || pageRequest.getSorting().getOrders() == null
         || pageRequest.getSorting().getOrders().isEmpty()) {
-      final OrderImpl labelOrder = new OrderImpl(Direction.ASC, "label");
-      labelOrder.setSubProperty("de");
-      Sorting sorting = Sorting.defaultBuilder().order(labelOrder).build();
+      // TODO: discuss default sorting (what if only english label exists? or german and english?)
+      final OrderImpl labelOrder1 = new OrderImpl(Direction.ASC, "label");
+      labelOrder1.setSubProperty("de");
+      final OrderImpl labelOrder2 = new OrderImpl(Direction.ASC, "label");
+      labelOrder2.setSubProperty("");
+      Sorting sorting = Sorting.defaultBuilder().order(labelOrder1).order(labelOrder2).build();
       pageRequest.setSorting(sorting);
     }
   }

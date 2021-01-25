@@ -11,6 +11,7 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -106,8 +107,10 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"created", "lastModified", "refId", "url"};
+  protected List<String> getAllowedOrderByFields() {
+    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
+    allowedOrderByFields.addAll(Arrays.asList("url"));
+    return allowedOrderByFields;
   }
 
   @Override
@@ -115,13 +118,10 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     if (modelProperty == null) {
       return null;
     }
+    if (super.getColumnName(modelProperty) != null) {
+      return super.getColumnName(modelProperty);
+    }
     switch (modelProperty) {
-      case "created":
-        return tableAlias + ".created";
-      case "lastModified":
-        return tableAlias + ".last_modified";
-      case "refId":
-        return tableAlias + ".refid";
       case "url":
         return tableAlias + ".url";
       default:
@@ -136,7 +136,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     List<Locale> result = dbi.withHandle(h -> h.createQuery(query).mapTo(Locale.class).list());
     return result;
   }
-  
+
   @Override
   public List<Webpage> getRootPages(UUID uuid) {
     final String wpTableAlias = webpageRepositoryImpl.getTableAlias();
@@ -229,29 +229,5 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
           return batch.execute();
         });
     return true;
-  }
-
-  @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"created", "lastModified", "refId", "url"};
-  }
-
-  @Override
-  protected String getColumnName(String modelProperty) {
-    if (modelProperty == null) {
-      return null;
-    }
-    switch (modelProperty) {
-      case "created":
-        return "w.created";
-      case "lastModified":
-        return "w.last_modified";
-      case "refId":
-        return "w.refid";
-      case "url":
-        return "w.url";
-      default:
-        return null;
-    }
   }
 }

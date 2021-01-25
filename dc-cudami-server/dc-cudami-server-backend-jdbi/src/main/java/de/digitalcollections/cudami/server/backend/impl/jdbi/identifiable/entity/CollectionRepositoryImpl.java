@@ -17,9 +17,9 @@ import de.digitalcollections.model.impl.identifiable.NodeImpl;
 import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.Map;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
@@ -185,10 +185,10 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {
-      "created", "label", "lastModified", "publicationEnd", "publicationStart", "refId"
-    };
+  protected List<String> getAllowedOrderByFields() {
+    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
+    allowedOrderByFields.addAll(Arrays.asList("publicationEnd", "publicationStart"));
+    return allowedOrderByFields;
   }
 
   @Override
@@ -296,19 +296,14 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     if (modelProperty == null) {
       return null;
     }
+    if (super.getColumnName(modelProperty) != null) {
+      return super.getColumnName(modelProperty);
+    }
     switch (modelProperty) {
-      case "created":
-        return tableAlias + ".created";
-      case "label":
-        return tableAlias + ".label";
-      case "lastModified":
-        return tableAlias + ".last_modified";
       case "publicationEnd":
         return tableAlias + ".publication_end";
       case "publicationStart":
         return tableAlias + ".publication_start";
-      case "refId":
-        return tableAlias + ".refid";
       default:
         return null;
     }
@@ -435,11 +430,19 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public List<Locale> getTopCollectionsLanguages() {
+  public List<Locale> getRootNodesLanguages() {
     String query =
         "SELECT DISTINCT languages"
-            + " FROM collections as c, jsonb_object_keys(c.label) as languages"
-            + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = c.uuid)";
+            + " FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + ", jsonb_object_keys("
+            + tableAlias
+            + ".label) AS languages"
+            + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = "
+            + tableAlias
+            + ".uuid)";
     List<Locale> result = dbi.withHandle(h -> h.createQuery(query).mapTo(Locale.class).list());
     return result;
   }

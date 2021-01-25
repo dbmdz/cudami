@@ -136,28 +136,6 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"created", "lastModified", "refId"};
-  }
-
-  @Override
-  protected String getColumnName(String modelProperty) {
-    if (modelProperty == null) {
-      return null;
-    }
-    switch (modelProperty) {
-      case "created":
-        return tableAlias + ".created";
-      case "lastModified":
-        return tableAlias + ".last_modified";
-      case "refId":
-        return tableAlias + ".refid";
-      default:
-        return null;
-    }
-  }
-
-  @Override
   public List<Agent> getCreators(UUID articleUuid) {
     String innerQuery =
         "SELECT * FROM "

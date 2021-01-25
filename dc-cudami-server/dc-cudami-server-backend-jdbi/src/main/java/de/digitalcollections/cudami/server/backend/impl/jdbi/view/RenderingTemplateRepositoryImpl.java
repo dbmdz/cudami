@@ -6,6 +6,7 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.view.RenderingTemplate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
@@ -56,8 +57,8 @@ public class RenderingTemplateRepositoryImpl extends AbstractPagingAndSortingRep
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"label", "name", "uuid"};
+  protected List<String> getAllowedOrderByFields() {
+    return Arrays.asList("label", "name", "uuid");
   }
 
   @Override

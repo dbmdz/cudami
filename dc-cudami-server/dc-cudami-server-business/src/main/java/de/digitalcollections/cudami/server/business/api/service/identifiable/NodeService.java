@@ -84,6 +84,8 @@ public interface NodeService<N extends Node> extends IdentifiableService<N> {
 
   PageResponse<N> getRootNodes(PageRequest pageRequest);
 
+  List<Locale> getRootNodesLanguages();
+
   default boolean removeChild(N parent, N child) {
     if (parent == null || child == null) {
       return false;

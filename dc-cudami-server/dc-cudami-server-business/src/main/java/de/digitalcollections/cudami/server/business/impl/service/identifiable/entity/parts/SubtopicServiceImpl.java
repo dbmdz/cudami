@@ -13,6 +13,7 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.entity.parts.SubtopicImpl;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,6 +107,11 @@ public class SubtopicServiceImpl extends EntityPartServiceImpl<Subtopic>
   @Override
   public PageResponse<Subtopic> getRootNodes(PageRequest pageRequest) {
     return ((NodeRepository<Subtopic>) repository).getRootNodes(pageRequest);
+  }
+
+  @Override
+  public List<Locale> getRootNodesLanguages() {
+    return ((NodeRepository<Subtopic>) repository).getRootNodesLanguages();
   }
 
   @Override

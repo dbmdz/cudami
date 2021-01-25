@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.entity.relation.Predicate;
 import de.digitalcollections.model.impl.identifiable.entity.relation.PredicateImpl;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -73,8 +74,9 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"created", "label", "lastModified", "value"};
+  protected List<String> getAllowedOrderByFields() {
+    List<String> allowedOrderByFields = Arrays.asList("created", "label", "lastModified", "value");
+    return allowedOrderByFields;
   }
 
   @Override

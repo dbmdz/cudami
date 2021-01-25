@@ -9,6 +9,7 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.relation.EntityRelationImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import javax.sql.DataSource;
@@ -136,8 +137,9 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  protected String[] getAllowedOrderByFields() {
-    return new String[] {"subject", "predicate", "object"};
+  protected List<String> getAllowedOrderByFields() {
+    List<String> allowedOrderByFields = Arrays.asList("subject", "predicate", "object");
+    return allowedOrderByFields;
   }
 
   @Override

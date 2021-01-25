@@ -64,14 +64,15 @@ public class DigitalObjectController {
   public PageResponse<DigitalObject> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "sortField", required = false, defaultValue = "lastModified")
-          String sortField,
-      @RequestParam(name = "sortDirection", required = false, defaultValue = "DESC")
-          Direction sortDirection,
+      @RequestParam(name = "sortField", required = false) String sortField,
+      @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
       @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
           NullHandling nullHandling) {
-    OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
-    Sorting sorting = new SortingImpl(order);
+    Sorting sorting = null;
+    if (sortField != null && sortDirection != null) {
+      OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
+      sorting = new SortingImpl(order);
+    }
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
     return service.find(pageRequest);
   }
