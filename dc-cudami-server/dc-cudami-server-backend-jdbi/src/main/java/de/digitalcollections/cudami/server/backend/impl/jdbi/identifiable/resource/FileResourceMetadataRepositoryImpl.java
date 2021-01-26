@@ -19,8 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryImpl<FileResource>
-    implements FileResourceMetadataRepository<FileResource> {
+public class FileResourceMetadataRepositoryImpl<F extends FileResource>
+    extends IdentifiableRepositoryImpl<F> implements FileResourceMetadataRepository<F> {
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(FileResourceMetadataRepositoryImpl.class);
@@ -78,7 +78,7 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
 
   @Autowired
   public FileResourceMetadataRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(
+    this(
         dbi,
         identifierRepository,
         TABLE_NAME,
@@ -92,8 +92,34 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
         getSqlUpdateFieldValues());
   }
 
+  protected FileResourceMetadataRepositoryImpl(
+      Jdbi dbi,
+      IdentifierRepository identifierRepository,
+      String tableName,
+      String tableAlias,
+      String mappingPrefix,
+      Class fileResourceImplClass,
+      String sqlSelectAllFields,
+      String sqlSelectReducedFields,
+      String sqlInsertFields,
+      String sqlInsertValues,
+      String sqlUpdateFieldValues) {
+    super(
+        dbi,
+        identifierRepository,
+        tableName,
+        tableAlias,
+        mappingPrefix,
+        fileResourceImplClass,
+        sqlSelectAllFields,
+        sqlSelectReducedFields,
+        sqlInsertFields,
+        sqlInsertValues,
+        sqlUpdateFieldValues);
+  }
+
   @Override
-  public SearchPageResponse<FileResource> find(SearchPageRequest searchPageRequest) {
+  public SearchPageResponse<F> find(SearchPageRequest searchPageRequest) {
     String commonSql = getCommonFileResourceSearchSql(tableName, tableAlias);
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchPageRequest.getQuery()));
   }
@@ -154,20 +180,20 @@ public class FileResourceMetadataRepositoryImpl extends IdentifiableRepositoryIm
   }
 
   @Override
-  public FileResource save(FileResource fileResource) {
+  public F save(F fileResource) {
     if (fileResource.getLabel() == null && fileResource.getFilename() != null) {
       // set a default label = filename (an empty label violates constraint)
       fileResource.setLabel(new LocalizedTextImpl(Locale.ROOT, fileResource.getFilename()));
     }
     super.save(fileResource);
-    FileResource result = findOne(fileResource.getUuid());
+    F result = findOne(fileResource.getUuid());
     return result;
   }
 
   @Override
-  public FileResource update(FileResource fileResource) {
+  public F update(F fileResource) {
     super.update(fileResource);
-    FileResource result = findOne(fileResource.getUuid());
+    F result = findOne(fileResource.getUuid());
     return result;
   }
 }
