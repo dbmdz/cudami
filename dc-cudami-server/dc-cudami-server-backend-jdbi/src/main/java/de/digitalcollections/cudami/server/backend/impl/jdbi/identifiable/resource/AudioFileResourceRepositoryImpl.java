@@ -8,7 +8,6 @@ import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.resource.AudioFileResourceImpl;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -55,7 +54,7 @@ public class AudioFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<
     return FileResourceMetadataRepositoryImpl.getSqlUpdateFieldValues() + ", duration=:duration";
   }
 
-  private final FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
+  private final FileResourceMetadataRepositoryImpl metadataRepository;
 
   @Autowired
   public AudioFileResourceRepositoryImpl(
@@ -74,20 +73,19 @@ public class AudioFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<
         getSqlInsertFields(),
         getSqlInsertValues(),
         getSqlUpdateFieldValues());
-    this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
+    this.metadataRepository = fileResourceMetadataRepositoryImpl;
   }
 
   @Override
   public SearchPageResponse<AudioFileResource> find(SearchPageRequest searchPageRequest) {
-    String commonSql =
-        fileResourceMetadataRepositoryImpl.getCommonFileResourceSearchSql(tableName, tableAlias);
+    String commonSql = metadataRepository.getCommonFileResourceSearchSql(tableName, tableAlias);
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchPageRequest.getQuery()));
   }
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
-    allowedOrderByFields.addAll(Arrays.asList("duration"));
+    List<String> allowedOrderByFields = metadataRepository.getAllowedOrderByFields();
+    allowedOrderByFields.add("duration");
     return allowedOrderByFields;
   }
 
@@ -96,8 +94,8 @@ public class AudioFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<
     if (modelProperty == null) {
       return null;
     }
-    if (fileResourceMetadataRepositoryImpl.getColumnName(modelProperty) != null) {
-      return fileResourceMetadataRepositoryImpl.getColumnName(modelProperty);
+    if (metadataRepository.getColumnName(modelProperty) != null) {
+      return metadataRepository.getColumnName(modelProperty);
     }
     switch (modelProperty) {
       case "duration":

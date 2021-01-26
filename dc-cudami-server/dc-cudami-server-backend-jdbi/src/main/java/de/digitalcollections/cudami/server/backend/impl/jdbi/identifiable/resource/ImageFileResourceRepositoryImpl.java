@@ -60,7 +60,7 @@ public class ImageFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<
         + ", height=:height, width=:width";
   }
 
-  private final FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
+  private final FileResourceMetadataRepositoryImpl metadataRepository;
 
   @Autowired
   public ImageFileResourceRepositoryImpl(
@@ -79,13 +79,12 @@ public class ImageFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<
         getSqlInsertFields(),
         getSqlInsertValues(),
         getSqlUpdateFieldValues());
-    this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
+    this.metadataRepository = fileResourceMetadataRepositoryImpl;
   }
 
   @Override
   public SearchPageResponse<ImageFileResource> find(SearchPageRequest searchPageRequest) {
-    String commonSql =
-        fileResourceMetadataRepositoryImpl.getCommonFileResourceSearchSql(tableName, tableAlias);
+    String commonSql = metadataRepository.getCommonFileResourceSearchSql(tableName, tableAlias);
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchPageRequest.getQuery()));
   }
 
@@ -101,8 +100,8 @@ public class ImageFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<
     if (modelProperty == null) {
       return null;
     }
-    if (fileResourceMetadataRepositoryImpl.getColumnName(modelProperty) != null) {
-      return fileResourceMetadataRepositoryImpl.getColumnName(modelProperty);
+    if (metadataRepository.getColumnName(modelProperty) != null) {
+      return metadataRepository.getColumnName(modelProperty);
     }
     switch (modelProperty) {
       case "height":

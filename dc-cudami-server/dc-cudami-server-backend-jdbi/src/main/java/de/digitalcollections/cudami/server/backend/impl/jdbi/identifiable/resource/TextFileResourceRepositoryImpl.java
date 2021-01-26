@@ -49,7 +49,7 @@ public class TextFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<T
     return FileResourceMetadataRepositoryImpl.getSqlUpdateFieldValues();
   }
 
-  private final FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
+  private final FileResourceMetadataRepositoryImpl metadataRepository;
 
   @Autowired
   public TextFileResourceRepositoryImpl(
@@ -68,20 +68,18 @@ public class TextFileResourceRepositoryImpl extends IdentifiableRepositoryImpl<T
         getSqlInsertFields(),
         getSqlInsertValues(),
         getSqlUpdateFieldValues());
-    this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
+    this.metadataRepository = fileResourceMetadataRepositoryImpl;
   }
 
   @Override
   public SearchPageResponse<TextFileResource> find(SearchPageRequest searchPageRequest) {
-    String commonSql =
-        fileResourceMetadataRepositoryImpl.getCommonFileResourceSearchSql(tableName, tableAlias);
+    String commonSql = metadataRepository.getCommonFileResourceSearchSql(tableName, tableAlias);
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchPageRequest.getQuery()));
   }
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
-    return allowedOrderByFields;
+    return metadataRepository.getAllowedOrderByFields();
   }
 
   @Override

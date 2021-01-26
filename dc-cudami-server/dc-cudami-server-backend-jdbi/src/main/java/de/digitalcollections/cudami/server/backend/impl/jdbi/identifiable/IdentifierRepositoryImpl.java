@@ -149,8 +149,7 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    List<String> allowedOrderByFields = Arrays.asList("id", "identifiable", "namespace");
-    return allowedOrderByFields;
+    return Arrays.asList("id", "identifiable", "namespace");
   }
 
   @Override

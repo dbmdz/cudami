@@ -138,8 +138,7 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    List<String> allowedOrderByFields = Arrays.asList("subject", "predicate", "object");
-    return allowedOrderByFields;
+    return Arrays.asList("subject", "predicate", "object");
   }
 
   @Override

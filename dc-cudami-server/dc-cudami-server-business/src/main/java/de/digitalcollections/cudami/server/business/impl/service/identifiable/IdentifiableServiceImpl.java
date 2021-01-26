@@ -156,8 +156,9 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
         || pageRequest.getSorting().getOrders() == null
         || pageRequest.getSorting().getOrders().isEmpty()) {
       // TODO: discuss default sorting (what if only english label exists? or german and english?)
+      String defaultLanguage = localeService.getDefaultLanguage();
       final OrderImpl labelOrder1 = new OrderImpl(Direction.ASC, "label");
-      labelOrder1.setSubProperty("de");
+      labelOrder1.setSubProperty(defaultLanguage);
       final OrderImpl labelOrder2 = new OrderImpl(Direction.ASC, "label");
       labelOrder2.setSubProperty("");
       Sorting sorting = Sorting.defaultBuilder().order(labelOrder1).order(labelOrder2).build();

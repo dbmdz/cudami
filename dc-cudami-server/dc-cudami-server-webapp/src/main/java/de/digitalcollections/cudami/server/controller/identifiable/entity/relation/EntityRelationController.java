@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.server.controller.identifiable.entity;
+package de.digitalcollections.cudami.server.controller.identifiable.entity.relation;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Api(description = "The entity relations controller", name = "Entity relations controller")
-public class EntityRelationsController {
+public class EntityRelationController {
 
   @Autowired private DigitalObjectService digitalObjectService;
 

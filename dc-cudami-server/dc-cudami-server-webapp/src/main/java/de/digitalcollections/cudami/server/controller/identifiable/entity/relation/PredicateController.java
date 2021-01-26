@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.server.controller;
+package de.digitalcollections.cudami.server.controller.identifiable.entity.relation;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.PredicatesServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.PredicateService;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Api(description = "The predicates controller", name = "Predicates controller")
-public class PredicatesController {
+public class PredicateController {
 
   @Autowired private PredicateService service;
 
