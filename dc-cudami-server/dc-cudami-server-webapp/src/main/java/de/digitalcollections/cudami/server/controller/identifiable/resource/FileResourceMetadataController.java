@@ -101,8 +101,20 @@ public class FileResourceMetadataController {
 
     FileResourceType fileResourceType;
     switch (type) {
+      case "application":
+        fileResourceType = FileResourceType.APPLICATION;
+        break;
+      case "audio":
+        fileResourceType = FileResourceType.AUDIO;
+        break;
       case "image":
         fileResourceType = FileResourceType.IMAGE;
+        break;
+      case "linkeddata":
+        fileResourceType = FileResourceType.LINKED_DATA;
+        break;
+      case "text":
+        fileResourceType = FileResourceType.TEXT;
         break;
       case "video":
         fileResourceType = FileResourceType.VIDEO;
@@ -111,10 +123,11 @@ public class FileResourceMetadataController {
         return null;
     }
 
-    Filtering filtering =
-        Filtering.defaultBuilder().filter("fileResourceType").isEquals(fileResourceType).build();
-    pageRequest.add(filtering);
-
+    if (fileResourceType != null) {
+      Filtering filtering =
+          Filtering.defaultBuilder().filter("fileResourceType").isEquals(fileResourceType).build();
+      pageRequest.add(filtering);
+    }
     return fileResourceService.find(pageRequest);
   }
 
