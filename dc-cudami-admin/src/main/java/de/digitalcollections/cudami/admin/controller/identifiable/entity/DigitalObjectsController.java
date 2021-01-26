@@ -10,7 +10,6 @@ import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.Project;
-import de.digitalcollections.model.api.paging.Order;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
@@ -74,14 +73,15 @@ public class DigitalObjectsController extends AbstractController {
   public SearchPageResponse<DigitalObjectImpl> search(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortField", required = false, defaultValue = "lastModified")
-          String sortField,
-      @RequestParam(name = "sortDirection", required = false, defaultValue = "DESC")
-          Direction sortDirection,
+      @RequestParam(name = "sortField", required = false) String sortField,
+      @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws HttpException {
-    Order order = new OrderImpl(sortDirection, sortField);
-    Sorting sorting = new SortingImpl(order);
+    Sorting sorting = null;
+    if (sortField != null && sortDirection != null) {
+      OrderImpl order = new OrderImpl(sortDirection, sortField);
+      sorting = new SortingImpl(order);
+    }
     SearchPageRequest pageRequest =
         new SearchPageRequestImpl(searchTerm, pageNumber, pageSize, sorting);
     return service.find(pageRequest);

@@ -13,6 +13,9 @@ import java.net.http.HttpClient;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * TODO: implement clients for all different fileresource types (application, audio, image, ....)
+ */
 public class CudamiFileResourcesMetadataClient extends CudamiBaseClient<FileResourceImpl> {
 
   public CudamiFileResourcesMetadataClient(HttpClient http, String serverUrl, ObjectMapper mapper) {

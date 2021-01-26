@@ -64,15 +64,17 @@ public class PersonController {
   public PageResponse<Person> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
-      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
-          Direction sortDirection,
+      @RequestParam(name = "sortField", required = false) String sortField,
+      @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
       @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
           NullHandling nullHandling,
       @RequestParam(name = "language", required = false, defaultValue = "de") String language,
       @RequestParam(name = "initial", required = false) String initial) {
-    OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
-    Sorting sorting = new SortingImpl(order);
+    Sorting sorting = null;
+    if (sortField != null && sortDirection != null) {
+      OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
+      sorting = new SortingImpl(order);
+    }
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
     if (initial == null) {
       return personService.find(pageRequest);
@@ -93,13 +95,15 @@ public class PersonController {
           UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
-      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
-          Direction sortDirection,
+      @RequestParam(name = "sortField", required = false) String sortField,
+      @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
       @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
           NullHandling nullHandling) {
-    OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
-    Sorting sorting = new SortingImpl(order);
+    Sorting sorting = null;
+    if (sortField != null && sortDirection != null) {
+      OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
+      sorting = new SortingImpl(order);
+    }
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
     return personService.findByLocationOfBirth(pageRequest, uuid);
   }
@@ -117,13 +121,15 @@ public class PersonController {
           UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
-      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
-          Direction sortDirection,
+      @RequestParam(name = "sortField", required = false) String sortField,
+      @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
       @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
           NullHandling nullHandling) {
-    OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
-    Sorting sorting = new SortingImpl(order);
+    Sorting sorting = null;
+    if (sortField != null && sortDirection != null) {
+      OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
+      sorting = new SortingImpl(order);
+    }
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
     return personService.findByLocationOfDeath(pageRequest, uuid);
   }

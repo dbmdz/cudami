@@ -44,14 +44,16 @@ public class IdentifiableController {
   public SearchPageResponse<Identifiable> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
-      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
-          Direction sortDirection,
+      @RequestParam(name = "sortField", required = false) String sortField,
+      @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
       @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
           NullHandling nullHandling,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
-    Sorting sorting = new SortingImpl(order);
+    Sorting sorting = null;
+    if (sortField != null && sortDirection != null) {
+      OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
+      sorting = new SortingImpl(order);
+    }
     SearchPageRequest pageRequest =
         new SearchPageRequestImpl(searchTerm, pageNumber, pageSize, sorting);
     return service.find(pageRequest);
