@@ -25,7 +25,7 @@ public interface NodeRepository<N extends Node> extends IdentifiableRepository<N
     return addChildren(parent.getUuid(), children);
   }
 
-  boolean addChildren(UUID parentUuid, List<N> collections);
+  boolean addChildren(UUID parentUuid, List<N> children);
 
   /**
    * @param nodeUuid the uuid of the current node

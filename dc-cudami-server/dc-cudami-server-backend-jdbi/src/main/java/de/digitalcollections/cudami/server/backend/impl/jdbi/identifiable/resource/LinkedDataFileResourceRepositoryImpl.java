@@ -61,7 +61,7 @@ public class LinkedDataFileResourceRepositoryImpl
         + ", context=:context, object_type=:objectType";
   }
 
-  private final FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
+  private final FileResourceMetadataRepositoryImpl metadataRepository;
 
   @Autowired
   public LinkedDataFileResourceRepositoryImpl(
@@ -80,13 +80,12 @@ public class LinkedDataFileResourceRepositoryImpl
         getSqlInsertFields(),
         getSqlInsertValues(),
         getSqlUpdateFieldValues());
-    this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
+    this.metadataRepository = fileResourceMetadataRepositoryImpl;
   }
 
   @Override
   public SearchPageResponse<LinkedDataFileResource> find(SearchPageRequest searchPageRequest) {
-    String commonSql =
-        fileResourceMetadataRepositoryImpl.getCommonFileResourceSearchSql(tableName, tableAlias);
+    String commonSql = metadataRepository.getCommonFileResourceSearchSql(tableName, tableAlias);
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchPageRequest.getQuery()));
   }
 
@@ -102,8 +101,8 @@ public class LinkedDataFileResourceRepositoryImpl
     if (modelProperty == null) {
       return null;
     }
-    if (fileResourceMetadataRepositoryImpl.getColumnName(modelProperty) != null) {
-      return fileResourceMetadataRepositoryImpl.getColumnName(modelProperty);
+    if (metadataRepository.getColumnName(modelProperty) != null) {
+      return metadataRepository.getColumnName(modelProperty);
     }
     switch (modelProperty) {
       case "context":

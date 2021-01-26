@@ -50,7 +50,7 @@ public class ApplicationFileResourceRepositoryImpl
     return FileResourceMetadataRepositoryImpl.getSqlUpdateFieldValues();
   }
 
-  private final FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
+  private final FileResourceMetadataRepositoryImpl metadataRepository;
 
   @Autowired
   public ApplicationFileResourceRepositoryImpl(
@@ -69,21 +69,18 @@ public class ApplicationFileResourceRepositoryImpl
         getSqlInsertFields(),
         getSqlInsertValues(),
         getSqlUpdateFieldValues());
-    this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
+    this.metadataRepository = fileResourceMetadataRepositoryImpl;
   }
 
   @Override
   public SearchPageResponse<ApplicationFileResource> find(SearchPageRequest searchPageRequest) {
-    String commonSql =
-        fileResourceMetadataRepositoryImpl.getCommonFileResourceSearchSql(tableName, tableAlias);
+    String commonSql = metadataRepository.getCommonFileResourceSearchSql(tableName, tableAlias);
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchPageRequest.getQuery()));
   }
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    List<String> allowedOrderByFields =
-        fileResourceMetadataRepositoryImpl.getAllowedOrderByFields();
-    return allowedOrderByFields;
+    return metadataRepository.getAllowedOrderByFields();
   }
 
   @Override
@@ -91,8 +88,8 @@ public class ApplicationFileResourceRepositoryImpl
     if (modelProperty == null) {
       return null;
     }
-    if (fileResourceMetadataRepositoryImpl.getColumnName(modelProperty) != null) {
-      return fileResourceMetadataRepositoryImpl.getColumnName(modelProperty);
+    if (metadataRepository.getColumnName(modelProperty) != null) {
+      return metadataRepository.getColumnName(modelProperty);
     }
     return null;
   }

@@ -98,8 +98,7 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    List<String> allowedOrderByFields = Arrays.asList("label", "namespace", "pattern");
-    return allowedOrderByFields;
+    return Arrays.asList("label", "namespace", "pattern");
   }
 
   @Override
