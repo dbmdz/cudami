@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.api.identifiable.resource.enums.FileResourceType;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
@@ -88,44 +87,45 @@ public class FileResourceMetadataController {
           String type,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortField", required = false, defaultValue = "uuid") String sortField,
-      @RequestParam(name = "sortDirection", required = false, defaultValue = "ASC")
-          Direction sortDirection,
+      @RequestParam(name = "sortField", required = false) String sortField,
+      @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
       @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
           NullHandling nullHandling,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
-    Sorting sorting = new SortingImpl(order);
+    Sorting sorting = null;
+    if (sortField != null && sortDirection != null) {
+      OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
+      sorting = new SortingImpl(order);
+    }
     SearchPageRequest pageRequest =
         new SearchPageRequestImpl(searchTerm, pageNumber, pageSize, sorting);
 
-    FileResourceType fileResourceType;
+    String prefix;
     switch (type) {
       case "application":
-        fileResourceType = FileResourceType.APPLICATION;
+        prefix = "application/";
         break;
       case "audio":
-        fileResourceType = FileResourceType.AUDIO;
+        prefix = "audio/";
         break;
       case "image":
-        fileResourceType = FileResourceType.IMAGE;
+        prefix = "image/";
         break;
       case "linkeddata":
-        fileResourceType = FileResourceType.LINKED_DATA;
+        prefix = "application/ld";
         break;
       case "text":
-        fileResourceType = FileResourceType.TEXT;
+        prefix = "text/";
         break;
       case "video":
-        fileResourceType = FileResourceType.VIDEO;
+        prefix = "video/";
         break;
       default:
         return null;
     }
-
-    if (fileResourceType != null) {
+    if (prefix != null) {
       Filtering filtering =
-          Filtering.defaultBuilder().filter("fileResourceType").isEquals(fileResourceType).build();
+          Filtering.defaultBuilder().filter("mimeType").startsWith(prefix).build();
       pageRequest.add(filtering);
     }
     return fileResourceService.find(pageRequest);
