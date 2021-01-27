@@ -84,7 +84,7 @@ public class PersonController {
 
   @ApiMethod(description = "get all persons born at given geo location")
   @GetMapping(
-      value = {"/latest/persons/placeOfBirth/{uuid}", "/v2/persons/placeOfBirth/{uuid}"},
+      value = {"/latest/persons/placeofbirth/{uuid}", "/v2/persons/placeofbirth/{uuid}"},
       produces = "application/json")
   @ApiResponseObject
   public PageResponse<Person> getByPlaceOfBirth(
@@ -110,7 +110,7 @@ public class PersonController {
 
   @ApiMethod(description = "get all persons died at given geo location")
   @GetMapping(
-      value = {"/latest/persons/placeOfDeath/{uuid}", "/v2/persons/placeOfDeath/{uuid}"},
+      value = {"/latest/persons/placeofdeath/{uuid}", "/v2/persons/placeofdeath/{uuid}"},
       produces = "application/json")
   @ApiResponseObject
   public PageResponse<Person> getByPlaceOfDeath(
