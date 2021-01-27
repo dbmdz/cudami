@@ -186,8 +186,11 @@ public class CollectionController {
       @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
       @RequestParam(name = "nullHandling", required = false) NullHandling nullHandling,
       @RequestParam(name = "active", required = false) String active) {
-    OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
-    Sorting sorting = new SortingImpl(order);
+    Sorting sorting = null;
+    if (sortField != null && sortDirection != null) {
+      OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
+      sorting = new SortingImpl(order);
+    }
     if (sortBy != null) {
       LOGGER.warn(
           "Endpoint '/latest/collections' was called with the old AND the new sorting syntax (sortBy).");
