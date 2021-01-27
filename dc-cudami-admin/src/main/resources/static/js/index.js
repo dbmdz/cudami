@@ -27,6 +27,20 @@ function addLanguageChangeHandler() {
   })
 }
 
+function appendQueryParameters() {
+  var existingQueryParameters = window.location.search
+  if (existingQueryParameters) {
+    existingQueryParameters = new URLSearchParams(existingQueryParameters)
+    existingQueryParameters.delete('language')
+    var changeLocaleLink = document.querySelector('a#change-locale')
+    var currentHref = changeLocaleLink.getAttribute('href')
+    changeLocaleLink.setAttribute(
+      'href',
+      `${currentHref}&${existingQueryParameters.toString()}`
+    )
+  }
+}
+
 function moveEditButtonToNavbar() {
   var navbar = document.querySelector('.navbar')
   var editButton = document.getElementById('edit-button')
