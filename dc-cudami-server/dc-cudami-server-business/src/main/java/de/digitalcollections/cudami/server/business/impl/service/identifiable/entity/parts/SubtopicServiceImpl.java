@@ -54,7 +54,7 @@ public class SubtopicServiceImpl extends EntityPartServiceImpl<Subtopic>
   }
 
   @Override
-  public Integer deleteFromParentSubtopic(UUID subtopicUuid, UUID parentSubtopicUuid) {
+  public Integer removeFromParentSubtopic(UUID subtopicUuid, UUID parentSubtopicUuid) {
     return ((SubtopicRepository) repository)
         .deleteFromParentSubtopic(subtopicUuid, parentSubtopicUuid);
   }
@@ -65,7 +65,7 @@ public class SubtopicServiceImpl extends EntityPartServiceImpl<Subtopic>
   }
 
   @Override
-  public Integer deleteFromParentTopic(UUID subtopicUuid, UUID topicUuid) {
+  public Integer removeFromParentTopic(UUID subtopicUuid, UUID topicUuid) {
     return ((SubtopicRepository) repository).deleteFromParentTopic(subtopicUuid, topicUuid);
   }
 
