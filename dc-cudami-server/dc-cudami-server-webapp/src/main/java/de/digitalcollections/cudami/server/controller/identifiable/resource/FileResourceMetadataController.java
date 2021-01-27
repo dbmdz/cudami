@@ -121,7 +121,8 @@ public class FileResourceMetadataController {
         prefix = "video/";
         break;
       default:
-        return null;
+        LOGGER.warn("Unsupported mimeType for type='{}'", type);
+        prefix = null;
     }
     if (prefix != null) {
       Filtering filtering =
