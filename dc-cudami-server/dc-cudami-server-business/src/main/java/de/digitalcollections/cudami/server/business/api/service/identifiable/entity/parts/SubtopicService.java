@@ -22,19 +22,15 @@ public interface SubtopicService extends NodeService<Subtopic>, EntityPartServic
     if (subtopic == null) {
       return null;
     }
-    return deleteFromParentSubtopic(subtopic.getUuid(), parentSubtopicUuid);
+    return removeFromParentSubtopic(subtopic.getUuid(), parentSubtopicUuid);
   }
-
-  Integer deleteFromParentSubtopic(UUID subtopicUuid, UUID parentSubtopicUuid);
 
   default Integer deleteFromParentTopic(Subtopic subtopic, UUID topicUuid) {
     if (subtopic == null) {
       return null;
     }
-    return deleteFromParentTopic(subtopic.getUuid(), topicUuid);
+    return removeFromParentTopic(subtopic.getUuid(), topicUuid);
   }
-
-  Integer deleteFromParentTopic(UUID subtopicUuid, UUID topicUuid);
 
   default List<Entity> getEntities(Subtopic subtopic) {
     if (subtopic == null) {
@@ -73,6 +69,10 @@ public interface SubtopicService extends NodeService<Subtopic>, EntityPartServic
   List<Subtopic> getSubtopicsOfFileResource(UUID fileResourceUuid);
 
   Topic getTopic(UUID subtopicUuid);
+
+  Integer removeFromParentSubtopic(UUID subtopicUuid, UUID parentSubtopicUuid);
+
+  Integer removeFromParentTopic(UUID subtopicUuid, UUID topicUuid);
 
   default List<Entity> saveEntities(Subtopic subtopic, List<Entity> entities) {
     if (subtopic == null) {
