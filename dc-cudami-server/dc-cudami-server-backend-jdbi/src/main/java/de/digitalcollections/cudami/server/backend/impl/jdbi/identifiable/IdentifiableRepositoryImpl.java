@@ -328,20 +328,20 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             + tableAlias
             + " LEFT JOIN LATERAL jsonb_object_keys("
             + tableAlias
-            + ".label) l(keys) ON "
+            + ".label) lbl(keys) ON "
             + tableAlias
             + ".label IS NOT NULL"
             + " LEFT JOIN LATERAL jsonb_object_keys("
             + tableAlias
-            + ".description) d(keys) ON "
+            + ".description) dsc(keys) ON "
             + tableAlias
             + ".description IS NOT NULL"
             + " WHERE ("
             + tableAlias
-            + ".label->>l.keys ILIKE '%' || :searchTerm || '%'"
+            + ".label->>lbl.keys ILIKE '%' || :searchTerm || '%'"
             + " OR "
             + tableAlias
-            + ".description->>d.keys ILIKE '%' || :searchTerm || '%')";
+            + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')";
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchPageRequest.getQuery()));
   }
 
