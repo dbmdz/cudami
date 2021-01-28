@@ -36,15 +36,16 @@ public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateB
         + tableAlias
         + ".text "
         + mappingPrefix
-        + "_text, "
+        + "_text";
+  }
+
+  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
         + tableAlias
         + ".homepage_url "
         + mappingPrefix
         + "_homepageUrl";
-  }
-
-  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
   public static String getSqlUpdateFieldValues() {
