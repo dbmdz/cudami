@@ -73,13 +73,12 @@ public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateB
     if (modelProperty == null) {
       return null;
     }
+    if (super.getColumnName(modelProperty) != null) {
+      return super.getColumnName(modelProperty);
+    }
     switch (modelProperty) {
-      case "created":
-        return tableAlias + ".created";
-      case "lastModified":
-        return tableAlias + ".last_modified";
-      case "refId":
-        return tableAlias + ".refid";
+      case "homepageUrl":
+        return tableAlias + ".homepage_url";
       default:
         return null;
     }
