@@ -5,6 +5,9 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.model.api.identifiable.IdentifierType;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.Sorting;
+import de.digitalcollections.model.api.paging.enums.Direction;
+import de.digitalcollections.model.impl.paging.SortingImpl;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -36,6 +39,7 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
 
   @Override
   public PageResponse<IdentifierType> find(PageRequest pageRequest) {
+    setDefaultSorting(pageRequest);
     return repository.find(pageRequest);
   }
 
@@ -52,6 +56,15 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
   @Override
   public IdentifierType save(IdentifierType identifierType) {
     return repository.save(identifierType);
+  }
+
+  private void setDefaultSorting(PageRequest pageRequest) {
+    if (pageRequest.getSorting() == null
+        || pageRequest.getSorting().getOrders() == null
+        || pageRequest.getSorting().getOrders().isEmpty()) {
+      Sorting sorting = new SortingImpl(Direction.ASC, "namespace");
+      pageRequest.setSorting(sorting);
+    }
   }
 
   @Override

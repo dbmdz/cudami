@@ -4,8 +4,11 @@ import de.digitalcollections.cudami.server.backend.api.repository.security.UserR
 import de.digitalcollections.cudami.server.business.api.service.security.UserService;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.Sorting;
+import de.digitalcollections.model.api.paging.enums.Direction;
 import de.digitalcollections.model.api.security.User;
 import de.digitalcollections.model.api.security.enums.Role;
+import de.digitalcollections.model.impl.paging.SortingImpl;
 import de.digitalcollections.model.impl.security.UserImpl;
 import java.util.List;
 import java.util.UUID;
@@ -38,6 +41,7 @@ public class UserServiceImpl implements UserService<User> {
 
   @Override
   public PageResponse<User> find(PageRequest pageRequest) {
+    setDefaultSorting(pageRequest);
     return userRepository.find(pageRequest);
   }
 
@@ -108,5 +112,14 @@ public class UserServiceImpl implements UserService<User> {
   //  @Transactional(readOnly = true)
   public List<User> findActiveAdminUsers() {
     return userRepository.findActiveAdminUsers();
+  }
+
+  private void setDefaultSorting(PageRequest pageRequest) {
+    if (pageRequest.getSorting() == null
+        || pageRequest.getSorting().getOrders() == null
+        || pageRequest.getSorting().getOrders().isEmpty()) {
+      Sorting sorting = new SortingImpl(Direction.ASC, "email");
+      pageRequest.setSorting(sorting);
+    }
   }
 }

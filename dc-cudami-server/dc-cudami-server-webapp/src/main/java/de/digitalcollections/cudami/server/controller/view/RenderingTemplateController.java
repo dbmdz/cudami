@@ -38,7 +38,7 @@ public class RenderingTemplateController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, null);
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting =
           new SortingImpl(sortBy.stream().filter(Objects::nonNull).collect(Collectors.toList()));

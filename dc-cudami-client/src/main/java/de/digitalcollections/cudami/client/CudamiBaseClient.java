@@ -7,7 +7,6 @@ import de.digitalcollections.cudami.client.exceptions.CudamiRestErrorDecoder;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.filter.FilterCriterion;
 import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.paging.FindParams;
 import de.digitalcollections.model.api.paging.Order;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -16,7 +15,6 @@ import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.paging.enums.Direction;
 import de.digitalcollections.model.api.paging.enums.NullHandling;
-import de.digitalcollections.model.impl.paging.FindParamsImpl;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
@@ -27,7 +25,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -312,7 +309,6 @@ public class CudamiBaseClient<T extends Object> {
 
   protected PageResponse doGetRequestForPagedObjectList(
       String requestUrl, PageRequest pageRequest, Class<?> targetType) throws HttpException {
-    FindParams findParams = getFindParams(pageRequest);
     if (!requestUrl.contains("?")) {
       requestUrl = requestUrl + "?";
     } else {
@@ -320,15 +316,8 @@ public class CudamiBaseClient<T extends Object> {
         requestUrl = requestUrl + "&";
       }
     }
-    requestUrl =
-        requestUrl
-            + String.format(
-                "pageNumber=%d&pageSize=%d&sortField=%s&sortDirection=%s&nullHandling=%s",
-                findParams.getPageNumber(),
-                findParams.getPageSize(),
-                findParams.getSortField(),
-                findParams.getSortDirection(),
-                findParams.getNullHandling());
+    String findParams = getFindParamsAsString(pageRequest);
+    requestUrl = requestUrl + findParams;
     HttpRequest req = createGetRequest(requestUrl);
     try {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
@@ -618,32 +607,6 @@ public class CudamiBaseClient<T extends Object> {
   }
 
   /**
-   * Wrapper for find params
-   *
-   * @param pageRequest source for find params
-   * @return wrapped find params
-   */
-  private FindParams getFindParams(PageRequest pageRequest) {
-    int pageNumber = pageRequest.getPageNumber();
-    int pageSize = pageRequest.getPageSize();
-
-    String sortField = "";
-    String sortDirection = "";
-    String nullHandling = "";
-    Sorting sorting = pageRequest.getSorting();
-    if (sorting != null) {
-      Iterator<Order> iterator = sorting.iterator();
-      if (iterator.hasNext()) {
-        Order order = iterator.next();
-        sortField = order.getProperty() == null ? "" : order.getProperty();
-        sortDirection = order.getDirection() == null ? "" : order.getDirection().name();
-        nullHandling = order.getNullHandling() == null ? "" : order.getNullHandling().name();
-      }
-    }
-    return new FindParamsImpl(pageNumber, pageSize, sortField, sortDirection, nullHandling);
-  }
-
-  /**
    * Converts the given pagerequest to a request string
    *
    * @param pageRequest source for find params
@@ -662,41 +625,32 @@ public class CudamiBaseClient<T extends Object> {
     if (orders == null || orders.isEmpty()) {
       return findParams.toString();
     }
-    if (orders.size() == 1) {
-      FindParams params = getFindParams(pageRequest);
-      String paramsString =
-          String.format(
-              "&sortField=%s&sortDirection=%s&nullHandling=%s",
-              params.getSortField(), params.getSortDirection(), params.getNullHandling());
-      findParams.append(paramsString);
-    } else {
-      String sortBy =
-          orders.stream()
-              .map(
-                  o -> {
-                    String property = o.getProperty();
-                    StringBuilder order = new StringBuilder(property);
-                    Optional<String> subProperty = o.getSubProperty();
-                    if (subProperty.isPresent()) {
-                      order.append("_").append(subProperty.get());
-                    }
-                    Direction direction = o.getDirection();
-                    if (direction != null && direction.isDescending()) {
-                      order.append(".desc");
-                    } else {
-                      order.append(".asc");
-                    }
-                    NullHandling nullHandling = o.getNullHandling();
-                    if (nullHandling == NullHandling.NULLS_FIRST) {
-                      order.append(".nullsfirst");
-                    } else if (nullHandling == NullHandling.NULLS_LAST) {
-                      order.append(".nullslast");
-                    }
-                    return order.toString();
-                  })
-              .collect(Collectors.joining(","));
-      findParams.append("&sortBy=").append(sortBy);
-    }
+    String sortBy =
+        orders.stream()
+            .map(
+                o -> {
+                  String property = o.getProperty();
+                  StringBuilder order = new StringBuilder(property);
+                  Optional<String> subProperty = o.getSubProperty();
+                  if (subProperty.isPresent()) {
+                    order.append("_").append(subProperty.get());
+                  }
+                  Direction direction = o.getDirection();
+                  if (direction != null && direction.isDescending()) {
+                    order.append(".desc");
+                  } else {
+                    order.append(".asc");
+                  }
+                  NullHandling nullHandling = o.getNullHandling();
+                  if (nullHandling == NullHandling.NULLS_FIRST) {
+                    order.append(".nullsfirst");
+                  } else if (nullHandling == NullHandling.NULLS_LAST) {
+                    order.append(".nullslast");
+                  }
+                  return order.toString();
+                })
+            .collect(Collectors.joining(","));
+    findParams.append("&sortBy=").append(sortBy);
     return findParams.toString();
   }
 

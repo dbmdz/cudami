@@ -8,21 +8,20 @@ import de.digitalcollections.model.api.identifiable.entity.Project;
 import de.digitalcollections.model.api.identifiable.entity.work.Item;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
+import de.digitalcollections.model.api.paging.Order;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.api.paging.enums.Direction;
-import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
-import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiPathParam;
@@ -79,16 +78,13 @@ public class DigitalObjectController {
   public PageResponse<DigitalObject> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "sortField", required = false) String sortField,
-      @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
-      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
-          NullHandling nullHandling) {
-    Sorting sorting = null;
-    if (sortField != null && sortDirection != null) {
-      OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
-      sorting = new SortingImpl(order);
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting =
+          new SortingImpl(sortBy.stream().filter(Objects::nonNull).collect(Collectors.toList()));
+      pageRequest.setSorting(sorting);
     }
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
     return service.find(pageRequest);
   }
 
@@ -144,18 +140,14 @@ public class DigitalObjectController {
   public SearchPageResponse<DigitalObject> findDigitalObjects(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortField", required = false) String sortField,
-      @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
-      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
-          NullHandling nullHandling,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    Sorting sorting = null;
-    if (sortField != null && sortDirection != null) {
-      OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
-      sorting = new SortingImpl(order);
+    SearchPageRequest pageRequest = new SearchPageRequestImpl(searchTerm, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting =
+          new SortingImpl(sortBy.stream().filter(Objects::nonNull).collect(Collectors.toList()));
+      pageRequest.setSorting(sorting);
     }
-    SearchPageRequest pageRequest =
-        new SearchPageRequestImpl(searchTerm, pageNumber, pageSize, sorting);
     return service.find(pageRequest);
   }
 

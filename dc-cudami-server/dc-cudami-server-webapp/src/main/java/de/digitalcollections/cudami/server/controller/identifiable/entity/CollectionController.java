@@ -14,12 +14,9 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.api.paging.enums.Direction;
-import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
 import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
-import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
@@ -182,22 +179,13 @@ public class CollectionController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "sortField", required = false) String sortField,
-      @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
-      @RequestParam(name = "nullHandling", required = false) NullHandling nullHandling,
       @RequestParam(name = "active", required = false) String active) {
-    Sorting sorting = null;
-    if (sortField != null && sortDirection != null) {
-      OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
-      sorting = new SortingImpl(order);
-    }
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
     if (sortBy != null) {
-      LOGGER.warn(
-          "Endpoint '/latest/collections' was called with the old AND the new sorting syntax (sortBy).");
-      sorting =
+      Sorting sorting =
           new SortingImpl(sortBy.stream().filter(Objects::nonNull).collect(Collectors.toList()));
+      pageRequest.setSorting(sorting);
     }
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
     if (active != null) {
       return collectionService.findActive(pageRequest);
     }
@@ -212,16 +200,13 @@ public class CollectionController {
   public PageResponse<Collection> findAllTop(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortField", required = false) String sortField,
-      @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
-      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
-          NullHandling nullHandling) {
-    Sorting sorting = null;
-    if (sortField != null && sortDirection != null) {
-      OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
-      sorting = new SortingImpl(order);
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting =
+          new SortingImpl(sortBy.stream().filter(Objects::nonNull).collect(Collectors.toList()));
+      pageRequest.setSorting(sorting);
     }
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
     return collectionService.getRootNodes(pageRequest);
   }
 
@@ -292,25 +277,14 @@ public class CollectionController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "sortField", required = false) String sortField,
-      @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
-      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
-          NullHandling nullHandling,
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "active", required = false) String active) {
-    Sorting sorting = null;
-    if (sortField != null && sortDirection != null) {
-      OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
-      sorting = new SortingImpl(order);
-    }
+    SearchPageRequest pageRequest = new SearchPageRequestImpl(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
-      LOGGER.warn(
-          "Endpoint '/latest/collections/search' was called with the old AND the new sorting syntax (sortBy).");
-      sorting =
+      Sorting sorting =
           new SortingImpl(sortBy.stream().filter(Objects::nonNull).collect(Collectors.toList()));
+      pageRequest.setSorting(sorting);
     }
-    SearchPageRequest pageRequest =
-        new SearchPageRequestImpl(searchTerm, pageNumber, pageSize, sorting);
     if (active != null) {
       return collectionService.findActive(pageRequest);
     }

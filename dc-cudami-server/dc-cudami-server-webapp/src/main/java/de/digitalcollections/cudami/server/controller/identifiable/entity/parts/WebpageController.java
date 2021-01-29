@@ -8,13 +8,11 @@ import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import de.digitalcollections.model.api.paging.Order;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.api.paging.enums.Direction;
-import de.digitalcollections.model.api.paging.enums.NullHandling;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
-import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
 import java.time.LocalDate;
@@ -22,6 +20,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiPathParam;
@@ -31,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -70,25 +68,23 @@ public class WebpageController {
   public PageResponse<Webpage> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "sortField", required = false) String sortField,
-      @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
-      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
-          NullHandling nullHandling,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "publicationStart", required = false)
           FilterCriterion<LocalDate> publicationStart,
       @RequestParam(name = "publicationEnd", required = false)
           FilterCriterion<LocalDate> publicationEnd) {
-    Sorting sorting = null;
-    if (sortField != null && sortDirection != null) {
-      OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
-      sorting = new SortingImpl(order);
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting =
+          new SortingImpl(sortBy.stream().filter(Objects::nonNull).collect(Collectors.toList()));
+      pageRequest.setSorting(sorting);
     }
     Filtering filtering =
         Filtering.defaultBuilder()
             .add("publicationStart", publicationStart)
             .add("publicationEnd", publicationEnd)
             .build();
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting, filtering);
+    pageRequest.setFiltering(filtering);
     return webpageService.find(pageRequest);
   }
 
@@ -194,19 +190,15 @@ public class WebpageController {
           UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "sortField", required = false) String sortField,
-      @RequestParam(name = "sortDirection", required = false, defaultValue = "DESC")
-          Direction sortDirection,
-      @RequestParam(name = "nullHandling", required = false, defaultValue = "NATIVE")
-          NullHandling nullHandling,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "active", required = false) String active)
       throws IdentifiableServiceException {
-    Sorting sorting = null;
-    if (StringUtils.hasText(sortField)) {
-      OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
-      sorting = new SortingImpl(order);
+    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting =
+          new SortingImpl(sortBy.stream().filter(Objects::nonNull).collect(Collectors.toList()));
+      pageRequest.setSorting(sorting);
     }
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
     if (active != null) {
       return webpageService.getActiveChildren(uuid, pageRequest);
     }
