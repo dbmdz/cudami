@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.WebpageRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
+import de.digitalcollections.model.api.filter.FilterValuePlaceholder;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.Node;
@@ -252,17 +253,17 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
 
   @Override
   public Webpage getParent(UUID uuid) {
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT * FROM "
-                + tableName
-                + " AS "
-                + tableAlias
-                + " INNER JOIN webpage_webpages ww ON "
-                + tableAlias
-                + ".uuid = ww.parent_webpage_uuid"
-                + " WHERE ww.child_webpage_uuid = :uuid");
-    Webpage result = retrieveOne(sqlSelectReducedFields, innerQuery, null, Map.of("uuid", uuid));
+    String sqlAdditionalJoins =
+        " INNER JOIN webpage_webpages ww ON " + tableAlias + ".uuid = ww.parent_webpage_uuid";
+
+    Filtering filtering =
+        Filtering.defaultBuilder()
+            .filter("ww.child_webpage_uuid")
+            .isEquals(new FilterValuePlaceholder(":uuid"))
+            .build();
+
+    Webpage result =
+        retrieveOne(sqlSelectReducedFields, sqlAdditionalJoins, filtering, Map.of("uuid", uuid));
 
     return result;
   }

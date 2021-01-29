@@ -6,6 +6,7 @@ import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
+import de.digitalcollections.model.api.filter.FilterValuePlaceholder;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.Identifier;
@@ -406,19 +407,17 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   @Override
   public I findOne(UUID uuid, Filtering filtering) {
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT * FROM "
-                + tableName
-                + " AS "
-                + tableAlias
-                + " WHERE "
-                + tableAlias
-                + ".uuid = :uuid");
-    addFiltering(filtering, innerQuery);
+    if (filtering == null) {
+      filtering = Filtering.defaultBuilder().build();
+    }
+    filtering.add(
+        Filtering.defaultBuilder()
+            .filter("uuid")
+            .isEquals(new FilterValuePlaceholder(":uuid"))
+            .build());
 
     I result =
-        retrieveOne(sqlSelectAllFields, innerQuery, sqlSelectAllFieldsJoins, Map.of("uuid", uuid));
+        retrieveOne(sqlSelectAllFields, sqlSelectAllFieldsJoins, filtering, Map.of("uuid", uuid));
 
     return result;
   }
@@ -432,22 +431,19 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     String namespace = identifier.getNamespace();
     String identifierId = identifier.getId();
 
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT * FROM "
-                + tableName
-                + " AS "
-                + tableAlias
-                + " LEFT JOIN identifiers AS id ON "
-                + tableAlias
-                + ".uuid = id.identifiable"
-                + " WHERE id.identifier = :id AND id.namespace = :namespace");
+    Filtering filtering =
+        Filtering.defaultBuilder()
+            .filter("id.identifier")
+            .isEquals(new FilterValuePlaceholder(":id"))
+            .filter("id.namespace")
+            .isEquals(new FilterValuePlaceholder(":namespace"))
+            .build();
 
     I result =
         retrieveOne(
             sqlSelectAllFields,
-            innerQuery,
             sqlSelectAllFieldsJoins,
+            filtering,
             Map.of("id", identifierId, "namespace", namespace));
 
     return result;
@@ -466,12 +462,16 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     switch (modelProperty) {
       case "created":
         return tableAlias + ".created";
+      case "description":
+        return tableAlias + ".description";
       case "label":
         return tableAlias + ".label";
       case "lastModified":
         return tableAlias + ".last_modified";
       case "type":
         return tableAlias + ".identifiable_type";
+      case "uuid":
+        return tableAlias + ".uuid";
       default:
         return null;
     }
@@ -570,33 +570,35 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   public I retrieveOne(
       String fieldsSql,
-      StringBuilder innerQuery,
       String sqlSelectAllFieldsJoins,
+      Filtering filtering,
       final Map<String, Object> argumentMappings) {
-    final String sql =
-        "SELECT"
-            + fieldsSql
-            + ","
-            + SQL_FULL_FIELDS_ID
-            + ","
-            + SQL_PREVIEW_IMAGE_FIELDS_PI
-            + " FROM "
-            + (innerQuery != null ? "(" + innerQuery + ")" : tableName)
-            + " AS "
-            + tableAlias
-            + (sqlSelectAllFieldsJoins != null ? sqlSelectAllFieldsJoins : "")
-            + " LEFT JOIN identifiers AS id ON "
-            + tableAlias
-            + ".uuid = id.identifiable"
-            + " LEFT JOIN fileresources_image AS file ON "
-            + tableAlias
-            + ".previewfileresource = file.uuid";
+    StringBuilder sql =
+        new StringBuilder(
+            "SELECT"
+                + fieldsSql
+                + ","
+                + SQL_FULL_FIELDS_ID
+                + ","
+                + SQL_PREVIEW_IMAGE_FIELDS_PI
+                + " FROM "
+                + tableName
+                + " AS "
+                + tableAlias
+                + (sqlSelectAllFieldsJoins != null ? sqlSelectAllFieldsJoins : "")
+                + " LEFT JOIN identifiers AS id ON "
+                + tableAlias
+                + ".uuid = id.identifiable"
+                + " LEFT JOIN fileresources_image AS file ON "
+                + tableAlias
+                + ".previewfileresource = file.uuid");
+    addFiltering(filtering, sql);
 
     I result =
         dbi
             .withHandle(
                 h ->
-                    h.createQuery(sql)
+                    h.createQuery(sql.toString())
                         .bindMap(argumentMappings)
                         .reduceRows(
                             new LinkedHashMap<UUID, I>(),

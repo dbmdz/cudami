@@ -5,6 +5,8 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work.ItemRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
+import de.digitalcollections.model.api.filter.FilterValuePlaceholder;
+import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.Project;
@@ -182,24 +184,20 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   @Override
   public Item getItem(UUID digitalObjectUuid) {
     final String itTableAlias = itemRepositoryImpl.getTableAlias();
-    final String itTableName = itemRepositoryImpl.getTableName();
+    String sqlAdditionalJoins =
+        " LEFT JOIN item_digitalobjects AS ido ON " + itTableAlias + ".uuid = ido.item_uuid";
 
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT * FROM "
-                + itTableName
-                + " AS "
-                + itTableAlias
-                + " LEFT JOIN item_digitalobjects AS ido ON "
-                + itTableAlias
-                + ".uuid = ido.item_uuid"
-                + " WHERE ido.digitalobject_uuid = :uuid");
+    Filtering filtering =
+        Filtering.defaultBuilder()
+            .filter("ido.digitalobject_uuid")
+            .isEquals(new FilterValuePlaceholder(":uuid"))
+            .build();
 
     Item result =
         itemRepositoryImpl.retrieveOne(
             itemRepositoryImpl.getSqlSelectReducedFields(),
-            innerQuery,
-            null,
+            sqlAdditionalJoins,
+            filtering,
             Map.of("uuid", digitalObjectUuid));
     return result;
   }

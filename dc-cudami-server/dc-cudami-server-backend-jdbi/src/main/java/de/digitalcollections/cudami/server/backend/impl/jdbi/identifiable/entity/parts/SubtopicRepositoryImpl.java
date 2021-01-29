@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
+import de.digitalcollections.model.api.filter.FilterValuePlaceholder;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.Node;
@@ -297,17 +298,17 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
 
   @Override
   public Subtopic getParent(UUID uuid) {
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT * FROM "
-                + tableName
-                + " AS "
-                + tableAlias
-                + " INNER JOIN subtopic_subtopics ss ON "
-                + tableAlias
-                + ".uuid = ss.parent_subtopic_uuid"
-                + " WHERE ss.child_subtopic_uuid = :uuid");
-    Subtopic result = retrieveOne(sqlSelectReducedFields, innerQuery, null, Map.of("uuid", uuid));
+    String sqlAdditionalJoins =
+        " INNER JOIN subtopic_subtopics ss ON " + tableAlias + ".uuid = ss.parent_subtopic_uuid";
+
+    Filtering filtering =
+        Filtering.defaultBuilder()
+            .filter("ss.child_subtopic_uuid")
+            .isEquals(new FilterValuePlaceholder(":uuid"))
+            .build();
+
+    Subtopic result =
+        retrieveOne(sqlSelectReducedFields, sqlAdditionalJoins, filtering, Map.of("uuid", uuid));
 
     return result;
   }
