@@ -29,47 +29,47 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
   private static final Logger LOGGER =
       LoggerFactory.getLogger(AbstractPagingAndSortingRepositoryImpl.class);
 
-  public void addFiltering(Filtering filtering, StringBuilder innerQuery) {
+  public void addFiltering(Filtering filtering, StringBuilder sqlQuery) {
     if (filtering != null) {
       // handle optional filtering params
       String filterClauses = getFilterClauses(filtering);
       if (!filterClauses.isEmpty()) {
-        String innerQueryStr = innerQuery.toString();
+        String innerQueryStr = sqlQuery.toString();
         if (innerQueryStr.toUpperCase().contains(" WHERE ")) {
-          innerQuery.append(" AND ");
+          sqlQuery.append(" AND ");
         } else {
-          innerQuery.append(" WHERE ");
+          sqlQuery.append(" WHERE ");
         }
-        innerQuery.append(filterClauses);
+        sqlQuery.append(filterClauses);
       }
     }
   }
 
-  public void addFiltering(PageRequest pageRequest, StringBuilder innerQuery) {
+  public void addFiltering(PageRequest pageRequest, StringBuilder sqlQuery) {
     if (pageRequest != null) {
-      addFiltering(pageRequest.getFiltering(), innerQuery);
+      addFiltering(pageRequest.getFiltering(), sqlQuery);
     }
   }
 
-  public void addLimit(PageRequest pageRequest, StringBuilder query) {
+  public void addLimit(PageRequest pageRequest, StringBuilder sqlQuery) {
     if (pageRequest != null) {
       int pageSize = pageRequest.getPageSize();
       if (pageSize > 0) {
-        query.append(" ").append("LIMIT").append(" ").append(pageSize);
+        sqlQuery.append(" ").append("LIMIT").append(" ").append(pageSize);
       }
     }
   }
 
-  public void addOffset(PageRequest pageRequest, StringBuilder query) {
+  public void addOffset(PageRequest pageRequest, StringBuilder sqlQuery) {
     if (pageRequest != null) {
       int offset = pageRequest.getOffset();
       if (offset >= 0) {
-        query.append(" ").append("OFFSET").append(" ").append(offset);
+        sqlQuery.append(" ").append("OFFSET").append(" ").append(offset);
       }
     }
   }
 
-  public void addOrderBy(PageRequest pageRequest, StringBuilder query) {
+  public void addOrderBy(PageRequest pageRequest, StringBuilder sqlQuery) {
     if (pageRequest != null) {
       List<String> allowedOrderByFields = getAllowedOrderByFields();
 
@@ -112,17 +112,17 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
                 .collect(Collectors.joining(","));
 
         if (StringUtils.hasText(orderBy)) {
-          query.append(" ORDER BY ").append(orderBy);
+          sqlQuery.append(" ORDER BY ").append(orderBy);
         }
       }
     }
   }
 
-  protected void addPageRequestParams(PageRequest pageRequest, StringBuilder query) {
+  protected void addPageRequestParams(PageRequest pageRequest, StringBuilder sqlQuery) {
     if (pageRequest != null) {
-      addOrderBy(pageRequest, query);
-      addLimit(pageRequest, query);
-      addOffset(pageRequest, query);
+      addOrderBy(pageRequest, sqlQuery);
+      addLimit(pageRequest, sqlQuery);
+      addOffset(pageRequest, sqlQuery);
     }
   }
 
@@ -170,6 +170,17 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
     if (fc != null) {
       FilterOperation filterOperation = fc.getOperation();
       // @see https://www.postgresql.org/docs/11/functions.html
+      final String fieldName = fc.getFieldName();
+      final String columnName = getColumnName(fieldName);
+      final String leftSide = (columnName != null) ? columnName : fieldName;
+      // FIXME using plain fieldName could be dangerous (sql injection) (was introduced because of
+      // join operations: "id.identifier" = ":id". maybe adding "id" prefix and plain columnname and
+      // repo to get columname from would help...?
+      if (leftSide.contains(" ") || leftSide.contains(";")) {
+        throw new IllegalArgumentException(
+            String.format("leftSide '%s' seems to contain malicious code!", leftSide));
+      }
+
       switch (filterOperation) {
         case BETWEEN:
           if (fc.getMinValue() == null || fc.getMaxValue() == null) {
@@ -178,7 +189,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
             // example: BETWEEN '2015-01-01' AND '2015-12-31'
             query
                 .append("(")
-                .append(getColumnName(fc.getFieldName()))
+                .append(leftSide)
                 .append(" BETWEEN ")
                 .append(convertToSqlString(fc.getMinValue()))
                 .append(" AND ")
@@ -189,7 +200,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
         case IN:
         case NOT_IN:
           // For 'in' or 'nin' operation
-          query.append("(").append(getColumnName(fc.getFieldName()));
+          query.append("(").append(leftSide);
           if (filterOperation == FilterOperation.NOT_IN) {
             query.append(" NOT");
           }
@@ -204,7 +215,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
           // @see https://www.postgresql.org/docs/11/functions-matching.html
           query
               .append("(")
-              .append(getColumnName(fc.getFieldName()))
+              .append(leftSide)
               .append(" ILIKE '%")
               .append(convertToSqlString(fc.getValue()))
               .append("%')");
@@ -213,7 +224,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
           // @see https://www.postgresql.org/docs/11/functions-matching.html
           query
               .append("(")
-              .append(getColumnName(fc.getFieldName()))
+              .append(leftSide)
               .append(" ILIKE ")
               .append(convertToSqlString(fc.getValue()))
               .append(" || '%')");
@@ -222,7 +233,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(getColumnName(fc.getFieldName()))
+              .append(leftSide)
               .append(" = ")
               .append(convertToSqlString(fc.getValue()))
               .append(")");
@@ -231,7 +242,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(getColumnName(fc.getFieldName()))
+              .append(leftSide)
               .append(" != ")
               .append(convertToSqlString(fc.getValue()))
               .append(")");
@@ -240,7 +251,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(getColumnName(fc.getFieldName()))
+              .append(leftSide)
               .append(" > ")
               .append(convertToSqlString(fc.getValue()))
               .append(")");
@@ -249,11 +260,11 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(getColumnName(fc.getFieldName()))
+              .append(leftSide)
               .append(" > ")
               .append(convertToSqlString(fc.getValue()))
               .append(" OR ")
-              .append(getColumnName(fc.getFieldName()))
+              .append(leftSide)
               .append(" IS NULL")
               .append(")");
           break;
@@ -261,7 +272,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(getColumnName(fc.getFieldName()))
+              .append(leftSide)
               .append(" >= ")
               .append(convertToSqlString(fc.getValue()))
               .append(")");
@@ -270,7 +281,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(getColumnName(fc.getFieldName()))
+              .append(leftSide)
               .append(" < ")
               .append(convertToSqlString(fc.getValue()))
               .append(")");
@@ -279,11 +290,11 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(getColumnName(fc.getFieldName()))
+              .append(leftSide)
               .append(" < ")
               .append(convertToSqlString(fc.getValue()))
               .append(" AND ")
-              .append(getColumnName(fc.getFieldName()))
+              .append(leftSide)
               .append(" IS NOT NULL")
               .append(")");
           break;
@@ -291,7 +302,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(getColumnName(fc.getFieldName()))
+              .append(leftSide)
               .append(" <= ")
               .append(convertToSqlString(fc.getValue()))
               .append(")");
@@ -300,11 +311,11 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(getColumnName(fc.getFieldName()))
+              .append(leftSide)
               .append(" <= ")
               .append(convertToSqlString(fc.getValue()))
               .append(" AND ")
-              .append(getColumnName(fc.getFieldName()))
+              .append(leftSide)
               .append(" IS NOT NULL")
               .append(")");
           break;
@@ -312,25 +323,21 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(getColumnName(fc.getFieldName()))
+              .append(leftSide)
               .append(" <= ")
               .append(convertToSqlString(fc.getValue()))
               .append(" OR ")
-              .append(getColumnName(fc.getFieldName()))
+              .append(leftSide)
               .append(" IS NULL")
               .append(")");
           break;
         case SET:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
-          query
-              .append("(")
-              .append(getColumnName(fc.getFieldName()))
-              .append(" IS NOT NULL")
-              .append(")");
+          query.append("(").append(leftSide).append(" IS NOT NULL").append(")");
           break;
         case NOT_SET:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
-          query.append("(").append(getColumnName(fc.getFieldName())).append(" IS NULL").append(")");
+          query.append("(").append(leftSide).append(" IS NULL").append(")");
           break;
         default:
           throw new UnsupportedOperationException(filterOperation + " not supported yet");

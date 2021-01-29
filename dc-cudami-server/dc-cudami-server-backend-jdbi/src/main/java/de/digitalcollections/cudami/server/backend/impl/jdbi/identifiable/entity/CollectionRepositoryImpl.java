@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CollectionRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
 import de.digitalcollections.model.api.filter.FilterCriterion;
+import de.digitalcollections.model.api.filter.FilterValuePlaceholder;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.Node;
@@ -346,17 +347,19 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
   @Override
   public Collection getParent(UUID uuid) {
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT * FROM "
-                + tableName
-                + " AS "
-                + tableAlias
-                + " INNER JOIN collection_collections cc ON "
-                + tableAlias
-                + ".uuid = cc.parent_collection_uuid"
-                + " WHERE cc.child_collection_uuid = :uuid");
-    Collection result = retrieveOne(sqlSelectReducedFields, innerQuery, null, Map.of("uuid", uuid));
+    String sqlAdditionalJoins =
+        " INNER JOIN collection_collections cc ON "
+            + tableAlias
+            + ".uuid = cc.parent_collection_uuid";
+
+    Filtering filtering =
+        Filtering.defaultBuilder()
+            .filter("cc.child_collection_uuid")
+            .isEquals(new FilterValuePlaceholder(":uuid"))
+            .build();
+
+    Collection result =
+        retrieveOne(sqlSelectReducedFields, sqlAdditionalJoins, filtering, Map.of("uuid", uuid));
 
     return result;
   }

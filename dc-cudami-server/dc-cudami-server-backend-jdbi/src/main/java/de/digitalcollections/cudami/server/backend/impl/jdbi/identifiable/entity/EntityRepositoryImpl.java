@@ -4,6 +4,8 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
+import de.digitalcollections.model.api.filter.FilterValuePlaceholder;
+import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
@@ -197,19 +199,14 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public E findOneByRefId(long refId) {
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT * FROM "
-                + tableName
-                + " AS "
-                + tableAlias
-                + " WHERE "
-                + tableAlias
-                + ".refid = :refId");
+    Filtering filtering =
+        Filtering.defaultBuilder()
+            .filter("refid")
+            .isEquals(new FilterValuePlaceholder(":refId"))
+            .build();
 
     E result =
-        retrieveOne(
-            sqlSelectAllFields, innerQuery, sqlSelectAllFieldsJoins, Map.of("refId", refId));
+        retrieveOne(sqlSelectAllFields, sqlSelectAllFieldsJoins, filtering, Map.of("refId", refId));
     return result;
   }
 
