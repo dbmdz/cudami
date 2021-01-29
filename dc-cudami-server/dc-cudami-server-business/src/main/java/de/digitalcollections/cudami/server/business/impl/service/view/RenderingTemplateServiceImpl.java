@@ -4,6 +4,9 @@ import de.digitalcollections.cudami.server.backend.api.repository.view.Rendering
 import de.digitalcollections.cudami.server.business.api.service.view.RenderingTemplateService;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.Sorting;
+import de.digitalcollections.model.api.paging.enums.Direction;
+import de.digitalcollections.model.impl.paging.SortingImpl;
 import de.digitalcollections.model.impl.view.RenderingTemplate;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,7 @@ public class RenderingTemplateServiceImpl implements RenderingTemplateService {
 
   @Override
   public PageResponse<RenderingTemplate> find(PageRequest pageRequest) {
+    setDefaultSorting(pageRequest);
     return repository.find(pageRequest);
   }
 
@@ -29,6 +33,15 @@ public class RenderingTemplateServiceImpl implements RenderingTemplateService {
   @Override
   public RenderingTemplate save(RenderingTemplate template) {
     return repository.save(template);
+  }
+
+  private void setDefaultSorting(PageRequest pageRequest) {
+    if (pageRequest.getSorting() == null
+        || pageRequest.getSorting().getOrders() == null
+        || pageRequest.getSorting().getOrders().isEmpty()) {
+      Sorting sorting = new SortingImpl(Direction.ASC, "name");
+      pageRequest.setSorting(sorting);
+    }
   }
 
   @Override
