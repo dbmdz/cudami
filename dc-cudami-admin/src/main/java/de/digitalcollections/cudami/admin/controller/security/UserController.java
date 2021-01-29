@@ -132,8 +132,8 @@ public class UserController extends AbstractController {
   @PostMapping("/users/{uuid}/edit")
   public String edit(
       @PathVariable UUID uuid,
-      @RequestParam("pwd1") String password1,
-      @RequestParam("pwd2") String password2,
+      @RequestParam(name = "pwd1", required = false) String password1,
+      @RequestParam(name = "pwd2", required = false) String password2,
       @ModelAttribute(name = "user") @Valid UserImpl user,
       BindingResult results,
       Model model,
