@@ -173,9 +173,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
       final String fieldName = fc.getFieldName();
       final String columnName = getColumnName(fieldName);
       final String leftSide = (columnName != null) ? columnName : fieldName;
-      // FIXME using plain fieldName could be dangerous (sql injection) (was introduced because of
-      // join operations: "id.identifier" = ":id". maybe adding "id" prefix and plain columnname and
-      // repo to get columname from would help...?
+      // basic sql injection detection:
       if (leftSide.contains(" ") || leftSide.contains(";")) {
         throw new IllegalArgumentException(
             String.format("leftSide '%s' seems to contain malicious code!", leftSide));
