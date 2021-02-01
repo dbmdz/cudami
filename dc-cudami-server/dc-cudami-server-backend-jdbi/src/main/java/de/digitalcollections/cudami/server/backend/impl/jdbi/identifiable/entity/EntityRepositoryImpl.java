@@ -8,7 +8,13 @@ import de.digitalcollections.model.api.filter.FilterValuePlaceholder;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import de.digitalcollections.model.api.paging.Order;
+import de.digitalcollections.model.api.paging.PageRequest;
+import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
+import de.digitalcollections.model.impl.paging.PageRequestImpl;
+import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -209,6 +215,16 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         retrieveOne(sqlSelectAllFields, sqlSelectAllFieldsJoins, filtering, Map.of("refId", refId));
     return result;
   }
+  
+  @Override
+  public PageResponse<E> findRandom(int count) {
+    // Warning: could be very slow if random is used on tables with many million records
+    // see https://www.gab.lc/articles/bigdata_postgresql_order_by_random/
+    StringBuilder innerQuery = new StringBuilder("SELECT * FROM " + tableName + " ORDER BY RANDOM() LIMIT " + count);
+    List<E> randomList = retrieveList(sqlSelectReducedFields, innerQuery, null);
+    PageRequest pageRequest = new PageRequestImpl(0, count);
+    return new PageResponseImpl<>(randomList, pageRequest, count);
+  }
 
   @Override
   protected List<String> getAllowedOrderByFields() {
@@ -234,6 +250,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         return null;
     }
   }
+
 
   @Override
   public List<FileResource> getRelatedFileResources(UUID entityUuid) {

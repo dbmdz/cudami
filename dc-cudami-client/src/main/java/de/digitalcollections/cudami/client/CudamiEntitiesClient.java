@@ -12,6 +12,7 @@ import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
 import de.digitalcollections.model.impl.identifiable.entity.relation.EntityRelationImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
+import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
 import java.net.http.HttpClient;
 import java.util.List;
@@ -22,14 +23,6 @@ public class CudamiEntitiesClient extends CudamiBaseClient<EntityImpl> {
 
   public CudamiEntitiesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
     super(http, serverUrl, EntityImpl.class, mapper);
-  }
-
-  public Entity create() {
-    return new EntityImpl();
-  }
-
-  public long count() throws HttpException {
-    return Long.parseLong(doGetRequestForString("/latest/entities/count"));
   }
 
   public void addRelatedFileresource(UUID uuid, UUID fileResourceUuid) throws HttpException {
@@ -44,6 +37,14 @@ public class CudamiEntitiesClient extends CudamiBaseClient<EntityImpl> {
         String.format(
             "/latest/entities/relations/%s/%s/%s", subjectEntityUuid, predicate, objectEntityUuid),
         (EntityImpl) null);
+  }
+  
+  public long count() throws HttpException {
+    return Long.parseLong(doGetRequestForString("/latest/entities/count"));
+  }
+  
+  public Entity create() {
+    return new EntityImpl();
   }
 
   public PageResponse<EntityImpl> find(PageRequest pageRequest) throws HttpException {
@@ -83,6 +84,11 @@ public class CudamiEntitiesClient extends CudamiBaseClient<EntityImpl> {
     return doGetRequestForObject(String.format("/latest/entities/%d", refId));
   }
 
+  public PageResponse<EntityImpl> findRandomEntities(int count) throws HttpException {
+    PageRequest pageRequest = new PageRequestImpl(0, count, null);
+    return doGetRequestForPagedObjectList("/latest/entities/random", pageRequest);
+  }
+  
   public List getRelatedFileResources(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
         String.format("/latest/entities/%s/related/fileresources", uuid), FileResourceImpl.class);
