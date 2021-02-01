@@ -45,7 +45,6 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
 
   @Override
   public PageResponse<Collection> findActive(PageRequest pageRequest) {
-    setDefaultSorting(pageRequest);
     Filtering filtering = filteringForActive();
     pageRequest.add(filtering);
     return find(pageRequest);
