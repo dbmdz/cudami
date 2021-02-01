@@ -115,9 +115,7 @@ public class UserServiceImpl implements UserService<User> {
   }
 
   private void setDefaultSorting(PageRequest pageRequest) {
-    if (pageRequest.getSorting() == null
-        || pageRequest.getSorting().getOrders() == null
-        || pageRequest.getSorting().getOrders().isEmpty()) {
+    if (!pageRequest.hasSorting()) {
       Sorting sorting = new SortingImpl(Direction.ASC, "email");
       pageRequest.setSorting(sorting);
     }
