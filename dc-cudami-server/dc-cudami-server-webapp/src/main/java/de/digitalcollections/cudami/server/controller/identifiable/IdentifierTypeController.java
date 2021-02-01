@@ -11,7 +11,6 @@ import de.digitalcollections.model.impl.paging.SortingImpl;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
@@ -43,8 +42,7 @@ public class IdentifierTypeController {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting =
-          new SortingImpl(sortBy.stream().filter(Objects::nonNull).collect(Collectors.toList()));
+      Sorting sorting = new SortingImpl(sortBy);
       pageRequest.setSorting(sorting);
     }
     return service.find(pageRequest);
