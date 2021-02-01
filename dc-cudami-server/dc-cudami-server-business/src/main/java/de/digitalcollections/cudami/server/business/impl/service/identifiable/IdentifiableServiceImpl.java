@@ -152,9 +152,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   protected void setDefaultSorting(PageRequest pageRequest) {
     // business logic: default sorting if no other sorting given: german label ascending
     // TODO or make dependend from language the user has chosen...?
-    if (pageRequest.getSorting() == null
-        || pageRequest.getSorting().getOrders() == null
-        || pageRequest.getSorting().getOrders().isEmpty()) {
+    if (!pageRequest.hasSorting()) {
       // TODO: discuss default sorting (what if only english label exists? or german and english?)
       String defaultLanguage = localeService.getDefaultLanguage();
       final OrderImpl labelOrder1 = new OrderImpl(Direction.ASC, "label");
