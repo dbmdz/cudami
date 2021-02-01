@@ -11,7 +11,6 @@ import de.digitalcollections.model.impl.view.RenderingTemplate;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,8 +39,7 @@ public class RenderingTemplateController {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting =
-          new SortingImpl(sortBy.stream().filter(Objects::nonNull).collect(Collectors.toList()));
+      Sorting sorting = new SortingImpl(sortBy);
       pageRequest.setSorting(sorting);
     }
     return service.find(pageRequest);
