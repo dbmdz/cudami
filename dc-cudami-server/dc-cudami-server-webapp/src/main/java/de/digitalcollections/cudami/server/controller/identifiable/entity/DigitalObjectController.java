@@ -157,6 +157,16 @@ public class DigitalObjectController {
     return service.getItem(uuid);
   }
 
+  @ApiMethod(description = "Find limited amount of random digital objects")
+  @GetMapping(
+      value = {"/latest/digitalobjects/random", "/v2/digitalobjects/random"},
+      produces = "application/json")
+  @ApiResponseObject
+  public PageResponse<DigitalObject> findRandomDigitalObjects(
+      @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
+    return service.getRandom(count);
+  }
+
   @ApiMethod(description = "Get (active) paged collections of a digital objects")
   @GetMapping(
       value = {
