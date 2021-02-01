@@ -38,11 +38,11 @@ public class CudamiEntitiesClient extends CudamiBaseClient<EntityImpl> {
             "/latest/entities/relations/%s/%s/%s", subjectEntityUuid, predicate, objectEntityUuid),
         (EntityImpl) null);
   }
-  
+
   public long count() throws HttpException {
     return Long.parseLong(doGetRequestForString("/latest/entities/count"));
   }
-  
+
   public Entity create() {
     return new EntityImpl();
   }
@@ -88,7 +88,7 @@ public class CudamiEntitiesClient extends CudamiBaseClient<EntityImpl> {
     PageRequest pageRequest = new PageRequestImpl(0, count, null);
     return doGetRequestForPagedObjectList("/latest/entities/random", pageRequest);
   }
-  
+
   public List getRelatedFileResources(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
         String.format("/latest/entities/%s/related/fileresources", uuid), FileResourceImpl.class);
