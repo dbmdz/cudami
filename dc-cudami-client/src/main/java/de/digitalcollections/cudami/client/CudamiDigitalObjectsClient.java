@@ -104,9 +104,9 @@ public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObjectIm
         ImageFileResourceImpl.class);
   }
 
-  
   public Item getItem(UUID uuid) throws HttpException {
-    return (Item) doGetRequestForObject(
+    return (Item)
+        doGetRequestForObject(
             String.format("/latest/digitalobjects/%s/item", uuid), ItemImpl.class);
   }
 
