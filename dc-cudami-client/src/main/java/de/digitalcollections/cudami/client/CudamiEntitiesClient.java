@@ -38,11 +38,11 @@ public class CudamiEntitiesClient extends CudamiBaseClient<EntityImpl> {
             "/latest/entities/relations/%s/%s/%s", subjectEntityUuid, predicate, objectEntityUuid),
         (EntityImpl) null);
   }
-  
+
   public long count() throws HttpException {
     return Long.parseLong(doGetRequestForString("/latest/entities/count"));
   }
-  
+
   public Entity create() {
     return new EntityImpl();
   }
