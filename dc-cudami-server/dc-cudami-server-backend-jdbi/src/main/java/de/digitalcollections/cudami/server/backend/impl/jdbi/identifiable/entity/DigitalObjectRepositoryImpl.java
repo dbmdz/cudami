@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work.ItemRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
+import de.digitalcollections.model.api.filter.FilterCriterion;
 import de.digitalcollections.model.api.filter.FilterValuePlaceholder;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
@@ -21,6 +22,7 @@ import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
@@ -65,7 +67,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   @Lazy @Autowired private CollectionRepositoryImpl collectionRepositoryImpl;
 
-  @Lazy @Autowired private FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
+  @Lazy @Autowired
+  private FileResourceMetadataRepositoryImpl<FileResource> fileResourceMetadataRepositoryImpl;
 
   @Lazy @Autowired private ImageFileResourceRepositoryImpl imageFileResourceRepositoryImpl;
 
@@ -115,6 +118,21 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             + " WHERE cd.digitalobject_uuid = :uuid";
 
     StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
+
+    // as filtering has other target object type (collection) than this repository (digitalobject)
+    // we have to rename filter field names to target table alias and column names:
+    Filtering filtering = pageRequest.getFiltering();
+    if (filtering != null) {
+      List<FilterCriterion> filterCriteria =
+          filtering.getFilterCriteria().stream()
+              .map(
+                  fc -> {
+                    fc.setFieldName(collectionRepositoryImpl.getColumnName(fc.getFieldName()));
+                    return fc;
+                  })
+              .collect(Collectors.toList());
+      filtering.setFilterCriteria(filterCriteria);
+    }
     addFiltering(pageRequest, innerQuery);
     pageRequest.setSorting(null);
     innerQuery.append(" ORDER BY ").append(tableAliasCollection).append(".label ASC");
