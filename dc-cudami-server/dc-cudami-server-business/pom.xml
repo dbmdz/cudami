@@ -13,6 +13,10 @@
   <artifactId>dc-cudami-server-business</artifactId>
   <packaging>jar</packaging>
 
+  <properties>
+    <version.jscience>4.3.1</version.jscience>
+  </properties>
+  
   <dependencies>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
@@ -25,6 +29,11 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jscience</groupId>
+      <artifactId>jscience</artifactId>
+      <version>${version.jscience}</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
