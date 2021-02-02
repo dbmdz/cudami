@@ -2,9 +2,13 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.PersonRepository;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.agent.FamilyNameRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.agent.GivenNameRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work.WorkRepositoryImpl;
+import de.digitalcollections.model.api.identifiable.agent.FamilyName;
+import de.digitalcollections.model.api.identifiable.agent.GivenName;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.agent.Person;
 import de.digitalcollections.model.api.identifiable.entity.geo.GeoLocation;
@@ -13,6 +17,8 @@ import de.digitalcollections.model.api.identifiable.entity.work.Work;
 import de.digitalcollections.model.api.identifiable.parts.LocalizedText;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.impl.identifiable.agent.FamilyNameImpl;
+import de.digitalcollections.model.impl.identifiable.agent.GivenNameImpl;
 import de.digitalcollections.model.impl.identifiable.entity.agent.PersonImpl;
 import de.digitalcollections.model.impl.identifiable.entity.geo.GeoLocationImpl;
 import java.util.LinkedHashMap;
@@ -24,6 +30,7 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.RowView;
+import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +49,11 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
           + ".locationofbirth"
           + " LEFT JOIN geolocations AS gldeath ON gldeath.uuid = "
           + TABLE_ALIAS
-          + ".locationofdeath";
+          + ".locationofdeath"
+          + " LEFT JOIN person_familynames AS pf ON pf.person_uuid = p.uuid"
+          + " LEFT JOIN familynames AS fn ON fn.uuid = pf.familyname_uuid"
+          + " LEFT JOIN person_givennames AS pg ON pg.person_uuid = p.uuid"
+          + " LEFT JOIN givennames AS gn ON gn.uuid = pg.givenname_uuid";
   public static final String TABLE_NAME = "persons";
 
   private static BiFunction<LinkedHashMap<UUID, Person>, RowView, LinkedHashMap<UUID, Person>>
@@ -75,6 +86,20 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         person.setPlaceOfDeath(placeOfDeath);
       }
 
+      try {
+        if (rowView.getColumn(FamilyNameRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
+            != null) {
+          person.getFamilyNames().add(rowView.getRow(FamilyNameImpl.class));
+        }
+        if (rowView.getColumn(GivenNameRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
+            != null) {
+          person.getGivenNames().add(rowView.getRow(GivenNameImpl.class));
+        }
+      } catch (Exception e) {
+        // TODO to avoid this, some boolean params has to be given to function, if fields should
+        // exist.
+        LOGGER.debug("No family name or given name in rowview. Skipping.");
+      }
       return map;
     };
   }
@@ -91,10 +116,22 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
   }
 
   public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    final String familyNameMappingPrefix = FamilyNameRepositoryImpl.MAPPING_PREFIX;
+    final String givenNameMappingPrefix = GivenNameRepositoryImpl.MAPPING_PREFIX;
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + "glbirth.uuid glbirth_uuid, glbirth.label glbirth_label, glbirth.geolocation_type glbirth_geoLocationType, "
-        + "gldeath.uuid gldeath_uuid, gldeath.label gldeath_label, gldeath.geolocation_type gldeath_geoLocationType";
+        + "gldeath.uuid gldeath_uuid, gldeath.label gldeath_label, gldeath.geolocation_type gldeath_geoLocationType"
+        + " fn.uuid "
+        + familyNameMappingPrefix
+        + "_uuid, fn.label "
+        + familyNameMappingPrefix
+        + "_label,"
+        + " gn.uuid "
+        + givenNameMappingPrefix
+        + "_uuid, gn.label "
+        + givenNameMappingPrefix
+        + "_label,";
   }
 
   public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
@@ -128,6 +165,8 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
   }
 
   private final DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
+  private final FamilyNameRepositoryImpl familyNameRepositoryImpl;
+  private final GivenNameRepositoryImpl givenNameRepositoryImpl;
   private final WorkRepositoryImpl workRepositoryImpl;
 
   @Autowired
@@ -135,6 +174,8 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
       Jdbi dbi,
       IdentifierRepository identifierRepository,
       DigitalObjectRepositoryImpl digitalObjectRepositoryImpl,
+      FamilyNameRepositoryImpl familyNameRepositoryImpl,
+      GivenNameRepositoryImpl givenNameRepositoryImpl,
       WorkRepositoryImpl workRepositoryImpl) {
     super(
         dbi,
@@ -150,7 +191,13 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         getSqlUpdateFieldValues(),
         SQL_FULL_FIELDS_JOINS,
         createAdditionalReduceRowsBiFunction());
+    // TODO Shoud be registered in their repos. test it
+    //    dbi.registerRowMapper(BeanMapper.factory(FamilyNameImpl.class, "fn"));
+    //    dbi.registerRowMapper(BeanMapper.factory(GivenNameImpl.class, "gn"));
+
     this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
+    this.familyNameRepositoryImpl = familyNameRepositoryImpl;
+    this.givenNameRepositoryImpl = givenNameRepositoryImpl;
     this.workRepositoryImpl = workRepositoryImpl;
   }
 
@@ -253,53 +300,59 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
     super.save(person, bindings);
 
     // save given names
-    //    List<GivenName> givenNames = person.getGivenNames();
-    //    saveRelatedGivenNames(givenNames, person);
+    List<GivenName> givenNames = person.getGivenNames();
+    saveRelatedGivenNames(givenNames, person);
     // save family names
-    //    List<FamilyName> familyNames = person.getFamilyNames();
-    //    saveRelatedFamilyNames(familyNames, person);
+    List<FamilyName> familyNames = person.getFamilyNames();
+    saveRelatedFamilyNames(familyNames, person);
     Person result = findOne(person.getUuid());
     return result;
   }
 
-  //  private void saveRelatedFamilyNames(List<FamilyName> familyNames, Person person) {
-  //    // we assume that relations are new (existing ones were deleted before (e.g. see update))
-  //    if (familyNames != null) {
-  //      dbi.useHandle(handle -> {
-  //        PreparedBatch preparedBatch = handle.prepareBatch("INSERT INTO
-  // rel_person_familynames(person_uuid, familyname_uuid, sortIndex) VALUES(:uuid, :familynameUuid,
-  // :sortIndex)");
-  //        int i = 0;
-  //        for (FamilyName familyName : familyNames) {
-  //          preparedBatch.bind("uuid", person.getUuid())
-  //                  .bind("familynameUuid", familyName.getUuid())
-  //                  .bind("sortIndex", i)
-  //                  .add();
-  //          i++;
-  //        }
-  //        preparedBatch.execute();
-  //      });
-  //    }
-  //  }
-  //  private void saveRelatedGivenNames(List<GivenName> givenNames, Person person) {
-  //    // we assume that relations are new (existing ones were deleted before (e.g. see update))
-  //    if (givenNames != null) {
-  //      dbi.useHandle(handle -> {
-  //        PreparedBatch preparedBatch = handle.prepareBatch("INSERT INTO
-  // rel_person_givennames(person_uuid, givenname_uuid, sortIndex) VALUES(:uuid, :givennameUuid,
-  // :sortIndex)");
-  //        int i = 0;
-  //        for (GivenName givenName : givenNames) {
-  //          preparedBatch.bind("uuid", person.getUuid())
-  //                  .bind("givennameUuid", givenName.getUuid())
-  //                  .bind("sortIndex", i)
-  //                  .add();
-  //          i++;
-  //        }
-  //        preparedBatch.execute();
-  //      });
-  //    }
-  //  }
+  private void saveRelatedFamilyNames(List<FamilyName> familyNames, Person person) {
+    // we assume that relations are new (existing ones were deleted before (e.g. see update))
+    if (familyNames != null) {
+      dbi.useHandle(
+          handle -> {
+            PreparedBatch preparedBatch =
+                handle.prepareBatch(
+                    "INSERT INTO person_familynames(person_uuid, familyname_uuid, sortIndex) VALUES(:uuid, :familynameUuid, :sortIndex)");
+            int i = 0;
+            for (FamilyName familyName : familyNames) {
+              preparedBatch
+                  .bind("uuid", person.getUuid())
+                  .bind("familynameUuid", familyName.getUuid())
+                  .bind("sortIndex", i)
+                  .add();
+              i++;
+            }
+            preparedBatch.execute();
+          });
+    }
+  }
+
+  private void saveRelatedGivenNames(List<GivenName> givenNames, Person person) {
+    // we assume that relations are new (existing ones were deleted before (e.g. see update))
+    if (givenNames != null) {
+      dbi.useHandle(
+          handle -> {
+            PreparedBatch preparedBatch =
+                handle.prepareBatch(
+                    "INSERT INTO person_givennames(person_uuid, givenname_uuid, sortIndex) VALUES(:uuid, :givennameUuid, :sortIndex)");
+            int i = 0;
+            for (GivenName givenName : givenNames) {
+              preparedBatch
+                  .bind("uuid", person.getUuid())
+                  .bind("givennameUuid", givenName.getUuid())
+                  .bind("sortIndex", i)
+                  .add();
+              i++;
+            }
+            preparedBatch.execute();
+          });
+    }
+  }
+
   @Override
   public Person update(Person person) {
     final UUID locationOfBirthUuid =
@@ -311,17 +364,23 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
     super.update(person, bindings);
 
     // save given names
-    //    List<GivenName> givenNames = person.getGivenNames();
-    //    // as we store the whole list new: delete old entries
-    //    dbi.withHandle(h -> h.createUpdate("DELETE FROM rel_person_givennames WHERE person_uuid =
-    // :uuid").bind("uuid", person.getUuid()).execute());
-    //    saveRelatedGivenNames(givenNames, person);
+    List<GivenName> givenNames = person.getGivenNames();
+    // as we store the whole list new: delete old entries
+    dbi.withHandle(
+        h ->
+            h.createUpdate("DELETE FROM person_givennames WHERE person_uuid = :uuid")
+                .bind("uuid", person.getUuid())
+                .execute());
+    saveRelatedGivenNames(givenNames, person);
     // save family names
-    //    List<FamilyName> familyNames = person.getFamilyNames();
-    //    // as we store the whole list new: delete old entries
-    //    dbi.withHandle(h -> h.createUpdate("DELETE FROM rel_person_familynames WHERE person_uuid =
-    // :uuid").bind("uuid", person.getUuid()).execute());
-    //    saveRelatedFamilyNames(familyNames, person);
+    List<FamilyName> familyNames = person.getFamilyNames();
+    // as we store the whole list new: delete old entries
+    dbi.withHandle(
+        h ->
+            h.createUpdate("DELETE FROM person_familynames WHERE person_uuid = :uuid")
+                .bind("uuid", person.getUuid())
+                .execute());
+    saveRelatedFamilyNames(familyNames, person);
     Person result = findOne(person.getUuid());
     return result;
   }
