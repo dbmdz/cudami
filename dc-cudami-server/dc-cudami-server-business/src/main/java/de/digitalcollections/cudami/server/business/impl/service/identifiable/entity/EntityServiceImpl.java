@@ -98,12 +98,7 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
   public E save(E entity) throws IdentifiableServiceException {
     try {
       E entityDb = super.save(entity);
-      Optional<String> hook =
-          hookProperties.getHookForActionAndType("save", entityDb.getEntityType());
-      if (hook.isPresent()) {
-        URI url = buildNotificationUrl(hook.get(), entityDb.getUuid(), entityDb.getEntityType());
-        sendNotification("POST", url);
-      }
+      sendNotification("save", "POST", entityDb.getUuid(), entityDb.getEntityType());
       return entityDb;
     } catch (IdentifiableServiceException e) {
       LOGGER.error("Cannot save entity " + entity + ": ", e);
@@ -122,13 +117,15 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
     return ((EntityRepository<E>) repository).saveRelatedFileResources(entityUuid, fileResources);
   }
 
-  /**
-   * Send a notification to an external url when an entity has changed
-   *
-   * @param httpVerb the http verb to use for the request
-   * @param url the url to send the request to
-   */
-  protected void sendNotification(String httpVerb, URI url) {
+  /** Send a notification to an external url when an entity has changed */
+  protected void sendNotification(
+      String action, String httpVerb, UUID uuid, EntityType entityType) {
+    Optional<String> hook = hookProperties.getHookForActionAndType(action, entityType);
+    if (hook.isEmpty()) {
+      // if no suitable hook is found, do nothing
+      return;
+    }
+    URI url = buildNotificationUrl(hook.get(), uuid, entityType);
     if (url == null) {
       LOGGER.warn("No url given, ignoring.");
       return;
@@ -158,12 +155,7 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
   public E update(E entity) throws IdentifiableServiceException {
     try {
       E entityDb = super.update(entity);
-      Optional<String> hook =
-          hookProperties.getHookForActionAndType("update", entityDb.getEntityType());
-      if (hook.isPresent()) {
-        URI url = buildNotificationUrl(hook.get(), entityDb.getUuid(), entityDb.getEntityType());
-        sendNotification("PUT", url);
-      }
+      sendNotification("update", "PUT", entityDb.getUuid(), entityDb.getEntityType());
       return entityDb;
     } catch (IdentifiableServiceException e) {
       LOGGER.error("Cannot update identifiable " + entity + ": ", e);
