@@ -14,11 +14,19 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
-public abstract class EntityPartRepositoryImpl<P extends EntityPart>
-    extends IdentifiableRepositoryImpl<P> implements EntityPartRepository<P> {
+@Repository
+public class EntityPartRepositoryImpl<P extends EntityPart> extends IdentifiableRepositoryImpl<P>
+    implements EntityPartRepository<P> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(EntityPartRepositoryImpl.class);
+
+  @Autowired
+  private EntityPartRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
+    super(dbi, identifierRepository);
+  }
 
   protected EntityPartRepositoryImpl(
       Jdbi dbi,

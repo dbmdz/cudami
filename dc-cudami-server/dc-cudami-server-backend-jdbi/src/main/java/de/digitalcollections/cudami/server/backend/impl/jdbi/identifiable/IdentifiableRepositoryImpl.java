@@ -123,7 +123,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   private final String sqlUpdateFieldValues;
 
   @Autowired
-  private IdentifiableRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
+  protected IdentifiableRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     this(
         dbi,
         identifierRepository,
