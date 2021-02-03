@@ -121,17 +121,19 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + "glbirth.uuid glbirth_uuid, glbirth.label glbirth_label, glbirth.geolocation_type glbirth_geoLocationType, "
-        + "gldeath.uuid gldeath_uuid, gldeath.label gldeath_label, gldeath.geolocation_type gldeath_geoLocationType"
-        + " fn.uuid "
+        + "gldeath.uuid gldeath_uuid, gldeath.label gldeath_label, gldeath.geolocation_type gldeath_geoLocationType, "
+        + "fn.uuid "
         + familyNameMappingPrefix
-        + "_uuid, fn.label "
+        + "_uuid, "
+        + "fn.label "
         + familyNameMappingPrefix
-        + "_label,"
-        + " gn.uuid "
+        + "_label, "
+        + "gn.uuid "
         + givenNameMappingPrefix
-        + "_uuid, gn.label "
+        + "_uuid, "
+        + "gn.label "
         + givenNameMappingPrefix
-        + "_label,";
+        + "_label";
   }
 
   public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
