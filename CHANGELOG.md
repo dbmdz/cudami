@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.4.0](https://github.com/dbmdz/cudami/releases/tag/4.4.0) - 2021-02-08
+
+### Added
+
+- Added functionality to define external http hooks for save and update actions
+- Introduced random lists and person family- and givennames
+
+### Changed
+
+- Refactored the whole SQL backend
+- Fixed editing of other users
+- Refactored to new sorting param syntax 
+
 ## [4.3.0](https://github.com/dbmdz/cudami/releases/tag/4.3.0) - 2021-01-22
 
 ### Added
