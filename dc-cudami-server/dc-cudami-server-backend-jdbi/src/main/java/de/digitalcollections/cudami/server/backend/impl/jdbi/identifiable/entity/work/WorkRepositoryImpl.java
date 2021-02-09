@@ -127,7 +127,10 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
 
     List<Agent> result =
         agentRepositoryImpl.retrieveList(
-            agentRepositoryImpl.getSqlSelectReducedFields(), innerQuery, Map.of("uuid", workUuid));
+            agentRepositoryImpl.getSqlSelectReducedFields(),
+            innerQuery,
+            Map.of("uuid", workUuid),
+            null);
     return result;
   }
 
@@ -150,7 +153,10 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
 
     List<Item> result =
         itemRepositoryImpl.retrieveList(
-            itemRepositoryImpl.getSqlSelectReducedFields(), innerQuery, Map.of("uuid", workUuid));
+            itemRepositoryImpl.getSqlSelectReducedFields(),
+            innerQuery,
+            Map.of("uuid", workUuid),
+            null);
     return result;
   }
 

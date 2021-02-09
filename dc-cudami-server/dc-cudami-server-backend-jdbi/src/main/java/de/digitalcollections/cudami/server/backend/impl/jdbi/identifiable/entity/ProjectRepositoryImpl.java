@@ -137,7 +137,8 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
         digitalObjectRepositoryImpl.retrieveList(
             digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
-            Map.of("uuid", projectUuid));
+            Map.of("uuid", projectUuid),
+            null);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);

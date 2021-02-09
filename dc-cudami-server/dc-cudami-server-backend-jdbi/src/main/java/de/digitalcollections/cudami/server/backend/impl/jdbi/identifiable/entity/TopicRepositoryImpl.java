@@ -108,7 +108,10 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
     List<Subtopic> result =
         subtopicRepositoryImpl.retrieveList(
-            subtopicRepositoryImpl.getSqlSelectReducedFields(), innerQuery, Map.of("uuid", uuid));
+            subtopicRepositoryImpl.getSqlSelectReducedFields(),
+            innerQuery,
+            Map.of("uuid", uuid),
+            null);
     return result;
   }
 

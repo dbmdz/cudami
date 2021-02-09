@@ -164,7 +164,8 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
         digitalObjectRepositoryImpl.retrieveList(
             digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
-            Map.of("uuid", itemUuid));
+            Map.of("uuid", itemUuid),
+            null);
     return result.stream().collect(Collectors.toSet());
   }
 
@@ -214,7 +215,10 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
 
     List<Work> result =
         workRepositoryImpl.retrieveList(
-            workRepositoryImpl.getSqlSelectReducedFields(), innerQuery, Map.of("uuid", itemUuid));
+            workRepositoryImpl.getSqlSelectReducedFields(),
+            innerQuery,
+            Map.of("uuid", itemUuid),
+            null);
     return result.stream().collect(Collectors.toSet());
   }
 

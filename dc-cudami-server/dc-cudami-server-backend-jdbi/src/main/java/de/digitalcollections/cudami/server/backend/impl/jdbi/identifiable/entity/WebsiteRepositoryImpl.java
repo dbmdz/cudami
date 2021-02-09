@@ -155,7 +155,10 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
 
     List<Webpage> result =
         webpageRepositoryImpl.retrieveList(
-            webpageRepositoryImpl.getSqlSelectReducedFields(), innerQuery, Map.of("uuid", uuid));
+            webpageRepositoryImpl.getSqlSelectReducedFields(),
+            innerQuery,
+            Map.of("uuid", uuid),
+            null);
     return result;
   }
 
@@ -183,7 +186,10 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
 
     List<Webpage> result =
         webpageRepositoryImpl.retrieveList(
-            webpageRepositoryImpl.getSqlSelectReducedFields(), innerQuery, Map.of("uuid", uuid));
+            webpageRepositoryImpl.getSqlSelectReducedFields(),
+            innerQuery,
+            Map.of("uuid", uuid),
+            null);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);

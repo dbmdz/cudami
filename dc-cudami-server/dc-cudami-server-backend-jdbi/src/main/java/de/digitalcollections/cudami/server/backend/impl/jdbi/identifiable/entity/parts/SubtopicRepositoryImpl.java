@@ -208,7 +208,8 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
                 + " WHERE ss.parent_subtopic_uuid = :uuid"
                 + " ORDER BY ss.sortIndex ASC");
 
-    List<Subtopic> result = retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid));
+    List<Subtopic> result =
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), null);
     return result;
   }
 
@@ -231,7 +232,8 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
     }
     addPageRequestParams(pageRequest, innerQuery);
 
-    List<Subtopic> result = retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid));
+    List<Subtopic> result =
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), null);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -262,7 +264,8 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
             .retrieveList(
                 entityRepositoryImpl.getSqlSelectReducedFields(),
                 innerQuery,
-                Map.of("uuid", subtopicUuid))
+                Map.of("uuid", subtopicUuid),
+                null)
             .stream()
             .map(Entity.class::cast)
             .collect(Collectors.toList());
@@ -291,7 +294,8 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
         fileResourceMetadataRepositoryImpl.retrieveList(
             fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
-            Map.of("uuid", subtopicUuid));
+            Map.of("uuid", subtopicUuid),
+            null);
 
     return result;
   }
@@ -326,7 +330,8 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
                 + ".uuid = ss.parent_subtopic_uuid"
                 + " WHERE ss.child_subtopic_uuid = :uuid");
 
-    List<Subtopic> result = retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid));
+    List<Subtopic> result =
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), null);
     return result;
   }
 
@@ -375,7 +380,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
                 + " WHERE se.entity_uuid = :uuid");
 
     List<Subtopic> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", entityUuid));
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", entityUuid), null);
     return result;
   }
 
@@ -393,7 +398,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
                 + " WHERE sf.fileresource_uuid = :uuid");
 
     List<Subtopic> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", fileResourceUuid));
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", fileResourceUuid), null);
     return result;
   }
 

@@ -260,7 +260,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                 + " ORDER BY cc.sortIndex ASC");
 
     List<Collection> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid));
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), null);
     return result;
   }
 
@@ -283,7 +283,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     addPageRequestParams(pageRequest, innerQuery);
 
     List<Collection> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid));
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), null);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -336,7 +336,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
         digitalObjectRepositoryImpl.retrieveList(
             digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
-            Map.of("uuid", collectionUuid));
+            Map.of("uuid", collectionUuid),
+            null);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -378,7 +379,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                 + " WHERE cc.child_collection_uuid = :uuid");
 
     List<Collection> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid));
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), null);
     return result;
   }
 
@@ -414,7 +415,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
         corporateBodyRepositoryImpl.retrieveList(
             corporateBodyRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
-            Map.of("uuid", uuid));
+            Map.of("uuid", uuid),
+            null);
 
     return result;
   }

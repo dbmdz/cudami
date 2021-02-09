@@ -21,7 +21,6 @@ import de.digitalcollections.model.impl.identifiable.agent.FamilyNameImpl;
 import de.digitalcollections.model.impl.identifiable.agent.GivenNameImpl;
 import de.digitalcollections.model.impl.identifiable.entity.agent.PersonImpl;
 import de.digitalcollections.model.impl.identifiable.entity.geo.GeoLocationImpl;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,7 +55,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
           + " LEFT JOIN givennames AS gn ON gn.uuid = pg.givenname_uuid";
   public static final String TABLE_NAME = "persons";
 
-  private static BiFunction<LinkedHashMap<UUID, Person>, RowView, LinkedHashMap<UUID, Person>>
+  private static BiFunction<Map<UUID, Person>, RowView, Map<UUID, Person>>
       createAdditionalReduceRowsBiFunction() {
     return (map, rowView) -> {
       // entity should be already in map, as we here just add additional data
@@ -235,7 +234,8 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         digitalObjectRepositoryImpl.retrieveList(
             digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
-            Map.of("uuid", uuidPerson));
+            Map.of("uuid", uuidPerson),
+            null);
 
     return list.stream().collect(Collectors.toSet());
   }
@@ -286,7 +286,10 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
 
     List<Work> list =
         workRepositoryImpl.retrieveList(
-            workRepositoryImpl.getSqlSelectReducedFields(), innerQuery, Map.of("uuid", uuidPerson));
+            workRepositoryImpl.getSqlSelectReducedFields(),
+            innerQuery,
+            Map.of("uuid", uuidPerson),
+            null);
 
     return list.stream().collect(Collectors.toSet());
   }
