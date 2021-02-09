@@ -14,7 +14,6 @@ import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -167,8 +166,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       String sqlInsertValues,
       String sqlUpdateFieldValues,
       String sqlSelectAllFieldsJoins,
-      BiFunction<LinkedHashMap<UUID, E>, RowView, LinkedHashMap<UUID, E>>
-          additionalReduceRowsBiFunction) {
+      BiFunction<Map<UUID, E>, RowView, Map<UUID, E>> additionalReduceRowsBiFunction) {
     super(
         dbi,
         identifierRepository,
@@ -220,7 +218,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     // see https://www.gab.lc/articles/bigdata_postgresql_order_by_random/
     StringBuilder innerQuery =
         new StringBuilder("SELECT * FROM " + tableName + " ORDER BY RANDOM() LIMIT " + count);
-    List<E> randomList = retrieveList(sqlSelectReducedFields, innerQuery, null);
+    List<E> randomList = retrieveList(sqlSelectReducedFields, innerQuery, null, null);
     PageRequest pageRequest = new PageRequestImpl(0, count);
     return new PageResponseImpl<>(randomList, pageRequest, count);
   }
@@ -271,7 +269,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         fileResourceMetadataRepositoryImpl.retrieveList(
             fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
-            Map.of("entityUuid", entityUuid));
+            Map.of("entityUuid", entityUuid),
+            null);
 
     return result;
   }

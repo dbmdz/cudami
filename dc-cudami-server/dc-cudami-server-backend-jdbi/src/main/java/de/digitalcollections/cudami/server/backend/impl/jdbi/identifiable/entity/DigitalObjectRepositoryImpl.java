@@ -142,7 +142,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         collectionRepositoryImpl.retrieveList(
             collectionRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
-            Map.of("uuid", digitalObjectUuid));
+            Map.of("uuid", digitalObjectUuid),
+            null);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -170,7 +171,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     Map<String, Object> argumentMappings = Map.of("uuid", digitalObjectUuid);
 
     List<FileResource> fileResources =
-        fileResourceMetadataRepositoryImpl.retrieveList(fieldsSql, innerQuery, argumentMappings);
+        fileResourceMetadataRepositoryImpl.retrieveList(
+            fieldsSql, innerQuery, argumentMappings, null);
 
     return fileResources;
   }
@@ -194,7 +196,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     Map<String, Object> argumentMappings = Map.of("uuid", digitalObjectUuid);
 
     List<ImageFileResource> fileResources =
-        imageFileResourceRepositoryImpl.retrieveList(fieldsSql, innerQuery, argumentMappings);
+        imageFileResourceRepositoryImpl.retrieveList(fieldsSql, innerQuery, argumentMappings, null);
 
     return fileResources;
   }
@@ -245,7 +247,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         projectRepositoryImpl.retrieveList(
             projectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
-            Map.of("uuid", digitalObjectUuid));
+            Map.of("uuid", digitalObjectUuid),
+            null);
+    // TODO check if order by statement from above must be added to preceeding line (instead null)?
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);

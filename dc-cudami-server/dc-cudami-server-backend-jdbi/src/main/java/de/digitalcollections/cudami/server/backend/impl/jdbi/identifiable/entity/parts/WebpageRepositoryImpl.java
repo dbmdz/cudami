@@ -201,7 +201,8 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
                 + " WHERE ww.parent_webpage_uuid = :uuid"
                 + " ORDER BY ww.sortIndex ASC");
 
-    List<Webpage> result = retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid));
+    List<Webpage> result =
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), null);
     return result;
   }
 
@@ -224,7 +225,8 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
     }
     addPageRequestParams(pageRequest, innerQuery);
 
-    List<Webpage> result = retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid));
+    List<Webpage> result =
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), null);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -281,7 +283,8 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
                 + ".uuid = ww.parent_webpage_uuid"
                 + " WHERE ww.child_webpage_uuid = :uuid");
 
-    List<Webpage> result = retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid));
+    List<Webpage> result =
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), null);
     return result;
   }
 

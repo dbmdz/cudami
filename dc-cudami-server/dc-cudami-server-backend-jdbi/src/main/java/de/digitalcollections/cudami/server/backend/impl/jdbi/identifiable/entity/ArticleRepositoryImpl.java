@@ -21,12 +21,13 @@ import de.digitalcollections.model.impl.identifiable.entity.agent.CorporateBodyI
 import de.digitalcollections.model.impl.identifiable.entity.agent.FamilyImpl;
 import de.digitalcollections.model.impl.identifiable.entity.agent.PersonImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
+import org.jdbi.v3.core.result.RowView;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,17 +162,15 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
     List<Agent> result =
         dbi.withHandle(
             h ->
-                h
-                    .createQuery(sql)
+                h.createQuery(sql)
                     .bind("uuid", articleUuid)
                     .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
                     .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
                     .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
                     .reduceRows(
-                        new LinkedHashMap<UUID, EntityImpl>(),
-                        entityRepositoryImpl.basicReduceRowsBiFunction)
-                    .values()
-                    .stream()
+                        (Map<UUID, EntityImpl> map, RowView rowView) -> {
+                          entityRepositoryImpl.basicReduceRowsBiFunction.apply(map, rowView);
+                        })
                     .map(
                         (entity) -> {
                           // FIXME: use new agentrepositoryimpl (see workrepositoryimpl)

@@ -26,7 +26,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 @Repository
 public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepositoryImpl
@@ -104,15 +104,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   /* BiFunction for reducing rows (related objects) of joins not already part of identifiable (Identifier, preview image ImageFileResource). */
-  public BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>>
-      additionalReduceRowsBiFunction =
-          (map, rowView) -> {
-            return map;
-          };
-  public final BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>>
-      basicReduceRowsBiFunction;
-  public final BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>>
-      fullReduceRowsBiFunction;
+  public BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> additionalReduceRowsBiFunction =
+      (map, rowView) -> {
+        return map;
+      };
+  public final BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> basicReduceRowsBiFunction;
+  public final BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> fullReduceRowsBiFunction;
   protected final Class identifiableImplClass;
   protected final IdentifierRepository identifierRepository;
   private final String sqlInsertFields;
@@ -210,8 +207,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       String sqlInsertValues,
       String sqlUpdateFieldValues,
       String sqlSelectAllFieldsJoins,
-      BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>>
-          additionalReduceRowsBiFunction) {
+      BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> additionalReduceRowsBiFunction) {
     super(dbi, tableName, tableAlias, mappingPrefix);
 
     // register row mapper for given class and mapping prefix
@@ -245,8 +241,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     this.sqlUpdateFieldValues = sqlUpdateFieldValues;
   }
 
-  private BiFunction<LinkedHashMap<UUID, I>, RowView, LinkedHashMap<UUID, I>>
-      createReduceRowsBiFunction(boolean withIdentifiers, boolean withPreviewImage) {
+  private BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> createReduceRowsBiFunction(
+      boolean withIdentifiers, boolean withPreviewImage) {
     return (map, rowView) -> {
       I identifiable =
           map.computeIfAbsent(
@@ -311,7 +307,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
     addFiltering(pageRequest, innerQuery);
     addPageRequestParams(pageRequest, innerQuery);
-    List<I> result = retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings);
+
+    String orderBy = getOrderBy(pageRequest.getSorting());
+    if (StringUtils.hasText(orderBy)) {
+      orderBy = " ORDER BY " + orderBy;
+    }
+    List<I> result = retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, orderBy);
 
     StringBuilder sqlCount = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, sqlCount);
@@ -351,7 +352,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
     addFiltering(searchPageRequest, innerQuery);
     addPageRequestParams(searchPageRequest, innerQuery);
-    List<I> result = retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings);
+    String orderBy = getOrderBy(searchPageRequest.getSorting());
+    if (StringUtils.hasText(orderBy)) {
+      orderBy = " ORDER BY " + orderBy;
+    }
+    List<I> result = retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, orderBy);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(searchPageRequest, countQuery);
@@ -362,12 +367,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   @Override
   public List<I> findAllFull() {
-    return retrieveList(sqlSelectAllFields, null, null);
+    return retrieveList(sqlSelectAllFields, null, null, null);
   }
 
   @Override
   public List<I> findAllReduced() {
-    return retrieveList(sqlSelectReducedFields, null, null);
+    return retrieveList(sqlSelectReducedFields, null, null, null);
   }
 
   @Override
@@ -509,7 +514,10 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   public List<I> retrieveList(
-      String fieldsSql, StringBuilder innerQuery, final Map<String, Object> argumentMappings) {
+      String fieldsSql,
+      StringBuilder innerQuery,
+      final Map<String, Object> argumentMappings,
+      String orderBy) {
     final String sql =
         "SELECT "
             + fieldsSql
@@ -527,22 +535,19 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             + ".uuid = id.identifiable"
             + " LEFT JOIN fileresources_image AS file ON "
             + tableAlias
-            + ".previewfileresource = file.uuid";
+            + ".previewfileresource = file.uuid"
+            + (orderBy != null ? orderBy : "");
+
     List<I> result =
-        dbi
-            .withHandle(
-                h ->
-                    h.createQuery(sql)
-                        .bindMap(argumentMappings)
-                        .reduceRows(
-                            new LinkedHashMap<UUID, I>(),
-                            (map, rowView) -> {
-                              basicReduceRowsBiFunction.apply(map, rowView);
-                              return map;
-                            }))
-            .values()
-            .stream()
-            .collect(Collectors.toList());
+        dbi.withHandle(
+            h ->
+                h.createQuery(sql)
+                    .bindMap(argumentMappings)
+                    .reduceRows(
+                        (Map<UUID, I> map, RowView rowView) -> {
+                          basicReduceRowsBiFunction.apply(map, rowView);
+                        })
+                    .collect(Collectors.toList()));
     return result;
   }
 
@@ -595,20 +600,15 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     addFiltering(filtering, sql);
 
     I result =
-        dbi
-            .withHandle(
+        dbi.withHandle(
                 h ->
                     h.createQuery(sql.toString())
                         .bindMap(argumentMappings)
                         .reduceRows(
-                            new LinkedHashMap<UUID, I>(),
-                            (map, rowView) -> {
+                            (Map<UUID, I> map, RowView rowView) -> {
                               fullReduceRowsBiFunction.apply(map, rowView);
                               additionalReduceRowsBiFunction.apply(map, rowView);
-                              return map;
                             }))
-            .values()
-            .stream()
             .findFirst()
             .orElse(null);
     return result;

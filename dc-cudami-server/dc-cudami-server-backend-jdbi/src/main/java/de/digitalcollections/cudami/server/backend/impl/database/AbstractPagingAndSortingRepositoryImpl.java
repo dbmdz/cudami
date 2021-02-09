@@ -71,51 +71,54 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
 
   public void addOrderBy(PageRequest pageRequest, StringBuilder sqlQuery) {
     if (pageRequest != null) {
-      List<String> allowedOrderByFields = getAllowedOrderByFields();
-
       // Sorting
       Sorting sorting = pageRequest.getSorting();
-      if (sorting != null) {
-        String orderBy =
-            Optional.ofNullable(sorting.getOrders()).orElse(Collections.emptyList()).stream()
-                .filter(
-                    o -> {
-                      String sortField = o.getProperty();
-                      final boolean allowedSortField =
-                          sortField != null
-                              && allowedOrderByFields != null
-                              && allowedOrderByFields.contains(sortField);
-                      if (!allowedSortField) {
-                        LOGGER.warn("'" + sortField + "' not in allowed sort fields! Ignoring it.");
-                      }
-                      return allowedSortField;
-                    })
-                .map(
-                    o -> {
-                      String sortDirection = null;
-                      Direction direction = o.getDirection();
-                      if (direction != null && direction.isDescending()) {
-                        sortDirection = "DESC";
-                      } else {
-                        sortDirection = "ASC";
-                      }
-                      String sortField = o.getProperty();
-                      Optional<String> subSortField = o.getSubProperty();
-                      String fullQualifiedColumnName = getColumnName(sortField);
-                      if (subSortField.isEmpty()) {
-                        return String.format("%s %s", fullQualifiedColumnName, sortDirection);
-                      }
-                      return String.format(
-                          "%s->>'%s' %s",
-                          fullQualifiedColumnName, subSortField.get(), sortDirection);
-                    })
-                .collect(Collectors.joining(","));
-
-        if (StringUtils.hasText(orderBy)) {
-          sqlQuery.append(" ORDER BY ").append(orderBy);
-        }
+      String orderBy = getOrderBy(sorting);
+      if (StringUtils.hasText(orderBy)) {
+        sqlQuery.append(" ORDER BY ").append(orderBy);
       }
     }
+  }
+
+  public String getOrderBy(Sorting sorting) {
+    if (sorting == null) {
+      return null;
+    }
+    List<String> allowedOrderByFields = getAllowedOrderByFields();
+    String orderBy =
+        Optional.ofNullable(sorting.getOrders()).orElse(Collections.emptyList()).stream()
+            .filter(
+                o -> {
+                  String sortField = o.getProperty();
+                  final boolean allowedSortField =
+                      sortField != null
+                          && allowedOrderByFields != null
+                          && allowedOrderByFields.contains(sortField);
+                  if (!allowedSortField) {
+                    LOGGER.warn("'" + sortField + "' not in allowed sort fields! Ignoring it.");
+                  }
+                  return allowedSortField;
+                })
+            .map(
+                o -> {
+                  String sortDirection = null;
+                  Direction direction = o.getDirection();
+                  if (direction != null && direction.isDescending()) {
+                    sortDirection = "DESC";
+                  } else {
+                    sortDirection = "ASC";
+                  }
+                  String sortField = o.getProperty();
+                  Optional<String> subSortField = o.getSubProperty();
+                  String fullQualifiedColumnName = getColumnName(sortField);
+                  if (subSortField.isEmpty()) {
+                    return String.format("%s %s", fullQualifiedColumnName, sortDirection);
+                  }
+                  return String.format(
+                      "%s->>'%s' %s", fullQualifiedColumnName, subSortField.get(), sortDirection);
+                })
+            .collect(Collectors.joining(","));
+    return orderBy;
   }
 
   protected void addPageRequestParams(PageRequest pageRequest, StringBuilder sqlQuery) {
