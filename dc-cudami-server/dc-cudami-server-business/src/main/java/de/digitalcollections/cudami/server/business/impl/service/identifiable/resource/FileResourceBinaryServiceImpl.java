@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.resource;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceBinaryRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceBinaryService;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
@@ -11,7 +10,6 @@ import de.digitalcollections.model.api.identifiable.resource.exceptions.Resource
 import java.io.InputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -22,15 +20,14 @@ public class FileResourceBinaryServiceImpl implements FileResourceBinaryService 
   private static final Logger LOGGER = LoggerFactory.getLogger(FileResourceBinaryServiceImpl.class);
 
   private final FileResourceBinaryRepository binaryRepository;
-  private final FileResourceMetadataRepository<FileResource> metadataRepository;
+  private final FileResourceMetadataServiceImpl metadataService;
 
-  @Autowired
   public FileResourceBinaryServiceImpl(
-      @Qualifier("fileResourceMetadataRepositoryImpl")
-          FileResourceMetadataRepository metadataRepository,
-      FileResourceBinaryRepository binaryRepository) {
+      FileResourceBinaryRepository binaryRepository,
+      @Qualifier("fileResourceMetadataServiceImpl")
+          FileResourceMetadataServiceImpl metadataService) {
     this.binaryRepository = binaryRepository;
-    this.metadataRepository = metadataRepository;
+    this.metadataService = metadataService;
   }
 
   @Override
@@ -87,7 +84,7 @@ public class FileResourceBinaryServiceImpl implements FileResourceBinaryService 
       throws IdentifiableServiceException {
     try {
       fileResource = binaryRepository.save(fileResource, binaryData);
-      fileResource = metadataRepository.save(fileResource);
+      fileResource = metadataService.save(fileResource);
       return fileResource;
     } catch (ResourceIOException e) {
       LOGGER.error("Cannot save fileResource " + fileResource.getFilename() + ": ", e);
