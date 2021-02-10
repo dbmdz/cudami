@@ -311,7 +311,6 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
         VideoFileResource videoFileResource = (VideoFileResource) fileResource;
         setVideoProperties(videoFileResource);
       }
-
     } catch (IOException ex) {
       String msg = "Error writing binary data of fileresource " + fileResource.getUuid().toString();
       throw new ResourceIOException(msg, ex);
