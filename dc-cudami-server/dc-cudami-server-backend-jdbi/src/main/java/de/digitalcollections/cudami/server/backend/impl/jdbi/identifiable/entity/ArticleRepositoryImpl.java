@@ -1,8 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
-import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierRepositoryImpl.SQL_FULL_FIELDS_ID;
-import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl.SQL_PREVIEW_IMAGE_FIELDS_PI;
-
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ArticleRepository;
 import de.digitalcollections.model.api.filter.Filtering;
@@ -14,20 +11,16 @@ import de.digitalcollections.model.api.identifiable.entity.agent.Family;
 import de.digitalcollections.model.api.identifiable.entity.agent.Person;
 import de.digitalcollections.model.api.identifiable.entity.enums.EntityType;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.entity.ArticleImpl;
 import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
 import de.digitalcollections.model.impl.identifiable.entity.agent.CorporateBodyImpl;
 import de.digitalcollections.model.impl.identifiable.entity.agent.FamilyImpl;
 import de.digitalcollections.model.impl.identifiable.entity.agent.PersonImpl;
-import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.core.mapper.reflect.BeanMapper;
-import org.jdbi.v3.core.result.RowView;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,13 +76,12 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
         + ", date_published=:datePublished, text=:text::JSONB, timevalue_published=:timeValuePublished::JSONB";
   }
 
-  private final EntityRepositoryImpl<EntityImpl> entityRepositoryImpl;
+  @Autowired
+  @Qualifier("entityRepositoryImpl")
+  private EntityRepositoryImpl<EntityImpl> entityRepositoryImpl;
 
   @Autowired
-  public ArticleRepositoryImpl(
-      Jdbi dbi,
-      IdentifierRepository identifierRepository,
-      @Qualifier("entityRepositoryImpl") EntityRepositoryImpl<EntityImpl> entityRepositoryImpl) {
+  public ArticleRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     super(
         dbi,
         identifierRepository,
@@ -102,7 +94,6 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
         getSqlInsertFields(),
         getSqlInsertValues(),
         getSqlUpdateFieldValues());
-    this.entityRepositoryImpl = entityRepositoryImpl;
   }
 
   @Override
@@ -138,68 +129,55 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
 
   @Override
   public List<Agent> getCreators(UUID articleUuid) {
-    String innerQuery =
-        "SELECT * FROM "
-            + EntityRepositoryImpl.TABLE_NAME
-            + " AS e"
-            + " LEFT JOIN article_creators AS ac ON e.uuid = ac.agent_uuid"
-            + " WHERE ac.article_uuid = :uuid"
-            + " ORDER BY ac.sortindex ASC";
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + EntityRepositoryImpl.TABLE_NAME
+                + " AS e"
+                + " LEFT JOIN article_creators AS ac ON e.uuid = ac.agent_uuid"
+                + " WHERE ac.article_uuid = :uuid"
+                + " ORDER BY ac.sortindex ASC");
 
-    final String sql =
-        "SELECT"
-            + entityRepositoryImpl.getSqlSelectReducedFields()
-            + ","
-            + SQL_FULL_FIELDS_ID
-            + ","
-            + SQL_PREVIEW_IMAGE_FIELDS_PI
-            + " FROM ("
-            + innerQuery
-            + ") AS e"
-            + " LEFT JOIN identifiers AS id ON e.uuid = id.identifiable"
-            + " LEFT JOIN fileresources_image AS file ON e.previewfileresource = file.uuid";
+    final String fieldsSql = entityRepositoryImpl.getSqlSelectReducedFields();
 
-    List<Agent> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sql)
-                    .bind("uuid", articleUuid)
-                    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
-                    .registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"))
-                    .registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"))
-                    .reduceRows(
-                        (Map<UUID, EntityImpl> map, RowView rowView) -> {
-                          entityRepositoryImpl.basicReduceRowsBiFunction.apply(map, rowView);
-                        })
-                    .map(
-                        (entity) -> {
-                          // FIXME: use new agentrepositoryimpl (see workrepositoryimpl)
-                          EntityType entityType = entity.getEntityType();
-                          switch (entityType) {
-                            case CORPORATE_BODY:
-                              CorporateBody corporateBody = new CorporateBodyImpl();
-                              corporateBody.setLabel(entity.getLabel());
-                              corporateBody.setRefId(entity.getRefId());
-                              corporateBody.setUuid(entity.getUuid());
-                              return corporateBody;
-                            case FAMILY:
-                              Family family = new FamilyImpl();
-                              family.setLabel(entity.getLabel());
-                              family.setRefId(entity.getRefId());
-                              family.setUuid(entity.getUuid());
-                              return family;
-                            case PERSON:
-                              Person person = new PersonImpl();
-                              person.setLabel(entity.getLabel());
-                              person.setRefId(entity.getRefId());
-                              person.setUuid(entity.getUuid());
-                              return person;
-                            default:
-                              return null;
-                          }
-                        })
-                    .collect(Collectors.toList()));
-    return result;
+    List<EntityImpl> entityList =
+        entityRepositoryImpl.retrieveList(fieldsSql, innerQuery, Map.of("uuid", articleUuid), null);
+
+    List<Agent> agents = null;
+    if (entityList != null) {
+      agents =
+          entityList.stream()
+              .map(
+                  (entity) -> {
+                    // FIXME: use new agentrepositoryimpl (see workrepositoryimpl)
+                    EntityType entityType = entity.getEntityType();
+                    switch (entityType) {
+                      case CORPORATE_BODY:
+                        CorporateBody corporateBody = new CorporateBodyImpl();
+                        corporateBody.setLabel(entity.getLabel());
+                        corporateBody.setRefId(entity.getRefId());
+                        corporateBody.setUuid(entity.getUuid());
+                        return corporateBody;
+                      case FAMILY:
+                        Family family = new FamilyImpl();
+                        family.setLabel(entity.getLabel());
+                        family.setRefId(entity.getRefId());
+                        family.setUuid(entity.getUuid());
+                        return family;
+                      case PERSON:
+                        Person person = new PersonImpl();
+                        person.setLabel(entity.getLabel());
+                        person.setRefId(entity.getRefId());
+                        person.setUuid(entity.getUuid());
+                        return person;
+                      default:
+                        return null;
+                    }
+                  })
+              .collect(Collectors.toList());
+    }
+
+    return agents;
   }
 
   @Override
