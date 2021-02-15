@@ -473,6 +473,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         return tableAlias + ".label";
       case "lastModified":
         return tableAlias + ".last_modified";
+      case "previewImage":
+        return tableAlias + ".previewfileresource";
       case "type":
         return tableAlias + ".identifiable_type";
       case "uuid":
