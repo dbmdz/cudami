@@ -76,12 +76,13 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
         + ", date_published=:datePublished, text=:text::JSONB, timevalue_published=:timeValuePublished::JSONB";
   }
 
-  @Autowired
-  @Qualifier("entityRepositoryImpl")
-  private EntityRepositoryImpl<EntityImpl> entityRepositoryImpl;
+  private final EntityRepositoryImpl<EntityImpl> entityRepositoryImpl;
 
   @Autowired
-  public ArticleRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
+  public ArticleRepositoryImpl(
+      Jdbi dbi,
+      IdentifierRepository identifierRepository,
+      @Qualifier("entityRepositoryImpl") EntityRepositoryImpl<EntityImpl> entityRepositoryImpl) {
     super(
         dbi,
         identifierRepository,
@@ -94,6 +95,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
         getSqlInsertFields(),
         getSqlInsertValues(),
         getSqlUpdateFieldValues());
+    this.entityRepositoryImpl = entityRepositoryImpl;
   }
 
   @Override
