@@ -203,9 +203,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
             .isEquals(new FilterValuePlaceholder(":refId"))
             .build();
 
-    E result =
-        retrieveOne(sqlSelectAllFields, sqlSelectAllFieldsJoins, filtering, Map.of("refId", refId));
-    return result;
+    return retrieveOne(
+        sqlSelectAllFields, sqlSelectAllFieldsJoins, filtering, Map.of("refId", refId));
   }
 
   @Override
@@ -214,8 +213,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     // see https://www.gab.lc/articles/bigdata_postgresql_order_by_random/
     StringBuilder innerQuery =
         new StringBuilder("SELECT * FROM " + tableName + " ORDER BY RANDOM() LIMIT " + count);
-    List<E> randomList = retrieveList(sqlSelectReducedFields, innerQuery, null, null);
-    return randomList;
+    return retrieveList(sqlSelectReducedFields, innerQuery, null, null);
   }
 
   @Override
@@ -260,14 +258,11 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
                 + " WHERE ref.entity_uuid = :entityUuid"
                 + " ORDER BY ref.sortindex ASC");
 
-    List<FileResource> result =
-        fileResourceMetadataRepositoryImpl.retrieveList(
-            fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields(),
-            innerQuery,
-            Map.of("entityUuid", entityUuid),
-            null);
-
-    return result;
+    return fileResourceMetadataRepositoryImpl.retrieveList(
+        fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields(),
+        innerQuery,
+        Map.of("entityUuid", entityUuid),
+        null);
   }
 
   @Override
