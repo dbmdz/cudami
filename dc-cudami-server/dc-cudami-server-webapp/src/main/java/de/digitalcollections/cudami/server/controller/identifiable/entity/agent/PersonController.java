@@ -68,15 +68,17 @@ public class PersonController {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "language", required = false, defaultValue = "de") String language,
       @RequestParam(name = "initial", required = false) String initial,
-      @RequestParam(name = "previewImage", required = false) FilterCriterion<UUID> previewImageFilter) {
+      @RequestParam(name = "previewImage", required = false)
+          FilterCriterion<UUID> previewImageFilter) {
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new SortingImpl(sortBy);
       pageRequest.setSorting(sorting);
     }
-    
+
     if (previewImageFilter != null) {
-      Filtering filtering = Filtering.defaultBuilder().add("previewImage", previewImageFilter).build();
+      Filtering filtering =
+          Filtering.defaultBuilder().add("previewImage", previewImageFilter).build();
       pageRequest.setFiltering(filtering);
     }
     if (initial == null) {
