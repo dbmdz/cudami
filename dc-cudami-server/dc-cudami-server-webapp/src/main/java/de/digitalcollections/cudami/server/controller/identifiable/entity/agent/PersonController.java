@@ -3,6 +3,8 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.agent
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.PersonService;
+import de.digitalcollections.model.api.filter.FilterCriterion;
+import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.agent.Person;
 import de.digitalcollections.model.api.identifiable.entity.work.Work;
@@ -65,11 +67,17 @@ public class PersonController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "language", required = false, defaultValue = "de") String language,
-      @RequestParam(name = "initial", required = false) String initial) {
+      @RequestParam(name = "initial", required = false) String initial,
+      @RequestParam(name = "previewImage", required = false) FilterCriterion<UUID> previewImageFilter) {
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new SortingImpl(sortBy);
       pageRequest.setSorting(sorting);
+    }
+    
+    if (previewImageFilter != null) {
+      Filtering filtering = Filtering.defaultBuilder().add("previewImage", previewImageFilter).build();
+      pageRequest.setFiltering(filtering);
     }
     if (initial == null) {
       return personService.find(pageRequest);
