@@ -538,7 +538,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             + " LEFT JOIN fileresources_image AS file ON "
             + tableAlias
             + ".previewfileresource = file.uuid"
-            + (orderBy != null ? orderBy : "");
+            + (orderBy != null ? " " + orderBy : "");
 
     List<I> result =
         dbi.withHandle(
