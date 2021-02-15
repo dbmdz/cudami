@@ -131,7 +131,7 @@ public class EntityController<E extends Entity> {
       value = {"/latest/entities/random", "/v2/entities/random"},
       produces = "application/json")
   @ApiResponseObject
-  public PageResponse<Entity> findRandomEntities(
+  public List<Entity> findRandomEntities(
       @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
     return service.getRandom(count);
   }

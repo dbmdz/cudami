@@ -162,7 +162,7 @@ public class DigitalObjectController {
       value = {"/latest/digitalobjects/random", "/v2/digitalobjects/random"},
       produces = "application/json")
   @ApiResponseObject
-  public PageResponse<DigitalObject> findRandomDigitalObjects(
+  public List<DigitalObject> findRandomDigitalObjects(
       @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
     return service.getRandom(count);
   }

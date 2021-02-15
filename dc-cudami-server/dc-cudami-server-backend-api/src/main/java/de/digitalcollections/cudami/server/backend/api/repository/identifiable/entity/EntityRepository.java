@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.server.backend.api.repository.identifiable.
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,7 +17,7 @@ public interface EntityRepository<E extends Entity> extends IdentifiableReposito
 
   E findOneByRefId(long refId);
 
-  PageResponse<E> findRandom(int count);
+  List<E> findRandom(int count);
 
   default List<FileResource> getRelatedFileResources(E entity) {
     return getRelatedFileResources(entity.getUuid());

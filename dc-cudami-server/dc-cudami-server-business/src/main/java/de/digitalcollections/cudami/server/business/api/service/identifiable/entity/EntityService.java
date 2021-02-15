@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.server.business.api.service.identifiable.en
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,7 +17,7 @@ public interface EntityService<E extends Entity> extends IdentifiableService<E> 
 
   E getByRefId(long refId);
 
-  PageResponse<E> getRandom(int count);
+  List<E> getRandom(int count);
 
   default List<FileResource> getRelatedFileResources(E entity) {
     return getRelatedFileResources(entity.getUuid());
