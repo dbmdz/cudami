@@ -83,7 +83,7 @@ public class CudamiEntitiesClient extends CudamiBaseClient<EntityImpl> {
     return doGetRequestForObject(String.format("/latest/entities/%d", refId));
   }
 
-  public List<EntityImpl> findRandomEntities(int count) throws HttpException {
+  public List findRandomEntities(int count) throws HttpException {
     return doGetRequestForObjectList(
         String.format("/latest/entities/random?count=%d", count), EntityImpl.class);
   }

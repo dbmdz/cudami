@@ -9,7 +9,6 @@ import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.enums.EntityType;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.api.paging.PageResponse;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -86,7 +85,7 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
   }
 
   @Override
-  public PageResponse<E> getRandom(int count) {
+  public List<E> getRandom(int count) {
     return ((EntityRepository<E>) repository).findRandom(count);
   }
 
