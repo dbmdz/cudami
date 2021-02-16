@@ -85,6 +85,9 @@ public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<Fil
   }
 
   private FileResource getTypeSpecific(FileResource fileResource) {
+    if (fileResource == null) {
+      return null;
+    }
     FileResource specificFileResource = createByMimeType(fileResource.getMimeType());
     if (specificFileResource instanceof ApplicationFileResource) {
       return applicationFileResourceService.get(fileResource.getUuid());
