@@ -75,6 +75,16 @@ public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<Fil
   @Override
   public FileResource get(UUID uuid) {
     FileResource fileResource = repository.findOne(uuid);
+    return getTypeSpecific(fileResource);
+  }
+
+  @Override
+  public FileResource getByIdentifier(String namespace, String id) {
+    FileResource fileResource = repository.findOneByIdentifier(namespace, id);
+    return getTypeSpecific(fileResource);
+  }
+
+  private FileResource getTypeSpecific(FileResource fileResource) {
     FileResource specificFileResource = createByMimeType(fileResource.getMimeType());
     if (specificFileResource instanceof ApplicationFileResource) {
       return applicationFileResourceService.get(fileResource.getUuid());
