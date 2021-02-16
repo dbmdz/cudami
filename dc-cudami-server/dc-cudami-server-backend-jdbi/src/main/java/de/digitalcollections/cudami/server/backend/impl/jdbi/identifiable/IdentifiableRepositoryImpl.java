@@ -10,6 +10,7 @@ import de.digitalcollections.model.api.filter.FilterValuePlaceholder;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.Identifiable;
 import de.digitalcollections.model.api.identifiable.Identifier;
+import de.digitalcollections.model.api.identifiable.resource.MimeType;
 import de.digitalcollections.model.api.paging.Order;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -22,6 +23,8 @@ import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.paging.SearchPageResponseImpl;
+import java.net.URI;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -133,9 +136,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         getSqlInsertFields(),
         getSqlInsertValues(),
         getSqlUpdateFieldValues());
-    // register row mappers for always joined classes and mapping prefix. as it is in autowired
-    // constructor, this will be done only once at instantiation done by Spring
-    dbi.registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"));
   }
 
   protected IdentifiableRepositoryImpl(
@@ -214,8 +214,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     // (until now everywhere BeanMapper.factory... was used. If this changes, row mapper
     // registration may be moved back into each repository impl?)
     dbi.registerRowMapper(BeanMapper.factory(identifiableImplClass, mappingPrefix));
-    dbi.registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"));
-    dbi.registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"));
 
     // set basic reduce rows bifunction for reduced selects (lists, paging)
     // note: it turned out, that we also want identifiers and previewimage for reduced selects. So
@@ -252,7 +250,20 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
               });
 
       if (withPreviewImage && rowView.getColumn("pi_uuid", UUID.class) != null) {
-        identifiable.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
+        // see definition in FileResourceMetadataRepositoryimpl.SQL_PREVIEW_IMAGE_FIELDS_PI:
+        // file.uuid pi_uuid, file.filename pi_filename, file.mimetype pi_mimeType,
+        // file.uri pi_uri, file.http_base_url pi_httpBaseUrl
+
+        // TODO workaround as long at is not possible to register two RowMappers for one type
+        // but for different prefixes (unitl now the first takes precedence),
+        // see discussion https://groups.google.com/g/jdbi/c/UhVygrtoH0U
+        ImageFileResourceImpl previewImage = new ImageFileResourceImpl();
+        previewImage.setUuid(rowView.getColumn("pi_uuid", UUID.class));
+        previewImage.setFilename(rowView.getColumn("pi_filename", String.class));
+        previewImage.setHttpBaseUrl(rowView.getColumn("pi_httpBaseUrl", URL.class));
+        previewImage.setMimeType(rowView.getColumn("pi_mimeType", MimeType.class));
+        previewImage.setUri(rowView.getColumn("pi_uri", URI.class));
+        identifiable.setPreviewImage(previewImage);
       }
       if (withIdentifiers && rowView.getColumn("id_uuid", UUID.class) != null) {
         IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
