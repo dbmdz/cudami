@@ -36,8 +36,8 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
   public IdentifierRepositoryImpl(Jdbi dbi) {
     super(dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX);
 
-    // Hint: if repository will be changed to extend IdentifiableRepositoryImpl,
-    // this registration can be removed, as it is done in IdentifiableRepoImpl
+    // Hint: as repo is no extension of IdentifiableRepositoryImpl (registering mapper for
+    // Identifiable in constructor), we have to register row mapper on ourselves
     dbi.registerRowMapper(BeanMapper.factory(IdentifierImpl.class, MAPPING_PREFIX));
   }
 
