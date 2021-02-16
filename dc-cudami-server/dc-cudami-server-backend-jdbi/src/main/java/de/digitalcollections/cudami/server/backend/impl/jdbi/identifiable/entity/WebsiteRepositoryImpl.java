@@ -9,7 +9,7 @@ import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
+import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.util.Arrays;
 import java.util.List;
@@ -71,13 +71,12 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
       Jdbi dbi,
       IdentifierRepository identifierRepository,
       WebpageRepositoryImpl webpageRepositoryImpl) {
-    super(
-        dbi,
+    super(dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        WebsiteImpl.class,
+        Website.class,
         getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),

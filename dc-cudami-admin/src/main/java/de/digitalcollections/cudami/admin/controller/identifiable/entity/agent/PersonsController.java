@@ -11,7 +11,7 @@ import de.digitalcollections.model.api.paging.Order;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.impl.identifiable.entity.agent.PersonImpl;
+import de.digitalcollections.model.identifiable.entity.agent.PersonImpl;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;

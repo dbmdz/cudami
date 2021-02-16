@@ -19,7 +19,7 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.identifiable.agent.FamilyName;
 import de.digitalcollections.model.identifiable.agent.GivenName;
-import de.digitalcollections.model.impl.identifiable.entity.agent.PersonImpl;
+import de.digitalcollections.model.identifiable.entity.agent.PersonImpl;
 import de.digitalcollections.model.impl.identifiable.entity.geo.GeoLocationImpl;
 import java.util.List;
 import java.util.Map;

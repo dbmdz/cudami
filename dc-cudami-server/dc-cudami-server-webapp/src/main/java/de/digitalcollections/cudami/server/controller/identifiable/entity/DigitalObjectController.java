@@ -14,7 +14,7 @@ import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
@@ -182,7 +182,7 @@ public class DigitalObjectController {
       @RequestParam(name = "active", required = false) String active) {
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, new SortingImpl());
 
-    DigitalObject digitalObject = new DigitalObjectImpl();
+    DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);
     if (active != null) {
       return service.getActiveCollections(digitalObject, pageRequest);
@@ -225,7 +225,7 @@ public class DigitalObjectController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, new SortingImpl());
 
-    DigitalObject digitalObject = new DigitalObjectImpl();
+    DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);
     return service.getProjects(digitalObject, pageRequest);
   }

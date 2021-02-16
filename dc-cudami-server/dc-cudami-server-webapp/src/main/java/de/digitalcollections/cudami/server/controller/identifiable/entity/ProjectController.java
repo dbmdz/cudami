@@ -8,8 +8,8 @@ import de.digitalcollections.model.api.paging.Order;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
-import de.digitalcollections.model.impl.identifiable.entity.ProjectImpl;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
 import java.util.List;
@@ -58,10 +58,10 @@ public class ProjectController {
       @ApiPathParam(description = "UUID of the project") @PathVariable("uuid") UUID projectUuid,
       @ApiPathParam(description = "UUID of the digital object") @PathVariable("digitalObjectUuid")
           UUID digitalObjectUuid) {
-    Project project = new ProjectImpl();
+    Project project = new Project();
     project.setUuid(projectUuid);
 
-    DigitalObject digitalObject = new DigitalObjectImpl();
+    DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(digitalObjectUuid);
 
     boolean successful = projectService.addDigitalObject(project, digitalObject);
@@ -81,7 +81,7 @@ public class ProjectController {
       @ApiPathParam(description = "UUID of the project") @PathVariable("uuid") UUID projectUuid,
       @ApiPathParam(description = "List of the digital objects") @RequestBody
           List<DigitalObject> digitalObjects) {
-    Project project = new ProjectImpl();
+    Project project = new Project();
     project.setUuid(projectUuid);
 
     boolean successful = projectService.addDigitalObjects(project, digitalObjects);
@@ -188,7 +188,7 @@ public class ProjectController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, new SortingImpl());
 
-    Project project = new ProjectImpl();
+    Project project = new Project();
     project.setUuid(projectUuid);
     return projectService.getDigitalObjects(project, pageRequest);
   }
@@ -205,10 +205,10 @@ public class ProjectController {
       @ApiPathParam(description = "UUID of the project") @PathVariable("uuid") UUID projectUuid,
       @ApiPathParam(description = "UUID of the digital object") @PathVariable("digitalObjectUuid")
           UUID digitalObjectUuid) {
-    Project project = new ProjectImpl();
+    Project project = new Project();
     project.setUuid(projectUuid);
 
-    DigitalObject digitalObject = new DigitalObjectImpl();
+    DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(digitalObjectUuid);
 
     boolean successful = projectService.removeDigitalObject(project, digitalObject);
@@ -238,7 +238,7 @@ public class ProjectController {
       @ApiPathParam(description = "UUID of the project") @PathVariable("uuid") UUID projectUuid,
       @ApiPathParam(description = "List of the digital objects") @RequestBody
           List<DigitalObject> digitalObjects) {
-    Project project = new ProjectImpl();
+    Project project = new Project();
     project.setUuid(projectUuid);
 
     boolean successful = projectService.saveDigitalObjects(project, digitalObjects);

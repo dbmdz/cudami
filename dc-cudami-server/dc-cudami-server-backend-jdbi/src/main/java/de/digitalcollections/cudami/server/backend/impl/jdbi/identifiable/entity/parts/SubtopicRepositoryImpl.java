@@ -17,8 +17,8 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.identifiable.Node;
-import de.digitalcollections.model.impl.identifiable.entity.Entity;
-import de.digitalcollections.model.impl.identifiable.entity.TopicImpl;
+import de.digitalcollections.model.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.impl.identifiable.entity.parts.SubtopicImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
@@ -409,11 +409,10 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
             + " WHERE ts.subtopic_uuid = :uuid";
 
     Topic result =
-        dbi.withHandle(
-            h ->
+        dbi.withHandle(h ->
                 h.createQuery(query)
                     .bind("uuid", rootSubtopicUuid)
-                    .mapToBean(TopicImpl.class)
+                    .mapToBean(Topic.class)
                     .one());
     return result;
   }

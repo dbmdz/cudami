@@ -15,7 +15,7 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.identifiable.Node;
-import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
+import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
 import java.util.Arrays;
@@ -85,13 +85,12 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
   @Autowired
   public CollectionRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(
-        dbi,
+    super(dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        CollectionImpl.class,
+        Collection.class,
         getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),

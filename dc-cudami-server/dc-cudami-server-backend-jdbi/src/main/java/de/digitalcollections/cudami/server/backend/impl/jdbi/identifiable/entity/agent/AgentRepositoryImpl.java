@@ -6,7 +6,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.api.identifiable.entity.work.Work;
-import de.digitalcollections.model.impl.identifiable.entity.agent.AgentImpl;
+import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import java.util.Set;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
@@ -48,13 +48,12 @@ public class AgentRepositoryImpl extends EntityRepositoryImpl<Agent> implements 
 
   @Autowired
   public AgentRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(
-        dbi,
+    super(dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        AgentImpl.class,
+        Agent.class,
         getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),

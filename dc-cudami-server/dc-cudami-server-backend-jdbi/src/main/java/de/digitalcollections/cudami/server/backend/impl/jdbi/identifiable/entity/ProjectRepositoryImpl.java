@@ -6,7 +6,7 @@ import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.Project;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.entity.ProjectImpl;
+import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import java.util.List;
 import java.util.Map;
@@ -69,13 +69,12 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
 
   @Autowired
   public ProjectRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(
-        dbi,
+    super(dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        ProjectImpl.class,
+        Project.class,
         getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),

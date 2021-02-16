@@ -16,7 +16,7 @@ import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.paging.enums.Direction;
-import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
@@ -70,7 +70,7 @@ public class DigitalObjectsController extends AbstractController {
 
   @GetMapping("/api/digitalobjects/search")
   @ResponseBody
-  public SearchPageResponse<DigitalObjectImpl> search(
+  public SearchPageResponse<DigitalObject> search(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortField", required = false) String sortField,

@@ -7,7 +7,7 @@ import de.digitalcollections.cudami.server.business.impl.service.identifiable.Id
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
-import de.digitalcollections.model.api.identifiable.entity.enums.EntityType;
+import de.digitalcollections.model.identifiable.entity.enums.EntityType;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import java.io.IOException;
 import java.net.MalformedURLException;

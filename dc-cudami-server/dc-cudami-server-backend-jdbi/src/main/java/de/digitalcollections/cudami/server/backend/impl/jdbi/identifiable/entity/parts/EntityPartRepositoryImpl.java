@@ -6,7 +6,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.Identi
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.EntityPart;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.impl.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import java.util.List;
 import java.util.UUID;

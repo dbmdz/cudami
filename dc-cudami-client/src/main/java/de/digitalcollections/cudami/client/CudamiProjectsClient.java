@@ -6,16 +6,16 @@ import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.Project;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
-import de.digitalcollections.model.impl.identifiable.entity.ProjectImpl;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.Project;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.UUID;
 
-public class CudamiProjectsClient extends CudamiBaseClient<ProjectImpl> {
+public class CudamiProjectsClient extends CudamiBaseClient<Project> {
 
   public CudamiProjectsClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, ProjectImpl.class, mapper);
+    super(http, serverUrl, Project.class, mapper);
   }
 
   public boolean addDigitalObject(UUID projectUuid, UUID digitalObjectUuid) throws HttpException {
@@ -33,14 +33,14 @@ public class CudamiProjectsClient extends CudamiBaseClient<ProjectImpl> {
   }
 
   public Project create() {
-    return new ProjectImpl();
+    return new Project();
   }
 
   public long count() throws HttpException {
     return Long.parseLong(doGetRequestForString("/latest/projects/count"));
   }
 
-  public PageResponse<ProjectImpl> find(PageRequest pageRequest) throws HttpException {
+  public PageResponse<Project> find(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/projects", pageRequest);
   }
 
@@ -59,10 +59,9 @@ public class CudamiProjectsClient extends CudamiBaseClient<ProjectImpl> {
 
   public PageResponse<DigitalObject> getDigitalObjects(UUID projectUuid, PageRequest pageRequest)
       throws HttpException {
-    return doGetRequestForPagedObjectList(
-        String.format("/latest/projects/%s/digitalobjects", projectUuid),
+    return doGetRequestForPagedObjectList(String.format("/latest/projects/%s/digitalobjects", projectUuid),
         pageRequest,
-        DigitalObjectImpl.class);
+        DigitalObject.class);
   }
 
   public boolean removeDigitalObject(UUID projectUuid, UUID digitalObjectUuid)
@@ -74,7 +73,7 @@ public class CudamiProjectsClient extends CudamiBaseClient<ProjectImpl> {
   }
 
   public Project save(Project project) throws HttpException {
-    return doPostRequestForObject("/latest/projects", (ProjectImpl) project);
+    return doPostRequestForObject("/latest/projects", (Project) project);
   }
 
   public boolean saveDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects)
@@ -88,14 +87,14 @@ public class CudamiProjectsClient extends CudamiBaseClient<ProjectImpl> {
   }
 
   public Project update(UUID uuid, Project project) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/projects/%s", uuid), (ProjectImpl) project);
+    return doPutRequestForObject(String.format("/latest/projects/%s", uuid), (Project) project);
   }
 
   public void delete(UUID uuid) throws HttpException {
     doDeleteRequestForString(String.format("/latest/projects/%s", uuid));
   }
 
-  public List<ProjectImpl> getAll() throws HttpException {
-    return doGetRequestForObjectList(String.format("/latest/projectlist", ProjectImpl.class));
+  public List<Project> getAll() throws HttpException {
+    return doGetRequestForObjectList(String.format("/latest/projectlist", Project.class));
   }
 }

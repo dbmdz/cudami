@@ -6,7 +6,7 @@ import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.work.Item;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.impl.identifiable.entity.work.ItemImpl;
 import de.digitalcollections.model.impl.identifiable.entity.work.WorkImpl;
 import java.net.http.HttpClient;
@@ -79,8 +79,7 @@ public class CudamiItemsClient extends CudamiBaseClient<ItemImpl> {
   }
 
   public List getDigitalObjects(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(
-        String.format("/latest/items/%s/digitalobjects", uuid), DigitalObjectImpl.class);
+    return doGetRequestForObjectList(String.format("/latest/items/%s/digitalobjects", uuid), DigitalObject.class);
   }
 
   public List getWorks(UUID uuid) throws HttpException {

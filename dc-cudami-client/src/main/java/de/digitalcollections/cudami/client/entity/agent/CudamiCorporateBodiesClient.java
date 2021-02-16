@@ -6,7 +6,7 @@ import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.entity.agent.CorporateBodyImpl;
+import de.digitalcollections.model.identifiable.entity.agent.CorporateBodyImpl;
 import java.net.http.HttpClient;
 import java.util.UUID;
 

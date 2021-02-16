@@ -9,7 +9,7 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.impl.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.impl.identifiable.entity.relation.EntityRelationImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;

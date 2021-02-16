@@ -10,7 +10,7 @@ import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
+import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import java.util.List;
 import java.util.Locale;
@@ -93,7 +93,7 @@ public class WebsitesController extends AbstractController {
 
   @GetMapping("/api/websites")
   @ResponseBody
-  public PageResponse<WebsiteImpl> findAll(
+  public PageResponse<Website> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws HttpException {

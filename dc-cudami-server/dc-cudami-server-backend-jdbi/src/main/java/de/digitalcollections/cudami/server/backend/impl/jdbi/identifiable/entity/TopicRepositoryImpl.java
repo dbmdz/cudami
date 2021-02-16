@@ -7,7 +7,7 @@ import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.api.identifiable.entity.Topic;
 import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
-import de.digitalcollections.model.impl.identifiable.entity.TopicImpl;
+import de.digitalcollections.model.identifiable.entity.Topic;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -54,13 +54,12 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
       Jdbi dbi,
       IdentifierRepository identifierRepository,
       SubtopicRepositoryImpl subtopicRepositoryImpl) {
-    super(
-        dbi,
+    super(dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        TopicImpl.class,
+        Topic.class,
         getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),

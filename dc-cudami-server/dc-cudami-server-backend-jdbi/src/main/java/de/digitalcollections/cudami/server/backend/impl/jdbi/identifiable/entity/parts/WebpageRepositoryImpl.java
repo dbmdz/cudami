@@ -13,7 +13,7 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.identifiable.Node;
-import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
+import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
@@ -326,11 +326,10 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
             + " WHERE ww.webpage_uuid = :uuid";
 
     Website result =
-        dbi.withHandle(
-            h ->
+        dbi.withHandle(h ->
                 h.createQuery(query)
                     .bind("uuid", rootWebpageUuid)
-                    .mapToBean(WebsiteImpl.class)
+                    .mapToBean(Website.class)
                     .one());
     return result;
   }

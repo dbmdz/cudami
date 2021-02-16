@@ -8,7 +8,7 @@ import de.digitalcollections.model.api.paging.Order;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
+import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
 import java.util.List;
@@ -134,7 +134,7 @@ public class WebsiteController {
   public ResponseEntity updateRootPagesOrder(
       @ApiPathParam(description = "UUID of the website") @PathVariable("uuid") UUID uuid,
       @ApiPathParam(description = "List of the rootpages") @RequestBody List<Webpage> rootPages) {
-    Website website = new WebsiteImpl();
+    Website website = new Website();
     website.setUuid(uuid);
 
     boolean successful = service.updateRootPagesOrder(website, rootPages);

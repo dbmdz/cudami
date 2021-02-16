@@ -6,27 +6,27 @@ import de.digitalcollections.model.api.identifiable.entity.Topic;
 import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.entity.TopicImpl;
+import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.impl.identifiable.entity.parts.SubtopicImpl;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.UUID;
 
-public class CudamiTopicsClient extends CudamiBaseClient<TopicImpl> {
+public class CudamiTopicsClient extends CudamiBaseClient<Topic> {
 
   public CudamiTopicsClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, TopicImpl.class, mapper);
+    super(http, serverUrl, Topic.class, mapper);
   }
 
   public Topic create() {
-    return new TopicImpl();
+    return new Topic();
   }
 
   public long count() throws HttpException {
     return Long.parseLong(doGetRequestForString("/latest/topics/count"));
   }
 
-  public PageResponse<TopicImpl> find(PageRequest pageRequest) throws HttpException {
+  public PageResponse<Topic> find(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/topics", pageRequest);
   }
 
@@ -49,10 +49,10 @@ public class CudamiTopicsClient extends CudamiBaseClient<TopicImpl> {
   }
 
   public Topic save(Topic topic) throws HttpException {
-    return doPostRequestForObject("/latest/topics", (TopicImpl) topic);
+    return doPostRequestForObject("/latest/topics", (Topic) topic);
   }
 
   public Topic update(UUID uuid, Topic topic) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/topics/%s", uuid), (TopicImpl) topic);
+    return doPutRequestForObject(String.format("/latest/topics/%s", uuid), (Topic) topic);
   }
 }

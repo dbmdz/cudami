@@ -7,7 +7,7 @@ import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
-import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
+import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
@@ -100,8 +100,7 @@ public class CudamiWebpagesClient extends CudamiBaseClient<WebpageImpl> {
 
   public Website getWebsite(UUID rootWebpageUuid) throws HttpException {
     return (Website)
-        doGetRequestForObject(
-            String.format("/latest/webpages/%s/website", rootWebpageUuid), WebsiteImpl.class);
+        doGetRequestForObject(String.format("/latest/webpages/%s/website", rootWebpageUuid), Website.class);
   }
 
   public Webpage save(Webpage webpage) throws HttpException {

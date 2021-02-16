@@ -14,7 +14,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ImageFileResourceService;
 import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
-import de.digitalcollections.model.impl.identifiable.entity.agent.CorporateBodyImpl;
+import de.digitalcollections.model.identifiable.entity.agent.CorporateBodyImpl;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.junit.jupiter.api.BeforeEach;

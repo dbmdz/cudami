@@ -8,7 +8,7 @@ import de.digitalcollections.model.api.filter.FilterValuePlaceholder;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.impl.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.entity.Entity;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;

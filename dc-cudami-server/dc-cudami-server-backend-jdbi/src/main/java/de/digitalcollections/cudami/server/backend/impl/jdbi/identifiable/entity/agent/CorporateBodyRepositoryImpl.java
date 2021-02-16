@@ -4,7 +4,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.impl.identifiable.entity.agent.CorporateBodyImpl;
+import de.digitalcollections.model.identifiable.entity.agent.CorporateBodyImpl;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

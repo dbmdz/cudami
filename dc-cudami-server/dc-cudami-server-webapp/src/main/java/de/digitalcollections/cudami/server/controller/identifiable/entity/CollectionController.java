@@ -15,8 +15,8 @@ import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
-import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
-import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
+import de.digitalcollections.model.identifiable.entity.Collection;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
 import de.digitalcollections.model.impl.paging.SortingImpl;
@@ -73,10 +73,10 @@ public class CollectionController {
           UUID collectionUuid,
       @ApiPathParam(description = "UUID of the digital object") @PathVariable("digitalObjectUuid")
           UUID digitalObjectUuid) {
-    Collection collection = new CollectionImpl();
+    Collection collection = new Collection();
     collection.setUuid(collectionUuid);
 
-    DigitalObject digitalObject = new DigitalObjectImpl();
+    DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(digitalObjectUuid);
 
     boolean successful = collectionService.addDigitalObject(collection, digitalObject);
@@ -100,7 +100,7 @@ public class CollectionController {
           UUID collectionUuid,
       @ApiPathParam(description = "List of the digital objects") @RequestBody
           List<DigitalObject> digitalObjects) {
-    Collection collection = new CollectionImpl();
+    Collection collection = new Collection();
     collection.setUuid(collectionUuid);
 
     boolean successful = collectionService.addDigitalObjects(collection, digitalObjects);
@@ -123,10 +123,10 @@ public class CollectionController {
       @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid") UUID uuid,
       @ApiPathParam(description = "UUID of the subcollection") @PathVariable("subcollectionUuid")
           UUID subcollectionUuid) {
-    Collection collection = new CollectionImpl();
+    Collection collection = new Collection();
     collection.setUuid(uuid);
 
-    Collection subcollection = new CollectionImpl();
+    Collection subcollection = new Collection();
     subcollection.setUuid(subcollectionUuid);
 
     boolean successful = collectionService.addChild(collection, subcollection);
@@ -149,7 +149,7 @@ public class CollectionController {
       @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid") UUID uuid,
       @ApiPathParam(description = "List of the subcollections") @RequestBody
           List<Collection> subcollections) {
-    Collection collection = new CollectionImpl();
+    Collection collection = new Collection();
     collection.setUuid(uuid);
 
     boolean successful = collectionService.addChildren(collection, subcollections);
@@ -337,7 +337,7 @@ public class CollectionController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
     PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, new SortingImpl());
 
-    Collection collection = new CollectionImpl();
+    Collection collection = new Collection();
     collection.setUuid(collectionUuid);
     return collectionService.getDigitalObjects(collection, pageRequest);
   }
@@ -421,10 +421,10 @@ public class CollectionController {
           UUID collectionUuid,
       @ApiPathParam(description = "UUID of the digital object") @PathVariable("digitalObjectUuid")
           UUID digitalObjectUuid) {
-    Collection collection = new CollectionImpl();
+    Collection collection = new Collection();
     collection.setUuid(collectionUuid);
 
-    DigitalObject digitalObject = new DigitalObjectImpl();
+    DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(digitalObjectUuid);
 
     boolean successful = collectionService.removeDigitalObject(collection, digitalObject);
@@ -447,10 +447,10 @@ public class CollectionController {
       @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid") UUID uuid,
       @ApiPathParam(description = "UUID of the subcollection") @PathVariable("subcollectionUuid")
           UUID subcollectionUuid) {
-    Collection collection = new CollectionImpl();
+    Collection collection = new Collection();
     collection.setUuid(uuid);
 
-    Collection subcollection = new CollectionImpl();
+    Collection subcollection = new Collection();
     subcollection.setUuid(subcollectionUuid);
 
     boolean successful = collectionService.removeChild(collection, subcollection);
@@ -484,7 +484,7 @@ public class CollectionController {
           UUID collectionUuid,
       @ApiPathParam(description = "List of the digital objects") @RequestBody
           List<DigitalObject> digitalObjects) {
-    Collection collection = new CollectionImpl();
+    Collection collection = new Collection();
     collection.setUuid(collectionUuid);
 
     boolean successful = collectionService.saveDigitalObjects(collection, digitalObjects);

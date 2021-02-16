@@ -9,8 +9,8 @@ import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
-import de.digitalcollections.model.impl.identifiable.entity.Entity;
-import de.digitalcollections.model.impl.identifiable.entity.TopicImpl;
+import de.digitalcollections.model.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.impl.identifiable.entity.parts.SubtopicImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
@@ -98,8 +98,7 @@ public class CudamiSubtopicsClient extends CudamiBaseClient<SubtopicImpl> {
 
   public Topic getTopic(UUID rootWebpageUuid) throws HttpException {
     return (Topic)
-        doGetRequestForObject(
-            String.format("/latest/subtopics/%s/topic", rootWebpageUuid), TopicImpl.class);
+        doGetRequestForObject(String.format("/latest/subtopics/%s/topic", rootWebpageUuid), Topic.class);
   }
 
   public Subtopic save(Subtopic subtopic) throws HttpException {

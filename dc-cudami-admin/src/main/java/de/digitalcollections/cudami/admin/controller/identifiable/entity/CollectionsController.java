@@ -15,7 +15,7 @@ import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.paging.enums.Direction;
-import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
+import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.impl.paging.OrderImpl;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
@@ -144,7 +144,7 @@ public class CollectionsController extends AbstractController {
 
   @GetMapping("/api/collections")
   @ResponseBody
-  public PageResponse<CollectionImpl> findAllTop(
+  public PageResponse<Collection> findAllTop(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws HttpException {
@@ -241,7 +241,7 @@ public class CollectionsController extends AbstractController {
 
   @GetMapping({"/api/collections/search", "/api/subcollections/search"})
   @ResponseBody
-  public SearchPageResponse<CollectionImpl> search(
+  public SearchPageResponse<Collection> search(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortField", required = false) String sortField,
@@ -288,7 +288,7 @@ public class CollectionsController extends AbstractController {
         languageSortingHelper.sortLanguages(displayLocale, existingSubcollectionLanguages));
     model.addAttribute("collection", collection);
 
-    List<CollectionImpl> parents = service.getParents(uuid);
+    List<Collection> parents = service.getParents(uuid);
     model.addAttribute("parents", parents);
 
     List<Node> breadcrumbs = new ArrayList<>();

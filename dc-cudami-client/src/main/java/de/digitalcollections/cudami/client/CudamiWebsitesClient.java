@@ -6,28 +6,28 @@ import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
+import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-public class CudamiWebsitesClient extends CudamiBaseClient<WebsiteImpl> {
+public class CudamiWebsitesClient extends CudamiBaseClient<Website> {
 
   public CudamiWebsitesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, WebsiteImpl.class, mapper);
+    super(http, serverUrl, Website.class, mapper);
   }
 
   public Website create() {
-    return new WebsiteImpl();
+    return new Website();
   }
 
   public long count() throws HttpException {
     return Long.parseLong(doGetRequestForString("/latest/websites/count"));
   }
 
-  public PageResponse<WebsiteImpl> find(PageRequest pageRequest) throws HttpException {
+  public PageResponse<Website> find(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/websites", pageRequest);
   }
 
@@ -55,11 +55,11 @@ public class CudamiWebsitesClient extends CudamiBaseClient<WebsiteImpl> {
   }
 
   public Website save(Website website) throws HttpException {
-    return doPostRequestForObject("/latest/websites", (WebsiteImpl) website);
+    return doPostRequestForObject("/latest/websites", (Website) website);
   }
 
   public Website update(UUID uuid, Website website) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/websites/%s", uuid), (WebsiteImpl) website);
+    return doPutRequestForObject(String.format("/latest/websites/%s", uuid), (Website) website);
   }
 
   public boolean updateRootPagesOrder(UUID websiteUuid, List<Webpage> rootpages)
