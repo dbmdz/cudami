@@ -2,8 +2,8 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.VersionRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
-import de.digitalcollections.model.api.identifiable.Version;
-import de.digitalcollections.model.impl.identifiable.VersionImpl;
+import de.digitalcollections.model.identifiable.Version;
+import de.digitalcollections.model.identifiable.versioning.Version;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -32,11 +32,10 @@ public class VersionRepositoryImpl extends JdbiRepositoryImpl implements Version
     final String sql = "SELECT * FROM " + tableName + " WHERE uuid = :uuid";
 
     Version version =
-        dbi.withHandle(
-            h ->
+        dbi.withHandle(h ->
                 h.createQuery(sql)
                     .bind("uuid", uuid)
-                    .mapToBean(VersionImpl.class)
+                    .mapToBean(Version.class)
                     .findOne()
                     .orElse(null));
     return version;
@@ -48,11 +47,10 @@ public class VersionRepositoryImpl extends JdbiRepositoryImpl implements Version
         "SELECT * FROM " + tableName + " WHERE instance_version_key = :instance_version_key";
 
     Version version =
-        dbi.withHandle(
-            h ->
+        dbi.withHandle(h ->
                 h.createQuery(sql)
                     .bind("instance_version_key", instVersionKey)
-                    .mapToBean(VersionImpl.class)
+                    .mapToBean(Version.class)
                     .findFirst()
                     .orElse(null));
     return version;
@@ -80,12 +78,11 @@ public class VersionRepositoryImpl extends JdbiRepositoryImpl implements Version
             + "VALUES (:uuid, :versionValue, :typeKey, :instanceKey, :instanceVersionKey, :description, :created, :status)"
             + " RETURNING *";
 
-    VersionImpl result =
-        dbi.withHandle(
-            h ->
+    Version result =
+        dbi.withHandle(h ->
                 h.createQuery(sql)
                     .bindBean(version)
-                    .mapToBean(VersionImpl.class)
+                    .mapToBean(Version.class)
                     .findOne()
                     .orElse(null));
 
@@ -99,11 +96,10 @@ public class VersionRepositoryImpl extends JdbiRepositoryImpl implements Version
         "UPDATE " + tableName + " SET status=:status WHERE uuid=:uuid" + " RETURNING *";
 
     Version result =
-        dbi.withHandle(
-            h ->
+        dbi.withHandle(h ->
                 h.createQuery(sql)
                     .bindBean(version)
-                    .mapToBean(VersionImpl.class)
+                    .mapToBean(Version.class)
                     .findOne()
                     .orElse(null));
 

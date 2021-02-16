@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable;
 
-import de.digitalcollections.model.api.identifiable.Version;
+import de.digitalcollections.model.identifiable.Version;
 import java.util.UUID;
 
 public interface VersionRepository {

@@ -17,8 +17,8 @@ import de.digitalcollections.model.api.identifiable.entity.work.Work;
 import de.digitalcollections.model.api.identifiable.parts.LocalizedText;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.agent.FamilyNameImpl;
-import de.digitalcollections.model.impl.identifiable.agent.GivenNameImpl;
+import de.digitalcollections.model.identifiable.agent.FamilyName;
+import de.digitalcollections.model.identifiable.agent.GivenName;
 import de.digitalcollections.model.impl.identifiable.entity.agent.PersonImpl;
 import de.digitalcollections.model.impl.identifiable.entity.geo.GeoLocationImpl;
 import java.util.List;
@@ -88,11 +88,11 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
       try {
         if (rowView.getColumn(FamilyNameRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
             != null) {
-          person.getFamilyNames().add(rowView.getRow(FamilyNameImpl.class));
+          person.getFamilyNames().add(rowView.getRow(FamilyName.class));
         }
         if (rowView.getColumn(GivenNameRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
             != null) {
-          person.getGivenNames().add(rowView.getRow(GivenNameImpl.class));
+          person.getGivenNames().add(rowView.getRow(GivenName.class));
         }
       } catch (Exception e) {
         // TODO to avoid this, some boolean params has to be given to function, if fields should
@@ -193,8 +193,8 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         SQL_FULL_FIELDS_JOINS,
         createAdditionalReduceRowsBiFunction());
     // TODO Shoud be registered in their repos. test it
-    //    dbi.registerRowMapper(BeanMapper.factory(FamilyNameImpl.class, "fn"));
-    //    dbi.registerRowMapper(BeanMapper.factory(GivenNameImpl.class, "gn"));
+    //    dbi.registerRowMapper(BeanMapper.factory(FamilyName.class, "fn"));
+    //    dbi.registerRowMapper(BeanMapper.factory(GivenName.class, "gn"));
 
     this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
     this.familyNameRepositoryImpl = familyNameRepositoryImpl;

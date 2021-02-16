@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.VersionService;
-import de.digitalcollections.model.api.identifiable.Version;
+import de.digitalcollections.model.identifiable.Version;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;

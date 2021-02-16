@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable;
 
-import de.digitalcollections.model.api.identifiable.Identifiable;
-import de.digitalcollections.model.api.identifiable.Version;
+import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.Version;
 import java.util.UUID;
 
 public interface VersionService {

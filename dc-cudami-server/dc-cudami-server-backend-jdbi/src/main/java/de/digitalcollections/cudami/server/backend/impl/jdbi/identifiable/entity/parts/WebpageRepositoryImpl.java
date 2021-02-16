@@ -5,14 +5,14 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.api.filter.FilterValuePlaceholder;
 import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.Identifier;
-import de.digitalcollections.model.api.identifiable.Node;
+import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Website;
 import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
-import de.digitalcollections.model.impl.identifiable.NodeImpl;
+import de.digitalcollections.model.identifiable.Node;
 import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
@@ -134,8 +134,7 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) {
 
     List<Node> result =
-        dbi.withHandle(
-            h ->
+        dbi.withHandle(h ->
                 h.createQuery(
                         "WITH recursive breadcrumb (uuid,label,parent_uuid,depth)"
                             + " AS ("
@@ -157,8 +156,8 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
                             + " WHERE ww.webpage_uuid = b.parent_uuid and w.uuid = ww.website_uuid"
                             + " ORDER BY depth ASC")
                     .bind("uuid", uuid)
-                    .registerRowMapper(BeanMapper.factory(NodeImpl.class))
-                    .mapTo(NodeImpl.class)
+                    .registerRowMapper(BeanMapper.factory(Node.class))
+                    .mapTo(Node.class)
                     .map(Node.class::cast)
                     .list());
 
@@ -166,15 +165,14 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
       // Special case: If we are on a top level webpage, we have no parent, so
       // we must construct a breadcrumb more or less manually
       result =
-          dbi.withHandle(
-              h ->
+          dbi.withHandle(h ->
                   h.createQuery(
                           "SELECT w.uuid as uuid, w.label as label"
                               + "        FROM webpages w"
                               + "        WHERE uuid= :uuid")
                       .bind("uuid", uuid)
-                      .registerRowMapper(BeanMapper.factory(NodeImpl.class))
-                      .mapTo(NodeImpl.class)
+                      .registerRowMapper(BeanMapper.factory(Node.class))
+                      .mapTo(Node.class)
                       .map(Node.class::cast)
                       .list());
     }

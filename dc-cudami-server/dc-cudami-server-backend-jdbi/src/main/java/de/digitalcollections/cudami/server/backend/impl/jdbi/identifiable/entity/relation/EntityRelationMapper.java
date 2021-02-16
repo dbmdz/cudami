@@ -5,7 +5,7 @@ import de.digitalcollections.model.api.identifiable.entity.enums.EntityType;
 import de.digitalcollections.model.api.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.api.identifiable.parts.LocalizedText;
 import de.digitalcollections.model.api.identifiable.parts.structuredcontent.LocalizedStructuredContent;
-import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
+import de.digitalcollections.model.impl.identifiable.entity.Entity;
 import de.digitalcollections.model.impl.identifiable.entity.relation.EntityRelationImpl;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -43,7 +43,7 @@ public class EntityRelationMapper<E extends Entity> implements RowMapper<EntityR
     result.setSubject(subjectEntity);
     result.setPredicate(rs.getString("predicate"));
 
-    Entity objectEntity = new EntityImpl();
+    Entity objectEntity = new Entity();
     objectEntity.setCreated(rs.getTimestamp("created").toLocalDateTime());
     objectEntity.setDescription(lscMapper.map(rs, "description", ctx));
     objectEntity.setEntityType(EntityType.valueOf(rs.getString("entity_type")));

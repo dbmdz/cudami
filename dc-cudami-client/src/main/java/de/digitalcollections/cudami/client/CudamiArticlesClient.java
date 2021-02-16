@@ -5,28 +5,28 @@ import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.Article;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.entity.ArticleImpl;
+import de.digitalcollections.model.identifiable.entity.Article;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-public class CudamiArticlesClient extends CudamiBaseClient<ArticleImpl> {
+public class CudamiArticlesClient extends CudamiBaseClient<Article> {
 
   public CudamiArticlesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, ArticleImpl.class, mapper);
+    super(http, serverUrl, Article.class, mapper);
   }
 
   public Article create() {
-    return new ArticleImpl();
+    return new Article();
   }
 
   long count() throws HttpException {
     return Long.parseLong(doGetRequestForString("/latest/articles/count"));
   }
 
-  public PageResponse<ArticleImpl> find(PageRequest pageRequest) throws HttpException {
+  public PageResponse<Article> find(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/articles", pageRequest);
   }
 
@@ -53,10 +53,10 @@ public class CudamiArticlesClient extends CudamiBaseClient<ArticleImpl> {
   }
 
   public Article save(Article article) throws HttpException {
-    return doPostRequestForObject("/latest/articles", (ArticleImpl) article);
+    return doPostRequestForObject("/latest/articles", (Article) article);
   }
 
   public Article update(UUID uuid, Article article) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/articles/%s", uuid), (ArticleImpl) article);
+    return doPutRequestForObject(String.format("/latest/articles/%s", uuid), (Article) article);
   }
 }

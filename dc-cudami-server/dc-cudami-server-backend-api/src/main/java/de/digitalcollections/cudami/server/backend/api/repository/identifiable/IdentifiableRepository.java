@@ -1,13 +1,13 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable;
 
 import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.Identifiable;
-import de.digitalcollections.model.api.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +61,7 @@ public interface IdentifiableRepository<I extends Identifiable> {
   I findOne(UUID uuid, Filtering filtering);
 
   default I findOneByIdentifier(String namespace, String id) {
-    return findOne(new IdentifierImpl(null, namespace, id));
+    return findOne(new Identifier(null, namespace, id));
   }
 
   default I save(I identifiable) {

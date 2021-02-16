@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
-import de.digitalcollections.model.api.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.api.paging.Order;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;

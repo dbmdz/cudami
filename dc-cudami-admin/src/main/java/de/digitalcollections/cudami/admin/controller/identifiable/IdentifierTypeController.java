@@ -7,10 +7,10 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiIdentifierTypesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.IdentifierType;
+import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.IdentifierTypeImpl;
+import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.impl.paging.PageRequestImpl;
 import java.util.UUID;
 import javax.validation.Valid;
@@ -65,7 +65,7 @@ public class IdentifierTypeController extends AbstractController {
 
   @PostMapping("/identifiertypes/new")
   public String create(
-      @ModelAttribute @Valid IdentifierTypeImpl identifierType,
+      @ModelAttribute @Valid IdentifierType identifierType,
       BindingResult results,
       Model model,
       SessionStatus status,
@@ -103,7 +103,7 @@ public class IdentifierTypeController extends AbstractController {
   @PostMapping("/identifiertypes/{pathUuid}/edit")
   public String edit(
       @PathVariable UUID pathUuid,
-      @ModelAttribute @Valid IdentifierTypeImpl identifierType,
+      @ModelAttribute @Valid IdentifierType identifierType,
       BindingResult results,
       Model model,
       SessionStatus status,
@@ -142,7 +142,7 @@ public class IdentifierTypeController extends AbstractController {
 
   @GetMapping("/api/identifiertypes")
   @ResponseBody
-  public PageResponse<IdentifierTypeImpl> find(
+  public PageResponse<IdentifierType> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws HttpException {

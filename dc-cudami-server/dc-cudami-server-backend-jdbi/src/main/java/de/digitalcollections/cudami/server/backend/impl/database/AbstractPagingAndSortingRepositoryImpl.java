@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.database;
 
 import de.digitalcollections.model.api.filter.FilterCriterion;
 import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.filter.enums.FilterOperation;
+import de.digitalcollections.model.filter.enums.FilterOperation;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.paging.enums.Direction;

@@ -6,14 +6,14 @@ import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.agent.FamilyName;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.agent.FamilyNameImpl;
+import de.digitalcollections.model.identifiable.agent.FamilyName;
 import java.net.http.HttpClient;
 import java.util.UUID;
 
-public class CudamiFamilyNamesClient extends CudamiBaseClient<FamilyNameImpl> {
+public class CudamiFamilyNamesClient extends CudamiBaseClient<FamilyName> {
 
   public CudamiFamilyNamesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, FamilyNameImpl.class, mapper);
+    super(http, serverUrl, FamilyName.class, mapper);
   }
 
   public long count() throws HttpException {
@@ -21,10 +21,10 @@ public class CudamiFamilyNamesClient extends CudamiBaseClient<FamilyNameImpl> {
   }
 
   public FamilyName create() {
-    return new FamilyNameImpl();
+    return new FamilyName();
   }
 
-  public PageResponse<FamilyNameImpl> find(PageRequest pageRequest) throws HttpException {
+  public PageResponse<FamilyName> find(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/familynames", pageRequest);
   }
 
@@ -33,7 +33,7 @@ public class CudamiFamilyNamesClient extends CudamiBaseClient<FamilyNameImpl> {
     return findByLanguageAndInitial("/latest/familynames", pageRequest, language, initial);
   }
 
-  public PageResponse<FamilyNameImpl> findByLanguageAndInitial(
+  public PageResponse<FamilyName> findByLanguageAndInitial(
       int pageNumber,
       int pageSize,
       String sortField,
@@ -63,11 +63,10 @@ public class CudamiFamilyNamesClient extends CudamiBaseClient<FamilyNameImpl> {
   }
 
   public FamilyName save(FamilyName familyName) throws HttpException {
-    return doPostRequestForObject("/latest/familynames", (FamilyNameImpl) familyName);
+    return doPostRequestForObject("/latest/familynames", (FamilyName) familyName);
   }
 
   public FamilyName update(UUID uuid, FamilyName familyName) throws HttpException {
-    return doPutRequestForObject(
-        String.format("/latest/familynames/%s", uuid), (FamilyNameImpl) familyName);
+    return doPutRequestForObject(String.format("/latest/familynames/%s", uuid), (FamilyName) familyName);
   }
 }

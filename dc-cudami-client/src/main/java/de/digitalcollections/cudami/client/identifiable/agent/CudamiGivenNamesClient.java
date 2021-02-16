@@ -6,14 +6,14 @@ import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.agent.GivenName;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.agent.GivenNameImpl;
+import de.digitalcollections.model.identifiable.agent.GivenName;
 import java.net.http.HttpClient;
 import java.util.UUID;
 
-public class CudamiGivenNamesClient extends CudamiBaseClient<GivenNameImpl> {
+public class CudamiGivenNamesClient extends CudamiBaseClient<GivenName> {
 
   public CudamiGivenNamesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, GivenNameImpl.class, mapper);
+    super(http, serverUrl, GivenName.class, mapper);
   }
 
   public long count() throws HttpException {
@@ -21,10 +21,10 @@ public class CudamiGivenNamesClient extends CudamiBaseClient<GivenNameImpl> {
   }
 
   public GivenName create() {
-    return new GivenNameImpl();
+    return new GivenName();
   }
 
-  public PageResponse<GivenNameImpl> find(PageRequest pageRequest) throws HttpException {
+  public PageResponse<GivenName> find(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/givennames", pageRequest);
   }
 
@@ -33,7 +33,7 @@ public class CudamiGivenNamesClient extends CudamiBaseClient<GivenNameImpl> {
     return findByLanguageAndInitial("/latest/givennames", pageRequest, language, initial);
   }
 
-  public PageResponse<GivenNameImpl> findByLanguageAndInitial(
+  public PageResponse<GivenName> findByLanguageAndInitial(
       int pageNumber,
       int pageSize,
       String sortField,
@@ -63,11 +63,10 @@ public class CudamiGivenNamesClient extends CudamiBaseClient<GivenNameImpl> {
   }
 
   public GivenName save(GivenName givenName) throws HttpException {
-    return doPostRequestForObject("/latest/givennames", (GivenNameImpl) givenName);
+    return doPostRequestForObject("/latest/givennames", (GivenName) givenName);
   }
 
   public GivenName update(UUID uuid, GivenName givenName) throws HttpException {
-    return doPutRequestForObject(
-        String.format("/latest/givennames/%s", uuid), (GivenNameImpl) givenName);
+    return doPutRequestForObject(String.format("/latest/givennames/%s", uuid), (GivenName) givenName);
   }
 }

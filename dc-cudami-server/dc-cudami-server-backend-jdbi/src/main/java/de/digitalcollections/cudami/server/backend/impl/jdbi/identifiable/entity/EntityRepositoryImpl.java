@@ -8,7 +8,7 @@ import de.digitalcollections.model.api.filter.FilterValuePlaceholder;
 import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
+import de.digitalcollections.model.impl.identifiable.entity.Entity;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -78,13 +78,12 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       Jdbi dbi,
       IdentifierRepository identifierRepository,
       FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl) {
-    this(
-        dbi,
+    this(dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        EntityImpl.class,
+        Entity.class,
         getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),

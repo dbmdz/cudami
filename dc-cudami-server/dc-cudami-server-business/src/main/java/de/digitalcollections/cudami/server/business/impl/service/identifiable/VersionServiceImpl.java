@@ -2,12 +2,12 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.VersionRepository;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.VersionService;
-import de.digitalcollections.model.api.identifiable.Identifiable;
-import de.digitalcollections.model.api.identifiable.Identifier;
-import de.digitalcollections.model.api.identifiable.Version;
-import de.digitalcollections.model.api.identifiable.Version.Status;
-import de.digitalcollections.model.api.identifiable.Version.TypeKey;
-import de.digitalcollections.model.impl.identifiable.VersionImpl;
+import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.Version;
+import de.digitalcollections.model.identifiable.versioning.enums.Status;
+import de.digitalcollections.model.identifiable.versioning.enums.TypeKey;
+import de.digitalcollections.model.identifiable.versioning.Version;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ public class VersionServiceImpl implements VersionService {
 
   @Override
   public Version create(String instanceKey, String instanceVersionkey) {
-    VersionImpl version = new VersionImpl();
+    Version version = new Version();
     version.setInstanceVersionKey(instanceVersionkey);
     version.setInstanceKey(instanceKey);
     version.setStatus(Status.INITIAL);

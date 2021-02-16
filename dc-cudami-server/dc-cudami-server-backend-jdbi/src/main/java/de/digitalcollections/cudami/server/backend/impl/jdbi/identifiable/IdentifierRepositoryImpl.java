@@ -2,12 +2,12 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
-import de.digitalcollections.model.api.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.paging.SearchPageResponseImpl;
 import java.util.Arrays;
@@ -63,10 +63,9 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
     final String sql = innerQuery.toString();
 
     List<Identifier> result =
-        dbi.withHandle(
-            h ->
+        dbi.withHandle(h ->
                 h.createQuery(sql)
-                    .mapToBean(IdentifierImpl.class)
+                    .mapToBean(Identifier.class)
                     .map(Identifier.class::cast)
                     .list());
 
@@ -89,11 +88,10 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
     final String sql = innerQuery.toString();
 
     List<Identifier> result =
-        dbi.withHandle(
-            h ->
+        dbi.withHandle(h ->
                 h.createQuery(sql)
                     .bind("searchTerm", searchPageRequest.getQuery())
-                    .mapToBean(IdentifierImpl.class)
+                    .mapToBean(Identifier.class)
                     .map(Identifier.class::cast)
                     .list());
 
@@ -120,11 +118,10 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
     final String sql = "SELECT * FROM " + tableName + " WHERE identifiable = :uuid";
 
     List<Identifier> result =
-        dbi.withHandle(
-            h ->
+        dbi.withHandle(h ->
                 h.createQuery(sql)
                     .bind("uuid", uuidIdentifiable)
-                    .mapToBean(IdentifierImpl.class)
+                    .mapToBean(Identifier.class)
                     .map(Identifier.class::cast)
                     .collect(Collectors.toList()));
     return result;
@@ -136,12 +133,11 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
         "SELECT * FROM " + tableName + " WHERE namespace = :namespace, identifier = :identifier";
 
     Identifier identifier =
-        dbi.withHandle(
-            h ->
+        dbi.withHandle(h ->
                 h.createQuery(sql)
                     .bind("namespace", namespace)
                     .bind("identifier", id)
-                    .mapToBean(IdentifierImpl.class)
+                    .mapToBean(Identifier.class)
                     .findOne()
                     .orElse(null));
     return identifier;
@@ -181,11 +177,10 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
             + " RETURNING *";
 
     Identifier result =
-        dbi.withHandle(
-            h ->
+        dbi.withHandle(h ->
                 h.createQuery(sql)
                     .bindBean(identifier)
-                    .mapToBean(IdentifierImpl.class)
+                    .mapToBean(Identifier.class)
                     .findOne()
                     .orElse(null));
     return result;

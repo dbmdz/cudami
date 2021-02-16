@@ -8,8 +8,8 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.api.filter.FilterValuePlaceholder;
 import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.Identifiable;
-import de.digitalcollections.model.api.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.api.paging.Order;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
@@ -17,8 +17,8 @@ import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.api.paging.Sorting;
 import de.digitalcollections.model.api.paging.enums.Direction;
-import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
-import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
+import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.paging.SearchPageResponseImpl;
@@ -121,13 +121,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   @Autowired
   protected IdentifiableRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    this(
-        dbi,
+    this(dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        IdentifiableImpl.class,
+        Identifiable.class,
         getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
@@ -214,7 +213,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     // (until now everywhere BeanMapper.factory... was used. If this changes, row mapper
     // registration may be moved back into each repository impl?)
     dbi.registerRowMapper(BeanMapper.factory(identifiableImplClass, mappingPrefix));
-    dbi.registerRowMapper(BeanMapper.factory(IdentifierImpl.class, "id"));
+    dbi.registerRowMapper(BeanMapper.factory(Identifier.class, "id"));
     dbi.registerRowMapper(BeanMapper.factory(ImageFileResourceImpl.class, "pi"));
 
     // set basic reduce rows bifunction for reduced selects (lists, paging)
@@ -255,7 +254,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         identifiable.setPreviewImage(rowView.getRow(ImageFileResourceImpl.class));
       }
       if (withIdentifiers && rowView.getColumn("id_uuid", UUID.class) != null) {
-        IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+        Identifier dbIdentifier = rowView.getRow(Identifier.class);
         identifiable.addIdentifier(dbIdentifier);
       }
       return map;

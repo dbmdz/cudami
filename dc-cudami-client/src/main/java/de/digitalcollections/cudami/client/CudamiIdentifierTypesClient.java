@@ -2,45 +2,45 @@ package de.digitalcollections.cudami.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.IdentifierType;
+import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.impl.identifiable.IdentifierTypeImpl;
+import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.UUID;
 
-public class CudamiIdentifierTypesClient extends CudamiBaseClient<IdentifierTypeImpl> {
+public class CudamiIdentifierTypesClient extends CudamiBaseClient<IdentifierType> {
 
   public CudamiIdentifierTypesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, IdentifierTypeImpl.class, mapper);
+    super(http, serverUrl, IdentifierType.class, mapper);
   }
 
   public IdentifierType create() {
-    return new IdentifierTypeImpl();
+    return new IdentifierType();
   }
 
   public long count() throws HttpException {
     return Long.parseLong(doGetRequestForString("/latest/identifiertypes/count"));
   }
 
-  public PageResponse<IdentifierTypeImpl> find(PageRequest pageRequest) throws HttpException {
+  public PageResponse<IdentifierType> find(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/identifiertypes", pageRequest);
   }
 
-  public SearchPageResponse<IdentifierTypeImpl> find(SearchPageRequest searchPageRequest)
+  public SearchPageResponse<IdentifierType> find(SearchPageRequest searchPageRequest)
       throws HttpException {
     return doGetSearchRequestForPagedObjectList(
         "/latest/identifiertypes/search", searchPageRequest);
   }
 
-  public List<IdentifierTypeImpl> find(String searchTerm, int maxResults) throws HttpException {
+  public List<IdentifierType> find(String searchTerm, int maxResults) throws HttpException {
     SearchPageRequest searchPageRequest =
         new SearchPageRequestImpl(searchTerm, 0, maxResults, null);
-    SearchPageResponse<IdentifierTypeImpl> response = find(searchPageRequest);
+    SearchPageResponse<IdentifierType> response = find(searchPageRequest);
     return response.getContent();
   }
 
@@ -59,11 +59,10 @@ public class CudamiIdentifierTypesClient extends CudamiBaseClient<IdentifierType
   }
 
   public IdentifierType save(IdentifierType identifierType) throws HttpException {
-    return doPostRequestForObject("/latest/identifiertypes", (IdentifierTypeImpl) identifierType);
+    return doPostRequestForObject("/latest/identifiertypes", (IdentifierType) identifierType);
   }
 
   public IdentifierType update(UUID uuid, IdentifierType identifierType) throws HttpException {
-    return doPutRequestForObject(
-        String.format("/latest/identifiertypes/%s", uuid), (IdentifierTypeImpl) identifierType);
+    return doPutRequestForObject(String.format("/latest/identifiertypes/%s", uuid), (IdentifierType) identifierType);
   }
 }

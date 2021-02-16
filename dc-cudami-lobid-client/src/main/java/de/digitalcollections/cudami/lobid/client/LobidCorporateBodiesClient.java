@@ -8,7 +8,7 @@ import de.digitalcollections.model.api.http.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.api.identifiable.resource.MimeType;
-import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.impl.identifiable.entity.agent.CorporateBodyImpl;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
@@ -50,7 +50,7 @@ public class LobidCorporateBodiesClient extends LobidBaseClient<LobidCorporateBo
     // identifier
     String gndIdentifier = lobidCorporateBody.getGndIdentifier();
     if (gndIdentifier != null) {
-      corporateBody.addIdentifier(new IdentifierImpl(null, "gnd", gndIdentifier));
+      corporateBody.addIdentifier(new Identifier(null, "gnd", gndIdentifier));
     }
 
     // homepage

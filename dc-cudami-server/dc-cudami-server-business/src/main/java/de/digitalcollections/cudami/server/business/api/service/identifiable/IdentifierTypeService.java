@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable;
 
-import de.digitalcollections.model.api.identifiable.IdentifierType;
+import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import java.util.List;

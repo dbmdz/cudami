@@ -6,7 +6,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.Identi
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.EntityPart;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
+import de.digitalcollections.model.impl.identifiable.entity.Entity;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import java.util.List;
 import java.util.UUID;
@@ -95,11 +95,10 @@ public class EntityPartRepositoryImpl<P extends EntityPart> extends Identifiable
             + " ORDER BY ref.sortindex";
 
     List<Entity> list =
-        dbi.withHandle(
-            h ->
+        dbi.withHandle(h ->
                 h.createQuery(query)
                     .bind("entityPartUuid", entityPartUuid)
-                    .mapToBean(EntityImpl.class)
+                    .mapToBean(Entity.class)
                     .map(Entity.class::cast)
                     .list());
     return list;

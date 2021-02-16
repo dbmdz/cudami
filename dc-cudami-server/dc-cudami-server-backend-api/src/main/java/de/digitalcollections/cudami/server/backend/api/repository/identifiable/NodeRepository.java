@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable;
 
-import de.digitalcollections.model.api.identifiable.Node;
+import de.digitalcollections.model.identifiable.Node;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;

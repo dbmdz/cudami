@@ -6,15 +6,15 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity
 import de.digitalcollections.model.api.filter.FilterCriterion;
 import de.digitalcollections.model.api.filter.FilterValuePlaceholder;
 import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.Identifier;
-import de.digitalcollections.model.api.identifiable.Node;
+import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Collection;
 import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
-import de.digitalcollections.model.impl.identifiable.NodeImpl;
+import de.digitalcollections.model.identifiable.Node;
 import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
 import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
@@ -196,8 +196,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
 
     List<Node> result =
-        dbi.withHandle(
-            h ->
+        dbi.withHandle(h ->
                 h.createQuery(
                         "WITH recursive breadcrumb (uuid,label,parent_uuid,depth)"
                             + " AS ("
@@ -215,8 +214,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                             + " SELECT * FROM breadcrumb"
                             + " ORDER BY depth ASC")
                     .bind("uuid", nodeUuid)
-                    .registerRowMapper(BeanMapper.factory(NodeImpl.class))
-                    .mapTo(NodeImpl.class)
+                    .registerRowMapper(BeanMapper.factory(Node.class))
+                    .mapTo(Node.class)
                     .map(Node.class::cast)
                     .list());
 
@@ -224,15 +223,14 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
       // Special case: If we are on a top level collection, we have no parent, so
       // we must construct a breadcrumb more or less manually
       result =
-          dbi.withHandle(
-              h ->
+          dbi.withHandle(h ->
                   h.createQuery(
                           "SELECT c.uuid AS uuid, c.label AS label"
                               + "        FROM collections c"
                               + "        WHERE uuid= :uuid")
                       .bind("uuid", nodeUuid)
-                      .registerRowMapper(BeanMapper.factory(NodeImpl.class))
-                      .mapTo(NodeImpl.class)
+                      .registerRowMapper(BeanMapper.factory(Node.class))
+                      .mapTo(Node.class)
                       .map(Node.class::cast)
                       .list());
     }

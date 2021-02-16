@@ -4,7 +4,7 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiIdentifiablesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
+import de.digitalcollections.model.identifiable.Identifiable;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,9 +24,9 @@ public class IdentifiableController extends AbstractController {
 
   @GetMapping(value = "/identifiables")
   @ResponseBody
-  public List<IdentifiableImpl> find(@RequestParam(name = "term") String searchTerm)
+  public List<Identifiable> find(@RequestParam(name = "term") String searchTerm)
       throws HttpException {
-    List<IdentifiableImpl> identifiables = service.find(searchTerm, 25);
+    List<Identifiable> identifiables = service.find(searchTerm, 25);
     return identifiables;
   }
 }

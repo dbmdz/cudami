@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierTypeRepository;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierTypeService;
-import de.digitalcollections.model.api.identifiable.IdentifierType;
+import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.Sorting;

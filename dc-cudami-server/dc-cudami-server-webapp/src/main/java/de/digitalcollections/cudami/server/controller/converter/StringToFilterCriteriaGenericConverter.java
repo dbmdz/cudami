@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.controller.converter;
 
 import de.digitalcollections.model.api.filter.FilterCriterion;
-import de.digitalcollections.model.api.filter.enums.FilterOperation;
+import de.digitalcollections.model.filter.enums.FilterOperation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;

@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.WebpageRepository;
-import de.digitalcollections.model.api.identifiable.Node;
+import de.digitalcollections.model.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.parts.LocalizedText;
-import de.digitalcollections.model.impl.identifiable.NodeImpl;
+import de.digitalcollections.model.identifiable.Node;
 import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +31,7 @@ class WebpageServiceImplTest {
   @Test
   @DisplayName("shall not do anything on a node without any label")
   public void ignoreNodeWithNoLabels() {
-    Node node = new NodeImpl();
+    Node node = new Node();
     service.cleanupLabelFromUnwantedLocales(Locale.GERMAN, FALLBACK_LOCALE, node);
     assertThat(node.getLabel()).isNull();
   }
@@ -39,7 +39,7 @@ class WebpageServiceImplTest {
   @Test
   @DisplayName("shall not do anything on a node without any localized label")
   public void ignoreNodeWithNoLocalizedLabels() {
-    Node node = new NodeImpl();
+    Node node = new Node();
     LocalizedText emptyLabel = new LocalizedTextImpl();
 
     node.setLabel(emptyLabel);
@@ -50,7 +50,7 @@ class WebpageServiceImplTest {
   @Test
   @DisplayName("shall use the fallback locale for a localized label, if possible")
   public void useFallbackLocale() {
-    Node node = new NodeImpl();
+    Node node = new Node();
     LocalizedText label = new LocalizedTextImpl();
     label.setText(FALLBACK_LOCALE, "Test");
 
@@ -65,7 +65,7 @@ class WebpageServiceImplTest {
   public void useFirstLocaleAsFallback() {
     LocalizedText expectedFirstLocaleLabel = new LocalizedTextImpl(Locale.FRENCH, "faux");
 
-    Node node = new NodeImpl();
+    Node node = new Node();
     LocalizedText label = new LocalizedTextImpl();
     label.setText(Locale.ITALIAN, "vero");
     label.setText(Locale.FRENCH, "faux");
@@ -80,7 +80,7 @@ class WebpageServiceImplTest {
   public void useDesiredLocale() {
     LocalizedText expectedGermanLabel = new LocalizedTextImpl(Locale.GERMAN, "richtig");
 
-    Node node = new NodeImpl();
+    Node node = new Node();
     LocalizedText label = new LocalizedTextImpl();
     label.setText(FALLBACK_LOCALE, "falsch");
     label.setText(Locale.GERMAN, "richtig");

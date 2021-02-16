@@ -7,8 +7,8 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.model.api.filter.FilterValuePlaceholder;
 import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.Identifier;
-import de.digitalcollections.model.api.identifiable.Node;
+import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.Node;
 import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.Topic;
 import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
@@ -16,8 +16,8 @@ import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.view.BreadcrumbNavigation;
-import de.digitalcollections.model.impl.identifiable.NodeImpl;
-import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
+import de.digitalcollections.model.identifiable.Node;
+import de.digitalcollections.model.impl.identifiable.entity.Entity;
 import de.digitalcollections.model.impl.identifiable.entity.TopicImpl;
 import de.digitalcollections.model.impl.identifiable.entity.parts.SubtopicImpl;
 import de.digitalcollections.model.impl.paging.PageResponseImpl;
@@ -66,7 +66,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
     return IdentifiableRepositoryImpl.getSqlUpdateFieldValues();
   }
 
-  private final EntityRepositoryImpl<EntityImpl> entityRepositoryImpl;
+  private final EntityRepositoryImpl<Entity> entityRepositoryImpl;
   private final FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
 
   @Autowired
@@ -146,8 +146,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
 
     List<Node> result =
-        dbi.withHandle(
-            h ->
+        dbi.withHandle(h ->
                 h.createQuery(
                         "WITH recursive breadcrumb (uuid,label,parent_uuid,depth)"
                             + " AS ("
@@ -169,8 +168,8 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
                             + " WHERE ts.subtopic_uuid = b.parent_uuid and t.uuid = ts.topic_uuid"
                             + " ORDER BY depth ASC")
                     .bind("uuid", nodeUuid)
-                    .registerRowMapper(BeanMapper.factory(NodeImpl.class))
-                    .mapTo(NodeImpl.class)
+                    .registerRowMapper(BeanMapper.factory(Node.class))
+                    .mapTo(Node.class)
                     .map(Node.class::cast)
                     .list());
 
@@ -178,15 +177,14 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
       // Special case: If we are on a top level subtopic, we have no parent, so
       // we must construct a breadcrumb more or less manually
       result =
-          dbi.withHandle(
-              h ->
+          dbi.withHandle(h ->
                   h.createQuery(
                           "SELECT s.uuid as uuid, s.label as label"
                               + "        FROM subtopics s"
                               + "        WHERE uuid= :uuid")
                       .bind("uuid", nodeUuid)
-                      .registerRowMapper(BeanMapper.factory(NodeImpl.class))
-                      .mapTo(NodeImpl.class)
+                      .registerRowMapper(BeanMapper.factory(Node.class))
+                      .mapTo(Node.class)
                       .map(Node.class::cast)
                       .list());
     }

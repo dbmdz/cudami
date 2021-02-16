@@ -9,7 +9,7 @@ import de.digitalcollections.model.api.paging.PageRequest;
 import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.api.paging.SearchPageRequest;
 import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
+import de.digitalcollections.model.impl.identifiable.entity.Entity;
 import de.digitalcollections.model.impl.identifiable.entity.relation.EntityRelationImpl;
 import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
 import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
@@ -18,24 +18,22 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-public class CudamiEntitiesClient extends CudamiBaseClient<EntityImpl> {
+public class CudamiEntitiesClient extends CudamiBaseClient<Entity> {
 
   public CudamiEntitiesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, EntityImpl.class, mapper);
+    super(http, serverUrl, Entity.class, mapper);
   }
 
   public void addRelatedFileresource(UUID uuid, UUID fileResourceUuid) throws HttpException {
-    doPostRequestForObject(
-        String.format("/latest/entities/%s/related/fileresources/%s", uuid, fileResourceUuid),
-        (EntityImpl) null);
+    doPostRequestForObject(String.format("/latest/entities/%s/related/fileresources/%s", uuid, fileResourceUuid),
+        (Entity) null);
   }
 
   public void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid)
       throws HttpException {
-    doPostRequestForObject(
-        String.format(
+    doPostRequestForObject(String.format(
             "/latest/entities/relations/%s/%s/%s", subjectEntityUuid, predicate, objectEntityUuid),
-        (EntityImpl) null);
+        (Entity) null);
   }
 
   public long count() throws HttpException {
@@ -43,22 +41,22 @@ public class CudamiEntitiesClient extends CudamiBaseClient<EntityImpl> {
   }
 
   public Entity create() {
-    return new EntityImpl();
+    return new Entity();
   }
 
-  public PageResponse<EntityImpl> find(PageRequest pageRequest) throws HttpException {
+  public PageResponse<Entity> find(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/entities", pageRequest);
   }
 
-  public SearchPageResponse<EntityImpl> find(SearchPageRequest searchPageRequest)
+  public SearchPageResponse<Entity> find(SearchPageRequest searchPageRequest)
       throws HttpException {
     return doGetSearchRequestForPagedObjectList("/latest/entities/search", searchPageRequest);
   }
 
-  public List<EntityImpl> find(String searchTerm, int maxResults) throws HttpException {
+  public List<Entity> find(String searchTerm, int maxResults) throws HttpException {
     SearchPageRequest searchPageRequest =
         new SearchPageRequestImpl(searchTerm, 0, maxResults, null);
-    SearchPageResponse<EntityImpl> response = find(searchPageRequest);
+    SearchPageResponse<Entity> response = find(searchPageRequest);
     return response.getContent();
   }
 
@@ -84,8 +82,7 @@ public class CudamiEntitiesClient extends CudamiBaseClient<EntityImpl> {
   }
 
   public List findRandomEntities(int count) throws HttpException {
-    return doGetRequestForObjectList(
-        String.format("/latest/entities/random?count=%d", count), EntityImpl.class);
+    return doGetRequestForObjectList(String.format("/latest/entities/random?count=%d", count), Entity.class);
   }
 
   public List getRelatedFileResources(UUID uuid) throws HttpException {
@@ -100,7 +97,7 @@ public class CudamiEntitiesClient extends CudamiBaseClient<EntityImpl> {
   }
 
   public Entity save(Entity entity) throws HttpException {
-    return doPostRequestForObject("/latest/entities", (EntityImpl) entity);
+    return doPostRequestForObject("/latest/entities", (Entity) entity);
   }
 
   public List<FileResource> saveRelatedFileResources(UUID uuid, List fileResources)
@@ -121,6 +118,6 @@ public class CudamiEntitiesClient extends CudamiBaseClient<EntityImpl> {
   }
 
   public Entity update(UUID uuid, Entity entity) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/entities/%s", uuid), (EntityImpl) entity);
+    return doPutRequestForObject(String.format("/latest/entities/%s", uuid), (Entity) entity);
   }
 }
