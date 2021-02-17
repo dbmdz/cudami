@@ -2,24 +2,16 @@ package de.digitalcollections.cudami.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.entity.Collection;
-import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.api.identifiable.entity.Project;
-import de.digitalcollections.model.api.identifiable.entity.work.Item;
-import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.SearchPageRequest;
-import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.impl.identifiable.entity.work.ItemImpl;
-import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
-import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
-import de.digitalcollections.model.impl.paging.PageRequestImpl;
-import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
+import de.digitalcollections.model.identifiable.entity.work.Item;
+import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.identifiable.resource.ImageFileResource;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.UUID;
@@ -54,7 +46,7 @@ public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObject> 
 
   public List<DigitalObject> find(String searchTerm, int maxResults) throws HttpException {
     SearchPageRequest searchPageRequest =
-        new SearchPageRequestImpl(searchTerm, 0, maxResults, null);
+        new SearchPageRequest(searchTerm, 0, maxResults, null);
     SearchPageResponse<DigitalObject> response = find(searchPageRequest);
     return response.getContent();
   }
@@ -73,7 +65,7 @@ public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObject> 
   }
 
   public PageResponse<DigitalObject> findRandomDigitalObjects(int count) throws HttpException {
-    PageRequest pageRequest = new PageRequestImpl(0, count, null);
+    PageRequest pageRequest = new PageRequest(0, count, null);
     return doGetRequestForPagedObjectList("/latest/digitalobjects/random", pageRequest);
   }
 
@@ -92,20 +84,17 @@ public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObject> 
   }
 
   public List<FileResource> getFileResources(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(
-        String.format("/latest/digitalobjects/%s/fileresources", uuid), FileResourceImpl.class);
+    return doGetRequestForObjectList(String.format("/latest/digitalobjects/%s/fileresources", uuid), FileResource.class);
   }
 
   public List<ImageFileResource> getImageFileResources(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(
-        String.format("/latest/digitalobjects/%s/fileresources/images", uuid),
-        ImageFileResourceImpl.class);
+    return doGetRequestForObjectList(String.format("/latest/digitalobjects/%s/fileresources/images", uuid),
+        ImageFileResource.class);
   }
 
   public Item getItem(UUID uuid) throws HttpException {
     return (Item)
-        doGetRequestForObject(
-            String.format("/latest/digitalobjects/%s/item", uuid), ItemImpl.class);
+        doGetRequestForObject(String.format("/latest/digitalobjects/%s/item", uuid), Item.class);
   }
 
   public PageResponse<Project> getProjects(UUID uuid, PageRequest pageRequest)
@@ -118,10 +107,9 @@ public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObject> 
   }
 
   public List<FileResource> saveFileResources(UUID uuid, List fileResources) throws HttpException {
-    return doPostRequestForObjectList(
-        String.format("/latest/digitalobjects/%s/fileresources", uuid),
+    return doPostRequestForObjectList(String.format("/latest/digitalobjects/%s/fileresources", uuid),
         fileResources,
-        FileResourceImpl.class);
+        FileResource.class);
   }
 
   public DigitalObject update(UUID uuid, DigitalObject digitalObject) throws HttpException {

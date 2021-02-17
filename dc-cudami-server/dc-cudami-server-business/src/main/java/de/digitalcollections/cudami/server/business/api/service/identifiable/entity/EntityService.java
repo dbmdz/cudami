@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
-import de.digitalcollections.model.api.identifiable.entity.Entity;
-import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import de.digitalcollections.model.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.util.List;
 import java.util.UUID;
 

@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.resource;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
-import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.api.identifiable.resource.MimeType;
+import de.digitalcollections.model.file.MimeType;
+import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.io.InputStream;
 import org.w3c.dom.Document;
 

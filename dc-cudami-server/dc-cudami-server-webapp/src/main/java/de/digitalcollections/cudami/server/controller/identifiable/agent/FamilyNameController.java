@@ -3,15 +3,13 @@ package de.digitalcollections.cudami.server.controller.identifiable.agent;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.agent.FamilyNameService;
-import de.digitalcollections.model.api.identifiable.agent.FamilyName;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.api.paging.enums.Direction;
-import de.digitalcollections.model.api.paging.enums.NullHandling;
-import de.digitalcollections.model.impl.paging.OrderImpl;
-import de.digitalcollections.model.impl.paging.PageRequestImpl;
-import de.digitalcollections.model.impl.paging.SortingImpl;
+import de.digitalcollections.model.identifiable.agent.FamilyName;
+import de.digitalcollections.model.paging.Direction;
+import de.digitalcollections.model.paging.NullHandling;
+import de.digitalcollections.model.paging.Order;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.Sorting;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
@@ -62,9 +60,9 @@ public class FamilyNameController {
           NullHandling nullHandling,
       @RequestParam(name = "language", required = false, defaultValue = "de") String language,
       @RequestParam(name = "initial", required = false) String initial) {
-    OrderImpl order = new OrderImpl(sortDirection, sortField, nullHandling);
-    Sorting sorting = new SortingImpl(order);
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
+    Order order = new Order(sortDirection, sortField, nullHandling);
+    Sorting sorting = new Sorting(order);
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, sorting);
     if (initial == null) {
       return familyNameService.find(pageRequest);
     }

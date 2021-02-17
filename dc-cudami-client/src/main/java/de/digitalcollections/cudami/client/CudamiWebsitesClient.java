@@ -2,12 +2,10 @@ package de.digitalcollections.cudami.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.entity.Website;
-import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.identifiable.entity.Website;
-import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
+import de.digitalcollections.model.identifiable.web.Webpage;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
@@ -50,8 +48,7 @@ public class CudamiWebsitesClient extends CudamiBaseClient<Website> {
 
   public PageResponse<Webpage> getRootPages(UUID uuid, PageRequest pageRequest)
       throws HttpException {
-    return doGetRequestForPagedObjectList(
-        String.format("/latest/websites/%s/rootpages", uuid), pageRequest, WebpageImpl.class);
+    return doGetRequestForPagedObjectList(String.format("/latest/websites/%s/rootpages", uuid), pageRequest, Webpage.class);
   }
 
   public Website save(Website website) throws HttpException {

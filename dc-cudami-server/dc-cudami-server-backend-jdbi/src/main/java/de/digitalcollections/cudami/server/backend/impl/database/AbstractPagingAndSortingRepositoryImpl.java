@@ -1,11 +1,11 @@
 package de.digitalcollections.cudami.server.backend.impl.database;
 
-import de.digitalcollections.model.api.filter.FilterCriterion;
-import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.filter.enums.FilterOperation;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.api.paging.enums.Direction;
+import de.digitalcollections.model.filter.FilterCriterion;
+import de.digitalcollections.model.filter.FilterOperation;
+import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.paging.Direction;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.Sorting;
 import java.time.LocalDate;
 import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;

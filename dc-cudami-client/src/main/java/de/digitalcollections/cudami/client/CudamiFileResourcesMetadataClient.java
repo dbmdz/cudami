@@ -2,13 +2,11 @@ package de.digitalcollections.cudami.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.SearchPageRequest;
-import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
-import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
+import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.UUID;
@@ -16,37 +14,37 @@ import java.util.UUID;
 /**
  * TODO: implement clients for all different fileresource types (application, audio, image, ....)
  */
-public class CudamiFileResourcesMetadataClient extends CudamiBaseClient<FileResourceImpl> {
+public class CudamiFileResourcesMetadataClient extends CudamiBaseClient<FileResource> {
 
   public CudamiFileResourcesMetadataClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, FileResourceImpl.class, mapper);
+    super(http, serverUrl, FileResource.class, mapper);
   }
 
   public FileResource create() {
-    return new FileResourceImpl();
+    return new FileResource();
   }
 
   public long count() throws HttpException {
     return Long.parseLong(doGetRequestForString("/latest/fileresources/count"));
   }
 
-  public PageResponse<FileResourceImpl> find(PageRequest pageRequest) throws HttpException {
+  public PageResponse<FileResource> find(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/fileresources", pageRequest);
   }
 
-  public SearchPageResponse<FileResourceImpl> find(SearchPageRequest searchPageRequest)
+  public SearchPageResponse<FileResource> find(SearchPageRequest searchPageRequest)
       throws HttpException {
     return doGetSearchRequestForPagedObjectList("/latest/fileresources/search", searchPageRequest);
   }
 
-  public List<FileResourceImpl> find(String searchTerm, int maxResults) throws HttpException {
+  public List<FileResource> find(String searchTerm, int maxResults) throws HttpException {
     SearchPageRequest searchPageRequest =
-        new SearchPageRequestImpl(searchTerm, 0, maxResults, null);
-    SearchPageResponse<FileResourceImpl> response = find(searchPageRequest);
+        new SearchPageRequest(searchTerm, 0, maxResults, null);
+    SearchPageResponse<FileResource> response = find(searchPageRequest);
     return response.getContent();
   }
 
-  public SearchPageResponse<FileResourceImpl> findFileResourcesByType(
+  public SearchPageResponse<FileResource> findFileResourcesByType(
       SearchPageRequest searchPageRequest, String type) throws HttpException {
     return doGetSearchRequestForPagedObjectList(
         String.format("/latest/fileresources/type/%s", type), searchPageRequest);
@@ -62,11 +60,10 @@ public class CudamiFileResourcesMetadataClient extends CudamiBaseClient<FileReso
   }
 
   public FileResource save(FileResource fileResource) throws HttpException {
-    return doPostRequestForObject("/latest/fileresources", (FileResourceImpl) fileResource);
+    return doPostRequestForObject("/latest/fileresources", (FileResource) fileResource);
   }
 
   public FileResource update(UUID uuid, FileResource fileResource) throws HttpException {
-    return doPutRequestForObject(
-        String.format("/latest/fileresources/%s", uuid), (FileResourceImpl) fileResource);
+    return doPutRequestForObject(String.format("/latest/fileresources/%s", uuid), (FileResource) fileResource);
   }
 }

@@ -4,10 +4,10 @@ import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceBinaryService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.resource.FileResourceMetadataServiceImpl;
-import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.api.identifiable.resource.MimeType;
-import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
-import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
+import de.digitalcollections.model.file.MimeType;
+import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.text.LocalizedStructuredContent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InvalidObjectException;
@@ -66,12 +66,11 @@ public class FileResourceBinaryController {
           LOGGER.info("filename = " + fileResource.getFilename());
 
           // set label to original filename for now. can be changed in next step of user input
-          fileResource.setLabel(
-              new LocalizedTextImpl(
+          fileResource.setLabel(new LocalizedText(
                   new Locale(localeService.getDefaultLanguage()), originalFilename));
 
           fileResource = fileUploadService.save(fileResource, stream);
-          fileResource.setDescription(new LocalizedStructuredContentImpl());
+          fileResource.setDescription(new LocalizedStructuredContent());
           LOGGER.info(
               "saved file '"
                   + fileResource.getUri().toString()

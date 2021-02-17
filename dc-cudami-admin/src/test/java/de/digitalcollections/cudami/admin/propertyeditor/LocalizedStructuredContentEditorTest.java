@@ -5,8 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.admin.test.TestApplication;
 import de.digitalcollections.cudami.admin.test.config.SpringConfigBusinessForTest;
-import de.digitalcollections.model.api.identifiable.parts.structuredcontent.LocalizedStructuredContent;
-import de.digitalcollections.model.impl.identifiable.parts.structuredcontent.LocalizedStructuredContentImpl;
+import de.digitalcollections.model.text.LocalizedStructuredContent;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
@@ -76,8 +75,8 @@ public class LocalizedStructuredContentEditorTest implements InitializingBean {
     String json = createJson("localizedStructuredContent.json");
     documentEditor.setAsText(json);
 
-    LocalizedStructuredContentImpl result =
-        (LocalizedStructuredContentImpl) documentEditor.getValue();
+    LocalizedStructuredContent result =
+        (LocalizedStructuredContent) documentEditor.getValue();
     assertThat(result.size()).isEqualTo(expResult.size());
   }
 }

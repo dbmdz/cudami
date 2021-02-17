@@ -2,8 +2,8 @@ package de.digitalcollections.cudami.lobid.client;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.digitalcollections.model.api.http.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.exception.http.HttpException;
+import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import org.junit.jupiter.api.Test;
 
 public class LobidClientIT {

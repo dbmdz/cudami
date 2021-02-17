@@ -3,17 +3,14 @@ package de.digitalcollections.cudami.server.controller.identifiable.resource;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
-import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.api.paging.Order;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.SearchPageRequest;
-import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.impl.paging.PageRequestImpl;
-import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
-import de.digitalcollections.model.impl.paging.SortingImpl;
+import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.paging.Order;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.paging.Sorting;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -61,9 +58,9 @@ public class FileResourceMetadataController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new SortingImpl(sortBy);
+      Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
     return fileResourceService.find(pageRequest);
@@ -84,9 +81,9 @@ public class FileResourceMetadataController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest pageRequest = new SearchPageRequestImpl(searchTerm, pageNumber, pageSize);
+    SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new SortingImpl(sortBy);
+      Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
 

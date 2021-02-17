@@ -2,33 +2,32 @@ package de.digitalcollections.cudami.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.security.User;
-import de.digitalcollections.model.impl.security.UserImpl;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.security.User;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.UUID;
 
-public class CudamiUsersClient extends CudamiBaseClient<UserImpl> {
+public class CudamiUsersClient extends CudamiBaseClient<User> {
 
   public CudamiUsersClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, UserImpl.class, mapper);
+    super(http, serverUrl, User.class, mapper);
   }
 
   public User create() {
-    return new UserImpl();
+    return new User();
   }
 
-  public PageResponse<UserImpl> find(PageRequest pageRequest) throws HttpException {
+  public PageResponse<User> find(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/users", pageRequest);
   }
 
-  public List<UserImpl> findActiveAdminUsers() throws HttpException {
+  public List<User> findActiveAdminUsers() throws HttpException {
     return doGetRequestForObjectList("/latest/users?role=ADMIN&enabled=true");
   }
 
-  public List<UserImpl> findAll() throws HttpException {
+  public List<User> findAll() throws HttpException {
     return doGetRequestForObjectList("/latest/users");
   }
 
@@ -41,10 +40,10 @@ public class CudamiUsersClient extends CudamiBaseClient<UserImpl> {
   }
 
   public User save(User user) throws HttpException {
-    return doPostRequestForObject("/latest/users", (UserImpl) user);
+    return doPostRequestForObject("/latest/users", (User) user);
   }
 
   public User update(UUID uuid, User user) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/users/%s", uuid), (UserImpl) user);
+    return doPutRequestForObject(String.format("/latest/users/%s", uuid), (User) user);
   }
 }

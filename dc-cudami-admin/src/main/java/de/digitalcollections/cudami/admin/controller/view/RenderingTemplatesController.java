@@ -5,14 +5,11 @@ import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.view.CudamiRenderingTemplatesClient;
-import de.digitalcollections.model.api.paging.Order;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.impl.paging.OrderImpl;
-import de.digitalcollections.model.impl.paging.PageRequestImpl;
-import de.digitalcollections.model.impl.paging.SortingImpl;
-import de.digitalcollections.model.impl.view.RenderingTemplate;
+import de.digitalcollections.model.paging.Order;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.view.RenderingTemplate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -77,11 +74,11 @@ public class RenderingTemplatesController extends AbstractController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws HttpException {
     List<Order> orders = new ArrayList<>();
-    OrderImpl labelOrder = new OrderImpl("label");
+    Order labelOrder = new Order("label");
     labelOrder.setSubProperty(localeService.getDefaultLanguage().getLanguage());
-    orders.addAll(Arrays.asList(labelOrder, new OrderImpl("name")));
-    Sorting sorting = new SortingImpl(orders);
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
+    orders.addAll(Arrays.asList(labelOrder, new Order("name")));
+    Sorting sorting = new Sorting(orders);
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, sorting);
     return service.find(pageRequest);
   }
 

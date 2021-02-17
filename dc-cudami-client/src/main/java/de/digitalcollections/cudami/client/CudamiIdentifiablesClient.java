@@ -3,12 +3,10 @@ package de.digitalcollections.cudami.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.identifiable.Identifiable;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.SearchPageRequest;
-import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.identifiable.Identifiable;
-import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
@@ -39,7 +37,7 @@ public class CudamiIdentifiablesClient extends CudamiBaseClient<Identifiable> {
 
   public List<Identifiable> find(String searchTerm, int maxResults) throws HttpException {
     SearchPageRequest searchPageRequest =
-        new SearchPageRequestImpl(searchTerm, 0, maxResults, null);
+        new SearchPageRequest(searchTerm, 0, maxResults, null);
     SearchPageResponse<Identifiable> response = find(searchPageRequest);
     return response.getContent();
   }

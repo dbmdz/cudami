@@ -2,8 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resou
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.LinkedDataFileResourceRepository;
-import de.digitalcollections.model.api.identifiable.resource.LinkedDataFileResource;
-import de.digitalcollections.model.impl.identifiable.resource.LinkedDataFileResourceImpl;
+import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import java.util.Arrays;
 import java.util.List;
 import org.jdbi.v3.core.Jdbi;
@@ -57,13 +56,12 @@ public class LinkedDataFileResourceRepositoryImpl
 
   @Autowired
   public LinkedDataFileResourceRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(
-        dbi,
+    super(dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        LinkedDataFileResourceImpl.class,
+        LinkedDataFileResource.class,
         getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),

@@ -12,9 +12,8 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.ExternalCorporateBodyRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ImageFileResourceService;
-import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
-import de.digitalcollections.model.identifiable.entity.agent.CorporateBodyImpl;
+import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,16 +32,16 @@ class CorporateBodyServiceImplTest {
   void setUp() throws IdentifiableServiceException {
     corporateBodyRepository = mock(CorporateBodyRepository.class);
     when(corporateBodyRepository.save(any(CorporateBody.class)))
-        .thenReturn(new CorporateBodyImpl());
+            .thenReturn(new CorporateBody());
     when(corporateBodyRepository.save(eq(null))).thenThrow(new NullPointerException());
 
     externalCorporateBodyRepository = mock(ExternalCorporateBodyRepository.class);
     imageFileResourceService = mock(ImageFileResourceService.class);
     when(imageFileResourceService.save(eq(null))).thenThrow(new NullPointerException());
 
-    corporateBodyService =
-        new CorporateBodyServiceImpl(
-            corporateBodyRepository, externalCorporateBodyRepository, imageFileResourceService);
+    corporateBodyService
+            = new CorporateBodyServiceImpl(
+                    corporateBodyRepository, externalCorporateBodyRepository, imageFileResourceService);
   }
 
   @Test
@@ -61,9 +60,9 @@ class CorporateBodyServiceImplTest {
   @Test
   @DisplayName("can retrieve and save corporate bodies without preview image")
   void saveWithoutPreviewImage() {
-    CorporateBody corporateBodyWithoutPreviewImage = new CorporateBodyImpl();
+    CorporateBody corporateBodyWithoutPreviewImage = new CorporateBody();
     when(externalCorporateBodyRepository.getByGndId(any(String.class)))
-        .thenReturn(corporateBodyWithoutPreviewImage);
+            .thenReturn(corporateBodyWithoutPreviewImage);
     assertThat(corporateBodyService.fetchAndSaveByGndId("12345")).isNotNull();
   }
 

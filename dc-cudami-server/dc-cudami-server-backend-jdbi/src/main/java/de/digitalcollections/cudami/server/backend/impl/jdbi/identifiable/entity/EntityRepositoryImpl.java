@@ -4,11 +4,10 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
-import de.digitalcollections.model.api.filter.FilterValuePlaceholder;
-import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.entity.Entity;
-import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import de.digitalcollections.model.filter.FilterValuePlaceholder;
+import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;

@@ -2,12 +2,11 @@ package de.digitalcollections.cudami.server.business.impl.service.view;
 
 import de.digitalcollections.cudami.server.backend.api.repository.view.RenderingTemplateRepository;
 import de.digitalcollections.cudami.server.business.api.service.view.RenderingTemplateService;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.api.paging.enums.Direction;
-import de.digitalcollections.model.impl.paging.SortingImpl;
-import de.digitalcollections.model.impl.view.RenderingTemplate;
+import de.digitalcollections.model.paging.Direction;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.view.RenderingTemplate;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +36,7 @@ public class RenderingTemplateServiceImpl implements RenderingTemplateService {
 
   private void setDefaultSorting(PageRequest pageRequest) {
     if (!pageRequest.hasSorting()) {
-      Sorting sorting = new SortingImpl(Direction.ASC, "name");
+      Sorting sorting = new Sorting(Direction.ASC, "name");
       pageRequest.setSorting(sorting);
     }
   }

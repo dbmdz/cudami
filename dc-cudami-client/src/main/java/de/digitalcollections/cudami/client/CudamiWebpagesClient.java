@@ -2,35 +2,32 @@ package de.digitalcollections.cudami.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.entity.Website;
-import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.view.BreadcrumbNavigation;
 import de.digitalcollections.model.identifiable.entity.Website;
-import de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl;
-import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
-import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
+import de.digitalcollections.model.identifiable.web.Webpage;
+import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.identifiable.web.BreadcrumbNavigation;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-public class CudamiWebpagesClient extends CudamiBaseClient<WebpageImpl> {
+public class CudamiWebpagesClient extends CudamiBaseClient<Webpage> {
 
   public CudamiWebpagesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, WebpageImpl.class, mapper);
+    super(http, serverUrl, Webpage.class, mapper);
   }
 
   public Webpage create() {
-    return new WebpageImpl();
+    return new Webpage();
   }
 
   public long count() throws HttpException {
     return Long.parseLong(doGetRequestForString("/latest/webpages/count"));
   }
 
-  public PageResponse<WebpageImpl> find(PageRequest pageRequest) throws HttpException {
+  public PageResponse<Webpage> find(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/webpages", pageRequest);
   }
 
@@ -56,34 +53,32 @@ public class CudamiWebpagesClient extends CudamiBaseClient<WebpageImpl> {
         String.format("/latest/webpages/identifier/%s:%s.json", namespace, id));
   }
 
-  public PageResponse<WebpageImpl> getActiveChildren(UUID uuid, PageRequest pageRequest)
+  public PageResponse<Webpage> getActiveChildren(UUID uuid, PageRequest pageRequest)
       throws HttpException {
-    return doGetRequestForPagedObjectList(
-        String.format("/latest/webpages/%s/children?active=true", uuid),
+    return doGetRequestForPagedObjectList(String.format("/latest/webpages/%s/children?active=true", uuid),
         pageRequest,
-        WebpageImpl.class);
+        Webpage.class);
   }
 
-  public List<WebpageImpl> getActiveChildrenTree(UUID uuid) throws HttpException {
+  public List<Webpage> getActiveChildrenTree(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
         String.format("/latest/webpages/%s/childrentree?active=true", uuid));
   }
 
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws HttpException {
     return (BreadcrumbNavigation)
-        doGetRequestForObject(
-            String.format("/latest/webpages/%s/breadcrumb", uuid), BreadcrumbNavigationImpl.class);
+        doGetRequestForObject(String.format("/latest/webpages/%s/breadcrumb", uuid), BreadcrumbNavigation.class);
   }
 
-  public List<WebpageImpl> getChildren(UUID uuid) throws HttpException {
+  public List<Webpage> getChildren(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(String.format("/latest/webpages/%s/children", uuid));
   }
 
-  public List<WebpageImpl> getChildrenTree(UUID uuid) throws HttpException {
+  public List<Webpage> getChildrenTree(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(String.format("/latest/webpages/%s/childrentree", uuid));
   }
 
-  public PageResponse<WebpageImpl> getChildren(UUID uuid, PageRequest pageRequest)
+  public PageResponse<Webpage> getChildren(UUID uuid, PageRequest pageRequest)
       throws HttpException {
     return doGetRequestForPagedObjectList(
         String.format("/latest/webpages/%s/children", uuid), pageRequest);
@@ -94,8 +89,7 @@ public class CudamiWebpagesClient extends CudamiBaseClient<WebpageImpl> {
   }
 
   public List getRelatedFileResources(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(
-        String.format("/latest/entities/%s/related/fileresources", uuid), FileResourceImpl.class);
+    return doGetRequestForObjectList(String.format("/latest/entities/%s/related/fileresources", uuid), FileResource.class);
   }
 
   public Website getWebsite(UUID rootWebpageUuid) throws HttpException {
@@ -104,23 +98,21 @@ public class CudamiWebpagesClient extends CudamiBaseClient<WebpageImpl> {
   }
 
   public Webpage save(Webpage webpage) throws HttpException {
-    return doPostRequestForObject("/latest/webpages", (WebpageImpl) webpage);
+    return doPostRequestForObject("/latest/webpages", (Webpage) webpage);
   }
 
   public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid)
       throws HttpException {
-    return doPostRequestForObject(
-        String.format("/latest/websites/%s/webpage", parentWebsiteUuid), (WebpageImpl) webpage);
+    return doPostRequestForObject(String.format("/latest/websites/%s/webpage", parentWebsiteUuid), (Webpage) webpage);
   }
 
   public Webpage saveWithParentWebpage(Webpage webpage, UUID parentWebpageUuid)
       throws HttpException {
-    return doPostRequestForObject(
-        String.format("/latest/webpages/%s/webpage", parentWebpageUuid), (WebpageImpl) webpage);
+    return doPostRequestForObject(String.format("/latest/webpages/%s/webpage", parentWebpageUuid), (Webpage) webpage);
   }
 
   public Webpage update(UUID uuid, Webpage webpage) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/webpages/%s", uuid), (WebpageImpl) webpage);
+    return doPutRequestForObject(String.format("/latest/webpages/%s", uuid), (Webpage) webpage);
   }
 
   public boolean updateChildrenOrder(UUID webpageUuid, List<Webpage> children)

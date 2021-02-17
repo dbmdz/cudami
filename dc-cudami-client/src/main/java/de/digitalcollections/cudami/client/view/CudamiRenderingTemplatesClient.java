@@ -3,9 +3,9 @@ package de.digitalcollections.cudami.client.view;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiBaseClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.view.RenderingTemplate;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.view.RenderingTemplate;
 import java.net.http.HttpClient;
 import java.util.UUID;
 
@@ -33,8 +33,4 @@ public class CudamiRenderingTemplatesClient extends CudamiBaseClient<RenderingTe
   public RenderingTemplate update(UUID uuid, RenderingTemplate template) throws HttpException {
     return doPutRequestForObject(String.format("/latest/renderingtemplates/%s", uuid), template);
   }
-
-  /*
-  - find
-  */
 }

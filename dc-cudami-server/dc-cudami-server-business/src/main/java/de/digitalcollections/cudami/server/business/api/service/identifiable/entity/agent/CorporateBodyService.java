@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
-import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 
 public interface CorporateBodyService extends EntityService<CorporateBody> {
 

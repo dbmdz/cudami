@@ -9,17 +9,14 @@ import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiFileResourcesMetadataClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.SearchPageRequest;
-import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.api.paging.enums.Direction;
-import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
-import de.digitalcollections.model.impl.paging.OrderImpl;
-import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
-import de.digitalcollections.model.impl.paging.SortingImpl;
+import de.digitalcollections.model.paging.Direction;
+import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.paging.Order;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.paging.Sorting;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -138,7 +135,7 @@ public class FileResourcesMetadataController extends AbstractController {
 
   @GetMapping("/api/fileresources/type/{type}")
   @ResponseBody
-  public SearchPageResponse<FileResourceImpl> searchFileResourcesByType(
+  public SearchPageResponse<FileResource> searchFileResourcesByType(
       @PathVariable String type,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
@@ -148,11 +145,11 @@ public class FileResourcesMetadataController extends AbstractController {
       throws HttpException {
     Sorting sorting = null;
     if (sortField != null && sortDirection != null) {
-      OrderImpl order = new OrderImpl(sortDirection, sortField);
-      sorting = new SortingImpl(order);
+      Order order = new Order(sortDirection, sortField);
+      sorting = new Sorting(order);
     }
     SearchPageRequest pageRequest =
-        new SearchPageRequestImpl(searchTerm, pageNumber, pageSize, sorting);
+        new SearchPageRequest(searchTerm, pageNumber, pageSize, sorting);
     return service.findFileResourcesByType(pageRequest, type);
   }
 

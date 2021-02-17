@@ -2,8 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resou
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.VideoFileResourceRepository;
-import de.digitalcollections.model.api.identifiable.resource.VideoFileResource;
-import de.digitalcollections.model.impl.identifiable.resource.VideoFileResourceImpl;
+import de.digitalcollections.model.identifiable.resource.VideoFileResource;
 import java.util.List;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
@@ -51,13 +50,12 @@ public class VideoFileResourceRepositoryImpl
 
   @Autowired
   public VideoFileResourceRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(
-        dbi,
+    super(dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        VideoFileResourceImpl.class,
+        VideoFileResource.class,
         getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),

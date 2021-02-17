@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.file.identifiable.resou
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.digitalcollections.model.api.identifiable.resource.MimeType;
+import de.digitalcollections.model.file.MimeType;
 import java.net.URI;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;

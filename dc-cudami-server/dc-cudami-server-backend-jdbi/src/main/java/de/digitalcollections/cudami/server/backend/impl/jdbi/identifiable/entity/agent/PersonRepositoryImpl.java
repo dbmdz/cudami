@@ -7,20 +7,16 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.agent.
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work.WorkRepositoryImpl;
-import de.digitalcollections.model.api.identifiable.agent.FamilyName;
-import de.digitalcollections.model.api.identifiable.agent.GivenName;
-import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.api.identifiable.entity.agent.Person;
-import de.digitalcollections.model.api.identifiable.entity.geo.GeoLocation;
-import de.digitalcollections.model.api.identifiable.entity.geo.enums.GeoLocationType;
-import de.digitalcollections.model.api.identifiable.entity.work.Work;
-import de.digitalcollections.model.api.identifiable.parts.LocalizedText;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocationType;
 import de.digitalcollections.model.identifiable.agent.FamilyName;
 import de.digitalcollections.model.identifiable.agent.GivenName;
-import de.digitalcollections.model.identifiable.entity.agent.PersonImpl;
-import de.digitalcollections.model.impl.identifiable.entity.geo.GeoLocationImpl;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.agent.Person;
+import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
+import de.digitalcollections.model.identifiable.entity.work.Work;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.text.LocalizedText;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -66,7 +62,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         LocalizedText label = rowView.getColumn("glbirth_label", LocalizedText.class);
         GeoLocationType geoLocationType =
             rowView.getColumn("glbirth_geoLocationType", GeoLocationType.class);
-        final GeoLocation placeOfBirth = new GeoLocationImpl();
+        final GeoLocation placeOfBirth = new GeoLocation();
         placeOfBirth.setUuid(glBirthUuid);
         placeOfBirth.setLabel(label);
         placeOfBirth.setGeoLocationType(geoLocationType);
@@ -78,7 +74,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         LocalizedText label = rowView.getColumn("gldeath_label", LocalizedText.class);
         GeoLocationType geoLocationType =
             rowView.getColumn("gldeath_geoLocationType", GeoLocationType.class);
-        final GeoLocation placeOfDeath = new GeoLocationImpl();
+        final GeoLocation placeOfDeath = new GeoLocation();
         placeOfDeath.setUuid(glDeathUuid);
         placeOfDeath.setLabel(label);
         placeOfDeath.setGeoLocationType(geoLocationType);
@@ -184,7 +180,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        PersonImpl.class,
+        Person.class,
         getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),

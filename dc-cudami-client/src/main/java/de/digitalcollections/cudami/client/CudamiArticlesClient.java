@@ -2,11 +2,10 @@ package de.digitalcollections.cudami.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.entity.Article;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.identifiable.entity.Article;
-import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
+import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
@@ -48,8 +47,7 @@ public class CudamiArticlesClient extends CudamiBaseClient<Article> {
   }
 
   public List getRelatedFileResources(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(
-        String.format("/latest/entities/%s/related/fileresources", uuid), FileResourceImpl.class);
+    return doGetRequestForObjectList(String.format("/latest/entities/%s/related/fileresources", uuid), FileResource.class);
   }
 
   public Article save(Article article) throws HttpException {

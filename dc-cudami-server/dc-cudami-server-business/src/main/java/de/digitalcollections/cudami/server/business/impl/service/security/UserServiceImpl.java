@@ -2,14 +2,12 @@ package de.digitalcollections.cudami.server.business.impl.service.security;
 
 import de.digitalcollections.cudami.server.backend.api.repository.security.UserRepository;
 import de.digitalcollections.cudami.server.business.api.service.security.UserService;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.api.paging.enums.Direction;
-import de.digitalcollections.model.api.security.User;
-import de.digitalcollections.model.api.security.enums.Role;
-import de.digitalcollections.model.impl.paging.SortingImpl;
-import de.digitalcollections.model.impl.security.UserImpl;
+import de.digitalcollections.model.paging.Direction;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.security.Role;
+import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.security.User;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +55,7 @@ public class UserServiceImpl implements UserService<User> {
 
   @Override
   public User createAdminUser() {
-    UserImpl user = (UserImpl) userRepository.create();
+    User user = (User) userRepository.create();
     user.getRoles().add(Role.ADMIN);
     return user;
   }
@@ -116,7 +114,7 @@ public class UserServiceImpl implements UserService<User> {
 
   private void setDefaultSorting(PageRequest pageRequest) {
     if (!pageRequest.hasSorting()) {
-      Sorting sorting = new SortingImpl(Direction.ASC, "email");
+      Sorting sorting = new Sorting(Direction.ASC, "email");
       pageRequest.setSorting(sorting);
     }
   }

@@ -4,11 +4,11 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.Node;
-import de.digitalcollections.model.api.identifiable.parts.LocalizedText;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.SearchPageRequest;
-import de.digitalcollections.model.api.paging.SearchPageResponse;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.text.LocalizedText;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;

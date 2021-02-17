@@ -2,15 +2,13 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.parts.WebpageRepositoryImpl;
-import de.digitalcollections.model.api.filter.Filtering;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.web.WebpageRepositoryImpl;
 import de.digitalcollections.model.identifiable.Identifier;
-import de.digitalcollections.model.api.identifiable.entity.Website;
-import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Website;
-import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import de.digitalcollections.model.identifiable.web.Webpage;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -194,7 +192,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     addFiltering(pageRequest, countQuery);
     long total = retrieveCount(countQuery, Map.of("uuid", uuid));
 
-    return new PageResponseImpl<>(result, pageRequest, total);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override

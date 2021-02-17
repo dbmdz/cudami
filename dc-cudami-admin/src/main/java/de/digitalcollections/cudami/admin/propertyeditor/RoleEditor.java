@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.admin.propertyeditor;
 
-import de.digitalcollections.model.api.security.enums.Role;
+import de.digitalcollections.model.security.Role;
 import java.beans.PropertyEditorSupport;
 import org.springframework.stereotype.Component;
 

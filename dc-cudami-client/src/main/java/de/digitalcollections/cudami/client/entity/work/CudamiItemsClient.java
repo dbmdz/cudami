@@ -3,20 +3,19 @@ package de.digitalcollections.cudami.client.entity.work;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiBaseClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.entity.work.Item;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.impl.identifiable.entity.work.ItemImpl;
-import de.digitalcollections.model.impl.identifiable.entity.work.WorkImpl;
+import de.digitalcollections.model.identifiable.entity.work.Item;
+import de.digitalcollections.model.identifiable.entity.work.Work;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.UUID;
 
-public class CudamiItemsClient extends CudamiBaseClient<ItemImpl> {
+public class CudamiItemsClient extends CudamiBaseClient<Item> {
 
   public CudamiItemsClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, ItemImpl.class, mapper);
+    super(http, serverUrl, Item.class, mapper);
   }
 
   public Boolean addDigitalObject(UUID itemUuid, UUID digitalObjectUuid) throws HttpException {
@@ -33,14 +32,14 @@ public class CudamiItemsClient extends CudamiBaseClient<ItemImpl> {
   }
 
   public Item create() {
-    return new ItemImpl();
+    return new Item();
   }
 
   public long count() throws HttpException {
     return Long.parseLong(doGetRequestForString("/latest/items/count"));
   }
 
-  public PageResponse<ItemImpl> find(PageRequest pageRequest) throws HttpException {
+  public PageResponse<Item> find(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/items", pageRequest);
   }
 
@@ -49,7 +48,7 @@ public class CudamiItemsClient extends CudamiBaseClient<ItemImpl> {
     return findByLanguageAndInitial("/latest/items", pageRequest, language, initial);
   }
 
-  public PageResponse<ItemImpl> findByLanguageAndInitial(
+  public PageResponse<Item> findByLanguageAndInitial(
       int pageNumber,
       int pageSize,
       String sortField,
@@ -83,14 +82,14 @@ public class CudamiItemsClient extends CudamiBaseClient<ItemImpl> {
   }
 
   public List getWorks(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(String.format("/latest/items/%s/works", uuid), WorkImpl.class);
+    return doGetRequestForObjectList(String.format("/latest/items/%s/works", uuid), Work.class);
   }
 
   public Item save(Item item) throws HttpException {
-    return doPostRequestForObject("/latest/items", (ItemImpl) item);
+    return doPostRequestForObject("/latest/items", (Item) item);
   }
 
   public Item update(UUID uuid, Item item) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/items/%s", uuid), (ItemImpl) item);
+    return doPutRequestForObject(String.format("/latest/items/%s", uuid), (Item) item);
   }
 }

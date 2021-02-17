@@ -5,20 +5,17 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work.ItemRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
-import de.digitalcollections.model.api.filter.FilterCriterion;
-import de.digitalcollections.model.api.filter.FilterValuePlaceholder;
-import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.entity.Collection;
-import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.api.identifiable.entity.Project;
-import de.digitalcollections.model.api.identifiable.entity.work.Item;
-import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.filter.FilterCriterion;
+import de.digitalcollections.model.filter.FilterValuePlaceholder;
+import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
-import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import de.digitalcollections.model.identifiable.entity.Project;
+import de.digitalcollections.model.identifiable.entity.work.Item;
+import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.identifiable.resource.ImageFileResource;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -148,7 +145,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     addFiltering(pageRequest, countQuery);
     long total = retrieveCount(countQuery, Map.of("uuid", digitalObjectUuid));
 
-    return new PageResponseImpl<>(result, pageRequest, total);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override
@@ -254,7 +251,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     addFiltering(pageRequest, countQuery);
     long total = retrieveCount(countQuery, Map.of("uuid", digitalObjectUuid));
 
-    return new PageResponseImpl<>(result, pageRequest, total);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override
@@ -285,7 +282,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       // first save fileresources
       for (FileResource fileResource : fileResources) {
         if (fileResource.getUuid() == null) {
-          fileResourceMetadataRepositoryImpl.save((FileResourceImpl) fileResource);
+          fileResourceMetadataRepositoryImpl.save((FileResource) fileResource);
         }
       }
 

@@ -3,11 +3,11 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.PersonRepository;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.PersonService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
-import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.api.identifiable.entity.agent.Person;
-import de.digitalcollections.model.api.identifiable.entity.work.Work;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.agent.Person;
+import de.digitalcollections.model.identifiable.entity.work.Work;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
 import java.util.Set;
 import java.util.UUID;
 import org.slf4j.Logger;

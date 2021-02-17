@@ -4,10 +4,9 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ItemRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
-import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.api.identifiable.entity.work.Item;
-import de.digitalcollections.model.api.identifiable.entity.work.Work;
-import de.digitalcollections.model.impl.identifiable.entity.work.ItemImpl;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.work.Item;
+import de.digitalcollections.model.identifiable.entity.work.Work;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -83,13 +82,12 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
       IdentifierRepository identifierRepository,
       @Lazy DigitalObjectRepositoryImpl digitalObjectRepositoryImpl,
       @Lazy WorkRepositoryImpl workRepositoryImpl) {
-    super(
-        dbi,
+    super(dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        ItemImpl.class,
+        Item.class,
         getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),

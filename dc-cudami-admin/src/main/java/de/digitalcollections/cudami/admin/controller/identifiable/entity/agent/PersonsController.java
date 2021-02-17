@@ -6,15 +6,11 @@ import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.entity.agent.CudamiPersonsClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.entity.agent.Person;
-import de.digitalcollections.model.api.paging.Order;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.identifiable.entity.agent.PersonImpl;
-import de.digitalcollections.model.impl.paging.OrderImpl;
-import de.digitalcollections.model.impl.paging.PageRequestImpl;
-import de.digitalcollections.model.impl.paging.SortingImpl;
+import de.digitalcollections.model.identifiable.entity.agent.Person;
+import de.digitalcollections.model.paging.Order;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.Sorting;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -90,16 +86,16 @@ public class PersonsController extends AbstractController {
 
   @GetMapping("/api/persons")
   @ResponseBody
-  public PageResponse<PersonImpl> findAll(
+  public PageResponse<Person> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws HttpException {
     List<Order> orders = new ArrayList<>();
-    OrderImpl labelOrder = new OrderImpl("label");
+    Order labelOrder = new Order("label");
     labelOrder.setSubProperty(localeService.getDefaultLanguage().getLanguage());
     orders.addAll(Arrays.asList(labelOrder));
-    Sorting sorting = new SortingImpl(orders);
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
+    Sorting sorting = new Sorting(orders);
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, sorting);
     return service.find(pageRequest);
   }
 

@@ -6,14 +6,14 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
-import de.digitalcollections.model.api.identifiable.parts.LocalizedText;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.SearchPageRequest;
-import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.api.paging.enums.Direction;
-import de.digitalcollections.model.impl.paging.OrderImpl;
+import de.digitalcollections.model.paging.Direction;
+import de.digitalcollections.model.paging.Order;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.text.LocalizedText;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -155,9 +155,9 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     if (!pageRequest.hasSorting()) {
       // TODO: discuss default sorting (what if only english label exists? or german and english?)
       String defaultLanguage = localeService.getDefaultLanguage();
-      final OrderImpl labelOrder1 = new OrderImpl(Direction.ASC, "label");
+      final Order labelOrder1 = new Order(Direction.ASC, "label");
       labelOrder1.setSubProperty(defaultLanguage);
-      final OrderImpl labelOrder2 = new OrderImpl(Direction.ASC, "label");
+      final Order labelOrder2 = new Order(Direction.ASC, "label");
       labelOrder2.setSubProperty("");
       Sorting sorting = Sorting.defaultBuilder().order(labelOrder1).order(labelOrder2).build();
       pageRequest.setSorting(sorting);

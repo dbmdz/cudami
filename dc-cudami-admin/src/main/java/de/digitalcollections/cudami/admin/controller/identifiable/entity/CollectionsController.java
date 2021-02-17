@@ -7,19 +7,15 @@ import de.digitalcollections.cudami.client.CudamiCollectionsClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.identifiable.Node;
-import de.digitalcollections.model.api.identifiable.entity.Collection;
-import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.SearchPageRequest;
-import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.api.paging.enums.Direction;
+import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.identifiable.entity.Collection;
-import de.digitalcollections.model.impl.paging.OrderImpl;
-import de.digitalcollections.model.impl.paging.PageRequestImpl;
-import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
-import de.digitalcollections.model.impl.paging.SortingImpl;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.paging.Order;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.paging.Sorting;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -148,7 +144,7 @@ public class CollectionsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws HttpException {
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     return service.findTopCollections(pageRequest);
   }
 
@@ -175,7 +171,7 @@ public class CollectionsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws HttpException {
-    return service.getDigitalObjects(uuid, new PageRequestImpl(pageNumber, pageSize));
+    return service.getDigitalObjects(uuid, new PageRequest(pageNumber, pageSize));
   }
 
   @GetMapping("/api/collections/{uuid}/subcollections")
@@ -185,7 +181,7 @@ public class CollectionsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws HttpException {
-    return service.getSubcollections(uuid, new PageRequestImpl(pageNumber, pageSize));
+    return service.getSubcollections(uuid, new PageRequest(pageNumber, pageSize));
   }
 
   @GetMapping("/collections")
@@ -250,11 +246,11 @@ public class CollectionsController extends AbstractController {
       throws HttpException {
     Sorting sorting = null;
     if (sortField != null && sortDirection != null) {
-      OrderImpl order = new OrderImpl(sortDirection, sortField);
-      sorting = new SortingImpl(order);
+      Order order = new Order(sortDirection, sortField);
+      sorting = new Sorting(order);
     }
     SearchPageRequest pageRequest =
-        new SearchPageRequestImpl(searchTerm, pageNumber, pageSize, sorting);
+        new SearchPageRequest(searchTerm, pageNumber, pageSize, sorting);
     return service.find(pageRequest);
   }
 

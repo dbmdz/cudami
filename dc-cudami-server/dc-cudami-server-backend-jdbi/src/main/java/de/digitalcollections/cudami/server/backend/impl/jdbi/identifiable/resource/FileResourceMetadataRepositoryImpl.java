@@ -3,11 +3,10 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resou
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
-import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.api.paging.SearchPageRequest;
-import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
-import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
+import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -78,13 +77,12 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
 
   @Autowired
   public FileResourceMetadataRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    this(
-        dbi,
+    this(dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        FileResourceImpl.class,
+        FileResource.class,
         getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
@@ -183,7 +181,7 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
   public F save(F fileResource) {
     if (fileResource.getLabel() == null && fileResource.getFilename() != null) {
       // set a default label = filename (an empty label violates constraint)
-      fileResource.setLabel(new LocalizedTextImpl(Locale.ROOT, fileResource.getFilename()));
+      fileResource.setLabel(new LocalizedText(Locale.ROOT, fileResource.getFilename()));
     }
     super.save(fileResource);
     F result = findOne(fileResource.getUuid());

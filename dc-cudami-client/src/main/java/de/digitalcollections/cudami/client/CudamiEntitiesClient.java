@@ -2,17 +2,13 @@ package de.digitalcollections.cudami.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.entity.Entity;
-import de.digitalcollections.model.api.identifiable.entity.relation.EntityRelation;
-import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.SearchPageRequest;
-import de.digitalcollections.model.api.paging.SearchPageResponse;
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.impl.identifiable.entity.relation.EntityRelationImpl;
-import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
-import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
+import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
@@ -55,7 +51,7 @@ public class CudamiEntitiesClient extends CudamiBaseClient<Entity> {
 
   public List<Entity> find(String searchTerm, int maxResults) throws HttpException {
     SearchPageRequest searchPageRequest =
-        new SearchPageRequestImpl(searchTerm, 0, maxResults, null);
+        new SearchPageRequest(searchTerm, 0, maxResults, null);
     SearchPageResponse<Entity> response = find(searchPageRequest);
     return response.getContent();
   }
@@ -86,14 +82,12 @@ public class CudamiEntitiesClient extends CudamiBaseClient<Entity> {
   }
 
   public List getRelatedFileResources(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(
-        String.format("/latest/entities/%s/related/fileresources", uuid), FileResourceImpl.class);
+    return doGetRequestForObjectList(String.format("/latest/entities/%s/related/fileresources", uuid), FileResource.class);
   }
 
   public List<EntityRelation> getRelations(UUID subjectEntityUuid) throws HttpException {
-    return doGetRequestForObjectList(
-        String.format("/latest/entities/relations/%s", subjectEntityUuid),
-        EntityRelationImpl.class);
+    return doGetRequestForObjectList(String.format("/latest/entities/relations/%s", subjectEntityUuid),
+        EntityRelation.class);
   }
 
   public Entity save(Entity entity) throws HttpException {
@@ -102,19 +96,17 @@ public class CudamiEntitiesClient extends CudamiBaseClient<Entity> {
 
   public List<FileResource> saveRelatedFileResources(UUID uuid, List fileResources)
       throws HttpException {
-    return doPostRequestForObjectList(
-        String.format("/latest/entities/%s/related/fileresources", uuid),
+    return doPostRequestForObjectList(String.format("/latest/entities/%s/related/fileresources", uuid),
         fileResources,
-        FileResourceImpl.class);
+        FileResource.class);
   }
 
   public List<EntityRelation> saveRelationsForSubject(List relations) throws HttpException {
-    return doPutRequestForObjectList(
-        String.format(
+    return doPutRequestForObjectList(String.format(
             "/latest/entities/%s/relations",
             ((EntityRelation) relations.get(0)).getSubject().getUuid()),
         relations,
-        EntityRelationImpl.class);
+        EntityRelation.class);
   }
 
   public Entity update(UUID uuid, Entity entity) throws HttpException {

@@ -3,10 +3,9 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.AgentRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
-import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.api.identifiable.entity.agent.Agent;
-import de.digitalcollections.model.api.identifiable.entity.work.Work;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
+import de.digitalcollections.model.identifiable.entity.work.Work;
 import java.util.Set;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;

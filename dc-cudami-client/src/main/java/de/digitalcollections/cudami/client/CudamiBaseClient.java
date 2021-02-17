@@ -5,19 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import de.digitalcollections.cudami.client.exceptions.CudamiRestErrorDecoder;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.filter.FilterCriterion;
-import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.paging.Order;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.SearchPageRequest;
-import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.api.paging.enums.Direction;
-import de.digitalcollections.model.api.paging.enums.NullHandling;
-import de.digitalcollections.model.impl.paging.OrderImpl;
-import de.digitalcollections.model.impl.paging.PageRequestImpl;
-import de.digitalcollections.model.impl.paging.SortingImpl;
+import de.digitalcollections.model.filter.FilterCriterion;
+import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.paging.Direction;
+import de.digitalcollections.model.paging.NullHandling;
+import de.digitalcollections.model.paging.Order;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.paging.Sorting;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -671,11 +668,11 @@ public class CudamiBaseClient<T extends Object> {
       String language,
       String initial)
       throws HttpException {
-    OrderImpl order =
-        new OrderImpl(
+    Order order =
+        new Order(
             Direction.fromString(sortDirection), sortField, NullHandling.valueOf(nullHandling));
-    Sorting sorting = new SortingImpl(order);
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
+    Sorting sorting = new Sorting(order);
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, sorting);
     return findByLanguageAndInitial(baseUrl, pageRequest, language, initial);
   }
 }

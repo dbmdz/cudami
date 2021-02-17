@@ -7,7 +7,7 @@ import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.EntityPart;
 import de.digitalcollections.model.api.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
+import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.util.List;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
@@ -113,11 +113,10 @@ public class EntityPartRepositoryImpl<P extends EntityPart> extends Identifiable
             + " ORDER BY ref.sortindex";
 
     List<FileResource> result =
-        dbi.withHandle(
-            h ->
+        dbi.withHandle(h ->
                 h.createQuery(query)
                     .bind("entityPartUuid", entityPartUuid)
-                    .mapToBean(FileResourceImpl.class)
+                    .mapToBean(FileResource.class)
                     .map(FileResource.class::cast)
                     .list());
     return result;

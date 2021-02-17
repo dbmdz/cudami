@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.business.impl.validator;
 
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
-import de.digitalcollections.model.api.security.User;
+import de.digitalcollections.model.security.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.Errors;

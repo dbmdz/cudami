@@ -1,9 +1,9 @@
 package de.digitalcollections.cudami.admin.business.api.service.security;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.security.User;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.security.User;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.security.core.userdetails.UserDetailsService;

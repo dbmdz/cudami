@@ -3,8 +3,8 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ArticleRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ArticleService;
-import de.digitalcollections.model.api.identifiable.entity.Article;
-import de.digitalcollections.model.api.identifiable.entity.agent.Agent;
+import de.digitalcollections.model.identifiable.entity.Article;
+import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;

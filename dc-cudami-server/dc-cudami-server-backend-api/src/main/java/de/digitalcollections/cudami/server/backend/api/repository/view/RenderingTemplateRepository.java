@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.server.backend.api.repository.view;
 
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.view.RenderingTemplate;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.view.RenderingTemplate;
 import java.util.UUID;
 
 /** Repository for rendering templates persistence handling. */

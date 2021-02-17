@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.admin.propertyeditor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.model.api.identifiable.parts.LocalizedText;
+import de.digitalcollections.model.text.LocalizedText;
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import org.slf4j.Logger;

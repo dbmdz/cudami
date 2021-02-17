@@ -3,10 +3,10 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.parts.EntityPartRepository;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.EntityPartService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
-import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.entity.Entity;
 import de.digitalcollections.model.api.identifiable.entity.parts.EntityPart;
-import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;

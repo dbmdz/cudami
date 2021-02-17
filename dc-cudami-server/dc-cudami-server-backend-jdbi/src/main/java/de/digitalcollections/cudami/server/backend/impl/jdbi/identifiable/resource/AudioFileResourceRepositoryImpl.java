@@ -2,8 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resou
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.AudioFileResourceRepository;
-import de.digitalcollections.model.api.identifiable.resource.AudioFileResource;
-import de.digitalcollections.model.impl.identifiable.resource.AudioFileResourceImpl;
+import de.digitalcollections.model.identifiable.resource.AudioFileResource;
 import java.util.List;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
@@ -51,13 +50,12 @@ public class AudioFileResourceRepositoryImpl
 
   @Autowired
   public AudioFileResourceRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(
-        dbi,
+    super(dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        AudioFileResourceImpl.class,
+        AudioFileResource.class,
         getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),

@@ -6,11 +6,10 @@ import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.security.User;
-import de.digitalcollections.model.api.security.enums.Role;
-import de.digitalcollections.model.impl.security.UserImpl;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.security.Role;
+import de.digitalcollections.model.security.User;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -88,7 +87,7 @@ public class UserController extends AbstractController {
   public String create(
       @RequestParam("pwd1") String password1,
       @RequestParam("pwd2") String password2,
-      @ModelAttribute(name = "user") @Valid UserImpl user,
+      @ModelAttribute(name = "user") @Valid User user,
       BindingResult results,
       Model model,
       SessionStatus status,
@@ -134,7 +133,7 @@ public class UserController extends AbstractController {
       @PathVariable UUID uuid,
       @RequestParam(name = "pwd1", required = false) String password1,
       @RequestParam(name = "pwd2", required = false) String password2,
-      @ModelAttribute(name = "user") @Valid UserImpl user,
+      @ModelAttribute(name = "user") @Valid User user,
       BindingResult results,
       Model model,
       SessionStatus status,
@@ -185,7 +184,7 @@ public class UserController extends AbstractController {
   public String updatePassword(
       @RequestParam("pwd1") String password1,
       @RequestParam("pwd2") String password2,
-      @ModelAttribute(name = "user") @Valid UserImpl user,
+      @ModelAttribute(name = "user") @Valid User user,
       BindingResult results,
       Model model,
       SessionStatus status,

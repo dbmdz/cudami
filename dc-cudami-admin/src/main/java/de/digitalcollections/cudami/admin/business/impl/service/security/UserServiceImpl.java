@@ -7,11 +7,10 @@ import de.digitalcollections.cudami.admin.business.impl.validator.UniqueUsername
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiUsersClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.security.User;
-import de.digitalcollections.model.api.security.enums.Role;
-import de.digitalcollections.model.impl.security.UserImpl;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.security.Role;
+import de.digitalcollections.model.security.User;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -31,7 +30,7 @@ import org.springframework.validation.Validator;
 
 /** Service for User handling. */
 @Service
-public class UserServiceImpl implements UserService<UserImpl>, InitializingBean {
+public class UserServiceImpl implements UserService<User>, InitializingBean {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
@@ -48,12 +47,12 @@ public class UserServiceImpl implements UserService<UserImpl>, InitializingBean 
   }
 
   @Override
-  public UserImpl activate(UUID uuid) throws ServiceException {
+  public User activate(UUID uuid) throws ServiceException {
     try {
       User user = client.findOne(uuid);
       user.setEnabled(true);
       user = client.update(user.getUuid(), user);
-      return (UserImpl) user;
+      return (User) user;
     } catch (HttpException ex) {
       throw new ServiceException(ex.getMessage(), ex);
     }
@@ -65,36 +64,36 @@ public class UserServiceImpl implements UserService<UserImpl>, InitializingBean 
   }
 
   @Override
-  public UserImpl create() {
-    return (UserImpl) client.create();
+  public User create() {
+    return (User) client.create();
   }
 
   @Override
-  public UserImpl create(UserImpl user, String password1, String password2, Errors results)
+  public User create(User user, String password1, String password2, Errors results)
       throws ServiceException {
     uniqueUsernameValidator.validate(user, results);
     if (!results.hasErrors()) {
-      return (UserImpl) save(password1, password2, user, results, false);
+      return (User) save(password1, password2, user, results, false);
     }
     return null;
   }
 
   @Override
-  public UserImpl createAdminUser() {
+  public User createAdminUser() {
     User user = create();
     List<Role> roles = new ArrayList<>();
     roles.add(Role.ADMIN);
     user.setRoles(roles);
-    return (UserImpl) user;
+    return (User) user;
   }
 
   @Override
-  public UserImpl deactivate(UUID uuid) throws ServiceException {
+  public User deactivate(UUID uuid) throws ServiceException {
     try {
       User user = client.findOne(uuid);
       user.setEnabled(false);
       user = client.update(user.getUuid(), user);
-      return (UserImpl) user;
+      return (User) user;
     } catch (HttpException ex) {
       throw new ServiceException(ex.getMessage(), ex);
     }
@@ -103,7 +102,7 @@ public class UserServiceImpl implements UserService<UserImpl>, InitializingBean 
   @Override
   public boolean doesActiveAdminUserExist() throws ServiceException {
     try {
-      List<UserImpl> findActiveAdminUsers = client.findActiveAdminUsers();
+      List<User> findActiveAdminUsers = client.findActiveAdminUsers();
       if (findActiveAdminUsers != null && !findActiveAdminUsers.isEmpty()) {
         return true;
       }
@@ -114,7 +113,7 @@ public class UserServiceImpl implements UserService<UserImpl>, InitializingBean 
   }
 
   @Override
-  public PageResponse<UserImpl> find(PageRequest pageRequest) throws ServiceException {
+  public PageResponse<User> find(PageRequest pageRequest) throws ServiceException {
     try {
       return client.find(pageRequest);
     } catch (HttpException ex) {
@@ -123,7 +122,7 @@ public class UserServiceImpl implements UserService<UserImpl>, InitializingBean 
   }
 
   @Override
-  public List<UserImpl> findAll() throws ServiceException {
+  public List<User> findAll() throws ServiceException {
     try {
       return client.findAll();
     } catch (HttpException ex) {
@@ -132,18 +131,18 @@ public class UserServiceImpl implements UserService<UserImpl>, InitializingBean 
   }
 
   @Override
-  public UserImpl findByEmail(String email) throws ServiceException {
+  public User findByEmail(String email) throws ServiceException {
     try {
-      return (UserImpl) client.findOneByEmail(email);
+      return (User) client.findOneByEmail(email);
     } catch (HttpException ex) {
       throw new ServiceException(ex.getMessage(), ex);
     }
   }
 
   @Override
-  public UserImpl findOne(UUID uuid) throws ServiceException {
+  public User findOne(UUID uuid) throws ServiceException {
     try {
-      return (UserImpl) client.findOne(uuid);
+      return (User) client.findOne(uuid);
     } catch (HttpException ex) {
       throw new ServiceException(ex.getMessage(), ex);
     }
@@ -181,9 +180,9 @@ public class UserServiceImpl implements UserService<UserImpl>, InitializingBean 
 
   // TODO: Simplify user management
   @Override
-  public UserImpl update(UserImpl user, String password1, String password2, Errors results)
+  public User update(User user, String password1, String password2, Errors results)
       throws ServiceException {
-    return (UserImpl) save(password1, password2, user, results, true);
+    return (User) save(password1, password2, user, results, true);
   }
 
   // TODO: Simplify user management

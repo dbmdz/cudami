@@ -2,9 +2,8 @@ package de.digitalcollections.cudami.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.api.identifiable.resource.exceptions.ResourceIOException;
-import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
+import de.digitalcollections.model.exception.ResourceIOException;
+import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -30,7 +29,7 @@ public class CudamiFileResourcesBinaryClient {
   }
 
   public FileResource create() {
-    return new FileResourceImpl();
+    return new FileResource();
   }
 
   public FileResource upload(InputStream inputStream, String filename, String contentType)

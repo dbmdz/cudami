@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.parts
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.parts.EntityPartService;
 import de.digitalcollections.model.api.identifiable.entity.parts.EntityPart;
-import de.digitalcollections.model.api.identifiable.resource.FileResource;
+import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.util.List;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;

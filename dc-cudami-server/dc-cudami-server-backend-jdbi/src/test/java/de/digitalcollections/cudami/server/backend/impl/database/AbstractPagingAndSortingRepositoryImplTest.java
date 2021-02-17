@@ -2,14 +2,12 @@ package de.digitalcollections.cudami.server.backend.impl.database;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.digitalcollections.model.api.filter.FilterCriterion;
-import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.api.paging.enums.Direction;
-import de.digitalcollections.model.impl.paging.OrderImpl;
-import de.digitalcollections.model.impl.paging.PageRequestImpl;
-import de.digitalcollections.model.impl.paging.SortingImpl;
+import de.digitalcollections.model.filter.FilterCriterion;
+import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.paging.Direction;
+import de.digitalcollections.model.paging.Order;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.Sorting;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Arrays;
@@ -27,58 +25,58 @@ public class AbstractPagingAndSortingRepositoryImplTest {
     repository.setColumnName("foo");
 
     StringBuilder query = new StringBuilder("");
-    PageRequest pr = new PageRequestImpl();
+    PageRequest pr = new PageRequest();
     repository.addOrderBy(pr, query);
     assertEquals(query.toString().trim(), "");
 
-    Sorting sorting = new SortingImpl();
+    Sorting sorting = new Sorting();
     pr.setSorting(sorting);
     repository.addOrderBy(pr, query);
     assertEquals(query.toString().trim(), "");
 
-    OrderImpl order = new OrderImpl();
-    sorting = new SortingImpl(order);
+    Order order = new Order();
+    sorting = new Sorting(order);
     pr.setSorting(sorting);
     repository.addOrderBy(pr, query);
     assertEquals(query.toString().trim(), "");
 
-    order = new OrderImpl("ham");
-    sorting = new SortingImpl(order);
+    order = new Order("ham");
+    sorting = new Sorting(order);
     pr.setSorting(sorting);
     repository.addOrderBy(pr, query);
     assertEquals(query.toString().trim(), "");
 
-    order = new OrderImpl("foo");
-    sorting = new SortingImpl(order);
+    order = new Order("foo");
+    sorting = new Sorting(order);
     pr.setSorting(sorting);
     repository.addOrderBy(pr, query);
     assertEquals(query.toString().trim(), "ORDER BY foo ASC");
 
-    order = new OrderImpl(Direction.DESC, "foo");
-    sorting = new SortingImpl(order);
+    order = new Order(Direction.DESC, "foo");
+    sorting = new Sorting(order);
     pr.setSorting(sorting);
     query = new StringBuilder("");
     repository.addOrderBy(pr, query);
     assertEquals(query.toString().trim(), "ORDER BY foo DESC");
 
-    order = new OrderImpl("foo");
+    order = new Order("foo");
     order.setSubProperty("bar");
-    sorting = new SortingImpl(order);
+    sorting = new Sorting(order);
     pr.setSorting(sorting);
     query = new StringBuilder("");
     repository.addOrderBy(pr, query);
     assertEquals(query.toString().trim(), "ORDER BY foo->>'bar' ASC");
 
-    order = new OrderImpl(Direction.DESC, "foo");
+    order = new Order(Direction.DESC, "foo");
     order.setSubProperty("bar");
-    sorting = new SortingImpl(order);
+    sorting = new Sorting(order);
     pr.setSorting(sorting);
     query = new StringBuilder("");
     repository.addOrderBy(pr, query);
     assertEquals(query.toString().trim(), "ORDER BY foo->>'bar' DESC");
 
-    OrderImpl secondOrder = new OrderImpl("foo");
-    sorting = sorting.and(new SortingImpl(secondOrder));
+    Order secondOrder = new Order("foo");
+    sorting = sorting.and(new Sorting(secondOrder));
     pr.setSorting(sorting);
     query = new StringBuilder("");
     repository.addOrderBy(pr, query);

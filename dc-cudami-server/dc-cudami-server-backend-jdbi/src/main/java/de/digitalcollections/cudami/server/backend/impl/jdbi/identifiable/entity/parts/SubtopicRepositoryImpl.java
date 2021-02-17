@@ -20,8 +20,8 @@ import de.digitalcollections.model.identifiable.Node;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.impl.identifiable.entity.parts.SubtopicImpl;
-import de.digitalcollections.model.impl.paging.PageResponseImpl;
-import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.identifiable.web.BreadcrumbNavigation;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -189,7 +189,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
                       .list());
     }
 
-    return new BreadcrumbNavigationImpl(result);
+    return new BreadcrumbNavigation(result);
   }
 
   @Override
@@ -237,7 +237,7 @@ public class SubtopicRepositoryImpl extends EntityPartRepositoryImpl<Subtopic>
     addFiltering(pageRequest, countQuery);
     long total = retrieveCount(countQuery, Map.of("uuid", uuid));
 
-    return new PageResponseImpl<>(result, pageRequest, total);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override

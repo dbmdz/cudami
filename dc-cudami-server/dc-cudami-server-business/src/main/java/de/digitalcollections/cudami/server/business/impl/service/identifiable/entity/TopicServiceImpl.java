@@ -2,8 +2,8 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.TopicRepository;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.TopicService;
-import de.digitalcollections.model.api.identifiable.entity.Topic;
 import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
+import de.digitalcollections.model.identifiable.entity.Topic;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;

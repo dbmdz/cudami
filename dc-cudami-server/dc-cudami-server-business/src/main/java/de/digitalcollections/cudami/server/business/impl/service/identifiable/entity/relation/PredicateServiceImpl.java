@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.relation;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.PredicateRepository;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.PredicateService;
-import de.digitalcollections.model.api.identifiable.entity.relation.Predicate;
+import de.digitalcollections.cudami.server.backend.api.repository.relation.PredicateRepository;
+import de.digitalcollections.cudami.server.business.api.service.relation.PredicateService;
+import de.digitalcollections.model.relation.Predicate;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

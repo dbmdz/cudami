@@ -3,23 +3,18 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
-import de.digitalcollections.model.api.filter.FilterCriterion;
-import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.entity.Collection;
-import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.api.paging.Order;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.SearchPageRequest;
-import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.api.view.BreadcrumbNavigation;
+import de.digitalcollections.model.filter.FilterCriterion;
+import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.impl.paging.PageRequestImpl;
-import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
-import de.digitalcollections.model.impl.paging.SortingImpl;
+import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.identifiable.web.BreadcrumbNavigation;
+import de.digitalcollections.model.paging.Order;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.paging.Sorting;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -179,9 +174,9 @@ public class CollectionController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "active", required = false) String active) {
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new SortingImpl(sortBy);
+      Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
     if (active != null) {
@@ -199,9 +194,9 @@ public class CollectionController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new SortingImpl(sortBy);
+      Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
     return collectionService.getRootNodes(pageRequest);
@@ -276,9 +271,9 @@ public class CollectionController {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "active", required = false) String active) {
-    SearchPageRequest pageRequest = new SearchPageRequestImpl(searchTerm, pageNumber, pageSize);
+    SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new SortingImpl(sortBy);
+      Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
     if (active != null) {
@@ -335,7 +330,7 @@ public class CollectionController {
           UUID collectionUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, new SortingImpl());
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, new Sorting());
 
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);
@@ -392,7 +387,7 @@ public class CollectionController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "active", required = false) String active) {
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (active != null) {
       return collectionService.getActiveChildren(collectionUuid, pageRequest);
     }

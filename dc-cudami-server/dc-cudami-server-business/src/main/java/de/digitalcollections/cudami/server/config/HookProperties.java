@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.config;
 
-import de.digitalcollections.model.identifiable.entity.enums.EntityType;
+import de.digitalcollections.model.identifiable.entity.EntityType;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;

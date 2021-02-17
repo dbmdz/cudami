@@ -3,11 +3,10 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierTypeRepository;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierTypeService;
 import de.digitalcollections.model.identifiable.IdentifierType;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.api.paging.enums.Direction;
-import de.digitalcollections.model.impl.paging.SortingImpl;
+import de.digitalcollections.model.paging.Direction;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.Sorting;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -60,7 +59,7 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
 
   private void setDefaultSorting(PageRequest pageRequest) {
     if (!pageRequest.hasSorting()) {
-      Sorting sorting = new SortingImpl(Direction.ASC, "namespace");
+      Sorting sorting = new Sorting(Direction.ASC, "namespace");
       pageRequest.setSorting(sorting);
     }
   }

@@ -3,13 +3,10 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.identifiable.Identifier;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.SearchPageRequest;
-import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.identifiable.Identifier;
-import de.digitalcollections.model.impl.paging.PageResponseImpl;
-import de.digitalcollections.model.impl.paging.SearchPageResponseImpl;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -74,7 +71,7 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
     long total =
         dbi.withHandle(h -> h.createQuery(sqlCount.toString()).mapTo(Long.class).findOne().get());
 
-    return new PageResponseImpl<>(result, pageRequest, total);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override
@@ -110,7 +107,7 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
                     .findOne()
                     .get());
 
-    return new SearchPageResponseImpl<>(result, searchPageRequest, total);
+    return new SearchPageResponse<>(result, searchPageRequest, total);
   }
 
   @Override
