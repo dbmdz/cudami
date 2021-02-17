@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.client.entity.agent;
+package de.digitalcollections.cudami.client.identifiable.entity.agent;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiBaseClient;
@@ -33,12 +33,12 @@ public class CudamiCorporateBodiesClient extends CudamiBaseClient<CorporateBody>
 
   public CorporateBody findOne(UUID uuid, String locale) throws HttpException {
     return doGetRequestForObject(
-            String.format("/latest/corporatebodies/%s?pLocale=%s", uuid, locale));
+        String.format("/latest/corporatebodies/%s?pLocale=%s", uuid, locale));
   }
 
   public CorporateBody findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-            String.format("/latest/corporatebodies/identifier/%s:%s.json", namespace, id));
+        String.format("/latest/corporatebodies/identifier/%s:%s.json", namespace, id));
   }
 
   public CorporateBody fetchAndSaveByGndId(String gndId) throws HttpException {
@@ -50,7 +50,6 @@ public class CudamiCorporateBodiesClient extends CudamiBaseClient<CorporateBody>
   }
 
   public CorporateBody update(UUID uuid, CorporateBody corporateBody) throws HttpException {
-    return doPutRequestForObject(
-            String.format("/latest/corporatebodies/%s", uuid), corporateBody);
+    return doPutRequestForObject(String.format("/latest/corporatebodies/%s", uuid), corporateBody);
   }
 }

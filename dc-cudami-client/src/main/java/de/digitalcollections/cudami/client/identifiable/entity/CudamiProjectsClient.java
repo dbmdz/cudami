@@ -1,6 +1,7 @@
-package de.digitalcollections.cudami.client;
+package de.digitalcollections.cudami.client.identifiable.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.cudami.client.CudamiBaseClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -57,7 +58,8 @@ public class CudamiProjectsClient extends CudamiBaseClient<Project> {
 
   public PageResponse<DigitalObject> getDigitalObjects(UUID projectUuid, PageRequest pageRequest)
       throws HttpException {
-    return doGetRequestForPagedObjectList(String.format("/latest/projects/%s/digitalobjects", projectUuid),
+    return doGetRequestForPagedObjectList(
+        String.format("/latest/projects/%s/digitalobjects", projectUuid),
         pageRequest,
         DigitalObject.class);
   }

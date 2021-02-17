@@ -5,9 +5,9 @@ import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
-import de.digitalcollections.model.impl.identifiable.entity.parts.SubtopicImpl;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.web.BreadcrumbNavigation;
+import de.digitalcollections.model.impl.identifiable.entity.parts.SubtopicImpl;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import java.net.http.HttpClient;
@@ -52,7 +52,8 @@ public class CudamiSubtopicsClient extends CudamiBaseClient<SubtopicImpl> {
 
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws HttpException {
     return (BreadcrumbNavigation)
-        doGetRequestForObject(String.format("/latest/subtopics/%s/breadcrumb", uuid), BreadcrumbNavigation.class);
+        doGetRequestForObject(
+            String.format("/latest/subtopics/%s/breadcrumb", uuid), BreadcrumbNavigation.class);
   }
 
   public List<SubtopicImpl> getChildren(UUID uuid) throws HttpException {
@@ -66,11 +67,13 @@ public class CudamiSubtopicsClient extends CudamiBaseClient<SubtopicImpl> {
   }
 
   public List getEntities(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(String.format("/latest/subtopics/%s/entities", uuid), Entity.class);
+    return doGetRequestForObjectList(
+        String.format("/latest/subtopics/%s/entities", uuid), Entity.class);
   }
 
   public List getFileResources(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(String.format("/latest/subtopics/%s/fileresources", uuid), FileResource.class);
+    return doGetRequestForObjectList(
+        String.format("/latest/subtopics/%s/fileresources", uuid), FileResource.class);
   }
 
   public Subtopic getParent(UUID uuid) throws HttpException {
@@ -78,7 +81,8 @@ public class CudamiSubtopicsClient extends CudamiBaseClient<SubtopicImpl> {
   }
 
   public List getRelatedFileResources(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(String.format("/latest/entities/%s/related/fileresources", uuid), FileResource.class);
+    return doGetRequestForObjectList(
+        String.format("/latest/entities/%s/related/fileresources", uuid), FileResource.class);
   }
 
   public List<SubtopicImpl> getSubtopicsOfEntity(UUID uuid) throws HttpException {
@@ -91,7 +95,8 @@ public class CudamiSubtopicsClient extends CudamiBaseClient<SubtopicImpl> {
 
   public Topic getTopic(UUID rootWebpageUuid) throws HttpException {
     return (Topic)
-        doGetRequestForObject(String.format("/latest/subtopics/%s/topic", rootWebpageUuid), Topic.class);
+        doGetRequestForObject(
+            String.format("/latest/subtopics/%s/topic", rootWebpageUuid), Topic.class);
   }
 
   public Subtopic save(Subtopic subtopic) throws HttpException {
@@ -99,11 +104,13 @@ public class CudamiSubtopicsClient extends CudamiBaseClient<SubtopicImpl> {
   }
 
   public List<Entity> saveEntities(UUID uuid, List entities) throws HttpException {
-    return doPostRequestForObjectList(String.format("/latest/subtopics/%s/entities", uuid), entities, Entity.class);
+    return doPostRequestForObjectList(
+        String.format("/latest/subtopics/%s/entities", uuid), entities, Entity.class);
   }
 
   public List<FileResource> saveFileResources(UUID uuid, List fileResources) throws HttpException {
-    return doPostRequestForObjectList(String.format("/latest/subtopics/%s/fileresources", uuid),
+    return doPostRequestForObjectList(
+        String.format("/latest/subtopics/%s/fileresources", uuid),
         fileResources,
         FileResource.class);
   }

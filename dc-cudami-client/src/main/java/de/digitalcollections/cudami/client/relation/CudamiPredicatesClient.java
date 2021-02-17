@@ -1,6 +1,7 @@
-package de.digitalcollections.cudami.client;
+package de.digitalcollections.cudami.client.relation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.cudami.client.CudamiBaseClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.relation.Predicate;
 import java.net.URLEncoder;
@@ -19,7 +20,8 @@ public class CudamiPredicatesClient extends CudamiBaseClient<Predicate> {
   }
 
   public Predicate save(Predicate predicate) throws HttpException {
-    return doPutRequestForObject(String.format(
+    return doPutRequestForObject(
+        String.format(
             "/latest/predicates/%s",
             URLEncoder.encode(predicate.getValue(), StandardCharsets.UTF_8)),
         (Predicate) predicate);

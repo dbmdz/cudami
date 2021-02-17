@@ -1,6 +1,7 @@
-package de.digitalcollections.cudami.client;
+package de.digitalcollections.cudami.client.identifiable.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.cudami.client.CudamiBaseClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.identifiable.entity.Article;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -47,7 +48,8 @@ public class CudamiArticlesClient extends CudamiBaseClient<Article> {
   }
 
   public List getRelatedFileResources(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(String.format("/latest/entities/%s/related/fileresources", uuid), FileResource.class);
+    return doGetRequestForObjectList(
+        String.format("/latest/entities/%s/related/fileresources", uuid), FileResource.class);
   }
 
   public Article save(Article article) throws HttpException {

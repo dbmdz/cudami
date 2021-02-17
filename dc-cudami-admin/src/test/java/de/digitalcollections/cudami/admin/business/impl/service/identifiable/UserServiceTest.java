@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import de.digitalcollections.cudami.admin.business.impl.service.security.UserServiceImpl;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiUsersClient;
+import de.digitalcollections.cudami.client.security.CudamiUsersClient;
 import de.digitalcollections.model.security.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

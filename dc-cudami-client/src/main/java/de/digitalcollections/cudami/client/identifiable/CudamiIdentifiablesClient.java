@@ -1,6 +1,7 @@
-package de.digitalcollections.cudami.client;
+package de.digitalcollections.cudami.client.identifiable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.cudami.client.CudamiBaseClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.paging.PageRequest;
@@ -36,8 +37,7 @@ public class CudamiIdentifiablesClient extends CudamiBaseClient<Identifiable> {
   }
 
   public List<Identifiable> find(String searchTerm, int maxResults) throws HttpException {
-    SearchPageRequest searchPageRequest =
-        new SearchPageRequest(searchTerm, 0, maxResults, null);
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, 0, maxResults, null);
     SearchPageResponse<Identifiable> response = find(searchPageRequest);
     return response.getContent();
   }
@@ -64,6 +64,7 @@ public class CudamiIdentifiablesClient extends CudamiBaseClient<Identifiable> {
   }
 
   public Identifiable update(UUID uuid, Identifiable identifiable) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/identifiables/%s", uuid), (Identifiable) identifiable);
+    return doPutRequestForObject(
+        String.format("/latest/identifiables/%s", uuid), (Identifiable) identifiable);
   }
 }

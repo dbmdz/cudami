@@ -1,6 +1,7 @@
-package de.digitalcollections.cudami.client;
+package de.digitalcollections.cudami.client.identifiable.entity.relation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.cudami.client.CudamiBaseClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.paging.PageRequest;
@@ -16,7 +17,8 @@ public class CudamiEntityRelationsClient extends CudamiBaseClient {
 
   public PageResponse<EntityRelation> getRelationsByPredicate(
       String predicate, PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList(String.format("/latest/entities/relations?predicate=%s", predicate),
+    return doGetRequestForPagedObjectList(
+        String.format("/latest/entities/relations?predicate=%s", predicate),
         pageRequest,
         EntityRelation.class);
   }

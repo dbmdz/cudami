@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.client.entity.agent;
+package de.digitalcollections.cudami.client.identifiable.entity.agent;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiBaseClient;
@@ -31,40 +31,40 @@ public class CudamiPersonsClient extends CudamiBaseClient<Person> {
   }
 
   public PageResponse findByLanguageAndInitial(
-          PageRequest pageRequest, String language, String initial) throws HttpException {
+      PageRequest pageRequest, String language, String initial) throws HttpException {
     return findByLanguageAndInitial("/latest/persons", pageRequest, language, initial);
   }
 
   public PageResponse<Person> findByLanguageAndInitial(
-          int pageNumber,
-          int pageSize,
-          String sortField,
-          String sortDirection,
-          String nullHandling,
-          String language,
-          String initial)
-          throws HttpException {
+      int pageNumber,
+      int pageSize,
+      String sortField,
+      String sortDirection,
+      String nullHandling,
+      String language,
+      String initial)
+      throws HttpException {
     return findByLanguageAndInitial(
-            "/latest/persons",
-            pageNumber,
-            pageSize,
-            sortField,
-            sortDirection,
-            nullHandling,
-            language,
-            initial);
+        "/latest/persons",
+        pageNumber,
+        pageSize,
+        sortField,
+        sortDirection,
+        nullHandling,
+        language,
+        initial);
   }
 
   public PageResponse<Person> findByPlaceOfBirth(PageRequest pageRequest, UUID uuidGeoLocation)
-          throws HttpException {
+      throws HttpException {
     return doGetRequestForPagedObjectList(
-            "/latest/persons/placeofbirth/" + uuidGeoLocation.toString(), pageRequest);
+        "/latest/persons/placeofbirth/" + uuidGeoLocation.toString(), pageRequest);
   }
 
   public PageResponse<Person> findByPlaceOfDeath(PageRequest pageRequest, UUID uuidGeoLocation)
-          throws HttpException {
+      throws HttpException {
     return doGetRequestForPagedObjectList(
-            "/latest/persons/placeofdeath/" + uuidGeoLocation.toString(), pageRequest);
+        "/latest/persons/placeofdeath/" + uuidGeoLocation.toString(), pageRequest);
   }
 
   public Person findOne(UUID uuid) throws HttpException {
@@ -73,15 +73,17 @@ public class CudamiPersonsClient extends CudamiBaseClient<Person> {
 
   public Person findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-            String.format("/latest/persons/identifier?namespace=%s&id=%s", namespace, id));
+        String.format("/latest/persons/identifier?namespace=%s&id=%s", namespace, id));
   }
 
   public List getDigitalObjects(UUID uuidPerson) throws HttpException {
-    return doGetRequestForObjectList(String.format("/latest/persons/%s/digitalobjects", uuidPerson), DigitalObject.class);
+    return doGetRequestForObjectList(
+        String.format("/latest/persons/%s/digitalobjects", uuidPerson), DigitalObject.class);
   }
 
   public List getWorks(UUID uuidPerson) throws HttpException {
-    return doGetRequestForObjectList(String.format("/latest/persons/%s/works", uuidPerson), Work.class);
+    return doGetRequestForObjectList(
+        String.format("/latest/persons/%s/works", uuidPerson), Work.class);
   }
 
   public Person save(Person person) throws HttpException {

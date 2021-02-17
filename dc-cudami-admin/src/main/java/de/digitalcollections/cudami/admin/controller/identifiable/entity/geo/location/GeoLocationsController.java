@@ -4,7 +4,7 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
-import de.digitalcollections.cudami.client.entity.geo.location.CudamiGeoLocationsClient;
+import de.digitalcollections.cudami.client.identifiable.entity.geo.location.CudamiGeoLocationsClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
 import de.digitalcollections.model.paging.Order;

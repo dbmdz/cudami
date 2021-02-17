@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.client.entity.geo.location;
+package de.digitalcollections.cudami.client.identifiable.entity.geo.location;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiBaseClient;
@@ -66,6 +66,7 @@ public class CudamiGeoLocationsClient extends CudamiBaseClient<GeoLocation> {
   }
 
   public GeoLocation update(UUID uuid, GeoLocation geoLocation) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/geolocations/%s", uuid), (GeoLocation) geoLocation);
+    return doPutRequestForObject(
+        String.format("/latest/geolocations/%s", uuid), (GeoLocation) geoLocation);
   }
 }

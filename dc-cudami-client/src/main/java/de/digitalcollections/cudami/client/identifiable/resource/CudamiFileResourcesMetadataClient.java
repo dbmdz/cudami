@@ -1,6 +1,7 @@
-package de.digitalcollections.cudami.client;
+package de.digitalcollections.cudami.client.identifiable.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.cudami.client.CudamiBaseClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.paging.PageRequest;
@@ -38,8 +39,7 @@ public class CudamiFileResourcesMetadataClient extends CudamiBaseClient<FileReso
   }
 
   public List<FileResource> find(String searchTerm, int maxResults) throws HttpException {
-    SearchPageRequest searchPageRequest =
-        new SearchPageRequest(searchTerm, 0, maxResults, null);
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, 0, maxResults, null);
     SearchPageResponse<FileResource> response = find(searchPageRequest);
     return response.getContent();
   }
@@ -64,6 +64,7 @@ public class CudamiFileResourcesMetadataClient extends CudamiBaseClient<FileReso
   }
 
   public FileResource update(UUID uuid, FileResource fileResource) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/fileresources/%s", uuid), (FileResource) fileResource);
+    return doPutRequestForObject(
+        String.format("/latest/fileresources/%s", uuid), (FileResource) fileResource);
   }
 }

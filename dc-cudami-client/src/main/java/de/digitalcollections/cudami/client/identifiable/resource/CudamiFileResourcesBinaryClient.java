@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.client;
+package de.digitalcollections.cudami.client.identifiable.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.exceptions.HttpException;

@@ -4,7 +4,7 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
-import de.digitalcollections.cudami.client.entity.agent.CudamiPersonsClient;
+import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiPersonsClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.paging.Order;

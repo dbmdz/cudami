@@ -1,6 +1,7 @@
-package de.digitalcollections.cudami.client;
+package de.digitalcollections.cudami.client.identifiable.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.cudami.client.CudamiBaseClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
@@ -21,13 +22,15 @@ public class CudamiEntitiesClient extends CudamiBaseClient<Entity> {
   }
 
   public void addRelatedFileresource(UUID uuid, UUID fileResourceUuid) throws HttpException {
-    doPostRequestForObject(String.format("/latest/entities/%s/related/fileresources/%s", uuid, fileResourceUuid),
+    doPostRequestForObject(
+        String.format("/latest/entities/%s/related/fileresources/%s", uuid, fileResourceUuid),
         (Entity) null);
   }
 
   public void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid)
       throws HttpException {
-    doPostRequestForObject(String.format(
+    doPostRequestForObject(
+        String.format(
             "/latest/entities/relations/%s/%s/%s", subjectEntityUuid, predicate, objectEntityUuid),
         (Entity) null);
   }
@@ -44,14 +47,12 @@ public class CudamiEntitiesClient extends CudamiBaseClient<Entity> {
     return doGetRequestForPagedObjectList("/latest/entities", pageRequest);
   }
 
-  public SearchPageResponse<Entity> find(SearchPageRequest searchPageRequest)
-      throws HttpException {
+  public SearchPageResponse<Entity> find(SearchPageRequest searchPageRequest) throws HttpException {
     return doGetSearchRequestForPagedObjectList("/latest/entities/search", searchPageRequest);
   }
 
   public List<Entity> find(String searchTerm, int maxResults) throws HttpException {
-    SearchPageRequest searchPageRequest =
-        new SearchPageRequest(searchTerm, 0, maxResults, null);
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, 0, maxResults, null);
     SearchPageResponse<Entity> response = find(searchPageRequest);
     return response.getContent();
   }
@@ -78,16 +79,18 @@ public class CudamiEntitiesClient extends CudamiBaseClient<Entity> {
   }
 
   public List findRandomEntities(int count) throws HttpException {
-    return doGetRequestForObjectList(String.format("/latest/entities/random?count=%d", count), Entity.class);
+    return doGetRequestForObjectList(
+        String.format("/latest/entities/random?count=%d", count), Entity.class);
   }
 
   public List getRelatedFileResources(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(String.format("/latest/entities/%s/related/fileresources", uuid), FileResource.class);
+    return doGetRequestForObjectList(
+        String.format("/latest/entities/%s/related/fileresources", uuid), FileResource.class);
   }
 
   public List<EntityRelation> getRelations(UUID subjectEntityUuid) throws HttpException {
-    return doGetRequestForObjectList(String.format("/latest/entities/relations/%s", subjectEntityUuid),
-        EntityRelation.class);
+    return doGetRequestForObjectList(
+        String.format("/latest/entities/relations/%s", subjectEntityUuid), EntityRelation.class);
   }
 
   public Entity save(Entity entity) throws HttpException {
@@ -96,13 +99,15 @@ public class CudamiEntitiesClient extends CudamiBaseClient<Entity> {
 
   public List<FileResource> saveRelatedFileResources(UUID uuid, List fileResources)
       throws HttpException {
-    return doPostRequestForObjectList(String.format("/latest/entities/%s/related/fileresources", uuid),
+    return doPostRequestForObjectList(
+        String.format("/latest/entities/%s/related/fileresources", uuid),
         fileResources,
         FileResource.class);
   }
 
   public List<EntityRelation> saveRelationsForSubject(List relations) throws HttpException {
-    return doPutRequestForObjectList(String.format(
+    return doPutRequestForObjectList(
+        String.format(
             "/latest/entities/%s/relations",
             ((EntityRelation) relations.get(0)).getSubject().getUuid()),
         relations,

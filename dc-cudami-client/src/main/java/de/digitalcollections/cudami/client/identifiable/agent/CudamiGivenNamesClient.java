@@ -66,6 +66,7 @@ public class CudamiGivenNamesClient extends CudamiBaseClient<GivenName> {
   }
 
   public GivenName update(UUID uuid, GivenName givenName) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/givennames/%s", uuid), (GivenName) givenName);
+    return doPutRequestForObject(
+        String.format("/latest/givennames/%s", uuid), (GivenName) givenName);
   }
 }

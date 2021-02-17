@@ -5,7 +5,7 @@ import de.digitalcollections.cudami.admin.business.api.service.security.UserServ
 import de.digitalcollections.cudami.admin.business.impl.validator.PasswordsValidatorParams;
 import de.digitalcollections.cudami.admin.business.impl.validator.UniqueUsernameValidator;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiUsersClient;
+import de.digitalcollections.cudami.client.security.CudamiUsersClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;

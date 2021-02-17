@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.admin.controller.identifiable.resource;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiFileResourcesBinaryClient;
+import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesBinaryClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.io.IOException;

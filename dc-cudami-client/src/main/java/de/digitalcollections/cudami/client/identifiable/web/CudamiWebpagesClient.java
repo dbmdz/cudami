@@ -1,11 +1,12 @@
-package de.digitalcollections.cudami.client;
+package de.digitalcollections.cudami.client.identifiable.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.cudami.client.CudamiBaseClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.identifiable.entity.Website;
-import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.web.BreadcrumbNavigation;
+import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import java.net.http.HttpClient;
@@ -55,7 +56,8 @@ public class CudamiWebpagesClient extends CudamiBaseClient<Webpage> {
 
   public PageResponse<Webpage> getActiveChildren(UUID uuid, PageRequest pageRequest)
       throws HttpException {
-    return doGetRequestForPagedObjectList(String.format("/latest/webpages/%s/children?active=true", uuid),
+    return doGetRequestForPagedObjectList(
+        String.format("/latest/webpages/%s/children?active=true", uuid),
         pageRequest,
         Webpage.class);
   }
@@ -67,7 +69,8 @@ public class CudamiWebpagesClient extends CudamiBaseClient<Webpage> {
 
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws HttpException {
     return (BreadcrumbNavigation)
-        doGetRequestForObject(String.format("/latest/webpages/%s/breadcrumb", uuid), BreadcrumbNavigation.class);
+        doGetRequestForObject(
+            String.format("/latest/webpages/%s/breadcrumb", uuid), BreadcrumbNavigation.class);
   }
 
   public List<Webpage> getChildren(UUID uuid) throws HttpException {
@@ -89,12 +92,14 @@ public class CudamiWebpagesClient extends CudamiBaseClient<Webpage> {
   }
 
   public List getRelatedFileResources(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(String.format("/latest/entities/%s/related/fileresources", uuid), FileResource.class);
+    return doGetRequestForObjectList(
+        String.format("/latest/entities/%s/related/fileresources", uuid), FileResource.class);
   }
 
   public Website getWebsite(UUID rootWebpageUuid) throws HttpException {
     return (Website)
-        doGetRequestForObject(String.format("/latest/webpages/%s/website", rootWebpageUuid), Website.class);
+        doGetRequestForObject(
+            String.format("/latest/webpages/%s/website", rootWebpageUuid), Website.class);
   }
 
   public Webpage save(Webpage webpage) throws HttpException {
@@ -103,12 +108,14 @@ public class CudamiWebpagesClient extends CudamiBaseClient<Webpage> {
 
   public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid)
       throws HttpException {
-    return doPostRequestForObject(String.format("/latest/websites/%s/webpage", parentWebsiteUuid), (Webpage) webpage);
+    return doPostRequestForObject(
+        String.format("/latest/websites/%s/webpage", parentWebsiteUuid), (Webpage) webpage);
   }
 
   public Webpage saveWithParentWebpage(Webpage webpage, UUID parentWebpageUuid)
       throws HttpException {
-    return doPostRequestForObject(String.format("/latest/webpages/%s/webpage", parentWebpageUuid), (Webpage) webpage);
+    return doPostRequestForObject(
+        String.format("/latest/webpages/%s/webpage", parentWebpageUuid), (Webpage) webpage);
   }
 
   public Webpage update(UUID uuid, Webpage webpage) throws HttpException {

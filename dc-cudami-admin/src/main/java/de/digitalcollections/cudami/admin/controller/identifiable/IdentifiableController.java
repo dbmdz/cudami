@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.admin.controller.identifiable;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiIdentifiablesClient;
+import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import java.util.List;

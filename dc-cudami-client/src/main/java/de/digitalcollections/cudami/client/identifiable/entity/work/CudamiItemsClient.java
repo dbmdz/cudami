@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.client.entity.work;
+package de.digitalcollections.cudami.client.identifiable.entity.work;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiBaseClient;
@@ -78,7 +78,8 @@ public class CudamiItemsClient extends CudamiBaseClient<Item> {
   }
 
   public List getDigitalObjects(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(String.format("/latest/items/%s/digitalobjects", uuid), DigitalObject.class);
+    return doGetRequestForObjectList(
+        String.format("/latest/items/%s/digitalobjects", uuid), DigitalObject.class);
   }
 
   public List getWorks(UUID uuid) throws HttpException {

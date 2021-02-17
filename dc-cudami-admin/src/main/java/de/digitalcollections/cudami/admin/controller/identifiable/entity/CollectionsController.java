@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiCollectionsClient;
+import de.digitalcollections.cudami.client.identifiable.entity.CudamiCollectionsClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.identifiable.Node;

@@ -1,11 +1,11 @@
 package de.digitalcollections.cudami.admin.controller.security;
 
-import de.digitalcollections.commons.springdata.domain.PageConverter;
-import de.digitalcollections.commons.springdata.domain.PageWrapper;
-import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
+import de.digitalcollections.cudami.admin.paging.PageConverter;
+import de.digitalcollections.cudami.admin.paging.PageWrapper;
+import de.digitalcollections.cudami.admin.paging.PageableConverter;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.security.Role;

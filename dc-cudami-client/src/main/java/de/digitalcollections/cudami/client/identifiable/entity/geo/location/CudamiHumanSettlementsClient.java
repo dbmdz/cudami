@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.client.entity.geo.location;
+package de.digitalcollections.cudami.client.identifiable.entity.geo.location;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiBaseClient;
@@ -66,6 +66,7 @@ public class CudamiHumanSettlementsClient extends CudamiBaseClient<HumanSettleme
   }
 
   public HumanSettlement update(UUID uuid, HumanSettlement humanSettlement) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/human_settlements/%s", uuid), (HumanSettlement) humanSettlement);
+    return doPutRequestForObject(
+        String.format("/latest/human_settlements/%s", uuid), (HumanSettlement) humanSettlement);
   }
 }
