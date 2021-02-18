@@ -75,7 +75,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   @Autowired
   public DigitalObjectRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(dbi,
+    super(
+        dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,

@@ -5,8 +5,8 @@ import de.digitalcollections.cudami.server.business.api.service.security.UserSer
 import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.security.User;
 import java.util.List;
 import java.util.UUID;

@@ -43,7 +43,8 @@ public class FamilyNameRepositoryImpl extends IdentifiableRepositoryImpl<FamilyN
 
   @Autowired
   public FamilyNameRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(dbi,
+    super(
+        dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,

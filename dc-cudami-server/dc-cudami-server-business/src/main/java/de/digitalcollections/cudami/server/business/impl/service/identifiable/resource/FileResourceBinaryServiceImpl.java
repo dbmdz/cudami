@@ -4,9 +4,9 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.r
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceBinaryService;
-import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.exception.ResourceIOException;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
+import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.io.InputStream;
 import org.slf4j.Logger;

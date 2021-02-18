@@ -50,7 +50,8 @@ public class AudioFileResourceRepositoryImpl
 
   @Autowired
   public AudioFileResourceRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(dbi,
+    super(
+        dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,

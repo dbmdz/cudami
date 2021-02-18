@@ -30,7 +30,11 @@ public interface NodeRepository<N extends Identifiable> extends IdentifiableRepo
     if (parent == null || children == null) {
       return false;
     }
-    List<UUID> childrenUuids = children.stream().filter(c -> c.getUuid() == null).map(c -> c.getUuid()).collect(Collectors.toList());
+    List<UUID> childrenUuids =
+        children.stream()
+            .filter(c -> c.getUuid() == null)
+            .map(c -> c.getUuid())
+            .collect(Collectors.toList());
     return addChildren(parent.getUuid(), childrenUuids);
   }
 

@@ -2,10 +2,10 @@ package de.digitalcollections.cudami.server.controller.security;
 
 import de.digitalcollections.cudami.server.business.api.service.security.UserService;
 import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.security.User;
 import java.util.List;
 import java.util.Objects;

@@ -67,7 +67,8 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
 
   @Autowired
   public ProjectRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(dbi,
+    super(
+        dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,

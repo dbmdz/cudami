@@ -60,11 +60,8 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
     final String sql = innerQuery.toString();
 
     List<Identifier> result =
-        dbi.withHandle(h ->
-                h.createQuery(sql)
-                    .mapToBean(Identifier.class)
-                    .map(Identifier.class::cast)
-                    .list());
+        dbi.withHandle(
+            h -> h.createQuery(sql).mapToBean(Identifier.class).map(Identifier.class::cast).list());
 
     StringBuilder sqlCount = new StringBuilder("SELECT count(*) FROM " + tableName);
     addFiltering(pageRequest, sqlCount);
@@ -85,7 +82,8 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
     final String sql = innerQuery.toString();
 
     List<Identifier> result =
-        dbi.withHandle(h ->
+        dbi.withHandle(
+            h ->
                 h.createQuery(sql)
                     .bind("searchTerm", searchPageRequest.getQuery())
                     .mapToBean(Identifier.class)
@@ -115,7 +113,8 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
     final String sql = "SELECT * FROM " + tableName + " WHERE identifiable = :uuid";
 
     List<Identifier> result =
-        dbi.withHandle(h ->
+        dbi.withHandle(
+            h ->
                 h.createQuery(sql)
                     .bind("uuid", uuidIdentifiable)
                     .mapToBean(Identifier.class)
@@ -130,7 +129,8 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
         "SELECT * FROM " + tableName + " WHERE namespace = :namespace, identifier = :identifier";
 
     Identifier identifier =
-        dbi.withHandle(h ->
+        dbi.withHandle(
+            h ->
                 h.createQuery(sql)
                     .bind("namespace", namespace)
                     .bind("identifier", id)
@@ -174,7 +174,8 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
             + " RETURNING *";
 
     Identifier result =
-        dbi.withHandle(h ->
+        dbi.withHandle(
+            h ->
                 h.createQuery(sql)
                     .bindBean(identifier)
                     .mapToBean(Identifier.class)

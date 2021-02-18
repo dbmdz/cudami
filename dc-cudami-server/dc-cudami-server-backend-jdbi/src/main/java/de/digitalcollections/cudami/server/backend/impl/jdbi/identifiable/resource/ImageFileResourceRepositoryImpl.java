@@ -56,7 +56,8 @@ public class ImageFileResourceRepositoryImpl
 
   @Autowired
   public ImageFileResourceRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(dbi,
+    super(
+        dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,

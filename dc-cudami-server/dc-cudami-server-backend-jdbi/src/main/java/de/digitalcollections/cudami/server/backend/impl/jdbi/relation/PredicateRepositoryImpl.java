@@ -49,7 +49,8 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
     final String sql = "SELECT * FROM " + tableName + " AS " + tableAlias;
 
     List<Predicate> result =
-        dbi.withHandle(h ->
+        dbi.withHandle(
+            h ->
                 h.createQuery(sql)
                     .mapToBean(Predicate.class)
                     .map(Predicate.class::cast)
@@ -61,7 +62,8 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
   public Predicate findOneByValue(String value) {
     String query = "SELECT * FROM " + tableName + " WHERE value = :value";
     Optional<Predicate> result =
-        dbi.withHandle(h ->
+        dbi.withHandle(
+            h ->
                 h.createQuery(query)
                     .bind("value", value)
                     .mapToBean(Predicate.class)

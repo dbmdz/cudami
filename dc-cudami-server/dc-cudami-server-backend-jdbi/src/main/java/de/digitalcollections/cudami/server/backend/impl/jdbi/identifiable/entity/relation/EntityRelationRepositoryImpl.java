@@ -81,7 +81,8 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
     addPageRequestParams(pageRequest, query);
 
     List<EntityRelation> result =
-        jdbcTemplate.query(query.toString(),
+        jdbcTemplate.query(
+            query.toString(),
             (rs, rowNum) -> {
               String subjectUuid = rs.getString("rel_subject");
               String predicate = rs.getString("rel_predicate");

@@ -47,7 +47,8 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
     final String sql = innerQuery.toString();
 
     List<IdentifierType> result =
-        dbi.withHandle(h ->
+        dbi.withHandle(
+            h ->
                 h.createQuery(sql)
                     .mapToBean(IdentifierType.class)
                     .map(IdentifierType.class::cast)
@@ -66,7 +67,8 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
     final String sql = "SELECT * FROM " + tableName + " WHERE uuid = :uuid";
 
     IdentifierType identifierType =
-        dbi.withHandle(h ->
+        dbi.withHandle(
+            h ->
                 h.createQuery(sql)
                     .bind("uuid", uuid)
                     .mapToBean(IdentifierType.class)
@@ -81,7 +83,8 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
     final String sql = "SELECT * FROM " + tableName + " WHERE namespace = :namespace";
 
     IdentifierType identifierType =
-        dbi.withHandle(h ->
+        dbi.withHandle(
+            h ->
                 h.createQuery(sql)
                     .bind("namespace", namespace)
                     .mapToBean(IdentifierType.class)
@@ -125,7 +128,8 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
             + " RETURNING *";
 
     IdentifierType result =
-        dbi.withHandle(h ->
+        dbi.withHandle(
+            h ->
                 h.createQuery(sql)
                     .bindBean(identifierType)
                     .mapToBean(IdentifierType.class)
@@ -143,7 +147,8 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
             + " SET label=:label, namespace=:namespace, pattern=:pattern WHERE uuid=:uuid RETURNING *";
 
     IdentifierType result =
-        dbi.withHandle(h ->
+        dbi.withHandle(
+            h ->
                 h.createQuery(sql)
                     .bindBean(identifierType)
                     .mapToBean(IdentifierType.class)

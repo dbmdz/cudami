@@ -45,7 +45,8 @@ public class ApplicationFileResourceRepositoryImpl
   @Autowired
   public ApplicationFileResourceRepositoryImpl(
       Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(dbi,
+    super(
+        dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,

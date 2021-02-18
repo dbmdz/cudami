@@ -4,9 +4,9 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
-import de.digitalcollections.cudami.client.identifiable.web.CudamiWebpagesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.identifiable.Node;
+import de.digitalcollections.cudami.client.identifiable.web.CudamiWebpagesClient;
+import de.digitalcollections.model.identifiable.INode;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.web.BreadcrumbNavigation;
@@ -50,11 +50,6 @@ public class WebpagesController extends AbstractController {
     this.languageSortingHelper = languageSortingHelper;
     this.localeService = cudamiClient.forLocales();
     this.service = cudamiClient.forWebpages();
-  }
-
-  @ModelAttribute("menu")
-  protected String module() {
-    return "webpages";
   }
 
   @GetMapping("/webpages/new")
@@ -111,6 +106,11 @@ public class WebpagesController extends AbstractController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws HttpException {
     return service.getChildren(uuid, new PageRequest(pageNumber, pageSize));
+  }
+
+  @ModelAttribute("menu")
+  protected String module() {
+    return "webpages";
   }
 
   @PostMapping("/api/webpages/new")
@@ -179,7 +179,7 @@ public class WebpagesController extends AbstractController {
 
     BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
 
-    List<Node> breadcrumbs = breadcrumbNavigation.getNavigationItems();
+    List<INode> breadcrumbs = breadcrumbNavigation.getNavigationItems();
     // Cut out first breadcrumb node (the one with empty uuid), which identifies the website, since
     // it is
     // handled individually

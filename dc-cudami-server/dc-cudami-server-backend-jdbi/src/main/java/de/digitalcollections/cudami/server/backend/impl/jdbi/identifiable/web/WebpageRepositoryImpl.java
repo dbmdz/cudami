@@ -3,15 +3,16 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.web;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
-import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.filter.FilterValuePlaceholder;
 import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.identifiable.INode;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.Node;
 import de.digitalcollections.model.identifiable.entity.Website;
-import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.identifiable.web.BreadcrumbNavigation;
+import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -79,7 +80,8 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
 
   @Autowired
   public WebpageRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(dbi,
+    super(
+        dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
@@ -150,8 +152,9 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   @Override
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) {
 
-    List<Node> result =
-        dbi.withHandle(h ->
+    List<INode> result =
+        dbi.withHandle(
+            h ->
                 h.createQuery(
                         "WITH recursive breadcrumb (uuid,label,parent_uuid,depth)"
                             + " AS ("
@@ -175,14 +178,15 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
                     .bind("uuid", uuid)
                     .registerRowMapper(BeanMapper.factory(Node.class))
                     .mapTo(Node.class)
-                    .map(Node.class::cast)
+                    .map(INode.class::cast)
                     .list());
 
     if (result.isEmpty()) {
       // Special case: If we are on a top level webpage, we have no parent, so
       // we must construct a breadcrumb more or less manually
       result =
-          dbi.withHandle(h ->
+          dbi.withHandle(
+              h ->
                   h.createQuery(
                           "SELECT w.uuid as uuid, w.label as label"
                               + "        FROM webpages w"
@@ -190,7 +194,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
                       .bind("uuid", uuid)
                       .registerRowMapper(BeanMapper.factory(Node.class))
                       .mapTo(Node.class)
-                      .map(Node.class::cast)
+                      .map(INode.class::cast)
                       .list());
     }
 
@@ -338,11 +342,8 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
             + " WHERE ww.webpage_uuid = :uuid";
 
     Website result =
-        dbi.withHandle(h ->
-                h.createQuery(query)
-                    .bind("uuid", rootWebpageUuid)
-                    .mapToBean(Website.class)
-                    .one());
+        dbi.withHandle(
+            h -> h.createQuery(query).bind("uuid", rootWebpageUuid).mapToBean(Website.class).one());
     return result;
   }
 

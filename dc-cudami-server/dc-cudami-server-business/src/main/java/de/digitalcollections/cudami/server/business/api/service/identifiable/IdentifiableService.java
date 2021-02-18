@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.server.business.api.service.identifiable;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
-import de.digitalcollections.model.identifiable.Node;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.paging.PageRequest;
@@ -35,9 +34,8 @@ public interface IdentifiableService<I extends Identifiable> {
 
   void addRelatedFileresource(UUID identifiableUuid, UUID fileResourceUuid);
 
-  default void cleanupLabelFromUnwantedLocales(Locale locale, Locale fallbackLocale, Node n) {
-    LocalizedText label = n.getLabel();
-
+  default void cleanupLabelFromUnwantedLocales(
+      Locale locale, Locale fallbackLocale, LocalizedText label) {
     // If no locales exist at all, we cannot do anything useful here
     if (label == null || label.getLocales() == null || label.getLocales().isEmpty()) {
       return;
@@ -85,19 +83,21 @@ public interface IdentifiableService<I extends Identifiable> {
   List<I> find(String searchTerm, int maxResults);
 
   /**
-   * @return list of ALL identifiables with FULL data. USE WITH CARE (only for internal workflow, NOT FOR USER INTERACTION!)!!!
+   * @return list of ALL identifiables with FULL data. USE WITH CARE (only for internal workflow,
+   *     NOT FOR USER INTERACTION!)!!!
    */
   List<I> findAllFull();
 
   /**
    * Returns a list of all identifiables, reduced to their identifiers and last modification date
    *
-   * @return partially filled complete list of all identifiables of implementing repository entity type
+   * @return partially filled complete list of all identifiables of implementing repository entity
+   *     type
    */
   List<I> findAllReduced();
 
   PageResponse<I> findByLanguageAndInitial(
-          PageRequest pageRequest, String language, String initial);
+      PageRequest pageRequest, String language, String initial);
 
   I get(Identifier identifier);
 
@@ -128,7 +128,8 @@ public interface IdentifiableService<I extends Identifiable> {
   I save(I identifiable) throws IdentifiableServiceException;
 
   /**
-   * Save list of entities related to an identifiable.Prerequisite: entities have been saved before (exist already)
+   * Save list of entities related to an identifiable.Prerequisite: entities have been saved before
+   * (exist already)
    *
    * @param identifiable entity part the entities are related to
    * @param entities the entities that are related to the entity part
@@ -144,14 +145,15 @@ public interface IdentifiableService<I extends Identifiable> {
   List<Entity> saveRelatedEntities(UUID identifiableUuid, List<Entity> entities);
 
   /**
-   * Save list of file resources related to an identifiable. Prerequisite: file resources have been saved before (exist already)
+   * Save list of file resources related to an identifiable. Prerequisite: file resources have been
+   * saved before (exist already)
    *
    * @param identifiable entity part the file resources are related to
    * @param fileResources the file resources that are related to the entity part
    * @return the list of the related file resources
    */
   default List<FileResource> saveRelatedFileResources(
-          I identifiable, List<FileResource> fileResources) {
+      I identifiable, List<FileResource> fileResources) {
     if (identifiable == null || fileResources == null) {
       return null;
     }
@@ -159,7 +161,7 @@ public interface IdentifiableService<I extends Identifiable> {
   }
 
   List<FileResource> saveRelatedFileResources(
-          UUID identifiableUuid, List<FileResource> fileResources);
+      UUID identifiableUuid, List<FileResource> fileResources);
 
   I update(I identifiable) throws IdentifiableServiceException;
 }

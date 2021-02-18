@@ -77,7 +77,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       Jdbi dbi,
       IdentifierRepository identifierRepository,
       FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl) {
-    this(dbi,
+    this(
+        dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,

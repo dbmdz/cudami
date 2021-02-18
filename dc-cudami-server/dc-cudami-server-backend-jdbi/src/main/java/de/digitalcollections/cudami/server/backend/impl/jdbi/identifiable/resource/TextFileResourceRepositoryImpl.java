@@ -44,7 +44,8 @@ public class TextFileResourceRepositoryImpl
 
   @Autowired
   public TextFileResourceRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(dbi,
+    super(
+        dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,

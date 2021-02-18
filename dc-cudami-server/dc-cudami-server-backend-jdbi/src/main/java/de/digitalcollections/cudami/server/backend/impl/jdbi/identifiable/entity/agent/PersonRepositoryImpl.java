@@ -7,12 +7,12 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.agent.
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work.WorkRepositoryImpl;
-import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocationType;
 import de.digitalcollections.model.identifiable.agent.FamilyName;
 import de.digitalcollections.model.identifiable.agent.GivenName;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
+import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocationType;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;

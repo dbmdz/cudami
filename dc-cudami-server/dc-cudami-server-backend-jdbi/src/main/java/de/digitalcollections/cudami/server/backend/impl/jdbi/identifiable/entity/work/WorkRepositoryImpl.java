@@ -4,8 +4,8 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.WorkRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
-import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.entity.work.Work;
@@ -69,7 +69,8 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
       IdentifierRepository identifierRepository,
       AgentRepositoryImpl agentRepositoryImpl,
       ItemRepositoryImpl itemRepositoryImpl) {
-    super(dbi,
+    super(
+        dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,

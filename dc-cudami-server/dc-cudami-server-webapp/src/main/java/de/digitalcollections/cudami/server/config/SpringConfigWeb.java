@@ -3,9 +3,7 @@ package de.digitalcollections.cudami.server.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.commons.springmvc.thymeleaf.SpacesDialect;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
-import de.digitalcollections.model.xml.xstream.DigitalCollectionsXStreamMarshaller;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,8 +12,6 @@ import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
 import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -70,20 +66,6 @@ public class SpringConfigWeb implements WebMvcConfigurer {
     configurer.mediaType("html", MediaType.TEXT_HTML);
     configurer.mediaType("json", MediaType.APPLICATION_JSON);
     configurer.mediaType("xml", MediaType.APPLICATION_XML);
-  }
-
-  @Override
-  public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-    converters.add(createXmlHttpMessageConverter());
-  }
-
-  private HttpMessageConverter<Object> createXmlHttpMessageConverter() {
-    MarshallingHttpMessageConverter xmlConverter = new MarshallingHttpMessageConverter();
-    DigitalCollectionsXStreamMarshaller xstreamMarshaller =
-        new DigitalCollectionsXStreamMarshaller();
-    xmlConverter.setMarshaller(xstreamMarshaller);
-    xmlConverter.setUnmarshaller(xstreamMarshaller);
-    return xmlConverter;
   }
 
   /**

@@ -3,8 +3,8 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.security;
 import de.digitalcollections.cudami.server.backend.api.repository.security.UserRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.security.User;
 import java.util.Arrays;
 import java.util.List;
@@ -36,11 +36,9 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
 
     addPageRequestParams(pageRequest, query);
     List<User> result =
-        dbi.withHandle(h ->
-                h.createQuery(query.toString())
-                    .mapToBean(User.class)
-                    .map(User.class::cast)
-                    .list());
+        dbi.withHandle(
+            h ->
+                h.createQuery(query.toString()).mapToBean(User.class).map(User.class::cast).list());
     long total = count();
     PageResponse<User> pageResponse = new PageResponse<>(result, pageRequest, total);
     return pageResponse;
@@ -48,7 +46,8 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
 
   @Override
   public List<User> findActiveAdminUsers() {
-    return dbi.withHandle(h ->
+    return dbi.withHandle(
+        h ->
             h.createQuery("SELECT * FROM users WHERE '" + Role.ADMIN.name() + "' = any(roles)")
                 .mapToBean(User.class)
                 .map(User.class::cast)
@@ -58,7 +57,8 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
   @Override
   public User findByEmail(String email) {
     List<User> users =
-        dbi.withHandle(h ->
+        dbi.withHandle(
+            h ->
                 h.createQuery("SELECT * FROM users WHERE email = :email")
                     .bind("email", email)
                     .mapToBean(User.class)
@@ -73,7 +73,8 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
   @Override
   public User findOne(UUID uuid) {
     List<User> users =
-        dbi.withHandle(h ->
+        dbi.withHandle(
+            h ->
                 h.createQuery("SELECT * FROM users WHERE uuid = :uuid")
                     .bind("uuid", uuid)
                     .mapToBean(User.class)
@@ -120,7 +121,8 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
     //    return (S) result;
 
     User result =
-        dbi.withHandle(h ->
+        dbi.withHandle(
+            h ->
                 h.registerArrayType(Role.class, "varchar")
                     .createQuery(
                         "INSERT INTO users(email, enabled, firstname, lastname, passwordHash, roles, uuid) VALUES (:email, :enabled, :firstname, :lastname, :passwordHash, :roles, :uuid) RETURNING *")
@@ -134,7 +136,8 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
   @Override
   public User update(User user) {
     User result =
-        dbi.withHandle(h ->
+        dbi.withHandle(
+            h ->
                 h.registerArrayType(Role.class, "varchar")
                     .createQuery(
                         "UPDATE users SET email=:email, enabled=:enabled, firstname=:firstname, lastname=:lastname, passwordHash=:passwordHash, roles=:roles, uuid=:uuid WHERE uuid=:uuid RETURNING *")

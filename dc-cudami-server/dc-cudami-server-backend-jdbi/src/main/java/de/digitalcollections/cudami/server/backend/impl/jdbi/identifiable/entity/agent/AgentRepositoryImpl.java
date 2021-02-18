@@ -47,7 +47,8 @@ public class AgentRepositoryImpl extends EntityRepositoryImpl<Agent> implements 
 
   @Autowired
   public AgentRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(dbi,
+    super(
+        dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,

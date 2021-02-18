@@ -7,9 +7,13 @@ import de.digitalcollections.cudami.admin.paging.PageableConverter;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
-import de.digitalcollections.cudami.client.identifiable.entity.CudamiTopicsClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
+import de.digitalcollections.cudami.client.identifiable.entity.CudamiTopicsClient;
+import de.digitalcollections.model.identifiable.INode;
+import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
+import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.identifiable.web.BreadcrumbNavigation;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import java.util.List;
@@ -108,9 +112,16 @@ public class TopicsController extends AbstractController {
   }
 
   @PostMapping("/api/topics/new")
-  public ResponseEntity save(@RequestBody Topic topic) {
+  public ResponseEntity save(
+      @RequestBody Topic topic,
+      @RequestParam(name = "parentUuid", required = false) UUID parentUuid) {
     try {
-      Topic topicDb = service.save(topic);
+      Topic topicDb = null;
+      if (parentUuid == null) {
+        topicDb = service.save(topic);
+      } else {
+        topicDb = service.saveWithParentTopic(topic, parentUuid);
+      }
       return ResponseEntity.status(HttpStatus.CREATED).body(topicDb);
     } catch (HttpException e) {
       LOGGER.error("Cannot save topic: ", e);
@@ -138,6 +149,19 @@ public class TopicsController extends AbstractController {
 
     model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("topic", topic);
+
+    List<FileResource> relatedFileResources = service.getFileResources(uuid);
+    model.addAttribute("relatedFileResources", relatedFileResources);
+
+    List<Entity> relatedEntities = service.getEntities(uuid);
+    model.addAttribute("relatedEntities", relatedEntities);
+
+    BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
+    List<INode> breadcrumbs = breadcrumbNavigation.getNavigationItems();
+    // Cut out first breadcrumb node (the one with empty uuid), which identifies the topic, since
+    // it is handled individually
+    breadcrumbs.removeIf(n -> n.getUuid() == null);
+    model.addAttribute("breadcrumbs", breadcrumbs);
 
     return "topics/view";
   }

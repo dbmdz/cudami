@@ -4,8 +4,9 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.TopicRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.model.filter.FilterValuePlaceholder;
-import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.identifiable.INode;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.Node;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
@@ -61,21 +62,22 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
   @Autowired
   public TopicRepositoryImpl(
-          Jdbi dbi,
-          IdentifierRepository identifierRepository,
-          EntityRepositoryImpl entityRepositoryImpl,
-          FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl) {
-    super(dbi,
-            identifierRepository,
-            TABLE_NAME,
-            TABLE_ALIAS,
-            MAPPING_PREFIX,
-            Topic.class,
-            getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
-            getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
-            getSqlInsertFields(),
-            getSqlInsertValues(),
-            getSqlUpdateFieldValues());
+      Jdbi dbi,
+      IdentifierRepository identifierRepository,
+      EntityRepositoryImpl entityRepositoryImpl,
+      FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl) {
+    super(
+        dbi,
+        identifierRepository,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        Topic.class,
+        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlInsertFields(),
+        getSqlInsertValues(),
+        getSqlUpdateFieldValues());
     this.entityRepositoryImpl = entityRepositoryImpl;
     this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
   }
@@ -85,26 +87,26 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
     if (parentUuid == null || childrenUuids == null) {
       return false;
     }
-    Integer nextSortIndex
-            = retrieveNextSortIndexForParentChildren(
-                    dbi, "topic_topics", "parent_topic_uuid", parentUuid);
+    Integer nextSortIndex =
+        retrieveNextSortIndexForParentChildren(
+            dbi, "topic_topics", "parent_topic_uuid", parentUuid);
 
     dbi.useHandle(
-            handle -> {
-              PreparedBatch preparedBatch
-              = handle.prepareBatch(
-                      "INSERT INTO topic_topics(parent_topic_uuid, child_topic_uuid, sortIndex)"
+        handle -> {
+          PreparedBatch preparedBatch =
+              handle.prepareBatch(
+                  "INSERT INTO topic_topics(parent_topic_uuid, child_topic_uuid, sortIndex)"
                       + " VALUES (:parentTopicUuid, :childTopicUuid, :sortIndex) ON CONFLICT (parent_topic_uuid, child_topic_uuid) DO NOTHING");
-              childrenUuids.forEach(
-                      childUuid -> {
-                        preparedBatch
-                                .bind("parentTopicUuid", parentUuid)
-                                .bind("childTopicUuid", childUuid)
-                                .bind("sortIndex", nextSortIndex + getIndex(childrenUuids, childUuid))
-                                .add();
-                      });
-              preparedBatch.execute();
-            });
+          childrenUuids.forEach(
+              childUuid -> {
+                preparedBatch
+                    .bind("parentTopicUuid", parentUuid)
+                    .bind("childTopicUuid", childUuid)
+                    .bind("sortIndex", nextSortIndex + getIndex(childrenUuids, childUuid))
+                    .add();
+              });
+          preparedBatch.execute();
+        });
     return true;
   }
 
@@ -130,41 +132,43 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
   @Override
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
-    List<Node> result
-            = dbi.withHandle(h
-                    -> h.createQuery(
-                    "WITH recursive breadcrumb (uuid,label,parent_uuid,depth)"
-                    + " AS ("
-                    + "        SELECT t.uuid AS uuid, t.label AS label, t.refid t_refId, tt.parent_topic_uuid AS parent_uuid, 99 AS depth"
-                    + "        FROM topics t, topic_topics tt"
-                    + "        WHERE uuid= :uuid and tt.child_topic_uuid = t.uuid"
-                    + ""
-                    + "        UNION ALL"
-                    + "        SELECT t.uuid AS uuid, t.label AS label, t.refid t_refId, tt.parent_topic_uuid AS parent_uuid, depth-1 AS depth"
-                    + "        FROM topics t, topic_topics tt, breadcrumb b"
-                    + "        WHERE b.uuid = tt.child_topic_uuid AND tt.parent_topic_uuid = t.uuid AND tt.parent_topic_uuid IS NOT null"
-                    + "    )"
-                    + " SELECT * FROM breadcrumb"
-                    + " ORDER BY depth ASC")
+    List<INode> result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(
+                        "WITH recursive breadcrumb (uuid,label,parent_uuid,depth)"
+                            + " AS ("
+                            + "        SELECT t.uuid AS uuid, t.label AS label, t.refid t_refId, tt.parent_topic_uuid AS parent_uuid, 99 AS depth"
+                            + "        FROM topics t, topic_topics tt"
+                            + "        WHERE uuid= :uuid and tt.child_topic_uuid = t.uuid"
+                            + ""
+                            + "        UNION ALL"
+                            + "        SELECT t.uuid AS uuid, t.label AS label, t.refid t_refId, tt.parent_topic_uuid AS parent_uuid, depth-1 AS depth"
+                            + "        FROM topics t, topic_topics tt, breadcrumb b"
+                            + "        WHERE b.uuid = tt.child_topic_uuid AND tt.parent_topic_uuid = t.uuid AND tt.parent_topic_uuid IS NOT null"
+                            + "    )"
+                            + " SELECT * FROM breadcrumb"
+                            + " ORDER BY depth ASC")
                     .bind("uuid", nodeUuid)
                     .registerRowMapper(BeanMapper.factory(Node.class))
                     .mapTo(Node.class)
-                    .map(Node.class::cast)
+                    .map(INode.class::cast)
                     .list());
 
     if (result.isEmpty()) {
       // Special case: If we are on a top level topic, we have no parent, so
       // we must construct a breadcrumb more or less manually
-      result
-              = dbi.withHandle(h
-                      -> h.createQuery(
-                      "SELECT t.uuid AS uuid, t.label AS label"
-                      + "        FROM topics t"
-                      + "        WHERE uuid= :uuid")
+      result =
+          dbi.withHandle(
+              h ->
+                  h.createQuery(
+                          "SELECT t.uuid AS uuid, t.label AS label"
+                              + "        FROM topics t"
+                              + "        WHERE uuid= :uuid")
                       .bind("uuid", nodeUuid)
                       .registerRowMapper(BeanMapper.factory(Node.class))
                       .mapTo(Node.class)
-                      .map(Node.class::cast)
+                      .map(INode.class::cast)
                       .list());
     }
 
@@ -173,27 +177,27 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
   @Override
   public List<Topic> getChildren(UUID uuid) {
-    StringBuilder innerQuery
-            = new StringBuilder(
-                    "SELECT * FROM "
-                    + tableName
-                    + " AS "
-                    + tableAlias
-                    + " INNER JOIN topic_topics tt ON "
-                    + tableAlias
-                    + ".uuid = tt.child_topic_uuid"
-                    + " WHERE tt.parent_topic_uuid = :uuid"
-                    + " ORDER BY tt.sortIndex ASC");
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + tableName
+                + " AS "
+                + tableAlias
+                + " INNER JOIN topic_topics tt ON "
+                + tableAlias
+                + ".uuid = tt.child_topic_uuid"
+                + " WHERE tt.parent_topic_uuid = :uuid"
+                + " ORDER BY tt.sortIndex ASC");
 
-    List<Topic> result
-            = retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), null);
+    List<Topic> result =
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), null);
     return result;
   }
 
   @Override
   public PageResponse<Topic> getChildren(UUID nodeUuid, PageRequest pageRequest) {
-    String commonSql
-            = " FROM "
+    String commonSql =
+        " FROM "
             + tableName
             + " AS "
             + tableAlias
@@ -208,8 +212,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
     innerQuery.append(" ORDER BY tt.sortIndex ASC");
     addPageRequestParams(pageRequest, innerQuery);
 
-    List<Topic> result
-            = retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", nodeUuid), null);
+    List<Topic> result =
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", nodeUuid), null);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -223,28 +227,28 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
     final String entityTableAlias = entityRepositoryImpl.getTableAlias();
     final String entityTableName = entityRepositoryImpl.getTableName();
 
-    StringBuilder innerQuery
-            = new StringBuilder(
-                    "SELECT * FROM "
-                    + entityTableName
-                    + " AS "
-                    + entityTableAlias
-                    + " INNER JOIN topic_entities te ON "
-                    + entityTableAlias
-                    + ".uuid = te.entity_uuid"
-                    + " WHERE te.topic_uuid = :uuid"
-                    + " ORDER BY te.sortIndex ASC");
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + entityTableName
+                + " AS "
+                + entityTableAlias
+                + " INNER JOIN topic_entities te ON "
+                + entityTableAlias
+                + ".uuid = te.entity_uuid"
+                + " WHERE te.topic_uuid = :uuid"
+                + " ORDER BY te.sortIndex ASC");
 
-    List<Entity> result
-            = entityRepositoryImpl
-                    .retrieveList(
-                            entityRepositoryImpl.getSqlSelectReducedFields(),
-                            innerQuery,
-                            Map.of("uuid", topicUuid),
-                            null)
-                    .stream()
-                    .map(Entity.class::cast)
-                    .collect(Collectors.toList());
+    List<Entity> result =
+        entityRepositoryImpl
+            .retrieveList(
+                entityRepositoryImpl.getSqlSelectReducedFields(),
+                innerQuery,
+                Map.of("uuid", topicUuid),
+                null)
+            .stream()
+            .map(Entity.class::cast)
+            .collect(Collectors.toList());
 
     return result;
   }
@@ -254,69 +258,68 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
     final String frTableAlias = fileResourceMetadataRepositoryImpl.getTableAlias();
     final String frTableName = fileResourceMetadataRepositoryImpl.getTableName();
 
-    StringBuilder innerQuery
-            = new StringBuilder(
-                    "SELECT * FROM "
-                    + frTableName
-                    + " AS "
-                    + frTableAlias
-                    + " INNER JOIN topic_fileresources tf ON "
-                    + frTableAlias
-                    + ".uuid = tf.fileresource_uuid"
-                    + " WHERE tf.topic_uuid = :uuid"
-                    + " ORDER BY tf.sortIndex ASC");
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + frTableName
+                + " AS "
+                + frTableAlias
+                + " INNER JOIN topic_fileresources tf ON "
+                + frTableAlias
+                + ".uuid = tf.fileresource_uuid"
+                + " WHERE tf.topic_uuid = :uuid"
+                + " ORDER BY tf.sortIndex ASC");
 
-    List<FileResource> result
-            = fileResourceMetadataRepositoryImpl.retrieveList(
-                    fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields(),
-                    innerQuery,
-                    Map.of("uuid", topicUuid),
-                    null);
+    List<FileResource> result =
+        fileResourceMetadataRepositoryImpl.retrieveList(
+            fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields(),
+            innerQuery,
+            Map.of("uuid", topicUuid),
+            null);
 
     return result;
   }
 
   @Override
   public Topic getParent(UUID nodeUuid) {
-    String sqlAdditionalJoins
-            = " INNER JOIN topic_topics tt ON "
-            + tableAlias
-            + ".uuid = tt.parent_topic_uuid";
+    String sqlAdditionalJoins =
+        " INNER JOIN topic_topics tt ON " + tableAlias + ".uuid = tt.parent_topic_uuid";
 
-    Filtering filtering
-            = Filtering.defaultBuilder()
-                    .filter("tt.child_topic_uuid")
-                    .isEquals(new FilterValuePlaceholder(":uuid"))
-                    .build();
+    Filtering filtering =
+        Filtering.defaultBuilder()
+            .filter("tt.child_topic_uuid")
+            .isEquals(new FilterValuePlaceholder(":uuid"))
+            .build();
 
-    Topic result
-            = retrieveOne(sqlSelectReducedFields, sqlAdditionalJoins, filtering, Map.of("uuid", nodeUuid));
+    Topic result =
+        retrieveOne(
+            sqlSelectReducedFields, sqlAdditionalJoins, filtering, Map.of("uuid", nodeUuid));
 
     return result;
   }
 
   @Override
   public List<Topic> getParents(UUID uuid) {
-    StringBuilder innerQuery
-            = new StringBuilder(
-                    "SELECT * FROM "
-                    + tableName
-                    + " AS "
-                    + tableAlias
-                    + " INNER JOIN topic_topics tt ON "
-                    + tableAlias
-                    + ".uuid = tt.parent_topic_uuid"
-                    + " WHERE tt.child_topic_uuid = :uuid");
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + tableName
+                + " AS "
+                + tableAlias
+                + " INNER JOIN topic_topics tt ON "
+                + tableAlias
+                + ".uuid = tt.parent_topic_uuid"
+                + " WHERE tt.child_topic_uuid = :uuid");
 
-    List<Topic> result
-            = retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), null);
+    List<Topic> result =
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), null);
     return result;
   }
 
   @Override
   public PageResponse<Topic> getRootNodes(PageRequest pageRequest) {
-    String commonSql
-            = " FROM "
+    String commonSql =
+        " FROM "
             + tableName
             + " AS "
             + tableAlias
@@ -328,8 +331,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
   @Override
   public List<Locale> getRootNodesLanguages() {
-    String query
-            = "SELECT DISTINCT languages"
+    String query =
+        "SELECT DISTINCT languages"
             + " FROM "
             + tableName
             + " AS "
@@ -346,37 +349,37 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
   @Override
   public List<Topic> getTopicsOfEntity(UUID entityUuid) {
-    StringBuilder innerQuery
-            = new StringBuilder(
-                    "SELECT * FROM "
-                    + tableName
-                    + " AS "
-                    + tableAlias
-                    + " INNER JOIN topic_entities te ON "
-                    + tableAlias
-                    + ".uuid = te.topic_uuid"
-                    + " WHERE te.entity_uuid = :uuid");
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + tableName
+                + " AS "
+                + tableAlias
+                + " INNER JOIN topic_entities te ON "
+                + tableAlias
+                + ".uuid = te.topic_uuid"
+                + " WHERE te.entity_uuid = :uuid");
 
-    List<Topic> result
-            = retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", entityUuid), null);
+    List<Topic> result =
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", entityUuid), null);
     return result;
   }
 
   @Override
   public List<Topic> getTopicsOfFileResource(UUID fileResourceUuid) {
-    StringBuilder innerQuery
-            = new StringBuilder(
-                    "SELECT * FROM "
-                    + tableName
-                    + " AS "
-                    + tableAlias
-                    + " INNER JOIN topic_fileresources tf ON "
-                    + tableAlias
-                    + ".uuid = tf.topic_uuid"
-                    + " WHERE tf.fileresource_uuid = :uuid");
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + tableName
+                + " AS "
+                + tableAlias
+                + " INNER JOIN topic_fileresources tf ON "
+                + tableAlias
+                + ".uuid = tf.topic_uuid"
+                + " WHERE tf.fileresource_uuid = :uuid");
 
-    List<Topic> result
-            = retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", fileResourceUuid), null);
+    List<Topic> result =
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", fileResourceUuid), null);
     return result;
   }
 
@@ -385,15 +388,15 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
     if (parentUuid == null || childUuid == null) {
       return false;
     }
-    final String sql
-            = "DELETE FROM topic_topics WHERE parent_topic_uuid=:parentTopicUuid AND child_topic_uuid=:childTopicUuid";
+    final String sql =
+        "DELETE FROM topic_topics WHERE parent_topic_uuid=:parentTopicUuid AND child_topic_uuid=:childTopicUuid";
 
     dbi.withHandle(
-            h
-            -> h.createUpdate(sql)
-                    .bind("parentTopicUuid", parentUuid)
-                    .bind("childTopicUuid", childUuid)
-                    .execute());
+        h ->
+            h.createUpdate(sql)
+                .bind("parentTopicUuid", parentUuid)
+                .bind("childTopicUuid", childUuid)
+                .execute());
     return true;
   }
 
@@ -408,27 +411,27 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   public List<Entity> saveEntities(UUID topicUuid, List<Entity> entities) {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
-            h
-            -> h.createUpdate("DELETE FROM topic_entities WHERE topic_uuid = :uuid")
-                    .bind("uuid", topicUuid)
-                    .execute());
+        h ->
+            h.createUpdate("DELETE FROM topic_entities WHERE topic_uuid = :uuid")
+                .bind("uuid", topicUuid)
+                .execute());
 
     if (entities != null) {
       // we assume that the entities are already saved...
       dbi.useHandle(
-              handle -> {
-                PreparedBatch preparedBatch
-                = handle.prepareBatch(
-                        "INSERT INTO topic_entities(topic_uuid, entity_uuid, sortIndex) VALUES(:uuid, :entityUuid, :sortIndex)");
-                for (Entity entity : entities) {
-                  preparedBatch
-                          .bind("uuid", topicUuid)
-                          .bind("entityUuid", entity.getUuid())
-                          .bind("sortIndex", getIndex(entities, entity))
-                          .add();
-                }
-                preparedBatch.execute();
-              });
+          handle -> {
+            PreparedBatch preparedBatch =
+                handle.prepareBatch(
+                    "INSERT INTO topic_entities(topic_uuid, entity_uuid, sortIndex) VALUES(:uuid, :entityUuid, :sortIndex)");
+            for (Entity entity : entities) {
+              preparedBatch
+                  .bind("uuid", topicUuid)
+                  .bind("entityUuid", entity.getUuid())
+                  .bind("sortIndex", getIndex(entities, entity))
+                  .add();
+            }
+            preparedBatch.execute();
+          });
     }
     return getEntities(topicUuid);
   }
@@ -437,49 +440,48 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   public List<FileResource> saveFileResources(UUID topicUuid, List<FileResource> fileResources) {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
-            h
-            -> h.createUpdate("DELETE FROM topic_fileresources WHERE topic_uuid = :uuid")
-                    .bind("uuid", topicUuid)
-                    .execute());
+        h ->
+            h.createUpdate("DELETE FROM topic_fileresources WHERE topic_uuid = :uuid")
+                .bind("uuid", topicUuid)
+                .execute());
 
     if (fileResources != null) {
       // we assume that the fileresources are already saved...
       dbi.useHandle(
-              handle -> {
-                PreparedBatch preparedBatch
-                = handle.prepareBatch(
-                        "INSERT INTO topic_fileresources(topic_uuid, fileresource_uuid, sortIndex) VALUES(:uuid, :fileResourceUuid, :sortIndex)");
-                for (FileResource fileResource : fileResources) {
-                  preparedBatch
-                          .bind("uuid", topicUuid)
-                          .bind("fileResourceUuid", fileResource.getUuid())
-                          .bind("sortIndex", getIndex(fileResources, fileResource))
-                          .add();
-                }
-                preparedBatch.execute();
-              });
+          handle -> {
+            PreparedBatch preparedBatch =
+                handle.prepareBatch(
+                    "INSERT INTO topic_fileresources(topic_uuid, fileresource_uuid, sortIndex) VALUES(:uuid, :fileResourceUuid, :sortIndex)");
+            for (FileResource fileResource : fileResources) {
+              preparedBatch
+                  .bind("uuid", topicUuid)
+                  .bind("fileResourceUuid", fileResource.getUuid())
+                  .bind("sortIndex", getIndex(fileResources, fileResource))
+                  .add();
+            }
+            preparedBatch.execute();
+          });
     }
     return getFileResources(topicUuid);
   }
 
   @Override
   public Topic saveWithParent(Topic child, UUID parentUuid) {
-    final UUID childUuid
-            = child.getUuid() == null ? save(child).getUuid() : child.getUuid();
+    final UUID childUuid = child.getUuid() == null ? save(child).getUuid() : child.getUuid();
 
-    Integer nextSortIndex
-            = retrieveNextSortIndexForParentChildren(
-                    dbi, "topic_topics", "parent_topic_uuid", parentUuid);
+    Integer nextSortIndex =
+        retrieveNextSortIndexForParentChildren(
+            dbi, "topic_topics", "parent_topic_uuid", parentUuid);
 
     dbi.withHandle(
-            h
-            -> h.createUpdate(
+        h ->
+            h.createUpdate(
                     "INSERT INTO topic_topics(parent_topic_uuid, child_topic_uuid, sortindex)"
-                    + " VALUES (:parentTopicUuid, :childTopicUuid, :sortIndex)")
-                    .bind("parentTopicUuid", parentUuid)
-                    .bind("childTopicUuid", childUuid)
-                    .bind("sortIndex", nextSortIndex)
-                    .execute());
+                        + " VALUES (:parentTopicUuid, :childTopicUuid, :sortIndex)")
+                .bind("parentTopicUuid", parentUuid)
+                .bind("childTopicUuid", childUuid)
+                .bind("sortIndex", nextSortIndex)
+                .execute());
 
     return findOne(childUuid);
   }
@@ -496,23 +498,23 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
     if (parentUuid == null || children == null) {
       return false;
     }
-    String query
-            = "UPDATE topic_topics"
+    String query =
+        "UPDATE topic_topics"
             + " SET sortindex = :idx"
             + " WHERE child_topic_uuid = :childUuid AND parent_topic_uuid = :parentUuid;";
     dbi.withHandle(
-            h -> {
-              PreparedBatch batch = h.prepareBatch(query);
-              int idx = 0;
-              for (Topic child : children) {
-                batch
-                        .bind("idx", idx++)
-                        .bind("childUuid", child.getUuid())
-                        .bind("parentUuid", parentUuid)
-                        .add();
-              }
-              return batch.execute();
-            });
+        h -> {
+          PreparedBatch batch = h.prepareBatch(query);
+          int idx = 0;
+          for (Topic child : children) {
+            batch
+                .bind("idx", idx++)
+                .bind("childUuid", child.getUuid())
+                .bind("parentUuid", parentUuid)
+                .add();
+          }
+          return batch.execute();
+        });
     return true;
   }
 }

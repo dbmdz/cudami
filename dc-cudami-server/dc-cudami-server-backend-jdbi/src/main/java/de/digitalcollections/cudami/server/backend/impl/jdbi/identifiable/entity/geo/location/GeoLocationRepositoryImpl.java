@@ -55,7 +55,8 @@ public class GeoLocationRepositoryImpl extends EntityRepositoryImpl<GeoLocation>
 
   @Autowired
   public GeoLocationRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(dbi,
+    super(
+        dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,

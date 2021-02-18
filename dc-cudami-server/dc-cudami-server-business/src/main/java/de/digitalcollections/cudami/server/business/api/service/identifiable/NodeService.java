@@ -31,7 +31,11 @@ public interface NodeService<N extends Identifiable> extends IdentifiableService
     if (parent == null || children == null) {
       return false;
     }
-    List<UUID> childrenUuids = children.stream().filter(c -> c.getUuid() == null).map(c -> c.getUuid()).collect(Collectors.toList());
+    List<UUID> childrenUuids =
+        children.stream()
+            .filter(c -> c.getUuid() == null)
+            .map(c -> c.getUuid())
+            .collect(Collectors.toList());
     return addChildren(parent.getUuid(), childrenUuids);
   }
 
@@ -46,8 +50,9 @@ public interface NodeService<N extends Identifiable> extends IdentifiableService
   BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid);
 
   /**
-   * Build and return the breadcrumb navigation for the given webpage UUID and desired locale. If no label for that locale exists, use the label for the fallbackLocale, and if even this fails, use the
-   * first locale.
+   * Build and return the breadcrumb navigation for the given webpage UUID and desired locale. If no
+   * label for that locale exists, use the label for the fallbackLocale, and if even this fails, use
+   * the first locale.
    *
    * @param nodeUuid the uuid of the webpage
    * @param locale the desired locale for the navigation item labels
@@ -55,15 +60,15 @@ public interface NodeService<N extends Identifiable> extends IdentifiableService
    * @return Breadcrumb navigation with labels in the desired language (if possible)
    */
   default BreadcrumbNavigation getBreadcrumbNavigation(
-          UUID nodeUuid, Locale locale, Locale fallbackLocale) {
+      UUID nodeUuid, Locale locale, Locale fallbackLocale) {
 
     BreadcrumbNavigation localizedBreadcrumbNavigation = getBreadcrumbNavigation(nodeUuid);
 
     localizedBreadcrumbNavigation.getNavigationItems().stream()
-            .forEach(
-                    n -> {
-                      cleanupLabelFromUnwantedLocales(locale, fallbackLocale, n);
-                    });
+        .forEach(
+            n -> {
+              cleanupLabelFromUnwantedLocales(locale, fallbackLocale, n.getLabel());
+            });
 
     return localizedBreadcrumbNavigation;
   }

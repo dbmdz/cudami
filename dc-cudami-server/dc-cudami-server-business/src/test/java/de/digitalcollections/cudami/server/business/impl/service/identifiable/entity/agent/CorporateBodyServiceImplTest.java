@@ -31,17 +31,16 @@ class CorporateBodyServiceImplTest {
   @BeforeEach
   void setUp() throws IdentifiableServiceException {
     corporateBodyRepository = mock(CorporateBodyRepository.class);
-    when(corporateBodyRepository.save(any(CorporateBody.class)))
-            .thenReturn(new CorporateBody());
+    when(corporateBodyRepository.save(any(CorporateBody.class))).thenReturn(new CorporateBody());
     when(corporateBodyRepository.save(eq(null))).thenThrow(new NullPointerException());
 
     externalCorporateBodyRepository = mock(ExternalCorporateBodyRepository.class);
     imageFileResourceService = mock(ImageFileResourceService.class);
     when(imageFileResourceService.save(eq(null))).thenThrow(new NullPointerException());
 
-    corporateBodyService
-            = new CorporateBodyServiceImpl(
-                    corporateBodyRepository, externalCorporateBodyRepository, imageFileResourceService);
+    corporateBodyService =
+        new CorporateBodyServiceImpl(
+            corporateBodyRepository, externalCorporateBodyRepository, imageFileResourceService);
   }
 
   @Test
@@ -62,7 +61,7 @@ class CorporateBodyServiceImplTest {
   void saveWithoutPreviewImage() {
     CorporateBody corporateBodyWithoutPreviewImage = new CorporateBody();
     when(externalCorporateBodyRepository.getByGndId(any(String.class)))
-            .thenReturn(corporateBodyWithoutPreviewImage);
+        .thenReturn(corporateBodyWithoutPreviewImage);
     assertThat(corporateBodyService.fetchAndSaveByGndId("12345")).isNotNull();
   }
 

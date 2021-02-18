@@ -3,13 +3,13 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.identifiable.entity.CudamiCollectionsClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.identifiable.Node;
-import de.digitalcollections.model.paging.Direction;
+import de.digitalcollections.cudami.client.identifiable.entity.CudamiCollectionsClient;
+import de.digitalcollections.model.identifiable.INode;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
@@ -287,7 +287,7 @@ public class CollectionsController extends AbstractController {
     List<Collection> parents = service.getParents(uuid);
     model.addAttribute("parents", parents);
 
-    List<Node> breadcrumbs = new ArrayList<>();
+    List<INode> breadcrumbs = new ArrayList<>();
     addParentNodeToBreadcrumb(collection, breadcrumbs);
     Collections.reverse(breadcrumbs);
 
@@ -298,11 +298,11 @@ public class CollectionsController extends AbstractController {
     return "collections/view";
   }
 
-  private void addParentNodeToBreadcrumb(Node currentNode, List<Node> breadcrumbs)
+  private void addParentNodeToBreadcrumb(INode currentNode, List<INode> breadcrumbs)
       throws HttpException {
-    Node parent = service.getParent(currentNode.getUuid());
+    Collection parent = service.getParent(currentNode.getUuid());
     if (parent != null && parent.getUuid() != null) {
-      breadcrumbs.add(parent);
+      breadcrumbs.add(parent.getNode());
       addParentNodeToBreadcrumb(parent, breadcrumbs);
     }
   }

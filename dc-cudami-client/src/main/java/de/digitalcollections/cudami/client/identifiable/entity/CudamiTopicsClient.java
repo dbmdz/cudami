@@ -3,9 +3,10 @@ package de.digitalcollections.cudami.client.identifiable.entity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiBaseClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.entity.parts.Subtopic;
+import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
-import de.digitalcollections.model.impl.identifiable.entity.parts.SubtopicImpl;
+import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.identifiable.web.BreadcrumbNavigation;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import java.net.http.HttpClient;
@@ -43,16 +44,85 @@ public class CudamiTopicsClient extends CudamiBaseClient<Topic> {
         String.format("/latest/topics/identifier/%s:%s.json", namespace, id));
   }
 
-  public List<Subtopic> getSubtopics(UUID uuid) throws HttpException {
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws HttpException {
+    return (BreadcrumbNavigation)
+        doGetRequestForObject(
+            String.format("/latest/topics/%s/breadcrumb", uuid), BreadcrumbNavigation.class);
+  }
+
+  public List<Topic> getChildren(UUID uuid) throws HttpException {
+    return doGetRequestForObjectList(String.format("/latest/topics/%s/children", uuid));
+  }
+
+  public PageResponse<Topic> getChildren(UUID uuid, PageRequest pageRequest) throws HttpException {
+    return doGetRequestForPagedObjectList(
+        String.format("/latest/topics/%s/children", uuid), pageRequest);
+  }
+
+  public List<Entity> getEntities(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
-        String.format("/latest/topics/%s/subtopics", uuid), SubtopicImpl.class);
+        String.format("/latest/topics/%s/entities", uuid), Entity.class);
+  }
+
+  public List<FileResource> getFileResources(UUID uuid) throws HttpException {
+    return doGetRequestForObjectList(
+        String.format("/latest/topics/%s/fileresources", uuid), FileResource.class);
+  }
+
+  public Topic getParent(UUID uuid) throws HttpException {
+    return doGetRequestForObject(String.format("/latest/topics/%s/parent", uuid));
+  }
+
+  public List<FileResource> getRelatedFileResources(UUID uuid) throws HttpException {
+    return doGetRequestForObjectList(
+        String.format("/latest/entities/%s/related/fileresources", uuid), FileResource.class);
+  }
+
+  public List<Topic> getTopicsOfEntity(UUID uuid) throws HttpException {
+    return doGetRequestForObjectList(String.format("/latest/topics/entity/%s", uuid));
+  }
+
+  public List<Topic> getTopicsOfFileResource(UUID uuid) throws HttpException {
+    return doGetRequestForObjectList(String.format("/latest/topics/fileresource/%s", uuid));
+  }
+
+  /**
+   * @param uuid
+   * @return
+   * @throws HttpException
+   * @deprecated use getChildren(uuid)
+   */
+  @Deprecated
+  public List<Topic> getSubtopics(UUID uuid) throws HttpException {
+    return getChildren(uuid);
+  }
+
+  public boolean removeChild(UUID parentUuid, UUID childUuid) throws HttpException {
+    return Boolean.parseBoolean(
+        doDeleteRequestForString(
+            String.format("/latest/topics/%s/children/%s", parentUuid, childUuid)));
   }
 
   public Topic save(Topic topic) throws HttpException {
-    return doPostRequestForObject("/latest/topics", (Topic) topic);
+    return doPostRequestForObject("/latest/topics", topic);
+  }
+
+  public List<Entity> saveEntities(UUID uuid, List entities) throws HttpException {
+    return doPostRequestForObjectList(
+        String.format("/latest/topics/%s/entities", uuid), entities, Entity.class);
+  }
+
+  public List<FileResource> saveFileResources(UUID uuid, List fileResources) throws HttpException {
+    return doPostRequestForObjectList(
+        String.format("/latest/topics/%s/fileresources", uuid), fileResources, FileResource.class);
+  }
+
+  public Topic saveWithParentTopic(Topic subtopic, UUID parentTopicUuid) throws HttpException {
+    return doPostRequestForObject(
+        String.format("/latest/topics/%s/subtopic", parentTopicUuid), subtopic);
   }
 
   public Topic update(UUID uuid, Topic topic) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/topics/%s", uuid), (Topic) topic);
+    return doPutRequestForObject(String.format("/latest/topics/%s", uuid), topic);
   }
 }

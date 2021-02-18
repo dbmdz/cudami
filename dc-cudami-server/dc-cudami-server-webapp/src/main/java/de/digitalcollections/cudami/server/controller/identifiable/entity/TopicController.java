@@ -38,25 +38,25 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The topic controller", name = "Topic controller")
 public class TopicController {
 
-  @Autowired
-  private LocaleService localeService;
+  @Autowired private LocaleService localeService;
 
-  @Autowired
-  private TopicService service;
+  @Autowired private TopicService service;
 
   @ApiMethod(description = "Add an existing topic to an existing parent topic")
   @PostMapping(
-          value = {
-            "/latest/topics/{parentTopicUuid}/subtopic/{subtopicUuid}",
-            "/v3/topics/{parentTopicUuid}/subtopic/{subtopicUuid}"
-          },
-          produces = MediaType.APPLICATION_JSON_VALUE)
+      value = {
+        "/latest/topics/{parentTopicUuid}/subtopic/{subtopicUuid}",
+        "/v3/topics/{parentTopicUuid}/subtopic/{subtopicUuid}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public ResponseEntity<Boolean> addChild(
-          @ApiPathParam(name = "parentTopicUuid", description = "The uuid of the parent topic")
-          @PathVariable UUID parentTopicUuid,
-          @ApiPathParam(name = "subtopicUuid", description = "The uuid of the subtopic") @PathVariable UUID subtopicUuid)
-          throws IdentifiableServiceException {
+      @ApiPathParam(name = "parentTopicUuid", description = "The uuid of the parent topic")
+          @PathVariable
+          UUID parentTopicUuid,
+      @ApiPathParam(name = "subtopicUuid", description = "The uuid of the subtopic") @PathVariable
+          UUID subtopicUuid)
+      throws IdentifiableServiceException {
     boolean successful = service.addChild(parentTopicUuid, subtopicUuid);
 
     if (successful) {
@@ -67,8 +67,8 @@ public class TopicController {
 
   @ApiMethod(description = "Get count of topics")
   @GetMapping(
-          value = {"/latest/topics/count", "/v2/topics/count"},
-          produces = MediaType.APPLICATION_JSON_VALUE)
+      value = {"/latest/topics/count", "/v2/topics/count"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public long count() {
     return service.count();
@@ -76,13 +76,13 @@ public class TopicController {
 
   @ApiMethod(description = "Get all topics")
   @GetMapping(
-          value = {"/latest/topics", "/v2/topics"},
-          produces = MediaType.APPLICATION_JSON_VALUE)
+      value = {"/latest/topics", "/v2/topics"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Topic> findAll(
-          @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-          @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-          @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
@@ -93,19 +93,21 @@ public class TopicController {
 
   @ApiMethod(description = "Get topic by uuid (and optional locale)")
   @GetMapping(
-          value = {"/latest/topics/{uuid}", "/v2/topics/{uuid}"},
-          produces = MediaType.APPLICATION_JSON_VALUE)
+      value = {"/latest/topics/{uuid}", "/v2/topics/{uuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public ResponseEntity<Topic> findById(
-          @ApiPathParam(
-                  description
-                  = "UUID of the topic, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
-          @PathVariable("uuid") UUID uuid,
-          @ApiQueryParam(
-                  name = "pLocale",
-                  description
-                  = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
-          @RequestParam(name = "pLocale", required = false) Locale pLocale) throws IdentifiableServiceException {
+      @ApiPathParam(
+              description = "UUID of the topic, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @ApiQueryParam(
+              name = "pLocale",
+              description =
+                  "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+          @RequestParam(name = "pLocale", required = false)
+          Locale pLocale)
+      throws IdentifiableServiceException {
     Topic topic;
     if (pLocale == null) {
       topic = service.get(uuid);
@@ -117,27 +119,28 @@ public class TopicController {
 
   @ApiMethod(description = "Get the breadcrumb for a topic")
   @GetMapping(
-          value = {"/latest/topics/{uuid}/breadcrumb", "/v3/topics/{uuid}/breadcrumb"},
-          produces = MediaType.APPLICATION_JSON_VALUE)
+      value = {"/latest/topics/{uuid}/breadcrumb", "/v3/topics/{uuid}/breadcrumb"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public ResponseEntity<BreadcrumbNavigation> getBreadcrumb(
-          @ApiPathParam(
-                  description
-                  = "UUID of the topic, e.g. <tt>6119d8e9-9c92-4091-8dcb-bc4053385406</tt>")
-          @PathVariable("uuid") UUID uuid,
-          @ApiQueryParam(
-                  name = "pLocale",
-                  description
-                  = "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
-          @RequestParam(name = "pLocale", required = false) Locale pLocale) {
+      @ApiPathParam(
+              description = "UUID of the topic, e.g. <tt>6119d8e9-9c92-4091-8dcb-bc4053385406</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @ApiQueryParam(
+              name = "pLocale",
+              description =
+                  "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+          @RequestParam(name = "pLocale", required = false)
+          Locale pLocale) {
 
     BreadcrumbNavigation breadcrumbNavigation;
 
     if (pLocale == null) {
       breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
     } else {
-      breadcrumbNavigation
-              = service.getBreadcrumbNavigation(uuid, pLocale, localeService.getDefaultLocale());
+      breadcrumbNavigation =
+          service.getBreadcrumbNavigation(uuid, pLocale, localeService.getDefaultLocale());
     }
 
     if (breadcrumbNavigation == null || breadcrumbNavigation.getNavigationItems().isEmpty()) {
@@ -149,8 +152,8 @@ public class TopicController {
 
   @ApiMethod(description = "Get subtopics of topic")
   @GetMapping(
-          value = {"/latest/topics/{uuid}/subtopics", "/v3/topics/{uuid}/subtopics"},
-          produces = MediaType.APPLICATION_JSON_VALUE)
+      value = {"/latest/topics/{uuid}/children", "/v3/topics/{uuid}/children"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   List<Topic> getChildren(@PathVariable UUID uuid) {
     return service.getChildren(uuid);
@@ -158,18 +161,18 @@ public class TopicController {
 
   @ApiMethod(description = "Get entities of topic")
   @GetMapping(
-          value = {"/latest/topics/{uuid}/entities", "/v3/topics/{uuid}/entities"},
-          produces = MediaType.APPLICATION_JSON_VALUE)
+      value = {"/latest/topics/{uuid}/entities", "/v3/topics/{uuid}/entities"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<Entity> getEntities(
-          @ApiPathParam(name = "uuid", description = "The uuid of the topic") @PathVariable UUID uuid) {
+      @ApiPathParam(name = "uuid", description = "The uuid of the topic") @PathVariable UUID uuid) {
     return service.getEntities(uuid);
   }
 
   @ApiMethod(description = "Get file resources of topic")
   @GetMapping(
-          value = {"/latest/topics/{uuid}/fileresources", "/v3/topics/{uuid}/fileresources"},
-          produces = MediaType.APPLICATION_JSON_VALUE)
+      value = {"/latest/topics/{uuid}/fileresources", "/v3/topics/{uuid}/fileresources"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<FileResource> getFileResources(@PathVariable UUID uuid) {
     return service.getFileResources(uuid);
@@ -177,8 +180,8 @@ public class TopicController {
 
   @ApiMethod(description = "Get parent topic of topic")
   @GetMapping(
-          value = {"/latest/topics/{uuid}/parent", "/v3/topics/{uuid}/parent"},
-          produces = MediaType.APPLICATION_JSON_VALUE)
+      value = {"/latest/topics/{uuid}/parent", "/v3/topics/{uuid}/parent"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   Topic getParent(@PathVariable UUID uuid) {
     return service.getParent(uuid);
@@ -186,17 +189,19 @@ public class TopicController {
 
   @ApiMethod(description = "Get subtopics of topic")
   @GetMapping(
-          value = {"/v2/topics/{uuid}/subtopics"},
-          produces = MediaType.APPLICATION_JSON_VALUE)
+      value = {"/v2/topics/{uuid}/subtopics"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   ResponseEntity<String> getSubtopics(@PathVariable UUID uuid) {
-    return new ResponseEntity<>("no longer supported. use '/v3/topics/{uuid}/subtopics' endpoint, returning list of child-topics", HttpStatus.GONE);
+    return new ResponseEntity<>(
+        "no longer supported. use '/v3/topics/{uuid}/children' endpoint, returning list of child-topics",
+        HttpStatus.GONE);
   }
 
   @ApiMethod(description = "Get topics an entity is linked to")
   @GetMapping(
-          value = {"/latest/topics/entity/{uuid}", "/v3/topics/entity/{uuid}"},
-          produces = MediaType.APPLICATION_JSON_VALUE)
+      value = {"/latest/topics/entity/{uuid}", "/v3/topics/entity/{uuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   List<Topic> getTopicsOfEntity(@PathVariable UUID uuid) {
     return service.getTopicsOfEntity(uuid);
@@ -204,26 +209,27 @@ public class TopicController {
 
   @ApiMethod(description = "Get topics a fileresource is linked to")
   @GetMapping(
-          value = {"/latest/topics/fileresource/{uuid}", "/v3/topics/fileresource/{uuid}"},
-          produces = MediaType.APPLICATION_JSON_VALUE)
+      value = {"/latest/topics/fileresource/{uuid}", "/v3/topics/fileresource/{uuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   List<Topic> getTopicsOfFileResource(@PathVariable UUID uuid) {
     return service.getTopicsOfFileResource(uuid);
   }
 
-  @ApiMethod(
-          description = "Remove child-relation of the given subtopic to the given parent topic")
+  @ApiMethod(description = "Remove child-relation of the given subtopic to the given parent topic")
   @DeleteMapping(
-          value = {
-            "/latest/topics/{parentTopicUuid}/subtopic/{subtopicUuid}",
-            "/v3/topics/{parentTopicUuid}/subtopic/{subtopicUuid}"
-          },
-          produces = MediaType.APPLICATION_JSON_VALUE)
+      value = {
+        "/latest/topics/{parentTopicUuid}/children/{subtopicUuid}",
+        "/v3/topics/{parentTopicUuid}/children/{subtopicUuid}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   ResponseEntity<Boolean> removeChild(
-          @ApiPathParam(name = "parentTopicUuid", description = "The uuid of the parent topic")
-          @PathVariable UUID parentTopicUuid,
-          @ApiPathParam(name = "subtopicUuid", description = "The uuid of the subtopic") @PathVariable UUID subtopicUuid) {
+      @ApiPathParam(name = "parentTopicUuid", description = "The uuid of the parent topic")
+          @PathVariable
+          UUID parentTopicUuid,
+      @ApiPathParam(name = "subtopicUuid", description = "The uuid of the subtopic") @PathVariable
+          UUID subtopicUuid) {
     boolean successful = service.removeChild(parentTopicUuid, subtopicUuid);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -233,18 +239,18 @@ public class TopicController {
 
   @ApiMethod(description = "Save a newly created topic")
   @PostMapping(
-          value = {"/latest/topics", "/v2/topics"},
-          produces = MediaType.APPLICATION_JSON_VALUE)
+      value = {"/latest/topics", "/v2/topics"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Topic save(@RequestBody Topic topic, BindingResult errors)
-          throws IdentifiableServiceException {
+      throws IdentifiableServiceException {
     return (Topic) service.save(topic);
   }
 
   @ApiMethod(description = "Save entities of topic")
   @PostMapping(
-          value = {"/latest/topics/{uuid}/entities", "/v3/topics/{uuid}/entities"},
-          produces = MediaType.APPLICATION_JSON_VALUE)
+      value = {"/latest/topics/{uuid}/entities", "/v3/topics/{uuid}/entities"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<Entity> saveEntities(@PathVariable UUID uuid, @RequestBody List<Entity> entities) {
     return service.saveEntities(uuid, entities);
@@ -252,38 +258,39 @@ public class TopicController {
 
   @ApiMethod(description = "Save fileresources of topic")
   @PostMapping(
-          value = {"/latest/topics/{uuid}/fileresources", "/v3/topics/{uuid}/fileresources"},
-          produces = MediaType.APPLICATION_JSON_VALUE)
+      value = {"/latest/topics/{uuid}/fileresources", "/v3/topics/{uuid}/fileresources"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<FileResource> saveFileresources(
-          @PathVariable UUID uuid, @RequestBody List<FileResource> fileResources) {
+      @PathVariable UUID uuid, @RequestBody List<FileResource> fileResources) {
     return service.saveFileResources(uuid, fileResources);
   }
 
   @ApiMethod(description = "Save a newly created topic and add it to parent")
   @PostMapping(
-          value = {
-            "/latest/topics/{parentTopicUuid}/subtopic",
-            "/v3/topics/{parentTopicUuid}/subtopic"
-          },
-          produces = MediaType.APPLICATION_JSON_VALUE)
+      value = {
+        "/latest/topics/{parentTopicUuid}/subtopic",
+        "/v3/topics/{parentTopicUuid}/subtopic"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Topic saveWithParentTopic(
-          @ApiPathParam(name = "parentTopicUuid", description = "The uuid of the parent topic")
-          @PathVariable UUID parentTopicUuid,
-          @RequestBody Topic topic,
-          BindingResult errors)
-          throws IdentifiableServiceException {
+      @ApiPathParam(name = "parentTopicUuid", description = "The uuid of the parent topic")
+          @PathVariable
+          UUID parentTopicUuid,
+      @RequestBody Topic topic,
+      BindingResult errors)
+      throws IdentifiableServiceException {
     return service.saveWithParent(topic, parentTopicUuid);
   }
 
   @ApiMethod(description = "Update a topic")
   @PutMapping(
-          value = {"/latest/topics/{uuid}", "/v2/topics/{uuid}"},
-          produces = MediaType.APPLICATION_JSON_VALUE)
+      value = {"/latest/topics/{uuid}", "/v2/topics/{uuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Topic update(@PathVariable UUID uuid, @RequestBody Topic topic, BindingResult errors)
-          throws IdentifiableServiceException {
+      throws IdentifiableServiceException {
     assert Objects.equals(uuid, topic.getUuid());
     return (Topic) service.update(topic);
   }

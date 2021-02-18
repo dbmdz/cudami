@@ -3,8 +3,8 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.web.WebpageRepositoryImpl;
-import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.PageRequest;
@@ -69,7 +69,8 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
       Jdbi dbi,
       IdentifierRepository identifierRepository,
       WebpageRepositoryImpl webpageRepositoryImpl) {
-    super(dbi,
+    super(
+        dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,

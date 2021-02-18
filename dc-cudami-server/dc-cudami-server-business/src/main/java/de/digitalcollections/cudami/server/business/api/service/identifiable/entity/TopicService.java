@@ -7,9 +7,7 @@ import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Service for Topic.
- */
+/** Service for Topic. */
 public interface TopicService extends NodeService<Topic>, EntityService<Topic> {
 
   default List<Entity> getEntities(Topic topic) {
@@ -57,8 +55,7 @@ public interface TopicService extends NodeService<Topic>, EntityService<Topic> {
 
   List<Entity> saveEntities(UUID topicUuid, List<Entity> entities);
 
-  default List<FileResource> saveFileResources(
-          Topic topic, List<FileResource> fileResources) {
+  default List<FileResource> saveFileResources(Topic topic, List<FileResource> fileResources) {
     if (topic == null) {
       return null;
     }

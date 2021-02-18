@@ -82,7 +82,8 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
       IdentifierRepository identifierRepository,
       @Lazy DigitalObjectRepositoryImpl digitalObjectRepositoryImpl,
       @Lazy WorkRepositoryImpl workRepositoryImpl) {
-    super(dbi,
+    super(
+        dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,

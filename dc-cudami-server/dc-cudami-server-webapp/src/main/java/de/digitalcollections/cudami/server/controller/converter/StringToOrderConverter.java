@@ -1,9 +1,9 @@
 package de.digitalcollections.cudami.server.controller.converter;
 
-import de.digitalcollections.model.paging.OrderBuilder;
 import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.NullHandling;
 import de.digitalcollections.model.paging.Order;
+import de.digitalcollections.model.paging.OrderBuilder;
 import de.digitalcollections.model.paging.Sorting;
 import java.util.HashSet;
 import java.util.Set;

@@ -12,21 +12,19 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-/**
- * Service for Webpage.
- */
+/** Service for Webpage. */
 public interface WebpageService extends NodeService<Webpage> {
 
   default Filtering filteringForActive() {
     // business logic that defines, what "active" means
     LocalDate now = LocalDate.now();
-    Filtering filtering
-            = Filtering.defaultBuilder()
-                    .filter("publicationStart")
-                    .lessOrEqualAndSet(now)
-                    .filter("publicationEnd")
-                    .greaterOrNotSet(now)
-                    .build();
+    Filtering filtering =
+        Filtering.defaultBuilder()
+            .filter("publicationStart")
+            .lessOrEqualAndSet(now)
+            .filter("publicationEnd")
+            .greaterOrNotSet(now)
+            .build();
     return filtering;
   }
 
@@ -41,5 +39,5 @@ public interface WebpageService extends NodeService<Webpage> {
   Website getWebsite(UUID webpageUuid);
 
   Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid)
-          throws IdentifiableServiceException;
+      throws IdentifiableServiceException;
 }

@@ -177,7 +177,8 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-  public List<FileResource> saveRelatedFileResources(UUID identifiableUuid, List<FileResource> fileResources) {
+  public List<FileResource> saveRelatedFileResources(
+      UUID identifiableUuid, List<FileResource> fileResources) {
     return repository.saveRelatedFileResources(identifiableUuid, fileResources);
   }
 

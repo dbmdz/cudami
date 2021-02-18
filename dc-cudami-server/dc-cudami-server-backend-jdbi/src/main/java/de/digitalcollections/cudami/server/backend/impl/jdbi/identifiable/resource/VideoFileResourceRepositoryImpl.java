@@ -50,7 +50,8 @@ public class VideoFileResourceRepositoryImpl
 
   @Autowired
   public VideoFileResourceRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(dbi,
+    super(
+        dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,

@@ -48,7 +48,8 @@ public class GivenNameRepositoryImpl extends IdentifiableRepositoryImpl<GivenNam
 
   @Autowired
   public GivenNameRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(dbi,
+    super(
+        dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,

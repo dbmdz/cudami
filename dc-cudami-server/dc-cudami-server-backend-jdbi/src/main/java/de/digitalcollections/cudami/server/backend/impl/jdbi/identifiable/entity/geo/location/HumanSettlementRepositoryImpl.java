@@ -54,7 +54,8 @@ public class HumanSettlementRepositoryImpl extends EntityRepositoryImpl<HumanSet
 
   @Autowired
   public HumanSettlementRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(dbi,
+    super(
+        dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateBody>
-        implements CorporateBodyRepository {
+    implements CorporateBodyRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CorporateBodyRepositoryImpl.class);
 
@@ -31,41 +31,41 @@ public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateB
 
   public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
-            + ", "
-            + tableAlias
-            + ".text "
-            + mappingPrefix
-            + "_text";
+        + ", "
+        + tableAlias
+        + ".text "
+        + mappingPrefix
+        + "_text";
   }
 
   public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
     return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
-            + ", "
-            + tableAlias
-            + ".homepage_url "
-            + mappingPrefix
-            + "_homepageUrl";
+        + ", "
+        + tableAlias
+        + ".homepage_url "
+        + mappingPrefix
+        + "_homepageUrl";
   }
 
   public static String getSqlUpdateFieldValues() {
     return EntityRepositoryImpl.getSqlUpdateFieldValues()
-            + ", homepage_url=:homepageUrl, text=:text::JSONB";
+        + ", homepage_url=:homepageUrl, text=:text::JSONB";
   }
 
   @Autowired
   public CorporateBodyRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
     super(
-            dbi,
-            identifierRepository,
-            TABLE_NAME,
-            TABLE_ALIAS,
-            MAPPING_PREFIX,
-            CorporateBody.class,
-            getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
-            getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
-            getSqlInsertFields(),
-            getSqlInsertValues(),
-            getSqlUpdateFieldValues());
+        dbi,
+        identifierRepository,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        CorporateBody.class,
+        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
+        getSqlInsertFields(),
+        getSqlInsertValues(),
+        getSqlUpdateFieldValues());
   }
 
   @Override

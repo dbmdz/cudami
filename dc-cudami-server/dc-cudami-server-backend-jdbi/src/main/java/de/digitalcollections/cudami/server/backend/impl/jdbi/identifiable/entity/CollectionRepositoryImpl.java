@@ -3,17 +3,18 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CollectionRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
-import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.FilterValuePlaceholder;
 import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.identifiable.INode;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.Node;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.identifiable.web.BreadcrumbNavigation;
 import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -81,7 +82,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
   @Autowired
   public CollectionRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
-    super(dbi,
+    super(
+        dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
@@ -189,8 +191,9 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
   @Override
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
-    List<Node> result =
-        dbi.withHandle(h ->
+    List<INode> result =
+        dbi.withHandle(
+            h ->
                 h.createQuery(
                         "WITH recursive breadcrumb (uuid,label,parent_uuid,depth)"
                             + " AS ("
@@ -208,14 +211,15 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                     .bind("uuid", nodeUuid)
                     .registerRowMapper(BeanMapper.factory(Node.class))
                     .mapTo(Node.class)
-                    .map(Node.class::cast)
+                    .map(INode.class::cast)
                     .list());
 
     if (result.isEmpty()) {
       // Special case: If we are on a top level collection, we have no parent, so
       // we must construct a breadcrumb more or less manually
       result =
-          dbi.withHandle(h ->
+          dbi.withHandle(
+              h ->
                   h.createQuery(
                           "SELECT c.uuid AS uuid, c.label AS label"
                               + "        FROM collections c"
@@ -223,7 +227,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                       .bind("uuid", nodeUuid)
                       .registerRowMapper(BeanMapper.factory(Node.class))
                       .mapTo(Node.class)
-                      .map(Node.class::cast)
+                      .map(INode.class::cast)
                       .list());
     }
 

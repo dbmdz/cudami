@@ -27,37 +27,37 @@ public class AbstractPagingAndSortingRepositoryImplTest {
     StringBuilder query = new StringBuilder("");
     PageRequest pr = new PageRequest();
     repository.addOrderBy(pr, query);
-    assertEquals(query.toString().trim(), "");
+    assertEquals("", query.toString().trim());
 
     Sorting sorting = new Sorting();
     pr.setSorting(sorting);
     repository.addOrderBy(pr, query);
-    assertEquals(query.toString().trim(), "");
+    assertEquals("", query.toString().trim());
 
     Order order = new Order();
     sorting = new Sorting(order);
     pr.setSorting(sorting);
     repository.addOrderBy(pr, query);
-    assertEquals(query.toString().trim(), "");
+    assertEquals("", query.toString().trim());
 
     order = new Order("ham");
     sorting = new Sorting(order);
     pr.setSorting(sorting);
     repository.addOrderBy(pr, query);
-    assertEquals(query.toString().trim(), "");
+    assertEquals("", query.toString().trim());
 
     order = new Order("foo");
     sorting = new Sorting(order);
     pr.setSorting(sorting);
     repository.addOrderBy(pr, query);
-    assertEquals(query.toString().trim(), "ORDER BY foo ASC");
+    assertEquals("ORDER BY foo ASC", query.toString().trim());
 
     order = new Order(Direction.DESC, "foo");
     sorting = new Sorting(order);
     pr.setSorting(sorting);
     query = new StringBuilder("");
     repository.addOrderBy(pr, query);
-    assertEquals(query.toString().trim(), "ORDER BY foo DESC");
+    assertEquals("ORDER BY foo DESC", query.toString().trim());
 
     order = new Order("foo");
     order.setSubProperty("bar");
@@ -65,7 +65,7 @@ public class AbstractPagingAndSortingRepositoryImplTest {
     pr.setSorting(sorting);
     query = new StringBuilder("");
     repository.addOrderBy(pr, query);
-    assertEquals(query.toString().trim(), "ORDER BY foo->>'bar' ASC");
+    assertEquals("ORDER BY foo->>'bar' ASC", query.toString().trim());
 
     order = new Order(Direction.DESC, "foo");
     order.setSubProperty("bar");
@@ -73,14 +73,14 @@ public class AbstractPagingAndSortingRepositoryImplTest {
     pr.setSorting(sorting);
     query = new StringBuilder("");
     repository.addOrderBy(pr, query);
-    assertEquals(query.toString().trim(), "ORDER BY foo->>'bar' DESC");
+    assertEquals("ORDER BY foo->>'bar' DESC", query.toString().trim());
 
     Order secondOrder = new Order("foo");
     sorting = sorting.and(new Sorting(secondOrder));
     pr.setSorting(sorting);
     query = new StringBuilder("");
     repository.addOrderBy(pr, query);
-    assertEquals(query.toString().trim(), "ORDER BY foo->>'bar' DESC,foo ASC");
+    assertEquals("ORDER BY foo->>'bar' DESC,foo ASC", query.toString().trim());
   }
 
   @Test

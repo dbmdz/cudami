@@ -30,7 +30,7 @@ class WebpageServiceImplTest {
   @DisplayName("shall not do anything on a node without any label")
   public void ignoreNodeWithNoLabels() {
     Node node = new Node();
-    service.cleanupLabelFromUnwantedLocales(Locale.GERMAN, FALLBACK_LOCALE, node);
+    service.cleanupLabelFromUnwantedLocales(Locale.GERMAN, FALLBACK_LOCALE, node.getLabel());
     assertThat(node.getLabel()).isNull();
   }
 
@@ -41,7 +41,7 @@ class WebpageServiceImplTest {
     LocalizedText emptyLabel = new LocalizedText();
 
     node.setLabel(emptyLabel);
-    service.cleanupLabelFromUnwantedLocales(Locale.GERMAN, FALLBACK_LOCALE, node);
+    service.cleanupLabelFromUnwantedLocales(Locale.GERMAN, FALLBACK_LOCALE, node.getLabel());
     assertThat(node.getLabel()).isEqualTo(emptyLabel);
   }
 
@@ -53,7 +53,7 @@ class WebpageServiceImplTest {
     label.setText(FALLBACK_LOCALE, "Test");
 
     node.setLabel(label);
-    service.cleanupLabelFromUnwantedLocales(Locale.GERMAN, FALLBACK_LOCALE, node);
+    service.cleanupLabelFromUnwantedLocales(Locale.GERMAN, FALLBACK_LOCALE, node.getLabel());
     assertThat(node.getLabel()).isEqualTo(label);
   }
 
@@ -69,7 +69,7 @@ class WebpageServiceImplTest {
     label.setText(Locale.FRENCH, "faux");
 
     node.setLabel(label);
-    service.cleanupLabelFromUnwantedLocales(Locale.GERMAN, FALLBACK_LOCALE, node);
+    service.cleanupLabelFromUnwantedLocales(Locale.GERMAN, FALLBACK_LOCALE, node.getLabel());
     assertThat(node.getLabel()).isEqualTo(expectedFirstLocaleLabel);
   }
 
@@ -84,7 +84,7 @@ class WebpageServiceImplTest {
     label.setText(Locale.GERMAN, "richtig");
 
     node.setLabel(label);
-    service.cleanupLabelFromUnwantedLocales(Locale.GERMAN, FALLBACK_LOCALE, node);
+    service.cleanupLabelFromUnwantedLocales(Locale.GERMAN, FALLBACK_LOCALE, node.getLabel());
     assertThat(node.getLabel()).isEqualTo(expectedGermanLabel);
   }
 }
