@@ -33,8 +33,8 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public boolean addChildren(UUID parentUuid, List<Collection> children) {
-    return ((NodeRepository<Collection>) repository).addChildren(parentUuid, children);
+  public boolean addChildren(UUID parentUuid, List<UUID> childrenUuids) {
+    return ((NodeRepository<Collection>) repository).addChildren(parentUuid, childrenUuids);
   }
 
   @Override
@@ -93,13 +93,13 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public List<Collection> getChildren(UUID uuid) {
-    return ((NodeRepository<Collection>) repository).getChildren(uuid);
+  public List<Collection> getChildren(UUID nodeUuid) {
+    return ((NodeRepository<Collection>) repository).getChildren(nodeUuid);
   }
 
   @Override
-  public PageResponse<Collection> getChildren(UUID uuid, PageRequest pageRequest) {
-    return ((NodeRepository<Collection>) repository).getChildren(uuid, pageRequest);
+  public PageResponse<Collection> getChildren(UUID nodeUuid, PageRequest pageRequest) {
+    return ((NodeRepository<Collection>) repository).getChildren(nodeUuid, pageRequest);
   }
 
   @Override

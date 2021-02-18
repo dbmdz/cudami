@@ -33,6 +33,7 @@ import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.jdbi.v3.core.result.RowView;
+import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -239,12 +240,34 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   @Override
   public void addRelatedEntity(UUID identifiableUuid, UUID entityUuid) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    Integer sortIndex =
+        retrieveNextSortIndexForParentChildren(
+            dbi, "rel_identifiable_entities", "identifiable_uuid", identifiableUuid);
+
+    dbi.withHandle(
+        h ->
+            h.createUpdate(
+                    "INSERT INTO rel_identifiable_entities(identifiable_uuid, entity_uuid, sortindex) VALUES (:identifiableUuid, :entityUuid, :sortindex)")
+                .bind("identifiableUuid", identifiableUuid)
+                .bind("entityUuid", entityUuid)
+                .bind("sortindex", sortIndex)
+                .execute());
   }
 
   @Override
   public void addRelatedFileresource(UUID identifiableUuid, UUID fileResourceUuid) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    Integer sortIndex =
+        retrieveNextSortIndexForParentChildren(
+            dbi, "rel_identifiable_fileresources", "identifiable_uuid", identifiableUuid);
+
+    dbi.withHandle(
+        h ->
+            h.createUpdate(
+                    "INSERT INTO rel_identifiable_fileresources(identifiable_uuid, fileresource_uuid, sortindex) VALUES (:identifiableUuid, :fileresourceUuid, :sortindex)")
+                .bind("identifiableUuid", identifiableUuid)
+                .bind("fileresourceUuid", fileResourceUuid)
+                .bind("sortindex", sortIndex)
+                .execute());
   }
 
   private BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> createReduceRowsBiFunction(
@@ -500,15 +523,52 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     }
     return -1;
   }
+  
+  public int getIndex(List<UUID> list, UUID uuid) {
+    int pos = -1;
+    for (UUID u : list) {
+      pos += 1;
+      if (u.equals(uuid)) {
+        return pos;
+      }
+    }
+    return -1;
+  }
 
   @Override
   public List<Entity> getRelatedEntities(UUID identifiableUuid) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    String query =
+        "SELECT * FROM entities e"
+            + " INNER JOIN rel_identifiable_entities ref ON e.uuid=ref.entity_uuid"
+            + " WHERE ref.identifiable_uuid = :identifiableUuid"
+            + " ORDER BY ref.sortindex";
+
+    List<Entity> list =
+        dbi.withHandle(h ->
+                h.createQuery(query)
+                    .bind("identifiableUuid", identifiableUuid)
+                    .mapToBean(Entity.class)
+                    .map(Entity.class::cast)
+                    .list());
+    return list;
   }
 
   @Override
   public List<FileResource> getRelatedFileResources(UUID identifiableUuid) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    String query =
+        "SELECT * FROM fileresources f"
+            + " INNER JOIN rel_identifiable_fileresources ref ON f.uuid=ref.fileresource_uuid"
+            + " WHERE ref.identifiableUuid = :identifiableUuid"
+            + " ORDER BY ref.sortindex";
+
+    List<FileResource> result =
+        dbi.withHandle(h ->
+                h.createQuery(query)
+                    .bind("identifiableUuid", identifiableUuid)
+                    .mapToBean(FileResource.class)
+                    .map(FileResource.class::cast)
+                    .list());
+    return result;
   }
 
   public String getSqlSelectAllFields() {
@@ -677,12 +737,60 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   @Override
   public List<Entity> saveRelatedEntities(UUID identifiableUuid, List<Entity> entities) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    // as we store the whole list new: delete old entries
+    dbi.withHandle(
+        h ->
+            h.createUpdate("DELETE FROM rel_identifiable_entities WHERE identifiable_uuid = :identifiableUuid")
+                .bind("identifiableUuid", identifiableUuid)
+                .execute());
+
+    if (entities != null) {
+      // we assume that the entities are already saved...
+      dbi.useHandle(
+          handle -> {
+            PreparedBatch preparedBatch =
+                handle.prepareBatch(
+                    "INSERT INTO rel_identifiable_entities(identifiable_uuid, entity_uuid, sortIndex) VALUES(:identifiableUuid, :entityUuid, :sortIndex)");
+            for (Entity entity : entities) {
+              preparedBatch
+                  .bind("identifiableUuid", identifiableUuid)
+                  .bind("entityUuid", entity.getUuid())
+                  .bind("sortIndex", getIndex(entities, entity))
+                  .add();
+            }
+            preparedBatch.execute();
+          });
+    }
+    return getRelatedEntities(identifiableUuid);
   }
 
   @Override
   public List<FileResource> saveRelatedFileResources(UUID identifiableUuid, List<FileResource> fileResources) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    if (fileResources == null) {
+      return null;
+    }
+    // as we store the whole list new: delete old entries
+    dbi.withHandle(
+        h ->
+            h.createUpdate("DELETE FROM rel_identifiable_fileresources WHERE identifiable_uuid = :identifiableUuid")
+                .bind("identifiableUuid", identifiableUuid)
+                .execute());
+
+    dbi.useHandle(
+        handle -> {
+          PreparedBatch preparedBatch =
+              handle.prepareBatch(
+                  "INSERT INTO rel_entity_fileresources(identifiable_uuid, fileresource_uuid, sortIndex) VALUES(:identifiableUuid, :fileResourceUuid, :sortIndex)");
+          for (FileResource fileResource : fileResources) {
+            preparedBatch
+                .bind("identifiableUuid", identifiableUuid)
+                .bind("fileResourceUuid", fileResource.getUuid())
+                .bind("sortIndex", getIndex(fileResources, fileResource))
+                .add();
+          }
+          preparedBatch.execute();
+        });
+    return getRelatedFileResources(identifiableUuid);
   }
 
   @Override

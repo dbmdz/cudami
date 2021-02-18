@@ -4,7 +4,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.N
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
-import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.parts.EntityPartServiceImpl;
+import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.BreadcrumbNavigation;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 
 /** Service for Webpage handling. */
 @Service
-public class WebpageServiceImpl extends EntityPartServiceImpl<Webpage> implements WebpageService {
+public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> implements WebpageService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpageServiceImpl.class);
 
@@ -31,8 +31,8 @@ public class WebpageServiceImpl extends EntityPartServiceImpl<Webpage> implement
   }
 
   @Override
-  public boolean addChildren(UUID parentUuid, List<Webpage> collections) {
-    return ((NodeRepository<Webpage>) repository).addChildren(parentUuid, collections);
+  public boolean addChildren(UUID parentUuid, List<UUID> childrenUuids) {
+    return ((NodeRepository<Webpage>) repository).addChildren(parentUuid, childrenUuids);
   }
 
   // TODO: test if webpages work as expected (using now IdentifiableServiceImpl logic)

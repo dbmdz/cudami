@@ -3,21 +3,15 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.web;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.parts.EntityPartRepositoryImpl;
-import de.digitalcollections.model.api.filter.FilterValuePlaceholder;
-import de.digitalcollections.model.api.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifier;
-import de.digitalcollections.model.identifiable.Node;
-import de.digitalcollections.model.api.identifiable.entity.Website;
-import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.view.BreadcrumbNavigation;
+import de.digitalcollections.model.filter.FilterValuePlaceholder;
+import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Node;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.identifiable.web.BreadcrumbNavigation;
+import de.digitalcollections.model.paging.PageRequest;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -32,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
+public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
     implements WebpageRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpageRepositoryImpl.class);
@@ -99,8 +93,31 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
   }
 
   @Override
-  public boolean addChildren(UUID parentUuid, List<Webpage> collections) {
-    throw new UnsupportedOperationException("Not supported yet.");
+  public boolean addChildren(UUID parentUuid, List<UUID> childrenUuids) {
+    if (parentUuid == null || childrenUuids == null) {
+      return false;
+    }
+    Integer nextSortIndex =
+        retrieveNextSortIndexForParentChildren(
+            dbi, "webpage_webpages", "parent_webpage_uuid", parentUuid);
+
+    dbi.useHandle(
+        handle -> {
+          PreparedBatch preparedBatch =
+              handle.prepareBatch(
+                  "INSERT INTO webpage_webpages(parent_webpage_uuid, child_webpage_uuid, sortIndex)"
+                      + " VALUES (:parentWebpageUuid, :childWebpageUuid, :sortIndex) ON CONFLICT (parent_webpage_uuid, child_webpage_uuid) DO NOTHING");
+          childrenUuids.forEach(
+              childUuid -> {
+                preparedBatch
+                    .bind("parentWebpageUuid", parentUuid)
+                    .bind("childWebpageUuid", childUuid)
+                    .bind("sortIndex", nextSortIndex + getIndex(childrenUuids, childUuid))
+                    .add();
+              });
+          preparedBatch.execute();
+        });
+    return true;
   }
 
   @Override
@@ -178,11 +195,6 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
     }
 
     return new BreadcrumbNavigation(result);
-  }
-
-  @Override
-  public List<Webpage> getChildren(Webpage webpage) {
-    return getChildren(webpage.getUuid());
   }
 
   @Override
@@ -336,7 +348,19 @@ public class WebpageRepositoryImpl extends EntityPartRepositoryImpl<Webpage>
 
   @Override
   public boolean removeChild(UUID parentUuid, UUID childUuid) {
-    throw new UnsupportedOperationException("Not supported yet.");
+    if (parentUuid == null || childUuid == null) {
+      return false;
+    }
+    final String sql =
+        "DELETE FROM webpage_webpages WHERE parent_webpage_uuid=:parentWebpageUuid AND child_webpage_uuid=:childWebpageUuid";
+
+    dbi.withHandle(
+        h ->
+            h.createUpdate(sql)
+                .bind("parentWebpageUuid", parentUuid)
+                .bind("childWebpageUuid", childUuid)
+                .execute());
+    return true;
   }
 
   @Override

@@ -95,8 +95,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public boolean addChildren(UUID parentUuid, List<Collection> children) {
-    if (parentUuid == null || children == null) {
+  public boolean addChildren(UUID parentUuid, List<UUID> childrenUuids) {
+    if (parentUuid == null || childrenUuids == null) {
       return false;
     }
     Integer nextSortIndex =
@@ -109,12 +109,12 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
               handle.prepareBatch(
                   "INSERT INTO collection_collections(parent_collection_uuid, child_collection_uuid, sortIndex)"
                       + " VALUES (:parentCollectionUuid, :childCollectionUuid, :sortIndex) ON CONFLICT (parent_collection_uuid, child_collection_uuid) DO NOTHING");
-          children.forEach(
-              child -> {
+          childrenUuids.forEach(
+              childUuid -> {
                 preparedBatch
                     .bind("parentCollectionUuid", parentUuid)
-                    .bind("childCollectionUuid", child.getUuid())
-                    .bind("sortIndex", nextSortIndex + getIndex(children, child))
+                    .bind("childCollectionUuid", childUuid)
+                    .bind("sortIndex", nextSortIndex + getIndex(childrenUuids, childUuid))
                     .add();
               });
           preparedBatch.execute();
@@ -189,7 +189,6 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
   @Override
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
-
     List<Node> result =
         dbi.withHandle(h ->
                 h.createQuery(
@@ -201,9 +200,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                             + ""
                             + "        UNION ALL"
                             + "        SELECT c.uuid AS uuid, c.label AS label, c.refid c_refId, cc.parent_collection_uuid AS parent_uuid, depth-1 AS depth"
-                            + "        FROM collections c,"
-                            + "             collection_collections cc,"
-                            + "             breadcrumb b"
+                            + "        FROM collections c, collection_collections cc, breadcrumb b"
                             + "        WHERE b.uuid = cc.child_collection_uuid AND cc.parent_collection_uuid = c.uuid AND cc.parent_collection_uuid IS NOT null"
                             + "    )"
                             + " SELECT * FROM breadcrumb"
@@ -231,11 +228,6 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     }
 
     return new BreadcrumbNavigation(result);
-  }
-
-  @Override
-  public List<Collection> getChildren(Collection collection) {
-    return CollectionRepository.super.getChildren(collection);
   }
 
   @Override

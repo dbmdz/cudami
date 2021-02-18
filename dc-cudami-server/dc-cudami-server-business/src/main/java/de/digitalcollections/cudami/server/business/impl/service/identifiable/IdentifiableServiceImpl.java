@@ -6,6 +6,8 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
@@ -36,6 +38,16 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   public IdentifiableServiceImpl(
       @Qualifier("identifiableRepositoryImpl") IdentifiableRepository<I> repository) {
     this.repository = repository;
+  }
+
+  @Override
+  public void addRelatedEntity(UUID identifiableUuid, UUID entityUuid) {
+    repository.addRelatedEntity(identifiableUuid, entityUuid);
+  }
+
+  @Override
+  public void addRelatedFileresource(UUID identifiableUuid, UUID fileResourceUuid) {
+    repository.addRelatedFileresource(identifiableUuid, fileResourceUuid);
   }
 
   @Override
@@ -104,6 +116,16 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     return repository.findOneByIdentifier(namespace, id);
   }
 
+  @Override
+  public List<Entity> getRelatedEntities(UUID identifiableUuid) {
+    return repository.getRelatedEntities(identifiableUuid);
+  }
+
+  @Override
+  public List<FileResource> getRelatedFileResources(UUID identifiableUuid) {
+    return repository.getRelatedFileResources(identifiableUuid);
+  }
+
   protected I reduceMultilanguageFieldsToGivenLocale(I identifiable, Locale locale) {
     if (identifiable == null) {
       return null;
@@ -147,6 +169,16 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       LOGGER.error("Cannot save identifiable " + identifiable + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
     }
+  }
+
+  @Override
+  public List<Entity> saveRelatedEntities(UUID identifiableUuid, List<Entity> entities) {
+    return repository.saveRelatedEntities(identifiableUuid, entities);
+  }
+
+  @Override
+  public List<FileResource> saveRelatedFileResources(UUID identifiableUuid, List<FileResource> fileResources) {
+    return repository.saveRelatedFileResources(identifiableUuid, fileResources);
   }
 
   protected void setDefaultSorting(PageRequest pageRequest) {

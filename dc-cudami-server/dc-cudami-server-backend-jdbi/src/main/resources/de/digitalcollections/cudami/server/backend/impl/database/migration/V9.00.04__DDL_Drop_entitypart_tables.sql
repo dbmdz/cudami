@@ -1,0 +1,2 @@
+DROP TABLE rel_entitypart_entities;
+DROP TABLE rel_entitypart_fileresources;
