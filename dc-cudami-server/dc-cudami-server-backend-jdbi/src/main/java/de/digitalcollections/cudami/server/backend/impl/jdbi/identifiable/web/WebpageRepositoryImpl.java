@@ -5,21 +5,19 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.w
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.filter.FilterValuePlaceholder;
 import de.digitalcollections.model.filter.Filtering;
-import de.digitalcollections.model.identifiable.INode;
 import de.digitalcollections.model.identifiable.Identifier;
-import de.digitalcollections.model.identifiable.Node;
 import de.digitalcollections.model.identifiable.entity.Website;
-import de.digitalcollections.model.identifiable.web.BreadcrumbNavigation;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.view.BreadcrumbNavigation;
+import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -152,33 +150,32 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   @Override
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) {
 
-    List<INode> result =
+    List<BreadcrumbNode> result =
         dbi.withHandle(
             h ->
                 h.createQuery(
-                        "WITH recursive breadcrumb (uuid,label,parent_uuid,depth)"
+                        "WITH RECURSIVE breadcrumb (targetId, label, parentId, depth)"
                             + " AS ("
-                            + "        SELECT w.uuid as uuid, w.label as label, ww.parent_webpage_uuid as parent_uuid,99 as depth"
+                            + "        SELECT w.uuid AS targetId, w.label AS label, ww.parent_webpage_uuid AS parentId, 99 AS depth"
                             + "        FROM webpages w, webpage_webpages ww"
-                            + "        WHERE uuid= :uuid and ww.child_webpage_uuid = w.uuid"
+                            + "        WHERE uuid=:uuid and ww.child_webpage_uuid = w.uuid"
                             + ""
                             + "        UNION ALL"
-                            + "        SELECT w.uuid as uuid, w.label as label, ww.parent_webpage_uuid as parent_uuid, depth-1 as depth"
-                            + "        FROM webpages w,"
-                            + "             webpage_webpages ww,"
-                            + "             breadcrumb b"
-                            + "        WHERE b.uuid = ww.child_webpage_uuid and ww.parent_webpage_uuid = w.uuid AND ww.parent_webpage_uuid is not null"
+                            + "        SELECT w.uuid AS targetId, w.label AS label, ww.parent_webpage_uuid AS parentId, depth-1 AS depth"
+                            + "        FROM webpages w, webpage_webpages ww, breadcrumb b"
+                            + "        WHERE b.targetId = ww.child_webpage_uuid AND ww.parent_webpage_uuid = w.uuid AND ww.parent_webpage_uuid IS NOT NULL"
                             + "    )"
-                            + " SELECT * from breadcrumb"
+                            + ""
+                            + " SELECT cast(targetId AS VARCHAR) AS targetId, label, parentId, depth FROM breadcrumb"
+                            + ""
                             + " UNION"
-                            + " SELECT null as uuid, w.label as label, null as parent_uuid, 0 as depth"
-                            + " FROM websites w, website_webpages ww, breadcrumb b"
-                            + " WHERE ww.webpage_uuid = b.parent_uuid and w.uuid = ww.website_uuid"
+                            + " SELECT NULL AS targetId, ws.label AS label, NULL AS parentId, 0 AS depth"
+                            + " FROM websites ws, website_webpages ww, breadcrumb b"
+                            + " WHERE ww.webpage_uuid = b.parentId AND ws.uuid = ww.website_uuid"
+                            + ""
                             + " ORDER BY depth ASC")
                     .bind("uuid", uuid)
-                    .registerRowMapper(BeanMapper.factory(Node.class))
-                    .mapTo(Node.class)
-                    .map(INode.class::cast)
+                    .mapTo(BreadcrumbNode.class)
                     .list());
 
     if (result.isEmpty()) {
@@ -188,13 +185,11 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
           dbi.withHandle(
               h ->
                   h.createQuery(
-                          "SELECT w.uuid as uuid, w.label as label"
+                          "SELECT cast(w.uuid AS VARCHAR) as targetId, w.label as label"
                               + "        FROM webpages w"
                               + "        WHERE uuid= :uuid")
                       .bind("uuid", uuid)
-                      .registerRowMapper(BeanMapper.factory(Node.class))
-                      .mapTo(Node.class)
-                      .map(INode.class::cast)
+                      .mapTo(BreadcrumbNode.class)
                       .list());
     }
 

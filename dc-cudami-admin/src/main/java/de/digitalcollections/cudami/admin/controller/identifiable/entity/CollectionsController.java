@@ -16,8 +16,8 @@ import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
-import java.util.ArrayList;
-import java.util.Collections;
+import de.digitalcollections.model.view.BreadcrumbNavigation;
+import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -265,7 +265,18 @@ public class CollectionsController extends AbstractController {
     }
   }
 
-  @GetMapping({"/collections/{uuid}", "/subcollections/{uuid}"})
+  @GetMapping({"/collections/{refId:[0-9]+}", "/subcollections/{refId:[0-9]+}"})
+  public String viewByRefId(
+      @PathVariable long refId, @PageableDefault(size = 25) Pageable pageable, Model model)
+      throws HttpException {
+    Collection collection = service.findOneByRefId(refId);
+    return view(collection.getUuid(), pageable, model);
+  }
+
+  @GetMapping({
+    "/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+    "/subcollections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+  })
   public String view(
       @PathVariable UUID uuid, @PageableDefault(size = 25) Pageable pageable, Model model)
       throws HttpException {
@@ -287,12 +298,12 @@ public class CollectionsController extends AbstractController {
     List<Collection> parents = service.getParents(uuid);
     model.addAttribute("parents", parents);
 
-    List<INode> breadcrumbs = new ArrayList<>();
-    addParentNodeToBreadcrumb(collection, breadcrumbs);
-    Collections.reverse(breadcrumbs);
+    //    List<INode> breadcrumbs = new ArrayList<>();
+    //    addParentNodeToBreadcrumb(collection, breadcrumbs);
+    //    Collections.reverse(breadcrumbs);
 
-    //    BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
-    //    List<Node> breadcrumbs = breadcrumbNavigation.getNavigationItems();
+    BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
+    List<BreadcrumbNode> breadcrumbs = breadcrumbNavigation.getNavigationItems();
     model.addAttribute("breadcrumbs", breadcrumbs);
 
     return "collections/view";

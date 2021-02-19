@@ -18,7 +18,7 @@
             <li class="breadcrumb-item"><a th:href="@{/collections}" th:text="#{collections}">Collections</a></li>
             <th:block th:if="${not #lists.isEmpty(breadcrumbs)}">
               <th:block th:each="breadcrumb : ${breadcrumbs}">
-                <li class="breadcrumb-item"><a th:href="@{/collections/} + ${breadcrumb.uuid}"><th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${breadcrumb.label}, ${locale})">Node Label</th:block></a></li>
+                <li class="breadcrumb-item"><a th:href="@{/collections/} + ${breadcrumb.targetId}"><th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${breadcrumb.label}, ${locale})">Node Label</th:block></a></li>
               </th:block>
             </th:block>
           </ol>

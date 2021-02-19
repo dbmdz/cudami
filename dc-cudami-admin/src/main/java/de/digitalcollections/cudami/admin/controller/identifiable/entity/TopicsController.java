@@ -9,13 +9,13 @@ import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiTopicsClient;
-import de.digitalcollections.model.identifiable.INode;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.identifiable.web.BreadcrumbNavigation;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.view.BreadcrumbNavigation;
+import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -140,10 +140,19 @@ public class TopicsController extends AbstractController {
     }
   }
 
-  @GetMapping("/topics/{uuid}")
+  @GetMapping({"/topics/{refId:[0-9]+}", "/subtopics/{refId:[0-9]+}"})
+  public String viewByRefId(@PathVariable long refId, Model model) throws HttpException {
+    Topic topic = service.findOneByRefId(refId);
+    return view(topic.getUuid(), model);
+  }
+
+  @GetMapping({
+    "/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+    "/subtopics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+  })
   public String view(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Topic topic = (Topic) service.findOne(uuid);
+    Topic topic = service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, topic.getLabel().getLocales());
 
@@ -157,10 +166,8 @@ public class TopicsController extends AbstractController {
     model.addAttribute("relatedEntities", relatedEntities);
 
     BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
-    List<INode> breadcrumbs = breadcrumbNavigation.getNavigationItems();
-    // Cut out first breadcrumb node (the one with empty uuid), which identifies the topic, since
-    // it is handled individually
-    breadcrumbs.removeIf(n -> n.getUuid() == null);
+
+    List<BreadcrumbNode> breadcrumbs = breadcrumbNavigation.getNavigationItems();
     model.addAttribute("breadcrumbs", breadcrumbs);
 
     return "topics/view";

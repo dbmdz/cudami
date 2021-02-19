@@ -8,13 +8,13 @@ import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.identifiable.web.BreadcrumbNavigation;
 import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -215,12 +215,26 @@ public class CollectionController {
     return collectionService.getByIdentifier(namespace, id);
   }
 
+  @ApiMethod(description = "Get collection by refId")
+  @GetMapping(value = {"/latest/collections/{refId:[0-9]+}"})
+  @ApiResponseObject
+  public ResponseEntity<Collection> findByRefId(
+      @ApiPathParam(description = "refId of the collection, e.g. <tt>42</tt>") @PathVariable
+          long refId)
+      throws IdentifiableServiceException {
+    Collection collection = collectionService.getByRefId(refId);
+    return findByUuid(collection.getUuid(), null, null);
+  }
+
   // Test-URL: http://localhost:9000/latest/collections/599a120c-2dd5-11e8-b467-0ed5f89f718b
   @ApiMethod(
       description =
           "Get an collection as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
-      value = {"/latest/collections/{uuid}", "/v2/collections/{uuid}"},
+      value = {
+        "/latest/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v2/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+      },
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   @ApiResponseObject
   public ResponseEntity<Collection> findByUuid(

@@ -7,11 +7,11 @@ import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.identifiable.web.BreadcrumbNavigation;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
@@ -109,6 +109,10 @@ public class CudamiCollectionsClient extends CudamiBaseClient<Collection> {
   public Collection findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
         String.format("/latest/collections/identifier/%s:%s.json", namespace, id));
+  }
+
+  public Collection findOneByRefId(long refId) throws HttpException {
+    return doGetRequestForObject(String.format("/latest/collections/%d", refId));
   }
 
   public PageResponse<Collection> findTopCollections(PageRequest pageRequest) throws HttpException {

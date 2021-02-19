@@ -80,7 +80,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr th:each="subtopic, stats : *{subtopics}">
+              <tr th:each="subtopic, stats : *{children}">
                 <td class="text-right" th:text="${stats.index + 1}">1</td>
                 <td class="center">
                   <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${subtopic.previewImage}, ${subtopic.previewImageRenderingHints}, ${#locale}, 30)"></th:block>

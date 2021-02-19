@@ -1,0 +1,1 @@
+UPDATE identifiables SET identifiable_type='RESOURCE' WHERE identifiable_type='ENTITY_PART';

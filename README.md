@@ -1,14 +1,3 @@
-TODO:
-
-V9.01.07__DDL_Drop_subtopic_tables.sql
-
-DROP TABLE topic_subtopics;
-DROP TABLE subtopic_entities;
-DROP TABLE subtopic_fileresources;
-DROP TABLE subtopic_subtopics;
-DROP TABLE subtopics;
-
-
 # cudami (cultural digital asset management)
 
 [![Javadocs](https://javadoc.io/badge/de.digitalcollections.cudami/dc-cudami.svg)](https://javadoc.io/doc/de.digitalcollections.cudami/dc-cudami)

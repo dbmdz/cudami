@@ -6,13 +6,13 @@ import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.web.CudamiWebpagesClient;
-import de.digitalcollections.model.identifiable.INode;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.identifiable.web.BreadcrumbNavigation;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.view.BreadcrumbNavigation;
+import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -179,11 +179,11 @@ public class WebpagesController extends AbstractController {
 
     BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
 
-    List<INode> breadcrumbs = breadcrumbNavigation.getNavigationItems();
+    List<BreadcrumbNode> breadcrumbs = breadcrumbNavigation.getNavigationItems();
     // Cut out first breadcrumb node (the one with empty uuid), which identifies the website, since
     // it is
     // handled individually
-    breadcrumbs.removeIf(n -> n.getUuid() == null);
+    breadcrumbs.removeIf(n -> n.getTargetId() == null);
     model.addAttribute("breadcrumbs", breadcrumbs);
 
     Website website = service.getWebsite(uuid);

@@ -5,22 +5,20 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.model.filter.FilterValuePlaceholder;
 import de.digitalcollections.model.filter.Filtering;
-import de.digitalcollections.model.identifiable.INode;
 import de.digitalcollections.model.identifiable.Identifier;
-import de.digitalcollections.model.identifiable.Node;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.identifiable.web.BreadcrumbNavigation;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.view.BreadcrumbNavigation;
+import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,27 +130,25 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
   @Override
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
-    List<INode> result =
+    List<BreadcrumbNode> result =
         dbi.withHandle(
             h ->
                 h.createQuery(
-                        "WITH recursive breadcrumb (uuid,label,parent_uuid,depth)"
+                        "WITH recursive breadcrumb (uuid,label,refId,parentId,depth)"
                             + " AS ("
-                            + "        SELECT t.uuid AS uuid, t.label AS label, t.refid t_refId, tt.parent_topic_uuid AS parent_uuid, 99 AS depth"
+                            + "        SELECT t.uuid AS uuid, t.label AS label, t.refid AS refId, tt.parent_topic_uuid AS parentId, 99 AS depth"
                             + "        FROM topics t, topic_topics tt"
                             + "        WHERE uuid= :uuid and tt.child_topic_uuid = t.uuid"
                             + ""
                             + "        UNION ALL"
-                            + "        SELECT t.uuid AS uuid, t.label AS label, t.refid t_refId, tt.parent_topic_uuid AS parent_uuid, depth-1 AS depth"
+                            + "        SELECT t.uuid AS uuid, t.label AS label, t.refid AS refID, tt.parent_topic_uuid AS parentId, depth-1 AS depth"
                             + "        FROM topics t, topic_topics tt, breadcrumb b"
                             + "        WHERE b.uuid = tt.child_topic_uuid AND tt.parent_topic_uuid = t.uuid AND tt.parent_topic_uuid IS NOT null"
                             + "    )"
-                            + " SELECT * FROM breadcrumb"
+                            + " SELECT cast(refId AS VARCHAR) as targetId, label, depth FROM breadcrumb"
                             + " ORDER BY depth ASC")
                     .bind("uuid", nodeUuid)
-                    .registerRowMapper(BeanMapper.factory(Node.class))
-                    .mapTo(Node.class)
-                    .map(INode.class::cast)
+                    .mapTo(BreadcrumbNode.class)
                     .list());
 
     if (result.isEmpty()) {
@@ -162,13 +158,10 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
           dbi.withHandle(
               h ->
                   h.createQuery(
-                          "SELECT t.uuid AS uuid, t.label AS label"
-                              + "        FROM topics t"
-                              + "        WHERE uuid= :uuid")
+                          "SELECT cast(refId AS VARCHAR) as targetId, label AS label"
+                              + " FROM topics WHERE uuid= :uuid")
                       .bind("uuid", nodeUuid)
-                      .registerRowMapper(BeanMapper.factory(Node.class))
-                      .mapTo(Node.class)
-                      .map(INode.class::cast)
+                      .mapTo(BreadcrumbNode.class)
                       .list());
     }
 

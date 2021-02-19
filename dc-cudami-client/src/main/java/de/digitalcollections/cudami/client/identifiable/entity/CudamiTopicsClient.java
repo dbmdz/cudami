@@ -6,9 +6,9 @@ import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.identifiable.web.BreadcrumbNavigation;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.UUID;
@@ -42,6 +42,10 @@ public class CudamiTopicsClient extends CudamiBaseClient<Topic> {
   public Topic findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
         String.format("/latest/topics/identifier/%s:%s.json", namespace, id));
+  }
+
+  public Topic findOneByRefId(long refId) throws HttpException {
+    return doGetRequestForObject(String.format("/latest/topics/%d", refId));
   }
 
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws HttpException {

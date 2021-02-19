@@ -6,11 +6,11 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.identifiable.web.BreadcrumbNavigation;
 import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -93,7 +93,10 @@ public class TopicController {
 
   @ApiMethod(description = "Get topic by uuid (and optional locale)")
   @GetMapping(
-      value = {"/latest/topics/{uuid}", "/v2/topics/{uuid}"},
+      value = {
+        "/latest/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v2/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public ResponseEntity<Topic> findById(
@@ -115,6 +118,16 @@ public class TopicController {
       topic = service.get(uuid, pLocale);
     }
     return new ResponseEntity<>(topic, HttpStatus.OK);
+  }
+
+  @ApiMethod(description = "Get topic by refId")
+  @GetMapping(value = {"/latest/topics/{refId:[0-9]+}", "/v3/topics/{refId:[0-9]+}"})
+  @ApiResponseObject
+  public ResponseEntity<Topic> findByRefId(
+      @ApiPathParam(description = "refId of the topic, e.g. <tt>42</tt>") @PathVariable long refId)
+      throws IdentifiableServiceException {
+    Topic topic = service.getByRefId(refId);
+    return findById(topic.getUuid(), null);
   }
 
   @ApiMethod(description = "Get the breadcrumb for a topic")
