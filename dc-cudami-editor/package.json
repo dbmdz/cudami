@@ -33,7 +33,7 @@
     "prosemirror-schema-basic": "^1.1.2",
     "prosemirror-schema-list": "^1.1.4",
     "prosemirror-tables": "^1.1.1",
-    "pubsub-js": "^1.9.2",
+    "pubsub-js": "^1.9.3",
     "react": "^16.14.0",
     "react-autosuggest": "^10.1.0",
     "react-date-picker": "^8.0.7",
