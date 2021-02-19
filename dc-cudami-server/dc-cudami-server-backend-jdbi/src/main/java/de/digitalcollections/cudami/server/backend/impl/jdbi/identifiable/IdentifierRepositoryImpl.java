@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,10 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
   @Autowired
   public IdentifierRepositoryImpl(Jdbi dbi) {
     super(dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX);
+
+    // Hint: as repo is no extension of IdentifiableRepositoryImpl (registering mapper for
+    // Identifiable in constructor), we have to register row mapper on ourselves
+    dbi.registerRowMapper(BeanMapper.factory(Identifier.class, MAPPING_PREFIX));
   }
 
   @Override

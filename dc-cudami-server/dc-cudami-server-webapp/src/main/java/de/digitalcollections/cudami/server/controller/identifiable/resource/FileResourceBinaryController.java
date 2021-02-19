@@ -6,14 +6,11 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.res
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.resource.FileResourceMetadataServiceImpl;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.text.LocalizedStructuredContent;
-import de.digitalcollections.model.text.LocalizedText;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InvalidObjectException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.tomcat.util.http.fileupload.FileItemIterator;
 import org.apache.tomcat.util.http.fileupload.FileItemStream;
@@ -65,12 +62,7 @@ public class FileResourceBinaryController {
           fileResource.setFilename(originalFilename);
           LOGGER.info("filename = " + fileResource.getFilename());
 
-          // set label to original filename for now. can be changed in next step of user input
-          fileResource.setLabel(
-              new LocalizedText(new Locale(localeService.getDefaultLanguage()), originalFilename));
-
           fileResource = fileUploadService.save(fileResource, stream);
-          fileResource.setDescription(new LocalizedStructuredContent());
           LOGGER.info(
               "saved file '"
                   + fileResource.getUri().toString()

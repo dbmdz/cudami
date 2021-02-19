@@ -139,7 +139,6 @@ public class FileResourceMetadataController {
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws IdentifiableServiceException {
-
     FileResource fileResource;
     if (pLocale == null) {
       fileResource = fileResourceService.get(uuid);

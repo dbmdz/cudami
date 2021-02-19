@@ -6,10 +6,8 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.Identi
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.text.LocalizedText;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
@@ -180,10 +178,6 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
 
   @Override
   public F save(F fileResource) {
-    if (fileResource.getLabel() == null && fileResource.getFilename() != null) {
-      // set a default label = filename (an empty label violates constraint)
-      fileResource.setLabel(new LocalizedText(Locale.ROOT, fileResource.getFilename()));
-    }
     super.save(fileResource);
     F result = findOne(fileResource.getUuid());
     return result;
