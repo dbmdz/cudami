@@ -634,14 +634,23 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
     List<I> result =
         dbi.withHandle(
-            h ->
-                h.createQuery(sql)
-                    .bindMap(argumentMappings)
-                    .reduceRows(
-                        (Map<UUID, I> map, RowView rowView) -> {
-                          basicReduceRowsBiFunction.apply(map, rowView);
-                        })
-                    .collect(Collectors.toList()));
+            (Handle handle) -> {
+              //              handle.execute("SET cust.code=:customerID", "bav");
+              // multitenancy, see
+              // https://varun-verma.medium.com/isolate-multi-tenant-data-in-postgresql-db-using-row-level-security-rls-bdd3089d9337
+              // https://aws.amazon.com/de/blogs/database/multi-tenant-data-isolation-with-postgresql-row-level-security/
+              // https://www.postgresql.org/docs/current/ddl-rowsecurity.html
+              // https://www.postgresql.org/docs/current/sql-createpolicy.html
+              
+              return handle
+                  .createQuery(sql)
+                  .bindMap(argumentMappings)
+                  .reduceRows(
+                      (Map<UUID, I> map, RowView rowView) -> {
+                        basicReduceRowsBiFunction.apply(map, rowView);
+                      })
+                  .collect(Collectors.toList());
+            });
     return result;
   }
 
