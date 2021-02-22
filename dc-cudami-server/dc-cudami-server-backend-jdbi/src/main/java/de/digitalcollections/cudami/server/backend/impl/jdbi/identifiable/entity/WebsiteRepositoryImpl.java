@@ -175,10 +175,13 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
             + ".uuid = ww.webpage_uuid"
             + " WHERE ww.website_uuid = :uuid";
 
-    StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
+    StringBuilder innerQuery = new StringBuilder("SELECT ww.sortindex AS idx, *" + commonSql);
     addFiltering(pageRequest, innerQuery);
+    
+    String orderBy = null;
     if (pageRequest.getSorting() == null) {
-      innerQuery.append(" ORDER BY ww.sortIndex ASC");
+      orderBy = "ORDER BY idx ASC";
+      innerQuery.append(" " + orderBy);
     }
     addPageRequestParams(pageRequest, innerQuery);
 
@@ -187,7 +190,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
             webpageRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             Map.of("uuid", uuid),
-            null);
+            orderBy);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);

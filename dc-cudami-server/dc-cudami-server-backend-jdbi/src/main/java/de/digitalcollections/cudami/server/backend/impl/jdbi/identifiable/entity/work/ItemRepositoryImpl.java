@@ -149,7 +149,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
 
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM "
+            "SELECT ido.sortindex AS idx, * FROM "
                 + doTableName
                 + " AS "
                 + doTableAlias
@@ -157,14 +157,14 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
                 + doTableAlias
                 + ".uuid = ido.digitalobject_uuid"
                 + " WHERE ido.item_uuid = :uuid"
-                + " ORDER BY ido.sortIndex ASC");
+                + " ORDER BY idx ASC");
 
     List<DigitalObject> result =
         digitalObjectRepositoryImpl.retrieveList(
             digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             Map.of("uuid", itemUuid),
-            null);
+            "ORDER BY idx ASC");
     return result.stream().collect(Collectors.toSet());
   }
 
@@ -202,7 +202,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
      */
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM "
+            "SELECT iw.sortindex AS idx, * FROM "
                 + wTableName
                 + " AS "
                 + wTableAlias
@@ -210,14 +210,14 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
                 + wTableAlias
                 + ".uuid = iw.work_uuid"
                 + " WHERE iw.item_uuid = :uuid"
-                + " ORDER BY iw.sortIndex ASC");
+                + " ORDER BY idx ASC");
 
     List<Work> result =
         workRepositoryImpl.retrieveList(
             workRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             Map.of("uuid", itemUuid),
-            null);
+            "ORDER BY idx ASC");
     return result.stream().collect(Collectors.toSet());
   }
 

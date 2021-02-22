@@ -129,7 +129,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   public List<Agent> getCreators(UUID articleUuid) {
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM "
+            "SELECT ac.sortindex AS idx, * FROM "
                 + EntityRepositoryImpl.TABLE_NAME
                 + " AS e"
                 + " LEFT JOIN article_creators AS ac ON e.uuid = ac.agent_uuid"
@@ -139,7 +139,8 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
     final String fieldsSql = entityRepositoryImpl.getSqlSelectReducedFields();
 
     List<Entity> entityList =
-        entityRepositoryImpl.retrieveList(fieldsSql, innerQuery, Map.of("uuid", articleUuid), null);
+        entityRepositoryImpl.retrieveList(
+            fieldsSql, innerQuery, Map.of("uuid", articleUuid), "ORDER BY idx ASC");
 
     List<Agent> agents = null;
     if (entityList != null) {

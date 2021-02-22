@@ -114,7 +114,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
 
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM "
+            "SELECT wc.sortindex AS idx, * FROM "
                 + agTableName
                 + " AS "
                 + agTableAlias
@@ -122,14 +122,14 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
                 + agTableAlias
                 + ".uuid = wc.agent_uuid"
                 + " WHERE wc.work_uuid = :uuid"
-                + " ORDER BY wc.sortIndex ASC");
+                + " ORDER BY idx ASC");
 
     List<Agent> result =
         agentRepositoryImpl.retrieveList(
             agentRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             Map.of("uuid", workUuid),
-            null);
+            "ORDER BY idx ASC");
     return result;
   }
 
@@ -140,7 +140,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
 
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM "
+            "SELECT iw.sortindex AS idx, * FROM "
                 + itTableName
                 + " AS "
                 + itTableAlias
@@ -148,14 +148,14 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
                 + itTableAlias
                 + ".uuid = iw.item_uuid"
                 + " WHERE iw.work_uuid = :uuid"
-                + " ORDER BY iw.sortIndex ASC");
+                + " ORDER BY idx ASC");
 
     List<Item> result =
         itemRepositoryImpl.retrieveList(
             itemRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             Map.of("uuid", workUuid),
-            null);
+            "ORDER BY idx ASC");
     return result;
   }
 

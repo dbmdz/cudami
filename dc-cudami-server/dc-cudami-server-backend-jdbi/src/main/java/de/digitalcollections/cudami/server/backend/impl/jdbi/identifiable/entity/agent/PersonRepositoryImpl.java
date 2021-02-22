@@ -270,7 +270,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
      */
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM "
+            "SELECT wc.sortindex AS idx, * FROM "
                 + wTableName
                 + " AS "
                 + wTableAlias
@@ -278,14 +278,14 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
                 + wTableAlias
                 + ".uuid = wc.work_uuid"
                 + " WHERE wc.agent_uuid = :uuid"
-                + " ORDER BY wc.sortIndex ASC");
+                + " ORDER BY idx ASC");
 
     List<Work> list =
         workRepositoryImpl.retrieveList(
             workRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             Map.of("uuid", uuidPerson),
-            null);
+            "ORDER BY idx ASC");
 
     return list.stream().collect(Collectors.toSet());
   }

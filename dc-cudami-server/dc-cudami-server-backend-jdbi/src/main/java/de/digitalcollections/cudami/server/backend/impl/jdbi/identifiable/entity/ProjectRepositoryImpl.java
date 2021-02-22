@@ -125,10 +125,10 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
             + ".uuid = pd.digitalobject_uuid"
             + " WHERE pd.project_uuid = :uuid";
 
-    StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
+    StringBuilder innerQuery = new StringBuilder("SELECT pd.sortindex AS idx, *" + commonSql);
     addFiltering(pageRequest, innerQuery);
     pageRequest.setSorting(null);
-    innerQuery.append(" ORDER BY pd.sortIndex ASC");
+    innerQuery.append(" ORDER BY idx ASC");
     addPageRequestParams(pageRequest, innerQuery);
 
     List<DigitalObject> result =
@@ -136,7 +136,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
             digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             Map.of("uuid", projectUuid),
-            null);
+            "ORDER BY idx ASC");
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);

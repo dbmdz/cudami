@@ -231,7 +231,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   public List<Collection> getChildren(UUID uuid) {
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM "
+            "SELECT cc.sortindex AS idx, * FROM "
                 + tableName
                 + " AS "
                 + tableAlias
@@ -239,10 +239,10 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                 + tableAlias
                 + ".uuid = cc.child_collection_uuid"
                 + " WHERE cc.parent_collection_uuid = :uuid"
-                + " ORDER BY cc.sortIndex ASC");
+                + " ORDER BY cc.sortindex ASC");
 
     List<Collection> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), null);
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), "ORDER BY idx ASC");
     return result;
   }
 
@@ -258,14 +258,14 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + ".uuid = cc.child_collection_uuid"
             + " WHERE cc.parent_collection_uuid = :uuid";
 
-    StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
+    StringBuilder innerQuery = new StringBuilder("SELECT cc.sortindex AS idx, *" + commonSql);
     addFiltering(pageRequest, innerQuery);
     pageRequest.setSorting(null);
-    innerQuery.append(" ORDER BY cc.sortIndex ASC");
+    innerQuery.append(" ORDER BY idx ASC");
     addPageRequestParams(pageRequest, innerQuery);
 
     List<Collection> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), null);
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), "ORDER BY idx ASC");
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -308,10 +308,10 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + ".uuid = cd.digitalobject_uuid"
             + " WHERE cd.collection_uuid = :uuid";
 
-    StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
+    StringBuilder innerQuery = new StringBuilder("SELECT cd.sortindex AS idx, *" + commonSql);
     addFiltering(pageRequest, innerQuery);
     pageRequest.setSorting(null);
-    innerQuery.append(" ORDER BY cd.sortIndex ASC");
+    innerQuery.append(" ORDER BY idx ASC");
     addPageRequestParams(pageRequest, innerQuery);
 
     List<DigitalObject> result =
@@ -319,7 +319,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             Map.of("uuid", collectionUuid),
-            null);
+            "ORDER BY idx ASC");
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);

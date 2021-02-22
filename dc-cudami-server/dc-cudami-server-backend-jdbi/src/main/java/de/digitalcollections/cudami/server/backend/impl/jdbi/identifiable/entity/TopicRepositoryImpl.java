@@ -172,7 +172,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   public List<Topic> getChildren(UUID uuid) {
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM "
+            "SELECT tt.sortindex AS idx, * FROM "
                 + tableName
                 + " AS "
                 + tableAlias
@@ -180,10 +180,10 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 + tableAlias
                 + ".uuid = tt.child_topic_uuid"
                 + " WHERE tt.parent_topic_uuid = :uuid"
-                + " ORDER BY tt.sortIndex ASC");
+                + " ORDER BY idx ASC");
 
     List<Topic> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), null);
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), "ORDER BY idx ASC");
     return result;
   }
 
@@ -199,14 +199,15 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
             + ".uuid = tt.child_topic_uuid"
             + " WHERE tt.parent_topic_uuid = :uuid";
 
-    StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
+    StringBuilder innerQuery = new StringBuilder("SELECT tt.sortindex AS idx, *" + commonSql);
     addFiltering(pageRequest, innerQuery);
     pageRequest.setSorting(null);
-    innerQuery.append(" ORDER BY tt.sortIndex ASC");
+    innerQuery.append(" ORDER BY idx ASC");
     addPageRequestParams(pageRequest, innerQuery);
 
     List<Topic> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", nodeUuid), null);
+        retrieveList(
+            sqlSelectReducedFields, innerQuery, Map.of("uuid", nodeUuid), "ORDER BY idx ASC");
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
@@ -222,7 +223,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM "
+            "SELECT te.sortindex AS idx, * FROM "
                 + entityTableName
                 + " AS "
                 + entityTableAlias
@@ -230,7 +231,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 + entityTableAlias
                 + ".uuid = te.entity_uuid"
                 + " WHERE te.topic_uuid = :uuid"
-                + " ORDER BY te.sortIndex ASC");
+                + " ORDER BY idx ASC");
 
     List<Entity> result =
         entityRepositoryImpl
@@ -238,7 +239,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 entityRepositoryImpl.getSqlSelectReducedFields(),
                 innerQuery,
                 Map.of("uuid", topicUuid),
-                null)
+                "ORDER BY idx ASC")
             .stream()
             .map(Entity.class::cast)
             .collect(Collectors.toList());
@@ -253,7 +254,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM "
+            "SELECT tf.sortindex AS idx, * FROM "
                 + frTableName
                 + " AS "
                 + frTableAlias
@@ -261,14 +262,14 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 + frTableAlias
                 + ".uuid = tf.fileresource_uuid"
                 + " WHERE tf.topic_uuid = :uuid"
-                + " ORDER BY tf.sortIndex ASC");
+                + " ORDER BY idx ASC");
 
     List<FileResource> result =
         fileResourceMetadataRepositoryImpl.retrieveList(
             fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             Map.of("uuid", topicUuid),
-            null);
+            "ORDER BY idx ASC");
 
     return result;
   }

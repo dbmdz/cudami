@@ -200,7 +200,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   public List<Webpage> getChildren(UUID uuid) {
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM "
+            "SELECT ww.sortindex AS idx, * FROM "
                 + tableName
                 + " AS "
                 + tableAlias
@@ -208,10 +208,10 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
                 + tableAlias
                 + ".uuid = ww.child_webpage_uuid"
                 + " WHERE ww.parent_webpage_uuid = :uuid"
-                + " ORDER BY ww.sortIndex ASC");
+                + " ORDER BY idx ASC");
 
     List<Webpage> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), null);
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), "ORDER BY idx ASC");
     return result;
   }
 
@@ -227,15 +227,15 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
             + ".uuid = ww.child_webpage_uuid"
             + " WHERE ww.parent_webpage_uuid = :uuid";
 
-    StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
+    StringBuilder innerQuery = new StringBuilder("SELECT ww.sortindex AS idx, *" + commonSql);
     addFiltering(pageRequest, innerQuery);
     if (pageRequest.getSorting() == null) {
-      innerQuery.append(" ORDER BY ww.sortIndex ASC");
+      innerQuery.append(" ORDER BY idx ASC");
     }
     addPageRequestParams(pageRequest, innerQuery);
 
     List<Webpage> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), null);
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), "ORDER BY idx ASC");
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);

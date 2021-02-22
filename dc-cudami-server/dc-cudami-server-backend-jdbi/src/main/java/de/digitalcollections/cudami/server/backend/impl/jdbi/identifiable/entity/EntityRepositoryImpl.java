@@ -247,7 +247,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM "
+            "SELECT ref.sortindex AS idx, * FROM "
                 + frTableName
                 + " AS "
                 + frTableAlias
@@ -255,13 +255,13 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
                 + frTableAlias
                 + ".uuid = ref.fileresource_uuid"
                 + " WHERE ref.entity_uuid = :entityUuid"
-                + " ORDER BY ref.sortindex ASC");
+                + " ORDER BY idx ASC");
 
     return fileResourceMetadataRepositoryImpl.retrieveList(
         fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields(),
         innerQuery,
         Map.of("entityUuid", entityUuid),
-        null);
+        "ORDER BY idx ASC");
   }
 
   @Override

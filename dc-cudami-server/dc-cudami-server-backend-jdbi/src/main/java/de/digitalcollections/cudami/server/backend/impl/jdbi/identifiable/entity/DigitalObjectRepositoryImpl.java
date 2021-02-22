@@ -156,7 +156,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     final String fieldsSql = fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields();
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM "
+            "SELECT df.sortindex AS idx, * FROM "
                 + frTableName
                 + " AS "
                 + frTableAlias
@@ -164,12 +164,12 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                 + frTableAlias
                 + ".uuid = df.fileresource_uuid"
                 + " WHERE df.digitalobject_uuid = :uuid"
-                + " ORDER BY df.sortIndex ASC");
+                + " ORDER BY idx ASC");
     Map<String, Object> argumentMappings = Map.of("uuid", digitalObjectUuid);
 
     List<FileResource> fileResources =
         fileResourceMetadataRepositoryImpl.retrieveList(
-            fieldsSql, innerQuery, argumentMappings, null);
+            fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC");
 
     return fileResources;
   }
@@ -181,7 +181,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     final String fieldsSql = imageFileResourceRepositoryImpl.getSqlSelectAllFields();
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM "
+            "SELECT df.sortindex AS idx, * FROM "
                 + frTableName
                 + " AS "
                 + frTableAlias
@@ -189,11 +189,12 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                 + frTableAlias
                 + ".uuid = df.fileresource_uuid"
                 + " WHERE df.digitalobject_uuid = :uuid"
-                + " ORDER BY df.sortIndex ASC");
+                + " ORDER BY idx ASC");
     Map<String, Object> argumentMappings = Map.of("uuid", digitalObjectUuid);
 
     List<ImageFileResource> fileResources =
-        imageFileResourceRepositoryImpl.retrieveList(fieldsSql, innerQuery, argumentMappings, null);
+        imageFileResourceRepositoryImpl.retrieveList(
+            fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC");
 
     return fileResources;
   }

@@ -641,7 +641,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
               // https://aws.amazon.com/de/blogs/database/multi-tenant-data-isolation-with-postgresql-row-level-security/
               // https://www.postgresql.org/docs/current/ddl-rowsecurity.html
               // https://www.postgresql.org/docs/current/sql-createpolicy.html
-              
+
               return handle
                   .createQuery(sql)
                   .bindMap(argumentMappings)
