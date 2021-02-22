@@ -91,6 +91,23 @@ public class TopicController {
     return service.find(pageRequest);
   }
 
+  @ApiMethod(description = "Get all top topics")
+  @GetMapping(
+      value = {"/latest/topics/top", "/v3/topics/top"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public PageResponse<Topic> findAllTop(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      pageRequest.setSorting(sorting);
+    }
+    return service.getRootNodes(pageRequest);
+  }
+
   @ApiMethod(description = "Get topic by uuid (and optional locale)")
   @GetMapping(
       value = {
@@ -227,6 +244,15 @@ public class TopicController {
   @ApiResponseObject
   List<Topic> getTopicsOfFileResource(@PathVariable UUID uuid) {
     return service.getTopicsOfFileResource(uuid);
+  }
+
+  @ApiMethod(description = "Get languages of all top topics")
+  @GetMapping(
+      value = {"/latest/topics/top/languages", "/v3/topics/top/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public List<Locale> getTopTopicsLanguages() {
+    return service.getRootNodesLanguages();
   }
 
   @ApiMethod(description = "Remove child-relation of the given subtopic to the given parent topic")

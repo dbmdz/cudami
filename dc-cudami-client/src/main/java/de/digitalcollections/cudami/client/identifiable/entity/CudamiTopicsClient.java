@@ -11,6 +11,7 @@ import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.net.http.HttpClient;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class CudamiTopicsClient extends CudamiBaseClient<Topic> {
@@ -46,6 +47,10 @@ public class CudamiTopicsClient extends CudamiBaseClient<Topic> {
 
   public Topic findOneByRefId(long refId) throws HttpException {
     return doGetRequestForObject(String.format("/latest/topics/%d", refId));
+  }
+
+  public PageResponse<Topic> findTopTopics(PageRequest pageRequest) throws HttpException {
+    return doGetRequestForPagedObjectList("/latest/topics/top", pageRequest);
   }
 
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws HttpException {
@@ -88,6 +93,10 @@ public class CudamiTopicsClient extends CudamiBaseClient<Topic> {
 
   public List<Topic> getTopicsOfFileResource(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(String.format("/latest/topics/fileresource/%s", uuid));
+  }
+
+  public List<Locale> getTopTopicsLanguages() throws HttpException {
+    return doGetRequestForObjectList("/latest/topics/top/languages", Locale.class);
   }
 
   /**

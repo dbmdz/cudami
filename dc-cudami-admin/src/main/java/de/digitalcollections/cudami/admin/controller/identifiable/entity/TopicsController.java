@@ -62,8 +62,14 @@ public class TopicsController extends AbstractController {
   }
 
   @GetMapping("/topics/new")
-  public String create(Model model) throws Exception {
+  public String create(
+      Model model,
+      @RequestParam(name = "parentType", required = false) String parentType,
+      @RequestParam(name = "parentUuid", required = false) String parentUuid)
+      throws Exception {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("parentType", parentType);
+    model.addAttribute("parentUuid", parentUuid);
     return "topics/create";
   }
 
@@ -105,9 +111,14 @@ public class TopicsController extends AbstractController {
   public String list(Model model, @PageableDefault(size = 25) Pageable pageable)
       throws HttpException {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
-    final PageResponse pageResponse = service.find(pageRequest);
+    final PageResponse pageResponse = service.findTopTopics(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
     model.addAttribute("page", new PageWrapper(page, "/topics"));
+
+    final Locale displayLocale = LocaleContextHolder.getLocale();
+    model.addAttribute(
+        "existingLanguages",
+        languageSortingHelper.sortLanguages(displayLocale, service.getTopTopicsLanguages()));
     return "topics/list";
   }
 
