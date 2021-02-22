@@ -177,7 +177,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
 
     StringBuilder innerQuery = new StringBuilder("SELECT ww.sortindex AS idx, *" + commonSql);
     addFiltering(pageRequest, innerQuery);
-    
+
     String orderBy = null;
     if (pageRequest.getSorting() == null) {
       orderBy = "ORDER BY idx ASC";
