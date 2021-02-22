@@ -3,6 +3,8 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.TopicService;
+import de.digitalcollections.model.filter.FilterCriterion;
+import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -189,14 +191,32 @@ public class TopicController {
     return service.getChildren(uuid);
   }
 
-  @ApiMethod(description = "Get entities of topic")
+  @ApiMethod(description = "Get all entities of topic")
   @GetMapping(
-      value = {"/latest/topics/{uuid}/entities", "/v3/topics/{uuid}/entities"},
+      value = {"/latest/topics/{uuid}/entities/all", "/v3/topics/{uuid}/entities/all"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<Entity> getEntities(
       @ApiPathParam(name = "uuid", description = "The uuid of the topic") @PathVariable UUID uuid) {
-    return service.getEntities(uuid);
+    return service.getAllEntities(uuid);
+  }
+
+  @ApiMethod(description = "Get paged entities of a topic")
+  @GetMapping(
+      value = {"/latest/topics/{uuid}/entities", "/v3/topics/{uuid}/entities"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public PageResponse<Entity> getEntities(
+      @ApiPathParam(description = "UUID of the topic") @PathVariable("uuid") UUID topicUuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "entityType", required = false) FilterCriterion<String> entityType) {
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, new Sorting());
+    if (entityType != null) {
+      Filtering filtering = Filtering.defaultBuilder().add("entityType", entityType).build();
+      pageRequest.setFiltering(filtering);
+    }
+    return service.getEntities(topicUuid, pageRequest);
   }
 
   @ApiMethod(description = "Get file resources of topic")

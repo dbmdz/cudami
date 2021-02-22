@@ -4,20 +4,24 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.N
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
 import java.util.List;
 import java.util.UUID;
 
 /** Repository for Topic persistence handling. */
 public interface TopicRepository extends NodeRepository<Topic>, EntityRepository<Topic> {
 
-  default List<Entity> getEntities(Topic topic) {
+  default List<Entity> getAllEntities(Topic topic) {
     if (topic == null) {
       return null;
     }
-    return getEntities(topic.getUuid());
+    return getAllEntities(topic.getUuid());
   }
 
-  List<Entity> getEntities(UUID topicUuid);
+  List<Entity> getAllEntities(UUID topicUuid);
+
+  public PageResponse<Entity> getEntities(UUID topicUuid, PageRequest pageRequest);
 
   default List<FileResource> getFileResources(Topic topic) {
     if (topic == null) {

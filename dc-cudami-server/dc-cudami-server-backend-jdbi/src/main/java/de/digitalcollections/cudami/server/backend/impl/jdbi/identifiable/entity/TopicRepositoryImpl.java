@@ -129,6 +129,37 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
+  public List<Entity> getAllEntities(UUID topicUuid) {
+    final String entityTableAlias = entityRepositoryImpl.getTableAlias();
+    final String entityTableName = entityRepositoryImpl.getTableName();
+
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT te.sortindex AS idx, * FROM "
+                + entityTableName
+                + " AS "
+                + entityTableAlias
+                + " INNER JOIN topic_entities te ON "
+                + entityTableAlias
+                + ".uuid = te.entity_uuid"
+                + " WHERE te.topic_uuid = :uuid"
+                + " ORDER BY idx ASC");
+
+    List<Entity> result =
+        entityRepositoryImpl
+            .retrieveList(
+                entityRepositoryImpl.getSqlSelectReducedFields(),
+                innerQuery,
+                Map.of("uuid", topicUuid),
+                "ORDER BY idx ASC")
+            .stream()
+            .map(Entity.class::cast)
+            .collect(Collectors.toList());
+
+    return result;
+  }
+
+  @Override
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
     List<BreadcrumbNode> result =
         dbi.withHandle(
@@ -217,34 +248,35 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<Entity> getEntities(UUID topicUuid) {
-    final String entityTableAlias = entityRepositoryImpl.getTableAlias();
-    final String entityTableName = entityRepositoryImpl.getTableName();
+  public PageResponse<Entity> getEntities(UUID topicUuid, PageRequest pageRequest) {
+    String commonSql =
+        " FROM "
+            + entityRepositoryImpl.getTableName()
+            + " AS "
+            + entityRepositoryImpl.getTableAlias()
+            + " INNER JOIN topic_entities te ON "
+            + entityRepositoryImpl.getTableAlias()
+            + ".uuid = te.entity_uuid"
+            + " WHERE te.topic_uuid = :uuid";
 
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT te.sortindex AS idx, * FROM "
-                + entityTableName
-                + " AS "
-                + entityTableAlias
-                + " INNER JOIN topic_entities te ON "
-                + entityTableAlias
-                + ".uuid = te.entity_uuid"
-                + " WHERE te.topic_uuid = :uuid"
-                + " ORDER BY idx ASC");
+    StringBuilder innerQuery = new StringBuilder("SELECT te.sortindex AS idx, *" + commonSql);
+    entityRepositoryImpl.addFiltering(pageRequest, innerQuery);
+    pageRequest.setSorting(null);
+    innerQuery.append(" ORDER BY idx ASC");
+    addPageRequestParams(pageRequest, innerQuery);
 
     List<Entity> result =
-        entityRepositoryImpl
-            .retrieveList(
-                entityRepositoryImpl.getSqlSelectReducedFields(),
-                innerQuery,
-                Map.of("uuid", topicUuid),
-                "ORDER BY idx ASC")
-            .stream()
-            .map(Entity.class::cast)
-            .collect(Collectors.toList());
+        entityRepositoryImpl.retrieveList(
+            entityRepositoryImpl.getSqlSelectReducedFields(),
+            innerQuery,
+            Map.of("uuid", topicUuid),
+            "ORDER BY idx ASC");
 
-    return result;
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    entityRepositoryImpl.addFiltering(pageRequest, countQuery);
+    long total = retrieveCount(countQuery, Map.of("uuid", topicUuid));
+
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override
@@ -427,7 +459,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
             preparedBatch.execute();
           });
     }
-    return getEntities(topicUuid);
+    return getAllEntities(topicUuid);
   }
 
   @Override

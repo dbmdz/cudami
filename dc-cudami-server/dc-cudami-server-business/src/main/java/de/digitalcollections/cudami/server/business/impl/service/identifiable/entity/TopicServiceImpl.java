@@ -35,6 +35,11 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
+  public List<Entity> getAllEntities(UUID topicUuid) {
+    return ((TopicRepository) repository).getAllEntities(topicUuid);
+  }
+
+  @Override
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
     return ((NodeRepository<Topic>) repository).getBreadcrumbNavigation(nodeUuid);
   }
@@ -50,8 +55,8 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
-  public List<Entity> getEntities(UUID topicUuid) {
-    return ((TopicRepository) repository).getEntities(topicUuid);
+  public PageResponse<Entity> getEntities(UUID topicUuid, PageRequest pageRequest) {
+    return ((TopicRepository) repository).getEntities(topicUuid, pageRequest);
   }
 
   @Override

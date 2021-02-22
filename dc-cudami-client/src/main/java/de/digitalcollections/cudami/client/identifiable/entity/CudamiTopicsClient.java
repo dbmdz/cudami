@@ -68,9 +68,14 @@ public class CudamiTopicsClient extends CudamiBaseClient<Topic> {
         String.format("/latest/topics/%s/children", uuid), pageRequest);
   }
 
-  public List<Entity> getEntities(UUID uuid) throws HttpException {
+  public List<Entity> getAllEntities(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
-        String.format("/latest/topics/%s/entities", uuid), Entity.class);
+        String.format("/latest/topics/%s/entities/all", uuid), Entity.class);
+  }
+
+  public PageResponse<Entity> getEntities(UUID uuid, PageRequest pageRequest) throws HttpException {
+    return doGetRequestForPagedObjectList(
+        String.format("/latest/topics/%s/entities", uuid), pageRequest, Entity.class);
   }
 
   public List<FileResource> getFileResources(UUID uuid) throws HttpException {

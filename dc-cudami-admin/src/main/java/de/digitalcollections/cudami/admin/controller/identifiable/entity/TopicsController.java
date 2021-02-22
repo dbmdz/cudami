@@ -173,7 +173,7 @@ public class TopicsController extends AbstractController {
     List<FileResource> relatedFileResources = service.getFileResources(uuid);
     model.addAttribute("relatedFileResources", relatedFileResources);
 
-    List<Entity> relatedEntities = service.getEntities(uuid);
+    List<Entity> relatedEntities = service.getAllEntities(uuid);
     model.addAttribute("relatedEntities", relatedEntities);
 
     BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
