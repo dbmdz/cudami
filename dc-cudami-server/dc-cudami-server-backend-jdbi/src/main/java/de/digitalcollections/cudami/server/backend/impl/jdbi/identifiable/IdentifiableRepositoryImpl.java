@@ -386,7 +386,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             + " OR "
             + tableAlias
             + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')";
-    return find(searchPageRequest, commonSql, Map.of("searchTerm", searchPageRequest.getQuery()));
+    String searchTerm = searchPageRequest.getQuery();
+    if (searchTerm == null) {
+      searchTerm = "";
+    }
+    return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
   }
 
   protected SearchPageResponse<I> find(
