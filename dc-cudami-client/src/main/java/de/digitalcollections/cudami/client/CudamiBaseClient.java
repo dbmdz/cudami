@@ -299,6 +299,10 @@ public class CudamiBaseClient<T extends Object> {
     }
     String findParams = getFindParamsAsString(searchPageRequest);
     requestUrl = requestUrl + findParams;
+    Filtering filtering = searchPageRequest.getFiltering();
+    if (filtering != null) {
+      requestUrl += "&" + getFilterParamsAsString(filtering.getFilterCriteria());
+    }
     String searchTerm = searchPageRequest.getQuery();
     if (searchTerm != null) {
       requestUrl =
