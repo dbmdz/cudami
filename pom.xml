@@ -78,7 +78,7 @@
     <version.assertj-core>3.19.0</version.assertj-core>
     <version.commons-beanutils>1.9.4</version.commons-beanutils>
     <version.commons-lang3>3.11</version.commons-lang3>
-    <version.dc-model>8.2.1-SNAPSHOT</version.dc-model>
+    <version.dc-model>8.2.1</version.dc-model>
     <version.flyway>7.5.4</version.flyway>
     <version.javax.servlet-api>4.0.1</version.javax.servlet-api>
     <version.junit>5.7.1</version.junit>
