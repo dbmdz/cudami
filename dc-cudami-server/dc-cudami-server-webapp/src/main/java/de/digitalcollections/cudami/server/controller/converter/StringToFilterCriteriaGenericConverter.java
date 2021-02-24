@@ -41,7 +41,7 @@ public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>>
   public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
     String operationAndValues = (String) source;
 
-    String[] filterSplit = StringUtils.split(operationAndValues, ":");
+    String[] filterSplit = StringUtils.tokenizeToStringArray(operationAndValues, ":");
     if (filterSplit == null || filterSplit.length != 2) {
       throw new IllegalArgumentException("More than one or no separator ':' found");
     }
@@ -55,7 +55,7 @@ public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>>
       operationValues = new String[] {operationValue};
     } else {
       // Split the filter value as comma separated.
-      operationValues = StringUtils.split(operationValue, ",");
+      operationValues = StringUtils.tokenizeToStringArray(operationValue, ",");
     }
     if (operationValues == null || operationValues.length < 1) {
       throw new IllegalArgumentException("Operation value can't be empty");
