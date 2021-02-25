@@ -14,8 +14,6 @@ import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocationType;
 import de.digitalcollections.model.identifiable.entity.work.Work;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.text.LocalizedText;
 import java.util.List;
 import java.util.Map;
@@ -59,11 +57,13 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
 
       if (rowView.getColumn("glbirth_uuid", UUID.class) != null) {
         UUID glBirthUuid = rowView.getColumn("glbirth_uuid", UUID.class);
+        Long glRefId = rowView.getColumn("glbirth_refid", Long.class);
         LocalizedText label = rowView.getColumn("glbirth_label", LocalizedText.class);
         GeoLocationType geoLocationType =
             rowView.getColumn("glbirth_geoLocationType", GeoLocationType.class);
         final GeoLocation placeOfBirth = new GeoLocation();
         placeOfBirth.setUuid(glBirthUuid);
+        placeOfBirth.setRefId(glRefId);
         placeOfBirth.setLabel(label);
         placeOfBirth.setGeoLocationType(geoLocationType);
         person.setPlaceOfBirth(placeOfBirth);
@@ -71,11 +71,13 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
 
       if (rowView.getColumn("gldeath_uuid", UUID.class) != null) {
         UUID glDeathUuid = rowView.getColumn("gldeath_uuid", UUID.class);
+        Long glRefId = rowView.getColumn("gldeath_refid", Long.class);
         LocalizedText label = rowView.getColumn("gldeath_label", LocalizedText.class);
         GeoLocationType geoLocationType =
             rowView.getColumn("gldeath_geoLocationType", GeoLocationType.class);
         final GeoLocation placeOfDeath = new GeoLocation();
         placeOfDeath.setUuid(glDeathUuid);
+        placeOfDeath.setRefId(glRefId);
         placeOfDeath.setLabel(label);
         placeOfDeath.setGeoLocationType(geoLocationType);
         person.setPlaceOfDeath(placeOfDeath);
@@ -115,8 +117,8 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
     final String givenNameMappingPrefix = GivenNameRepositoryImpl.MAPPING_PREFIX;
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
-        + "glbirth.uuid glbirth_uuid, glbirth.label glbirth_label, glbirth.geolocation_type glbirth_geoLocationType, "
-        + "gldeath.uuid gldeath_uuid, gldeath.label gldeath_label, gldeath.geolocation_type gldeath_geoLocationType, "
+        + "glbirth.uuid glbirth_uuid, glbirth.refId glbirth_refid, glbirth.label glbirth_label, glbirth.geolocation_type glbirth_geoLocationType, "
+        + "gldeath.uuid gldeath_uuid, gldeath.refId gldeath_refid, gldeath.label gldeath_label, gldeath.geolocation_type gldeath_geoLocationType, "
         + "fn.uuid "
         + familyNameMappingPrefix
         + "_uuid, "
@@ -199,13 +201,31 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
   }
 
   @Override
-  public PageResponse<Person> findByLocationOfBirth(PageRequest pageRequest, UUID uuidGeoLocation) {
-    throw new UnsupportedOperationException("Not supported yet.");
-  }
-
-  @Override
-  public PageResponse<Person> findByLocationOfDeath(PageRequest pageRequest, UUID uuidGeoLocation) {
-    throw new UnsupportedOperationException("Not supported yet.");
+  protected String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    if (super.getColumnName(modelProperty) != null) {
+      return super.getColumnName(modelProperty);
+    }
+    switch (modelProperty) {
+      case "dateOfBirth":
+        return tableAlias + ".dateofbirth";
+      case "dateOfDeath":
+        return tableAlias + ".dateofdeath";
+      case "gender":
+        return tableAlias + ".gender";
+      case "placeOfBirth":
+        return tableAlias + ".locationofbirth";
+      case "placeOfDeath":
+        return tableAlias + ".locationofdeath";
+      case "timeValueOfBirth":
+        return tableAlias + ".timevalueofbirth";
+      case "timeValueOfDeath":
+        return tableAlias + ".timevalueofdeath";
+      default:
+        return null;
+    }
   }
 
   @Override
