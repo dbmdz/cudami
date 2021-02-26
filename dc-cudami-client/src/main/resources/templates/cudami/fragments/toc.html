@@ -4,7 +4,7 @@
   <body>
 
   <th:block th:fragment="toc(tocs)">
-    <th:block th:if="${tocs}">
+    <th:block th:if="${tocs} AND ${tocs.values()} AND ${tocs.values().stream().findFirst().isPresent()}">
       <ul>
         <th:block th:if="${locale}">
           <th:block th:if="${tocs.get(locale)}">
@@ -24,7 +24,7 @@
   </th:block>
 
   <th:block th:fragment="renderToC(toc)">
-    <th:block th:each="tocEntry : ${toc.children}">
+    <th:block th:each="tocEntry : ${toc}">
       <th:block th:insert="~{::renderToCEntry(${tocEntry})}"></th:block>
     </th:block>
   </th:block>
