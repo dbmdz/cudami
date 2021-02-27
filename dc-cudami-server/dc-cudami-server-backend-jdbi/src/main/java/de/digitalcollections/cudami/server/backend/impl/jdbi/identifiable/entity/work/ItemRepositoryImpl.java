@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import java.util.List;
@@ -218,7 +219,11 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
             innerQuery,
             Map.of("uuid", itemUuid),
             "ORDER BY idx ASC");
-    return result.stream().collect(Collectors.toSet());
+    return result.stream().map(w -> {
+      List<Agent> creators = workRepositoryImpl.getCreators(w.getUuid());
+      w.setCreators(creators);
+      return w;
+    }).collect(Collectors.toSet());
   }
 
   @Override
