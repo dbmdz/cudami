@@ -15,6 +15,7 @@ import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocationType;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.text.LocalizedText;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -316,8 +317,9 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         person.getPlaceOfBirth() == null ? null : person.getPlaceOfBirth().getUuid();
     final UUID locationOfDeathUuid =
         person.getPlaceOfDeath() == null ? null : person.getPlaceOfDeath().getUuid();
-    Map<String, Object> bindings =
-        Map.of("locationOfBirth", locationOfBirthUuid, "locationOfDeath", locationOfDeathUuid);
+    Map<String, Object> bindings = new HashMap<>();
+    bindings.put("locationOfBirth", locationOfBirthUuid);
+    bindings.put("locationOfDeath", locationOfDeathUuid);
     super.save(person, bindings);
 
     // save given names
@@ -380,8 +382,9 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         person.getPlaceOfBirth() == null ? null : person.getPlaceOfBirth().getUuid();
     final UUID locationOfDeathUuid =
         person.getPlaceOfDeath() == null ? null : person.getPlaceOfDeath().getUuid();
-    Map<String, Object> bindings =
-        Map.of("locationOfBirth", locationOfBirthUuid, "locationOfDeath", locationOfDeathUuid);
+    Map<String, Object> bindings = new HashMap<>();
+    bindings.put("locationOfBirth", locationOfBirthUuid);
+    bindings.put("locationOfDeath", locationOfDeathUuid);
     super.update(person, bindings);
 
     // save given names
