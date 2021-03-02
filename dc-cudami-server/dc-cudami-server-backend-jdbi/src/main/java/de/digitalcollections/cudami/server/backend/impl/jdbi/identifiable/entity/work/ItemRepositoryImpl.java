@@ -219,11 +219,14 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
             innerQuery,
             Map.of("uuid", itemUuid),
             "ORDER BY idx ASC");
-    return result.stream().map(w -> {
-      List<Agent> creators = workRepositoryImpl.getCreators(w.getUuid());
-      w.setCreators(creators);
-      return w;
-    }).collect(Collectors.toSet());
+    return result.stream()
+        .map(
+            w -> {
+              List<Agent> creators = workRepositoryImpl.getCreators(w.getUuid());
+              w.setCreators(creators);
+              return w;
+            })
+        .collect(Collectors.toSet());
   }
 
   @Override
