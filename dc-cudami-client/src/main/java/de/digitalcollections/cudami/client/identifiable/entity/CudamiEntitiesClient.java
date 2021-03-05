@@ -94,7 +94,7 @@ public class CudamiEntitiesClient extends CudamiBaseClient<Entity> {
   }
 
   public Entity save(Entity entity) throws HttpException {
-    return doPostRequestForObject("/latest/entities", (Entity) entity);
+    return doPostRequestForObject("/latest/entities", entity);
   }
 
   public List<FileResource> saveRelatedFileResources(UUID uuid, List fileResources)
@@ -115,6 +115,6 @@ public class CudamiEntitiesClient extends CudamiBaseClient<Entity> {
   }
 
   public Entity update(UUID uuid, Entity entity) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/entities/%s", uuid), (Entity) entity);
+    return doPutRequestForObject(String.format("/latest/entities/%s", uuid), entity);
   }
 }

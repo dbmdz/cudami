@@ -41,10 +41,10 @@ public class CudamiUsersClient extends CudamiBaseClient<User> {
   }
 
   public User save(User user) throws HttpException {
-    return doPostRequestForObject("/latest/users", (User) user);
+    return doPostRequestForObject("/latest/users", user);
   }
 
   public User update(UUID uuid, User user) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/users/%s", uuid), (User) user);
+    return doPutRequestForObject(String.format("/latest/users/%s", uuid), user);
   }
 }

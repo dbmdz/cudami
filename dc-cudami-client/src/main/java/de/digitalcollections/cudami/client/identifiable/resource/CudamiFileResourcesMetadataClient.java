@@ -21,12 +21,12 @@ public class CudamiFileResourcesMetadataClient extends CudamiBaseClient<FileReso
     super(http, serverUrl, FileResource.class, mapper);
   }
 
-  public FileResource create() {
-    return new FileResource();
-  }
-
   public long count() throws HttpException {
     return Long.parseLong(doGetRequestForString("/latest/fileresources/count"));
+  }
+
+  public FileResource create() {
+    return new FileResource();
   }
 
   public PageResponse<FileResource> find(PageRequest pageRequest) throws HttpException {
@@ -34,7 +34,7 @@ public class CudamiFileResourcesMetadataClient extends CudamiBaseClient<FileReso
   }
 
   public SearchPageResponse<FileResource> find(SearchPageRequest searchPageRequest)
-      throws HttpException {
+          throws HttpException {
     return doGetSearchRequestForPagedObjectList("/latest/fileresources/search", searchPageRequest);
   }
 
@@ -45,9 +45,9 @@ public class CudamiFileResourcesMetadataClient extends CudamiBaseClient<FileReso
   }
 
   public SearchPageResponse<FileResource> findFileResourcesByType(
-      SearchPageRequest searchPageRequest, String type) throws HttpException {
+          SearchPageRequest searchPageRequest, String type) throws HttpException {
     return doGetSearchRequestForPagedObjectList(
-        String.format("/latest/fileresources/type/%s", type), searchPageRequest);
+            String.format("/latest/fileresources/type/%s", type), searchPageRequest);
   }
 
   public FileResource findOne(UUID uuid) throws HttpException {
@@ -56,15 +56,14 @@ public class CudamiFileResourcesMetadataClient extends CudamiBaseClient<FileReso
 
   public FileResource findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-        String.format("/latest/fileresources/identifier/%s:%s.json", namespace, id));
+            String.format("/latest/fileresources/identifier/%s:%s.json", namespace, id));
   }
 
   public FileResource save(FileResource fileResource) throws HttpException {
-    return doPostRequestForObject("/latest/fileresources", (FileResource) fileResource);
+    return doPostRequestForObject("/latest/fileresources", fileResource);
   }
 
   public FileResource update(UUID uuid, FileResource fileResource) throws HttpException {
-    return doPutRequestForObject(
-        String.format("/latest/fileresources/%s", uuid), (FileResource) fileResource);
+    return doPutRequestForObject(String.format("/latest/fileresources/%s", uuid), fileResource);
   }
 }
