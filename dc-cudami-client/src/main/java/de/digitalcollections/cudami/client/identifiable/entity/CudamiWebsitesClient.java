@@ -18,12 +18,12 @@ public class CudamiWebsitesClient extends CudamiBaseClient<Website> {
     super(http, serverUrl, Website.class, mapper);
   }
 
-  public Website create() {
-    return new Website();
-  }
-
   public long count() throws HttpException {
     return Long.parseLong(doGetRequestForString("/latest/websites/count"));
+  }
+
+  public Website create() {
+    return new Website();
   }
 
   public PageResponse<Website> find(PageRequest pageRequest) throws HttpException {
@@ -54,11 +54,11 @@ public class CudamiWebsitesClient extends CudamiBaseClient<Website> {
   }
 
   public Website save(Website website) throws HttpException {
-    return doPostRequestForObject("/latest/websites", (Website) website);
+    return doPostRequestForObject("/latest/websites", website);
   }
 
   public Website update(UUID uuid, Website website) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/websites/%s", uuid), (Website) website);
+    return doPutRequestForObject(String.format("/latest/websites/%s", uuid), website);
   }
 
   public boolean updateRootPagesOrder(UUID websiteUuid, List<Webpage> rootpages)

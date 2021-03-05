@@ -19,12 +19,12 @@ public class CudamiIdentifiablesClient extends CudamiBaseClient<Identifiable> {
     super(http, serverUrl, Identifiable.class, mapper);
   }
 
-  public Identifiable create() {
-    return new Identifiable();
-  }
-
   public long count() throws HttpException {
     return Long.parseLong(doGetRequestForString("/latest/identifiables/count"));
+  }
+
+  public Identifiable create() {
+    return new Identifiable();
   }
 
   public PageResponse<Identifiable> find(PageRequest pageRequest) throws HttpException {
@@ -46,11 +46,6 @@ public class CudamiIdentifiablesClient extends CudamiBaseClient<Identifiable> {
     return doGetRequestForObject(String.format("/latest/identifiables/%s", uuid));
   }
 
-  public Identifiable findOneByIdentifier(String namespace, String id) throws HttpException {
-    return doGetRequestForObject(
-        String.format("/latest/identifiables/identifier/%s:%s.json", namespace, id));
-  }
-
   public Identifiable findOne(UUID uuid, Locale locale) throws HttpException {
     return findOne(uuid, locale.toString());
   }
@@ -59,12 +54,16 @@ public class CudamiIdentifiablesClient extends CudamiBaseClient<Identifiable> {
     return doGetRequestForObject(String.format("/latest/identifiables/%s?locale=%s", uuid, locale));
   }
 
+  public Identifiable findOneByIdentifier(String namespace, String id) throws HttpException {
+    return doGetRequestForObject(
+        String.format("/latest/identifiables/identifier/%s:%s.json", namespace, id));
+  }
+
   public Identifiable save(Identifiable identifiable) throws HttpException {
-    return doPostRequestForObject("/latest/identifiables", (Identifiable) identifiable);
+    return doPostRequestForObject("/latest/identifiables", identifiable);
   }
 
   public Identifiable update(UUID uuid, Identifiable identifiable) throws HttpException {
-    return doPutRequestForObject(
-        String.format("/latest/identifiables/%s", uuid), (Identifiable) identifiable);
+    return doPutRequestForObject(String.format("/latest/identifiables/%s", uuid), identifiable);
   }
 }

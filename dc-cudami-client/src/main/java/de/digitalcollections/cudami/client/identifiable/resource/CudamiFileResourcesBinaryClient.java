@@ -32,6 +32,24 @@ public class CudamiFileResourcesBinaryClient {
     return new FileResource();
   }
 
+  private FileResource doPost(HttpEntity entity) throws HttpException {
+    try {
+      HttpPost post = new HttpPost(serverUri + "/latest/files");
+      post.setEntity(entity);
+      HttpClient client = HttpClientBuilder.create().build();
+      HttpResponse response = client.execute(post);
+
+      if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+        FileResource fileResource =
+            mapper.readValue(response.getEntity().getContent(), FileResource.class);
+        return fileResource;
+      }
+      throw new ResourceIOException("Error saving uploaded file data");
+    } catch (IOException ex) {
+      throw new HttpException("Error posting data to server", ex);
+    }
+  }
+
   public FileResource upload(InputStream inputStream, String filename, String contentType)
       throws HttpException {
     try {
@@ -63,24 +81,6 @@ public class CudamiFileResourcesBinaryClient {
       return doPost(entity);
     } catch (Exception ex) {
       throw new HttpException("Error saving uploaded file data", ex);
-    }
-  }
-
-  private FileResource doPost(HttpEntity entity) throws HttpException {
-    try {
-      HttpPost post = new HttpPost(serverUri + "/latest/files");
-      post.setEntity(entity);
-      HttpClient client = HttpClientBuilder.create().build();
-      HttpResponse response = client.execute(post);
-
-      if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-        FileResource fileResource =
-            mapper.readValue(response.getEntity().getContent(), FileResource.class);
-        return fileResource;
-      }
-      throw new ResourceIOException("Error saving uploaded file data");
-    } catch (IOException ex) {
-      throw new HttpException("Error posting data to server", ex);
     }
   }
 }

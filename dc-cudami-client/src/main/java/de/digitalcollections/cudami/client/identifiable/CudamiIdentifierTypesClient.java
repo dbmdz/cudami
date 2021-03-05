@@ -18,12 +18,12 @@ public class CudamiIdentifierTypesClient extends CudamiBaseClient<IdentifierType
     super(http, serverUrl, IdentifierType.class, mapper);
   }
 
-  public IdentifierType create() {
-    return new IdentifierType();
-  }
-
   public long count() throws HttpException {
     return Long.parseLong(doGetRequestForString("/latest/identifiertypes/count"));
+  }
+
+  public IdentifierType create() {
+    return new IdentifierType();
   }
 
   public PageResponse<IdentifierType> find(PageRequest pageRequest) throws HttpException {
@@ -57,11 +57,10 @@ public class CudamiIdentifierTypesClient extends CudamiBaseClient<IdentifierType
   }
 
   public IdentifierType save(IdentifierType identifierType) throws HttpException {
-    return doPostRequestForObject("/latest/identifiertypes", (IdentifierType) identifierType);
+    return doPostRequestForObject("/latest/identifiertypes", identifierType);
   }
 
   public IdentifierType update(UUID uuid, IdentifierType identifierType) throws HttpException {
-    return doPutRequestForObject(
-        String.format("/latest/identifiertypes/%s", uuid), (IdentifierType) identifierType);
+    return doPutRequestForObject(String.format("/latest/identifiertypes/%s", uuid), identifierType);
   }
 }

@@ -20,12 +20,12 @@ public class CudamiTopicsClient extends CudamiBaseClient<Topic> {
     super(http, serverUrl, Topic.class, mapper);
   }
 
-  public Topic create() {
-    return new Topic();
-  }
-
   public long count() throws HttpException {
     return Long.parseLong(doGetRequestForString("/latest/topics/count"));
+  }
+
+  public Topic create() {
+    return new Topic();
   }
 
   public PageResponse<Topic> find(PageRequest pageRequest) throws HttpException {
@@ -53,6 +53,11 @@ public class CudamiTopicsClient extends CudamiBaseClient<Topic> {
     return doGetRequestForPagedObjectList("/latest/topics/top", pageRequest);
   }
 
+  public List<Entity> getAllEntities(UUID uuid) throws HttpException {
+    return doGetRequestForObjectList(
+        String.format("/latest/topics/%s/entities/all", uuid), Entity.class);
+  }
+
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws HttpException {
     return (BreadcrumbNavigation)
         doGetRequestForObject(
@@ -66,11 +71,6 @@ public class CudamiTopicsClient extends CudamiBaseClient<Topic> {
   public PageResponse<Topic> getChildren(UUID uuid, PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList(
         String.format("/latest/topics/%s/children", uuid), pageRequest);
-  }
-
-  public List<Entity> getAllEntities(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(
-        String.format("/latest/topics/%s/entities/all", uuid), Entity.class);
   }
 
   public PageResponse<Entity> getEntities(UUID uuid, PageRequest pageRequest) throws HttpException {
@@ -91,19 +91,6 @@ public class CudamiTopicsClient extends CudamiBaseClient<Topic> {
     return doGetRequestForObjectList(
         String.format("/latest/entities/%s/related/fileresources", uuid), FileResource.class);
   }
-
-  public List<Topic> getTopicsOfEntity(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(String.format("/latest/topics/entity/%s", uuid));
-  }
-
-  public List<Topic> getTopicsOfFileResource(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(String.format("/latest/topics/fileresource/%s", uuid));
-  }
-
-  public List<Locale> getTopTopicsLanguages() throws HttpException {
-    return doGetRequestForObjectList("/latest/topics/top/languages", Locale.class);
-  }
-
   /**
    * @param uuid
    * @return
@@ -113,6 +100,18 @@ public class CudamiTopicsClient extends CudamiBaseClient<Topic> {
   @Deprecated
   public List<Topic> getSubtopics(UUID uuid) throws HttpException {
     return getChildren(uuid);
+  }
+
+  public List<Locale> getTopTopicsLanguages() throws HttpException {
+    return doGetRequestForObjectList("/latest/topics/top/languages", Locale.class);
+  }
+
+  public List<Topic> getTopicsOfEntity(UUID uuid) throws HttpException {
+    return doGetRequestForObjectList(String.format("/latest/topics/entity/%s", uuid));
+  }
+
+  public List<Topic> getTopicsOfFileResource(UUID uuid) throws HttpException {
+    return doGetRequestForObjectList(String.format("/latest/topics/fileresource/%s", uuid));
   }
 
   public boolean removeChild(UUID parentUuid, UUID childUuid) throws HttpException {

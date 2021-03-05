@@ -33,28 +33,28 @@ public class CudamiWorksClient extends CudamiBaseClient<Work> {
   }
 
   public PageResponse findByLanguageAndInitial(
-          PageRequest pageRequest, String language, String initial) throws HttpException {
+      PageRequest pageRequest, String language, String initial) throws HttpException {
     return findByLanguageAndInitial("/latest/works", pageRequest, language, initial);
   }
 
   public PageResponse<Work> findByLanguageAndInitial(
-          int pageNumber,
-          int pageSize,
-          String sortField,
-          String sortDirection,
-          String nullHandling,
-          String language,
-          String initial)
-          throws HttpException {
+      int pageNumber,
+      int pageSize,
+      String sortField,
+      String sortDirection,
+      String nullHandling,
+      String language,
+      String initial)
+      throws HttpException {
     return findByLanguageAndInitial(
-            "/latest/works",
-            pageNumber,
-            pageSize,
-            sortField,
-            sortDirection,
-            nullHandling,
-            language,
-            initial);
+        "/latest/works",
+        pageNumber,
+        pageSize,
+        sortField,
+        sortDirection,
+        nullHandling,
+        language,
+        initial);
   }
 
   public Work findOne(UUID uuid) throws HttpException {
@@ -63,11 +63,12 @@ public class CudamiWorksClient extends CudamiBaseClient<Work> {
 
   public Work findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-            String.format("/latest/works/identifier?namespace=%s&id=%s", namespace, id));
+        String.format("/latest/works/identifier?namespace=%s&id=%s", namespace, id));
   }
 
   public Set<Agent> getCreators(UUID uuid) throws HttpException {
-    return (Set<Agent>) doGetRequestForObjectList(
+    return (Set<Agent>)
+        doGetRequestForObjectList(
             String.format("/latest/works/%s/creators", uuid), DigitalObject.class);
   }
 

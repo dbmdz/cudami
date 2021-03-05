@@ -62,11 +62,10 @@ public class CudamiFamilyNamesClient extends CudamiBaseClient<FamilyName> {
   }
 
   public FamilyName save(FamilyName familyName) throws HttpException {
-    return doPostRequestForObject("/latest/familynames", (FamilyName) familyName);
+    return doPostRequestForObject("/latest/familynames", familyName);
   }
 
   public FamilyName update(UUID uuid, FamilyName familyName) throws HttpException {
-    return doPutRequestForObject(
-        String.format("/latest/familynames/%s", uuid), (FamilyName) familyName);
+    return doPutRequestForObject(String.format("/latest/familynames/%s", uuid), familyName);
   }
 }

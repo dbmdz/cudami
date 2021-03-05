@@ -34,7 +34,7 @@ public class CudamiFileResourcesMetadataClient extends CudamiBaseClient<FileReso
   }
 
   public SearchPageResponse<FileResource> find(SearchPageRequest searchPageRequest)
-          throws HttpException {
+      throws HttpException {
     return doGetSearchRequestForPagedObjectList("/latest/fileresources/search", searchPageRequest);
   }
 
@@ -45,9 +45,9 @@ public class CudamiFileResourcesMetadataClient extends CudamiBaseClient<FileReso
   }
 
   public SearchPageResponse<FileResource> findFileResourcesByType(
-          SearchPageRequest searchPageRequest, String type) throws HttpException {
+      SearchPageRequest searchPageRequest, String type) throws HttpException {
     return doGetSearchRequestForPagedObjectList(
-            String.format("/latest/fileresources/type/%s", type), searchPageRequest);
+        String.format("/latest/fileresources/type/%s", type), searchPageRequest);
   }
 
   public FileResource findOne(UUID uuid) throws HttpException {
@@ -56,7 +56,7 @@ public class CudamiFileResourcesMetadataClient extends CudamiBaseClient<FileReso
 
   public FileResource findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-            String.format("/latest/fileresources/identifier/%s:%s.json", namespace, id));
+        String.format("/latest/fileresources/identifier/%s:%s.json", namespace, id));
   }
 
   public FileResource save(FileResource fileResource) throws HttpException {

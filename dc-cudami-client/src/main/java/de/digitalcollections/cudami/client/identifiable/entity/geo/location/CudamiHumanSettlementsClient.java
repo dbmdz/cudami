@@ -28,28 +28,28 @@ public class CudamiHumanSettlementsClient extends CudamiBaseClient<HumanSettleme
   }
 
   public PageResponse findByLanguageAndInitial(
-          PageRequest pageRequest, String language, String initial) throws HttpException {
+      PageRequest pageRequest, String language, String initial) throws HttpException {
     return findByLanguageAndInitial("/latest/human_settlements", pageRequest, language, initial);
   }
 
   public PageResponse<HumanSettlement> findByLanguageAndInitial(
-          int pageNumber,
-          int pageSize,
-          String sortField,
-          String sortDirection,
-          String nullHandling,
-          String language,
-          String initial)
-          throws HttpException {
+      int pageNumber,
+      int pageSize,
+      String sortField,
+      String sortDirection,
+      String nullHandling,
+      String language,
+      String initial)
+      throws HttpException {
     return findByLanguageAndInitial(
-            "/latest/human_settlements",
-            pageNumber,
-            pageSize,
-            sortField,
-            sortDirection,
-            nullHandling,
-            language,
-            initial);
+        "/latest/human_settlements",
+        pageNumber,
+        pageSize,
+        sortField,
+        sortDirection,
+        nullHandling,
+        language,
+        initial);
   }
 
   public HumanSettlement findOne(UUID uuid) throws HttpException {
@@ -58,7 +58,7 @@ public class CudamiHumanSettlementsClient extends CudamiBaseClient<HumanSettleme
 
   public HumanSettlement findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-            String.format("/latest/human_settlements/identifier?namespace=%s&id=%s", namespace, id));
+        String.format("/latest/human_settlements/identifier?namespace=%s&id=%s", namespace, id));
   }
 
   public HumanSettlement save(HumanSettlement humanSettlement) throws HttpException {
@@ -66,6 +66,7 @@ public class CudamiHumanSettlementsClient extends CudamiBaseClient<HumanSettleme
   }
 
   public HumanSettlement update(UUID uuid, HumanSettlement humanSettlement) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/human_settlements/%s", uuid), humanSettlement);
+    return doPutRequestForObject(
+        String.format("/latest/human_settlements/%s", uuid), humanSettlement);
   }
 }

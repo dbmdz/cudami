@@ -18,12 +18,12 @@ public class CudamiPersonsClient extends CudamiBaseClient<Person> {
     super(http, serverUrl, Person.class, mapper);
   }
 
-  public Person create() {
-    return new Person();
-  }
-
   public long count() throws HttpException {
     return Long.parseLong(doGetRequestForString("/latest/persons/count"));
+  }
+
+  public Person create() {
+    return new Person();
   }
 
   public PageResponse<Person> find(PageRequest pageRequest) throws HttpException {

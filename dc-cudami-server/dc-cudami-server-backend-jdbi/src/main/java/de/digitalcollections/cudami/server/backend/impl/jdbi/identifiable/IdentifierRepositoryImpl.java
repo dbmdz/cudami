@@ -65,8 +65,7 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
     final String sql = innerQuery.toString();
 
     List<Identifier> result =
-        dbi.withHandle(
-            h -> h.createQuery(sql).mapToBean(Identifier.class).map(Identifier.class::cast).list());
+        dbi.withHandle(h -> h.createQuery(sql).mapToBean(Identifier.class).list());
 
     StringBuilder sqlCount = new StringBuilder("SELECT count(*) FROM " + tableName);
     addFiltering(pageRequest, sqlCount);

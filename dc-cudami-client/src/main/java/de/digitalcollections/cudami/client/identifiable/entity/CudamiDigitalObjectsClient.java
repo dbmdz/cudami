@@ -108,7 +108,7 @@ public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObject> 
   }
 
   public DigitalObject save(DigitalObject digitalObject) throws HttpException {
-    return doPostRequestForObject("/latest/digitalobjects", (DigitalObject) digitalObject);
+    return doPostRequestForObject("/latest/digitalobjects", digitalObject);
   }
 
   public List<FileResource> saveFileResources(UUID uuid, List fileResources) throws HttpException {
@@ -119,7 +119,6 @@ public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObject> 
   }
 
   public DigitalObject update(UUID uuid, DigitalObject digitalObject) throws HttpException {
-    return doPutRequestForObject(
-        String.format("/latest/digitalobjects/%s", uuid), (DigitalObject) digitalObject);
+    return doPutRequestForObject(String.format("/latest/digitalobjects/%s", uuid), digitalObject);
   }
 }

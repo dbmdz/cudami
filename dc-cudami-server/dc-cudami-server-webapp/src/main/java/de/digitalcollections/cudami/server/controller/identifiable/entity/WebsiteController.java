@@ -67,7 +67,7 @@ public class WebsiteController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Website findById(@PathVariable UUID uuid) {
-    return (Website) service.get(uuid);
+    return service.get(uuid);
   }
 
   @ApiMethod(description = "Get languages of all websites")
@@ -109,7 +109,7 @@ public class WebsiteController {
   @ApiResponseObject
   public Website save(@RequestBody Website website, BindingResult errors)
       throws IdentifiableServiceException {
-    return (Website) service.save(website);
+    return service.save(website);
   }
 
   @ApiMethod(description = "Update a website")
@@ -120,7 +120,7 @@ public class WebsiteController {
   public Website update(@PathVariable UUID uuid, @RequestBody Website website, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, website.getUuid());
-    return (Website) service.update(website);
+    return service.update(website);
   }
 
   @ApiMethod(description = "Update the order of a website's rootpages")

@@ -112,9 +112,9 @@ public class V1WebpageController {
   private Webpage loadWebpage(Locale pLocale, UUID uuid) throws IdentifiableServiceException {
     Webpage webpage;
     if (pLocale == null) {
-      webpage = (Webpage) webpageService.get(uuid);
+      webpage = webpageService.get(uuid);
     } else {
-      webpage = (Webpage) webpageService.get(uuid, pLocale);
+      webpage = webpageService.get(uuid, pLocale);
     }
     return webpage;
   }

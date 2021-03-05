@@ -41,9 +41,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-/**
- * Controller for collection management pages.
- */
+/** Controller for collection management pages. */
 @Controller
 public class CollectionsController extends AbstractController {
 
@@ -55,7 +53,7 @@ public class CollectionsController extends AbstractController {
 
   @Autowired
   public CollectionsController(
-          LanguageSortingHelper languageSortingHelper, CudamiClient cudamiClient) {
+      LanguageSortingHelper languageSortingHelper, CudamiClient cudamiClient) {
     this.languageSortingHelper = languageSortingHelper;
     this.localeService = cudamiClient.forLocales();
     this.service = cudamiClient.forCollections();
@@ -63,8 +61,8 @@ public class CollectionsController extends AbstractController {
 
   @PostMapping("/api/collections/{uuid}/digitalobjects")
   public ResponseEntity addDigitalObjects(
-          @PathVariable UUID uuid, @RequestBody List<DigitalObject> digitalObjects)
-          throws HttpException {
+      @PathVariable UUID uuid, @RequestBody List<DigitalObject> digitalObjects)
+      throws HttpException {
     boolean successful = service.addDigitalObjects(uuid, digitalObjects);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -74,8 +72,8 @@ public class CollectionsController extends AbstractController {
 
   @PostMapping("/api/collections/{collectionUuid}/subcollections/{subcollectionUuid}")
   public ResponseEntity addSubcollection(
-          @PathVariable UUID collectionUuid, @PathVariable UUID subcollectionUuid)
-          throws HttpException {
+      @PathVariable UUID collectionUuid, @PathVariable UUID subcollectionUuid)
+      throws HttpException {
     boolean successful = service.addSubcollection(collectionUuid, subcollectionUuid);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -85,8 +83,8 @@ public class CollectionsController extends AbstractController {
 
   @PostMapping("/api/collections/{collectionUuid}/subcollections")
   public ResponseEntity addSubcollections(
-          @PathVariable UUID collectionUuid, @RequestBody List<Collection> subcollections)
-          throws HttpException {
+      @PathVariable UUID collectionUuid, @RequestBody List<Collection> subcollections)
+      throws HttpException {
     boolean successful = service.addSubcollections(collectionUuid, subcollections);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -96,10 +94,10 @@ public class CollectionsController extends AbstractController {
 
   @GetMapping({"/collections/new", "/subcollections/new"})
   public String create(
-          Model model,
-          @RequestParam(name = "parentType", required = false) String parentType,
-          @RequestParam(name = "parentUuid", required = false) String parentUuid)
-          throws HttpException {
+      Model model,
+      @RequestParam(name = "parentType", required = false) String parentType,
+      @RequestParam(name = "parentUuid", required = false) String parentUuid)
+      throws HttpException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
@@ -114,14 +112,14 @@ public class CollectionsController extends AbstractController {
 
   @GetMapping({"/collections/{uuid}/edit", "/subcollections/{uuid}/edit"})
   public String edit(
-          @PathVariable UUID uuid,
-          @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
-          Model model)
-          throws HttpException {
+      @PathVariable UUID uuid,
+      @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
+      Model model)
+      throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Collection collection = service.findOne(uuid);
-    List<Locale> existingLanguages
-            = languageSortingHelper.sortLanguages(displayLocale, collection.getLabel().getLocales());
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, collection.getLabel().getLocales());
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);
@@ -137,9 +135,9 @@ public class CollectionsController extends AbstractController {
   @GetMapping("/api/collections")
   @ResponseBody
   public PageResponse<Collection> findAllTop(
-          @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-          @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
-          throws HttpException {
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      throws HttpException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     return service.findTopCollections(pageRequest);
   }
@@ -150,7 +148,7 @@ public class CollectionsController extends AbstractController {
   })
   @ResponseBody
   public Collection findOneByIdentifier(@PathVariable String namespace, @PathVariable String id)
-          throws HttpException {
+      throws HttpException {
     return service.findOneByIdentifier(namespace, id);
   }
 
@@ -163,20 +161,20 @@ public class CollectionsController extends AbstractController {
   @GetMapping("/api/collections/{uuid}/digitalobjects")
   @ResponseBody
   public PageResponse<DigitalObject> getDigitalObjects(
-          @PathVariable UUID uuid,
-          @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-          @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
-          throws HttpException {
+      @PathVariable UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      throws HttpException {
     return service.getDigitalObjects(uuid, new PageRequest(pageNumber, pageSize));
   }
 
   @GetMapping("/api/collections/{uuid}/subcollections")
   @ResponseBody
   public PageResponse<Collection> getSubcollections(
-          @PathVariable UUID uuid,
-          @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-          @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
-          throws HttpException {
+      @PathVariable UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      throws HttpException {
     return service.getSubcollections(uuid, new PageRequest(pageNumber, pageSize));
   }
 
@@ -184,8 +182,8 @@ public class CollectionsController extends AbstractController {
   public String list(Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     model.addAttribute(
-            "existingLanguages",
-            languageSortingHelper.sortLanguages(displayLocale, service.getTopCollectionsLanguages()));
+        "existingLanguages",
+        languageSortingHelper.sortLanguages(displayLocale, service.getTopCollectionsLanguages()));
     return "collections/list";
   }
 
@@ -197,8 +195,8 @@ public class CollectionsController extends AbstractController {
   @DeleteMapping("/api/collections/{collectionUuid}/digitalobjects/{digitalobjectUuid}")
   @ResponseBody
   public ResponseEntity removeDigitalObject(
-          @PathVariable UUID collectionUuid, @PathVariable UUID digitalobjectUuid)
-          throws HttpException {
+      @PathVariable UUID collectionUuid, @PathVariable UUID digitalobjectUuid)
+      throws HttpException {
     boolean successful = service.removeDigitalObject(collectionUuid, digitalobjectUuid);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -208,8 +206,8 @@ public class CollectionsController extends AbstractController {
 
   @DeleteMapping("/api/collections/{collectionUuid}/subcollections/{subcollectionUuid}")
   public ResponseEntity removeSubcollection(
-          @PathVariable UUID collectionUuid, @PathVariable UUID subcollectionUuid)
-          throws HttpException {
+      @PathVariable UUID collectionUuid, @PathVariable UUID subcollectionUuid)
+      throws HttpException {
     boolean successful = service.removeSubcollection(collectionUuid, subcollectionUuid);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -219,9 +217,9 @@ public class CollectionsController extends AbstractController {
 
   @PostMapping("/api/collections/new")
   public ResponseEntity save(
-          @RequestBody Collection collection,
-          @RequestParam(name = "parentType", required = false) String parentType,
-          @RequestParam(name = "parentUuid", required = false) UUID parentUuid) {
+      @RequestBody Collection collection,
+      @RequestParam(name = "parentType", required = false) String parentType,
+      @RequestParam(name = "parentUuid", required = false) UUID parentUuid) {
     try {
       Collection collectionDb = null;
       if ("collection".equals(parentType)) {
@@ -239,19 +237,19 @@ public class CollectionsController extends AbstractController {
   @GetMapping({"/api/collections/search", "/api/subcollections/search"})
   @ResponseBody
   public SearchPageResponse<Collection> search(
-          @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-          @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-          @RequestParam(name = "sortField", required = false) String sortField,
-          @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
-          @RequestParam(name = "searchTerm", required = false) String searchTerm)
-          throws HttpException {
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortField", required = false) String sortField,
+      @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      throws HttpException {
     Sorting sorting = null;
     if (sortField != null && sortDirection != null) {
       Order order = new Order(sortDirection, sortField);
       sorting = new Sorting(order);
     }
-    SearchPageRequest pageRequest
-            = new SearchPageRequest(searchTerm, pageNumber, pageSize, sorting);
+    SearchPageRequest pageRequest =
+        new SearchPageRequest(searchTerm, pageNumber, pageSize, sorting);
     return service.find(pageRequest);
   }
 
@@ -271,21 +269,21 @@ public class CollectionsController extends AbstractController {
     "/subcollections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
   })
   public String view(
-          @PathVariable UUID uuid, @PageableDefault(size = 25) Pageable pageable, Model model)
-          throws HttpException {
+      @PathVariable UUID uuid, @PageableDefault(size = 25) Pageable pageable, Model model)
+      throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Collection collection = service.findOne(uuid);
-    List<Locale> existingLanguages
-            = languageSortingHelper.sortLanguages(displayLocale, collection.getLabel().getLocales());
-    List<Locale> existingSubcollectionLanguages
-            = collection.getChildren().stream()
-                    .flatMap(child -> child.getLabel().getLocales().stream())
-                    .collect(Collectors.toList());
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, collection.getLabel().getLocales());
+    List<Locale> existingSubcollectionLanguages =
+        collection.getChildren().stream()
+            .flatMap(child -> child.getLabel().getLocales().stream())
+            .collect(Collectors.toList());
 
     model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute(
-            "existingSubcollectionLanguages",
-            languageSortingHelper.sortLanguages(displayLocale, existingSubcollectionLanguages));
+        "existingSubcollectionLanguages",
+        languageSortingHelper.sortLanguages(displayLocale, existingSubcollectionLanguages));
     model.addAttribute("collection", collection);
 
     List<Collection> parents = service.getParents(uuid);
@@ -300,8 +298,8 @@ public class CollectionsController extends AbstractController {
 
   @GetMapping({"/collections/{refId:[0-9]+}", "/subcollections/{refId:[0-9]+}"})
   public String viewByRefId(
-          @PathVariable long refId, @PageableDefault(size = 25) Pageable pageable, Model model)
-          throws HttpException {
+      @PathVariable long refId, @PageableDefault(size = 25) Pageable pageable, Model model)
+      throws HttpException {
     Collection collection = service.findOneByRefId(refId);
     return view(collection.getUuid(), pageable, model);
   }

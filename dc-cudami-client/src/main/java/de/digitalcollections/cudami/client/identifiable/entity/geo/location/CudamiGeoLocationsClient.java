@@ -28,28 +28,28 @@ public class CudamiGeoLocationsClient extends CudamiBaseClient<GeoLocation> {
   }
 
   public PageResponse findByLanguageAndInitial(
-          PageRequest pageRequest, String language, String initial) throws HttpException {
+      PageRequest pageRequest, String language, String initial) throws HttpException {
     return findByLanguageAndInitial("/latest/geolocations", pageRequest, language, initial);
   }
 
   public PageResponse<GeoLocation> findByLanguageAndInitial(
-          int pageNumber,
-          int pageSize,
-          String sortField,
-          String sortDirection,
-          String nullHandling,
-          String language,
-          String initial)
-          throws HttpException {
+      int pageNumber,
+      int pageSize,
+      String sortField,
+      String sortDirection,
+      String nullHandling,
+      String language,
+      String initial)
+      throws HttpException {
     return findByLanguageAndInitial(
-            "/latest/geolocations",
-            pageNumber,
-            pageSize,
-            sortField,
-            sortDirection,
-            nullHandling,
-            language,
-            initial);
+        "/latest/geolocations",
+        pageNumber,
+        pageSize,
+        sortField,
+        sortDirection,
+        nullHandling,
+        language,
+        initial);
   }
 
   public GeoLocation findOne(UUID uuid) throws HttpException {
@@ -58,7 +58,7 @@ public class CudamiGeoLocationsClient extends CudamiBaseClient<GeoLocation> {
 
   public GeoLocation findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-            String.format("/latest/geolocations/identifier?namespace=%s&id=%s", namespace, id));
+        String.format("/latest/geolocations/identifier?namespace=%s&id=%s", namespace, id));
   }
 
   public GeoLocation save(GeoLocation geoLocation) throws HttpException {

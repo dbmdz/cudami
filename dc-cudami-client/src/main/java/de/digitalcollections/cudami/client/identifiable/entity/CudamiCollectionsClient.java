@@ -191,7 +191,7 @@ public class CudamiCollectionsClient extends CudamiBaseClient<Collection> {
   }
 
   public Collection save(Collection collection) throws HttpException {
-    return doPostRequestForObject("/latest/collections", (Collection) collection);
+    return doPostRequestForObject("/latest/collections", collection);
   }
 
   public boolean saveDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects)
@@ -207,12 +207,10 @@ public class CudamiCollectionsClient extends CudamiBaseClient<Collection> {
   public Collection saveWithParentCollection(Collection collection, UUID parentCollectionUuid)
       throws HttpException {
     return doPostRequestForObject(
-        String.format("/latest/collections/%s/collection", parentCollectionUuid),
-        (Collection) collection);
+        String.format("/latest/collections/%s/collection", parentCollectionUuid), collection);
   }
 
   public Collection update(UUID uuid, Collection collection) throws HttpException {
-    return doPutRequestForObject(
-        String.format("/latest/collections/%s", uuid), (Collection) collection);
+    return doPutRequestForObject(String.format("/latest/collections/%s", uuid), collection);
   }
 }

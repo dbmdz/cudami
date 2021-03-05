@@ -284,7 +284,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       // first save fileresources
       for (FileResource fileResource : fileResources) {
         if (fileResource.getUuid() == null) {
-          fileResourceMetadataRepositoryImpl.save((FileResource) fileResource);
+          fileResourceMetadataRepositoryImpl.save(fileResource);
         }
       }
 

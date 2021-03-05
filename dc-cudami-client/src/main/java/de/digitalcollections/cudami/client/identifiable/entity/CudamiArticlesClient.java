@@ -18,12 +18,12 @@ public class CudamiArticlesClient extends CudamiBaseClient<Article> {
     super(http, serverUrl, Article.class, mapper);
   }
 
-  public Article create() {
-    return new Article();
-  }
-
   long count() throws HttpException {
     return Long.parseLong(doGetRequestForString("/latest/articles/count"));
+  }
+
+  public Article create() {
+    return new Article();
   }
 
   public PageResponse<Article> find(PageRequest pageRequest) throws HttpException {
@@ -53,10 +53,10 @@ public class CudamiArticlesClient extends CudamiBaseClient<Article> {
   }
 
   public Article save(Article article) throws HttpException {
-    return doPostRequestForObject("/latest/articles", (Article) article);
+    return doPostRequestForObject("/latest/articles", article);
   }
 
   public Article update(UUID uuid, Article article) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/articles/%s", uuid), (Article) article);
+    return doPutRequestForObject(String.format("/latest/articles/%s", uuid), article);
   }
 }

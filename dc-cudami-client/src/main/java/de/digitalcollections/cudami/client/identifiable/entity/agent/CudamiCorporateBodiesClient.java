@@ -15,12 +15,16 @@ public class CudamiCorporateBodiesClient extends CudamiBaseClient<CorporateBody>
     super(http, serverUrl, CorporateBody.class, mapper);
   }
 
+  public long count() throws HttpException {
+    return Long.parseLong(doGetRequestForString("/latest/corporatebodies/count"));
+  }
+
   public CorporateBody create() {
     return new CorporateBody();
   }
 
-  public long count() throws HttpException {
-    return Long.parseLong(doGetRequestForString("/latest/corporatebodies/count"));
+  public CorporateBody fetchAndSaveByGndId(String gndId) throws HttpException {
+    return doPostRequestForObject(String.format("/latest/corporatebodies/gnd/%s", gndId));
   }
 
   public PageResponse<CorporateBody> find(PageRequest pageRequest) throws HttpException {
@@ -39,10 +43,6 @@ public class CudamiCorporateBodiesClient extends CudamiBaseClient<CorporateBody>
   public CorporateBody findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
         String.format("/latest/corporatebodies/identifier/%s:%s.json", namespace, id));
-  }
-
-  public CorporateBody fetchAndSaveByGndId(String gndId) throws HttpException {
-    return doPostRequestForObject(String.format("/latest/corporatebodies/gnd/%s", gndId));
   }
 
   public CorporateBody save(CorporateBody corporateBody) throws HttpException {

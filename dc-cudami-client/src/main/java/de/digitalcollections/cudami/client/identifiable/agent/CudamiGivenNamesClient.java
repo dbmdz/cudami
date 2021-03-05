@@ -62,11 +62,10 @@ public class CudamiGivenNamesClient extends CudamiBaseClient<GivenName> {
   }
 
   public GivenName save(GivenName givenName) throws HttpException {
-    return doPostRequestForObject("/latest/givennames", (GivenName) givenName);
+    return doPostRequestForObject("/latest/givennames", givenName);
   }
 
   public GivenName update(UUID uuid, GivenName givenName) throws HttpException {
-    return doPutRequestForObject(
-        String.format("/latest/givennames/%s", uuid), (GivenName) givenName);
+    return doPutRequestForObject(String.format("/latest/givennames/%s", uuid), givenName);
   }
 }

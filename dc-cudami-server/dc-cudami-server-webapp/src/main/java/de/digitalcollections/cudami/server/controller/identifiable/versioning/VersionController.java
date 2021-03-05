@@ -27,7 +27,7 @@ public class VersionController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Version findById(@PathVariable UUID uuid) {
-    return (Version) versionService.get(uuid);
+    return versionService.get(uuid);
   }
 
   @ApiMethod(description = "Update the version status")
@@ -37,6 +37,6 @@ public class VersionController {
   @ApiResponseObject
   public Version update(@PathVariable UUID uuid, @RequestBody Version version, BindingResult errors)
       throws Exception {
-    return (Version) versionService.update(version);
+    return versionService.update(version);
   }
 }

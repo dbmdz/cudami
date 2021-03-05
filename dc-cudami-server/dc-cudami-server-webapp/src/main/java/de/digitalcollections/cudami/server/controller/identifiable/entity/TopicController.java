@@ -303,7 +303,7 @@ public class TopicController {
   @ApiResponseObject
   public Topic save(@RequestBody Topic topic, BindingResult errors)
       throws IdentifiableServiceException {
-    return (Topic) service.save(topic);
+    return service.save(topic);
   }
 
   @ApiMethod(description = "Save entities of topic")
@@ -351,6 +351,6 @@ public class TopicController {
   public Topic update(@PathVariable UUID uuid, @RequestBody Topic topic, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, topic.getUuid());
-    return (Topic) service.update(topic);
+    return service.update(topic);
   }
 }

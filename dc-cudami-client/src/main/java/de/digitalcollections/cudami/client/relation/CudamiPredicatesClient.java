@@ -24,6 +24,6 @@ public class CudamiPredicatesClient extends CudamiBaseClient<Predicate> {
         String.format(
             "/latest/predicates/%s",
             URLEncoder.encode(predicate.getValue(), StandardCharsets.UTF_8)),
-        (Predicate) predicate);
+        predicate);
   }
 }

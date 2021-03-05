@@ -31,31 +31,15 @@ public class UserServiceImpl implements UserService<User> {
   @Override
   //  @Transactional(readOnly = false)
   public User activate(UUID uuid) {
-    User user = (User) userRepository.findOne(uuid);
+    User user = userRepository.findOne(uuid);
     user.setEnabled(true);
     user = userRepository.save(user);
     return user;
   }
 
   @Override
-  public PageResponse<User> find(PageRequest pageRequest) {
-    setDefaultSorting(pageRequest);
-    return userRepository.find(pageRequest);
-  }
-
-  @Override
-  //  @Transactional(readOnly = false)
-  public User save(User user, Errors results) {
-    uniqueUsernameValidator.validate(user, results);
-    if (!results.hasErrors()) {
-      return (User) userRepository.save(user);
-    }
-    return null;
-  }
-
-  @Override
   public User createAdminUser() {
-    User user = (User) userRepository.create();
+    User user = userRepository.create();
     user.getRoles().add(Role.ADMIN);
     return user;
   }
@@ -63,7 +47,7 @@ public class UserServiceImpl implements UserService<User> {
   @Override
   //  @Transactional(readOnly = false)
   public User deactivate(UUID uuid) {
-    User user = (User) userRepository.findOne(uuid);
+    User user = userRepository.findOne(uuid);
     user.setEnabled(false);
     user = userRepository.save(user);
     return user;
@@ -79,16 +63,28 @@ public class UserServiceImpl implements UserService<User> {
   }
 
   @Override
+  public PageResponse<User> find(PageRequest pageRequest) {
+    setDefaultSorting(pageRequest);
+    return userRepository.find(pageRequest);
+  }
+
+  @Override
+  //  @Transactional(readOnly = true)
+  public List<User> findActiveAdminUsers() {
+    return userRepository.findActiveAdminUsers();
+  }
+
+  @Override
   public User get(UUID uuid) {
-    return (User) userRepository.findOne(uuid);
+    return userRepository.findOne(uuid);
   }
 
   /*
-    see: http://stackoverflow.com/questions/19302196/transaction-marked-as-rollback-only-how-do-i-find-the-cause
-    When you mark your method as @Transactional, occurrence of any exception inside your method will mark the surrounding TX as roll-back only (even if you catch them). You can use other attributes of
-    @Transactional annotation to prevent it of rolling back like:
+   see: http://stackoverflow.com/questions/19302196/transaction-marked-as-rollback-only-how-do-i-find-the-cause
+   When you mark your method as @Transactional, occurrence of any exception inside your method will mark the surrounding TX as roll-back only (even if you catch them). You can use other attributes of
+   @Transactional annotation to prevent it of rolling back like:
 
-    @Transactional(rollbackFor=MyException.class, noRollbackFor=MyException2.class)
+   @Transactional(rollbackFor=MyException.class, noRollbackFor=MyException2.class)
   */
   @Override
   //  @Transactional(readOnly = true, noRollbackFor = UsernameNotFoundException.class)
@@ -102,14 +98,12 @@ public class UserServiceImpl implements UserService<User> {
 
   @Override
   //  @Transactional(readOnly = false)
-  public User update(User user, Errors results) {
-    return (User) userRepository.update(user);
-  }
-
-  @Override
-  //  @Transactional(readOnly = true)
-  public List<User> findActiveAdminUsers() {
-    return userRepository.findActiveAdminUsers();
+  public User save(User user, Errors results) {
+    uniqueUsernameValidator.validate(user, results);
+    if (!results.hasErrors()) {
+      return userRepository.save(user);
+    }
+    return null;
   }
 
   private void setDefaultSorting(PageRequest pageRequest) {
@@ -117,5 +111,11 @@ public class UserServiceImpl implements UserService<User> {
       Sorting sorting = new Sorting(Direction.ASC, "email");
       pageRequest.setSorting(sorting);
     }
+  }
+
+  @Override
+  //  @Transactional(readOnly = false)
+  public User update(User user, Errors results) {
+    return userRepository.update(user);
   }
 }

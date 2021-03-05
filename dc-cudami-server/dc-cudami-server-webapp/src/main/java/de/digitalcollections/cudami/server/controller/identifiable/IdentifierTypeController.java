@@ -52,7 +52,7 @@ public class IdentifierTypeController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public IdentifierType findById(@PathVariable UUID uuid) {
-    return (IdentifierType) service.get(uuid);
+    return service.get(uuid);
   }
 
   @ApiMethod(description = "save a newly created identifier type")
@@ -72,6 +72,6 @@ public class IdentifierTypeController {
   public IdentifierType update(
       @PathVariable UUID uuid, @RequestBody IdentifierType identifierType, BindingResult errors) {
     assert Objects.equals(uuid, identifierType.getUuid());
-    return (IdentifierType) service.update(identifierType);
+    return service.update(identifierType);
   }
 }
