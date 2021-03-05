@@ -34,11 +34,9 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
-  private final Validator passwordsValidator;
-
-  private Validator uniqueUsernameValidator;
-
   private final CudamiUsersClient client;
+  private final Validator passwordsValidator;
+  private Validator uniqueUsernameValidator;
 
   public UserServiceImpl(
       @Qualifier("passwordsValidator") Validator passwordsValidator, CudamiClient client) {
@@ -52,10 +50,21 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
       User user = client.findOne(uuid);
       user.setEnabled(true);
       user = client.update(user.getUuid(), user);
-      return (User) user;
+      return user;
     } catch (HttpException ex) {
       throw new ServiceException(ex.getMessage(), ex);
     }
+  }
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    this.uniqueUsernameValidator = new UniqueUsernameValidator(this);
+  }
+
+  private org.springframework.security.core.userdetails.User buildUserForAuthentication(
+      User user, List<? extends GrantedAuthority> authorities) {
+    return new org.springframework.security.core.userdetails.User(
+        user.getEmail(), user.getPasswordHash(), user.isEnabled(), true, true, true, authorities);
   }
 
   @Override
@@ -65,7 +74,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
 
   @Override
   public User create() {
-    return (User) client.create();
+    return client.create();
   }
 
   @Override
@@ -73,7 +82,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
       throws ServiceException {
     uniqueUsernameValidator.validate(user, results);
     if (!results.hasErrors()) {
-      return (User) save(password1, password2, user, results, false);
+      return save(password1, password2, user, results, false);
     }
     return null;
   }
@@ -84,7 +93,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
     List<Role> roles = new ArrayList<>();
     roles.add(Role.ADMIN);
     user.setRoles(roles);
-    return (User) user;
+    return user;
   }
 
   @Override
@@ -93,7 +102,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
       User user = client.findOne(uuid);
       user.setEnabled(false);
       user = client.update(user.getUuid(), user);
-      return (User) user;
+      return user;
     } catch (HttpException ex) {
       throw new ServiceException(ex.getMessage(), ex);
     }
@@ -133,7 +142,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
   @Override
   public User findByEmail(String email) throws ServiceException {
     try {
-      return (User) client.findOneByEmail(email);
+      return client.findOneByEmail(email);
     } catch (HttpException ex) {
       throw new ServiceException(ex.getMessage(), ex);
     }
@@ -142,7 +151,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
   @Override
   public User findOne(UUID uuid) throws ServiceException {
     try {
-      return (User) client.findOne(uuid);
+      return client.findOne(uuid);
     } catch (HttpException ex) {
       throw new ServiceException(ex.getMessage(), ex);
     }
@@ -170,19 +179,6 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
     List<? extends GrantedAuthority> authorities = user.getRoles();
 
     return buildUserForAuthentication(user, authorities);
-  }
-
-  private org.springframework.security.core.userdetails.User buildUserForAuthentication(
-      User user, List<? extends GrantedAuthority> authorities) {
-    return new org.springframework.security.core.userdetails.User(
-        user.getEmail(), user.getPasswordHash(), user.isEnabled(), true, true, true, authorities);
-  }
-
-  // TODO: Simplify user management
-  @Override
-  public User update(User user, String password1, String password2, Errors results)
-      throws ServiceException {
-    return (User) save(password1, password2, user, results, true);
   }
 
   // TODO: Simplify user management
@@ -213,8 +209,10 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
     return user;
   }
 
+  // TODO: Simplify user management
   @Override
-  public void afterPropertiesSet() throws Exception {
-    this.uniqueUsernameValidator = new UniqueUsernameValidator(this);
+  public User update(User user, String password1, String password2, Errors results)
+      throws ServiceException {
+    return save(password1, password2, user, results, true);
   }
 }
