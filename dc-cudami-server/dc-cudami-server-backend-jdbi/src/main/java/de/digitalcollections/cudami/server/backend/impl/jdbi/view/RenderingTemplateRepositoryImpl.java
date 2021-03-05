@@ -2,10 +2,9 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.view;
 
 import de.digitalcollections.cudami.server.backend.api.repository.view.RenderingTemplateRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.AbstractPagingAndSortingRepositoryImpl;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.paging.PageResponseImpl;
-import de.digitalcollections.model.impl.view.RenderingTemplate;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.view.RenderingTemplate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -41,7 +40,7 @@ public class RenderingTemplateRepositoryImpl extends AbstractPagingAndSortingRep
         dbi.withHandle(
             h -> h.createQuery(query.toString()).mapToBean(RenderingTemplate.class).list());
     long total = count();
-    return new PageResponseImpl(result, pageRequest, total);
+    return new PageResponse(result, pageRequest, total);
   }
 
   @Override

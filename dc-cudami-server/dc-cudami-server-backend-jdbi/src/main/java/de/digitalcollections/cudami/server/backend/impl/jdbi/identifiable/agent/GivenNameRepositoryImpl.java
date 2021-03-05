@@ -3,8 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.agent
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.agent.GivenNameRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
-import de.digitalcollections.model.api.identifiable.agent.GivenName;
-import de.digitalcollections.model.impl.identifiable.agent.GivenNameImpl;
+import de.digitalcollections.model.identifiable.agent.GivenName;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +54,7 @@ public class GivenNameRepositoryImpl extends IdentifiableRepositoryImpl<GivenNam
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        GivenNameImpl.class,
+        GivenName.class,
         getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),

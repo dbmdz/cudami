@@ -5,9 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import de.digitalcollections.cudami.admin.business.impl.service.security.UserServiceImpl;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiUsersClient;
-import de.digitalcollections.model.api.security.User;
-import de.digitalcollections.model.impl.security.UserImpl;
+import de.digitalcollections.cudami.client.security.CudamiUsersClient;
+import de.digitalcollections.model.security.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +27,7 @@ public class UserServiceTest {
 
   @BeforeEach
   public void setup() throws Exception {
-    user = new UserImpl();
+    user = new User();
     user.setEmail("foo@spar.org");
     user.setPasswordHash(new BCryptPasswordEncoder().encode("foobar"));
     Mockito.when(cudamiClient.forUsers()).thenReturn(userRepository);

@@ -4,14 +4,12 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
-import de.digitalcollections.cudami.client.CudamiWebsitesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.entity.Website;
-import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
-import de.digitalcollections.model.impl.paging.PageRequestImpl;
+import de.digitalcollections.cudami.client.identifiable.entity.CudamiWebsitesClient;
+import de.digitalcollections.model.identifiable.entity.Website;
+import de.digitalcollections.model.identifiable.web.Webpage;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -93,11 +91,11 @@ public class WebsitesController extends AbstractController {
 
   @GetMapping("/api/websites")
   @ResponseBody
-  public PageResponse<WebsiteImpl> findAll(
+  public PageResponse<Website> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws HttpException {
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     return service.find(pageRequest);
   }
 
@@ -114,7 +112,7 @@ public class WebsitesController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws HttpException {
-    return service.getRootPages(uuid, new PageRequestImpl(pageNumber, pageSize));
+    return service.getRootPages(uuid, new PageRequest(pageNumber, pageSize));
   }
 
   @GetMapping("/websites")

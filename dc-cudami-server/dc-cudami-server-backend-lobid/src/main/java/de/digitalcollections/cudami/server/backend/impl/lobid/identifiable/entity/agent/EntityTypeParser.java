@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.lobid.identifiable.enti
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import de.digitalcollections.model.api.identifiable.entity.enums.EntityType;
+import de.digitalcollections.model.identifiable.entity.EntityType;
 import java.util.Iterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,13 +1,12 @@
 package de.digitalcollections.cudami.server.backend.impl.file.identifiable.resource;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceBinaryRepository;
-import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
-import de.digitalcollections.model.api.identifiable.resource.MimeType;
-import de.digitalcollections.model.api.identifiable.resource.VideoFileResource;
-import de.digitalcollections.model.api.identifiable.resource.exceptions.ResourceIOException;
-import de.digitalcollections.model.api.identifiable.resource.exceptions.ResourceNotFoundException;
-import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
+import de.digitalcollections.model.exception.ResourceIOException;
+import de.digitalcollections.model.exception.ResourceNotFoundException;
+import de.digitalcollections.model.file.MimeType;
+import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.identifiable.resource.ImageFileResource;
+import de.digitalcollections.model.identifiable.resource.VideoFileResource;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -126,7 +125,7 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
   @Override
   public FileResource find(String uuidStr, MimeType mimeType)
       throws ResourceIOException, ResourceNotFoundException {
-    FileResource resource = new FileResourceImpl();
+    FileResource resource = new FileResource();
 
     final UUID uuid = UUID.fromString(uuidStr);
     resource.setUuid(uuid);

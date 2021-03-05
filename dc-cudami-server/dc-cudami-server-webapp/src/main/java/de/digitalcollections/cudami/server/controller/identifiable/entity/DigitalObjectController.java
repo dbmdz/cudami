@@ -2,22 +2,18 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
-import de.digitalcollections.model.api.identifiable.entity.Collection;
-import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.api.identifiable.entity.Project;
-import de.digitalcollections.model.api.identifiable.entity.work.Item;
-import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
-import de.digitalcollections.model.api.paging.Order;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.SearchPageRequest;
-import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
-import de.digitalcollections.model.impl.paging.PageRequestImpl;
-import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
-import de.digitalcollections.model.impl.paging.SortingImpl;
+import de.digitalcollections.model.identifiable.entity.Collection;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.Project;
+import de.digitalcollections.model.identifiable.entity.work.Item;
+import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.identifiable.resource.ImageFileResource;
+import de.digitalcollections.model.paging.Order;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.paging.Sorting;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -78,9 +74,9 @@ public class DigitalObjectController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new SortingImpl(sortBy);
+      Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
     return service.find(pageRequest);
@@ -140,9 +136,9 @@ public class DigitalObjectController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest pageRequest = new SearchPageRequestImpl(searchTerm, pageNumber, pageSize);
+    SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new SortingImpl(sortBy);
+      Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
     return service.find(pageRequest);
@@ -180,9 +176,9 @@ public class DigitalObjectController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "active", required = false) String active) {
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, new SortingImpl());
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, new Sorting());
 
-    DigitalObject digitalObject = new DigitalObjectImpl();
+    DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);
     if (active != null) {
       return service.getActiveCollections(digitalObject, pageRequest);
@@ -223,9 +219,9 @@ public class DigitalObjectController {
       @ApiPathParam(description = "UUID of the digital object") @PathVariable("uuid") UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, new SortingImpl());
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, new Sorting());
 
-    DigitalObject digitalObject = new DigitalObjectImpl();
+    DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);
     return service.getProjects(digitalObject, pageRequest);
   }

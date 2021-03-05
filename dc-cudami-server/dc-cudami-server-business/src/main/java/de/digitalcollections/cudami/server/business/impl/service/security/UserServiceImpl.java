@@ -2,14 +2,12 @@ package de.digitalcollections.cudami.server.business.impl.service.security;
 
 import de.digitalcollections.cudami.server.backend.api.repository.security.UserRepository;
 import de.digitalcollections.cudami.server.business.api.service.security.UserService;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.api.paging.enums.Direction;
-import de.digitalcollections.model.api.security.User;
-import de.digitalcollections.model.api.security.enums.Role;
-import de.digitalcollections.model.impl.paging.SortingImpl;
-import de.digitalcollections.model.impl.security.UserImpl;
+import de.digitalcollections.model.paging.Direction;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.security.Role;
+import de.digitalcollections.model.security.User;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,31 +31,15 @@ public class UserServiceImpl implements UserService<User> {
   @Override
   //  @Transactional(readOnly = false)
   public User activate(UUID uuid) {
-    User user = (User) userRepository.findOne(uuid);
+    User user = userRepository.findOne(uuid);
     user.setEnabled(true);
     user = userRepository.save(user);
     return user;
   }
 
   @Override
-  public PageResponse<User> find(PageRequest pageRequest) {
-    setDefaultSorting(pageRequest);
-    return userRepository.find(pageRequest);
-  }
-
-  @Override
-  //  @Transactional(readOnly = false)
-  public User save(User user, Errors results) {
-    uniqueUsernameValidator.validate(user, results);
-    if (!results.hasErrors()) {
-      return (User) userRepository.save(user);
-    }
-    return null;
-  }
-
-  @Override
   public User createAdminUser() {
-    UserImpl user = (UserImpl) userRepository.create();
+    User user = userRepository.create();
     user.getRoles().add(Role.ADMIN);
     return user;
   }
@@ -65,7 +47,7 @@ public class UserServiceImpl implements UserService<User> {
   @Override
   //  @Transactional(readOnly = false)
   public User deactivate(UUID uuid) {
-    User user = (User) userRepository.findOne(uuid);
+    User user = userRepository.findOne(uuid);
     user.setEnabled(false);
     user = userRepository.save(user);
     return user;
@@ -81,16 +63,28 @@ public class UserServiceImpl implements UserService<User> {
   }
 
   @Override
+  public PageResponse<User> find(PageRequest pageRequest) {
+    setDefaultSorting(pageRequest);
+    return userRepository.find(pageRequest);
+  }
+
+  @Override
+  //  @Transactional(readOnly = true)
+  public List<User> findActiveAdminUsers() {
+    return userRepository.findActiveAdminUsers();
+  }
+
+  @Override
   public User get(UUID uuid) {
-    return (User) userRepository.findOne(uuid);
+    return userRepository.findOne(uuid);
   }
 
   /*
-    see: http://stackoverflow.com/questions/19302196/transaction-marked-as-rollback-only-how-do-i-find-the-cause
-    When you mark your method as @Transactional, occurrence of any exception inside your method will mark the surrounding TX as roll-back only (even if you catch them). You can use other attributes of
-    @Transactional annotation to prevent it of rolling back like:
+   see: http://stackoverflow.com/questions/19302196/transaction-marked-as-rollback-only-how-do-i-find-the-cause
+   When you mark your method as @Transactional, occurrence of any exception inside your method will mark the surrounding TX as roll-back only (even if you catch them). You can use other attributes of
+   @Transactional annotation to prevent it of rolling back like:
 
-    @Transactional(rollbackFor=MyException.class, noRollbackFor=MyException2.class)
+   @Transactional(rollbackFor=MyException.class, noRollbackFor=MyException2.class)
   */
   @Override
   //  @Transactional(readOnly = true, noRollbackFor = UsernameNotFoundException.class)
@@ -104,20 +98,24 @@ public class UserServiceImpl implements UserService<User> {
 
   @Override
   //  @Transactional(readOnly = false)
-  public User update(User user, Errors results) {
-    return (User) userRepository.update(user);
-  }
-
-  @Override
-  //  @Transactional(readOnly = true)
-  public List<User> findActiveAdminUsers() {
-    return userRepository.findActiveAdminUsers();
+  public User save(User user, Errors results) {
+    uniqueUsernameValidator.validate(user, results);
+    if (!results.hasErrors()) {
+      return userRepository.save(user);
+    }
+    return null;
   }
 
   private void setDefaultSorting(PageRequest pageRequest) {
     if (!pageRequest.hasSorting()) {
-      Sorting sorting = new SortingImpl(Direction.ASC, "email");
+      Sorting sorting = new Sorting(Direction.ASC, "email");
       pageRequest.setSorting(sorting);
     }
+  }
+
+  @Override
+  //  @Transactional(readOnly = false)
+  public User update(User user, Errors results) {
+    return userRepository.update(user);
   }
 }

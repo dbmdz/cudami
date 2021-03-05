@@ -1,9 +1,10 @@
 package de.digitalcollections.cudami.server.controller.converter;
 
-import de.digitalcollections.model.api.paging.Order;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.api.paging.enums.Direction;
-import de.digitalcollections.model.api.paging.enums.NullHandling;
+import de.digitalcollections.model.paging.Direction;
+import de.digitalcollections.model.paging.NullHandling;
+import de.digitalcollections.model.paging.Order;
+import de.digitalcollections.model.paging.OrderBuilder;
+import de.digitalcollections.model.paging.Sorting;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -34,7 +35,7 @@ public class StringToOrderConverter implements GenericConverter {
     if (!matcher.matches()) {
       return null;
     }
-    Order.Builder order = Order.defaultBuilder();
+    OrderBuilder order = Order.defaultBuilder();
     String property = matcher.group("property");
     order.property(property);
     String subProperty = matcher.group("subProperty");

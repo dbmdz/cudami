@@ -1,12 +1,10 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation;
 
-import de.digitalcollections.model.api.identifiable.entity.Entity;
-import de.digitalcollections.model.api.identifiable.entity.enums.EntityType;
-import de.digitalcollections.model.api.identifiable.entity.relation.EntityRelation;
-import de.digitalcollections.model.api.identifiable.parts.LocalizedText;
-import de.digitalcollections.model.api.identifiable.parts.structuredcontent.LocalizedStructuredContent;
-import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
-import de.digitalcollections.model.impl.identifiable.entity.relation.EntityRelationImpl;
+import de.digitalcollections.model.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.entity.EntityType;
+import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.text.LocalizedStructuredContent;
+import de.digitalcollections.model.text.LocalizedText;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -38,12 +36,12 @@ public class EntityRelationMapper<E extends Entity> implements RowMapper<EntityR
             .findFor(LocalizedText.class)
             .orElseThrow(() -> new NoSuchMapperException("LocalizedText"));
 
-    EntityRelation result = new EntityRelationImpl();
+    EntityRelation result = new EntityRelation();
 
     result.setSubject(subjectEntity);
     result.setPredicate(rs.getString("predicate"));
 
-    Entity objectEntity = new EntityImpl();
+    Entity objectEntity = new Entity();
     objectEntity.setCreated(rs.getTimestamp("created").toLocalDateTime());
     objectEntity.setDescription(lscMapper.map(rs, "description", ctx));
     objectEntity.setEntityType(EntityType.valueOf(rs.getString("entity_type")));

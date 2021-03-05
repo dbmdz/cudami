@@ -2,8 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resou
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ApplicationFileResourceRepository;
-import de.digitalcollections.model.api.identifiable.resource.ApplicationFileResource;
-import de.digitalcollections.model.impl.identifiable.resource.ApplicationFileResourceImpl;
+import de.digitalcollections.model.identifiable.resource.ApplicationFileResource;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +51,7 @@ public class ApplicationFileResourceRepositoryImpl
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        ApplicationFileResourceImpl.class,
+        ApplicationFileResource.class,
         getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),

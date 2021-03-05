@@ -4,14 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.lobid.client.model.LobidCorporateBody;
 import de.digitalcollections.cudami.lobid.client.model.LobidDepiction;
 import de.digitalcollections.cudami.lobid.client.model.LobidHomepage;
-import de.digitalcollections.model.api.http.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
-import de.digitalcollections.model.api.identifiable.resource.MimeType;
-import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
-import de.digitalcollections.model.impl.identifiable.entity.agent.CorporateBodyImpl;
-import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
-import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
+import de.digitalcollections.model.exception.http.HttpException;
+import de.digitalcollections.model.file.MimeType;
+import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.identifiable.resource.ImageFileResource;
+import de.digitalcollections.model.text.LocalizedText;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -36,7 +34,7 @@ public class LobidCorporateBodiesClient extends LobidBaseClient<LobidCorporateBo
   }
 
   private CorporateBody mapLobidToModel(LobidCorporateBody lobidCorporateBody) {
-    CorporateBody corporateBody = new CorporateBodyImpl();
+    CorporateBody corporateBody = new CorporateBody();
 
     // label
     String labelText = lobidCorporateBody.getPreferredName();
@@ -45,12 +43,12 @@ public class LobidCorporateBodiesClient extends LobidBaseClient<LobidCorporateBo
     if (labelText != null && abbreviatedNameForTheCorporateBody != null) {
       labelText = labelText + " (" + abbreviatedNameForTheCorporateBody.get(0) + ")";
     }
-    corporateBody.setLabel(new LocalizedTextImpl(Locale.GERMAN, labelText));
+    corporateBody.setLabel(new LocalizedText(Locale.GERMAN, labelText));
 
     // identifier
     String gndIdentifier = lobidCorporateBody.getGndIdentifier();
     if (gndIdentifier != null) {
-      corporateBody.addIdentifier(new IdentifierImpl(null, "gnd", gndIdentifier));
+      corporateBody.addIdentifier(new Identifier(null, "gnd", gndIdentifier));
     }
 
     // homepage
@@ -68,8 +66,8 @@ public class LobidCorporateBodiesClient extends LobidBaseClient<LobidCorporateBo
     List<LobidDepiction> depiction = lobidCorporateBody.getDepiction();
     if (depiction != null && !depiction.isEmpty()) {
       String thumbnailUrl = depiction.get(0).getThumbnail();
-      ImageFileResource previewImage = new ImageFileResourceImpl();
-      previewImage.setLabel(new LocalizedTextImpl(Locale.GERMAN, "Logo " + labelText));
+      ImageFileResource previewImage = new ImageFileResource();
+      previewImage.setLabel(new LocalizedText(Locale.GERMAN, "Logo " + labelText));
       previewImage.setUri(URI.create(thumbnailUrl));
       previewImage.setMimeType(MimeType.MIME_IMAGE);
       corporateBody.setPreviewImage(previewImage);

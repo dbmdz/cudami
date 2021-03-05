@@ -3,28 +3,23 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CollectionRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
-import de.digitalcollections.model.api.filter.FilterCriterion;
-import de.digitalcollections.model.api.filter.FilterValuePlaceholder;
-import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.Identifier;
-import de.digitalcollections.model.api.identifiable.Node;
-import de.digitalcollections.model.api.identifiable.entity.Collection;
-import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.view.BreadcrumbNavigation;
-import de.digitalcollections.model.impl.identifiable.NodeImpl;
-import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
-import de.digitalcollections.model.impl.paging.PageResponseImpl;
-import de.digitalcollections.model.impl.view.BreadcrumbNavigationImpl;
+import de.digitalcollections.model.filter.FilterCriterion;
+import de.digitalcollections.model.filter.FilterValuePlaceholder;
+import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.entity.Collection;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.view.BreadcrumbNavigation;
+import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,7 +86,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        CollectionImpl.class,
+        Collection.class,
         getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
@@ -100,8 +95,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public boolean addChildren(UUID parentUuid, List<Collection> children) {
-    if (parentUuid == null || children == null) {
+  public boolean addChildren(UUID parentUuid, List<UUID> childrenUuids) {
+    if (parentUuid == null || childrenUuids == null) {
       return false;
     }
     Integer nextSortIndex =
@@ -114,12 +109,12 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
               handle.prepareBatch(
                   "INSERT INTO collection_collections(parent_collection_uuid, child_collection_uuid, sortIndex)"
                       + " VALUES (:parentCollectionUuid, :childCollectionUuid, :sortIndex) ON CONFLICT (parent_collection_uuid, child_collection_uuid) DO NOTHING");
-          children.forEach(
-              child -> {
+          childrenUuids.forEach(
+              childUuid -> {
                 preparedBatch
                     .bind("parentCollectionUuid", parentUuid)
-                    .bind("childCollectionUuid", child.getUuid())
-                    .bind("sortIndex", nextSortIndex + getIndex(children, child))
+                    .bind("childCollectionUuid", childUuid)
+                    .bind("sortIndex", nextSortIndex + getIndex(childrenUuids, childUuid))
                     .add();
               });
           preparedBatch.execute();
@@ -194,30 +189,25 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
   @Override
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
-
-    List<Node> result =
+    List<BreadcrumbNode> result =
         dbi.withHandle(
             h ->
                 h.createQuery(
-                        "WITH recursive breadcrumb (uuid,label,parent_uuid,depth)"
+                        "WITH recursive breadcrumb (uuid,label,refId,parentId,depth)"
                             + " AS ("
-                            + "        SELECT c.uuid AS uuid, c.label AS label, c.refid c_refId, cc.parent_collection_uuid AS parent_uuid, 99 AS depth"
+                            + "        SELECT c.uuid AS uuid, c.label AS label, c.refid AS refId, cc.parent_collection_uuid AS parentId, 99 AS depth"
                             + "        FROM collections c, collection_collections cc"
                             + "        WHERE uuid= :uuid and cc.child_collection_uuid = c.uuid"
                             + ""
                             + "        UNION ALL"
-                            + "        SELECT c.uuid AS uuid, c.label AS label, c.refid c_refId, cc.parent_collection_uuid AS parent_uuid, depth-1 AS depth"
-                            + "        FROM collections c,"
-                            + "             collection_collections cc,"
-                            + "             breadcrumb b"
+                            + "        SELECT c.uuid AS uuid, c.label AS label, c.refid AS refID, cc.parent_collection_uuid AS parentId, depth-1 AS depth"
+                            + "        FROM collections c, collection_collections cc, breadcrumb b"
                             + "        WHERE b.uuid = cc.child_collection_uuid AND cc.parent_collection_uuid = c.uuid AND cc.parent_collection_uuid IS NOT null"
                             + "    )"
-                            + " SELECT * FROM breadcrumb"
+                            + " SELECT cast(refId AS VARCHAR) as targetId, label, depth FROM breadcrumb"
                             + " ORDER BY depth ASC")
                     .bind("uuid", nodeUuid)
-                    .registerRowMapper(BeanMapper.factory(NodeImpl.class))
-                    .mapTo(NodeImpl.class)
-                    .map(Node.class::cast)
+                    .mapTo(BreadcrumbNode.class)
                     .list());
 
     if (result.isEmpty()) {
@@ -227,29 +217,21 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
           dbi.withHandle(
               h ->
                   h.createQuery(
-                          "SELECT c.uuid AS uuid, c.label AS label"
-                              + "        FROM collections c"
-                              + "        WHERE uuid= :uuid")
+                          "SELECT cast(refId AS VARCHAR) as targetId, label AS label"
+                              + " FROM collections WHERE uuid= :uuid")
                       .bind("uuid", nodeUuid)
-                      .registerRowMapper(BeanMapper.factory(NodeImpl.class))
-                      .mapTo(NodeImpl.class)
-                      .map(Node.class::cast)
+                      .mapTo(BreadcrumbNode.class)
                       .list());
     }
 
-    return new BreadcrumbNavigationImpl(result);
-  }
-
-  @Override
-  public List<Collection> getChildren(Collection collection) {
-    return CollectionRepository.super.getChildren(collection);
+    return new BreadcrumbNavigation(result);
   }
 
   @Override
   public List<Collection> getChildren(UUID uuid) {
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM "
+            "SELECT cc.sortindex AS idx, * FROM "
                 + tableName
                 + " AS "
                 + tableAlias
@@ -257,10 +239,10 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                 + tableAlias
                 + ".uuid = cc.child_collection_uuid"
                 + " WHERE cc.parent_collection_uuid = :uuid"
-                + " ORDER BY cc.sortIndex ASC");
+                + " ORDER BY cc.sortindex ASC");
 
     List<Collection> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), null);
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), "ORDER BY idx ASC");
     return result;
   }
 
@@ -276,20 +258,20 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + ".uuid = cc.child_collection_uuid"
             + " WHERE cc.parent_collection_uuid = :uuid";
 
-    StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
+    StringBuilder innerQuery = new StringBuilder("SELECT cc.sortindex AS idx, *" + commonSql);
     addFiltering(pageRequest, innerQuery);
     pageRequest.setSorting(null);
-    innerQuery.append(" ORDER BY cc.sortIndex ASC");
+    innerQuery.append(" ORDER BY idx ASC");
     addPageRequestParams(pageRequest, innerQuery);
 
     List<Collection> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), null);
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), "ORDER BY idx ASC");
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
     long total = retrieveCount(countQuery, Map.of("uuid", uuid));
 
-    return new PageResponseImpl<>(result, pageRequest, total);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override
@@ -326,10 +308,10 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + ".uuid = cd.digitalobject_uuid"
             + " WHERE cd.collection_uuid = :uuid";
 
-    StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
+    StringBuilder innerQuery = new StringBuilder("SELECT cd.sortindex AS idx, *" + commonSql);
     addFiltering(pageRequest, innerQuery);
     pageRequest.setSorting(null);
-    innerQuery.append(" ORDER BY cd.sortIndex ASC");
+    innerQuery.append(" ORDER BY idx ASC");
     addPageRequestParams(pageRequest, innerQuery);
 
     List<DigitalObject> result =
@@ -337,13 +319,13 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             Map.of("uuid", collectionUuid),
-            null);
+            "ORDER BY idx ASC");
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
     long total = retrieveCount(countQuery, Map.of("uuid", collectionUuid));
 
-    return new PageResponseImpl<>(result, pageRequest, total);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override

@@ -1,17 +1,17 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.agent;
 
-import de.digitalcollections.commons.springdata.domain.PageConverter;
-import de.digitalcollections.commons.springdata.domain.PageWrapper;
-import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
+import de.digitalcollections.cudami.admin.paging.PageConverter;
+import de.digitalcollections.cudami.admin.paging.PageWrapper;
+import de.digitalcollections.cudami.admin.paging.PageableConverter;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
-import de.digitalcollections.cudami.client.entity.agent.CudamiCorporateBodiesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiCorporateBodiesClient;
+import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;

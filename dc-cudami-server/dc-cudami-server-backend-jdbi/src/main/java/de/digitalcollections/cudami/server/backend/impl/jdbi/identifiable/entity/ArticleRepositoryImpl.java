@@ -2,20 +2,16 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ArticleRepository;
-import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.Identifier;
-import de.digitalcollections.model.api.identifiable.entity.Article;
-import de.digitalcollections.model.api.identifiable.entity.agent.Agent;
-import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.api.identifiable.entity.agent.Family;
-import de.digitalcollections.model.api.identifiable.entity.agent.Person;
-import de.digitalcollections.model.api.identifiable.entity.enums.EntityType;
-import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.impl.identifiable.entity.ArticleImpl;
-import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
-import de.digitalcollections.model.impl.identifiable.entity.agent.CorporateBodyImpl;
-import de.digitalcollections.model.impl.identifiable.entity.agent.FamilyImpl;
-import de.digitalcollections.model.impl.identifiable.entity.agent.PersonImpl;
+import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.entity.Article;
+import de.digitalcollections.model.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.entity.EntityType;
+import de.digitalcollections.model.identifiable.entity.agent.Agent;
+import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.identifiable.entity.agent.Family;
+import de.digitalcollections.model.identifiable.entity.agent.Person;
+import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -76,20 +72,20 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
         + ", date_published=:datePublished, text=:text::JSONB, timevalue_published=:timeValuePublished::JSONB";
   }
 
-  private final EntityRepositoryImpl<EntityImpl> entityRepositoryImpl;
+  private final EntityRepositoryImpl<Entity> entityRepositoryImpl;
 
   @Autowired
   public ArticleRepositoryImpl(
       Jdbi dbi,
       IdentifierRepository identifierRepository,
-      @Qualifier("entityRepositoryImpl") EntityRepositoryImpl<EntityImpl> entityRepositoryImpl) {
+      @Qualifier("entityRepositoryImpl") EntityRepositoryImpl<Entity> entityRepositoryImpl) {
     super(
         dbi,
         identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        ArticleImpl.class,
+        Article.class,
         getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
@@ -133,7 +129,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   public List<Agent> getCreators(UUID articleUuid) {
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM "
+            "SELECT ac.sortindex AS idx, * FROM "
                 + EntityRepositoryImpl.TABLE_NAME
                 + " AS e"
                 + " LEFT JOIN article_creators AS ac ON e.uuid = ac.agent_uuid"
@@ -142,8 +138,9 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
 
     final String fieldsSql = entityRepositoryImpl.getSqlSelectReducedFields();
 
-    List<EntityImpl> entityList =
-        entityRepositoryImpl.retrieveList(fieldsSql, innerQuery, Map.of("uuid", articleUuid), null);
+    List<Entity> entityList =
+        entityRepositoryImpl.retrieveList(
+            fieldsSql, innerQuery, Map.of("uuid", articleUuid), "ORDER BY idx ASC");
 
     List<Agent> agents = null;
     if (entityList != null) {
@@ -155,19 +152,19 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
                     EntityType entityType = entity.getEntityType();
                     switch (entityType) {
                       case CORPORATE_BODY:
-                        CorporateBody corporateBody = new CorporateBodyImpl();
+                        CorporateBody corporateBody = new CorporateBody();
                         corporateBody.setLabel(entity.getLabel());
                         corporateBody.setRefId(entity.getRefId());
                         corporateBody.setUuid(entity.getUuid());
                         return corporateBody;
                       case FAMILY:
-                        Family family = new FamilyImpl();
+                        Family family = new Family();
                         family.setLabel(entity.getLabel());
                         family.setRefId(entity.getRefId());
                         family.setUuid(entity.getUuid());
                         return family;
                       case PERSON:
-                        Person person = new PersonImpl();
+                        Person person = new Person();
                         person.setLabel(entity.getLabel());
                         person.setRefId(entity.getRefId());
                         person.setUuid(entity.getUuid());

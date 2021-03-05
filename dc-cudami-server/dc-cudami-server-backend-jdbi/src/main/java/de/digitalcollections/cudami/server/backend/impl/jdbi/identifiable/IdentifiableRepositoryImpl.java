@@ -6,23 +6,21 @@ import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
-import de.digitalcollections.model.api.filter.FilterValuePlaceholder;
-import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.Identifiable;
-import de.digitalcollections.model.api.identifiable.Identifier;
-import de.digitalcollections.model.api.identifiable.resource.MimeType;
-import de.digitalcollections.model.api.paging.Order;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.SearchPageRequest;
-import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.api.paging.enums.Direction;
-import de.digitalcollections.model.impl.identifiable.IdentifiableImpl;
-import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
-import de.digitalcollections.model.impl.identifiable.resource.ImageFileResourceImpl;
-import de.digitalcollections.model.impl.paging.PageResponseImpl;
-import de.digitalcollections.model.impl.paging.SearchPageResponseImpl;
+import de.digitalcollections.model.file.MimeType;
+import de.digitalcollections.model.filter.FilterValuePlaceholder;
+import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.identifiable.resource.ImageFileResource;
+import de.digitalcollections.model.paging.Direction;
+import de.digitalcollections.model.paging.Order;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.paging.Sorting;
 import java.net.URI;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -39,6 +37,7 @@ import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.jdbi.v3.core.result.RowView;
+import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,7 +129,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        IdentifiableImpl.class,
+        Identifiable.class,
         getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
@@ -239,6 +238,38 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     this.sqlUpdateFieldValues = sqlUpdateFieldValues;
   }
 
+  @Override
+  public void addRelatedEntity(UUID identifiableUuid, UUID entityUuid) {
+    Integer sortIndex =
+        retrieveNextSortIndexForParentChildren(
+            dbi, "rel_identifiable_entities", "identifiable_uuid", identifiableUuid);
+
+    dbi.withHandle(
+        h ->
+            h.createUpdate(
+                    "INSERT INTO rel_identifiable_entities(identifiable_uuid, entity_uuid, sortindex) VALUES (:identifiableUuid, :entityUuid, :sortindex)")
+                .bind("identifiableUuid", identifiableUuid)
+                .bind("entityUuid", entityUuid)
+                .bind("sortindex", sortIndex)
+                .execute());
+  }
+
+  @Override
+  public void addRelatedFileresource(UUID identifiableUuid, UUID fileResourceUuid) {
+    Integer sortIndex =
+        retrieveNextSortIndexForParentChildren(
+            dbi, "rel_identifiable_fileresources", "identifiable_uuid", identifiableUuid);
+
+    dbi.withHandle(
+        h ->
+            h.createUpdate(
+                    "INSERT INTO rel_identifiable_fileresources(identifiable_uuid, fileresource_uuid, sortindex) VALUES (:identifiableUuid, :fileresourceUuid, :sortindex)")
+                .bind("identifiableUuid", identifiableUuid)
+                .bind("fileresourceUuid", fileResourceUuid)
+                .bind("sortindex", sortIndex)
+                .execute());
+  }
+
   private BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> createReduceRowsBiFunction(
       boolean withIdentifiers, boolean withPreviewImage) {
     return (map, rowView) -> {
@@ -257,7 +288,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         // TODO workaround as long at is not possible to register two RowMappers for one type
         // but for different prefixes (unitl now the first takes precedence),
         // see discussion https://groups.google.com/g/jdbi/c/UhVygrtoH0U
-        ImageFileResourceImpl previewImage = new ImageFileResourceImpl();
+        ImageFileResource previewImage = new ImageFileResource();
         previewImage.setUuid(rowView.getColumn("pi_uuid", UUID.class));
         previewImage.setFilename(rowView.getColumn("pi_filename", String.class));
         previewImage.setHttpBaseUrl(rowView.getColumn("pi_httpBaseUrl", URL.class));
@@ -266,7 +297,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         identifiable.setPreviewImage(previewImage);
       }
       if (withIdentifiers && rowView.getColumn("id_uuid", UUID.class) != null) {
-        IdentifierImpl dbIdentifier = rowView.getRow(IdentifierImpl.class);
+        Identifier dbIdentifier = rowView.getRow(Identifier.class);
         identifiable.addIdentifier(dbIdentifier);
       }
       return map;
@@ -329,7 +360,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     addFiltering(pageRequest, sqlCount);
     long total = retrieveCount(sqlCount, argumentMappings);
 
-    return new PageResponseImpl<>(result, pageRequest, total);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override
@@ -355,7 +386,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             + " OR "
             + tableAlias
             + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')";
-    return find(searchPageRequest, commonSql, Map.of("searchTerm", searchPageRequest.getQuery()));
+    String searchTerm = searchPageRequest.getQuery();
+    if (searchTerm == null) {
+      searchTerm = "";
+    }
+    return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
   }
 
   protected SearchPageResponse<I> find(
@@ -373,7 +408,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     addFiltering(searchPageRequest, countQuery);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new SearchPageResponseImpl<>(result, searchPageRequest, total);
+    return new SearchPageResponse<>(result, searchPageRequest, total);
   }
 
   @Override
@@ -397,11 +432,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     }
     // TODO: test if binding works (because of single quotes done by filter expandion) or we have to
     // put here values direktly, not passing Map.of....
-    Filtering.defaultBuilder()
-        .filter(tableAlias + ".label ->> :language")
-        .startsWith(":initial")
-        .build();
-    filtering.add(filtering);
+    Filtering initialFiltering =
+        Filtering.defaultBuilder()
+            .filter(tableAlias + ".label ->> :language")
+            .startsWith(":initial")
+            .build();
+    filtering.add(initialFiltering);
 
     // add special ordering
     Sorting sorting = pageRequest.getSorting();
@@ -506,6 +542,55 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     return -1;
   }
 
+  public int getIndex(List<UUID> list, UUID uuid) {
+    int pos = -1;
+    for (UUID u : list) {
+      pos += 1;
+      if (u.equals(uuid)) {
+        return pos;
+      }
+    }
+    return -1;
+  }
+
+  @Override
+  public List<Entity> getRelatedEntities(UUID identifiableUuid) {
+    String query =
+        "SELECT * FROM entities e"
+            + " INNER JOIN rel_identifiable_entities ref ON e.uuid=ref.entity_uuid"
+            + " WHERE ref.identifiable_uuid = :identifiableUuid"
+            + " ORDER BY ref.sortindex";
+
+    List<Entity> list =
+        dbi.withHandle(
+            h ->
+                h.createQuery(query)
+                    .bind("identifiableUuid", identifiableUuid)
+                    .mapToBean(Entity.class)
+                    .map(Entity.class::cast)
+                    .list());
+    return list;
+  }
+
+  @Override
+  public List<FileResource> getRelatedFileResources(UUID identifiableUuid) {
+    String query =
+        "SELECT * FROM fileresources f"
+            + " INNER JOIN rel_identifiable_fileresources ref ON f.uuid=ref.fileresource_uuid"
+            + " WHERE ref.identifiableUuid = :identifiableUuid"
+            + " ORDER BY ref.sortindex";
+
+    List<FileResource> result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(query)
+                    .bind("identifiableUuid", identifiableUuid)
+                    .mapToBean(FileResource.class)
+                    .map(FileResource.class::cast)
+                    .list());
+    return result;
+  }
+
   public String getSqlSelectAllFields() {
     return sqlSelectAllFields;
   }
@@ -553,14 +638,23 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
     List<I> result =
         dbi.withHandle(
-            h ->
-                h.createQuery(sql)
-                    .bindMap(argumentMappings)
-                    .reduceRows(
-                        (Map<UUID, I> map, RowView rowView) -> {
-                          basicReduceRowsBiFunction.apply(map, rowView);
-                        })
-                    .collect(Collectors.toList()));
+            (Handle handle) -> {
+              //              handle.execute("SET cust.code=:customerID", "bav");
+              // multitenancy, see
+              // https://varun-verma.medium.com/isolate-multi-tenant-data-in-postgresql-db-using-row-level-security-rls-bdd3089d9337
+              // https://aws.amazon.com/de/blogs/database/multi-tenant-data-isolation-with-postgresql-row-level-security/
+              // https://www.postgresql.org/docs/current/ddl-rowsecurity.html
+              // https://www.postgresql.org/docs/current/sql-createpolicy.html
+
+              return handle
+                  .createQuery(sql)
+                  .bindMap(argumentMappings)
+                  .reduceRows(
+                      (Map<UUID, I> map, RowView rowView) -> {
+                        basicReduceRowsBiFunction.apply(map, rowView);
+                      })
+                  .collect(Collectors.toList());
+            });
     return result;
   }
 
@@ -668,6 +762,67 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         identifierRepository.save(identifier);
       }
     }
+  }
+
+  @Override
+  public List<Entity> saveRelatedEntities(UUID identifiableUuid, List<Entity> entities) {
+    // as we store the whole list new: delete old entries
+    dbi.withHandle(
+        h ->
+            h.createUpdate(
+                    "DELETE FROM rel_identifiable_entities WHERE identifiable_uuid = :identifiableUuid")
+                .bind("identifiableUuid", identifiableUuid)
+                .execute());
+
+    if (entities != null) {
+      // we assume that the entities are already saved...
+      dbi.useHandle(
+          handle -> {
+            PreparedBatch preparedBatch =
+                handle.prepareBatch(
+                    "INSERT INTO rel_identifiable_entities(identifiable_uuid, entity_uuid, sortIndex) VALUES(:identifiableUuid, :entityUuid, :sortIndex)");
+            for (Entity entity : entities) {
+              preparedBatch
+                  .bind("identifiableUuid", identifiableUuid)
+                  .bind("entityUuid", entity.getUuid())
+                  .bind("sortIndex", getIndex(entities, entity))
+                  .add();
+            }
+            preparedBatch.execute();
+          });
+    }
+    return getRelatedEntities(identifiableUuid);
+  }
+
+  @Override
+  public List<FileResource> saveRelatedFileResources(
+      UUID identifiableUuid, List<FileResource> fileResources) {
+    if (fileResources == null) {
+      return null;
+    }
+    // as we store the whole list new: delete old entries
+    dbi.withHandle(
+        h ->
+            h.createUpdate(
+                    "DELETE FROM rel_identifiable_fileresources WHERE identifiable_uuid = :identifiableUuid")
+                .bind("identifiableUuid", identifiableUuid)
+                .execute());
+
+    dbi.useHandle(
+        handle -> {
+          PreparedBatch preparedBatch =
+              handle.prepareBatch(
+                  "INSERT INTO rel_entity_fileresources(identifiable_uuid, fileresource_uuid, sortIndex) VALUES(:identifiableUuid, :fileResourceUuid, :sortIndex)");
+          for (FileResource fileResource : fileResources) {
+            preparedBatch
+                .bind("identifiableUuid", identifiableUuid)
+                .bind("fileResourceUuid", fileResource.getUuid())
+                .bind("sortIndex", getIndex(fileResources, fileResource))
+                .add();
+          }
+          preparedBatch.execute();
+        });
+    return getRelatedFileResources(identifiableUuid);
   }
 
   @Override

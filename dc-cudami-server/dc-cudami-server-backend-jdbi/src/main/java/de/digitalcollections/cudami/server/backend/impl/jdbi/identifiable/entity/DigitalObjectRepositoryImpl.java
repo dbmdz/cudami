@@ -5,20 +5,17 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work.ItemRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
-import de.digitalcollections.model.api.filter.FilterCriterion;
-import de.digitalcollections.model.api.filter.FilterValuePlaceholder;
-import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.entity.Collection;
-import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.api.identifiable.entity.Project;
-import de.digitalcollections.model.api.identifiable.entity.work.Item;
-import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
-import de.digitalcollections.model.impl.identifiable.resource.FileResourceImpl;
-import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import de.digitalcollections.model.filter.FilterCriterion;
+import de.digitalcollections.model.filter.FilterValuePlaceholder;
+import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.identifiable.entity.Collection;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.Project;
+import de.digitalcollections.model.identifiable.entity.work.Item;
+import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.identifiable.resource.ImageFileResource;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -84,7 +81,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        DigitalObjectImpl.class,
+        DigitalObject.class,
         getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
@@ -149,7 +146,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     addFiltering(pageRequest, countQuery);
     long total = retrieveCount(countQuery, Map.of("uuid", digitalObjectUuid));
 
-    return new PageResponseImpl<>(result, pageRequest, total);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override
@@ -159,7 +156,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     final String fieldsSql = fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields();
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM "
+            "SELECT df.sortindex AS idx, * FROM "
                 + frTableName
                 + " AS "
                 + frTableAlias
@@ -167,12 +164,12 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                 + frTableAlias
                 + ".uuid = df.fileresource_uuid"
                 + " WHERE df.digitalobject_uuid = :uuid"
-                + " ORDER BY df.sortIndex ASC");
+                + " ORDER BY idx ASC");
     Map<String, Object> argumentMappings = Map.of("uuid", digitalObjectUuid);
 
     List<FileResource> fileResources =
         fileResourceMetadataRepositoryImpl.retrieveList(
-            fieldsSql, innerQuery, argumentMappings, null);
+            fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC");
 
     return fileResources;
   }
@@ -184,7 +181,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     final String fieldsSql = imageFileResourceRepositoryImpl.getSqlSelectAllFields();
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM "
+            "SELECT df.sortindex AS idx, * FROM "
                 + frTableName
                 + " AS "
                 + frTableAlias
@@ -192,11 +189,12 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                 + frTableAlias
                 + ".uuid = df.fileresource_uuid"
                 + " WHERE df.digitalobject_uuid = :uuid"
-                + " ORDER BY df.sortIndex ASC");
+                + " ORDER BY idx ASC");
     Map<String, Object> argumentMappings = Map.of("uuid", digitalObjectUuid);
 
     List<ImageFileResource> fileResources =
-        imageFileResourceRepositoryImpl.retrieveList(fieldsSql, innerQuery, argumentMappings, null);
+        imageFileResourceRepositoryImpl.retrieveList(
+            fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC");
 
     return fileResources;
   }
@@ -255,7 +253,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     addFiltering(pageRequest, countQuery);
     long total = retrieveCount(countQuery, Map.of("uuid", digitalObjectUuid));
 
-    return new PageResponseImpl<>(result, pageRequest, total);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override
@@ -286,7 +284,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       // first save fileresources
       for (FileResource fileResource : fileResources) {
         if (fileResource.getUuid() == null) {
-          fileResourceMetadataRepositoryImpl.save((FileResourceImpl) fileResource);
+          fileResourceMetadataRepositoryImpl.save(fileResource);
         }
       }
 

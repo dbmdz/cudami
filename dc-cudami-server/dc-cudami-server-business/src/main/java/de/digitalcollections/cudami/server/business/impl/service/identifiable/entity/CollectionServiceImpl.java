@@ -4,16 +4,15 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.N
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CollectionRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
-import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.entity.Collection;
-import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.api.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.SearchPageRequest;
-import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.api.view.BreadcrumbNavigation;
-import de.digitalcollections.model.impl.paging.PageRequestImpl;
+import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.identifiable.entity.Collection;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -34,8 +33,8 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public boolean addChildren(UUID parentUuid, List<Collection> children) {
-    return ((NodeRepository<Collection>) repository).addChildren(parentUuid, children);
+  public boolean addChildren(UUID parentUuid, List<UUID> childrenUuids) {
+    return ((NodeRepository<Collection>) repository).addChildren(parentUuid, childrenUuids);
   }
 
   @Override
@@ -76,7 +75,7 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   @Override
   public List<Collection> getActiveChildren(UUID uuid) {
     Filtering filtering = filteringForActive();
-    PageRequest pageRequest = new PageRequestImpl();
+    PageRequest pageRequest = new PageRequest();
     pageRequest.add(filtering);
     return getChildren(uuid, pageRequest).getContent();
   }
@@ -94,13 +93,13 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public List<Collection> getChildren(UUID uuid) {
-    return ((NodeRepository<Collection>) repository).getChildren(uuid);
+  public List<Collection> getChildren(UUID nodeUuid) {
+    return ((NodeRepository<Collection>) repository).getChildren(nodeUuid);
   }
 
   @Override
-  public PageResponse<Collection> getChildren(UUID uuid, PageRequest pageRequest) {
-    return ((NodeRepository<Collection>) repository).getChildren(uuid, pageRequest);
+  public PageResponse<Collection> getChildren(UUID nodeUuid, PageRequest pageRequest) {
+    return ((NodeRepository<Collection>) repository).getChildren(nodeUuid, pageRequest);
   }
 
   @Override

@@ -3,12 +3,10 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityRelationRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
-import de.digitalcollections.model.api.identifiable.entity.Entity;
-import de.digitalcollections.model.api.identifiable.entity.relation.EntityRelation;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.entity.relation.EntityRelationImpl;
-import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import de.digitalcollections.model.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -93,7 +91,7 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
               Entity subject = entityRepositoryImpl.findOne(UUID.fromString(subjectUuid));
               Entity object = entityRepositoryImpl.findOne(UUID.fromString(objectUuid));
 
-              return new EntityRelationImpl(subject, predicate, object);
+              return new EntityRelation(subject, predicate, object);
             });
     String countQuery = "SELECT count(*) FROM " + tableName + " AS " + tableAlias;
     if (!filterClauses.isEmpty()) {
@@ -101,7 +99,7 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
     }
     final String sqlCount = countQuery;
     long count = dbi.withHandle(h -> h.createQuery(sqlCount).mapTo(Long.class).findOne().get());
-    PageResponse<EntityRelation> pageResponse = new PageResponseImpl<>(result, pageRequest, count);
+    PageResponse<EntityRelation> pageResponse = new PageResponse<>(result, pageRequest, count);
     return pageResponse;
   }
 

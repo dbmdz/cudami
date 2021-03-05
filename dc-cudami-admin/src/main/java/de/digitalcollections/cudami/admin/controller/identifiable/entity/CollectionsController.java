@@ -3,25 +3,20 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiCollectionsClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.Node;
-import de.digitalcollections.model.api.identifiable.entity.Collection;
-import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.SearchPageRequest;
-import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.api.paging.enums.Direction;
-import de.digitalcollections.model.impl.identifiable.entity.CollectionImpl;
-import de.digitalcollections.model.impl.paging.OrderImpl;
-import de.digitalcollections.model.impl.paging.PageRequestImpl;
-import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
-import de.digitalcollections.model.impl.paging.SortingImpl;
-import java.util.ArrayList;
-import java.util.Collections;
+import de.digitalcollections.cudami.client.identifiable.entity.CudamiCollectionsClient;
+import de.digitalcollections.model.identifiable.entity.Collection;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.paging.Direction;
+import de.digitalcollections.model.paging.Order;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.view.BreadcrumbNavigation;
+import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -62,11 +57,6 @@ public class CollectionsController extends AbstractController {
     this.languageSortingHelper = languageSortingHelper;
     this.localeService = cudamiClient.forLocales();
     this.service = cudamiClient.forCollections();
-  }
-
-  @ModelAttribute("menu")
-  protected String module() {
-    return "collections";
   }
 
   @PostMapping("/api/collections/{uuid}/digitalobjects")
@@ -144,11 +134,11 @@ public class CollectionsController extends AbstractController {
 
   @GetMapping("/api/collections")
   @ResponseBody
-  public PageResponse<CollectionImpl> findAllTop(
+  public PageResponse<Collection> findAllTop(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws HttpException {
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     return service.findTopCollections(pageRequest);
   }
 
@@ -175,7 +165,7 @@ public class CollectionsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws HttpException {
-    return service.getDigitalObjects(uuid, new PageRequestImpl(pageNumber, pageSize));
+    return service.getDigitalObjects(uuid, new PageRequest(pageNumber, pageSize));
   }
 
   @GetMapping("/api/collections/{uuid}/subcollections")
@@ -185,7 +175,7 @@ public class CollectionsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws HttpException {
-    return service.getSubcollections(uuid, new PageRequestImpl(pageNumber, pageSize));
+    return service.getSubcollections(uuid, new PageRequest(pageNumber, pageSize));
   }
 
   @GetMapping("/collections")
@@ -195,6 +185,11 @@ public class CollectionsController extends AbstractController {
         "existingLanguages",
         languageSortingHelper.sortLanguages(displayLocale, service.getTopCollectionsLanguages()));
     return "collections/list";
+  }
+
+  @ModelAttribute("menu")
+  protected String module() {
+    return "collections";
   }
 
   @DeleteMapping("/api/collections/{collectionUuid}/digitalobjects/{digitalobjectUuid}")
@@ -241,7 +236,7 @@ public class CollectionsController extends AbstractController {
 
   @GetMapping({"/api/collections/search", "/api/subcollections/search"})
   @ResponseBody
-  public SearchPageResponse<CollectionImpl> search(
+  public SearchPageResponse<Collection> search(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortField", required = false) String sortField,
@@ -250,11 +245,11 @@ public class CollectionsController extends AbstractController {
       throws HttpException {
     Sorting sorting = null;
     if (sortField != null && sortDirection != null) {
-      OrderImpl order = new OrderImpl(sortDirection, sortField);
-      sorting = new SortingImpl(order);
+      Order order = new Order(sortDirection, sortField);
+      sorting = new Sorting(order);
     }
     SearchPageRequest pageRequest =
-        new SearchPageRequestImpl(searchTerm, pageNumber, pageSize, sorting);
+        new SearchPageRequest(searchTerm, pageNumber, pageSize, sorting);
     return service.find(pageRequest);
   }
 
@@ -269,7 +264,10 @@ public class CollectionsController extends AbstractController {
     }
   }
 
-  @GetMapping({"/collections/{uuid}", "/subcollections/{uuid}"})
+  @GetMapping({
+    "/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+    "/subcollections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+  })
   public String view(
       @PathVariable UUID uuid, @PageableDefault(size = 25) Pageable pageable, Model model)
       throws HttpException {
@@ -288,26 +286,21 @@ public class CollectionsController extends AbstractController {
         languageSortingHelper.sortLanguages(displayLocale, existingSubcollectionLanguages));
     model.addAttribute("collection", collection);
 
-    List<CollectionImpl> parents = service.getParents(uuid);
+    List<Collection> parents = service.getParents(uuid);
     model.addAttribute("parents", parents);
 
-    List<Node> breadcrumbs = new ArrayList<>();
-    addParentNodeToBreadcrumb(collection, breadcrumbs);
-    Collections.reverse(breadcrumbs);
-
-    //    BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
-    //    List<Node> breadcrumbs = breadcrumbNavigation.getNavigationItems();
+    BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
+    List<BreadcrumbNode> breadcrumbs = breadcrumbNavigation.getNavigationItems();
     model.addAttribute("breadcrumbs", breadcrumbs);
 
     return "collections/view";
   }
 
-  private void addParentNodeToBreadcrumb(Node currentNode, List<Node> breadcrumbs)
+  @GetMapping({"/collections/{refId:[0-9]+}", "/subcollections/{refId:[0-9]+}"})
+  public String viewByRefId(
+      @PathVariable long refId, @PageableDefault(size = 25) Pageable pageable, Model model)
       throws HttpException {
-    Node parent = service.getParent(currentNode.getUuid());
-    if (parent != null && parent.getUuid() != null) {
-      breadcrumbs.add(parent);
-      addParentNodeToBreadcrumb(parent, breadcrumbs);
-    }
+    Collection collection = service.findOneByRefId(refId);
+    return view(collection.getUuid(), pageable, model);
   }
 }

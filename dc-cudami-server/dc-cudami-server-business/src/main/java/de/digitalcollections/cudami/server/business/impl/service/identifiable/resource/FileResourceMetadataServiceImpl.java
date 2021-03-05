@@ -11,15 +11,15 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.res
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.TextFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.VideoFileResourceService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
-import de.digitalcollections.model.api.identifiable.resource.ApplicationFileResource;
-import de.digitalcollections.model.api.identifiable.resource.AudioFileResource;
-import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.api.identifiable.resource.ImageFileResource;
-import de.digitalcollections.model.api.identifiable.resource.LinkedDataFileResource;
-import de.digitalcollections.model.api.identifiable.resource.MimeType;
-import de.digitalcollections.model.api.identifiable.resource.TextFileResource;
-import de.digitalcollections.model.api.identifiable.resource.VideoFileResource;
-import de.digitalcollections.model.impl.identifiable.parts.LocalizedTextImpl;
+import de.digitalcollections.model.file.MimeType;
+import de.digitalcollections.model.identifiable.resource.ApplicationFileResource;
+import de.digitalcollections.model.identifiable.resource.AudioFileResource;
+import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.identifiable.resource.ImageFileResource;
+import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
+import de.digitalcollections.model.identifiable.resource.TextFileResource;
+import de.digitalcollections.model.identifiable.resource.VideoFileResource;
+import de.digitalcollections.model.text.LocalizedText;
 import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -39,10 +39,9 @@ public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<Fil
   private final AudioFileResourceService audioFileResourceService;
   private final ImageFileResourceService imageFileResourceService;
   private final LinkedDataFileResourceService linkedDataFileResourceService;
+  private final LocaleService localeService;
   private final TextFileResourceService textFileResourceService;
   private final VideoFileResourceService videoFileResourceService;
-
-  private final LocaleService localeService;
 
   @Autowired
   public FileResourceMetadataServiceImpl(
@@ -110,7 +109,7 @@ public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<Fil
     if (fileResource.getLabel() == null && fileResource.getFilename() != null) {
       // set a default label = filename (an empty label violates constraint)
       fileResource.setLabel(
-          new LocalizedTextImpl(
+          new LocalizedText(
               new Locale(localeService.getDefaultLanguage()), fileResource.getFilename()));
     }
     if (fileResource instanceof ApplicationFileResource) {

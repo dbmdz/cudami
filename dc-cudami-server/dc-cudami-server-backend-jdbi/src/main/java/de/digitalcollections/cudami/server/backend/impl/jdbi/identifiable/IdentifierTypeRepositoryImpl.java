@@ -2,11 +2,9 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierTypeRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
-import de.digitalcollections.model.api.identifiable.IdentifierType;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.IdentifierTypeImpl;
-import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import de.digitalcollections.model.identifiable.IdentifierType;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -52,7 +50,7 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
         dbi.withHandle(
             h ->
                 h.createQuery(sql)
-                    .mapToBean(IdentifierTypeImpl.class)
+                    .mapToBean(IdentifierType.class)
                     .map(IdentifierType.class::cast)
                     .list());
 
@@ -61,7 +59,7 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
     long total =
         dbi.withHandle(h -> h.createQuery(sqlCount.toString()).mapTo(Long.class).findOne().get());
 
-    return new PageResponseImpl<>(result, pageRequest, total);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override
@@ -73,7 +71,7 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
             h ->
                 h.createQuery(sql)
                     .bind("uuid", uuid)
-                    .mapToBean(IdentifierTypeImpl.class)
+                    .mapToBean(IdentifierType.class)
                     .findOne()
                     .orElse(null));
 
@@ -89,7 +87,7 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
             h ->
                 h.createQuery(sql)
                     .bind("namespace", namespace)
-                    .mapToBean(IdentifierTypeImpl.class)
+                    .mapToBean(IdentifierType.class)
                     .findOne()
                     .orElse(null));
 
@@ -134,7 +132,7 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
             h ->
                 h.createQuery(sql)
                     .bindBean(identifierType)
-                    .mapToBean(IdentifierTypeImpl.class)
+                    .mapToBean(IdentifierType.class)
                     .findOne()
                     .orElse(null));
     return result;
@@ -153,7 +151,7 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
             h ->
                 h.createQuery(sql)
                     .bindBean(identifierType)
-                    .mapToBean(IdentifierTypeImpl.class)
+                    .mapToBean(IdentifierType.class)
                     .findOne()
                     .orElse(null));
     return result;

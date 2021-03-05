@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.digitalcollections.model.api.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import java.net.URI;
 import org.junit.jupiter.api.Test;

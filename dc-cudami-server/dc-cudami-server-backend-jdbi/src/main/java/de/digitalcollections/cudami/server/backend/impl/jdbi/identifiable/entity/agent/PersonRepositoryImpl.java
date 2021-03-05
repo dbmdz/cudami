@@ -7,20 +7,15 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.agent.
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work.WorkRepositoryImpl;
-import de.digitalcollections.model.api.identifiable.agent.FamilyName;
-import de.digitalcollections.model.api.identifiable.agent.GivenName;
-import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.api.identifiable.entity.agent.Person;
-import de.digitalcollections.model.api.identifiable.entity.geo.GeoLocation;
-import de.digitalcollections.model.api.identifiable.entity.geo.enums.GeoLocationType;
-import de.digitalcollections.model.api.identifiable.entity.work.Work;
-import de.digitalcollections.model.api.identifiable.parts.LocalizedText;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.agent.FamilyNameImpl;
-import de.digitalcollections.model.impl.identifiable.agent.GivenNameImpl;
-import de.digitalcollections.model.impl.identifiable.entity.agent.PersonImpl;
-import de.digitalcollections.model.impl.identifiable.entity.geo.GeoLocationImpl;
+import de.digitalcollections.model.identifiable.agent.FamilyName;
+import de.digitalcollections.model.identifiable.agent.GivenName;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.agent.Person;
+import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
+import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocationType;
+import de.digitalcollections.model.identifiable.entity.work.Work;
+import de.digitalcollections.model.text.LocalizedText;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -63,11 +58,13 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
 
       if (rowView.getColumn("glbirth_uuid", UUID.class) != null) {
         UUID glBirthUuid = rowView.getColumn("glbirth_uuid", UUID.class);
+        Long glRefId = rowView.getColumn("glbirth_refid", Long.class);
         LocalizedText label = rowView.getColumn("glbirth_label", LocalizedText.class);
         GeoLocationType geoLocationType =
             rowView.getColumn("glbirth_geoLocationType", GeoLocationType.class);
-        final GeoLocation placeOfBirth = new GeoLocationImpl();
+        final GeoLocation placeOfBirth = new GeoLocation();
         placeOfBirth.setUuid(glBirthUuid);
+        placeOfBirth.setRefId(glRefId);
         placeOfBirth.setLabel(label);
         placeOfBirth.setGeoLocationType(geoLocationType);
         person.setPlaceOfBirth(placeOfBirth);
@@ -75,11 +72,13 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
 
       if (rowView.getColumn("gldeath_uuid", UUID.class) != null) {
         UUID glDeathUuid = rowView.getColumn("gldeath_uuid", UUID.class);
+        Long glRefId = rowView.getColumn("gldeath_refid", Long.class);
         LocalizedText label = rowView.getColumn("gldeath_label", LocalizedText.class);
         GeoLocationType geoLocationType =
             rowView.getColumn("gldeath_geoLocationType", GeoLocationType.class);
-        final GeoLocation placeOfDeath = new GeoLocationImpl();
+        final GeoLocation placeOfDeath = new GeoLocation();
         placeOfDeath.setUuid(glDeathUuid);
+        placeOfDeath.setRefId(glRefId);
         placeOfDeath.setLabel(label);
         placeOfDeath.setGeoLocationType(geoLocationType);
         person.setPlaceOfDeath(placeOfDeath);
@@ -88,11 +87,11 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
       try {
         if (rowView.getColumn(FamilyNameRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
             != null) {
-          person.getFamilyNames().add(rowView.getRow(FamilyNameImpl.class));
+          person.getFamilyNames().add(rowView.getRow(FamilyName.class));
         }
         if (rowView.getColumn(GivenNameRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
             != null) {
-          person.getGivenNames().add(rowView.getRow(GivenNameImpl.class));
+          person.getGivenNames().add(rowView.getRow(GivenName.class));
         }
       } catch (Exception e) {
         // TODO to avoid this, some boolean params has to be given to function, if fields should
@@ -119,8 +118,8 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
     final String givenNameMappingPrefix = GivenNameRepositoryImpl.MAPPING_PREFIX;
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
-        + "glbirth.uuid glbirth_uuid, glbirth.label glbirth_label, glbirth.geolocation_type glbirth_geoLocationType, "
-        + "gldeath.uuid gldeath_uuid, gldeath.label gldeath_label, gldeath.geolocation_type gldeath_geoLocationType, "
+        + "glbirth.uuid glbirth_uuid, glbirth.refId glbirth_refid, glbirth.label glbirth_label, glbirth.geolocation_type glbirth_geoLocationType, "
+        + "gldeath.uuid gldeath_uuid, gldeath.refId gldeath_refid, gldeath.label gldeath_label, gldeath.geolocation_type gldeath_geoLocationType, "
         + "fn.uuid "
         + familyNameMappingPrefix
         + "_uuid, "
@@ -184,7 +183,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        PersonImpl.class,
+        Person.class,
         getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
@@ -193,8 +192,8 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         SQL_FULL_FIELDS_JOINS,
         createAdditionalReduceRowsBiFunction());
     // TODO Shoud be registered in their repos. test it
-    //    dbi.registerRowMapper(BeanMapper.factory(FamilyNameImpl.class, "fn"));
-    //    dbi.registerRowMapper(BeanMapper.factory(GivenNameImpl.class, "gn"));
+    //    dbi.registerRowMapper(BeanMapper.factory(FamilyName.class, "fn"));
+    //    dbi.registerRowMapper(BeanMapper.factory(GivenName.class, "gn"));
 
     this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
     this.familyNameRepositoryImpl = familyNameRepositoryImpl;
@@ -203,13 +202,31 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
   }
 
   @Override
-  public PageResponse<Person> findByLocationOfBirth(PageRequest pageRequest, UUID uuidGeoLocation) {
-    throw new UnsupportedOperationException("Not supported yet.");
-  }
-
-  @Override
-  public PageResponse<Person> findByLocationOfDeath(PageRequest pageRequest, UUID uuidGeoLocation) {
-    throw new UnsupportedOperationException("Not supported yet.");
+  protected String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    if (super.getColumnName(modelProperty) != null) {
+      return super.getColumnName(modelProperty);
+    }
+    switch (modelProperty) {
+      case "dateOfBirth":
+        return tableAlias + ".dateofbirth";
+      case "dateOfDeath":
+        return tableAlias + ".dateofdeath";
+      case "gender":
+        return tableAlias + ".gender";
+      case "placeOfBirth":
+        return tableAlias + ".locationofbirth";
+      case "placeOfDeath":
+        return tableAlias + ".locationofdeath";
+      case "timeValueOfBirth":
+        return tableAlias + ".timevalueofbirth";
+      case "timeValueOfDeath":
+        return tableAlias + ".timevalueofdeath";
+      default:
+        return null;
+    }
   }
 
   @Override
@@ -274,7 +291,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
      */
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM "
+            "SELECT wc.sortindex AS idx, * FROM "
                 + wTableName
                 + " AS "
                 + wTableAlias
@@ -282,14 +299,14 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
                 + wTableAlias
                 + ".uuid = wc.work_uuid"
                 + " WHERE wc.agent_uuid = :uuid"
-                + " ORDER BY wc.sortIndex ASC");
+                + " ORDER BY idx ASC");
 
     List<Work> list =
         workRepositoryImpl.retrieveList(
             workRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             Map.of("uuid", uuidPerson),
-            null);
+            "ORDER BY idx ASC");
 
     return list.stream().collect(Collectors.toSet());
   }
@@ -300,8 +317,9 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         person.getPlaceOfBirth() == null ? null : person.getPlaceOfBirth().getUuid();
     final UUID locationOfDeathUuid =
         person.getPlaceOfDeath() == null ? null : person.getPlaceOfDeath().getUuid();
-    Map<String, Object> bindings =
-        Map.of("locationOfBirth", locationOfBirthUuid, "locationOfDeath", locationOfDeathUuid);
+    Map<String, Object> bindings = new HashMap<>();
+    bindings.put("locationOfBirth", locationOfBirthUuid);
+    bindings.put("locationOfDeath", locationOfDeathUuid);
     super.save(person, bindings);
 
     // save given names
@@ -364,8 +382,9 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         person.getPlaceOfBirth() == null ? null : person.getPlaceOfBirth().getUuid();
     final UUID locationOfDeathUuid =
         person.getPlaceOfDeath() == null ? null : person.getPlaceOfDeath().getUuid();
-    Map<String, Object> bindings =
-        Map.of("locationOfBirth", locationOfBirthUuid, "locationOfDeath", locationOfDeathUuid);
+    Map<String, Object> bindings = new HashMap<>();
+    bindings.put("locationOfBirth", locationOfBirthUuid);
+    bindings.put("locationOfDeath", locationOfDeathUuid);
     super.update(person, bindings);
 
     // save given names

@@ -2,12 +2,10 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.security;
 
 import de.digitalcollections.cudami.server.backend.api.repository.security.UserRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.security.User;
-import de.digitalcollections.model.api.security.enums.Role;
-import de.digitalcollections.model.impl.paging.PageResponseImpl;
-import de.digitalcollections.model.impl.security.UserImpl;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.security.Role;
+import de.digitalcollections.model.security.User;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -29,7 +27,7 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
 
   @Override
   public User create() {
-    return new UserImpl();
+    return new User();
   }
 
   @Override
@@ -40,12 +38,9 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
     List<User> result =
         dbi.withHandle(
             h ->
-                h.createQuery(query.toString())
-                    .mapToBean(UserImpl.class)
-                    .map(User.class::cast)
-                    .list());
+                h.createQuery(query.toString()).mapToBean(User.class).map(User.class::cast).list());
     long total = count();
-    PageResponse<User> pageResponse = new PageResponseImpl<>(result, pageRequest, total);
+    PageResponse<User> pageResponse = new PageResponse<>(result, pageRequest, total);
     return pageResponse;
   }
 
@@ -54,7 +49,7 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
     return dbi.withHandle(
         h ->
             h.createQuery("SELECT * FROM users WHERE '" + Role.ADMIN.name() + "' = any(roles)")
-                .mapToBean(UserImpl.class)
+                .mapToBean(User.class)
                 .map(User.class::cast)
                 .list());
   }
@@ -66,7 +61,7 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
             h ->
                 h.createQuery("SELECT * FROM users WHERE email = :email")
                     .bind("email", email)
-                    .mapToBean(UserImpl.class)
+                    .mapToBean(User.class)
                     .map(User.class::cast)
                     .list());
     if (users.isEmpty()) {
@@ -82,7 +77,7 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
             h ->
                 h.createQuery("SELECT * FROM users WHERE uuid = :uuid")
                     .bind("uuid", uuid)
-                    .mapToBean(UserImpl.class)
+                    .mapToBean(User.class)
                     .map(User.class::cast)
                     .list());
     if (users.isEmpty()) {
@@ -116,23 +111,23 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
   @Override
   public User save(User user) {
     user.setUuid(UUID.randomUUID());
-    //    UserImpl result = dbi.withHandle(h -> h.createQuery(
+    //    User result = dbi.withHandle(h -> h.createQuery(
     //            "INSERT INTO users(email, enabled, firstname, lastname, passwordHash, roles)
     // VALUES (:email, :enabled, :firstname, :lastname, :passwordHash, :roles) RETURNING *")
     //            .bindBean(user)
     //            .bind("roles", user.getRoles().stream().map(Role::name).toArray(String[]::new))
-    //            .mapToBean(UserImpl.class)
+    //            .mapToBean(User.class)
     //            .findOne().orElse(null));
     //    return (S) result;
 
-    UserImpl result =
+    User result =
         dbi.withHandle(
             h ->
                 h.registerArrayType(Role.class, "varchar")
                     .createQuery(
                         "INSERT INTO users(email, enabled, firstname, lastname, passwordHash, roles, uuid) VALUES (:email, :enabled, :firstname, :lastname, :passwordHash, :roles, :uuid) RETURNING *")
                     .bindBean(user)
-                    .mapToBean(UserImpl.class)
+                    .mapToBean(User.class)
                     .findOne()
                     .orElse(null));
     return result;
@@ -147,7 +142,7 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
                     .createQuery(
                         "UPDATE users SET email=:email, enabled=:enabled, firstname=:firstname, lastname=:lastname, passwordHash=:passwordHash, roles=:roles, uuid=:uuid WHERE uuid=:uuid RETURNING *")
                     .bindBean(user)
-                    .mapToBean(UserImpl.class)
+                    .mapToBean(User.class)
                     .map(User.class::cast)
                     .findOne()
                     .orElse(null));

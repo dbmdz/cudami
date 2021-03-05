@@ -1,17 +1,21 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
-import de.digitalcollections.commons.springdata.domain.PageConverter;
-import de.digitalcollections.commons.springdata.domain.PageWrapper;
-import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
+import de.digitalcollections.cudami.admin.paging.PageConverter;
+import de.digitalcollections.cudami.admin.paging.PageWrapper;
+import de.digitalcollections.cudami.admin.paging.PageableConverter;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
-import de.digitalcollections.cudami.client.CudamiTopicsClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.entity.Topic;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
+import de.digitalcollections.cudami.client.identifiable.entity.CudamiTopicsClient;
+import de.digitalcollections.model.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.entity.Topic;
+import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.view.BreadcrumbNavigation;
+import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -58,8 +62,14 @@ public class TopicsController extends AbstractController {
   }
 
   @GetMapping("/topics/new")
-  public String create(Model model) throws Exception {
+  public String create(
+      Model model,
+      @RequestParam(name = "parentType", required = false) String parentType,
+      @RequestParam(name = "parentUuid", required = false) String parentUuid)
+      throws Exception {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("parentType", parentType);
+    model.addAttribute("parentUuid", parentUuid);
     return "topics/create";
   }
 
@@ -101,16 +111,28 @@ public class TopicsController extends AbstractController {
   public String list(Model model, @PageableDefault(size = 25) Pageable pageable)
       throws HttpException {
     final PageRequest pageRequest = PageableConverter.convert(pageable);
-    final PageResponse pageResponse = service.find(pageRequest);
+    final PageResponse pageResponse = service.findTopTopics(pageRequest);
     Page page = PageConverter.convert(pageResponse, pageRequest);
     model.addAttribute("page", new PageWrapper(page, "/topics"));
+
+    final Locale displayLocale = LocaleContextHolder.getLocale();
+    model.addAttribute(
+        "existingLanguages",
+        languageSortingHelper.sortLanguages(displayLocale, service.getTopTopicsLanguages()));
     return "topics/list";
   }
 
   @PostMapping("/api/topics/new")
-  public ResponseEntity save(@RequestBody Topic topic) {
+  public ResponseEntity save(
+      @RequestBody Topic topic,
+      @RequestParam(name = "parentUuid", required = false) UUID parentUuid) {
     try {
-      Topic topicDb = service.save(topic);
+      Topic topicDb = null;
+      if (parentUuid == null) {
+        topicDb = service.save(topic);
+      } else {
+        topicDb = service.saveWithParentTopic(topic, parentUuid);
+      }
       return ResponseEntity.status(HttpStatus.CREATED).body(topicDb);
     } catch (HttpException e) {
       LOGGER.error("Cannot save topic: ", e);
@@ -129,15 +151,35 @@ public class TopicsController extends AbstractController {
     }
   }
 
-  @GetMapping("/topics/{uuid}")
+  @GetMapping({"/topics/{refId:[0-9]+}", "/subtopics/{refId:[0-9]+}"})
+  public String viewByRefId(@PathVariable long refId, Model model) throws HttpException {
+    Topic topic = service.findOneByRefId(refId);
+    return view(topic.getUuid(), model);
+  }
+
+  @GetMapping({
+    "/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+    "/subtopics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+  })
   public String view(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Topic topic = (Topic) service.findOne(uuid);
+    Topic topic = service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, topic.getLabel().getLocales());
 
     model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("topic", topic);
+
+    List<FileResource> relatedFileResources = service.getFileResources(uuid);
+    model.addAttribute("relatedFileResources", relatedFileResources);
+
+    List<Entity> relatedEntities = service.getAllEntities(uuid);
+    model.addAttribute("relatedEntities", relatedEntities);
+
+    BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
+
+    List<BreadcrumbNode> breadcrumbs = breadcrumbNavigation.getNavigationItems();
+    model.addAttribute("breadcrumbs", breadcrumbs);
 
     return "topics/view";
   }

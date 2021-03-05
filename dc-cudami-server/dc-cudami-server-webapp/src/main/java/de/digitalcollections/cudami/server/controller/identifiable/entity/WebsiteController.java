@@ -2,15 +2,12 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
-import de.digitalcollections.model.api.identifiable.entity.Website;
-import de.digitalcollections.model.api.identifiable.entity.parts.Webpage;
-import de.digitalcollections.model.api.paging.Order;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl;
-import de.digitalcollections.model.impl.paging.PageRequestImpl;
-import de.digitalcollections.model.impl.paging.SortingImpl;
+import de.digitalcollections.model.identifiable.entity.Website;
+import de.digitalcollections.model.identifiable.web.Webpage;
+import de.digitalcollections.model.paging.Order;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.Sorting;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -56,9 +53,9 @@ public class WebsiteController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new SortingImpl(sortBy);
+      Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
     return service.find(pageRequest);
@@ -70,7 +67,7 @@ public class WebsiteController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Website findById(@PathVariable UUID uuid) {
-    return (Website) service.get(uuid);
+    return service.get(uuid);
   }
 
   @ApiMethod(description = "Get languages of all websites")
@@ -97,9 +94,9 @@ public class WebsiteController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
       throws IdentifiableServiceException {
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new SortingImpl(sortBy);
+      Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
     return service.getRootPages(uuid, pageRequest);
@@ -112,7 +109,7 @@ public class WebsiteController {
   @ApiResponseObject
   public Website save(@RequestBody Website website, BindingResult errors)
       throws IdentifiableServiceException {
-    return (Website) service.save(website);
+    return service.save(website);
   }
 
   @ApiMethod(description = "Update a website")
@@ -123,7 +120,7 @@ public class WebsiteController {
   public Website update(@PathVariable UUID uuid, @RequestBody Website website, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, website.getUuid());
-    return (Website) service.update(website);
+    return service.update(website);
   }
 
   @ApiMethod(description = "Update the order of a website's rootpages")
@@ -134,7 +131,7 @@ public class WebsiteController {
   public ResponseEntity updateRootPagesOrder(
       @ApiPathParam(description = "UUID of the website") @PathVariable("uuid") UUID uuid,
       @ApiPathParam(description = "List of the rootpages") @RequestBody List<Webpage> rootPages) {
-    Website website = new WebsiteImpl();
+    Website website = new Website();
     website.setUuid(uuid);
 
     boolean successful = service.updateRootPagesOrder(website, rootPages);

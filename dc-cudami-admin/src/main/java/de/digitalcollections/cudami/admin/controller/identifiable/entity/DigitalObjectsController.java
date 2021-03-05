@@ -1,26 +1,22 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
-import de.digitalcollections.commons.springdata.domain.PageConverter;
-import de.digitalcollections.commons.springdata.domain.PageWrapper;
-import de.digitalcollections.commons.springdata.domain.PageableConverter;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
+import de.digitalcollections.cudami.admin.paging.PageConverter;
+import de.digitalcollections.cudami.admin.paging.PageWrapper;
+import de.digitalcollections.cudami.admin.paging.PageableConverter;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiDigitalObjectsClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.identifiable.entity.Collection;
-import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.api.identifiable.entity.Project;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.SearchPageRequest;
-import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.api.paging.enums.Direction;
-import de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl;
-import de.digitalcollections.model.impl.paging.OrderImpl;
-import de.digitalcollections.model.impl.paging.PageRequestImpl;
-import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
-import de.digitalcollections.model.impl.paging.SortingImpl;
+import de.digitalcollections.cudami.client.identifiable.entity.CudamiDigitalObjectsClient;
+import de.digitalcollections.model.identifiable.entity.Collection;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.Project;
+import de.digitalcollections.model.paging.Direction;
+import de.digitalcollections.model.paging.Order;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.paging.Sorting;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +66,7 @@ public class DigitalObjectsController extends AbstractController {
 
   @GetMapping("/api/digitalobjects/search")
   @ResponseBody
-  public SearchPageResponse<DigitalObjectImpl> search(
+  public SearchPageResponse<DigitalObject> search(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortField", required = false) String sortField,
@@ -79,11 +75,11 @@ public class DigitalObjectsController extends AbstractController {
       throws HttpException {
     Sorting sorting = null;
     if (sortField != null && sortDirection != null) {
-      OrderImpl order = new OrderImpl(sortDirection, sortField);
-      sorting = new SortingImpl(order);
+      Order order = new Order(sortDirection, sortField);
+      sorting = new Sorting(order);
     }
     SearchPageRequest pageRequest =
-        new SearchPageRequestImpl(searchTerm, pageNumber, pageSize, sorting);
+        new SearchPageRequest(searchTerm, pageNumber, pageSize, sorting);
     return service.find(pageRequest);
   }
 
@@ -93,12 +89,12 @@ public class DigitalObjectsController extends AbstractController {
     model.addAttribute("digitalObject", digitalObject);
 
     final PageResponse<Collection> pageResponseCollections =
-        service.getCollections(uuid, new PageRequestImpl(0, 100));
+        service.getCollections(uuid, new PageRequest(0, 100));
     List<Collection> collections = pageResponseCollections.getContent();
     model.addAttribute("collections", collections);
 
     final PageResponse<Project> pageResponseProjects =
-        service.getProjects(uuid, new PageRequestImpl(0, 100));
+        service.getProjects(uuid, new PageRequest(0, 100));
     List<Project> projects = pageResponseProjects.getContent();
     model.addAttribute("projects", projects);
 

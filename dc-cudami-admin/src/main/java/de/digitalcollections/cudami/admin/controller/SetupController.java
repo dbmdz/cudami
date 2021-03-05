@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.admin.controller;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
-import de.digitalcollections.model.impl.security.UserImpl;
+import de.digitalcollections.model.security.User;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -50,7 +50,7 @@ public class SetupController extends AbstractController {
   public String adminUser(
       @RequestParam("pwd1") String password1,
       @RequestParam("pwd2") String password2,
-      @ModelAttribute(name = "user") @Valid UserImpl user,
+      @ModelAttribute(name = "user") @Valid User user,
       BindingResult results,
       Model model,
       SessionStatus status,

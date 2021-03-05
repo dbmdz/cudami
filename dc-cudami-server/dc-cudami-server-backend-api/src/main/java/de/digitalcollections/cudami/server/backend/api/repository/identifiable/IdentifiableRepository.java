@@ -1,19 +1,37 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable;
 
-import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.Identifiable;
-import de.digitalcollections.model.api.identifiable.Identifier;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.SearchPageRequest;
-import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.impl.identifiable.IdentifierImpl;
-import de.digitalcollections.model.impl.paging.SearchPageRequestImpl;
+import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 public interface IdentifiableRepository<I extends Identifiable> {
+
+  default void addRelatedEntity(I identifiable, Entity entity) {
+    if (identifiable == null || entity == null) {
+      return;
+    }
+    addRelatedEntity(identifiable.getUuid(), entity.getUuid());
+  }
+
+  void addRelatedEntity(UUID identifiableUuid, UUID entityUuid);
+
+  default void addRelatedFileresource(I identifiable, FileResource fileResource) {
+    if (identifiable == null || fileResource == null) {
+      return;
+    }
+    addRelatedFileresource(identifiable.getUuid(), fileResource.getUuid());
+  }
+
+  void addRelatedFileresource(UUID identifiableUuid, UUID fileResourceUuid);
 
   long count();
 
@@ -30,7 +48,7 @@ public interface IdentifiableRepository<I extends Identifiable> {
   SearchPageResponse<I> find(SearchPageRequest searchPageRequest);
 
   default List<I> find(String searchTerm, int maxResults) {
-    SearchPageRequestImpl request = new SearchPageRequestImpl(searchTerm, 0, maxResults, null);
+    SearchPageRequest request = new SearchPageRequest(searchTerm, 0, maxResults, null);
     SearchPageResponse<I> response = find(request);
     return response.getContent();
   }
@@ -61,14 +79,68 @@ public interface IdentifiableRepository<I extends Identifiable> {
   I findOne(UUID uuid, Filtering filtering);
 
   default I findOneByIdentifier(String namespace, String id) {
-    return findOne(new IdentifierImpl(null, namespace, id));
+    return findOne(new Identifier(null, namespace, id));
   }
+
+  default List<Entity> getRelatedEntities(I identifiable) {
+    if (identifiable == null) {
+      return null;
+    }
+    return getRelatedEntities(identifiable.getUuid());
+  }
+
+  List<Entity> getRelatedEntities(UUID identifiableUuid);
+
+  default List<FileResource> getRelatedFileResources(I identifiable) {
+    if (identifiable == null) {
+      return null;
+    }
+    return getRelatedFileResources(identifiable.getUuid());
+  }
+
+  List<FileResource> getRelatedFileResources(UUID identifiableUuid);
 
   default I save(I identifiable) {
     return save(identifiable, null);
   }
 
   I save(I identifiable, Map<String, Object> bindings);
+
+  /**
+   * Save list of entities related to an identifiable.Prerequisite: entities have been saved before
+   * (exist already)
+   *
+   * @param identifiable identifiable the entities are related to
+   * @param entities the entities that are related to the identifiable
+   * @return the list of the related entities
+   */
+  default List<Entity> saveRelatedEntities(I identifiable, List<Entity> entities) {
+    if (identifiable == null || entities == null) {
+      return null;
+    }
+    return saveRelatedEntities(identifiable.getUuid(), entities);
+  }
+
+  List<Entity> saveRelatedEntities(UUID identifiableUuid, List<Entity> entities);
+
+  /**
+   * Save list of file resources related to an entity. Prerequisite: file resources have been saved
+   * before (exist already)
+   *
+   * @param identifiable identifiable the file resources are related to
+   * @param fileResources the file resources that are related to the identifiable
+   * @return the list of the related file resources
+   */
+  default List<FileResource> saveRelatedFileResources(
+      I identifiable, List<FileResource> fileResources) {
+    if (identifiable == null || fileResources == null) {
+      return null;
+    }
+    return saveRelatedFileResources(identifiable.getUuid(), fileResources);
+  }
+
+  List<FileResource> saveRelatedFileResources(
+      UUID identifiableUuid, List<FileResource> fileResources);
 
   default I update(I identifiable) {
     return update(identifiable, null);

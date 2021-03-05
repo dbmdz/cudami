@@ -2,12 +2,10 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ProjectRepository;
-import de.digitalcollections.model.api.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.api.identifiable.entity.Project;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.impl.identifiable.entity.ProjectImpl;
-import de.digitalcollections.model.impl.paging.PageResponseImpl;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.Project;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -75,7 +73,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        ProjectImpl.class,
+        Project.class,
         getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
@@ -127,10 +125,10 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
             + ".uuid = pd.digitalobject_uuid"
             + " WHERE pd.project_uuid = :uuid";
 
-    StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
+    StringBuilder innerQuery = new StringBuilder("SELECT pd.sortindex AS idx, *" + commonSql);
     addFiltering(pageRequest, innerQuery);
     pageRequest.setSorting(null);
-    innerQuery.append(" ORDER BY pd.sortIndex ASC");
+    innerQuery.append(" ORDER BY idx ASC");
     addPageRequestParams(pageRequest, innerQuery);
 
     List<DigitalObject> result =
@@ -138,13 +136,13 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
             digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             Map.of("uuid", projectUuid),
-            null);
+            "ORDER BY idx ASC");
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
     long total = retrieveCount(countQuery, Map.of("uuid", projectUuid));
 
-    return new PageResponseImpl<>(result, pageRequest, total);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override

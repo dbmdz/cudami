@@ -5,19 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import de.digitalcollections.cudami.client.exceptions.CudamiRestErrorDecoder;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.api.filter.FilterCriterion;
-import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.paging.Order;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.paging.SearchPageRequest;
-import de.digitalcollections.model.api.paging.SearchPageResponse;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.api.paging.enums.Direction;
-import de.digitalcollections.model.api.paging.enums.NullHandling;
-import de.digitalcollections.model.impl.paging.OrderImpl;
-import de.digitalcollections.model.impl.paging.PageRequestImpl;
-import de.digitalcollections.model.impl.paging.SortingImpl;
+import de.digitalcollections.model.filter.FilterCriterion;
+import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.paging.Direction;
+import de.digitalcollections.model.paging.NullHandling;
+import de.digitalcollections.model.paging.Order;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.paging.Sorting;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -271,6 +268,26 @@ public class CudamiBaseClient<T extends Object> {
     }
   }
 
+  protected PageResponse doGetRequestForPagedObjectList(
+      String requestUrl, PageRequest pageRequest, Class<?> targetType) throws HttpException {
+    return doGetRequestForPagedObjectList(requestUrl, pageRequest);
+  }
+
+  protected String doGetRequestForString(String requestUrl) throws HttpException {
+    HttpRequest req = createGetRequest(requestUrl);
+    try {
+      HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
+      Integer statusCode = response.statusCode();
+      if (statusCode >= 400) {
+        throw CudamiRestErrorDecoder.decode("GET " + requestUrl, statusCode);
+      }
+      final String body = response.body();
+      return body;
+    } catch (IOException | InterruptedException e) {
+      throw new HttpException("Failed to retrieve response due to connection error", e);
+    }
+  }
+
   protected SearchPageResponse<T> doGetSearchRequestForPagedObjectList(
       String requestUrl, SearchPageRequest searchPageRequest) throws HttpException {
     if (!requestUrl.contains("?")) {
@@ -282,6 +299,10 @@ public class CudamiBaseClient<T extends Object> {
     }
     String findParams = getFindParamsAsString(searchPageRequest);
     requestUrl = requestUrl + findParams;
+    Filtering filtering = searchPageRequest.getFiltering();
+    if (filtering != null) {
+      requestUrl += "&" + getFilterParamsAsString(filtering.getFilterCriteria());
+    }
     String searchTerm = searchPageRequest.getQuery();
     if (searchTerm != null) {
       requestUrl =
@@ -302,51 +323,6 @@ public class CudamiBaseClient<T extends Object> {
       SearchPageResponse<T> result = mapper.readerFor(SearchPageResponse.class).readValue(body);
       result.setQuery(searchTerm);
       return result;
-    } catch (IOException | InterruptedException e) {
-      throw new HttpException("Failed to retrieve response due to connection error", e);
-    }
-  }
-
-  protected PageResponse doGetRequestForPagedObjectList(
-      String requestUrl, PageRequest pageRequest, Class<?> targetType) throws HttpException {
-    if (!requestUrl.contains("?")) {
-      requestUrl = requestUrl + "?";
-    } else {
-      if (!requestUrl.endsWith("&")) {
-        requestUrl = requestUrl + "&";
-      }
-    }
-    String findParams = getFindParamsAsString(pageRequest);
-    requestUrl = requestUrl + findParams;
-    HttpRequest req = createGetRequest(requestUrl);
-    try {
-      HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
-      Integer statusCode = response.statusCode();
-      if (statusCode >= 400) {
-        throw CudamiRestErrorDecoder.decode("GET " + requestUrl, statusCode);
-      }
-      // This is the most performant approach for Jackson
-      final byte[] body = response.body();
-      if (body == null) {
-        return null;
-      }
-      PageResponse result = mapper.readerFor(PageResponse.class).readValue(body);
-      return result;
-    } catch (IOException | InterruptedException e) {
-      throw new HttpException("Failed to retrieve response due to connection error", e);
-    }
-  }
-
-  protected String doGetRequestForString(String requestUrl) throws HttpException {
-    HttpRequest req = createGetRequest(requestUrl);
-    try {
-      HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
-      Integer statusCode = response.statusCode();
-      if (statusCode >= 400) {
-        throw CudamiRestErrorDecoder.decode("GET " + requestUrl, statusCode);
-      }
-      final String body = response.body();
-      return body;
     } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to connection error", e);
     }
@@ -596,6 +572,31 @@ public class CudamiBaseClient<T extends Object> {
     }
   }
 
+  public PageResponse<T> findByLanguageAndInitial(
+      String baseUrl, PageRequest pageRequest, String language, String initial)
+      throws HttpException {
+    return doGetRequestForPagedObjectList(
+        String.format(baseUrl + "?language=%s&initial=%s", language, initial), pageRequest);
+  }
+
+  public PageResponse<T> findByLanguageAndInitial(
+      String baseUrl,
+      int pageNumber,
+      int pageSize,
+      String sortField,
+      String sortDirection,
+      String nullHandling,
+      String language,
+      String initial)
+      throws HttpException {
+    Order order =
+        new Order(
+            Direction.fromString(sortDirection), sortField, NullHandling.valueOf(nullHandling));
+    Sorting sorting = new Sorting(order);
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, sorting);
+    return findByLanguageAndInitial(baseUrl, pageRequest, language, initial);
+  }
+
   /**
    * Converts the given list of filter criterias to a request string
    *
@@ -652,30 +653,5 @@ public class CudamiBaseClient<T extends Object> {
             .collect(Collectors.joining(","));
     findParams.append("&sortBy=").append(sortBy);
     return findParams.toString();
-  }
-
-  public PageResponse<T> findByLanguageAndInitial(
-      String baseUrl, PageRequest pageRequest, String language, String initial)
-      throws HttpException {
-    return doGetRequestForPagedObjectList(
-        String.format(baseUrl + "?language=%s&initial=%s", language, initial), pageRequest);
-  }
-
-  public PageResponse<T> findByLanguageAndInitial(
-      String baseUrl,
-      int pageNumber,
-      int pageSize,
-      String sortField,
-      String sortDirection,
-      String nullHandling,
-      String language,
-      String initial)
-      throws HttpException {
-    OrderImpl order =
-        new OrderImpl(
-            Direction.fromString(sortDirection), sortField, NullHandling.valueOf(nullHandling));
-    Sorting sorting = new SortingImpl(order);
-    PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
-    return findByLanguageAndInitial(baseUrl, pageRequest, language, initial);
   }
 }

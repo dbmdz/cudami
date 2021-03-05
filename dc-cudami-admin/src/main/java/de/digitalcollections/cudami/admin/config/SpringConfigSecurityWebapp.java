@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.admin.config;
 
-import de.digitalcollections.model.api.security.enums.Role;
+import de.digitalcollections.model.security.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;

@@ -6,7 +6,7 @@
   <parent>
     <groupId>de.digitalcollections.cudami</groupId>
     <artifactId>dc-cudami</artifactId>
-    <version>4.4.1</version>
+    <version>5.0.0-SNAPSHOT</version>
   </parent>
 
   <name>DigitalCollections: cudami Management Webapp</name>
@@ -21,7 +21,7 @@
 
     <version.dc-commons-server>4.1.1</version.dc-commons-server>
     <version.dc-commons-springboot>4.1.1</version.dc-commons-springboot>
-    <version.dc-commons-springdata>4.1.2</version.dc-commons-springdata>
+    <!--<version.dc-commons-springdata>4.1.2</version.dc-commons-springdata>-->
     <version.dc-commons-springmvc>4.1.2</version.dc-commons-springmvc>
     <version.thymeleaf-spring-data-dialect>3.4.1</version.thymeleaf-spring-data-dialect>
     <version.webjar-bootstrap>4.6.0</version.webjar-bootstrap>
@@ -55,11 +55,11 @@
       <artifactId>dc-commons-springboot</artifactId>
       <version>${version.dc-commons-springboot}</version>
     </dependency>
-    <dependency>
+<!--    <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-springdata</artifactId>
       <version>${version.dc-commons-springdata}</version>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-springmvc</artifactId>

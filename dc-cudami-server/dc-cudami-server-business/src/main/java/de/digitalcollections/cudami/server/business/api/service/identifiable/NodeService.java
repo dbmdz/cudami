@@ -1,32 +1,45 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
-import de.digitalcollections.model.api.identifiable.Node;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.PageResponse;
-import de.digitalcollections.model.api.view.BreadcrumbNavigation;
+import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
-public interface NodeService<N extends Node> extends IdentifiableService<N> {
+public interface NodeService<N extends Identifiable> extends IdentifiableService<N> {
 
   default boolean addChild(N parent, N child) {
     if (parent == null || child == null) {
       return false;
     }
-    return addChildren(parent.getUuid(), Arrays.asList(child));
+    return addChild(parent.getUuid(), child.getUuid());
+  }
+
+  default boolean addChild(UUID parentUuid, UUID childUuid) {
+    if (parentUuid == null || childUuid == null) {
+      return false;
+    }
+    return addChildren(parentUuid, Arrays.asList(childUuid));
   }
 
   default boolean addChildren(N parent, List<N> children) {
     if (parent == null || children == null) {
       return false;
     }
-    return addChildren(parent.getUuid(), children);
+    List<UUID> childrenUuids =
+        children.stream()
+            .filter(c -> c.getUuid() == null)
+            .map(c -> c.getUuid())
+            .collect(Collectors.toList());
+    return addChildren(parent.getUuid(), childrenUuids);
   }
 
-  boolean addChildren(UUID parentUuid, List<N> collections);
+  boolean addChildren(UUID parentUuid, List<UUID> childrenUUIDs);
 
   /**
    * Build and return the breadcrumb navigation for the given node UUID
@@ -54,7 +67,7 @@ public interface NodeService<N extends Node> extends IdentifiableService<N> {
     localizedBreadcrumbNavigation.getNavigationItems().stream()
         .forEach(
             n -> {
-              cleanupLabelFromUnwantedLocales(locale, fallbackLocale, n);
+              cleanupLabelFromUnwantedLocales(locale, fallbackLocale, n.getLabel());
             });
 
     return localizedBreadcrumbNavigation;

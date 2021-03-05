@@ -4,12 +4,11 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.WorkRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
-import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.Identifier;
-import de.digitalcollections.model.api.identifiable.entity.agent.Agent;
-import de.digitalcollections.model.api.identifiable.entity.work.Item;
-import de.digitalcollections.model.api.identifiable.entity.work.Work;
-import de.digitalcollections.model.impl.identifiable.entity.work.WorkImpl;
+import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.entity.agent.Agent;
+import de.digitalcollections.model.identifiable.entity.work.Item;
+import de.digitalcollections.model.identifiable.entity.work.Work;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -76,7 +75,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        WorkImpl.class,
+        Work.class,
         getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
@@ -115,7 +114,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
 
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM "
+            "SELECT wc.sortindex AS idx, * FROM "
                 + agTableName
                 + " AS "
                 + agTableAlias
@@ -123,14 +122,14 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
                 + agTableAlias
                 + ".uuid = wc.agent_uuid"
                 + " WHERE wc.work_uuid = :uuid"
-                + " ORDER BY wc.sortIndex ASC");
+                + " ORDER BY idx ASC");
 
     List<Agent> result =
         agentRepositoryImpl.retrieveList(
             agentRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             Map.of("uuid", workUuid),
-            null);
+            "ORDER BY idx ASC");
     return result;
   }
 
@@ -141,7 +140,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
 
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM "
+            "SELECT iw.sortindex AS idx, * FROM "
                 + itTableName
                 + " AS "
                 + itTableAlias
@@ -149,14 +148,14 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
                 + itTableAlias
                 + ".uuid = iw.item_uuid"
                 + " WHERE iw.work_uuid = :uuid"
-                + " ORDER BY iw.sortIndex ASC");
+                + " ORDER BY idx ASC");
 
     List<Item> result =
         itemRepositoryImpl.retrieveList(
             itemRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             Map.of("uuid", workUuid),
-            null);
+            "ORDER BY idx ASC");
     return result;
   }
 

@@ -30,29 +30,29 @@
 </th:block>
 
 <th:block th:fragment="renderContentBlock(block)">
-  <th:block th:if="${block.class.simpleName == 'BlockquoteImpl'}">
+  <th:block th:if="${block.class.simpleName == 'Blockquote'}">
     <blockquote>
       <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
     </blockquote>
   </th:block>
 
-  <th:block th:if="${block.class.simpleName == 'BulletListImpl'}">
+  <th:block th:if="${block.class.simpleName == 'BulletList'}">
     <ul>
       <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
     </ul>
   </th:block>
 
-  <th:block th:if="${block.class.simpleName == 'CodeBlockImpl'}">
+  <th:block th:if="${block.class.simpleName == 'CodeBlock'}">
     <pre>
       <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
     </pre>
   </th:block>
 
-  <th:block th:if="${block.class.simpleName == 'HardBreakImpl'}">
+  <th:block th:if="${block.class.simpleName == 'HardBreak'}">
     <br/>
   </th:block>
 
-  <th:block th:if="${block.class.simpleName == 'HeadingImpl'}">
+  <th:block th:if="${block.class.simpleName == 'Heading'}">
     <h1 th:if="${block.getAttribute('level') == 1}">
       <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
     </h1>
@@ -73,17 +73,17 @@
     </h6>
   </th:block>
 
-  <th:block th:if="${block.class.simpleName == 'HorizontalRuleImpl'}">
+  <th:block th:if="${block.class.simpleName == 'HorizontalRule'}">
     <hr/>
   </th:block>
 
-  <th:block th:if="${block.class.simpleName == 'IFrameImpl'}" th:with="attr=${block.attributes}">
+  <th:block th:if="${block.class.simpleName == 'IFrame'}" th:with="attr=${block.attributes}">
     <iframe th:attr="src=${attr.get('src') != null}?${attr.get('src')}, width=${attr.get('width') != null}?${attr.get('width')}, height=${attr.get('height') != null}?${attr.get('height')}, title=${attr.get('title') != null}?${attr.get('title')}">
       [Your user agent does not support frames or is currently configured not to display frames. However, you may visit <a th:attr="href=${attr.get('src') != null}?${attr.get('src')}">the related document.</a>]
     </iframe>
   </th:block>
 
-  <th:block th:if="${block.class.simpleName == 'ImageImpl'}" th:with="attr=${block.attributes}">
+  <th:block th:if="${block.class.simpleName == 'Image'}" th:with="attr=${block.attributes}">
     <figure class="image-in-text mb-0" th:classappend="${(alignment != null ? 'alignment-' + alignment + ' ' : '') + 'width-' + #strings.substringBefore(attr.get('width'),'%')}" th:with="alignment=${attr.get('alignment')}">
       <th:block th:if="${attr.get('linkUrl')}">
         <a th:attr="href=${attr.get('linkUrl')}, target=${attr.get('linkNewTab') ? '_blank' : ''}">
@@ -99,19 +99,19 @@
     </figure>
   </th:block>
 
-  <th:block th:if="${block.class.simpleName == 'ListItemImpl'}">
+  <th:block th:if="${block.class.simpleName == 'ListItem'}">
     <li>
       <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
     </li>
   </th:block>
 
-  <th:block th:if="${block.class.simpleName == 'OrderedListImpl'}">
+  <th:block th:if="${block.class.simpleName == 'OrderedList'}">
     <ol>
       <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
     </ol>
   </th:block>
 
-  <th:block th:if="${block.class.simpleName == 'ParagraphImpl'}">
+  <th:block th:if="${block.class.simpleName == 'Paragraph'}">
     <th:block th:if="${block.contentBlocks} AND ${block.contentBlocks.size()} > 0">
       <p>
         <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
@@ -119,31 +119,31 @@
     </th:block>
   </th:block>
 
-  <th:block th:if="${block.class.simpleName == 'TableCellImpl'}" th:with="attr=${block.attributes}">
+  <th:block th:if="${block.class.simpleName == 'TableCell'}" th:with="attr=${block.attributes}">
     <td th:attr="colspan=${attr.get('colspan') != null}?${attr.get('colspan')}, rowspan=${attr.get('rowspan') != null}?${attr.get('rowspan')}, data-colwidth=${attr.get('colwidth') != null}?${attr.get('colwidth')}">
       <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
     </td>
   </th:block>
 
-  <th:block th:if="${block.class.simpleName == 'TableHeaderImpl'}" th:with="attr=${block.attributes}">
+  <th:block th:if="${block.class.simpleName == 'TableHeader'}" th:with="attr=${block.attributes}">
     <th th:attr="colspan=${attr.get('colspan') != null}?${attr.get('colspan')}, rowspan=${attr.get('rowspan') != null}?${attr.get('rowspan')}, data-colwidth=${attr.get('colwidth') != null}?${attr.get('colwidth')}">
       <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
     </th>
   </th:block>
 
-  <th:block th:if="${block.class.simpleName == 'TableImpl'}">
+  <th:block th:if="${block.class.simpleName == 'Table'}">
     <table>
       <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
     </table>
   </th:block>
 
-  <th:block th:if="${block.class.simpleName == 'TableRowImpl'}">
+  <th:block th:if="${block.class.simpleName == 'TableRow'}">
     <tr>
       <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
     </tr>
   </th:block>
 
-  <th:block th:if="${block.class.simpleName == 'TextImpl'}">
+  <th:block th:if="${block.class.simpleName == 'Text'}">
     <th:block th:if="${block.marks}">
       <th:block th:each="mark, iter : ${block.marks}">
         <th:block th:if="${mark.type} == 'link'">
@@ -181,7 +181,7 @@
       </th:block>
     </th:block>
   </th:block>
-  <th:block th:if="${block.class.simpleName == 'VideoImpl'}" th:with="attr=${block.attributes}">
+  <th:block th:if="${block.class.simpleName == 'Video'}" th:with="attr=${block.attributes}">
     <figure class="mb-0 video-in-text" th:classappend="${(alignment != null ? 'alignment-' + alignment + ' ' : '') + 'width-' + #strings.substringBefore(attr.get('width'),'%')}" th:with="alignment=${attr.get('alignment')}">
       <video controls preload="metadata" th:attr="poster=${attr.get('previewUrl')}, src=${attr.get('url')}, title=${attr.get('title')}"></video>
       <th:block th:if="${attr.get('caption')}">

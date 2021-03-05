@@ -10,7 +10,6 @@ import CorporateBodyForm from './CorporateBodyForm'
 import FileResourceForm from './FileResourceForm'
 import FormErrors from './FormErrors'
 import ProjectForm from './ProjectForm'
-import SubtopicForm from './SubtopicForm'
 import TopicForm from './TopicForm'
 import WebpageForm from './WebpageForm'
 import WebsiteForm from './WebsiteForm'
@@ -155,7 +154,6 @@ class IdentifiableForm extends Component {
       corporateBody: CorporateBodyForm,
       fileResource: FileResourceForm,
       project: ProjectForm,
-      subtopic: SubtopicForm,
       topic: TopicForm,
       webpage: WebpageForm,
       website: WebsiteForm,

@@ -1,11 +1,11 @@
 package de.digitalcollections.cudami.server.backend.impl.database;
 
-import de.digitalcollections.model.api.filter.FilterCriterion;
-import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.filter.enums.FilterOperation;
-import de.digitalcollections.model.api.paging.PageRequest;
-import de.digitalcollections.model.api.paging.Sorting;
-import de.digitalcollections.model.api.paging.enums.Direction;
+import de.digitalcollections.model.filter.FilterCriterion;
+import de.digitalcollections.model.filter.FilterOperation;
+import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.paging.Direction;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.Sorting;
 import java.time.LocalDate;
 import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
@@ -80,47 +80,6 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
     }
   }
 
-  public String getOrderBy(Sorting sorting) {
-    if (sorting == null) {
-      return null;
-    }
-    List<String> allowedOrderByFields = getAllowedOrderByFields();
-    String orderBy =
-        Optional.ofNullable(sorting.getOrders()).orElse(Collections.emptyList()).stream()
-            .filter(
-                o -> {
-                  String sortField = o.getProperty();
-                  final boolean allowedSortField =
-                      sortField != null
-                          && allowedOrderByFields != null
-                          && allowedOrderByFields.contains(sortField);
-                  if (!allowedSortField) {
-                    LOGGER.warn("'" + sortField + "' not in allowed sort fields! Ignoring it.");
-                  }
-                  return allowedSortField;
-                })
-            .map(
-                o -> {
-                  String sortDirection = null;
-                  Direction direction = o.getDirection();
-                  if (direction != null && direction.isDescending()) {
-                    sortDirection = "DESC";
-                  } else {
-                    sortDirection = "ASC";
-                  }
-                  String sortField = o.getProperty();
-                  Optional<String> subSortField = o.getSubProperty();
-                  String fullQualifiedColumnName = getColumnName(sortField);
-                  if (subSortField.isEmpty()) {
-                    return String.format("%s %s", fullQualifiedColumnName, sortDirection);
-                  }
-                  return String.format(
-                      "%s->>'%s' %s", fullQualifiedColumnName, subSortField.get(), sortDirection);
-                })
-            .collect(Collectors.joining(","));
-    return orderBy;
-  }
-
   protected void addPageRequestParams(PageRequest pageRequest, StringBuilder sqlQuery) {
     if (pageRequest != null) {
       addOrderBy(pageRequest, sqlQuery);
@@ -165,6 +124,47 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
             .map(this::getWhereClause)
             .collect(Collectors.joining(" AND "));
     return filterClauses;
+  }
+
+  public String getOrderBy(Sorting sorting) {
+    if (sorting == null) {
+      return null;
+    }
+    List<String> allowedOrderByFields = getAllowedOrderByFields();
+    String orderBy =
+        Optional.ofNullable(sorting.getOrders()).orElse(Collections.emptyList()).stream()
+            .filter(
+                o -> {
+                  String sortField = o.getProperty();
+                  final boolean allowedSortField =
+                      sortField != null
+                          && allowedOrderByFields != null
+                          && allowedOrderByFields.contains(sortField);
+                  if (!allowedSortField) {
+                    LOGGER.warn("'" + sortField + "' not in allowed sort fields! Ignoring it.");
+                  }
+                  return allowedSortField;
+                })
+            .map(
+                o -> {
+                  String sortDirection = null;
+                  Direction direction = o.getDirection();
+                  if (direction != null && direction.isDescending()) {
+                    sortDirection = "DESC";
+                  } else {
+                    sortDirection = "ASC";
+                  }
+                  String sortField = o.getProperty();
+                  Optional<String> subSortField = o.getSubProperty();
+                  String fullQualifiedColumnName = getColumnName(sortField);
+                  if (subSortField.isEmpty()) {
+                    return String.format("%s %s", fullQualifiedColumnName, sortDirection);
+                  }
+                  return String.format(
+                      "%s->>'%s' %s", fullQualifiedColumnName, subSortField.get(), sortDirection);
+                })
+            .collect(Collectors.joining(","));
+    return orderBy;
   }
 
   protected String getWhereClause(FilterCriterion<?> fc)

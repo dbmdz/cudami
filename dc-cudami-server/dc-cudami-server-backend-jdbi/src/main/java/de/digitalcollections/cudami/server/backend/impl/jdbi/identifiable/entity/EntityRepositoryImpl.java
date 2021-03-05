@@ -4,11 +4,10 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
-import de.digitalcollections.model.api.filter.FilterValuePlaceholder;
-import de.digitalcollections.model.api.filter.Filtering;
-import de.digitalcollections.model.api.identifiable.entity.Entity;
-import de.digitalcollections.model.api.identifiable.resource.FileResource;
-import de.digitalcollections.model.impl.identifiable.entity.EntityImpl;
+import de.digitalcollections.model.filter.FilterValuePlaceholder;
+import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -84,7 +83,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        EntityImpl.class,
+        Entity.class,
         getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
@@ -248,7 +247,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM "
+            "SELECT ref.sortindex AS idx, * FROM "
                 + frTableName
                 + " AS "
                 + frTableAlias
@@ -256,13 +255,13 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
                 + frTableAlias
                 + ".uuid = ref.fileresource_uuid"
                 + " WHERE ref.entity_uuid = :entityUuid"
-                + " ORDER BY ref.sortindex ASC");
+                + " ORDER BY idx ASC");
 
     return fileResourceMetadataRepositoryImpl.retrieveList(
         fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields(),
         innerQuery,
         Map.of("entityUuid", entityUuid),
-        null);
+        "ORDER BY idx ASC");
   }
 
   @Override
