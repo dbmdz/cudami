@@ -26,7 +26,6 @@ public class IdentifiableController extends AbstractController {
   @ResponseBody
   public List<Identifiable> find(@RequestParam(name = "term") String searchTerm)
       throws HttpException {
-    List<Identifiable> identifiables = service.find(searchTerm, 25);
-    return identifiables;
+    return service.find(searchTerm, 25);
   }
 }
