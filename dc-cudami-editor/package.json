@@ -20,7 +20,7 @@
     "@babel/runtime": "^7.13.4",
     "bootstrap": "^4.6.0",
     "classnames": "^2.2.6",
-    "i18next": "^19.8.9",
+    "i18next": "^19.9.1",
     "lodash": "^4.17.21",
     "object.fromentries": "^2.0.4",
     "prosemirror-commands": "^1.1.7",
