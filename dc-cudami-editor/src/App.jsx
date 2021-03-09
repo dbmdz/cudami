@@ -13,6 +13,7 @@ import {
   Row,
 } from 'reactstrap'
 import {
+  FaBarcode,
   FaCubes,
   FaFile,
   FaFolderPlus,
@@ -34,6 +35,7 @@ import IdentifiableForm from './components/IdentifiableForm'
 import PagedIdentifiableList from './components/PagedIdentifiableList'
 import PagedRenderingTemplateList from './components/PagedRenderingTemplateList'
 import RenderingTemplateForm from './components/RenderingTemplateForm'
+import PagedIdentifierTypeList from './components/lists/PagedIdentifierTypeList'
 
 const availableFormTypes = [
   'article',
@@ -67,6 +69,7 @@ const iconMapping = {
   corporateBody: FaUniversity,
   digitalObject: FaCubes,
   fileResource: FaFile,
+  identifierType: FaBarcode,
   project: FaIndustry,
   renderingTemplate: FaPalette,
   subcollection: FaList,
@@ -154,6 +157,7 @@ const StartPage = () => (
     </Row>
     <h3>Other</h3>
     <Row>
+      <ListCard type="identifierType" />
       <ListCard type="renderingTemplate" />
     </Row>
   </Container>
@@ -230,6 +234,14 @@ const App = () => {
                 type={match.params.type}
                 uiLocale={uiLocale}
               />
+            </Container>
+          )}
+        />
+        <Route
+          path={'/identifierType/list'}
+          render={() => (
+            <Container>
+              <PagedIdentifierTypeList mockApi={true} />
             </Container>
           )}
         />

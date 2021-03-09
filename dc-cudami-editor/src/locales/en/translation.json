@@ -97,6 +97,7 @@
     },
     "homepage": "Homepage",
     "identifiers": "Identifiers",
+    "identifierTypes": "Identifier types",
     "image": "image",
     "imageLink": "Image link",
     "inPageNavigation": "Page navigation",
@@ -137,6 +138,7 @@
       "collection": "move to another collection"
     },
     "name": "Name",
+    "namespace": "Namespace",
     "new": "New",
     "next": "Next",
     "no": "No",
@@ -145,6 +147,7 @@
     "numberOfRows": "Number of rows",
     "openLinkNewTab": "open in a new tab",
     "openLinkSameTab": "open in the same tab",
+    "pattern": "Pattern",
     "person": "Person",
     "persons": "Persons",
     "publicationStatus": {
@@ -190,6 +193,8 @@
       "digitalObjects_plural": "found {{ count }} digital objects",
       "geoLocations": "found {{ count }} geolocation",
       "geoLocations_plural": "found {{ count }} geolocations",
+      "identifierTypes": "found {{ count }} identifier type",
+      "identifierTypes_plural": "found {{ count }} identifier types",
       "persons": "found {{ count }} person",
       "persons_plural": "found {{ count }} persons",
       "renderingTemplates": "found {{ count }} design template",
