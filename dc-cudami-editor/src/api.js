@@ -5,6 +5,7 @@ export const typeToEndpointMapping = {
   digitalObject: 'digitalobjects',
   fileResource: 'fileresources',
   geoLocation: 'geolocations',
+  identifierType: 'identifiertypes',
   person: 'persons',
   project: 'projects',
   renderingTemplate: 'renderingtemplates',

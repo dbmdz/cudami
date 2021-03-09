@@ -1,9 +1,6 @@
 package de.digitalcollections.cudami.admin.controller.identifiable;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.paging.PageConverter;
-import de.digitalcollections.cudami.admin.paging.PageWrapper;
-import de.digitalcollections.cudami.admin.paging.PageableConverter;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifierTypesClient;
@@ -17,10 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -151,18 +144,7 @@ public class IdentifierTypeController extends AbstractController {
   }
 
   @GetMapping(value = "/identifiertypes")
-  public String list(
-      Model model,
-      @PageableDefault(
-              sort = {"label"},
-              direction = Sort.Direction.ASC,
-              size = 25)
-          Pageable pageable)
-      throws HttpException {
-    final PageRequest pageRequest = PageableConverter.convert(pageable);
-    final PageResponse pageResponse = service.find(pageRequest);
-    Page page = PageConverter.convert(pageResponse, pageRequest);
-    model.addAttribute("page", new PageWrapper(page, "/identifiertypes"));
+  public String list() {
     return "identifiertypes/list";
   }
 }

@@ -97,6 +97,7 @@
     },
     "homepage": "Homepage",
     "identifiers": "Identifikatoren",
+    "identifierTypes": "Identifikatortypen",
     "image": "Bild",
     "imageLink": "Bild-Link",
     "inPageNavigation": "Seitennavigation",
@@ -137,6 +138,7 @@
       "collection": "in andere Sammlung verschieben"
     },
     "name": "Name",
+    "namespace": "Namensraum",
     "new": "Neu",
     "next": "Weiter",
     "no": "Nein",
@@ -145,6 +147,7 @@
     "numberOfRows": "Anzahl an Zeilen",
     "openLinkNewTab": "in einem neuen Tab öffnen",
     "openLinkSameTab": "im selben Tab öffnen",
+    "pattern": "Muster",
     "person": "Person",
     "persons": "Personen",
     "publicationStatus": {
@@ -190,6 +193,8 @@
       "digitalObjects_plural": "{{ count }} Digitalisate gefunden",
       "geoLocations": "{{ count }} Ort gefunden",
       "geoLocations_plural": "{{ count }} Orte gefunden",
+      "identifierTypes": "{{ count }} Identifikatortyp gefunden",
+      "identifierTypes_plural": "{{ count }} Identifikatortypen gefunden",
       "persons": "{{ count }} Person gefunden",
       "persons_plural": "{{ count }} Personen gefunden",
       "renderingTemplates": "{{ count }} Gestaltungsvorlage gefunden",
