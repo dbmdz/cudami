@@ -43,6 +43,10 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
 
   @Override
   public void delete(List<UUID> uuids) {
+    if (uuids == null || uuids.isEmpty()) {
+      return;
+    }
+
     dbi.withHandle(
         h ->
             h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
