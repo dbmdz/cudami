@@ -220,7 +220,7 @@ const App = () => {
           )}
         />
         <Route
-          path={`/:type/list`}
+          path={`/:type(${availableRootListTypes.join('|')})/list`}
           render={({match}) => (
             <Container>
               <PagedIdentifiableList
