@@ -5,7 +5,7 @@
 see [official documentation](https://webpack.js.org/configuration/dev-server/)
 
 1. install dependencies: `npm install`
-2. start webpack development server: `npm run start`
+2. start webpack development server: `npm start`
 3. open <http://localhost:3000> to browse to the development UI implemented in `src/App.jsx`:
 
 ![Development UI](./assets/development-ui.png)
@@ -23,10 +23,16 @@ $ mvn clean install -U
 
 Start application (repository server and management webapp) and test your changes.
 
-## Format Javascript Files
+## Format JavaScript Files
 
 ```
-npm install --only=dev && npm run format-check
+npm install --only=dev && npm run format
+```
+
+## Lint JavaScript files
+
+```
+npm install --only=dev && npm run lint
 ```
 
 ## Typical list of files to add/change for a new object type
