@@ -35,13 +35,17 @@ npm install --only=dev && npm run format
 npm install --only=dev && npm run lint
 ```
 
-## Typical list of files to add/change for a new object type
+## Developer guide for adding a new object type
+
+### List for an Identifiable (Table)
 
 Example: persons list
 
-* cudami/dc-cudami-admin/src/main/resources/templates/main.html: add icon with link to list
+* Add navigation icon with link to list page
 
-```
+In `cudami/dc-cudami-admin/src/main/resources/templates/main.html`:
+
+```html
 <div class="card">
   <a class="btn" th:href="@{/persons}" th:title="#{persons}">
     <div class="card-body">
@@ -52,7 +56,199 @@ Example: persons list
 </div>
 ```
 
-* cudami/dc-cudami-admin/src/main/java/de/digitalcollections/cudami/admin/controller/identifiable/entity/agent/PersonsController.java
+* Add controller endpoint for providing thymeleaf template
+
+In `cudami/dc-cudami-admin/src/main/java/de/digitalcollections/cudami/admin/controller/identifiable/entity/agent/PersonsController.java`:
+
+```java
+@GetMapping("/persons")
+public String list() {
+  return "persons/list";
+}
+```
+
+* Add thymeleaf template embedding react-table
+
+File `cudami/dc-cudami-admin/src/main/resources/templates/persons/list.html`:
+
+```html
+...
+<section layout:fragment="content">
+  <div id="list"></div>
+  <script th:src="@{/js/identifiable-list.bundle.js}"></script>
+  <script th:inline="javascript">
+    IdentifiableList({
+      apiContextPath: /*[[@{/}]]*/ '',
+      existingLanguages: /*[[${existingLanguages}]]*/,
+      id: "list",
+      showEdit: true,
+      showNew: true,
+      type: "person",
+      uiLocale: /*[[${#locale.language}]]*/
+    });
+  </script>
+</section>
+...
+```
+
+This initializes an `IdentifiableList`-React-Component, defined in `cudami/dc-cudami-editor/src/lib/IdentifiableList.jsx`.
+
+Inside this the render method is called for the React-component `PagedIdentifiableList` defined in `cudami/dc-cudami-editor/src/components/PagedIdentifiableList.jsx`
+
+* Add Identifiable-specific table rendering
+
+In `cudami/dc-cudami-editor/src/components/PagedIdentifiableList.jsx` add handling for specific tdentifiable type:
+
+```
+...
+import PersonList from './PersonList'
+...
+  getListComponent = () => {
+    const LIST_COMPONENT_MAPPING = {
+      collection: CollectionList,
+      digitalObject: DigitalObjectList,
+      subcollection: CollectionList,
+      person: PersonList,
+      webpage: WebpageList,
+      website: WebsiteList,
+    }
+...
+```
+
+Add table component `cudami/dc-cudami-editor/src/components/PersonList.jsx`:
+
+```
+import React, {useContext} from 'react'
+import {Table} from 'reactstrap'
+import {useTranslation} from 'react-i18next'
+import {FaHashtag, FaImage} from 'react-icons/fa'
+
+import AppContext from './AppContext'
+import IdentifierList from './IdentifierList'
+import ListButtons from './ListButtons'
+import PreviewImage from './PreviewImage'
+import {formatDate} from './utils'
+import {typeToEndpointMapping} from '../api'
+
+const PersonList = ({
+  enableMove,
+  enableRemove,
+  identifiables,
+  identifierTypes,
+  language,
+  onMove,
+  onRemove,
+  pageNumber,
+  pageSize,
+  parentType,
+  showEdit,
+  type,
+}) => {
+  const {t} = useTranslation()
+  const {apiContextPath, uiLocale} = useContext(AppContext)
+  const viewBaseUrl = `${apiContextPath}${typeToEndpointMapping[type]}`
+  return (
+    <Table bordered className="mb-0" hover responsive size="sm" striped>
+      <thead>
+        <tr>
+          <th className="text-right">
+            <FaHashtag />
+          </th>
+          <th className="text-center">
+            <FaImage />
+          </th>
+          <th className="text-center">{t('label')}</th>
+          <th className="text-center">{t('identifiers')}</th>
+          <th className="text-center">{t('lastModified')}</th>
+          <th className="text-center">{t('actions')}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {identifiables.map(
+          (
+            {
+              identifiers,
+              label,
+              lastModified,
+              previewImage,
+              previewImageRenderingHints,
+              uuid,
+            },
+            index
+          ) => (
+            <tr key={uuid}>
+              <td className="text-right">
+                {index + 1 + pageNumber * pageSize}
+              </td>
+              <td className="text-center">
+                <PreviewImage
+                  image={previewImage}
+                  renderingHints={previewImageRenderingHints}
+                  width={30}
+                />
+              </td>
+              <td>
+                {label[language] && (
+                  <a href={`${viewBaseUrl}/${uuid}`}>{label[language]}</a>
+                )}
+              </td>
+              <td>
+                <IdentifierList
+                  identifiers={identifiers}
+                  identifierTypes={identifierTypes}
+                />
+              </td>
+              <td className="text-center">
+                {formatDate(new Date(lastModified), uiLocale)}
+              </td>
+              <td className="text-center">
+                <ListButtons
+                  enableMove={enableMove}
+                  enableRemove={enableRemove}
+                  onMove={() => onMove(index)}
+                  onRemove={() => onRemove(index)}
+                  parentType={parentType}
+                  showEdit={showEdit}
+                  viewUrl={`${viewBaseUrl}/${uuid}`}
+                />
+              </td>
+            </tr>
+          )
+        )}
+      </tbody>
+    </Table>
+  )
+}
+
+export default PersonList
+```
+
+* Register identifiable type to endpoint mapping
+
+In `cudami/dc-cudami-editor/src/api.js` add endpoint mapping for type `person`:
+
+```
+export const typeToEndpointMapping = {
+  article: 'articles',
+  collection: 'collections',
+  corporateBody: 'corporatebodies',
+  digitalObject: 'digitalobjects',
+  fileResource: 'fileresources',
+  geoLocation: 'geolocations',
+  identifierType: 'identifiertypes',
+  person: 'persons',
+  project: 'projects',
+  renderingTemplate: 'renderingtemplates',
+  subcollection: 'subcollections',
+  topic: 'topics',
+  webpage: 'webpages',
+  website: 'websites',
+}
+```
+
+* Add Endpoint for table component
+
+In `cudami/dc-cudami-admin/src/main/java/de/digitalcollections/cudami/admin/controller/identifiable/entity/agent/PersonsController.java`:
 
 ```
 @GetMapping("/api/persons")
@@ -71,200 +267,46 @@ public PageResponse<PersonImpl> findAll(
 }
 ```
 
-* cudami/dc-cudami-admin/src/main/resources/templates/persons/list.html:
+* Add internationalized texts
+
+In `cudami/dc-cudami-editor/src/locales/de/translation.json`
 
 ```
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
-      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
-      layout:decorate="~{base}">
-  <head>
-    <title th:text="#{persons}">Persons</title>
-  </head>
-  <body>
-    <section layout:fragment="content">
-      <div id="list"></div>
-      <script th:src="@{/js/persons-list.bundle.js}"></script>
-      <script th:inline="javascript">
-        PersonsList({
-          apiContextPath: /*[[@{/}]]*/ '',
-          id: "list",
-          uiLocale: /*[[${#locale.language}]]*/
-        });
-      </script>
-    </section>
-  </body>
-</html>
-```
-
-* cudami/dc-cudami-editor/src/lib/PersonsList.jsx:
-
-```
-import React from 'react'
-import ReactDOM from 'react-dom'
-
-import initI18n from '../i18n'
-import PagedPersonsList from '../components/PagedPersonsList'
-
-export default function ({apiContextPath, id, uiLocale}) {
-  initI18n(uiLocale)
-  ReactDOM.render(
-    <PagedPersonsList apiContextPath={apiContextPath} />,
-    document.getElementById(id)
-  )
+{
+  ...
+  "translation": {
+    ...
+    "person": "Person",
+    "persons": "Personen",
+    ...
+    "totalElements": {
+      ...
+      "persons": "{{ count }} Person gefunden",
+      "persons_plural": "{{ count }} Personen gefunden",
+      ...
+    }
+  ...
+  }
 }
 ```
 
-* cudami/dc-cudami-editor/src/components/PagedPersonsList.jsx
+In `cudami/dc-cudami-editor/src/locales/en/translation.json`
 
 ```
-import React, {useEffect, useState} from 'react'
-import {Button, Card, CardBody, Col, Nav, Row, Table} from 'reactstrap'
-import {useTranslation} from 'react-i18next'
-
-import LanguageTab from './LanguageTab'
-import ListButtons from './ListButtons'
-import ListPagination from './ListPagination'
-import {loadDefaultLanguage, typeToEndpointMapping} from '../api'
-import usePagination from '../hooks/usePagination'
-
-const PagedPersonsList = ({
-  apiContextPath = '/',
-  mockApi = false,
-}) => {
-  const type = 'person'
-  const {
-    content: persons,
-    numberOfPages,
-    pageNumber,
-    setPageNumber,
-    totalElements,
-  } = usePagination(apiContextPath, mockApi, type)
-  const [defaultLanguage, setDefaultLanguage] = useState('')
-  useEffect(() => {
-    loadDefaultLanguage(apiContextPath, mockApi).then((defaultLanguage) =>
-      setDefaultLanguage(defaultLanguage)
-    )
-  }, [])
-  const {t} = useTranslation()
-  return (
-    <>
-      <Row>
-        <Col>
-          <h1>{t('persons')}</h1>
-        </Col>
-        <Col className="text-right">
-        {/*
-          <Button href={`${apiContextPath}${typeToEndpointMapping[type]}/new`}>
-            {t('new')}
-          </Button>
-        */}
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <hr />
-        </Col>
-      </Row>
-      <Nav tabs>
-        <LanguageTab
-          activeLanguage={defaultLanguage}
-          language={defaultLanguage}
-          toggle={() => {}}
-        />
-      </Nav>
-      <Card className="border-top-0">
-        <CardBody>
-          <ListPagination
-            changePage={({selected}) => setPageNumber(selected)}
-            numberOfPages={numberOfPages}
-            pageNumber={pageNumber}
-            totalElements={totalElements}
-            type={type}
-          />
-          <Table bordered className="mb-0" hover responsive size="sm" striped>
-            <thead>
-              <tr>
-                <th className="text-center">{t('label')}</th>
-                <th className="text-center">{t('description')}</th>
-                <th className="text-center">{t('actions')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {persons.map(({description, label, name, uuid}) => (
-                <tr key={uuid}>
-                  <td>{label?.[defaultLanguage]}</td>
-                  <td>{description?.[defaultLanguage]}</td>
-                  <td className="text-center">
-                    <ListButtons
-                      editUrl={`${apiContextPath}${typeToEndpointMapping[type]}/${uuid}/edit`}
-                      showEdit={false}
-                      showView={false}
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-          <ListPagination
-            changePage={({selected}) => setPageNumber(selected)}
-            numberOfPages={numberOfPages}
-            pageNumber={pageNumber}
-            position="under"
-            showTotalElements={false}
-            totalElements={totalElements}
-            type={type}
-          />
-        </CardBody>
-      </Card>
-    </>
-  )
-}
-
-export default PagedPersonsList
-```
-
-* cudami/dc-cudami-editor/webpack.config.js:
-
-```
-const config = {
-  cache: true,
-  devtool: 'sourcemaps',
-  entry: {
-    IdentifiableEditor: './src/lib/IdentifiableEditor.jsx',
-    IdentifiableList: './src/lib/IdentifiableList.jsx',
-    **PersonsList: './src/lib/PersonsList.jsx',**
-    RenderingTemplateEditor: './src/lib/RenderingTemplateEditor.jsx',
-    RenderingTemplateList: './src/lib/RenderingTemplateList.jsx'
-  },
-```
-
-* cudami/dc-cudami-editor/src/locales/de/translation.json and
-  cudami/dc-cudami-editor/src/locales/en/translation.json
-
-```
+{
+  ...
+  "translation": {
+    ...
     "person": "Person",
     "persons": "Persons",
-
-"totalElements": {
-      "digitalObjects": "found {{ count }} digital object",
-      "digitalObjects_plural": "found {{ count }} digital objects",
-      **"persons": "found {{ count }} person",**
-      **"persons_plural": "found {{ count }} persons",**
+    ...
+    "totalElements": {
+      ...
+      "persons": "found {{ count }} person",
+      "persons_plural": "found {{ count }} persons",
+      ...
+    }
+  ...
+  }
+}
 ```
-
-* cudami/dc-cudami-editor/src/api.js
-
-```
-export const typeToEndpointMapping = {
-  article: 'articles',
-  collection: 'collections',
-  corporateBody: 'corporatebodies',
-  digitalObject: 'digitalobjects',
-  fileResource: 'fileresources',
-  **person: 'persons',**
-```
-
-* 

@@ -10,12 +10,16 @@
   <body>
     <section layout:fragment="content">
       <div id="list"></div>
-      <script th:src="@{/js/persons-list.bundle.js}"></script>
+      <script th:src="@{/js/identifiable-list.bundle.js}"></script>
       <script th:inline="javascript">
-        PersonsList({
-          apiContextPath: /*[[@{/}]]*/ '',
-          id: "list",
-          uiLocale: /*[[${#locale.language}]]*/
+        IdentifiableList({
+        apiContextPath: /*[[@{/}]]*/ '',
+                existingLanguages: /*[[${existingLanguages}]]*/,
+        id: "list",
+                showEdit: true,
+                showNew: true,
+                type: "person",
+        uiLocale: /*[[${#locale.language}]]*/
         });
       </script>
     </section>

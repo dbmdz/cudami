@@ -9,7 +9,6 @@ const config = {
     IdentifiableEditor: './src/lib/IdentifiableEditor.jsx',
     IdentifiableList: './src/lib/IdentifiableList.jsx',
     IdentifierTypeList: './src/lib/IdentifierTypeList.jsx',
-    PersonsList: './src/lib/PersonsList.jsx',
     RenderingTemplateEditor: './src/lib/RenderingTemplateEditor.jsx',
     RenderingTemplateList: './src/lib/RenderingTemplateList.jsx'
   },
