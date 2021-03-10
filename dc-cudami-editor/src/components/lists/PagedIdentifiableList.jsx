@@ -12,8 +12,8 @@ import AppContext from '../AppContext'
 import FeedbackMessage from '../FeedbackMessage'
 import LanguageTab from '../LanguageTab'
 import Pagination from '../Pagination'
-import AddAttachedIdentifiablesModal from '../modals/AddAttachedIdentifiablesModal'
-import RemoveAttachedIdentifiableModal from '../modals/RemoveAttachedIdentifiableModal'
+import AddAttachedIdentifiablesDialog from '../dialogs/AddAttachedIdentifiablesDialog'
+import RemoveAttachedIdentifiableDialog from '../dialogs/RemoveAttachedIdentifiableDialog'
 import {
   addAttachedIdentifiable,
   addAttachedIdentifiables,
@@ -432,7 +432,7 @@ class PagedIdentifiableList extends Component {
           </CardBody>
         </Card>
         {enableAdd && (
-          <AddAttachedIdentifiablesModal
+          <AddAttachedIdentifiablesDialog
             action="add"
             identifierTypes={identifierTypes}
             isOpen={modalsOpen.addAttachedIdentifiables}
@@ -442,7 +442,7 @@ class PagedIdentifiableList extends Component {
           />
         )}
         {enableMove && (
-          <AddAttachedIdentifiablesModal
+          <AddAttachedIdentifiablesDialog
             action="move"
             identifierTypes={identifierTypes}
             isOpen={modalsOpen.moveAttachedIdentifiable}
@@ -453,7 +453,7 @@ class PagedIdentifiableList extends Component {
           />
         )}
         {enableRemove && (
-          <RemoveAttachedIdentifiableModal
+          <RemoveAttachedIdentifiableDialog
             isOpen={modalsOpen.removeAttachedIdentifiable}
             onConfirm={this.handleRemove}
             onToggle={() => this.toggleModal('removeAttachedIdentifiable')}

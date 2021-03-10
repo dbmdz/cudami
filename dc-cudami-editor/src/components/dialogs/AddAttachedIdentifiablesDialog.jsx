@@ -23,7 +23,7 @@ import IdentifierSearch from '../IdentifierSearch'
 import PreviewImage from '../PreviewImage'
 import {searchIdentifiables} from '../../api'
 
-class AddAttachedIdentifiablesModal extends Component {
+class AddAttachedIdentifiablesDialog extends Component {
   fixedOptions = ['label']
 
   constructor(props) {
@@ -212,6 +212,6 @@ class AddAttachedIdentifiablesModal extends Component {
   }
 }
 
-AddAttachedIdentifiablesModal.contextType = AppContext
+AddAttachedIdentifiablesDialog.contextType = AppContext
 
-export default withTranslation()(AddAttachedIdentifiablesModal)
+export default withTranslation()(AddAttachedIdentifiablesDialog)

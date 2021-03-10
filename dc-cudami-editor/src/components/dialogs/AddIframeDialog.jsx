@@ -5,6 +5,7 @@ import {
   Button,
   Form,
   FormGroup,
+  FormText,
   Modal,
   ModalBody,
   ModalHeader,
@@ -13,10 +14,12 @@ import {withTranslation} from 'react-i18next'
 
 import InputWithFloatingLabel from '../InputWithFloatingLabel'
 
-class LinkAdderModal extends Component {
+class AddIframeDialog extends Component {
   initialAttributes = {
-    href: '',
+    height: '',
+    src: '',
     title: '',
+    width: '',
   }
 
   constructor(props) {
@@ -26,7 +29,7 @@ class LinkAdderModal extends Component {
       editing: false,
     }
     subscribe(
-      'editor.show-link-modal',
+      'editor.show-iframe-modal',
       (_msg, {attributes = {}, editing = false} = {}) => {
         this.setState({
           attributes: {
@@ -40,9 +43,9 @@ class LinkAdderModal extends Component {
     )
   }
 
-  addLinkToEditor = () => {
+  addIframeToEditor = () => {
     publish(
-      'editor.add-link',
+      'editor.add-iframe',
       mapValues(this.state.attributes, (value) =>
         value !== '' ? value : undefined
       )
@@ -72,29 +75,51 @@ class LinkAdderModal extends Component {
     return (
       <Modal isOpen={isOpen} toggle={this.destroy}>
         <ModalHeader toggle={this.destroy}>
-          {editing ? t('editLink') : t('insertLink')}
+          {editing ? t('insert.iframe.edit') : t('insert.iframe.new')}
         </ModalHeader>
         <ModalBody>
           <Form
             onSubmit={(evt) => {
               evt.preventDefault()
-              this.addLinkToEditor()
+              this.addIframeToEditor()
             }}
           >
             <FormGroup>
               <InputWithFloatingLabel
                 label="URL"
-                name="link-url"
-                onChange={(value) => this.setAttribute('href', value.trim())}
-                pattern="^(https?://|/).*$"
+                name="iframe-url"
+                onChange={(value) => this.setAttribute('src', value.trim())}
                 required
-                value={attributes.href}
+                type="url"
+                value={attributes.src}
               />
             </FormGroup>
             <FormGroup>
               <InputWithFloatingLabel
+                label={t('width')}
+                name="iframe-width"
+                onChange={(value) => this.setAttribute('width', value)}
+                value={attributes.width}
+              />
+              <FormText className="ml-1">
+                {t('forExample')} <code>300px</code> or <code>50%</code>
+              </FormText>
+            </FormGroup>
+            <FormGroup>
+              <InputWithFloatingLabel
+                label={t('height')}
+                name="iframe-height"
+                onChange={(value) => this.setAttribute('height', value)}
+                value={attributes.height}
+              />
+              <FormText className="ml-1">
+                {t('forExample')} <code>300px</code> or <code>50%</code>
+              </FormText>
+            </FormGroup>
+            <FormGroup>
+              <InputWithFloatingLabel
                 label={t('tooltip')}
-                name="link-title"
+                name="iframe-title"
                 onChange={(value) => this.setAttribute('title', value)}
                 value={attributes.title}
               />
@@ -109,4 +134,4 @@ class LinkAdderModal extends Component {
   }
 }
 
-export default withTranslation()(LinkAdderModal)
+export default withTranslation()(AddIframeDialog)

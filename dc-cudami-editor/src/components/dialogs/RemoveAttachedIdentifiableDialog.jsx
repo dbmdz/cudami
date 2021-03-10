@@ -3,7 +3,7 @@ import React from 'react'
 import {Button, Modal, ModalBody, ModalHeader, ModalFooter} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-const RemoveAttachedIdentifiableModal = ({
+const RemoveAttachedIdentifiableDialog = ({
   isOpen,
   onConfirm,
   onToggle,
@@ -34,4 +34,4 @@ const RemoveAttachedIdentifiableModal = ({
   )
 }
 
-export default RemoveAttachedIdentifiableModal
+export default RemoveAttachedIdentifiableDialog
