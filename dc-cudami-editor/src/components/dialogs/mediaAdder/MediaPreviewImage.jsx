@@ -14,7 +14,7 @@ const handleClick = (onUpdate) => {
       unsubscribe(token)
     }
   )
-  publish('editor.show-preview-image-modal', {
+  publish('editor.show-preview-image-dialog', {
     enableMetadata: false,
     enableRenderingHints: false,
   })

@@ -113,7 +113,7 @@ export default function (t) {
             toggleMark(schema.marks.link, data)(state, dispatch)
             unsubscribe(token)
           })
-          publish('editor.show-link-modal')
+          publish('editor.show-link-dialog')
         },
       },
     },
@@ -221,7 +221,7 @@ export default function (t) {
             dispatch(state.tr.replaceSelectionWith(image))
             unsubscribe(token)
           })
-          publish('editor.show-image-modal')
+          publish('editor.show-image-dialog')
         },
       },
       video: {
@@ -234,7 +234,7 @@ export default function (t) {
             dispatch(state.tr.replaceSelectionWith(video))
             unsubscribe(token)
           })
-          publish('editor.show-video-modal')
+          publish('editor.show-video-dialog')
         },
       },
       hr: {
@@ -256,7 +256,7 @@ export default function (t) {
             dispatch(state.tr.replaceSelectionWith(iframe))
             unsubscribe(token)
           })
-          publish('editor.show-iframe-modal')
+          publish('editor.show-iframe-dialog')
         },
       },
       table: {
@@ -281,7 +281,7 @@ export default function (t) {
             dispatch(state.tr.replaceSelectionWith(table))
             unsubscribe(token)
           })
-          publish('editor.show-table-modal')
+          publish('editor.show-table-dialog')
         },
       },
     },

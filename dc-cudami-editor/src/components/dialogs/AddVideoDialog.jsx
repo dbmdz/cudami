@@ -33,7 +33,7 @@ class AddVideoDialog extends Component {
       renderingHintsOpen: false,
     }
     subscribe(
-      'editor.show-video-modal',
+      'editor.show-video-dialog',
       (_msg, {attributes = {}, editing = false} = {}) => {
         this.setState({
           attributes: {

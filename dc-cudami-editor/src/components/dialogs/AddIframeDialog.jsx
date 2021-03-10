@@ -29,7 +29,7 @@ class AddIframeDialog extends Component {
       editing: false,
     }
     subscribe(
-      'editor.show-iframe-modal',
+      'editor.show-iframe-dialog',
       (_msg, {attributes = {}, editing = false} = {}) => {
         this.setState({
           attributes: {

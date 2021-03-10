@@ -33,7 +33,7 @@ const WebpageForm = ({
   onToggleLanguage,
   onUpdate,
 }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const {t} = useTranslation()
   const {
     description,
@@ -94,7 +94,7 @@ const WebpageForm = ({
           </Col>
           <Col sm="3">
             <TemplateSelector
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => setIsDialogOpen(true)}
               onRemove={() =>
                 onUpdate({
                   renderingHints: {
@@ -180,7 +180,7 @@ const WebpageForm = ({
         </Row>
       </Form>
       <SelectRenderingTemplateDialog
-        isOpen={isModalOpen}
+        isOpen={isDialogOpen}
         onSelect={(templateName) =>
           onUpdate({
             renderingHints: {
@@ -189,7 +189,7 @@ const WebpageForm = ({
             },
           })
         }
-        toggle={() => setIsModalOpen(!isModalOpen)}
+        toggle={() => setIsDialogOpen(!isDialogOpen)}
       />
     </>
   )

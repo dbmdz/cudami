@@ -27,6 +27,7 @@ const handleClick = (
       unsubscribe(token)
     }
   )
+  const message = 'editor.show-preview-image-dialog'
   if (currentPreviewImage && currentRenderingHints) {
     const {
       altText,
@@ -35,7 +36,7 @@ const handleClick = (
       targetLink,
       title,
     } = currentRenderingHints
-    publish('editor.show-preview-image-modal', {
+    publish(message, {
       attributes: {
         altText: altText?.[language],
         caption: caption?.[language],
@@ -47,7 +48,7 @@ const handleClick = (
       uuid: currentPreviewImage.uuid,
     })
   } else {
-    publish('editor.show-preview-image-modal')
+    publish(message)
   }
 }
 

@@ -34,7 +34,7 @@ class AddPreviewImageDialog extends Component {
       renderingHintsOpen: false,
     }
     subscribe(
-      'editor.show-preview-image-modal',
+      'editor.show-preview-image-dialog',
       (
         _msg,
         {
