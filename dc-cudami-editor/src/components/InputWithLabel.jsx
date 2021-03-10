@@ -1,6 +1,6 @@
 import React from 'react'
-import {FormGroup, Input, Label} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
+import {FormGroup, Input, Label} from 'reactstrap'
 
 const InputWithLabel = ({
   id,

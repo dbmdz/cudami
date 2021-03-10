@@ -1,25 +1,25 @@
-import {keymap} from 'prosemirror-keymap'
-import {undoInputRule} from 'prosemirror-inputrules'
-import {undo, redo} from 'prosemirror-history'
-import {
-  wrapInList,
-  splitListItem,
-  liftListItem,
-  sinkListItem,
-} from 'prosemirror-schema-list'
-import {goToNextCell} from 'prosemirror-tables'
 import {
   baseKeymap,
-  toggleMark,
-  wrapIn,
-  setBlockType,
   chainCommands,
   exitCode,
-  joinUp,
   joinDown,
+  joinUp,
   lift,
   selectParentNode,
+  setBlockType,
+  toggleMark,
+  wrapIn,
 } from 'prosemirror-commands'
+import {redo, undo} from 'prosemirror-history'
+import {undoInputRule} from 'prosemirror-inputrules'
+import {keymap} from 'prosemirror-keymap'
+import {
+  liftListItem,
+  sinkListItem,
+  splitListItem,
+  wrapInList,
+} from 'prosemirror-schema-list'
+import {goToNextCell} from 'prosemirror-tables'
 
 import schema from './schema'
 

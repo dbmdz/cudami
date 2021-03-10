@@ -1,7 +1,7 @@
-import React from 'react'
 import classNames from 'classnames'
-import {FormGroup, Input, InputGroup, InputGroupAddon} from 'reactstrap'
+import React from 'react'
 import {useTranslation} from 'react-i18next'
+import {FormGroup, Input, InputGroup, InputGroupAddon} from 'reactstrap'
 
 import InfoTooltip from '../../InfoTooltip'
 

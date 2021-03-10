@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import {FaSearch} from 'react-icons/fa'
 import {
   Button,
   Col,
@@ -7,12 +8,11 @@ import {
   ListGroupItem,
   Row,
 } from 'reactstrap'
-import {FaSearch} from 'react-icons/fa'
 
+import {findByIdentifier} from '../api'
 import AppContext from './AppContext'
 import InputWithSpinner from './InputWithSpinner'
 import PreviewImage from './PreviewImage'
-import {findByIdentifier} from '../api'
 
 class IdentifierSearch extends Component {
   constructor(props) {

@@ -1,14 +1,14 @@
 import React, {useContext} from 'react'
-import {Table} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 import {FaHashtag, FaImage} from 'react-icons/fa'
+import {Table} from 'reactstrap'
 
-import ActionButtons from './ActionButtons'
-import IdentifierList from './IdentifierList'
+import {typeToEndpointMapping} from '../../api'
 import AppContext from '../AppContext'
 import PreviewImage from '../PreviewImage'
 import {formatDate} from '../utils'
-import {typeToEndpointMapping} from '../../api'
+import ActionButtons from './ActionButtons'
+import IdentifierList from './IdentifierList'
 
 const DigitalObjectList = ({
   enableMove,

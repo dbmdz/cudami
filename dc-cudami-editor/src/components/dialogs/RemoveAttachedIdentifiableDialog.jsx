@@ -1,7 +1,7 @@
 import startCase from 'lodash/startCase'
 import React from 'react'
-import {Button, Modal, ModalBody, ModalHeader, ModalFooter} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
+import {Button, Modal, ModalBody, ModalFooter, ModalHeader} from 'reactstrap'
 
 const RemoveAttachedIdentifiableDialog = ({
   isOpen,

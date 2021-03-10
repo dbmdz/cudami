@@ -1,5 +1,7 @@
 import startCase from 'lodash/startCase'
 import React, {Component} from 'react'
+import {withTranslation} from 'react-i18next'
+import {FaTrash} from 'react-icons/fa'
 import {
   Button,
   Col,
@@ -13,15 +15,13 @@ import {
   ModalHeader,
   Row,
 } from 'reactstrap'
-import {withTranslation} from 'react-i18next'
-import {FaTrash} from 'react-icons/fa'
 
+import {searchIdentifiables} from '../../api'
 import AppContext from '../AppContext'
 import Autocomplete from '../Autocomplete'
 import FeedbackMessage from '../FeedbackMessage'
 import IdentifierSearch from '../IdentifierSearch'
 import PreviewImage from '../PreviewImage'
-import {searchIdentifiables} from '../../api'
 
 class AddAttachedIdentifiablesDialog extends Component {
   fixedOptions = ['label']

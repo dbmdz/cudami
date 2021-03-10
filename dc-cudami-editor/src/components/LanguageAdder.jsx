@@ -1,7 +1,7 @@
 import React from 'react'
-import {NavItem, NavLink} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 import {FaPlus} from 'react-icons/fa'
+import {NavItem, NavLink} from 'reactstrap'
 
 const LanguageAdder = ({onClick}) => {
   const {t} = useTranslation()

@@ -1,4 +1,5 @@
 import React, {useContext} from 'react'
+import {useTranslation} from 'react-i18next'
 import {
   Button,
   ListGroup,
@@ -11,11 +12,10 @@ import {
   ModalHeader,
   Spinner,
 } from 'reactstrap'
-import {useTranslation} from 'react-i18next'
 
+import usePagination from '../../hooks/usePagination'
 import AppContext from '../AppContext'
 import Pagination from '../Pagination'
-import usePagination from '../../hooks/usePagination'
 
 const SelectRenderingTemplateDialog = ({isOpen, onSelect, toggle}) => {
   const type = 'renderingTemplate'

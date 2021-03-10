@@ -1,9 +1,9 @@
-import React from 'react'
 import {publish, subscribe, unsubscribe} from 'pubsub-js'
+import React from 'react'
 import {render} from 'react-dom'
 
-import {markActive} from '../utils'
 import EditButton from '../../components/editor/EditButton'
+import {markActive} from '../utils'
 
 class LinkEditingToolbar {
   constructor(editorView) {

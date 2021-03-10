@@ -1,10 +1,10 @@
 import {
-  inputRules,
-  wrappingInputRule,
-  textblockTypeInputRule,
-  smartQuotes,
-  emDash,
   ellipsis,
+  emDash,
+  inputRules,
+  smartQuotes,
+  textblockTypeInputRule,
+  wrappingInputRule,
 } from 'prosemirror-inputrules'
 
 import schema from './schema'

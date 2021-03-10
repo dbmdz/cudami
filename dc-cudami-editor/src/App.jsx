@@ -1,17 +1,6 @@
+import 'bootstrap/dist/css/bootstrap.min.css'
+
 import React from 'react'
-import {
-  Button,
-  ButtonGroup,
-  Card,
-  CardBody,
-  CardFooter,
-  Col,
-  Container,
-  Nav,
-  Navbar,
-  NavbarBrand,
-  Row,
-} from 'reactstrap'
 import {
   FaBarcode,
   FaCubes,
@@ -27,15 +16,27 @@ import {
   FaSitemap,
   FaUniversity,
 } from 'react-icons/fa'
-import {BrowserRouter as Router, Link, Route} from 'react-router-dom'
-import 'bootstrap/dist/css/bootstrap.min.css'
+import {Link, Route, BrowserRouter as Router} from 'react-router-dom'
+import {
+  Button,
+  ButtonGroup,
+  Card,
+  CardBody,
+  CardFooter,
+  Col,
+  Container,
+  Nav,
+  Navbar,
+  NavbarBrand,
+  Row,
+} from 'reactstrap'
 
-import initI18n from './i18n'
 import IdentifiableForm from './components/forms/IdentifiableForm'
 import RenderingTemplateForm from './components/forms/RenderingTemplateForm'
 import PagedIdentifiableList from './components/lists/PagedIdentifiableList'
 import PagedIdentifierTypeList from './components/lists/PagedIdentifierTypeList'
 import PagedRenderingTemplateList from './components/lists/PagedRenderingTemplateList'
+import initI18n from './i18n'
 
 const availableFormTypes = [
   'article',

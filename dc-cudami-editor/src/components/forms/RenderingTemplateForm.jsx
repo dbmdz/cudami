@@ -1,4 +1,7 @@
+import '../../polyfills'
+
 import React, {useEffect, useState} from 'react'
+import {useTranslation} from 'react-i18next'
 import {
   Card,
   CardBody,
@@ -9,11 +12,7 @@ import {
   TabContent,
   TabPane,
 } from 'reactstrap'
-import {useTranslation} from 'react-i18next'
 
-import ActionButtons from './ActionButtons'
-import LanguageTab from '../LanguageTab'
-import InputWithLabel from '../InputWithLabel'
 import {
   loadDefaultLanguage,
   loadIdentifiable,
@@ -21,7 +20,9 @@ import {
   typeToEndpointMapping,
   updateIdentifiable,
 } from '../../api'
-import '../../polyfills'
+import InputWithLabel from '../InputWithLabel'
+import LanguageTab from '../LanguageTab'
+import ActionButtons from './ActionButtons'
 
 const loadData = async (context, mock, uuid) => {
   const defaultLanguage = await loadDefaultLanguage(context, mock)

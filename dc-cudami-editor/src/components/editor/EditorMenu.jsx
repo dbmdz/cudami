@@ -1,8 +1,8 @@
-import React from 'react'
-import classNames from 'classnames'
-import {DropdownItem, DropdownMenu, UncontrolledDropdown} from 'reactstrap'
-
 import './EditorMenu.css'
+
+import classNames from 'classnames'
+import React from 'react'
+import {DropdownItem, DropdownMenu, UncontrolledDropdown} from 'reactstrap'
 
 const Button = ({dispatch, fullWidth, item, state}) => {
   const disabled = item.enable && !item.enable(state)

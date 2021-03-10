@@ -1,6 +1,6 @@
 import React from 'react'
-import {Button, PopoverBody, UncontrolledPopover} from 'reactstrap'
 import {FaQuestionCircle} from 'react-icons/fa'
+import {Button, PopoverBody, UncontrolledPopover} from 'reactstrap'
 
 const InfoTooltip = ({className = 'border', color = 'light', name, text}) => (
   <>

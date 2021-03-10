@@ -1,11 +1,11 @@
 import React from 'react'
-import {Button, Card, CardBody, Col, Row, Table} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
+import {Button, Card, CardBody, Col, Row, Table} from 'reactstrap'
 
-import ActionButtons from './ActionButtons'
-import Pagination from '../Pagination'
 import {typeToEndpointMapping} from '../../api'
 import usePagination from '../../hooks/usePagination'
+import Pagination from '../Pagination'
+import ActionButtons from './ActionButtons'
 
 const PagedIdentifierTypeList = ({apiContextPath = '/', mockApi = false}) => {
   const type = 'identifierType'

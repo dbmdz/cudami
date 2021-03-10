@@ -1,6 +1,6 @@
 import React from 'react'
-import {NavItem, NavLink} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
+import {NavItem, NavLink} from 'reactstrap'
 
 const LanguageTab = ({activeLanguage, language, toggle}) => {
   const {t} = useTranslation()

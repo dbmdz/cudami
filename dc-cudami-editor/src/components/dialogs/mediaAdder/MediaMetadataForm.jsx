@@ -1,4 +1,5 @@
 import React from 'react'
+import {useTranslation} from 'react-i18next'
 import {
   Button,
   Card,
@@ -9,10 +10,9 @@ import {
   InputGroup,
   InputGroupAddon,
 } from 'reactstrap'
-import {useTranslation} from 'react-i18next'
 
-import InputWithFloatingLabel from '../../InputWithFloatingLabel'
 import InfoTooltip from '../../InfoTooltip'
+import InputWithFloatingLabel from '../../InputWithFloatingLabel'
 
 const MediaMetadataForm = ({
   altText,

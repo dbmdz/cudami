@@ -1,5 +1,6 @@
-import React, {Component} from 'react'
 import classNames from 'classnames'
+import React, {Component} from 'react'
+import {withTranslation} from 'react-i18next'
 import {
   Card,
   CardBody,
@@ -12,9 +13,8 @@ import {
   TabContent,
   TabPane,
 } from 'reactstrap'
-import {withTranslation} from 'react-i18next'
 
-import MediaLabelInput from './MediaLabelInput'
+import {searchMedia, uploadFile} from '../../../api'
 import AppContext from '../../AppContext'
 import Autocomplete from '../../Autocomplete'
 import FeedbackMessage from '../../FeedbackMessage'
@@ -22,7 +22,7 @@ import FileUploadForm from '../../FileUploadForm'
 import InfoTooltip from '../../InfoTooltip'
 import PreviewImage from '../../PreviewImage'
 import {getImageUrl, getVideoUrl} from '../../utils'
-import {searchMedia, uploadFile} from '../../../api'
+import MediaLabelInput from './MediaLabelInput'
 
 class MediaSelector extends Component {
   constructor(props) {

@@ -1,13 +1,13 @@
 import React from 'react'
-import {Col, Form, Nav, Row, TabContent, TabPane} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
+import {Col, Form, Nav, Row, TabContent, TabPane} from 'reactstrap'
 
-import FileResourceUploadForm from './FileResourceUploadForm'
-import ActionButtons from './ActionButtons'
 import InputWithLabel from '../InputWithLabel'
 import LanguageAdder from '../LanguageAdder'
 import LanguageTab from '../LanguageTab'
 import Teaser from '../Teaser'
+import ActionButtons from './ActionButtons'
+import FileResourceUploadForm from './FileResourceUploadForm'
 
 const FileResourceForm = ({
   activeLanguage,

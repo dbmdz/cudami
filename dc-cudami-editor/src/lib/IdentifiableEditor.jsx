@@ -1,8 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import initI18n from '../i18n'
 import IdentifiableForm from '../components/forms/IdentifiableForm'
+import initI18n from '../i18n'
 
 export default function ({
   activeLanguage,

@@ -1,20 +1,11 @@
+import '../common.css'
+import '../../polyfills'
+
 import uniqBy from 'lodash/uniqBy'
 import React, {Component} from 'react'
-import {Button, Card, CardBody, Col, Nav, Row} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
+import {Button, Card, CardBody, Col, Nav, Row} from 'reactstrap'
 
-import '../common.css'
-import CollectionList from './CollectionList'
-import DigitalObjectList from './DigitalObjectList'
-import PersonList from './PersonList'
-import WebpageList from './WebpageList'
-import WebsiteList from './WebsiteList'
-import AppContext from '../AppContext'
-import FeedbackMessage from '../FeedbackMessage'
-import LanguageTab from '../LanguageTab'
-import Pagination from '../Pagination'
-import AddAttachedIdentifiablesDialog from '../dialogs/AddAttachedIdentifiablesDialog'
-import RemoveAttachedIdentifiableDialog from '../dialogs/RemoveAttachedIdentifiableDialog'
 import {
   addAttachedIdentifiable,
   addAttachedIdentifiables,
@@ -26,7 +17,17 @@ import {
   typeToEndpointMapping,
   updateAttachedIdentifiablesOrder,
 } from '../../api'
-import '../../polyfills'
+import AppContext from '../AppContext'
+import AddAttachedIdentifiablesDialog from '../dialogs/AddAttachedIdentifiablesDialog'
+import RemoveAttachedIdentifiableDialog from '../dialogs/RemoveAttachedIdentifiableDialog'
+import FeedbackMessage from '../FeedbackMessage'
+import LanguageTab from '../LanguageTab'
+import Pagination from '../Pagination'
+import CollectionList from './CollectionList'
+import DigitalObjectList from './DigitalObjectList'
+import PersonList from './PersonList'
+import WebpageList from './WebpageList'
+import WebsiteList from './WebsiteList'
 
 class PagedIdentifiableList extends Component {
   pageSize = 20

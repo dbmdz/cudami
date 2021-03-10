@@ -1,9 +1,10 @@
+import './Autocomplete.css'
+
 import React, {Component} from 'react'
-import {Col, FormGroup, Row} from 'reactstrap'
 import Autosuggest from 'react-autosuggest'
 import {withTranslation} from 'react-i18next'
+import {Col, FormGroup, Row} from 'reactstrap'
 
-import './Autocomplete.css'
 import AppContext from './AppContext'
 import FeedbackMessage from './FeedbackMessage'
 import InputWithSpinner from './InputWithSpinner'

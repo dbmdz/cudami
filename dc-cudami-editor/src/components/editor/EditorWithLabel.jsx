@@ -1,11 +1,12 @@
-import React, {Component} from 'react'
-import {Editor} from '@aeaton/react-prosemirror'
-import {Label} from 'reactstrap'
-import {withTranslation} from 'react-i18next'
-
 import './EditorWithLabel.css'
-import EditorMenu from './EditorMenu'
+
+import {Editor} from '@aeaton/react-prosemirror'
+import React, {Component} from 'react'
+import {withTranslation} from 'react-i18next'
+import {Label} from 'reactstrap'
+
 import {menu, options} from '../../config'
+import EditorMenu from './EditorMenu'
 
 class EditorWithLabel extends Component {
   constructor(props) {
