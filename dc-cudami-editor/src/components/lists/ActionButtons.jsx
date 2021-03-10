@@ -3,7 +3,7 @@ import {Button, ButtonGroup} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 import {FaExchangeAlt, FaEye, FaPencilAlt, FaUnlink} from 'react-icons/fa'
 
-const ListButtons = ({
+const ActionButtons = ({
   editUrl,
   enableMove,
   enableRemove,
@@ -60,4 +60,4 @@ const ListButtons = ({
   )
 }
 
-export default ListButtons
+export default ActionButtons

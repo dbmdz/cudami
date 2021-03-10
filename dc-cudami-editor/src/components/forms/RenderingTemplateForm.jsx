@@ -11,17 +11,17 @@ import {
 } from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-import FormButtons from './FormButtons'
-import FormInput from './FormInput'
-import LanguageTab from './LanguageTab'
+import ActionButtons from './ActionButtons'
+import LanguageTab from '../LanguageTab'
+import InputWithLabel from '../InputWithLabel'
 import {
   loadDefaultLanguage,
   loadIdentifiable,
   saveIdentifiable,
   typeToEndpointMapping,
   updateIdentifiable,
-} from '../api'
-import '../polyfills'
+} from '../../api'
+import '../../polyfills'
 
 const loadData = async (context, mock, uuid) => {
   const defaultLanguage = await loadDefaultLanguage(context, mock)
@@ -85,7 +85,7 @@ const RenderingTemplateForm = ({
           </h1>
         </Col>
         <Col xs="6" sm="3">
-          <FormButtons formId={formId} />
+          <ActionButtons formId={formId} />
         </Col>
       </Row>
       <Row>
@@ -95,8 +95,10 @@ const RenderingTemplateForm = ({
       </Row>
       <Row>
         <Col sm="12">
-          {uuid && <FormInput id="uuid" label="ID" readOnly value={uuid} />}
-          <FormInput
+          {uuid && (
+            <InputWithLabel id="uuid" label="ID" readOnly value={uuid} />
+          )}
+          <InputWithLabel
             id="name"
             labelKey="name"
             onChange={(name) => setTemplate({...template, name})}
@@ -114,7 +116,7 @@ const RenderingTemplateForm = ({
             <TabPane tabId={defaultLanguage}>
               <Card className="bg-light">
                 <CardBody>
-                  <FormInput
+                  <InputWithLabel
                     id="label"
                     labelKey="label"
                     onChange={(label) =>
@@ -129,7 +131,7 @@ const RenderingTemplateForm = ({
                     }
                     value={label?.[defaultLanguage] ?? ''}
                   />
-                  <FormInput
+                  <InputWithLabel
                     id="description"
                     labelKey="description"
                     onChange={(description) =>

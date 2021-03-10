@@ -3,18 +3,16 @@ import {Table} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 import {FaHashtag, FaImage} from 'react-icons/fa'
 
-import AppContext from './AppContext'
-import IdentifierList from './IdentifierList'
-import ListButtons from './ListButtons'
-import PreviewImage from './PreviewImage'
-import {formatDate} from './utils'
-import {typeToEndpointMapping} from '../api'
+import ActionButtons from './ActionButtons'
+import AppContext from '../AppContext'
+import PreviewImage from '../PreviewImage'
+import {formatDate} from '../utils'
+import {typeToEndpointMapping} from '../../api'
 
-const DigitalObjectList = ({
+const WebsiteList = ({
   enableMove,
   enableRemove,
   identifiables,
-  identifierTypes,
   language,
   onMove,
   onRemove,
@@ -38,7 +36,7 @@ const DigitalObjectList = ({
             <FaImage />
           </th>
           <th className="text-center">{t('label')}</th>
-          <th className="text-center">{t('identifiers')}</th>
+          <th className="text-center">URL</th>
           <th className="text-center">{t('lastModified')}</th>
           <th className="text-center">{t('actions')}</th>
         </tr>
@@ -47,11 +45,11 @@ const DigitalObjectList = ({
         {identifiables.map(
           (
             {
-              identifiers,
               label,
               lastModified,
               previewImage,
               previewImageRenderingHints,
+              url,
               uuid,
             },
             index
@@ -73,16 +71,15 @@ const DigitalObjectList = ({
                 )}
               </td>
               <td>
-                <IdentifierList
-                  identifiers={identifiers}
-                  identifierTypes={identifierTypes}
-                />
+                <a href={url} rel="noreferrer" target="_blank">
+                  {url}
+                </a>
               </td>
               <td className="text-center">
                 {formatDate(new Date(lastModified), uiLocale)}
               </td>
               <td className="text-center">
-                <ListButtons
+                <ActionButtons
                   enableMove={enableMove}
                   enableRemove={enableRemove}
                   onMove={() => onMove(index)}
@@ -100,4 +97,4 @@ const DigitalObjectList = ({
   )
 }
 
-export default DigitalObjectList
+export default WebsiteList

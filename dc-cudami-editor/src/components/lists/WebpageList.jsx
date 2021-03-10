@@ -10,12 +10,12 @@ import {
 } from 'react-icons/fa'
 import {List, arrayMove} from 'react-movable'
 
-import AppContext from './AppContext'
-import ListButtons from './ListButtons'
-import PreviewImage from './PreviewImage'
-import PublicationStatus from './PublicationStatus'
-import {formatDate} from './utils'
-import {typeToEndpointMapping} from '../api'
+import ActionButtons from './ActionButtons'
+import AppContext from '../AppContext'
+import PreviewImage from '../PreviewImage'
+import PublicationStatus from '../PublicationStatus'
+import {formatDate} from '../utils'
+import {typeToEndpointMapping} from '../../api'
 
 const WebpageItem = forwardRef(
   (
@@ -110,7 +110,7 @@ const WebpageItem = forwardRef(
           {formatDate(new Date(lastModified), uiLocale)}
         </td>
         <td className="text-center" style={{width: actionsCol}}>
-          <ListButtons
+          <ActionButtons
             enableMove={enableMove}
             enableRemove={enableRemove}
             onMove={() => onMove(index)}

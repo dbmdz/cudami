@@ -3,7 +3,7 @@ import {publish, subscribe, unsubscribe} from 'pubsub-js'
 import {render} from 'react-dom'
 
 import {markActive} from '../utils'
-import EditButton from '../../components/EditButton'
+import EditButton from '../../components/editor/EditButton'
 
 class LinkEditingToolbar {
   constructor(editorView) {

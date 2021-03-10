@@ -1,24 +1,14 @@
 import React from 'react'
-import {
-  Card,
-  CardBody,
-  Col,
-  Form,
-  Nav,
-  Row,
-  TabContent,
-  TabPane,
-} from 'reactstrap'
+import {Col, Form, Nav, Row, TabContent, TabPane} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-import FormButtons from './FormButtons'
-import FormEditor from './FormEditor'
-import FormInput from './FormInput'
-import LanguageAdder from './LanguageAdder'
-import LanguageTab from './LanguageTab'
-import Teaser from './Teaser'
+import ActionButtons from './ActionButtons'
+import InputWithLabel from '../InputWithLabel'
+import LanguageAdder from '../LanguageAdder'
+import LanguageTab from '../LanguageTab'
+import Teaser from '../Teaser'
 
-const ProjectForm = ({
+const TopicForm = ({
   activeLanguage,
   canAddLanguage,
   existingLanguages,
@@ -40,10 +30,10 @@ const ProjectForm = ({
     >
       <Row>
         <Col xs="6" sm="9">
-          <h1>{identifiable.uuid ? t('editProject') : t('createProject')}</h1>
+          <h1>{identifiable.uuid ? t('editTopic') : t('createTopic')}</h1>
         </Col>
         <Col xs="6" sm="3">
-          <FormButtons formId={formId} />
+          <ActionButtons formId={formId} />
         </Col>
       </Row>
       <Row>
@@ -54,7 +44,7 @@ const ProjectForm = ({
       <Row>
         <Col sm="12">
           {identifiable.uuid && (
-            <FormInput
+            <InputWithLabel
               id="uuid"
               label="ID"
               readOnly
@@ -94,22 +84,6 @@ const ProjectForm = ({
                   }
                   updatePreviewImage={onUpdate}
                 />
-                <Card className="border-top-0">
-                  <CardBody>
-                    <FormEditor
-                      document={identifiable.text[language]}
-                      type="text"
-                      onUpdate={(document) => {
-                        onUpdate({
-                          text: {
-                            ...identifiable.text,
-                            [language]: document,
-                          },
-                        })
-                      }}
-                    />
-                  </CardBody>
-                </Card>
               </TabPane>
             ))}
           </TabContent>
@@ -119,4 +93,4 @@ const ProjectForm = ({
   )
 }
 
-export default ProjectForm
+export default TopicForm

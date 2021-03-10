@@ -3,7 +3,7 @@ import React from 'react'
 import {useTranslation} from 'react-i18next'
 import ReactPaginate from 'react-paginate'
 
-const ListPagination = ({
+const Pagination = ({
   changePage,
   numberOfPages = 0,
   pageNumber = 0,
@@ -54,4 +54,4 @@ const ListPagination = ({
   )
 }
 
-export default ListPagination
+export default Pagination

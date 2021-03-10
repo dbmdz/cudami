@@ -1,7 +1,7 @@
 import React from 'react'
 import {Button} from 'reactstrap'
 
-import icons from '../config/icons'
+import icons from '../../config/icons'
 
 const EditButton = ({onClick}) => {
   return (

@@ -12,15 +12,15 @@ import {
 } from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-import FormButtons from './FormButtons'
-import FormDateInput from './FormDateInput'
-import FormEditor from './FormEditor'
-import FormInput from './FormInput'
-import FormTemplateSelector from './FormTemplateSelector'
-import LanguageAdder from './LanguageAdder'
-import LanguageTab from './LanguageTab'
-import Teaser from './Teaser'
-import SelectRenderingTemplateModal from './modals/SelectRenderingTemplateModal'
+import ActionButtons from './ActionButtons'
+import DateInput from '../DateInput'
+import EditorWithLabel from '../editor/EditorWithLabel'
+import InputWithLabel from '../InputWithLabel'
+import TemplateSelector from '../TemplateSelector'
+import LanguageAdder from '../LanguageAdder'
+import LanguageTab from '../LanguageTab'
+import Teaser from '../Teaser'
+import SelectRenderingTemplateModal from '../modals/SelectRenderingTemplateModal'
 
 const WebpageForm = ({
   activeLanguage,
@@ -60,7 +60,7 @@ const WebpageForm = ({
             <h1>{uuid ? t('editWebpage') : t('createWebpage')}</h1>
           </Col>
           <Col xs="6" sm="3">
-            <FormButtons formId={formId} />
+            <ActionButtons formId={formId} />
           </Col>
         </Row>
         <Row>
@@ -71,13 +71,13 @@ const WebpageForm = ({
         {uuid && (
           <Row>
             <Col sm="12">
-              <FormInput id="uuid" label="ID" readOnly value={uuid} />
+              <InputWithLabel id="uuid" label="ID" readOnly value={uuid} />
             </Col>
           </Row>
         )}
         <Row>
           <Col sm="3">
-            <FormDateInput
+            <DateInput
               id="publication-start-date"
               label={t('publicationStatus.startDate')}
               onChange={(date) => onUpdate({publicationStart: date})}
@@ -85,7 +85,7 @@ const WebpageForm = ({
             />
           </Col>
           <Col sm="3">
-            <FormDateInput
+            <DateInput
               id="publication-end-date"
               label={t('publicationStatus.endDate')}
               onChange={(date) => onUpdate({publicationEnd: date})}
@@ -93,7 +93,7 @@ const WebpageForm = ({
             />
           </Col>
           <Col sm="3">
-            <FormTemplateSelector
+            <TemplateSelector
               onClick={() => setIsModalOpen(true)}
               onRemove={() =>
                 onUpdate({
@@ -142,7 +142,7 @@ const WebpageForm = ({
                   />
                   <Card className="border-top-0">
                     <CardBody>
-                      <FormEditor
+                      <EditorWithLabel
                         document={text[language]}
                         type="text"
                         onUpdate={(document) => {
@@ -170,7 +170,7 @@ const WebpageForm = ({
                           }}
                           type="switch"
                         />
-                      </FormEditor>
+                      </EditorWithLabel>
                     </CardBody>
                   </Card>
                 </TabPane>

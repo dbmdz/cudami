@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import initI18n from '../i18n'
-import PagedIdentifiableList from '../components/PagedIdentifiableList'
+import PagedIdentifiableList from '../components/lists/PagedIdentifiableList'
 
 export default function ({
   apiContextPath,

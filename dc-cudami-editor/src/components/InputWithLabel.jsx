@@ -2,7 +2,7 @@ import React from 'react'
 import {FormGroup, Input, Label} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-const FormInput = ({
+const InputWithLabel = ({
   id,
   label,
   labelKey,
@@ -30,4 +30,4 @@ const FormInput = ({
   )
 }
 
-export default FormInput
+export default InputWithLabel

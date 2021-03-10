@@ -3,18 +3,17 @@ import React, {Component} from 'react'
 import {Button, Card, CardBody, Col, Nav, Row} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
-import './common.css'
-import AppContext from './AppContext'
+import '../common.css'
 import CollectionList from './CollectionList'
 import DigitalObjectList from './DigitalObjectList'
-import FeedbackMessage from './FeedbackMessage'
-import LanguageTab from './LanguageTab'
-import ListPagination from './ListPagination'
-import PersonList from './PersonList'
 import WebpageList from './WebpageList'
 import WebsiteList from './WebsiteList'
-import AddAttachedIdentifiablesModal from './modals/AddAttachedIdentifiablesModal'
-import RemoveAttachedIdentifiableModal from './modals/RemoveAttachedIdentifiableModal'
+import AppContext from '../AppContext'
+import FeedbackMessage from '../FeedbackMessage'
+import LanguageTab from '../LanguageTab'
+import Pagination from '../Pagination'
+import AddAttachedIdentifiablesModal from '../modals/AddAttachedIdentifiablesModal'
+import RemoveAttachedIdentifiableModal from '../modals/RemoveAttachedIdentifiableModal'
 import {
   addAttachedIdentifiable,
   addAttachedIdentifiables,
@@ -25,8 +24,8 @@ import {
   removeAttachedIdentifiable,
   typeToEndpointMapping,
   updateAttachedIdentifiablesOrder,
-} from '../api'
-import '../polyfills'
+} from '../../api'
+import '../../polyfills'
 
 class PagedIdentifiableList extends Component {
   pageSize = 20
@@ -402,7 +401,7 @@ class PagedIdentifiableList extends Component {
         <Card className="border-top-0">
           <CardBody>
             <div className="d-flex justify-content-between">
-              <ListPagination
+              <Pagination
                 changePage={this.updatePage}
                 numberOfPages={numberOfPages}
                 pageNumber={pageNumber}
@@ -421,7 +420,7 @@ class PagedIdentifiableList extends Component {
               )}
             </div>
             {this.getListComponent()}
-            <ListPagination
+            <Pagination
               changePage={this.updatePage}
               numberOfPages={numberOfPages}
               pageNumber={pageNumber}

@@ -2,32 +2,32 @@ import kebabCase from 'lodash/kebabCase'
 import React, {Component} from 'react'
 import {withTranslation} from 'react-i18next'
 
-import './common.css'
-import AppContext from './AppContext'
+import '../common.css'
 import ArticleForm from './ArticleForm'
 import CollectionForm from './CollectionForm'
 import CorporateBodyForm from './CorporateBodyForm'
 import FileResourceForm from './FileResourceForm'
-import FormErrors from './FormErrors'
+import FormErrors from '../FormErrors'
 import ProjectForm from './ProjectForm'
 import TopicForm from './TopicForm'
 import WebpageForm from './WebpageForm'
 import WebsiteForm from './WebsiteForm'
+import AppContext from '../AppContext'
 import {
   loadAvailableLanguages,
   loadDefaultLanguage,
   loadIdentifiable,
   saveIdentifiable,
   updateIdentifiable,
-} from '../api'
-import '../polyfills'
-import IframeAdderModal from './modals/IframeAdderModal'
-import ImageAdderModal from './modals/ImageAdderModal'
-import LanguageAdderModal from './modals/LanguageAdderModal'
-import LinkAdderModal from './modals/LinkAdderModal'
-import PreviewImageAdderModal from './modals/PreviewImageAdderModal'
-import TableAdderModal from './modals/TableAdderModal'
-import VideoAdderModal from './modals/VideoAdderModal'
+} from '../../api'
+import '../../polyfills'
+import IframeAdderModal from '../modals/IframeAdderModal'
+import ImageAdderModal from '../modals/ImageAdderModal'
+import LanguageAdderModal from '../modals/LanguageAdderModal'
+import LinkAdderModal from '../modals/LinkAdderModal'
+import PreviewImageAdderModal from '../modals/PreviewImageAdderModal'
+import TableAdderModal from '../modals/TableAdderModal'
+import VideoAdderModal from '../modals/VideoAdderModal'
 
 class IdentifiableForm extends Component {
   identifiablesWithLongText = [
