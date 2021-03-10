@@ -256,7 +256,7 @@ public class ProjectController {
     return projectService.update(project);
   }
 
-  @ApiMethod(description = "Get languages of all persons")
+  @ApiMethod(description = "Get languages of all projects")
   @GetMapping(
       value = {"/latest/projects/languages", "/v3/projects/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)

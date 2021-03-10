@@ -9,6 +9,7 @@ import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 /** Repository for Digital object persistence handling. */
@@ -59,4 +60,6 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
   }
 
   List<FileResource> saveFileResources(UUID digitalObjectUuid, List<FileResource> fileResources);
+
+  List<Locale> getLanguages();
 }

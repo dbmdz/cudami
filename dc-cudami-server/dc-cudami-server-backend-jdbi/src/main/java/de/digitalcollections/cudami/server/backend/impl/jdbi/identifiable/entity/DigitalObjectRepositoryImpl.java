@@ -17,6 +17,7 @@ import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -311,6 +312,16 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   public DigitalObject update(DigitalObject digitalObject) {
     super.update(digitalObject);
     DigitalObject result = findOne(digitalObject.getUuid());
+    return result;
+  }
+
+  @Override
+  public List<Locale> getLanguages() {
+    String query =
+        "SELECT DISTINCT languages FROM "
+            + TABLE_NAME
+            + " as p, jsonb_object_keys(p.label) as languages";
+    List<Locale> result = dbi.withHandle(h -> h.createQuery(query).mapTo(Locale.class).list());
     return result;
   }
 }

@@ -72,6 +72,7 @@
     },
     "defineRenderingHints": "Define rendering hints",
     "description": "Abstract",
+    "digitalObject": "Digital object",
     "digitalObjects": "Digital objects",
     "dragAndDropImage": "Drag and drop file to upload here",
     "edit": "edit",
