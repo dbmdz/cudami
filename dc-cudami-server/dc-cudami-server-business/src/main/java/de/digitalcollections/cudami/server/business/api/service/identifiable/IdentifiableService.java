@@ -107,6 +107,8 @@ public interface IdentifiableService<I extends Identifiable> {
 
   I getByIdentifier(String namespace, String id);
 
+  List<Locale> getLanguages();
+
   default List<Entity> getRelatedEntities(I identifiable) {
     if (identifiable == null) {
       return null;

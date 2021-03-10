@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -551,6 +552,20 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       }
     }
     return -1;
+  }
+
+  @Override
+  public List<Locale> getLanguages() {
+    String query =
+        "SELECT DISTINCT languages FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + ", jsonb_object_keys("
+            + tableAlias
+            + ".label) AS languages";
+    List<Locale> result = dbi.withHandle(h -> h.createQuery(query).mapTo(Locale.class).list());
+    return result;
   }
 
   @Override

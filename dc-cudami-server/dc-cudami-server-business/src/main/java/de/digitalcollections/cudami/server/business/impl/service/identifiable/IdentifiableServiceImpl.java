@@ -117,6 +117,11 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
+  public List<Locale> getLanguages() {
+    return repository.getLanguages();
+  }
+
+  @Override
   public List<Entity> getRelatedEntities(UUID identifiableUuid) {
     return repository.getRelatedEntities(identifiableUuid);
   }

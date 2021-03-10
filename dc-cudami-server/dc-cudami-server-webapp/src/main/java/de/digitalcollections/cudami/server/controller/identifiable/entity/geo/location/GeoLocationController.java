@@ -38,7 +38,7 @@ public class GeoLocationController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationController.class);
 
-  @Autowired GeoLocationService geoLocationService;
+  @Autowired private GeoLocationService geoLocationService;
 
   @ApiMethod(description = "count all geolocations")
   @GetMapping(
@@ -115,6 +115,15 @@ public class GeoLocationController {
       throws IdentifiableServiceException {
     GeoLocation result = geoLocationService.getByIdentifier(namespace, id);
     return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
+  @ApiMethod(description = "Get languages of all geolocations")
+  @GetMapping(
+      value = {"/latest/geolocations/languages", "/v3/geolocations/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public List<Locale> getLanguages() {
+    return geoLocationService.getLanguages();
   }
 
   @ApiMethod(description = "save a newly created geolocation")
