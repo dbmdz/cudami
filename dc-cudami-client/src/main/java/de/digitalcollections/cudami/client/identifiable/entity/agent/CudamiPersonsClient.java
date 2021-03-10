@@ -10,6 +10,7 @@ import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class CudamiPersonsClient extends CudamiBaseClient<Person> {
@@ -79,6 +80,10 @@ public class CudamiPersonsClient extends CudamiBaseClient<Person> {
   public List getDigitalObjects(UUID uuidPerson) throws HttpException {
     return doGetRequestForObjectList(
         String.format("/latest/persons/%s/digitalobjects", uuidPerson), DigitalObject.class);
+  }
+
+  public List<Locale> getLanguages() throws HttpException {
+    return doGetRequestForObjectList("/latest/persons/languages", Locale.class);
   }
 
   public List getWorks(UUID uuidPerson) throws HttpException {

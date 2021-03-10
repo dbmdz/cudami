@@ -106,7 +106,11 @@ public class PersonsController extends AbstractController {
   }
 
   @GetMapping("/persons")
-  public String list() {
+  public String list(Model model) throws HttpException {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
+    model.addAttribute(
+        "existingLanguages",
+        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages()));
     return "persons/list";
   }
 

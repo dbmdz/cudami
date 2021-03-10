@@ -62,8 +62,70 @@ In `cudami/dc-cudami-admin/src/main/java/de/digitalcollections/cudami/admin/cont
 
 ```java
 @GetMapping("/persons")
-public String list() {
-  return "persons/list";
+  public String list(Model model) throws HttpException {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
+    model.addAttribute(
+        "existingLanguages",
+        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages()));
+    return "persons/list";
+  }
+```
+
+As the list should be multilingual, we need the list of all languages the label of persons have in backend. Therefore the call `service.getLanguages()` has to be implemented if not exists already.
+
+* Add `getLanguages` method
+
+In `cudami/dc-cudami-client/src/main/java/de/digitalcollections/cudami/client/identifiable/entity/agent/CudamiPersonsClient.java`:
+
+```
+public List<Locale> getLanguages() throws HttpException {
+    return doGetRequestForObjectList("/latest/persons/languages", Locale.class);
+}
+```
+
+In `cudami/dc-cudami-server/dc-cudami-server-webapp/src/main/java/de/digitalcollections/cudami/server/controller/identifiable/entity/agent/PersonController.java`
+
+```
+@ApiMethod(description = "Get languages of all persons")
+@GetMapping(
+    value = {"/latest/persons/languages", "/v3/persons/languages"},
+    produces = MediaType.APPLICATION_JSON_VALUE)
+@ApiResponseObject
+public List<Locale> getLanguages() {
+  return personService.getLanguages();
+}
+```
+
+In `cudami/dc-cudami-server/dc-cudami-server-business/src/main/java/de/digitalcollections/cudami/server/business/api/service/identifiable/entity/agent/PersonService.java`:
+
+```
+List<Locale> getLanguages();
+```
+
+In `cudami/dc-cudami-server/dc-cudami-server-business/src/main/java/de/digitalcollections/cudami/server/business/impl/service/identifiable/entity/agent/PersonServiceImpl.java`:
+
+```
+@Override
+public List<Locale> getLanguages() {
+  return ((PersonRepository) repository).getLanguages();
+}
+```
+
+In `cudami/dc-cudami-server/dc-cudami-server-backend-api/src/main/java/de/digitalcollections/cudami/server/backend/api/repository/identifiable/entity/agent/PersonRepository.java`:
+
+```
+List<Locale> getLanguages();
+```
+
+In `cudami/dc-cudami-server/dc-cudami-server-backend-jdbi/src/main/java/de/digitalcollections/cudami/server/backend/impl/jdbi/identifiable/entity/agent/PersonRepositoryImpl.java`:
+
+```
+@Override
+public List<Locale> getLanguages() {
+  String query =
+      "SELECT DISTINCT languages FROM persons as p, jsonb_object_keys(p.label) as languages";
+  List<Locale> result = dbi.withHandle(h -> h.createQuery(query).mapTo(Locale.class).list());
+  return result;
 }
 ```
 

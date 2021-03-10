@@ -9,6 +9,8 @@ import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -51,6 +53,11 @@ public class PersonServiceImpl extends EntityServiceImpl<Person> implements Pers
   @Override
   public Set<DigitalObject> getDigitalObjects(UUID uuidPerson) {
     return ((PersonRepository) repository).getDigitalObjects(uuidPerson);
+  }
+
+  @Override
+  public List<Locale> getLanguages() {
+    return ((PersonRepository) repository).getLanguages();
   }
 
   @Override

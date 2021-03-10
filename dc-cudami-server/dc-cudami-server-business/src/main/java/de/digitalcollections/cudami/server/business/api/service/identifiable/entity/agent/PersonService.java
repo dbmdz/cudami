@@ -6,6 +6,8 @@ import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
@@ -16,6 +18,8 @@ public interface PersonService extends EntityService<Person> {
   PageResponse<Person> findByLocationOfDeath(PageRequest pageRequest, UUID uuid);
 
   Set<DigitalObject> getDigitalObjects(UUID uuidPerson);
+
+  List<Locale> getLanguages();
 
   default Set<Work> getWorks(Person person) {
     if (person == null) {

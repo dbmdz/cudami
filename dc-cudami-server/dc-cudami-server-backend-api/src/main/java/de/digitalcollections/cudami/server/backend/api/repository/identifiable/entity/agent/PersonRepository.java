@@ -4,12 +4,16 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
 public interface PersonRepository extends EntityRepository<Person> {
 
   Set<DigitalObject> getDigitalObjects(UUID uuidPerson);
+
+  List<Locale> getLanguages();
 
   default Set<Work> getWorks(Person person) {
     if (person == null) {
