@@ -11,6 +11,19 @@
     "start": "react-scripts start",
     "test": "react-scripts test"
   },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "prettier": "@fisker/prettier-config",
   "eslintConfig": {
     "extends": "react-app"
   },
@@ -51,21 +64,15 @@
     "@babel/plugin-transform-runtime": "^7.13.10",
     "@fisker/prettier-config": "^4.0.1",
     "eslint-plugin-react": "^7.22.0",
+    "import-sort-style-module": "^6.0.0",
     "prettier": "2.2.1",
+    "prettier-plugin-import-sort": "0.0.6",
     "react-router-dom": "^5.2.0",
     "webpack-cli": "^4.5.0"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "prettier": "@fisker/prettier-config"
+  "importSort": {
+    ".js, .jsx": {
+      "style": "module"
+    }
+  }
 }
