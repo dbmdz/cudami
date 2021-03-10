@@ -31,11 +31,11 @@ import {BrowserRouter as Router, Link, Route} from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.min.css'
 
 import initI18n from './i18n'
-import IdentifiableForm from './components/IdentifiableForm'
-import PagedIdentifiableList from './components/PagedIdentifiableList'
-import PagedRenderingTemplateList from './components/PagedRenderingTemplateList'
-import RenderingTemplateForm from './components/RenderingTemplateForm'
+import IdentifiableForm from './components/forms/IdentifiableForm'
+import RenderingTemplateForm from './components/forms/RenderingTemplateForm'
+import PagedIdentifiableList from './components/lists/PagedIdentifiableList'
 import PagedIdentifierTypeList from './components/lists/PagedIdentifierTypeList'
+import PagedRenderingTemplateList from './components/lists/PagedRenderingTemplateList'
 
 const availableFormTypes = [
   'article',

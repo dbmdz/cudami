@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from 'react'
-import {Button, Card, CardBody, Col, Nav, Row, Table} from 'reactstrap'
+import {Card, CardBody, Col, Nav, Row, Table} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-import LanguageTab from './LanguageTab'
-import ListButtons from './ListButtons'
-import ListPagination from './ListPagination'
-import {loadDefaultLanguage, typeToEndpointMapping} from '../api'
-import usePagination from '../hooks/usePagination'
+import ActionButtons from './ActionButtons'
+import LanguageTab from '../LanguageTab'
+import Pagination from '../Pagination'
+import {loadDefaultLanguage, typeToEndpointMapping} from '../../api'
+import usePagination from '../../hooks/usePagination'
 
 const PagedGeoLocationsList = ({apiContextPath = '/', mockApi = false}) => {
   const type = 'geoLocation'
@@ -46,7 +46,7 @@ const PagedGeoLocationsList = ({apiContextPath = '/', mockApi = false}) => {
       </Nav>
       <Card className="border-top-0">
         <CardBody>
-          <ListPagination
+          <Pagination
             changePage={({selected}) => setPageNumber(selected)}
             numberOfPages={numberOfPages}
             pageNumber={pageNumber}
@@ -67,7 +67,7 @@ const PagedGeoLocationsList = ({apiContextPath = '/', mockApi = false}) => {
                   <td>{label?.[defaultLanguage]}</td>
                   <td>{description?.[defaultLanguage]}</td>
                   <td className="text-center">
-                    <ListButtons
+                    <ActionButtons
                       editUrl={`${apiContextPath}${typeToEndpointMapping[type]}/${uuid}/edit`}
                       showEdit={false}
                       showView={false}
@@ -77,7 +77,7 @@ const PagedGeoLocationsList = ({apiContextPath = '/', mockApi = false}) => {
               ))}
             </tbody>
           </Table>
-          <ListPagination
+          <Pagination
             changePage={({selected}) => setPageNumber(selected)}
             numberOfPages={numberOfPages}
             pageNumber={pageNumber}

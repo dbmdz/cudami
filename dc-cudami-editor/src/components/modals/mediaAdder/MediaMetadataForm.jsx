@@ -11,7 +11,7 @@ import {
 } from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-import FloatingLabelInput from '../../FloatingLabelInput'
+import InputWithFloatingLabel from '../../InputWithFloatingLabel'
 import InfoTooltip from '../../InfoTooltip'
 
 const MediaMetadataForm = ({
@@ -39,7 +39,7 @@ const MediaMetadataForm = ({
           {enableCaption && (
             <FormGroup>
               <InputGroup>
-                <FloatingLabelInput
+                <InputWithFloatingLabel
                   label={t('caption')}
                   name={`${mediaType}-caption`}
                   onChange={(value) => onChange('caption', value)}
@@ -57,7 +57,7 @@ const MediaMetadataForm = ({
           {enableTitle && (
             <FormGroup>
               <InputGroup>
-                <FloatingLabelInput
+                <InputWithFloatingLabel
                   label={t('tooltip')}
                   name={`${mediaType}-title`}
                   onChange={(value) => onChange('title', value)}
@@ -75,7 +75,7 @@ const MediaMetadataForm = ({
           {enableAltText && (
             <FormGroup>
               <InputGroup>
-                <FloatingLabelInput
+                <InputWithFloatingLabel
                   label={t('altText')}
                   name={`${mediaType}-alttext`}
                   onChange={(value) => onChange('altText', value)}

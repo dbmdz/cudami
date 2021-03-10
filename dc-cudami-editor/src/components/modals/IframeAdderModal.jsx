@@ -12,7 +12,7 @@ import {
 } from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
-import FloatingLabelInput from '../FloatingLabelInput'
+import InputWithFloatingLabel from '../InputWithFloatingLabel'
 
 class IframeAdderModal extends Component {
   initialAttributes = {
@@ -85,7 +85,7 @@ class IframeAdderModal extends Component {
             }}
           >
             <FormGroup>
-              <FloatingLabelInput
+              <InputWithFloatingLabel
                 label="URL"
                 name="iframe-url"
                 onChange={(value) => this.setAttribute('src', value.trim())}
@@ -95,7 +95,7 @@ class IframeAdderModal extends Component {
               />
             </FormGroup>
             <FormGroup>
-              <FloatingLabelInput
+              <InputWithFloatingLabel
                 label={t('width')}
                 name="iframe-width"
                 onChange={(value) => this.setAttribute('width', value)}
@@ -106,7 +106,7 @@ class IframeAdderModal extends Component {
               </FormText>
             </FormGroup>
             <FormGroup>
-              <FloatingLabelInput
+              <InputWithFloatingLabel
                 label={t('height')}
                 name="iframe-height"
                 onChange={(value) => this.setAttribute('height', value)}
@@ -117,7 +117,7 @@ class IframeAdderModal extends Component {
               </FormText>
             </FormGroup>
             <FormGroup>
-              <FloatingLabelInput
+              <InputWithFloatingLabel
                 label={t('tooltip')}
                 name="iframe-title"
                 onChange={(value) => this.setAttribute('title', value)}

@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import React, {useState} from 'react'
 import {Input, Label} from 'reactstrap'
 
-const FloatingLabelInput = ({
+const InputWithFloatingLabel = ({
   label,
   name,
   onChange,
@@ -41,4 +41,4 @@ const FloatingLabelInput = ({
   )
 }
 
-export default FloatingLabelInput
+export default InputWithFloatingLabel

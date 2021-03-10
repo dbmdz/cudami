@@ -11,12 +11,12 @@ import {
 } from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-import FormButtons from './FormButtons'
-import FormEditor from './FormEditor'
-import FormInput from './FormInput'
-import LanguageAdder from './LanguageAdder'
-import LanguageTab from './LanguageTab'
-import Teaser from './Teaser'
+import ActionButtons from './ActionButtons'
+import InputWithLabel from '../InputWithLabel'
+import LanguageAdder from '../LanguageAdder'
+import LanguageTab from '../LanguageTab'
+import Teaser from '../Teaser'
+import EditorWithLabel from '../editor/EditorWithLabel'
 
 const ArticleForm = ({
   activeLanguage,
@@ -43,7 +43,7 @@ const ArticleForm = ({
           <h1>{identifiable.uuid ? t('editArticle') : t('createArticle')}</h1>
         </Col>
         <Col xs="6" sm="3">
-          <FormButtons formId={formId} />
+          <ActionButtons formId={formId} />
         </Col>
       </Row>
       <Row>
@@ -54,7 +54,7 @@ const ArticleForm = ({
       <Row>
         <Col sm="12">
           {identifiable.uuid && (
-            <FormInput
+            <InputWithLabel
               id="uuid"
               label="ID"
               readOnly
@@ -96,7 +96,7 @@ const ArticleForm = ({
                 />
                 <Card className="border-top-0">
                   <CardBody>
-                    <FormEditor
+                    <EditorWithLabel
                       document={identifiable.text[language]}
                       type="text"
                       onUpdate={(document) => {

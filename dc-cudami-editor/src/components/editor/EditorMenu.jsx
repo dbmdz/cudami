@@ -2,7 +2,7 @@ import React from 'react'
 import classNames from 'classnames'
 import {DropdownItem, DropdownMenu, UncontrolledDropdown} from 'reactstrap'
 
-import './FormEditorMenu.css'
+import './EditorMenu.css'
 
 const Button = ({dispatch, fullWidth, item, state}) => {
   const disabled = item.enable && !item.enable(state)
@@ -78,7 +78,7 @@ const DropDown = ({dispatch, item, state}) => {
   )
 }
 
-const FormEditorMenu = ({menu, view}) => (
+const EditorMenu = ({menu, view}) => (
   <div className="menu-bar">
     {Object.entries(menu).map(([key, value]) => (
       <ButtonGroup items={value} key={key} view={view} />
@@ -86,4 +86,4 @@ const FormEditorMenu = ({menu, view}) => (
   </div>
 )
 
-export default FormEditorMenu
+export default EditorMenu

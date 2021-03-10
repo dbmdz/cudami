@@ -1,25 +1,14 @@
 import React from 'react'
-import {
-  Card,
-  CardBody,
-  Col,
-  Form,
-  Nav,
-  Row,
-  TabContent,
-  TabPane,
-} from 'reactstrap'
+import {Col, Form, Nav, Row, TabContent, TabPane} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-import FormButtons from './FormButtons'
-import FormDateInput from './FormDateInput'
-import FormEditor from './FormEditor'
-import FormInput from './FormInput'
-import LanguageAdder from './LanguageAdder'
-import LanguageTab from './LanguageTab'
-import Teaser from './Teaser'
+import ActionButtons from './ActionButtons'
+import InputWithLabel from '../InputWithLabel'
+import LanguageAdder from '../LanguageAdder'
+import LanguageTab from '../LanguageTab'
+import Teaser from '../Teaser'
 
-const CollectionForm = ({
+const WebsiteForm = ({
   activeLanguage,
   canAddLanguage,
   existingLanguages,
@@ -42,11 +31,13 @@ const CollectionForm = ({
       <Row>
         <Col xs="6" sm="9">
           <h1>
-            {identifiable.uuid ? t('editCollection') : t('createCollection')}
+            {identifiable.uuid
+              ? t('editWebsite', {url: identifiable.url})
+              : t('createWebsite')}
           </h1>
         </Col>
         <Col xs="6" sm="3">
-          <FormButtons formId={formId} />
+          <ActionButtons formId={formId} />
         </Col>
       </Row>
       <Row>
@@ -54,38 +45,24 @@ const CollectionForm = ({
           <hr />
         </Col>
       </Row>
-      {identifiable.uuid && (
-        <Row>
-          <Col sm="12">
-            <FormInput
+      <Row>
+        <Col sm="12">
+          {identifiable.uuid && (
+            <InputWithLabel
               id="uuid"
               label="ID"
               readOnly
               value={identifiable.uuid}
             />
-          </Col>
-        </Row>
-      )}
-      <Row>
-        <Col sm="3">
-          <FormDateInput
-            id="publication-start-date"
-            label={t('publicationStatus.startDate')}
-            onChange={(date) => onUpdate({publicationStart: date})}
-            value={identifiable.publicationStart}
+          )}
+          <InputWithLabel
+            îd="url"
+            label="URL"
+            onChange={(url) => onUpdate({...identifiable, url})}
+            required
+            type="url"
+            value={identifiable.url}
           />
-        </Col>
-        <Col sm="3">
-          <FormDateInput
-            id="publication-end-date"
-            label={t('publicationStatus.endDate')}
-            onChange={(date) => onUpdate({publicationEnd: date})}
-            value={identifiable.publicationEnd}
-          />
-        </Col>
-      </Row>
-      <Row>
-        <Col sm="12">
           <Nav tabs>
             {existingLanguages.map((language) => (
               <LanguageTab
@@ -119,22 +96,6 @@ const CollectionForm = ({
                   }
                   updatePreviewImage={onUpdate}
                 />
-                <Card className="border-top-0">
-                  <CardBody>
-                    <FormEditor
-                      document={identifiable.text[language]}
-                      type="text"
-                      onUpdate={(document) => {
-                        onUpdate({
-                          text: {
-                            ...identifiable.text,
-                            [language]: document,
-                          },
-                        })
-                      }}
-                    />
-                  </CardBody>
-                </Card>
               </TabPane>
             ))}
           </TabContent>
@@ -144,4 +105,4 @@ const CollectionForm = ({
   )
 }
 
-export default CollectionForm
+export default WebsiteForm

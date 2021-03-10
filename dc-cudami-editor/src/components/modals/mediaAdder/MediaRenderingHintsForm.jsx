@@ -11,7 +11,7 @@ import {
 } from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-import FloatingLabelInput from '../../FloatingLabelInput'
+import InputWithFloatingLabel from '../../InputWithFloatingLabel'
 
 const MediaRenderingHintsForm = ({
   alignment,
@@ -124,7 +124,7 @@ const MediaRenderingHintsForm = ({
               <Label className="font-weight-bold">
                 {t(`${mediaType}Link`)}
               </Label>
-              <FloatingLabelInput
+              <InputWithFloatingLabel
                 label="URL"
                 name={`${mediaType}-link`}
                 onChange={(value) => onChange('linkUrl', value)}

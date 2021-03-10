@@ -11,14 +11,15 @@ import {
 } from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-import FormButtons from './FormButtons'
-import FormEditor from './FormEditor'
-import FormInput from './FormInput'
-import LanguageAdder from './LanguageAdder'
-import LanguageTab from './LanguageTab'
-import Teaser from './Teaser'
+import ActionButtons from './ActionButtons'
+import DateInput from '../DateInput'
+import EditorWithLabel from '../editor/EditorWithLabel'
+import InputWithLabel from '../InputWithLabel'
+import LanguageAdder from '../LanguageAdder'
+import LanguageTab from '../LanguageTab'
+import Teaser from '../Teaser'
 
-const CorporateBodyForm = ({
+const CollectionForm = ({
   activeLanguage,
   canAddLanguage,
   existingLanguages,
@@ -41,13 +42,11 @@ const CorporateBodyForm = ({
       <Row>
         <Col xs="6" sm="9">
           <h1>
-            {identifiable.uuid
-              ? t('editCorporateBody')
-              : t('createCorporateBody')}
+            {identifiable.uuid ? t('editCollection') : t('createCollection')}
           </h1>
         </Col>
         <Col xs="6" sm="3">
-          <FormButtons formId={formId} />
+          <ActionButtons formId={formId} />
         </Col>
       </Row>
       <Row>
@@ -55,23 +54,38 @@ const CorporateBodyForm = ({
           <hr />
         </Col>
       </Row>
-      <Row>
-        <Col sm="12">
-          {identifiable.uuid && (
-            <FormInput
+      {identifiable.uuid && (
+        <Row>
+          <Col sm="12">
+            <InputWithLabel
               id="uuid"
               label="ID"
               readOnly
               value={identifiable.uuid}
             />
-          )}
-          <FormInput
-            îd="homepage"
-            labelKey="homepage"
-            onChange={(url) => onUpdate({...identifiable, homepageUrl: url})}
-            type="url"
-            value={identifiable.homepageUrl}
+          </Col>
+        </Row>
+      )}
+      <Row>
+        <Col sm="3">
+          <DateInput
+            id="publication-start-date"
+            label={t('publicationStatus.startDate')}
+            onChange={(date) => onUpdate({publicationStart: date})}
+            value={identifiable.publicationStart}
           />
+        </Col>
+        <Col sm="3">
+          <DateInput
+            id="publication-end-date"
+            label={t('publicationStatus.endDate')}
+            onChange={(date) => onUpdate({publicationEnd: date})}
+            value={identifiable.publicationEnd}
+          />
+        </Col>
+      </Row>
+      <Row>
+        <Col sm="12">
           <Nav tabs>
             {existingLanguages.map((language) => (
               <LanguageTab
@@ -107,7 +121,7 @@ const CorporateBodyForm = ({
                 />
                 <Card className="border-top-0">
                   <CardBody>
-                    <FormEditor
+                    <EditorWithLabel
                       document={identifiable.text[language]}
                       type="text"
                       onUpdate={(document) => {
@@ -130,4 +144,4 @@ const CorporateBodyForm = ({
   )
 }
 
-export default CorporateBodyForm
+export default CollectionForm

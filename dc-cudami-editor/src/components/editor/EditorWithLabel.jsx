@@ -3,11 +3,11 @@ import {Editor} from '@aeaton/react-prosemirror'
 import {Label} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
-import './FormEditor.css'
-import FormEditorMenu from './FormEditorMenu'
-import {menu, options} from '../config'
+import './EditorWithLabel.css'
+import EditorMenu from './EditorMenu'
+import {menu, options} from '../../config'
 
-class FormEditor extends Component {
+class EditorWithLabel extends Component {
   constructor(props) {
     super(props)
     this.editorOptions = {
@@ -38,7 +38,7 @@ class FormEditor extends Component {
             }}
             render={({editor, view}) => (
               <>
-                <FormEditorMenu menu={translatedMenu} view={view} />
+                <EditorMenu menu={translatedMenu} view={view} />
                 <div className="text-area">{editor}</div>
               </>
             )}
@@ -49,4 +49,4 @@ class FormEditor extends Component {
   }
 }
 
-export default withTranslation()(FormEditor)
+export default withTranslation()(EditorWithLabel)

@@ -2,9 +2,9 @@ import React, {Component} from 'react'
 import {Button, ButtonGroup, Card, Col, Form, Input, Row} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
-import AppContext from './AppContext'
-import FileUploadForm from './FileUploadForm'
-import {uploadFile} from '../api'
+import FileUploadForm from '../FileUploadForm'
+import AppContext from '../AppContext'
+import {uploadFile} from '../../api'
 
 class FileResourceUploadForm extends Component {
   constructor(props) {

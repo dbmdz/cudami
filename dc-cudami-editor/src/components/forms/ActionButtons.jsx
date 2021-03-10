@@ -5,14 +5,14 @@ import {createPortal} from 'react-dom'
 import {useTranslation} from 'react-i18next'
 import {useInView} from 'react-intersection-observer'
 
-const FormButtonsInNavbar = ({buttons, navbar}) => {
+const ActionButtonsInNavbar = ({buttons, navbar}) => {
   return createPortal(
     <NavItem className="border-left ml-2 pl-3">{buttons}</NavItem>,
     navbar.querySelector('.navbar-nav')
   )
 }
 
-const FormButtons = ({formId}) => {
+const ActionButtons = ({formId}) => {
   const navbar = document.querySelector('.navbar')
   const {inView, ref} = useInView({
     delay: 100,
@@ -37,7 +37,7 @@ const FormButtons = ({formId}) => {
   })
   return (
     <>
-      {!inView && <FormButtonsInNavbar buttons={buttons} navbar={navbar} />}
+      {!inView && <ActionButtonsInNavbar buttons={buttons} navbar={navbar} />}
       <div className={classes} ref={ref}>
         {buttons}
       </div>
@@ -45,4 +45,4 @@ const FormButtons = ({formId}) => {
   )
 }
 
-export default FormButtons
+export default ActionButtons

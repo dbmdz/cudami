@@ -3,12 +3,12 @@ import {Table} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 import {FaHashtag, FaImage} from 'react-icons/fa'
 
-import AppContext from './AppContext'
-import ListButtons from './ListButtons'
-import PreviewImage from './PreviewImage'
-import PublicationStatus from './PublicationStatus'
-import {formatDate} from './utils'
-import {typeToEndpointMapping} from '../api'
+import ActionButtons from './ActionButtons'
+import AppContext from '../AppContext'
+import PreviewImage from '../PreviewImage'
+import PublicationStatus from '../PublicationStatus'
+import {formatDate} from '../utils'
+import {typeToEndpointMapping} from '../../api'
 
 const CollectionList = ({
   enableMove,
@@ -91,7 +91,7 @@ const CollectionList = ({
                   {formatDate(new Date(lastModified), uiLocale)}
                 </td>
                 <td className="text-center">
-                  <ListButtons
+                  <ActionButtons
                     enableMove={enableMove}
                     enableRemove={enableRemove}
                     onMove={() => onMove(index)}

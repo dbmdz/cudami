@@ -10,7 +10,7 @@ import {
 import {useTranslation} from 'react-i18next'
 import {FaEdit, FaPlus, FaTrash} from 'react-icons/fa'
 
-const FormTemplateSelector = ({onClick, onRemove, templateName}) => {
+const TemplateSelector = ({onClick, onRemove, templateName}) => {
   const {t} = useTranslation()
   const id = 'rendering-template-selector'
   return (
@@ -51,4 +51,4 @@ const FormTemplateSelector = ({onClick, onRemove, templateName}) => {
   )
 }
 
-export default FormTemplateSelector
+export default TemplateSelector

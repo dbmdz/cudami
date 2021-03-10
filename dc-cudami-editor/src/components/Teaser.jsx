@@ -1,9 +1,9 @@
 import React from 'react'
 import {Card, CardBody, Col, Row} from 'reactstrap'
 
-import FormEditor from './FormEditor'
-import FormInput from './FormInput'
+import InputWithLabel from './InputWithLabel'
 import TeaserPreviewImage from './TeaserPreviewImage'
+import EditorWithLabel from './editor/EditorWithLabel'
 
 const Teaser = ({
   description,
@@ -27,7 +27,7 @@ const Teaser = ({
             />
           </Col>
           <Col sm="10">
-            <FormInput
+            <InputWithLabel
               id={`label-${language}`}
               labelKey="label"
               onChange={(label) => {
@@ -35,7 +35,7 @@ const Teaser = ({
               }}
               value={label}
             />
-            <FormEditor
+            <EditorWithLabel
               document={description}
               onUpdate={(document) => {
                 onUpdate('description', document)

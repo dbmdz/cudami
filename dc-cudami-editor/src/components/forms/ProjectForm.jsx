@@ -1,14 +1,24 @@
 import React from 'react'
-import {Col, Form, Nav, Row, TabContent, TabPane} from 'reactstrap'
+import {
+  Card,
+  CardBody,
+  Col,
+  Form,
+  Nav,
+  Row,
+  TabContent,
+  TabPane,
+} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
-import FormButtons from './FormButtons'
-import FormInput from './FormInput'
-import LanguageAdder from './LanguageAdder'
-import LanguageTab from './LanguageTab'
-import Teaser from './Teaser'
+import ActionButtons from './ActionButtons'
+import EditorWithLabel from '../editor/EditorWithLabel'
+import InputWithLabel from '../InputWithLabel'
+import LanguageAdder from '../LanguageAdder'
+import LanguageTab from '../LanguageTab'
+import Teaser from '../Teaser'
 
-const WebsiteForm = ({
+const ProjectForm = ({
   activeLanguage,
   canAddLanguage,
   existingLanguages,
@@ -30,14 +40,10 @@ const WebsiteForm = ({
     >
       <Row>
         <Col xs="6" sm="9">
-          <h1>
-            {identifiable.uuid
-              ? t('editWebsite', {url: identifiable.url})
-              : t('createWebsite')}
-          </h1>
+          <h1>{identifiable.uuid ? t('editProject') : t('createProject')}</h1>
         </Col>
         <Col xs="6" sm="3">
-          <FormButtons formId={formId} />
+          <ActionButtons formId={formId} />
         </Col>
       </Row>
       <Row>
@@ -48,21 +54,13 @@ const WebsiteForm = ({
       <Row>
         <Col sm="12">
           {identifiable.uuid && (
-            <FormInput
+            <InputWithLabel
               id="uuid"
               label="ID"
               readOnly
               value={identifiable.uuid}
             />
           )}
-          <FormInput
-            îd="url"
-            label="URL"
-            onChange={(url) => onUpdate({...identifiable, url})}
-            required
-            type="url"
-            value={identifiable.url}
-          />
           <Nav tabs>
             {existingLanguages.map((language) => (
               <LanguageTab
@@ -96,6 +94,22 @@ const WebsiteForm = ({
                   }
                   updatePreviewImage={onUpdate}
                 />
+                <Card className="border-top-0">
+                  <CardBody>
+                    <EditorWithLabel
+                      document={identifiable.text[language]}
+                      type="text"
+                      onUpdate={(document) => {
+                        onUpdate({
+                          text: {
+                            ...identifiable.text,
+                            [language]: document,
+                          },
+                        })
+                      }}
+                    />
+                  </CardBody>
+                </Card>
               </TabPane>
             ))}
           </TabContent>
@@ -105,4 +119,4 @@ const WebsiteForm = ({
   )
 }
 
-export default WebsiteForm
+export default ProjectForm

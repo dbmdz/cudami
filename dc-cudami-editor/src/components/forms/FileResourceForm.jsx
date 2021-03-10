@@ -3,11 +3,11 @@ import {Col, Form, Nav, Row, TabContent, TabPane} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 
 import FileResourceUploadForm from './FileResourceUploadForm'
-import FormButtons from './FormButtons'
-import FormInput from './FormInput'
-import LanguageAdder from './LanguageAdder'
-import LanguageTab from './LanguageTab'
-import Teaser from './Teaser'
+import ActionButtons from './ActionButtons'
+import InputWithLabel from '../InputWithLabel'
+import LanguageAdder from '../LanguageAdder'
+import LanguageTab from '../LanguageTab'
+import Teaser from '../Teaser'
 
 const FileResourceForm = ({
   activeLanguage,
@@ -37,7 +37,7 @@ const FileResourceForm = ({
           <h1>{t('editFileResource', {name: identifiable.filename})}</h1>
         </Col>
         <Col xs="6" sm="3">
-          <FormButtons formId={formId} />
+          <ActionButtons formId={formId} />
         </Col>
       </Row>
       <Row>
@@ -47,7 +47,12 @@ const FileResourceForm = ({
       </Row>
       <Row>
         <Col sm="12">
-          <FormInput id="uuid" label="ID" readOnly value={identifiable.uuid} />
+          <InputWithLabel
+            id="uuid"
+            label="ID"
+            readOnly
+            value={identifiable.uuid}
+          />
           <Nav tabs>
             {existingLanguages.map((language) => (
               <LanguageTab

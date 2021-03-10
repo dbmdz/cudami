@@ -14,7 +14,7 @@ import {
 import {useTranslation} from 'react-i18next'
 
 import AppContext from '../AppContext'
-import ListPagination from '../ListPagination'
+import Pagination from '../Pagination'
 import usePagination from '../../hooks/usePagination'
 
 const SelectRenderingTemplateModal = ({isOpen, onSelect, toggle}) => {
@@ -36,7 +36,7 @@ const SelectRenderingTemplateModal = ({isOpen, onSelect, toggle}) => {
     <Modal isOpen={isOpen} toggle={toggle}>
       <ModalHeader toggle={toggle}>{t('chooseRenderingTemplate')}</ModalHeader>
       <ModalBody>
-        <ListPagination
+        <Pagination
           changePage={({selected}) => setPageNumber(selected)}
           numberOfPages={numberOfPages}
           pageNumber={pageNumber}
@@ -66,7 +66,7 @@ const SelectRenderingTemplateModal = ({isOpen, onSelect, toggle}) => {
             </ListGroupItem>
           ))}
         </ListGroup>
-        <ListPagination
+        <Pagination
           changePage={({selected}) => setPageNumber(selected)}
           numberOfPages={numberOfPages}
           pageNumber={pageNumber}

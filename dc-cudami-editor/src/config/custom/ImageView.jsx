@@ -2,7 +2,7 @@ import React from 'react'
 import {publish, subscribe, unsubscribe} from 'pubsub-js'
 import {render} from 'react-dom'
 
-import EditButton from '../../components/EditButton'
+import EditButton from '../../components/editor/EditButton'
 
 class ImageView {
   constructor(node, view, getPos) {

@@ -17,7 +17,7 @@ const formatDate = (date) => {
   return undefined
 }
 
-const FormDateInput = ({id, label, onChange, value}) => {
+const DateInput = ({id, label, onChange, value}) => {
   const {uiLocale} = useContext(AppContext)
   const {t} = useTranslation()
   return (
@@ -42,4 +42,4 @@ const FormDateInput = ({id, label, onChange, value}) => {
   )
 }
 
-export default FormDateInput
+export default DateInput
