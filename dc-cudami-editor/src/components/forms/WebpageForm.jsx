@@ -20,7 +20,7 @@ import TemplateSelector from '../TemplateSelector'
 import LanguageAdder from '../LanguageAdder'
 import LanguageTab from '../LanguageTab'
 import Teaser from '../Teaser'
-import SelectRenderingTemplateModal from '../modals/SelectRenderingTemplateModal'
+import SelectRenderingTemplateDialog from '../dialogs/SelectRenderingTemplateDialog'
 
 const WebpageForm = ({
   activeLanguage,
@@ -179,7 +179,7 @@ const WebpageForm = ({
           </Col>
         </Row>
       </Form>
-      <SelectRenderingTemplateModal
+      <SelectRenderingTemplateDialog
         isOpen={isModalOpen}
         onSelect={(templateName) =>
           onUpdate({

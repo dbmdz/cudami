@@ -17,7 +17,7 @@ import AppContext from '../AppContext'
 import Pagination from '../Pagination'
 import usePagination from '../../hooks/usePagination'
 
-const SelectRenderingTemplateModal = ({isOpen, onSelect, toggle}) => {
+const SelectRenderingTemplateDialog = ({isOpen, onSelect, toggle}) => {
   const type = 'renderingTemplate'
   const {apiContextPath, defaultLanguage, mockApi} = useContext(AppContext)
   const {
@@ -85,4 +85,4 @@ const SelectRenderingTemplateModal = ({isOpen, onSelect, toggle}) => {
   )
 }
 
-export default SelectRenderingTemplateModal
+export default SelectRenderingTemplateDialog

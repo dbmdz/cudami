@@ -10,7 +10,7 @@ import {
 } from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
-class LanguageAdderModal extends Component {
+class AddLanguageDialog extends Component {
   constructor(props) {
     super(props)
     this.state = {}
@@ -73,4 +73,4 @@ class LanguageAdderModal extends Component {
   }
 }
 
-export default withTranslation()(LanguageAdderModal)
+export default withTranslation()(AddLanguageDialog)

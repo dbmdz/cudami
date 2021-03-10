@@ -4,14 +4,14 @@ import React, {Component} from 'react'
 import {Button, Form, Modal, ModalBody, ModalHeader} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
-import './MediaAdderModal.css'
+import './AddMediaDialog.css'
 import MediaMetadataForm from './mediaAdder/MediaMetadataForm'
 import MediaRenderingHintsForm from './mediaAdder/MediaRenderingHintsForm'
 import MediaSelector from './mediaAdder/MediaSelector'
 import AppContext from '../AppContext'
 import {loadIdentifiable, saveFileResource, updateFileResource} from '../../api'
 
-class ImageAdderModal extends Component {
+class AddImageDialog extends Component {
   initialAttributes = {
     alignment: 'left',
     altText: '',
@@ -201,6 +201,6 @@ class ImageAdderModal extends Component {
   }
 }
 
-ImageAdderModal.contextType = AppContext
+AddImageDialog.contextType = AppContext
 
-export default withTranslation()(ImageAdderModal)
+export default withTranslation()(AddImageDialog)

@@ -21,13 +21,13 @@ import {
   updateIdentifiable,
 } from '../../api'
 import '../../polyfills'
-import IframeAdderModal from '../modals/IframeAdderModal'
-import ImageAdderModal from '../modals/ImageAdderModal'
-import LanguageAdderModal from '../modals/LanguageAdderModal'
-import LinkAdderModal from '../modals/LinkAdderModal'
-import PreviewImageAdderModal from '../modals/PreviewImageAdderModal'
-import TableAdderModal from '../modals/TableAdderModal'
-import VideoAdderModal from '../modals/VideoAdderModal'
+import AddIframeDialog from '../dialogs/AddIframeDialog'
+import AddImageDialog from '../dialogs/AddImageDialog'
+import AddLanguageDialog from '../dialogs/AddLanguageDialog'
+import AddLinkDialog from '../dialogs/AddLinkDialog'
+import AddPreviewImageDialog from '../dialogs/AddPreviewImageDialog'
+import AddTableDialog from '../dialogs/AddTableDialog'
+import AddVideoDialog from '../dialogs/AddVideoDialog'
 
 class IdentifiableForm extends Component {
   identifiablesWithLongText = [
@@ -263,35 +263,35 @@ class IdentifiableForm extends Component {
             <FormErrors invalidLanguages={this.state.invalidLanguages} />
           )}
           {this.getFormComponent()}
-          <IframeAdderModal
+          <AddIframeDialog
             isOpen={this.state.modalsOpen.iframeAdder}
             onToggle={() => this.toggleModal('iframeAdder')}
           />
-          <ImageAdderModal
+          <AddImageDialog
             activeLanguage={this.state.activeLanguage}
             isOpen={this.state.modalsOpen.imageAdder}
             onToggle={() => this.toggleModal('imageAdder')}
           />
-          <LanguageAdderModal
+          <AddLanguageDialog
             addLanguage={this.addLanguage}
             availableLanguages={this.state.availableLanguages}
             isOpen={this.state.modalsOpen.languageAdder}
             onToggle={() => this.toggleModal('languageAdder')}
           />
-          <LinkAdderModal
+          <AddLinkDialog
             isOpen={this.state.modalsOpen.linkAdder}
             onToggle={() => this.toggleModal('linkAdder')}
           />
-          <TableAdderModal
+          <AddTableDialog
             isOpen={this.state.modalsOpen.tableAdder}
             onToggle={() => this.toggleModal('tableAdder')}
           />
-          <VideoAdderModal
+          <AddVideoDialog
             activeLanguage={this.state.activeLanguage}
             isOpen={this.state.modalsOpen.videoAdder}
             onToggle={() => this.toggleModal('videoAdder')}
           />
-          <PreviewImageAdderModal
+          <AddPreviewImageDialog
             activeLanguage={this.state.activeLanguage}
             isOpen={this.state.modalsOpen.previewImageAdder}
             onToggle={() => this.toggleModal('previewImageAdder')}

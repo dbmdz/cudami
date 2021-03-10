@@ -12,7 +12,7 @@ import {
 } from 'reactstrap'
 import {withTranslation} from 'react-i18next'
 
-class TableAdderModal extends Component {
+class AddTableDialog extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -89,4 +89,4 @@ class TableAdderModal extends Component {
   }
 }
 
-export default withTranslation()(TableAdderModal)
+export default withTranslation()(AddTableDialog)
