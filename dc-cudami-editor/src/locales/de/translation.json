@@ -51,6 +51,8 @@
       "digitalObjectFromProject": "Sind Sie sicher, dass Sie das Digitalisat aus dem Projekt entfernen wollen?",
       "subcollectionFromCollection": "Sind Sie sicher, dass Sie die untergeordnete Sammlung aus der Sammlung entfernen wollen?"
     },
+    "corporateBody": "Institution",
+    "corporateBodys": "Institutionen",
     "createArticle": "Neuen Artikel anlegen",
     "createCollection": "Neue Sammlung anlegen",
     "createCorporateBody": "Neue Institution anlegen",
@@ -189,6 +191,8 @@
     "totalElements": {
       "collections": "{{ count }} Sammlung gefunden",
       "collections_plural": "{{ count }} Sammlungen gefunden",
+      "corporateBodys": "{{ count }} Institution gefunden",
+      "corporateBodys_plural": "{{ count }} Institutionen gefunden",
       "digitalObjects": "{{ count }} Digitalisat gefunden",
       "digitalObjects_plural": "{{ count }} Digitalisate gefunden",
       "geoLocations": "{{ count }} Ort gefunden",

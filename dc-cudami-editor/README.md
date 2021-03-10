@@ -284,16 +284,16 @@ In `cudami/dc-cudami-admin/src/main/java/de/digitalcollections/cudami/admin/cont
 ```
 @GetMapping("/api/persons")
 @ResponseBody
-public PageResponse<PersonImpl> findAll(
+public PageResponse<Person> findAll(
     @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
     @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
     throws HttpException {
   List<Order> orders = new ArrayList<>();
-  OrderImpl labelOrder = new OrderImpl("label");
+  Order labelOrder = new Order("label");
   labelOrder.setSubProperty(localeService.getDefaultLanguage().getLanguage());
   orders.addAll(Arrays.asList(labelOrder));
-  Sorting sorting = new SortingImpl(orders);
-  PageRequest pageRequest = new PageRequestImpl(pageNumber, pageSize, sorting);
+  Sorting sorting = new Sorting(orders);
+  PageRequest pageRequest = new PageRequest(pageNumber, pageSize, sorting);
   return service.find(pageRequest);
 }
 ```

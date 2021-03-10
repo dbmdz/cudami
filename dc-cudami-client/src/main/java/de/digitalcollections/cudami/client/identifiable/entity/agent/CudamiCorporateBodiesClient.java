@@ -7,6 +7,8 @@ import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import java.net.http.HttpClient;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class CudamiCorporateBodiesClient extends CudamiBaseClient<CorporateBody> {
@@ -43,6 +45,10 @@ public class CudamiCorporateBodiesClient extends CudamiBaseClient<CorporateBody>
   public CorporateBody findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
         String.format("/latest/corporatebodies/identifier/%s:%s.json", namespace, id));
+  }
+
+  public List<Locale> getLanguages() throws HttpException {
+    return doGetRequestForObjectList("/latest/corporatebodies/languages", Locale.class);
   }
 
   public CorporateBody save(CorporateBody corporateBody) throws HttpException {

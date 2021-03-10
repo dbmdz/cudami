@@ -137,6 +137,15 @@ public class CorporateBodyController {
     return corporateBodyService.getByRefId(refId);
   }
 
+  @ApiMethod(description = "Get languages of all corporatebodies")
+  @GetMapping(
+      value = {"/latest/corporatebodies/languages", "/v3/corporatebodies/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public List<Locale> getLanguages() {
+    return corporateBodyService.getLanguages();
+  }
+
   @ApiMethod(description = "Save a newly created corporate body")
   @PostMapping(
       value = {"/latest/corporatebodies", "/v2/corporatebodies"},

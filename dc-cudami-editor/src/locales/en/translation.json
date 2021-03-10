@@ -51,6 +51,8 @@
       "digitalObjectFromProject": "Are you sure that you want to remove this digital object from the project?",
       "subcollectionFromCollection": "Are you sure that you want to remove this sub collection from the collection?"
     },
+    "corporateBody": "Corporate Body",
+    "corporateBodys": "Corporate Bodies",
     "createArticle": "Create a new article",
     "createCollection": "Create a new collection",
     "createCorporateBody": "Create a new corporate body",
@@ -189,6 +191,8 @@
     "totalElements": {
       "collections": "found {{ count }} collection",
       "collections_plural": "found {{ count }} collections",
+      "corporateBodys": "found {{ count }} corporate body",
+      "corporateBodys_plural": "found {{ count }} corporate bodies",
       "digitalObjects": "found {{ count }} digital object",
       "digitalObjects_plural": "found {{ count }} digital objects",
       "geoLocations": "found {{ count }} geolocation",
