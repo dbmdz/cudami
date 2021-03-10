@@ -1,4 +1,3 @@
-import '../common.css'
 import '../../polyfills'
 
 import uniqBy from 'lodash/uniqBy'

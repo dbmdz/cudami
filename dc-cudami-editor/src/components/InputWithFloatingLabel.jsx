@@ -1,3 +1,5 @@
+import './InputWithFloatingLabel.css'
+
 import classNames from 'classnames'
 import React, {useState} from 'react'
 import {Input, Label} from 'reactstrap'
