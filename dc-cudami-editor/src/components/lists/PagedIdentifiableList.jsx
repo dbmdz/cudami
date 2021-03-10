@@ -23,6 +23,7 @@ import FeedbackMessage from '../FeedbackMessage'
 import LanguageTab from '../LanguageTab'
 import Pagination from '../Pagination'
 import CollectionList from './CollectionList'
+import CorporateBodyList from './CorporateBodyList'
 import DigitalObjectList from './DigitalObjectList'
 import GeoLocationList from './GeoLocationList'
 import PersonList from './PersonList'
@@ -116,6 +117,7 @@ class PagedIdentifiableList extends Component {
   getListComponent = () => {
     const LIST_COMPONENT_MAPPING = {
       collection: CollectionList,
+      corporateBody: CorporateBodyList,
       digitalObject: DigitalObjectList,
       geoLocation: GeoLocationList,
       person: PersonList,
