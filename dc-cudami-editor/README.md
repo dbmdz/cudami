@@ -26,13 +26,13 @@ Start application (repository server and management webapp) and test your change
 ## Format JavaScript Files
 
 ```
-npm install --only=dev && npm run format
+npm install && npm run format
 ```
 
 ## Lint JavaScript files
 
 ```
-npm install --only=dev && npm run lint
+npm install && npm run lint
 ```
 
 ## Developer guide for adding a new object type
