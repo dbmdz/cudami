@@ -14,7 +14,3 @@ input:not([value=""]) ~ .floating-label {
   top: -11px;
   z-index: 5;
 }
-
-.nav-tabs .nav-link {
-  cursor: pointer;
-}

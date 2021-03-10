@@ -23,9 +23,7 @@ const Pagination = ({
         breakClassName="page-item"
         breakLabel="&hellip;"
         breakLinkClassName="page-link"
-        containerClassName={classNames({
-          'd-inline-flex': true,
-          pagination: true,
+        containerClassName={classNames('d-inline-flex pagination', {
           'mb-0': position === 'under',
           'mb-2': position === 'above',
           'mt-2': position === 'under',

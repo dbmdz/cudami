@@ -1,4 +1,3 @@
-import '../common.css'
 import '../../polyfills'
 
 import kebabCase from 'lodash/kebabCase'

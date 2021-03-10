@@ -30,8 +30,7 @@ const ActionButtons = ({formId}) => {
       </Button>
     </ButtonGroup>
   )
-  const classes = classNames({
-    'float-right': true,
+  const classes = classNames('float-right', {
     invisible: !inView,
     visible: inView,
   })

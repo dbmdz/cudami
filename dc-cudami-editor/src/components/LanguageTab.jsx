@@ -8,6 +8,7 @@ const LanguageTab = ({activeLanguage, language, toggle}) => {
     <NavItem>
       <NavLink
         className={language === activeLanguage ? 'active' : ''}
+        href="#"
         onClick={() => toggle(language)}
       >
         {t(`languageNames:${language}`)}

@@ -1,3 +1,5 @@
+import './InputWithFloatingLabel.css'
+
 import classNames from 'classnames'
 import React, {useState} from 'react'
 import {Input, Label} from 'reactstrap'
@@ -27,8 +29,7 @@ const InputWithFloatingLabel = ({
         value={value}
       />
       <Label
-        className={classNames({
-          'floating-label': true,
+        className={classNames('floating-label', {
           'text-muted': value === '' && !focussed,
           'text-primary': focussed,
           'text-secondary': value !== '' && !focussed,
