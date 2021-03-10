@@ -28,7 +28,7 @@ class LinkEditingToolbar {
       view.dispatch(view.state.tr.addMark(selection.from, selection.to, link))
       unsubscribe(token)
     })
-    publish('editor.show-link-modal', {
+    publish('editor.show-link-dialog', {
       attributes: this.link.attrs,
       editing: true,
     })

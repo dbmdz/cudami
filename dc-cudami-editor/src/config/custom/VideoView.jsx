@@ -53,7 +53,7 @@ class VideoView {
       dispatch(transaction)
       unsubscribe(token)
     })
-    publish('editor.show-video-modal', {
+    publish('editor.show-video-dialog', {
       attributes: this.node.attrs,
       editing: true,
     })

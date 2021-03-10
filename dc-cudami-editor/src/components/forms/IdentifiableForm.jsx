@@ -46,18 +46,18 @@ class IdentifiableForm extends Component {
     this.state = {
       activeLanguage: props.activeLanguage,
       availableLanguages: [],
+      dialogsOpen: {
+        addIframe: false,
+        addImage: false,
+        addLanguage: false,
+        addLink: false,
+        addPreviewImage: false,
+        addTable: false,
+        addVideo: false,
+      },
       existingLanguages: props.existingLanguages ?? [props.activeLanguage],
       identifiable: null,
       invalidLanguages: [],
-      modalsOpen: {
-        iframeAdder: false,
-        imageAdder: false,
-        languageAdder: false,
-        linkAdder: false,
-        previewImageAdder: false,
-        tableAdder: false,
-        videoAdder: false,
-      },
     }
   }
 
@@ -167,7 +167,7 @@ class IdentifiableForm extends Component {
         existingLanguages={this.state.existingLanguages}
         formId={`${kebabCase(this.props.type)}-form`}
         identifiable={this.state.identifiable}
-        onAddLanguage={() => this.toggleModal('languageAdder')}
+        onAddLanguage={() => this.toggleDialog('addLanguage')}
         onSubmit={this.submitIdentifiable}
         onToggleLanguage={this.toggleLanguage}
         onUpdate={this.updateIdentifiable}
@@ -230,11 +230,11 @@ class IdentifiableForm extends Component {
     })
   }
 
-  toggleModal = (name) => {
+  toggleDialog = (name) => {
     this.setState({
-      modalsOpen: {
-        ...this.state.modalsOpen,
-        [name]: !this.state.modalsOpen[name],
+      dialogsOpen: {
+        ...this.state.dialogsOpen,
+        [name]: !this.state.dialogsOpen[name],
       },
     })
   }
@@ -250,52 +250,59 @@ class IdentifiableForm extends Component {
 
   render() {
     const {apiContextPath, mockApi, uiLocale} = this.props
+    const {
+      activeLanguage,
+      availableLanguages,
+      defaultLanguage,
+      dialogsOpen,
+      invalidLanguages,
+    } = this.state
     return this.state.identifiable ? (
       <AppContext.Provider
         value={{
           apiContextPath,
-          defaultLanguage: this.state.defaultLanguage,
+          defaultLanguage,
           mockApi,
           uiLocale,
         }}
       >
         <div className="identifiable-editor">
-          {this.state.invalidLanguages.length > 0 && (
-            <FormErrors invalidLanguages={this.state.invalidLanguages} />
+          {invalidLanguages.length > 0 && (
+            <FormErrors invalidLanguages={invalidLanguages} />
           )}
           {this.getFormComponent()}
           <AddIframeDialog
-            isOpen={this.state.modalsOpen.iframeAdder}
-            onToggle={() => this.toggleModal('iframeAdder')}
+            isOpen={dialogsOpen.addIframe}
+            onToggle={() => this.toggleDialog('addIframe')}
           />
           <AddImageDialog
-            activeLanguage={this.state.activeLanguage}
-            isOpen={this.state.modalsOpen.imageAdder}
-            onToggle={() => this.toggleModal('imageAdder')}
+            activeLanguage={activeLanguage}
+            isOpen={dialogsOpen.addImage}
+            onToggle={() => this.toggleDialog('addImage')}
           />
           <AddLanguageDialog
             addLanguage={this.addLanguage}
-            availableLanguages={this.state.availableLanguages}
-            isOpen={this.state.modalsOpen.languageAdder}
-            onToggle={() => this.toggleModal('languageAdder')}
+            availableLanguages={availableLanguages}
+            isOpen={dialogsOpen.addLanguage}
+            onToggle={() => this.toggleDialog('addLanguage')}
           />
           <AddLinkDialog
-            isOpen={this.state.modalsOpen.linkAdder}
-            onToggle={() => this.toggleModal('linkAdder')}
+            isOpen={dialogsOpen.addLink}
+            onToggle={() => this.toggleDialog('addLink')}
           />
           <AddTableDialog
-            isOpen={this.state.modalsOpen.tableAdder}
-            onToggle={() => this.toggleModal('tableAdder')}
+            isOpen={dialogsOpen.addTable}
+            onToggle={() => this.toggleDialog('addTable')}
           />
           <AddVideoDialog
-            activeLanguage={this.state.activeLanguage}
-            isOpen={this.state.modalsOpen.videoAdder}
-            onToggle={() => this.toggleModal('videoAdder')}
+            activeLanguage={activeLanguage}
+            isOpen={dialogsOpen.addVideo}
+            onToggle={() => this.toggleDialog('addVideo')}
           />
           <AddPreviewImageDialog
-            activeLanguage={this.state.activeLanguage}
-            isOpen={this.state.modalsOpen.previewImageAdder}
-            onToggle={() => this.toggleModal('previewImageAdder')}
+            activeLanguage={activeLanguage}
+            isOpen={dialogsOpen.addPreviewImage}
+            onToggle={() => this.toggleDialog('addPreviewImage')}
           />
         </div>
       </AppContext.Provider>

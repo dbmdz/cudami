@@ -38,14 +38,14 @@ class PagedIdentifiableList extends Component {
     this.state = {
       activeLanguage: existingLanguages?.[0] ?? '',
       changeOfOrderActive: false,
-      existingLanguages: existingLanguages ?? [],
-      identifiables: [],
-      identifierTypes: [],
-      modalsOpen: {
+      dialogsOpen: {
         addAttachedIdentifiables: false,
         moveAttachedIdentifiable: false,
         removeAttachedIdentifiable: false,
       },
+      existingLanguages: existingLanguages ?? [],
+      identifiables: [],
+      identifierTypes: [],
       numberOfPages: 0,
       pageNumber: 0,
       totalElements: 0,
@@ -141,11 +141,11 @@ class PagedIdentifiableList extends Component {
         language={activeLanguage}
         onChangeOrder={(identifiables) => this.setState({identifiables})}
         onMove={(moveIndex) => {
-          this.toggleModal('moveAttachedIdentifiable')
+          this.toggleDialog('moveAttachedIdentifiable')
           this.setState({moveIndex})
         }}
         onRemove={(removeIndex) => {
-          this.toggleModal('removeAttachedIdentifiable')
+          this.toggleDialog('removeAttachedIdentifiable')
           this.setState({removeIndex})
         }}
         pageNumber={pageNumber}
@@ -303,11 +303,11 @@ class PagedIdentifiableList extends Component {
     })
   }
 
-  toggleModal = (name) => {
+  toggleDialog = (name) => {
     this.setState({
-      modalsOpen: {
-        ...this.state.modalsOpen,
-        [name]: !this.state.modalsOpen[name],
+      dialogsOpen: {
+        ...this.state.dialogsOpen,
+        [name]: !this.state.dialogsOpen[name],
       },
     })
   }
@@ -346,7 +346,7 @@ class PagedIdentifiableList extends Component {
       existingLanguages,
       feedbackMessage,
       identifierTypes,
-      modalsOpen,
+      dialogsOpen,
       numberOfPages,
       pageNumber,
       totalElements,
@@ -374,7 +374,7 @@ class PagedIdentifiableList extends Component {
             {enableAdd && (
               <Button
                 className={showNew ? 'ml-1' : ''}
-                onClick={() => this.toggleModal('addAttachedIdentifiables')}
+                onClick={() => this.toggleDialog('addAttachedIdentifiables')}
               >
                 {t('add')}
               </Button>
@@ -437,9 +437,9 @@ class PagedIdentifiableList extends Component {
           <AddAttachedIdentifiablesDialog
             action="add"
             identifierTypes={identifierTypes}
-            isOpen={modalsOpen.addAttachedIdentifiables}
+            isOpen={dialogsOpen.addAttachedIdentifiables}
             onSubmit={this.handleAdd}
-            onToggle={() => this.toggleModal('addAttachedIdentifiables')}
+            onToggle={() => this.toggleDialog('addAttachedIdentifiables')}
             type={type}
           />
         )}
@@ -447,18 +447,18 @@ class PagedIdentifiableList extends Component {
           <AddAttachedIdentifiablesDialog
             action="move"
             identifierTypes={identifierTypes}
-            isOpen={modalsOpen.moveAttachedIdentifiable}
+            isOpen={dialogsOpen.moveAttachedIdentifiable}
             maxElements={1}
             onSubmit={(identifiables) => this.handleMove(identifiables[0])}
-            onToggle={() => this.toggleModal('moveAttachedIdentifiable')}
+            onToggle={() => this.toggleDialog('moveAttachedIdentifiable')}
             type={type}
           />
         )}
         {enableRemove && (
           <RemoveAttachedIdentifiableDialog
-            isOpen={modalsOpen.removeAttachedIdentifiable}
+            isOpen={dialogsOpen.removeAttachedIdentifiable}
             onConfirm={this.handleRemove}
-            onToggle={() => this.toggleModal('removeAttachedIdentifiable')}
+            onToggle={() => this.toggleDialog('removeAttachedIdentifiable')}
             parentType={parentType}
             type={type}
           />

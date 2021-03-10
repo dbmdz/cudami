@@ -34,7 +34,7 @@ class AddImageDialog extends Component {
       renderingHintsOpen: false,
     }
     subscribe(
-      'editor.show-image-modal',
+      'editor.show-image-dialog',
       (_msg, {attributes = {}, editing = false} = {}) => {
         this.setState({
           attributes: {

@@ -26,7 +26,7 @@ class AddLinkDialog extends Component {
       editing: false,
     }
     subscribe(
-      'editor.show-link-modal',
+      'editor.show-link-dialog',
       (_msg, {attributes = {}, editing = false} = {}) => {
         this.setState({
           attributes: {

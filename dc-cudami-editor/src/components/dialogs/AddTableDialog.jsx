@@ -19,7 +19,7 @@ class AddTableDialog extends Component {
       columns: 2,
       rows: 2,
     }
-    subscribe('editor.show-table-modal', () => {
+    subscribe('editor.show-table-dialog', () => {
       this.props.onToggle()
     })
   }

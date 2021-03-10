@@ -51,7 +51,7 @@ class ImageView {
       dispatch(transaction)
       unsubscribe(token)
     })
-    publish('editor.show-image-modal', {
+    publish('editor.show-image-dialog', {
       attributes: this.node.attrs,
       editing: true,
     })
