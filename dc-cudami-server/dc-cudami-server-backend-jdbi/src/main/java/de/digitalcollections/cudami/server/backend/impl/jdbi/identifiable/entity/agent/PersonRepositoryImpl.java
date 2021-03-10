@@ -17,6 +17,7 @@ import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.text.LocalizedText;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -255,6 +256,14 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
             null);
 
     return list.stream().collect(Collectors.toSet());
+  }
+
+  @Override
+  public List<Locale> getLanguages() {
+    String query =
+        "SELECT DISTINCT languages FROM persons as p, jsonb_object_keys(p.label) as languages";
+    List<Locale> result = dbi.withHandle(h -> h.createQuery(query).mapTo(Locale.class).list());
+    return result;
   }
 
   @Override

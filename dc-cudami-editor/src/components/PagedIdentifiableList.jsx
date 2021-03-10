@@ -10,6 +10,7 @@ import DigitalObjectList from './DigitalObjectList'
 import FeedbackMessage from './FeedbackMessage'
 import LanguageTab from './LanguageTab'
 import ListPagination from './ListPagination'
+import PersonList from './PersonList'
 import WebpageList from './WebpageList'
 import WebsiteList from './WebsiteList'
 import AddAttachedIdentifiablesModal from './modals/AddAttachedIdentifiablesModal'
@@ -115,6 +116,7 @@ class PagedIdentifiableList extends Component {
     const LIST_COMPONENT_MAPPING = {
       collection: CollectionList,
       digitalObject: DigitalObjectList,
+      person: PersonList,
       subcollection: CollectionList,
       webpage: WebpageList,
       website: WebsiteList,

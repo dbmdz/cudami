@@ -189,6 +189,15 @@ public class PersonController {
     return personService.getDigitalObjects(uuid);
   }
 
+  @ApiMethod(description = "Get languages of all persons")
+  @GetMapping(
+      value = {"/latest/persons/languages", "/v3/persons/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public List<Locale> getLanguages() {
+    return personService.getLanguages();
+  }
+
   @ApiMethod(
       description =
           "get a person's works as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
