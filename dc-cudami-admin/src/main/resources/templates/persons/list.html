@@ -13,13 +13,13 @@
       <script th:src="@{/js/identifiable-list.bundle.js}"></script>
       <script th:inline="javascript">
         IdentifiableList({
-        apiContextPath: /*[[@{/}]]*/ '',
-                existingLanguages: /*[[${existingLanguages}]]*/,
-        id: "list",
-                showEdit: true,
-                showNew: true,
-                type: "person",
-        uiLocale: /*[[${#locale.language}]]*/
+          apiContextPath: /*[[@{/}]]*/ '',
+          existingLanguages: /*[[${existingLanguages}]]*/,
+          id: "list",
+          showEdit: true,
+          showNew: true,
+          type: "person",
+          uiLocale: /*[[${#locale.language}]]*/
         });
       </script>
     </section>
