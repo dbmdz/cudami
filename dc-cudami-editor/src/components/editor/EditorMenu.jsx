@@ -8,11 +8,10 @@ const Button = ({dispatch, fullWidth, item, state}) => {
   const disabled = item.enable && !item.enable(state)
   return (
     <button
-      className={classNames({
+      className={classNames('menu-button', {
         active: item.active && item.active(state),
-        disabled: disabled,
+        disabled,
         'full-width': fullWidth,
-        'menu-button': true,
         'text-left': fullWidth,
       })}
       onClick={(evt) => {
