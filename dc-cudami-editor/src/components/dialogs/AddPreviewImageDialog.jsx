@@ -1,15 +1,16 @@
+import './AddMediaDialog.css'
+
 import transform from 'lodash/transform'
 import {publish, subscribe} from 'pubsub-js'
 import React, {Component} from 'react'
-import {Button, Form, Modal, ModalBody, ModalHeader} from 'reactstrap'
 import {withTranslation} from 'react-i18next'
+import {Button, Form, Modal, ModalBody, ModalHeader} from 'reactstrap'
 
-import './AddMediaDialog.css'
+import {loadIdentifiable, saveFileResource, updateFileResource} from '../../api'
+import AppContext from '../AppContext'
 import MediaMetadataForm from './mediaAdder/MediaMetadataForm'
 import MediaRenderingHintsForm from './mediaAdder/MediaRenderingHintsForm'
 import MediaSelector from './mediaAdder/MediaSelector'
-import AppContext from '../AppContext'
-import {loadIdentifiable, saveFileResource, updateFileResource} from '../../api'
 
 class AddPreviewImageDialog extends Component {
   initialAttributes = {

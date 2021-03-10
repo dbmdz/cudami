@@ -1,7 +1,7 @@
 import React from 'react'
-import {Alert, Button} from 'reactstrap'
 import {Trans} from 'react-i18next'
 import {FaTimes} from 'react-icons/fa'
+import {Alert, Button} from 'reactstrap'
 
 const FeedbackMessage = ({className = 'mb-0', message, onClose}) => {
   let {color = 'info', key, links = [], values} = message

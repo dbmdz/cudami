@@ -1,9 +1,9 @@
 import classNames from 'classnames'
 import React from 'react'
-import {Button, ButtonGroup, NavItem} from 'reactstrap'
 import {createPortal} from 'react-dom'
 import {useTranslation} from 'react-i18next'
 import {useInView} from 'react-intersection-observer'
+import {Button, ButtonGroup, NavItem} from 'reactstrap'
 
 const ActionButtonsInNavbar = ({buttons, navbar}) => {
   return createPortal(

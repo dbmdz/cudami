@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import {withTranslation} from 'react-i18next'
 import {
   Button,
   Form,
@@ -8,7 +9,6 @@ import {
   ModalBody,
   ModalHeader,
 } from 'reactstrap'
-import {withTranslation} from 'react-i18next'
 
 class AddLanguageDialog extends Component {
   constructor(props) {

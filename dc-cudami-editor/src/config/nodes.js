@@ -1,7 +1,7 @@
-import {nodes} from 'prosemirror-schema-basic'
-import {orderedList, bulletList, listItem} from 'prosemirror-schema-list'
-import {tableNodes} from 'prosemirror-tables'
 import {footnoteNodes} from '@aeaton/prosemirror-footnotes'
+import {nodes} from 'prosemirror-schema-basic'
+import {bulletList, listItem, orderedList} from 'prosemirror-schema-list'
+import {tableNodes} from 'prosemirror-tables'
 
 import iframe from './custom/IframeNode'
 import image from './custom/ImageNode'

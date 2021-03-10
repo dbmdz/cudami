@@ -1,9 +1,9 @@
 import React from 'react'
 import {Card, CardBody, Col, Row} from 'reactstrap'
 
+import EditorWithLabel from './editor/EditorWithLabel'
 import InputWithLabel from './InputWithLabel'
 import TeaserPreviewImage from './TeaserPreviewImage'
-import EditorWithLabel from './editor/EditorWithLabel'
 
 const Teaser = ({
   description,

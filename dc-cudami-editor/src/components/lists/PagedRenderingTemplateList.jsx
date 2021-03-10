@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from 'react'
-import {Button, Card, CardBody, Col, Nav, Row, Table} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
+import {Button, Card, CardBody, Col, Nav, Row, Table} from 'reactstrap'
 
-import ActionButtons from './ActionButtons'
-import LanguageTab from '../LanguageTab'
-import Pagination from '../Pagination'
 import {loadDefaultLanguage, typeToEndpointMapping} from '../../api'
 import usePagination from '../../hooks/usePagination'
+import LanguageTab from '../LanguageTab'
+import Pagination from '../Pagination'
+import ActionButtons from './ActionButtons'
 
 const PagedRenderingTemplateList = ({
   apiContextPath = '/',

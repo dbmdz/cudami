@@ -1,7 +1,7 @@
 import React from 'react'
-import {Button, ButtonGroup} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 import {FaExchangeAlt, FaEye, FaPencilAlt, FaUnlink} from 'react-icons/fa'
+import {Button, ButtonGroup} from 'reactstrap'
 
 const ActionButtons = ({
   editUrl,

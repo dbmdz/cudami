@@ -1,4 +1,6 @@
 import React from 'react'
+import {useTranslation} from 'react-i18next'
+import {FaEdit, FaPlus, FaTrash} from 'react-icons/fa'
 import {
   Button,
   FormGroup,
@@ -7,8 +9,6 @@ import {
   InputGroupAddon,
   Label,
 } from 'reactstrap'
-import {useTranslation} from 'react-i18next'
-import {FaEdit, FaPlus, FaTrash} from 'react-icons/fa'
 
 const TemplateSelector = ({onClick, onRemove, templateName}) => {
   const {t} = useTranslation()

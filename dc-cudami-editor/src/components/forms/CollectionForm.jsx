@@ -1,4 +1,5 @@
 import React from 'react'
+import {useTranslation} from 'react-i18next'
 import {
   Card,
   CardBody,
@@ -9,15 +10,14 @@ import {
   TabContent,
   TabPane,
 } from 'reactstrap'
-import {useTranslation} from 'react-i18next'
 
-import ActionButtons from './ActionButtons'
 import DateInput from '../DateInput'
 import EditorWithLabel from '../editor/EditorWithLabel'
 import InputWithLabel from '../InputWithLabel'
 import LanguageAdder from '../LanguageAdder'
 import LanguageTab from '../LanguageTab'
 import Teaser from '../Teaser'
+import ActionButtons from './ActionButtons'
 
 const CollectionForm = ({
   activeLanguage,

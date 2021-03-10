@@ -1,4 +1,5 @@
 import React from 'react'
+import {useTranslation} from 'react-i18next'
 import {
   Button,
   Card,
@@ -9,7 +10,6 @@ import {
   FormGroup,
   Label,
 } from 'reactstrap'
-import {useTranslation} from 'react-i18next'
 
 import InputWithFloatingLabel from '../../InputWithFloatingLabel'
 

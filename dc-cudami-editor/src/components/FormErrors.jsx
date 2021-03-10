@@ -1,6 +1,6 @@
 import React from 'react'
-import {Alert} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
+import {Alert} from 'reactstrap'
 
 const FormErrors = ({invalidLanguages}) => {
   const {t} = useTranslation()

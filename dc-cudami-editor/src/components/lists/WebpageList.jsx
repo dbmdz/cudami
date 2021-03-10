@@ -1,5 +1,4 @@
 import React, {forwardRef, useContext, useState} from 'react'
-import {Button, Table} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 import {
   FaArrowsAltV,
@@ -9,13 +8,14 @@ import {
   FaTimes,
 } from 'react-icons/fa'
 import {List, arrayMove} from 'react-movable'
+import {Button, Table} from 'reactstrap'
 
-import ActionButtons from './ActionButtons'
+import {typeToEndpointMapping} from '../../api'
 import AppContext from '../AppContext'
 import PreviewImage from '../PreviewImage'
 import PublicationStatus from '../PublicationStatus'
 import {formatDate} from '../utils'
-import {typeToEndpointMapping} from '../../api'
+import ActionButtons from './ActionButtons'
 
 const WebpageItem = forwardRef(
   (

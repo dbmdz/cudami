@@ -1,18 +1,10 @@
+import '../common.css'
+import '../../polyfills'
+
 import kebabCase from 'lodash/kebabCase'
 import React, {Component} from 'react'
 import {withTranslation} from 'react-i18next'
 
-import '../common.css'
-import ArticleForm from './ArticleForm'
-import CollectionForm from './CollectionForm'
-import CorporateBodyForm from './CorporateBodyForm'
-import FileResourceForm from './FileResourceForm'
-import FormErrors from '../FormErrors'
-import ProjectForm from './ProjectForm'
-import TopicForm from './TopicForm'
-import WebpageForm from './WebpageForm'
-import WebsiteForm from './WebsiteForm'
-import AppContext from '../AppContext'
 import {
   loadAvailableLanguages,
   loadDefaultLanguage,
@@ -20,7 +12,7 @@ import {
   saveIdentifiable,
   updateIdentifiable,
 } from '../../api'
-import '../../polyfills'
+import AppContext from '../AppContext'
 import AddIframeDialog from '../dialogs/AddIframeDialog'
 import AddImageDialog from '../dialogs/AddImageDialog'
 import AddLanguageDialog from '../dialogs/AddLanguageDialog'
@@ -28,6 +20,15 @@ import AddLinkDialog from '../dialogs/AddLinkDialog'
 import AddPreviewImageDialog from '../dialogs/AddPreviewImageDialog'
 import AddTableDialog from '../dialogs/AddTableDialog'
 import AddVideoDialog from '../dialogs/AddVideoDialog'
+import FormErrors from '../FormErrors'
+import ArticleForm from './ArticleForm'
+import CollectionForm from './CollectionForm'
+import CorporateBodyForm from './CorporateBodyForm'
+import FileResourceForm from './FileResourceForm'
+import ProjectForm from './ProjectForm'
+import TopicForm from './TopicForm'
+import WebpageForm from './WebpageForm'
+import WebsiteForm from './WebsiteForm'
 
 class IdentifiableForm extends Component {
   identifiablesWithLongText = [
