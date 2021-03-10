@@ -255,4 +255,13 @@ public class ProjectController {
     assert Objects.equals(uuid, project.getUuid());
     return projectService.update(project);
   }
+
+  @ApiMethod(description = "Get languages of all persons")
+  @GetMapping(
+      value = {"/latest/projects/languages", "/v3/projects/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public List<Locale> getLanguages() {
+    return projectService.getLanguages();
+  }
 }

@@ -1,9 +1,6 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.paging.PageConverter;
-import de.digitalcollections.cudami.admin.paging.PageWrapper;
-import de.digitalcollections.cudami.admin.paging.PageableConverter;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -11,8 +8,12 @@ import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiProjectsClient;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
+import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.Sorting;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -20,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -125,12 +125,12 @@ public class ProjectsController extends AbstractController {
   }
 
   @GetMapping("/projects")
-  public String list(Model model, @PageableDefault(size = 25) Pageable pageable)
-      throws HttpException {
-    final PageRequest pageRequest = PageableConverter.convert(pageable);
-    final PageResponse pageResponse = service.find(pageRequest);
-    Page page = PageConverter.convert(pageResponse, pageRequest);
-    model.addAttribute("page", new PageWrapper(page, "/projects"));
+  public String list(Model model) throws HttpException {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
+    model.addAttribute(
+        "existingLanguages",
+        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages()));
+
     return "projects/list";
   }
 
@@ -180,5 +180,20 @@ public class ProjectsController extends AbstractController {
     model.addAttribute("project", project);
 
     return "projects/view";
+  }
+
+  @GetMapping("/api/projects")
+  @ResponseBody
+  public PageResponse<Project> findAll(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      throws HttpException {
+    List<Order> orders = new ArrayList<>();
+    Order labelOrder = new Order("label");
+    labelOrder.setSubProperty(localeService.getDefaultLanguage().getLanguage());
+    orders.addAll(Arrays.asList(labelOrder));
+    Sorting sorting = new Sorting(orders);
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, sorting);
+    return service.find(pageRequest);
   }
 }

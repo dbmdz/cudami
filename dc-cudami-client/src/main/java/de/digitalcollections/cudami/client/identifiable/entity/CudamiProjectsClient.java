@@ -9,6 +9,7 @@ import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class CudamiProjectsClient extends CudamiBaseClient<Project> {
@@ -96,5 +97,9 @@ public class CudamiProjectsClient extends CudamiBaseClient<Project> {
 
   public Project update(UUID uuid, Project project) throws HttpException {
     return doPutRequestForObject(String.format("/latest/projects/%s", uuid), project);
+  }
+
+  public List<Locale> getLanguages() throws HttpException {
+    return doGetRequestForObjectList("/latest/projects/languages", Locale.class);
   }
 }

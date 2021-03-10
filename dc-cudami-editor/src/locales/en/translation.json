@@ -152,6 +152,8 @@
     "pattern": "Pattern",
     "person": "Person",
     "persons": "Persons",
+    "project": "Project",
+    "projects": "Projects",
     "publicationStatus": {
       "currentlyPublished": "currently published",
       "endDate": "End of publication",
@@ -201,6 +203,8 @@
       "identifierTypes_plural": "found {{ count }} identifier types",
       "persons": "found {{ count }} person",
       "persons_plural": "found {{ count }} persons",
+      "projects": "found {{ count }} project",
+      "projects_plural": "found {{ count }} projects",
       "renderingTemplates": "found {{ count }} design template",
       "renderingTemplates_plural": "found {{ count }} design templates",
       "subcollections": "found {{ count }} collection",
