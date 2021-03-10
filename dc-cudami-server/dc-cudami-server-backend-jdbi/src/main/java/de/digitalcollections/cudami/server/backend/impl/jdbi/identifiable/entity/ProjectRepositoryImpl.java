@@ -7,6 +7,7 @@ import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
@@ -217,6 +218,16 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   public Project update(Project project) {
     super.update(project);
     Project result = findOne(project.getUuid());
+    return result;
+  }
+
+  @Override
+  public List<Locale> getLanguages() {
+    String query =
+        "SELECT DISTINCT languages FROM "
+            + TABLE_NAME
+            + " as p, jsonb_object_keys(p.label) as languages";
+    List<Locale> result = dbi.withHandle(h -> h.createQuery(query).mapTo(Locale.class).list());
     return result;
   }
 }

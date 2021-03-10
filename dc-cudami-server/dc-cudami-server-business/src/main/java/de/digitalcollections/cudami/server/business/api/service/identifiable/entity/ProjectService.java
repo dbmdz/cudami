@@ -6,6 +6,7 @@ import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public interface ProjectService extends EntityService<Project> {
@@ -61,4 +62,6 @@ public interface ProjectService extends EntityService<Project> {
   }
 
   boolean saveDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects);
+
+  List<Locale> getLanguages();
 }

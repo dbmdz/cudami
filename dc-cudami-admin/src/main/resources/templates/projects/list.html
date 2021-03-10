@@ -29,38 +29,21 @@
 
       <div class="row">
         <div class="col-sm-12" >
-          <div th:replace="fragments/pagination-navigation :: pagination-bootstrap4"></div>
-
-          <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
-            <thead>
-              <tr sd:page-object="${page.page}">
-                <th class="text-right" th:text="#{abbr_number}">Nr.</th>
-                <th></th>
-                <th class="center" th:text="#{label}">Label</th>
-                <th class="center" th:text="#{last_modified}">last modified</th>
-                <th class="center" th:text="#{actions}">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr th:each="project, stats : ${page.content}">
-                <td class="text-right" th:text="(${page.number - 1} * ${page.size}) + ${stats.index + 1}">1</td>
-                <td class="center">
-                  <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${project.previewImage}, ${project.previewImageRenderingHints}, ${#locale}, 30)"></th:block>
-                </td>
-                <td>
-                  <a th:href="@{'/projects/' + ${project.uuid}}" th:if="${project.label}" th:text="${project.label.text}">bavarikon</a>
-                </td>
-                <td>
-                  <span class="float-right" th:with="df=#{dateTime.format},dateTime=${project.lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
-                </td>
-                <td class="center">
-                  <a th:href="@{'/projects/' + ${project.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
-                  <a th:href="@{'/projects/' + ${project.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div th:replace="fragments/pagination-navigation :: pagination-bootstrap4"></div>
+          <section layout:fragment="content">
+            <div id="list"></div>
+            <script th:src="@{/js/identifiable-list.bundle.js}"></script>
+            <script th:inline="javascript">
+              IdentifiableList({
+                apiContextPath: /*[[@{/}]]*/ '',
+                existingLanguages: /*[[${existingLanguages}]]*/,
+                id: "list",
+                showEdit: true,
+                showNew: true,
+                type: "project",
+                uiLocale: /*[[${#locale.language}]]*/
+              });
+            </script>
+          </section>
         </div>
       </div>
     </section>

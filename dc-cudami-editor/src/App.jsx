@@ -57,7 +57,7 @@ const availableAttachedListTypes = {
   website: ['webpage'],
 }
 
-const availableRootListTypes = ['collection', 'website']
+const availableRootListTypes = ['collection', 'project', 'website']
 
 const getUiLocale = (searchParams) => {
   const query = new URLSearchParams(searchParams)

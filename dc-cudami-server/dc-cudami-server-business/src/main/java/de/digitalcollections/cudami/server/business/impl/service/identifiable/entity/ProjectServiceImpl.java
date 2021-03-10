@@ -10,6 +10,7 @@ import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -75,5 +76,10 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
   @Override
   public boolean saveDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects) {
     return ((ProjectRepository) repository).saveDigitalObjects(projectUuid, digitalObjects);
+  }
+
+  @Override
+  public List<Locale> getLanguages() {
+    return ((ProjectRepository) repository).getLanguages();
   }
 }
