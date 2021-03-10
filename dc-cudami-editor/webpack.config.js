@@ -5,7 +5,6 @@ const config = {
   cache: true,
   devtool: 'sourcemaps',
   entry: {
-    GeoLocationsList: './src/lib/GeoLocationsList.jsx',
     IdentifiableEditor: './src/lib/IdentifiableEditor.jsx',
     IdentifiableList: './src/lib/IdentifiableList.jsx',
     IdentifierTypeList: './src/lib/IdentifierTypeList.jsx',

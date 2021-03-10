@@ -88,8 +88,8 @@
     "enterMetadata": "Enter metadata",
     "file": "File",
     "forExample": "e.g.",
-    "geolocation": "Geolocation",
-    "geolocations": "Geolocations",
+    "geoLocation": "Geolocation",
+    "geoLocations": "Geolocations",
     "height": "Height",
     "history": {
       "redo": "Redo last undone change",

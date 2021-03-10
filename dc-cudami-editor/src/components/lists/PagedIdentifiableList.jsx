@@ -24,6 +24,7 @@ import LanguageTab from '../LanguageTab'
 import Pagination from '../Pagination'
 import CollectionList from './CollectionList'
 import DigitalObjectList from './DigitalObjectList'
+import GeoLocationList from './GeoLocationList'
 import PersonList from './PersonList'
 import WebpageList from './WebpageList'
 import WebsiteList from './WebsiteList'
@@ -116,6 +117,7 @@ class PagedIdentifiableList extends Component {
     const LIST_COMPONENT_MAPPING = {
       collection: CollectionList,
       digitalObject: DigitalObjectList,
+      geoLocation: GeoLocationList,
       person: PersonList,
       subcollection: CollectionList,
       webpage: WebpageList,

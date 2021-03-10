@@ -14,10 +14,13 @@ import de.digitalcollections.model.paging.Sorting;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -63,7 +66,11 @@ public class GeoLocationsController extends AbstractController {
   }
 
   @GetMapping("/geolocations")
-  public String list() {
+  public String list(Model model) throws HttpException {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
+    model.addAttribute(
+        "existingLanguages",
+        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages()));
     return "geolocations/list";
   }
 

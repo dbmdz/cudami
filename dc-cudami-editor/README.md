@@ -96,38 +96,7 @@ public List<Locale> getLanguages() {
 }
 ```
 
-In `cudami/dc-cudami-server/dc-cudami-server-business/src/main/java/de/digitalcollections/cudami/server/business/api/service/identifiable/entity/agent/PersonService.java`:
-
-```
-List<Locale> getLanguages();
-```
-
-In `cudami/dc-cudami-server/dc-cudami-server-business/src/main/java/de/digitalcollections/cudami/server/business/impl/service/identifiable/entity/agent/PersonServiceImpl.java`:
-
-```
-@Override
-public List<Locale> getLanguages() {
-  return ((PersonRepository) repository).getLanguages();
-}
-```
-
-In `cudami/dc-cudami-server/dc-cudami-server-backend-api/src/main/java/de/digitalcollections/cudami/server/backend/api/repository/identifiable/entity/agent/PersonRepository.java`:
-
-```
-List<Locale> getLanguages();
-```
-
-In `cudami/dc-cudami-server/dc-cudami-server-backend-jdbi/src/main/java/de/digitalcollections/cudami/server/backend/impl/jdbi/identifiable/entity/agent/PersonRepositoryImpl.java`:
-
-```
-@Override
-public List<Locale> getLanguages() {
-  String query =
-      "SELECT DISTINCT languages FROM persons as p, jsonb_object_keys(p.label) as languages";
-  List<Locale> result = dbi.withHandle(h -> h.createQuery(query).mapTo(Locale.class).list());
-  return result;
-}
-```
+The method `getlanguages()` is implemented generically in underlying `IdentifiableService` and `IdentifiableRepository`. No further implementation needed.
 
 * Add thymeleaf template embedding react-table
 

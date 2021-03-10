@@ -10,6 +10,7 @@ import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -81,6 +82,8 @@ public interface IdentifiableRepository<I extends Identifiable> {
   default I findOneByIdentifier(String namespace, String id) {
     return findOne(new Identifier(null, namespace, id));
   }
+
+  List<Locale> getLanguages();
 
   default List<Entity> getRelatedEntities(I identifiable) {
     if (identifiable == null) {

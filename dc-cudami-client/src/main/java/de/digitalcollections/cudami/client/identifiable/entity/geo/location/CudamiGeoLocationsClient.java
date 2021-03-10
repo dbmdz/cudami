@@ -7,6 +7,8 @@ import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import java.net.http.HttpClient;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class CudamiGeoLocationsClient extends CudamiBaseClient<GeoLocation> {
@@ -59,6 +61,10 @@ public class CudamiGeoLocationsClient extends CudamiBaseClient<GeoLocation> {
   public GeoLocation findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
         String.format("/latest/geolocations/identifier?namespace=%s&id=%s", namespace, id));
+  }
+
+  public List<Locale> getLanguages() throws HttpException {
+    return doGetRequestForObjectList("/latest/geolocations/languages", Locale.class);
   }
 
   public GeoLocation save(GeoLocation geoLocation) throws HttpException {

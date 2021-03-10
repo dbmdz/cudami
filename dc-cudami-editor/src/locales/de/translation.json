@@ -88,8 +88,8 @@
     "enterMetadata": "Metadaten eingeben",
     "file": "Datei",
     "forExample": "z.B.",
-    "geolocation": "Ort",
-    "geolocations": "Orte",
+    "geoLocation": "Ort",
+    "geoLocations": "Orte",
     "height": "Höhe",
     "history": {
       "redo": "Letzte rückgängig gemachte Änderung wiederholen",
