@@ -1,10 +1,9 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.paging.PageConverter;
-import de.digitalcollections.cudami.admin.paging.PageWrapper;
-import de.digitalcollections.cudami.admin.paging.PageableConverter;
+import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiDigitalObjectsClient;
 import de.digitalcollections.model.identifiable.entity.Collection;
@@ -17,12 +16,13 @@ import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,9 +36,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class DigitalObjectsController extends AbstractController {
 
   private final CudamiDigitalObjectsClient service;
+  private final CudamiLocalesClient localeService;
+  private final LanguageSortingHelper languageSortingHelper;
 
   @Autowired
-  public DigitalObjectsController(CudamiClient client) {
+  public DigitalObjectsController(
+      LanguageSortingHelper languageSortingHelper, CudamiClient client) {
+    this.languageSortingHelper = languageSortingHelper;
+    this.localeService = client.forLocales();
     this.service = client.forDigitalObjects();
   }
 
@@ -55,13 +60,27 @@ public class DigitalObjectsController extends AbstractController {
   }
 
   @GetMapping("/digitalobjects")
-  public String list(Model model, @PageableDefault(size = 25) Pageable pageable)
-      throws HttpException {
-    final PageRequest pageRequest = PageableConverter.convert(pageable);
-    final PageResponse pageResponse = service.find(pageRequest);
-    Page page = PageConverter.convert(pageResponse, pageRequest);
-    model.addAttribute("page", new PageWrapper(page, "/digitalobjects"));
+  public String list(Model model) throws HttpException {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
+    model.addAttribute(
+        "existingLanguages",
+        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages()));
     return "digitalobjects/list";
+  }
+
+  @GetMapping("/api/digitalobjects")
+  @ResponseBody
+  public PageResponse<DigitalObject> findAll(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      throws HttpException {
+    List<Order> orders = new ArrayList<>();
+    Order labelOrder = new Order("label");
+    labelOrder.setSubProperty(localeService.getDefaultLanguage().getLanguage());
+    orders.addAll(Arrays.asList(labelOrder));
+    Sorting sorting = new Sorting(orders);
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, sorting);
+    return service.find(pageRequest);
   }
 
   @GetMapping("/api/digitalobjects/search")

@@ -15,6 +15,7 @@ import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
@@ -262,5 +263,14 @@ public class DigitalObjectController {
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, digitalObject.getUuid());
     return service.update(digitalObject);
+  }
+
+  @ApiMethod(description = "Get languages of all digital objects")
+  @GetMapping(
+      value = {"/latest/digitalobjects/languages", "/v3/digitalobjects/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public List<Locale> getLanguages() {
+    return service.getLanguages();
   }
 }
