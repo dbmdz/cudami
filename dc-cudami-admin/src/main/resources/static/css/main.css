@@ -1,3 +1,16 @@
+/* admin lte */
+.nav-sidebar .nav-treeview .nav-link p {
+  font-size: 0.8rem;
+}
+.nav-sidebar .nav-item > .nav-link {
+    margin-bottom: 0rem;
+}
+.nav-sidebar .nav-link > .right:nth-child(2), .nav-sidebar .nav-link > p > .right:nth-child(2) {
+    right: 1rem;
+}
+/* admin lte */
+
+
 a[href^="http"]:not(.no-external):after {
   content: "\f35d";
   font-family: "Font Awesome 5 Free";
@@ -6,122 +19,3 @@ a[href^="http"]:not(.no-external):after {
   padding-left: 3px;
 }
 
-body {
-  padding: 4.5rem 0 1rem;
-}
-
-.card-deck > .card {
-  margin-top: 10px;
-}
-
-.card {
-  /*max-width: 250px;*/
-  min-width: 150px;
-}
-
-.card .icon {
-  color: #06b0ef;
-  font-size: 65px;
-}
-
-.card .card-footer {
-  border: 0px;
-  background-color: transparent;
-}
-
-h3 {
-  margin-top: 10px;
-}
-
-.center {
-  text-align: center;
-}
-.alert {
-  font-size: 14px;
-  padding: 5px 15px;
-}
-
-.btn.disabled, .btn[disabled], fieldset[disabled] .btn {
-  opacity: 0.25;
-}
-
-h1 a.btn {
-  float: right;
-}
-label, .control-label {
-  font-size: inherit;
-}
-.navbar-light .navbar-nav .nav-link {
-  -webkit-transition: all .2s ease-out;
-  -moz-transition: all .2s ease-out;
-  -o-transition: all .2s ease-out;
-  transition: all .2s ease-out;
-}
-table {
-  font-size: 14px;
-}
-table .actionButton {
-  padding: 2px 3px;
-  -webkit-border-radius: 90px;
-  -moz-border-radius: 90px;
-  border-radius: 90px;
-  -webkit-transition: all .2s ease-out;
-  -moz-transition: all .2s ease-out;
-  -o-transition: all .2s ease-out;
-  transition: all .2s ease-out;
-}
-table .actionButton:hover {
-  background-color: #c7f1ff;
-}
-.checkbox-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.has-error p {
-  font-size: 10px;
-  color:red;
-}
-.rows-striped .row:nth-child(odd) {
-  background-color:#c7f1ff;
-}
-.rows-striped .row:nth-child(even) {
-  background-color: white;
-}
-
-.main-content {
-  margin-top: 20px;
-}
-
-.tab-content {
-  border-left: solid 1px #ccc;
-  border-bottom: solid 1px #ccc;
-  padding: 10px;
-  border-right: solid 1px #ccc;
-}
-
-div.editor {
-  margin: 0;
-}
-
-.new-button {
-  margin-bottom: 3px;
-}
-
-iframe.editable {
-  border: 5px dashed;
-}
-
-li > p {
-  margin: 0;
-}
-
-blockquote {
-  border-left: 3px solid #ccc;
-  padding-left: 1em;
-}
-
-.long-text {
-  max-height: 500px;
-  overflow-y: auto;
-}
