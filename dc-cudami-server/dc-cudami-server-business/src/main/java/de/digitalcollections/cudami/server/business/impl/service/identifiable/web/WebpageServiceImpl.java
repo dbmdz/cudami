@@ -10,6 +10,8 @@ import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.util.List;
 import java.util.Locale;
@@ -165,5 +167,10 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   @Override
   public boolean updateChildrenOrder(UUID parentUuid, List<Webpage> children) {
     return ((NodeRepository<Webpage>) repository).updateChildrenOrder(parentUuid, children);
+  }
+
+  @Override
+  public SearchPageResponse<Webpage> findRootNodes(SearchPageRequest searchPageRequest) {
+    return ((NodeRepository<Webpage>)repository).findRootNodes(searchPageRequest);
   }
 }

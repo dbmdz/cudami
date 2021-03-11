@@ -130,6 +130,11 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
+  public SearchPageResponse<Collection> findRootNodes(SearchPageRequest searchPageRequest) {
+    return ((NodeRepository<Collection>) repository).findRootNodes(searchPageRequest);
+  }
+
+  @Override
   public List<Locale> getRootNodesLanguages() {
     return ((NodeRepository<Collection>) repository).getRootNodesLanguages();
   }

@@ -11,6 +11,8 @@ import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.List;
@@ -353,6 +355,40 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
             + tableAlias
             + ".uuid)";
     return find(pageRequest, commonSql, null);
+  }
+
+  @Override
+  public SearchPageResponse<Topic> findRootNodes(SearchPageRequest searchPageRequest) {
+    String commonSql =
+        " FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + " LEFT JOIN LATERAL jsonb_object_keys("
+            + tableAlias
+            + ".label) lbl(keys) ON "
+            + tableAlias
+            + ".label IS NOT NULL"
+            + " LEFT JOIN LATERAL jsonb_object_keys("
+            + tableAlias
+            + ".description) dsc(keys) ON "
+            + tableAlias
+            + ".description IS NOT NULL"
+            + " WHERE (("
+            + tableAlias
+            + ".label->>lbl.keys ILIKE '%' || :searchTerm || '%'"
+            + " OR "
+            + tableAlias
+            + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')"
+            + " AND "
+            + " NOT EXISTS (SELECT FROM topic_topics WHERE child_topic_uuid = "
+            + tableAlias
+            + ".uuid))";
+    String searchTerm = searchPageRequest.getQuery();
+    if (searchTerm == null) {
+      searchTerm = "";
+    }
+    return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
   }
 
   @Override

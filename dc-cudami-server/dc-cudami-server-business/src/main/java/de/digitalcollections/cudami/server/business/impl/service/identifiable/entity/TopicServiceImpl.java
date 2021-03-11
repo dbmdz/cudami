@@ -9,6 +9,8 @@ import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.util.List;
 import java.util.Locale;
@@ -117,5 +119,10 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   @Override
   public boolean updateChildrenOrder(UUID parentUuid, List<Topic> children) {
     return ((NodeRepository<Topic>) repository).updateChildrenOrder(parentUuid, children);
+  }
+
+  @Override
+  public SearchPageResponse<Topic> findRootNodes(SearchPageRequest searchPageRequest) {
+    return ((NodeRepository<Topic>)repository).findRootNodes(searchPageRequest);
   }
 }

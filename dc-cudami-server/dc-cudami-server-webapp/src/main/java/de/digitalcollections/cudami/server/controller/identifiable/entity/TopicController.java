@@ -11,6 +11,7 @@ import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.Sorting;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -101,13 +103,21 @@ public class TopicController {
   public PageResponse<Topic> findAllTop(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.getRootNodes(pageRequest);
+
+    if (StringUtils.hasText(searchTerm)) {
+      SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageRequest.getPageNumber(),
+          pageRequest.getPageSize(), pageRequest.getSorting());
+      return service.findRootNodes(searchPageRequest);
+    } else {
+      return service.getRootNodes(pageRequest);
+    }
   }
 
   @ApiMethod(description = "Get topic by uuid (and optional locale)")

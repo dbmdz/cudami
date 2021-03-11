@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -193,14 +194,24 @@ public class CollectionController {
   public PageResponse<Collection> findAllTop(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return collectionService.getRootNodes(pageRequest);
+
+    if (StringUtils.hasText(searchTerm)) {
+      SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageRequest.getPageNumber(),
+      pageRequest.getPageSize(), pageRequest.getSorting());
+      return collectionService.findRootNodes(searchPageRequest);
+    } else {
+      return collectionService.getRootNodes(pageRequest);
+    }
   }
+
+
 
   @ApiMethod(description = "Get collection by namespace and id")
   @GetMapping(
