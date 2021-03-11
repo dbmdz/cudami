@@ -16,8 +16,6 @@ import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -74,12 +72,7 @@ public class DigitalObjectsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws HttpException {
-    List<Order> orders = new ArrayList<>();
-    Order labelOrder = new Order("label");
-    labelOrder.setSubProperty(localeService.getDefaultLanguage().getLanguage());
-    orders.addAll(Arrays.asList(labelOrder));
-    Sorting sorting = new Sorting(orders);
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, sorting);
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     return service.find(pageRequest);
   }
 
