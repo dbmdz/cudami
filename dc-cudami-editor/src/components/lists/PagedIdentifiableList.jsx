@@ -27,6 +27,7 @@ import CorporateBodyList from './CorporateBodyList'
 import DigitalObjectList from './DigitalObjectList'
 import GeoLocationList from './GeoLocationList'
 import PersonList from './PersonList'
+import ProjectList from './ProjectList'
 import WebpageList from './WebpageList'
 import WebsiteList from './WebsiteList'
 
