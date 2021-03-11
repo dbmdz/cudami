@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="" />
+    <link rel="shortcut icon" href="../../images/favicon.png" th:href="@{/images/favicon.png}"/>
+
+    <title layout:title-pattern="$LAYOUT_TITLE: $CONTENT_TITLE">cudami</title>
+
+    <!-- Bootstrap core CSS -->
+    <link th:href="@{|/webjars/bootswatch/${webjarVersions.bootswatch}/dist/yeti/bootstrap.min.css|}" rel="stylesheet" />
+
+    <!-- Font awesome CSS -->
+    <link th:href="@{|/webjars/font-awesome/${webjarVersions['font-awesome']}/css/all.css|}" rel="stylesheet" />
+
+    <link th:href="@{|/webjars/jquery-ui-dist/${webjarVersions['jquery-ui']}/jquery-ui.min.css|}" rel="stylesheet" />
+
+    <!-- Custom styles for this template -->
+    <link th:href="@{/css/main.css}" rel="stylesheet" />
+
+    <script th:src="@{/js/thirdparty/ie-emulation-modes-warning.js}"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script th:src="@{|/webjars/html5shiv/${webjarVersions.html5shiv}/html5shiv.min.js|}"></script>
+      <script th:src="@{|/webjars/respond/${webjarVersions.respond}/dest/respond.min.js|}"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="navbar navbar-expand-md bg-white navbar-light fixed-top">
+      <div class="container-fluid">
+        <a class="navbar-brand nav-link" th:href="@{/}">
+          <img th:src="@{/images/logo-cudami.png}" height="39" style="margin-top:-5px;"/>
+          <!--            <i class="logo fas fa-code-branch"></i>-->
+          <!--<span class="logotext" title="cudami">cudami</span><br/><span style="font-size: 9px;white-space: nowrap;">cultural digital asset management</span>-->
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div id="navbarResponsive" class="collapse navbar-collapse">
+          <ul class="navbar-nav ml-auto" sec:authorize="isAuthenticated()">
+            <li class="nav-item">
+              <th:block th:unless="${#locale.language == 'en'}"><a id="change-locale" th:href="@{''(language=en)}" class="nav-link">English</a></th:block>
+              <th:block th:if="${#locale.language == 'en'}"><a id="change-locale" th:href="@{''(language=de)}" class="nav-link">Deutsch</a></th:block>
+            </li>
+            <li class="dropdown nav-item">
+              <a href="#" class="dropdown-toggle nav-link" id="userMenuDropdownButton" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                <span id="currentUserName" sec:authentication="name"></span> <span class="caret"></span>
+                <span style="display:none;" sec:authentication="principal.authorities">[ROLE_USER, ROLE_ADMIN]</span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="userMenuDropdownButton" role="menu">
+                <li class="dropdown-item position-relative">
+                  <a class="stretched-link" th:href="@{/users/updatePassword}" th:text="#{change_password}">Change password</a>
+                </li>
+                <li class="dropdown-item position-relative">
+                  <form th:action="@{/logout}" role="logout" method="post">
+                    <button class="btn btn-link btn-sm font-weight-light p-0 stretched-link" type="submit" th:text="#{menu_logout}">Logout</button>
+                  </form>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <div th:replace="fragments/feedback-messages :: global-bootstrap4"></div>
+
+      <section layout:fragment="content">
+        ...
+      </section>
+
+    </div>
+
+    <script th:src="@{|/webjars/jquery/${webjarVersions.jquery}/dist/jquery.min.js|}"></script>
+    <script th:src="@{|/webjars/jquery-ui-dist/${webjarVersions['jquery-ui']}/jquery-ui.min.js|}"></script>
+    <script th:src="@{|/webjars/bootstrap/${webjarVersions.bootstrap}/dist/js/bootstrap.bundle.min.js|}"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script th:src="@{|/webjars/ie10-viewport-bug-workaround/${webjarVersions['ie10-viewport-bug-workaround']}/dist/ie10-viewport-bug-workaround.min.js|}"></script>
+    <script th:src="@{|/webjars/url-search-params-polyfill/${webjarVersions['url-search-params-polyfill']}/index.js|}"></script>
+    <div th:replace="fragments/modals-confirmation :: confirmYesNoDialog-bootstrap4"></div>
+
+    <script th:src="@{/js/index.js}"></script>
+    <script>
+      $(function () {
+        activateExternalLinks()
+        activatePopovers()
+        appendQueryParameters()
+      })
+    </script>
+
+    <th:block layout:fragment="beforeBodyEnds"></th:block>
+  </body>
+</html>

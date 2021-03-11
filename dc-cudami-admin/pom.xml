@@ -55,7 +55,7 @@
       <artifactId>dc-commons-springboot</artifactId>
       <version>${version.dc-commons-springboot}</version>
     </dependency>
-<!--    <dependency>
+    <!--    <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-springdata</artifactId>
       <version>${version.dc-commons-springdata}</version>
@@ -189,6 +189,11 @@
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
+      <artifactId>AdminLTE</artifactId>
+      <version>3.1.0-rc</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
       <artifactId>font-awesome</artifactId>
       <version>${version.webjar-fontawesome}</version>
     </dependency>
@@ -196,6 +201,11 @@
       <groupId>org.webjars</groupId>
       <artifactId>html5shiv</artifactId>
       <version>${version.webjar-html5shiv}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>webjars-locator</artifactId>
+      <version>0.40</version>
     </dependency>
     <dependency>
       <groupId>org.webjars.bower</groupId>

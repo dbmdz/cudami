@@ -9,17 +9,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class MainController {
 
-  @GetMapping(value = {"", "/"})
-  public String printWelcome(Model model) {
-    model.addAttribute("time", new Date());
-    return "main";
-  }
-
   @GetMapping("/login")
   public String login(
       @RequestParam(value = "error", defaultValue = "false") boolean error, Model model) {
     model.addAttribute("error", error);
     model.addAttribute("login", true);
     return "login";
+  }
+
+  @GetMapping(value = {"/lte"})
+  public String lteStarter(Model model) {
+    model.addAttribute("time", new Date());
+    return "starter";
+  }
+
+  @GetMapping(value = {"", "/"})
+  public String printWelcome(Model model) {
+    model.addAttribute("time", new Date());
+    return "main";
   }
 }
