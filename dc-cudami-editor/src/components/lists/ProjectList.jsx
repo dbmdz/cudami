@@ -1,14 +1,14 @@
 import React, {useContext} from 'react'
-import {Table} from 'reactstrap'
 import {useTranslation} from 'react-i18next'
 import {FaHashtag, FaImage} from 'react-icons/fa'
+import {Table} from 'reactstrap'
 
-import ActionButtons from './ActionButtons'
+import {typeToEndpointMapping} from '../../api'
 import AppContext from '../AppContext'
-import IdentifierList from './IdentifierList'
 import PreviewImage from '../PreviewImage'
 import {formatDate} from '../utils'
-import {typeToEndpointMapping} from '../../api'
+import ActionButtons from './ActionButtons'
+import IdentifierList from './IdentifierList'
 
 const ProjectList = ({
   enableMove,
@@ -28,8 +28,8 @@ const ProjectList = ({
   const {apiContextPath, uiLocale} = useContext(AppContext)
   const viewBaseUrl = `${apiContextPath}${typeToEndpointMapping[type]}`
   return (
-      <Table bordered className="mb-0" hover responsive size="sm" striped>
-        <thead>
+    <Table bordered className="mb-0" hover responsive size="sm" striped>
+      <thead>
         <tr>
           <th className="text-right">
             <FaHashtag />
@@ -42,61 +42,61 @@ const ProjectList = ({
           <th className="text-center">{t('lastModified')}</th>
           <th className="text-center">{t('actions')}</th>
         </tr>
-        </thead>
-        <tbody>
+      </thead>
+      <tbody>
         {identifiables.map(
-            (
-                {
-                  identifiers,
-                  label,
-                  lastModified,
-                  previewImage,
-                  previewImageRenderingHints,
-                  uuid,
-                },
-                index
-            ) => (
-                <tr key={uuid}>
-                  <td className="text-right">
-                    {index + 1 + pageNumber * pageSize}
-                  </td>
-                  <td className="text-center">
-                    <PreviewImage
-                        image={previewImage}
-                        renderingHints={previewImageRenderingHints}
-                        width={30}
-                    />
-                  </td>
-                  <td>
-                    {label[language] && (
-                        <a href={`${viewBaseUrl}/${uuid}`}>{label[language]}</a>
-                    )}
-                  </td>
-                  <td>
-                    <IdentifierList
-                        identifiers={identifiers}
-                        identifierTypes={identifierTypes}
-                    />
-                  </td>
-                  <td className="text-center">
-                    {formatDate(new Date(lastModified), uiLocale)}
-                  </td>
-                  <td className="text-center">
-                    <ActionButtons
-                        enableMove={enableMove}
-                        enableRemove={enableRemove}
-                        onMove={() => onMove(index)}
-                        onRemove={() => onRemove(index)}
-                        parentType={parentType}
-                        showEdit={showEdit}
-                        viewUrl={`${viewBaseUrl}/${uuid}`}
-                    />
-                  </td>
-                </tr>
-            )
+          (
+            {
+              identifiers,
+              label,
+              lastModified,
+              previewImage,
+              previewImageRenderingHints,
+              uuid,
+            },
+            index
+          ) => (
+            <tr key={uuid}>
+              <td className="text-right">
+                {index + 1 + pageNumber * pageSize}
+              </td>
+              <td className="text-center">
+                <PreviewImage
+                  image={previewImage}
+                  renderingHints={previewImageRenderingHints}
+                  width={30}
+                />
+              </td>
+              <td>
+                {label[language] && (
+                  <a href={`${viewBaseUrl}/${uuid}`}>{label[language]}</a>
+                )}
+              </td>
+              <td>
+                <IdentifierList
+                  identifiers={identifiers}
+                  identifierTypes={identifierTypes}
+                />
+              </td>
+              <td className="text-center">
+                {formatDate(new Date(lastModified), uiLocale)}
+              </td>
+              <td className="text-center">
+                <ActionButtons
+                  enableMove={enableMove}
+                  enableRemove={enableRemove}
+                  onMove={() => onMove(index)}
+                  onRemove={() => onRemove(index)}
+                  parentType={parentType}
+                  showEdit={showEdit}
+                  viewUrl={`${viewBaseUrl}/${uuid}`}
+                />
+              </td>
+            </tr>
+          )
         )}
-        </tbody>
-      </Table>
+      </tbody>
+    </Table>
   )
 }
 
