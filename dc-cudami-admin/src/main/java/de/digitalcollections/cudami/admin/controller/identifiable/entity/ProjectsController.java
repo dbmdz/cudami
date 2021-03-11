@@ -8,12 +8,8 @@ import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiProjectsClient;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.Sorting;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -188,12 +184,7 @@ public class ProjectsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws HttpException {
-    List<Order> orders = new ArrayList<>();
-    Order labelOrder = new Order("label");
-    labelOrder.setSubProperty(localeService.getDefaultLanguage().getLanguage());
-    orders.addAll(Arrays.asList(labelOrder));
-    Sorting sorting = new Sorting(orders);
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, sorting);
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     return service.find(pageRequest);
   }
 }
