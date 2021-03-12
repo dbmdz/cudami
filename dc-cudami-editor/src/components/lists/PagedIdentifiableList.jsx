@@ -254,7 +254,8 @@ class PagedIdentifiableList extends Component {
         parentUuid,
         type,
         pageNumber,
-        pageSize
+        pageSize,
+        searchTerm
       )
     }
     return await loadRootIdentifiables(

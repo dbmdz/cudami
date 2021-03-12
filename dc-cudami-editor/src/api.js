@@ -105,9 +105,13 @@ export async function loadAttachedIdentifiables(
   parentUuid,
   type,
   pageNumber,
-  pageSize
+  pageSize,
+  searchTerm
 ) {
   let url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}?pageNumber=${pageNumber}&pageSize=${pageSize}`
+  if (searchTerm) {
+    url = url.concat("&searchTerm=", searchTerm)
+  }
   if (mock) {
     url = `/__mock__/${type}s.json`
   }
