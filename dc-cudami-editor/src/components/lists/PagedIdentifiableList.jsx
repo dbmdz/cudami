@@ -116,7 +116,7 @@ class PagedIdentifiableList extends Component {
     )
   }
 
-  getListComponent = () => {
+  getListComponent = ({identifiables}) => {
     const LIST_COMPONENT_MAPPING = {
       collection: CollectionList,
       corporateBody: CorporateBodyList,
@@ -133,7 +133,6 @@ class PagedIdentifiableList extends Component {
     const {
       activeLanguage,
       changeOfOrderActive,
-      identifiables,
       identifierTypes,
       pageNumber,
     } = this.state
@@ -368,6 +367,7 @@ class PagedIdentifiableList extends Component {
       defaultLanguage,
       existingLanguages,
       feedbackMessage,
+      identifiables,
       identifierTypes,
       dialogsOpen,
       numberOfPages,
@@ -449,7 +449,9 @@ class PagedIdentifiableList extends Component {
               )
               }
             </div>
-            {this.getListComponent()}
+            <this.getListComponent
+                identifiables={identifiables}
+            />
             <Pagination
               changePage={this.updatePage}
               numberOfPages={numberOfPages}
