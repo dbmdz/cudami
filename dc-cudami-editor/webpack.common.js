@@ -1,17 +1,14 @@
-const path = require('path');
-const _ = require('lodash');
+const path = require('path')
+const _ = require('lodash')
 
-const config = {
-  cache: true,
-  devtool: 'sourcemaps',
+module.exports = {
   entry: {
     IdentifiableEditor: './src/lib/IdentifiableEditor.jsx',
     IdentifiableList: './src/lib/IdentifiableList.jsx',
     IdentifierTypeList: './src/lib/IdentifierTypeList.jsx',
     RenderingTemplateEditor: './src/lib/RenderingTemplateEditor.jsx',
-    RenderingTemplateList: './src/lib/RenderingTemplateList.jsx'
+    RenderingTemplateList: './src/lib/RenderingTemplateList.jsx',
   },
-  mode: 'production',
   module: {
     rules: [
       {
@@ -21,7 +18,7 @@ const config = {
       {
         exclude: /(node_modules)/,
         test: /\.jsx?$/,
-        use: ['babel-loader']
+        use: ['babel-loader'],
       },
       {
         test: /\.(png|jpe?g|gif|svg)$/,
@@ -34,7 +31,7 @@ const config = {
       },
       {
         test: /\.(woff2|ttf)$/,
-        use: ['file-loader']
+        use: ['file-loader'],
       },
     ],
   },
@@ -45,14 +42,12 @@ const config = {
     library: '[name]',
     libraryExport: 'default',
     libraryTarget: 'umd',
-    path: null
+    path: path.resolve(
+      __dirname,
+      '../dc-cudami-admin/target/classes/static/js'
+    ),
   },
   resolve: {
     extensions: ['.js', '.jsx'],
-  }
+  },
 }
-
-module.exports = (_env, options) => {
-  config.output.path = options.outputPath || path.join(__dirname, 'dist');
-  return config;
-};
