@@ -203,15 +203,17 @@ public class CollectionController {
     }
 
     if (StringUtils.hasText(searchTerm)) {
-      SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageRequest.getPageNumber(),
-      pageRequest.getPageSize(), pageRequest.getSorting());
+      SearchPageRequest searchPageRequest =
+          new SearchPageRequest(
+              searchTerm,
+              pageRequest.getPageNumber(),
+              pageRequest.getPageSize(),
+              pageRequest.getSorting());
       return collectionService.findRootNodes(searchPageRequest);
     } else {
       return collectionService.getRootNodes(pageRequest);
     }
   }
-
-
 
   @ApiMethod(description = "Get collection by namespace and id")
   @GetMapping(

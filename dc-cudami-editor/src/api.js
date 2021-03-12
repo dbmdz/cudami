@@ -118,17 +118,19 @@ export async function loadAttachedIdentifiables(
   try {
     const response = await fetch(url)
     const json = await response.json()
-    const {content, pageRequest, totalElements} = json
+    const {content, pageRequest, totalElements, searchTerm} = json
     return {
       content,
       pageSize: pageRequest.pageSize,
       totalElements,
+      searchTerm
     }
   } catch (err) {
     return {
       content: [],
       pageSize: 0,
       totalElements: 0,
+      searchTerm: '',
     }
   }
 }
@@ -183,7 +185,7 @@ export async function loadRootIdentifiables(
 ) {
   let url = `${contextPath}api/${typeToEndpointMapping[type]}?pageNumber=${pageNumber}&pageSize=${pageSize}`
   if (searchTerm) {
-    url = url.concat("?searchTerm=", searchTerm)
+    url = url.concat("&searchTerm=", searchTerm)
   }
   if (mock) {
     url = `/__mock__/${type}s.json`

@@ -51,6 +51,7 @@ class PagedIdentifiableList extends Component {
       numberOfPages: 0,
       pageNumber: 0,
       totalElements: 0,
+      searchTerm: '',
     }
   }
 
@@ -128,7 +129,7 @@ class PagedIdentifiableList extends Component {
       website: WebsiteList,
     }
     const ListComponent = LIST_COMPONENT_MAPPING[this.props.type]
-    const {enableMove, enableRemove, parentType, showEdit, showSearch, searchTerm, type} = this.props
+    const {enableMove, enableRemove, parentType, showEdit, enableSearch, type} = this.props
     const {
       activeLanguage,
       changeOfOrderActive,
@@ -141,6 +142,7 @@ class PagedIdentifiableList extends Component {
         changeOfOrderActive={changeOfOrderActive}
         enableMove={enableMove}
         enableRemove={enableRemove}
+        enableSearch={enableSearch}
         identifiables={identifiables}
         identifierTypes={identifierTypes}
         language={activeLanguage}
@@ -157,8 +159,6 @@ class PagedIdentifiableList extends Component {
         pageSize={this.pageSize}
         parentType={parentType}
         showEdit={showEdit}
-        showSearch={showSearch}
-        searchTerm={searchTerm}
         type={type}
       />
     )
@@ -333,6 +333,19 @@ class PagedIdentifiableList extends Component {
     })
   }
 
+  executeSearch = async (evt) => {
+    evt.preventDefault()
+    const {content, pageSize, totalElements, pageRequest, query} = await this.loadIdentifiables(
+        this.state.pageNumber, this.pageSize, this.state.searchTerm)
+    this.setState({
+      identifiables: content,
+      numberOfPages: Math.ceil(totalElements / pageSize),
+      pageNumber: pageRequest.pageNumber,
+      totalElements,
+      searchTerm: query
+    })
+  }
+
   render() {
     const {
       apiContextPath,
@@ -340,12 +353,11 @@ class PagedIdentifiableList extends Component {
       enableChangeOfOrder,
       enableMove,
       enableRemove,
+      enableSearch,
       mockApi,
       parentType,
       parentUuid,
       showNew,
-      showSearch,
-      searchTerm,
       t,
       type,
       uiLocale,
@@ -360,6 +372,7 @@ class PagedIdentifiableList extends Component {
       dialogsOpen,
       numberOfPages,
       pageNumber,
+      searchTerm,
       totalElements,
     } = this.state
     const showChangeOfOrder =
@@ -431,8 +444,8 @@ class PagedIdentifiableList extends Component {
                   {t('save')}
                 </Button>
               )}
-              {showSearch && (
-                  <span>{t('searchTerm')}: <form action=""><input type="text" name="searchTerm" value={searchTerm}/></form></span>
+              {enableSearch && (
+                  <span>{t('searchTerm')}: <form onSubmit={this.executeSearch}><input type="text" value={searchTerm} onChange={(evt) => this.setState({searchTerm: evt.target.value})}/></form></span>
               )
               }
             </div>
@@ -489,10 +502,10 @@ PagedIdentifiableList.defaultProps = {
   enableChangeOfOrder: false,
   enableMove: false,
   enableRemove: false,
+  enableSearch: false,
   mockApi: false,
   showEdit: false,
   showNew: false,
-  showSearch: false
 }
 
 export default withTranslation()(PagedIdentifiableList)

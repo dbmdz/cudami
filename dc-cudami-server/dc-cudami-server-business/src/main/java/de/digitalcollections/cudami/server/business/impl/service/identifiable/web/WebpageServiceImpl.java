@@ -171,6 +171,6 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
 
   @Override
   public SearchPageResponse<Webpage> findRootNodes(SearchPageRequest searchPageRequest) {
-    return ((NodeRepository<Webpage>)repository).findRootNodes(searchPageRequest);
+    return ((NodeRepository<Webpage>) repository).findRootNodes(searchPageRequest);
   }
 }

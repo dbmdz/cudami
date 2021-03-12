@@ -119,7 +119,8 @@ public class CudamiCollectionsClient extends CudamiBaseClient<Collection> {
     return doGetRequestForPagedObjectList("/latest/collections/top", pageRequest);
   }
 
-  public PageResponse<Collection> findTopCollections(SearchPageRequest searchPageRequest) throws HttpException {
+  public PageResponse<Collection> findTopCollections(SearchPageRequest searchPageRequest)
+      throws HttpException {
     return doGetSearchRequestForPagedObjectList("/latest/collections/top", searchPageRequest);
   }
 

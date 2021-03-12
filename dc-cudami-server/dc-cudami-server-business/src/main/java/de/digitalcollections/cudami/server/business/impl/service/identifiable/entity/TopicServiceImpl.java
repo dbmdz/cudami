@@ -123,6 +123,6 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
 
   @Override
   public SearchPageResponse<Topic> findRootNodes(SearchPageRequest searchPageRequest) {
-    return ((NodeRepository<Topic>)repository).findRootNodes(searchPageRequest);
+    return ((NodeRepository<Topic>) repository).findRootNodes(searchPageRequest);
   }
 }

@@ -112,8 +112,12 @@ public class TopicController {
     }
 
     if (StringUtils.hasText(searchTerm)) {
-      SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageRequest.getPageNumber(),
-          pageRequest.getPageSize(), pageRequest.getSorting());
+      SearchPageRequest searchPageRequest =
+          new SearchPageRequest(
+              searchTerm,
+              pageRequest.getPageNumber(),
+              pageRequest.getPageSize(),
+              pageRequest.getSorting());
       return service.findRootNodes(searchPageRequest);
     } else {
       return service.getRootNodes(pageRequest);

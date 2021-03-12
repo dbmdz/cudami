@@ -186,18 +186,11 @@ public class CollectionsController extends AbstractController {
   }
 
   @GetMapping("/collections")
-  public String list(
-      @RequestParam(name = "searchTerm", required = false) String searchTerm, Model model)
-      throws HttpException {
+  public String list(Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
         languageSortingHelper.sortLanguages(displayLocale, service.getTopCollectionsLanguages()));
-
-    if (StringUtils.hasText(searchTerm)) {
-      model.addAttribute("searchTerm", searchTerm);
-    }
-
     return "collections/list";
   }
 
@@ -248,6 +241,8 @@ public class CollectionsController extends AbstractController {
     }
   }
 
+  // TODO: Parent als Parameter mitgeben. Wenn leer => TopCollection
+  // TODO: Weiteres Request-Parameter für "Suche über alle Collections und Subcollections"
   @GetMapping({"/api/collections/search", "/api/subcollections/search"})
   @ResponseBody
   public SearchPageResponse<Collection> search(

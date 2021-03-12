@@ -312,7 +312,6 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
     return find(pageRequest, commonSql, null);
   }
 
-
   @Override
   public SearchPageResponse<Webpage> findRootNodes(SearchPageRequest searchPageRequest) {
     String commonSql =
