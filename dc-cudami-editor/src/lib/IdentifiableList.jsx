@@ -16,6 +16,8 @@ export default function ({
   parentUuid,
   showEdit,
   showNew,
+  showSearch,
+  searchTerm,
   type,
   uiLocale,
 }) {
@@ -32,6 +34,8 @@ export default function ({
       parentUuid={parentUuid}
       showEdit={showEdit}
       showNew={showNew}
+      showSearch={showSearch}
+      searchTerm={searchTerm}
       type={type}
       uiLocale={uiLocale}
     />,

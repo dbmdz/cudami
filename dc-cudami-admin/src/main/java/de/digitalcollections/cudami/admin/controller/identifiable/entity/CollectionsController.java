@@ -142,7 +142,7 @@ public class CollectionsController extends AbstractController {
       throws HttpException {
     if (StringUtils.hasText(searchTerm)) {
       SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-      return service.find(searchPageRequest);
+      return service.findTopCollections(searchPageRequest);
     }
 
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
@@ -186,11 +186,18 @@ public class CollectionsController extends AbstractController {
   }
 
   @GetMapping("/collections")
-  public String list(Model model) throws HttpException {
+  public String list(
+      @RequestParam(name = "searchTerm", required = false) String searchTerm, Model model)
+      throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
         languageSortingHelper.sortLanguages(displayLocale, service.getTopCollectionsLanguages()));
+
+    if (StringUtils.hasText(searchTerm)) {
+      model.addAttribute("searchTerm", searchTerm);
+    }
+
     return "collections/list";
   }
 

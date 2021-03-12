@@ -128,7 +128,7 @@ class PagedIdentifiableList extends Component {
       website: WebsiteList,
     }
     const ListComponent = LIST_COMPONENT_MAPPING[this.props.type]
-    const {enableMove, enableRemove, parentType, showEdit, type} = this.props
+    const {enableMove, enableRemove, parentType, showEdit, showSearch, searchTerm, type} = this.props
     const {
       activeLanguage,
       changeOfOrderActive,
@@ -157,6 +157,8 @@ class PagedIdentifiableList extends Component {
         pageSize={this.pageSize}
         parentType={parentType}
         showEdit={showEdit}
+        showSearch={showSearch}
+        searchTerm={searchTerm}
         type={type}
       />
     )
@@ -242,7 +244,7 @@ class PagedIdentifiableList extends Component {
     this.updatePage({selected: pageNumber})
   }
 
-  loadIdentifiables = async (pageNumber, pageSize = this.pageSize) => {
+  loadIdentifiables = async (pageNumber, pageSize = this.pageSize, searchTerm) => {
     const {apiContextPath, mockApi, parentType, parentUuid, type} = this.props
     if (parentType && parentUuid) {
       return await loadAttachedIdentifiables(
@@ -260,7 +262,8 @@ class PagedIdentifiableList extends Component {
       mockApi,
       type,
       pageNumber,
-      pageSize
+      pageSize,
+      searchTerm
     )
   }
 
@@ -340,6 +343,8 @@ class PagedIdentifiableList extends Component {
       parentType,
       parentUuid,
       showNew,
+      showSearch,
+      searchTerm,
       t,
       type,
       uiLocale,
@@ -425,6 +430,10 @@ class PagedIdentifiableList extends Component {
                   {t('save')}
                 </Button>
               )}
+              {showSearch && (
+                  <span>{t('searchTerm')}: <form action=""><input type="text" name="searchTerm" value={searchTerm}/></form></span>
+              )
+              }
             </div>
             {this.getListComponent()}
             <Pagination
@@ -482,6 +491,7 @@ PagedIdentifiableList.defaultProps = {
   mockApi: false,
   showEdit: false,
   showNew: false,
+  showSearch: false
 }
 
 export default withTranslation()(PagedIdentifiableList)
