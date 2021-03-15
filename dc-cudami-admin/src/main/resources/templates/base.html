@@ -8,6 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title layout:title-pattern="$LAYOUT_TITLE: $CONTENT_TITLE">cudami</title>
 
+    <link rel="shortcut icon" th:href="@{/images/favicon.png}" />
+
     <link rel="stylesheet" th:href="@{/css/fonts-source-sans-pro.css}">
     <link rel="stylesheet" th:href="@{/webjars/AdminLTE/plugins/fontawesome-free/css/all.min.css}">
     <link rel="stylesheet" th:href="@{/webjars/AdminLTE/dist/css/adminlte.min.css}">
@@ -20,21 +22,21 @@
 
       <!-- Navbar -->
       <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-        <!-- Left navbar links -->
+         <!--Left navbar links--> 
         <ul class="navbar-nav">
           <li class="nav-item">
             <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
           </li>
-          <li class="nav-item d-none d-sm-inline-block">
+<!--          <li class="nav-item d-none d-sm-inline-block">
             <a href="index3.html" class="nav-link">Home</a>
           </li>
           <li class="nav-item d-none d-sm-inline-block">
             <a href="#" class="nav-link">Contact</a>
-          </li>
+          </li>-->
         </ul>
 
         <!-- SEARCH FORM -->
-        <form class="form-inline ml-3">
+<!--        <form class="form-inline ml-3">
           <div class="input-group input-group-sm">
             <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
             <div class="input-group-append">
@@ -43,7 +45,7 @@
               </button>
             </div>
           </div>
-        </form>
+        </form>-->
 
         <!-- Right navbar links -->
         <ul class="navbar-nav ml-auto">
@@ -51,91 +53,6 @@
           <th:block th:unless="${#locale.language == 'en'}"><a id="change-locale" th:href="@{''(language=en)}" class="nav-link">English</a></th:block>
           <th:block th:if="${#locale.language == 'en'}"><a id="change-locale" th:href="@{''(language=de)}" class="nav-link">Deutsch</a></th:block>
           </li>
-          <!-- Messages Dropdown Menu -->
-          <!--          <li class="nav-item dropdown">
-                      <a class="nav-link" data-toggle="dropdown" href="#">
-                        <i class="far fa-comments"></i>
-                        <span class="badge badge-danger navbar-badge">3</span>
-                      </a>
-                      <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                        <a href="#" class="dropdown-item">
-                           Message Start 
-                          <div class="media">
-                            <img th:src="@{/webjars/AdminLTE/dist/img/user1-128x128.jpg}" alt="User Avatar" class="img-size-50 mr-3 img-circle">
-                            <div class="media-body">
-                              <h3 class="dropdown-item-title">
-                                Brad Diesel
-                                <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
-                              </h3>
-                              <p class="text-sm">Call me whenever you can...</p>
-                              <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-                            </div>
-                          </div>
-                           Message End 
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                           Message Start 
-                          <div class="media">
-                            <img th:src="@{/webjars/AdminLTE/dist/img/user8-128x128.jpg}" alt="User Avatar" class="img-size-50 img-circle mr-3">
-                            <div class="media-body">
-                              <h3 class="dropdown-item-title">
-                                John Pierce
-                                <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>
-                              </h3>
-                              <p class="text-sm">I got your message bro</p>
-                              <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-                            </div>
-                          </div>
-                           Message End 
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                           Message Start 
-                          <div class="media">
-                            <img th:src="@{/webjars/AdminLTE/dist/img/user3-128x128.jpg}" alt="User Avatar" class="img-size-50 img-circle mr-3">
-                            <div class="media-body">
-                              <h3 class="dropdown-item-title">
-                                Nora Silvester
-                                <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>
-                              </h3>
-                              <p class="text-sm">The subject goes here</p>
-                              <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-                            </div>
-                          </div>
-                           Message End 
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
-                      </div>
-                    </li>-->
-          <!-- Notifications Dropdown Menu -->
-          <!--          <li class="nav-item dropdown">
-                      <a class="nav-link" data-toggle="dropdown" href="#">
-                        <i class="far fa-bell"></i>
-                        <span class="badge badge-warning navbar-badge">15</span>
-                      </a>
-                      <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                        <span class="dropdown-header">15 Notifications</span>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                          <i class="fas fa-envelope mr-2"></i> 4 new messages
-                          <span class="float-right text-muted text-sm">3 mins</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                          <i class="fas fa-users mr-2"></i> 8 friend requests
-                          <span class="float-right text-muted text-sm">12 hours</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                          <i class="fas fa-file mr-2"></i> 3 new reports
-                          <span class="float-right text-muted text-sm">2 days</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-                      </div>
-                    </li>-->
           <li class="dropdown nav-item">
             <a href="#" class="dropdown-toggle nav-link" id="userMenuDropdownButton" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
               <span id="currentUserName" sec:authentication="name"></span> <span class="caret"></span>
@@ -157,11 +74,11 @@
               <i class="fas fa-expand-arrows-alt"></i>
             </a>
           </li>
-          <li class="nav-item">
+<!--          <li class="nav-item">
             <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
               <i class="fas fa-th-large"></i>
             </a>
-          </li>
+          </li>-->
         </ul>
       </nav>
       <!-- /.navbar -->
@@ -169,42 +86,20 @@
       <!-- Main Sidebar Container -->
       <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
-        <a href="index3.html" class="brand-link">
+        <a th:href="@{/}" class="brand-link">
           <img th:src="@{/images/logo-cudami.png}" alt="cudami Logo" class="brand-image" style="opacity: .8">
           <span class="brand-text font-weight-light">&nbsp;</span>
         </a>
 
         <!-- Sidebar -->
         <div class="sidebar">
-          <!-- Sidebar user panel (optional) -->
-          <!--          <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                      <div class="image">
-                        <img th:src="@{/webjars/AdminLTE/dist/img/user2-160x160.jpg}" class="img-circle elevation-2" alt="User Image">
-                      </div>
-                      <div class="info">
-                        <a href="#" class="d-block">Alexander Pierce</a>
-                      </div>
-                    </div>-->
-
-          <!-- SidebarSearch Form -->
-          <!--          <div class="form-inline">
-                      <div class="input-group" data-widget="sidebar-search">
-                        <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
-                        <div class="input-group-append">
-                          <button class="btn btn-sidebar">
-                            <i class="fas fa-search fa-fw"></i>
-                          </button>
-                        </div>
-                      </div>
-                    </div>-->
-
           <!-- Sidebar Menu -->
           <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
               <!-- Add icons to the links using the .nav-icon class
                    with font-awesome or any other icon font library -->
               <th:block sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
-                <li class="nav-item menu-open">
+                <li class="nav-item">
                   <a href="#" class="nav-link">
                     <!--                    <i class="nav-icon fas fa-tachometer-alt"></i>-->
                     <p>
@@ -279,9 +174,9 @@
                   </a>
                   <ul class="nav nav-treeview">
                     <li class="nav-item">
-                      <a th:href="@{/projects}" th:title="#{digitization_projects}" class="nav-link">
-                        <i class="fas fa-industry nav-icon"></i>
-                        <p th:text="#{digitization_projects}">(Digitization-)Projects</p>
+                      <a th:href="@{/articles}" th:title="#{articles}" class="nav-link">
+                        <i class="far fa-newspaper nav-icon"></i>
+                        <p th:text="#{articles}">Articles</p>
                       </a>
                     </li>
                     <li class="nav-item">
@@ -291,9 +186,9 @@
                       </a>
                     </li>
                     <li class="nav-item">
-                      <a th:href="@{/articles}" th:title="#{articles}" class="nav-link">
-                        <i class="far fa-newspaper nav-icon"></i>
-                        <p th:text="#{articles}">Articles</p>
+                      <a th:href="@{/projects}" th:title="#{digitization_projects}" class="nav-link">
+                        <i class="fas fa-industry nav-icon"></i>
+                        <p th:text="#{digitization_projects}">(Digitization-)Projects</p>
                       </a>
                     </li>
                   </ul>
@@ -307,16 +202,40 @@
                     </p>
                   </a>
                   <ul class="nav nav-treeview">
-                    <li class="nav-item">
-                      <a th:href="@{/corporatebodies}" th:title="#{corporateBodies}" class="nav-link">
-                        <i class="fas fa-university nav-icon"></i>
-                        <p th:text="#{corporateBodies}">Corporate bodies</p>
+<!--                    <li class="nav-item">
+                      <a th:href="@{/items}" th:title="#{items}" class="nav-link">
+                        <i class="fas fa-cube nav-icon"></i>
+                        <p th:text="#{items}">items</p>
                       </a>
                     </li>
+                    <li class="nav-item">
+                      <a th:href="@{/manifestations}" th:title="#{manifestations}" class="nav-link">
+                        <i class="fas fa-layer-group nav-icon"></i>
+                        <p th:text="#{manifestations}">Manifestations</p>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a th:href="@{/expressions}" th:title="#{expressions}" class="nav-link">
+                        <i class="far fa-comment-dots nav-icon"></i>
+                        <p th:text="#{expressions}">Expressions</p>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a th:href="@{/works}" th:title="#{works}" class="nav-link">
+                        <i class="far fa-lightbulb nav-icon"></i>
+                        <p th:text="#{works}">Works</p>
+                      </a>
+                    </li>-->
                     <li class="nav-item">
                       <a th:href="@{/persons}" th:title="#{persons}" class="nav-link">
                         <i class="fas fa-users nav-icon"></i>
                         <p th:text="#{persons}">Persons</p>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a th:href="@{/corporatebodies}" th:title="#{corporateBodies}" class="nav-link">
+                        <i class="fas fa-university nav-icon"></i>
+                        <p th:text="#{corporateBodies}">Corporate bodies</p>
                       </a>
                     </li>
                     <li class="nav-item">
@@ -354,93 +273,9 @@
 
       <!-- Content Wrapper. Contains page content -->
       <div class="content-wrapper">
-        <!-- Content Header (Page header) -->
-        <div class="content-header">
-          <div class="container-fluid">
-<!--            <div class="row mb-2">
-              <div class="col-sm-6">
-                <h1 class="m-0">Starter Page</h1>
-              </div> /.col 
-              <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                  <li class="breadcrumb-item"><a href="#">Home</a></li>
-                  <li class="breadcrumb-item active">Starter Page</li>
-                </ol>
-              </div> /.col 
-            </div> /.row -->
-          </div><!-- /.container-fluid -->
-        </div>
-        <!-- /.content-header -->
-
-        <!-- Main content -->
-        <div class="content">
-          <div class="container-fluid">
-            <div th:replace="fragments/feedback-messages :: global-bootstrap4"></div>
-
-      <section layout:fragment="content">
-        ...
-      </section>
-<!--            <div class="row">
-              <div class="col-lg-6">
-                <div class="card">
-                  <div class="card-body">
-                    <h5 class="card-title">Card title</h5>
-
-                    <p class="card-text">
-                      Some quick example text to build on the card title and make up the bulk of the card's
-                      content.
-                    </p>
-
-                    <a href="#" class="card-link">Card link</a>
-                    <a href="#" class="card-link">Another link</a>
-                  </div>
-                </div>
-
-                <div class="card card-primary card-outline">
-                  <div class="card-body">
-                    <h5 class="card-title">Card title</h5>
-
-                    <p class="card-text">
-                      Some quick example text to build on the card title and make up the bulk of the card's
-                      content.
-                    </p>
-                    <a href="#" class="card-link">Card link</a>
-                    <a href="#" class="card-link">Another link</a>
-                  </div>
-                </div> /.card 
-              </div>
-               /.col-md-6 
-              <div class="col-lg-6">
-                <div class="card">
-                  <div class="card-header">
-                    <h5 class="m-0">Featured</h5>
-                  </div>
-                  <div class="card-body">
-                    <h6 class="card-title">Special title treatment</h6>
-
-                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
-                  </div>
-                </div>
-
-                <div class="card card-primary card-outline">
-                  <div class="card-header">
-                    <h5 class="m-0">Featured</h5>
-                  </div>
-                  <div class="card-body">
-                    <h6 class="card-title">Special title treatment</h6>
-
-                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
-                  </div>
-                </div>
-              </div>
-               /.col-md-6 
-            </div>-->
-            <!-- /.row -->
-          </div><!-- /.container-fluid -->
-        </div>
-        <!-- /.content -->
+        <th:block layout:fragment="content">
+          <!-- Content of page -->
+        </th:block>
       </div>
       <!-- /.content-wrapper -->
 
@@ -457,11 +292,11 @@
       <!-- Main Footer -->
       <footer class="main-footer">
         <!-- To the right -->
-        <div class="float-right d-none d-sm-inline">
-          Anything you want
+        <div class="float-right d-none d-sm-inline text-muted">
+        v<small th:text="${version}">1.0.0</small>
         </div>
         <!-- Default to the left -->
-        <strong>Copyright &copy; 2014-2020 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights reserved.
+        <small><a href="https://github.com/dbmdz/cudami">cudami Digital Asset Management System</a>.</small>
       </footer>
     </div>
     <!-- ./wrapper -->
@@ -474,5 +309,15 @@
     <script th:src="@{/webjars/AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
     <!-- AdminLTE App -->
     <script th:src="@{/webjars/AdminLTE/dist/js/adminlte.min.js}"></script>
+    
+    <script th:src="@{/js/index.js}"></script>
+    <script>
+      $(function () {
+        activateExternalLinks()
+        activatePopovers()
+        appendQueryParameters()
+      })
+    </script>
+    <th:block layout:fragment="beforeBodyEnds"></th:block>
   </body>
 </html>

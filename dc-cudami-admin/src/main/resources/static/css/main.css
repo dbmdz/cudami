@@ -1,12 +1,15 @@
 /* admin lte */
+.main-sidebar {
+  overflow-y: auto;
+}
 .nav-sidebar .nav-treeview .nav-link p {
   font-size: 0.8rem;
 }
 .nav-sidebar .nav-item > .nav-link {
-    margin-bottom: 0rem;
+  margin-bottom: 0rem;
 }
 .nav-sidebar .nav-link > .right:nth-child(2), .nav-sidebar .nav-link > p > .right:nth-child(2) {
-    right: 1rem;
+  right: 1rem;
 }
 /* admin lte */
 
@@ -19,3 +22,14 @@ a[href^="http"]:not(.no-external):after {
   padding-left: 3px;
 }
 
+.welcome {
+  -ms-flex-align: center;
+  align-items: center;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  height: 80vh;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
