@@ -20,6 +20,7 @@ import AppContext from '../AppContext'
 import AddAttachedIdentifiablesDialog from '../dialogs/AddAttachedIdentifiablesDialog'
 import RemoveAttachedIdentifiableDialog from '../dialogs/RemoveAttachedIdentifiableDialog'
 import FeedbackMessage from '../FeedbackMessage'
+import IdentifiableSearch from '../IdentifiableSearch'
 import LanguageTab from '../LanguageTab'
 import Pagination from '../Pagination'
 import CollectionList from './CollectionList'
@@ -108,6 +109,20 @@ class PagedIdentifiableList extends Component {
     return successful
   }
 
+  executeSearch = async () => {
+    const {content, pageSize, totalElements} = await this.loadIdentifiables(
+      0,
+      this.pageSize,
+      this.state.searchTerm
+    )
+    this.setState({
+      identifiables: content,
+      numberOfPages: Math.ceil(totalElements / pageSize),
+      pageNumber: 0,
+      totalElements,
+    })
+  }
+
   getLabelValue = (label) => {
     return (
       label[this.state.activeLanguage] ??
@@ -116,7 +131,7 @@ class PagedIdentifiableList extends Component {
     )
   }
 
-  getListComponent = ({identifiables}) => {
+  getListComponent = () => {
     const LIST_COMPONENT_MAPPING = {
       collection: CollectionList,
       corporateBody: CorporateBodyList,
@@ -129,10 +144,11 @@ class PagedIdentifiableList extends Component {
       website: WebsiteList,
     }
     const ListComponent = LIST_COMPONENT_MAPPING[this.props.type]
-    const {enableMove, enableRemove, parentType, showEdit, enableSearch, type} = this.props
+    const {enableMove, enableRemove, parentType, showEdit, type} = this.props
     const {
       activeLanguage,
       changeOfOrderActive,
+      identifiables,
       identifierTypes,
       pageNumber,
     } = this.state
@@ -141,7 +157,6 @@ class PagedIdentifiableList extends Component {
         changeOfOrderActive={changeOfOrderActive}
         enableMove={enableMove}
         enableRemove={enableRemove}
-        enableSearch={enableSearch}
         identifiables={identifiables}
         identifierTypes={identifierTypes}
         language={activeLanguage}
@@ -243,7 +258,7 @@ class PagedIdentifiableList extends Component {
     this.updatePage({selected: pageNumber})
   }
 
-  loadIdentifiables = async (pageNumber, pageSize = this.pageSize, searchTerm) => {
+  loadIdentifiables = async (pageNumber, pageSize = this.pageSize) => {
     const {apiContextPath, mockApi, parentType, parentUuid, type} = this.props
     if (parentType && parentUuid) {
       return await loadAttachedIdentifiables(
@@ -254,7 +269,7 @@ class PagedIdentifiableList extends Component {
         type,
         pageNumber,
         pageSize,
-        searchTerm
+        this.state.searchTerm
       )
     }
     return await loadRootIdentifiables(
@@ -263,7 +278,7 @@ class PagedIdentifiableList extends Component {
       type,
       pageNumber,
       pageSize,
-      searchTerm
+      this.state.searchTerm
     )
   }
 
@@ -332,19 +347,6 @@ class PagedIdentifiableList extends Component {
     })
   }
 
-  executeSearch = async (evt) => {
-    evt.preventDefault()
-    const {content, pageSize, totalElements, pageRequest, query} = await this.loadIdentifiables(
-        this.state.pageNumber, this.pageSize, this.state.searchTerm)
-    this.setState({
-      identifiables: content,
-      numberOfPages: Math.ceil(totalElements / pageSize),
-      pageNumber: pageRequest.pageNumber,
-      totalElements,
-      searchTerm: query
-    })
-  }
-
   render() {
     const {
       apiContextPath,
@@ -367,7 +369,6 @@ class PagedIdentifiableList extends Component {
       defaultLanguage,
       existingLanguages,
       feedbackMessage,
-      identifiables,
       identifierTypes,
       dialogsOpen,
       numberOfPages,
@@ -445,13 +446,14 @@ class PagedIdentifiableList extends Component {
                 </Button>
               )}
               {enableSearch && (
-                  <span>{t('searchTerm')}: <form onSubmit={this.executeSearch}><input type="text" value={searchTerm} onChange={(evt) => this.setState({searchTerm: evt.target.value})}/></form></span>
-              )
-              }
+                <IdentifiableSearch
+                  onChange={(value) => this.setState({searchTerm: value})}
+                  onSubmit={this.executeSearch}
+                  value={searchTerm}
+                />
+              )}
             </div>
-            <this.getListComponent
-                identifiables={identifiables}
-            />
+            {this.getListComponent()}
             <Pagination
               changePage={this.updatePage}
               numberOfPages={numberOfPages}

@@ -110,7 +110,7 @@ export async function loadAttachedIdentifiables(
 ) {
   let url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}?pageNumber=${pageNumber}&pageSize=${pageSize}`
   if (searchTerm) {
-    url = url.concat("&searchTerm=", searchTerm)
+    url = `${url}&searchTerm=${searchTerm}`
   }
   if (mock) {
     url = `/__mock__/${type}s.json`
@@ -123,7 +123,7 @@ export async function loadAttachedIdentifiables(
       content,
       pageSize: pageRequest.pageSize,
       totalElements,
-      searchTerm
+      searchTerm,
     }
   } catch (err) {
     return {
@@ -185,7 +185,7 @@ export async function loadRootIdentifiables(
 ) {
   let url = `${contextPath}api/${typeToEndpointMapping[type]}?pageNumber=${pageNumber}&pageSize=${pageSize}`
   if (searchTerm) {
-    url = url.concat("&searchTerm=", searchTerm)
+    url = `${url}&searchTerm=${searchTerm}`
   }
   if (mock) {
     url = `/__mock__/${type}s.json`
