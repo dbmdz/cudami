@@ -1,13 +1,26 @@
 package de.digitalcollections.cudami.admin.controller;
 
+import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
+import de.digitalcollections.model.security.User;
 import java.util.Date;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 @Controller
+@SessionAttributes("loggedInUser")
 public class MainController {
+
+  private final UserService<User> userService;
+
+  public MainController(UserService<User> userService) {
+    this.userService = userService;
+  }
 
   @GetMapping("/login")
   public String login(
@@ -17,15 +30,19 @@ public class MainController {
     return "login";
   }
 
-  @GetMapping(value = {"/lte"})
-  public String lteStarter(Model model) {
-    model.addAttribute("time", new Date());
-    return "starter";
-  }
-
   @GetMapping(value = {"", "/"})
   public String printWelcome(Model model) {
     model.addAttribute("time", new Date());
+
+    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    if (principal instanceof UserDetails) {
+      try {
+        String username = ((UserDetails) principal).getUsername();
+        User user = userService.findByEmail(username);
+        model.addAttribute("loggedInUser", user);
+      } catch (ServiceException ex) {
+      }
+    }
     return "main";
   }
 }

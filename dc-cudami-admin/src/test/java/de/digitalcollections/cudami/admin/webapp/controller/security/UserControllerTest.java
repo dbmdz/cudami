@@ -37,7 +37,7 @@ public class UserControllerTest {
   @Test
   public void resourceRequest() {
     String body = this.testRestTemplate.getForObject("/css/main.css", String.class);
-    assertThat(body.contains("background")).isTrue();
+    assertThat(body.contains("font-family")).isTrue();
   }
 
   // see
