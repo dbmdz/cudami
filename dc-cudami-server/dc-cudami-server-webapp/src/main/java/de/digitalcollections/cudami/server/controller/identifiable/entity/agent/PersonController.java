@@ -11,6 +11,7 @@ import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.Sorting;
 import java.util.List;
 import java.util.Locale;
@@ -67,22 +68,23 @@ public class PersonController {
       @RequestParam(name = "language", required = false, defaultValue = "de") String language,
       @RequestParam(name = "initial", required = false) String initial,
       @RequestParam(name = "previewImage", required = false)
-          FilterCriterion<UUID> previewImageFilter) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+          FilterCriterion<UUID> previewImageFilter,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
+      searchPageRequest.setSorting(sorting);
     }
 
     if (previewImageFilter != null) {
       Filtering filtering =
           Filtering.defaultBuilder().add("previewImage", previewImageFilter).build();
-      pageRequest.setFiltering(filtering);
+      searchPageRequest.setFiltering(filtering);
     }
     if (initial == null) {
-      return personService.find(pageRequest);
+      return personService.find(searchPageRequest);
     }
-    return personService.findByLanguageAndInitial(pageRequest, language, initial);
+    return personService.findByLanguageAndInitial(searchPageRequest, language, initial);
   }
 
   @ApiMethod(description = "get all persons born at given geo location")

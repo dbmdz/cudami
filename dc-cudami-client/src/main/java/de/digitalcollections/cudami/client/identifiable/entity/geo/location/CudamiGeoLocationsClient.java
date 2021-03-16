@@ -6,6 +6,8 @@ import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
@@ -25,8 +27,8 @@ public class CudamiGeoLocationsClient extends CudamiBaseClient<GeoLocation> {
     return new GeoLocation();
   }
 
-  public PageResponse<GeoLocation> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/geolocations", pageRequest);
+  public SearchPageResponse<GeoLocation> find(SearchPageRequest searchPageRequest) throws HttpException {
+    return doGetSearchRequestForPagedObjectList("/latest/geolocations", searchPageRequest);
   }
 
   public PageResponse findByLanguageAndInitial(
