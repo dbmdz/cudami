@@ -7,17 +7,25 @@
     <title th:text="|#{rendering_templates}: #{rendering_template_edit(${name})}|">Rendering templates: Edit rendering template "template"</title>
   </head>
   <body>
-    <section layout:fragment="content">
-      <div id="editor"></div>
-      <script th:src="@{/js/rendering-template-editor.bundle.js}"></script>
-      <script th:inline="javascript">
-        RenderingTemplateEditor({
-          apiContextPath: /*[[@{/}]]*/ '',
-          id: "editor",
-          uiLocale: /*[[${#locale.language}]]*/,
-          uuid: /*[[${uuid}]]*/
-        });
-      </script>
-    </section>
+    <th:block layout:fragment="content">
+      <div class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-12">
+              <div id="editor"></div>
+              <script th:src="@{/js/rendering-template-editor.bundle.js}"></script>
+              <script th:inline="javascript">
+                RenderingTemplateEditor({
+                  apiContextPath: /*[[@{/}]]*/ '',
+                  id: "editor",
+                  uiLocale: /*[[${#locale.language}]]*/,
+                  uuid: /*[[${uuid}]]*/
+                });
+              </script>
+            </div>
+          </div>
+        </div>
+      </div>
+    </th:block>
   </body>
 </html>
