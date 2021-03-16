@@ -9,143 +9,155 @@
     <link th:href="@{/css/cudami/media-in-text.css}" rel="stylesheet" />
   </head>
   <body>
-    <section layout:fragment="content" th:object="${collection}">
+  <th:block layout:fragment="content" th:object="${collection}">
+    <div class="content-header">
+      <div class="container-fluid">
 
-      <div class="row">
-        <div class="col-12">
-          <ol class="breadcrumb hidden-xs-down">
-            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-            <li class="breadcrumb-item"><a th:href="@{/collections}" th:text="#{collections}">Collections</a></li>
-            <th:block th:if="${not #lists.isEmpty(breadcrumbs)}">
-              <th:block th:each="breadcrumb : ${breadcrumbs}">
-                <li class="breadcrumb-item"><a th:href="@{/collections/} + ${breadcrumb.targetId}"><th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${breadcrumb.label}, ${locale})">Node Label</th:block></a></li>
+        <div class="row">
+          <div class="col-12">
+            <ol class="breadcrumb hidden-xs-down">
+              <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+              <li class="breadcrumb-item"><a th:href="@{/collections}" th:text="#{collections}">Collections</a></li>
+              <th:block th:if="${not #lists.isEmpty(breadcrumbs)}">
+                <th:block th:each="breadcrumb : ${breadcrumbs}">
+                  <li class="breadcrumb-item"><a th:href="@{/collections/} + ${breadcrumb.targetId}"><th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${breadcrumb.label}, ${locale})">Node Label</th:block></a></li>
+                </th:block>
               </th:block>
-            </th:block>
-          </ol>
-        </div>
-      </div>
-      
-      <div class="row">
-        <div class="col-sm-6">
-          <h1 th:text="#{collection}">Collection</h1>
-        </div>
-        <div class="col-sm-6">
-          <div class="float-right">
-            <a class="btn btn-secondary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
+            </ol>
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="row">
-        <div class="col-sm-12">
-          <hr/>
-        </div>
-      </div>
+    <!-- Main content -->
+    <div class="content">
+      <div class="container-fluid">
+        <div th:replace="fragments/feedback-messages :: global-bootstrap4"></div>
 
-      <div class="row">
-        <div class="col-sm-12">
-          <div class="container-fluid rows-striped">
-            <div class="row">
-              <div class="col-md-3"><label class="font-weight-bold" th:text="#{id}">ID</label></div>
-              <div class="col-md-9"><span th:text="*{uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
-            </div>
-            <div class="row">
-              <div class="col-md-3">
-                <label class="font-weight-bold" th:text="#{publicationStatus}">Publication status</label>
-                <button class="btn btn-link" data-html="true" data-placement="bottom" data-toggle="popover" data-trigger="focus" th:attr="data-content=#{tooltip_publication_status}" id="publication_status_tooltip" type="button">
-                  <i class="fas fa-question-circle"></i>
-                </button>
-              </div>
-              <div class="col-md-9" th:with="now=${T(java.time.LocalDate).now()}">
-                <th:block th:if="${collection.publicationStart}  == null OR  ${collection.publicationStart.compareTo(now)} > 0"><span class="badge badge-pill badge-warning">&nbsp;</span></th:block>
-                <th:block th:if="(${collection.publicationStart} != null AND ${collection.publicationStart.compareTo(now)} <= 0) AND (${collection.publicationEnd} == null OR ${collection.publicationEnd.compareTo(now)} > 0)"><span class="badge badge-pill badge-success">&nbsp;</span></th:block>
-                <th:block th:if="(${collection.publicationStart} != null AND ${collection.publicationStart.compareTo(now)} <= 0) AND (${collection.publicationEnd} != null AND ${collection.publicationEnd.compareTo(now)} <= 0)"><span class="badge badge-pill badge-danger">&nbsp;</span></th:block>
-
-                <th:block th:if="*{publicationStart} != null OR *{publicationEnd} != null">
-                  (<span th:with="df=#{date.format},pubStart=*{publicationStart}" th:text="${#temporals.format(pubStart,df)}">01.01.2000</span>&nbsp;<span th:text="#{to}">to</span>&nbsp;<span th:with="df=#{date.format},pubEnd=*{publicationEnd}" th:text="${#temporals.format(pubEnd,df)}">01.01.2000</span>)
-                </th:block>
-              </div>
-            </div>
-            <div class="row" th:if="${not #lists.isEmpty(parents)}">
-              <div class="col-md-3"><label class="font-weight-bold" th:text="#{parent_collections}">Parent collections</label></div>
-              <div class="col-md-9">
-                <th:block th:each="parent : ${parents}">
-                  <a class="mr-2" th:href="@{/collections/} + ${parent.uuid}"><th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${parent.label}, ${locale})">Parent Label</th:block></a>
-                </th:block>
-              </div>
+        <div class="row">
+          <div class="col-sm-6">
+            <h1 th:text="#{collection}">Collection</h1>
+          </div>
+          <div class="col-sm-6">
+            <div class="float-right">
+              <a class="btn btn-secondary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="row main-content">
-        <div class="col-sm-12">
-          <ul class="nav nav-tabs" role="tablist">
-            <li class="nav-item" th:each="language,iter : ${existingLanguages}">
-              <a class="language-switcher nav-link" th:classappend="${iter.index} == 0 ? active" th:href="${'#' + language}" data-toggle="tab" th:text="${language.getDisplayName(#locale)}" role="tab">language</a>
-            </li>
-          </ul>
-          <div class="tab-content">
-            <div th:each="language,iter : ${existingLanguages}" th:id="${language}" class="tab-pane" th:classappend="${iter.index} == 0 ? active">
-              <div class="card">
-                <div class="card-body bg-light">
-                  <div th:replace="fragments/identifiable::renderTeaser(${collection}, ${language})"></div>
+        <div class="row">
+          <div class="col-sm-12">
+            <hr/>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="container-fluid rows-striped">
+              <div class="row">
+                <div class="col-md-3"><label class="font-weight-bold" th:text="#{id}">ID</label></div>
+                <div class="col-md-9"><span th:text="*{uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
+              </div>
+              <div class="row">
+                <div class="col-md-3">
+                  <label class="font-weight-bold" th:text="#{publicationStatus}">Publication status</label>
+                  <button class="btn btn-link" data-html="true" data-placement="bottom" data-toggle="popover" data-trigger="focus" th:attr="data-content=#{tooltip_publication_status}" id="publication_status_tooltip" type="button">
+                    <i class="fas fa-question-circle"></i>
+                  </button>
                 </div>
-                <th:block th:if="*{text} and ${collection.text.containsKey(language)}">
-                  <div class="card-body long-text">
-                    <div th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(*{text}, ${language})"></div>
-                  </div>
-                </th:block>
+                <div class="col-md-9" th:with="now=${T(java.time.LocalDate).now()}">
+                  <th:block th:if="${collection.publicationStart}  == null OR  ${collection.publicationStart.compareTo(now)} > 0"><span class="badge badge-pill badge-warning">&nbsp;</span></th:block>
+                  <th:block th:if="(${collection.publicationStart} != null AND ${collection.publicationStart.compareTo(now)} <= 0) AND (${collection.publicationEnd} == null OR ${collection.publicationEnd.compareTo(now)} > 0)"><span class="badge badge-pill badge-success">&nbsp;</span></th:block>
+                  <th:block th:if="(${collection.publicationStart} != null AND ${collection.publicationStart.compareTo(now)} <= 0) AND (${collection.publicationEnd} != null AND ${collection.publicationEnd.compareTo(now)} <= 0)"><span class="badge badge-pill badge-danger">&nbsp;</span></th:block>
+
+                  <th:block th:if="*{publicationStart} != null OR *{publicationEnd} != null">
+                    (<span th:with="df=#{date.format},pubStart=*{publicationStart}" th:text="${#temporals.format(pubStart,df)}">01.01.2000</span>&nbsp;<span th:text="#{to}">to</span>&nbsp;<span th:with="df=#{date.format},pubEnd=*{publicationEnd}" th:text="${#temporals.format(pubEnd,df)}">01.01.2000</span>)
+                  </th:block>
+                </div>
+              </div>
+              <div class="row" th:if="${not #lists.isEmpty(parents)}">
+                <div class="col-md-3"><label class="font-weight-bold" th:text="#{parent_collections}">Parent collections</label></div>
+                <div class="col-md-9">
+                  <th:block th:each="parent : ${parents}">
+                    <a class="mr-2" th:href="@{/collections/} + ${parent.uuid}"><th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${parent.label}, ${locale})">Parent Label</th:block></a>
+                  </th:block>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="mt-3 row">
-        <div class="col-sm-12">
-          <div id="subcollection-list"></div>
+        <div class="row main-content">
+          <div class="col-sm-12">
+            <ul class="nav nav-tabs" role="tablist">
+              <li class="nav-item" th:each="language,iter : ${existingLanguages}">
+                <a class="language-switcher nav-link" th:classappend="${iter.index} == 0 ? active" th:href="${'#' + language}" data-toggle="tab" th:text="${language.getDisplayName(#locale)}" role="tab">language</a>
+              </li>
+            </ul>
+            <div class="tab-content">
+              <div th:each="language,iter : ${existingLanguages}" th:id="${language}" class="tab-pane" th:classappend="${iter.index} == 0 ? active">
+                <div class="card">
+                  <div class="card-body bg-light">
+                    <div th:replace="fragments/identifiable::renderTeaser(${collection}, ${language})"></div>
+                  </div>
+                  <th:block th:if="*{text} and ${collection.text.containsKey(language)}">
+                    <div class="card-body long-text">
+                      <div th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(*{text}, ${language})"></div>
+                    </div>
+                  </th:block>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3 row">
+          <div class="col-sm-12">
+            <div id="subcollection-list"></div>
+          </div>
+        </div>
+
+        <div class="mt-3 row">
+          <div class="col-sm-12">
+            <div id="digitalobject-list"></div>
+          </div>
         </div>
       </div>
+    </div>
+  </th:block>
 
-      <div class="mt-3 row">
-        <div class="col-sm-12">
-          <div id="digitalobject-list"></div>
-        </div>
-      </div>
-    </section>
-    <section layout:fragment="beforeBodyEnds">
-      <script>
-        addLanguageChangeHandler()
-        moveEditButtonToNavbar()
-      </script>
-      <script th:src="@{/js/identifiable-list.bundle.js}"></script>
-      <script th:inline="javascript">
-        IdentifiableList({
-          apiContextPath: /*[[@{/}]]*/ '',
-          enableAdd: true,
-          enableMove: true,
-          enableRemove: true,
-          existingLanguages: /*[[${existingSubcollectionLanguages}]]*/,
-          id: "subcollection-list",
-          parentType: "collection",
-          parentUuid: /*[[*{uuid}]]*/,
-          showEdit: true,
-          showNew: true,
-          type: "subcollection",
-          uiLocale: /*[[${#locale.language}]]*/
-        });
-        IdentifiableList({
-          apiContextPath: /*[[@{/}]]*/ '',
-          enableAdd: true,
-          enableRemove: true,
-          id: "digitalobject-list",
-          parentType: "collection",
-          parentUuid: /*[[*{uuid}]]*/,
-          type: "digitalObject",
-          uiLocale: /*[[${#locale.language}]]*/
-        });
-      </script>
-    </section>
-  </body>
+  <section layout:fragment="beforeBodyEnds">
+    <script>
+      addLanguageChangeHandler()
+              moveEditButtonToNavbar()
+    </script>
+    <script th:src="@{/js/identifiable-list.bundle.js}"></script>
+    <script th:inline="javascript">
+      IdentifiableList({
+        apiContextPath: /*[[@{/}]]*/ '',
+        enableAdd: true,
+        enableMove: true,
+        enableRemove: true,
+        existingLanguages: /*[[${existingSubcollectionLanguages}]]*/,
+        id: "subcollection-list",
+        parentType: "collection",
+        parentUuid: /*[[*{uuid}]]*/,
+        showEdit: true,
+        showNew: true,
+        type: "subcollection",
+        uiLocale: /*[[${#locale.language}]]*/
+      });
+      IdentifiableList({
+        apiContextPath: /*[[@{/}]]*/ '',
+        enableAdd: true,
+        enableRemove: true,
+        id: "digitalobject-list",
+        parentType: "collection",
+        parentUuid: /*[[*{uuid}]]*/,
+        type: "digitalObject",
+        uiLocale: /*[[${#locale.language}]]*/
+      });
+    </script>
+  </section>
+</body>
 </html>
