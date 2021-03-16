@@ -352,7 +352,7 @@ public class CollectionController {
       },
       produces = "application/json")
   @ApiResponseObject
-  public PageResponse<DigitalObject> getDigitalObjects(
+  public SearchPageResponse<DigitalObject> getDigitalObjects(
       @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
