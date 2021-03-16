@@ -7,6 +7,8 @@ import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
@@ -44,8 +46,8 @@ public class CudamiProjectsClient extends CudamiBaseClient<Project> {
     doDeleteRequestForString(String.format("/latest/projects/%s", uuid));
   }
 
-  public PageResponse<Project> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/projects", pageRequest);
+  public SearchPageResponse<Project> find(SearchPageRequest searchPageRequest) throws HttpException {
+    return doGetSearchRequestForPagedObjectList("/latest/projects", searchPageRequest);
   }
 
   public Project findOne(UUID uuid) throws HttpException {
