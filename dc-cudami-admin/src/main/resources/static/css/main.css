@@ -11,6 +11,15 @@
 .nav-sidebar .nav-link > .right:nth-child(2), .nav-sidebar .nav-link > p > .right:nth-child(2) {
   right: 1rem;
 }
+.sidebar-mini .logo-mini {
+  display: none;
+}
+.sidebar-mini.sidebar-collapse .logo-lg {
+  display: none;
+}
+.sidebar-mini.sidebar-collapse .logo-mini {
+  display: block;
+}
 /* admin lte */
 
 
