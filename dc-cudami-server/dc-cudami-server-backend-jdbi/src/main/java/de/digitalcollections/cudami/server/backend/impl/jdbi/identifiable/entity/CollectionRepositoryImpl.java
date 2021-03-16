@@ -17,6 +17,7 @@ import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 @Repository
 public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
@@ -295,6 +297,69 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
+  public SearchPageResponse<DigitalObject> getDigitalObjects(
+      UUID collectionUuid, SearchPageRequest searchPageRequest) {
+    final String doTableAlias = digitalObjectRepositoryImpl.getTableAlias();
+    final String doTableName = digitalObjectRepositoryImpl.getTableName();
+
+    String commonSql =
+        " FROM "
+            + doTableName
+            + " AS "
+            + doTableAlias
+            + " LEFT JOIN collection_digitalobjects AS cd ON "
+            + doTableAlias
+            + ".uuid = cd.digitalobject_uuid";
+
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", collectionUuid);
+
+    if (StringUtils.hasText(searchPageRequest.getQuery())) {
+      commonSql +=
+              " LEFT JOIN LATERAL jsonb_object_keys("
+              + doTableAlias
+              + ".label) lbl(keys) ON "
+              + doTableAlias
+              + ".label IS NOT NULL"
+              + " LEFT JOIN LATERAL jsonb_object_keys("
+              + doTableAlias
+              + ".description) dsc(keys) ON "
+              + doTableAlias
+              + ".description IS NOT NULL"
+              + " WHERE ("
+              + doTableAlias
+              + ".label->>lbl.keys ILIKE '%' || :searchTerm || '%'"
+              + " OR "
+              + doTableAlias
+              + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')"
+              + " AND cd.collection_uuid = :uuid";
+      argumentMappings.put("searchTerm", searchPageRequest.getQuery());
+    } else {
+      commonSql += " WHERE cd.collection_uuid = :uuid";
+    }
+
+
+    StringBuilder innerQuery = new StringBuilder("SELECT cd.sortindex AS idx, *" + commonSql);
+    addFiltering(searchPageRequest, innerQuery);
+    searchPageRequest.setSorting(null);
+    innerQuery.append(" ORDER BY idx ASC");
+    addPageRequestParams(searchPageRequest, innerQuery);
+
+    List<DigitalObject> result =
+        digitalObjectRepositoryImpl.retrieveList(
+            digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
+            innerQuery,
+            argumentMappings,
+            "ORDER BY idx ASC");
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    addFiltering(searchPageRequest, countQuery);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new SearchPageResponse<>(result, searchPageRequest, total);
+  }
+
+  @Override
   public PageResponse<DigitalObject> getDigitalObjects(
       UUID collectionUuid, PageRequest pageRequest) {
     final String doTableAlias = digitalObjectRepositoryImpl.getTableAlias();
@@ -329,6 +394,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
     return new PageResponse<>(result, pageRequest, total);
   }
+
+
 
   @Override
   public Collection getParent(UUID uuid) {

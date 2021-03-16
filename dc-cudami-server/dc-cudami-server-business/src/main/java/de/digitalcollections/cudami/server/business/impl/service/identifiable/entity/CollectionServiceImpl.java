@@ -103,9 +103,9 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public PageResponse<DigitalObject> getDigitalObjects(
-      UUID collectionUuid, PageRequest pageRequest) {
-    return ((CollectionRepository) repository).getDigitalObjects(collectionUuid, pageRequest);
+  public SearchPageResponse<DigitalObject> getDigitalObjects(
+      UUID collectionUuid, SearchPageRequest searchPageRequest) {
+    return ((CollectionRepository) repository).getDigitalObjects(collectionUuid, searchPageRequest);
   }
 
   @Override

@@ -44,15 +44,15 @@ public interface CollectionService extends NodeService<Collection>, EntityServic
 
   PageResponse<Collection> getActiveChildren(UUID uuid, PageRequest pageRequest);
 
-  default PageResponse<DigitalObject> getDigitalObjects(
-      Collection collection, PageRequest pageRequest) {
+  default SearchPageResponse<DigitalObject> getDigitalObjects(
+      Collection collection, SearchPageRequest searchPageRequest) {
     if (collection == null) {
       return null;
     }
-    return getDigitalObjects(collection.getUuid(), pageRequest);
+    return getDigitalObjects(collection.getUuid(), searchPageRequest);
   }
 
-  PageResponse<DigitalObject> getDigitalObjects(UUID collectionUuid, PageRequest pageRequest);
+  SearchPageResponse<DigitalObject> getDigitalObjects(UUID collectionUuid, SearchPageRequest searchPageRequest);
 
   List<CorporateBody> getRelatedCorporateBodies(UUID uuid, Filtering filtering);
 

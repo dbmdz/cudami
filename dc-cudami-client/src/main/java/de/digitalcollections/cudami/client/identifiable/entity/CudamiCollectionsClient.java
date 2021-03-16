@@ -138,11 +138,11 @@ public class CudamiCollectionsClient extends CudamiBaseClient<Collection> {
             String.format("/latest/collections/%s/breadcrumb", uuid), BreadcrumbNavigation.class);
   }
 
-  public PageResponse<DigitalObject> getDigitalObjects(UUID collectionUuid, PageRequest pageRequest)
+  public SearchPageResponse<DigitalObject> getDigitalObjects(UUID collectionUuid, SearchPageRequest searchPageRequest)
       throws HttpException {
-    return doGetRequestForPagedObjectList(
+    return doGetSearchRequestForPagedObjectList(
         String.format("/latest/collections/%s/digitalobjects", collectionUuid),
-        pageRequest,
+        searchPageRequest,
         DigitalObject.class);
   }
 

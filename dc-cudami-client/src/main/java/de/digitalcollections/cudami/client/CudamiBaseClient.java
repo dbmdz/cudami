@@ -288,8 +288,8 @@ public class CudamiBaseClient<T extends Object> {
     }
   }
 
-  protected SearchPageResponse<T> doGetSearchRequestForPagedObjectList(
-      String requestUrl, SearchPageRequest searchPageRequest) throws HttpException {
+  protected <X extends Object> SearchPageResponse<X> doGetSearchRequestForPagedObjectList(
+      String requestUrl, SearchPageRequest searchPageRequest, Class<X> type) throws HttpException {
     if (!requestUrl.contains("?")) {
       requestUrl = requestUrl + "?";
     } else {
@@ -320,12 +320,17 @@ public class CudamiBaseClient<T extends Object> {
       if (body == null || body.length == 0) {
         return null;
       }
-      SearchPageResponse<T> result = mapper.readerFor(SearchPageResponse.class).readValue(body);
+      SearchPageResponse<X> result = mapper.readerFor(SearchPageResponse.class).readValue(body);
       result.setQuery(searchTerm);
       return result;
     } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to connection error", e);
     }
+  }
+
+  protected SearchPageResponse<T> doGetSearchRequestForPagedObjectList(
+      String requestUrl, SearchPageRequest searchPageRequest) throws HttpException {
+    return doGetSearchRequestForPagedObjectList(requestUrl, searchPageRequest, (Class<T>) getClass());
   }
 
   protected String doPatchRequestForString(String requestUrl) throws HttpException {

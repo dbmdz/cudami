@@ -356,12 +356,13 @@ public class CollectionController {
       @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, new Sorting());
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize, new Sorting());
 
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);
-    return collectionService.getDigitalObjects(collection, pageRequest);
+    return collectionService.getDigitalObjects(collection, searchPageRequest);
   }
 
   @ApiMethod(description = "Get the first created parent of a collection")
