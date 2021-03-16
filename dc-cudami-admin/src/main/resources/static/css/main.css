@@ -2,9 +2,6 @@
 .main-sidebar {
   overflow-y: auto;
 }
-.nav-sidebar .nav-treeview .nav-link p {
-  font-size: 0.8rem;
-}
 .nav-sidebar .nav-item > .nav-link {
   margin-bottom: 0rem;
 }
