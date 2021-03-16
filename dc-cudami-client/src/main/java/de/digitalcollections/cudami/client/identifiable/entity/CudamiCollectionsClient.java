@@ -138,6 +138,16 @@ public class CudamiCollectionsClient extends CudamiBaseClient<Collection> {
             String.format("/latest/collections/%s/breadcrumb", uuid), BreadcrumbNavigation.class);
   }
 
+  @Deprecated(since = "5.0", forRemoval = true)
+  /** @deprecated Please use {@link #getDigitalObjects(UUID, SearchPageRequest)} instead */
+  public PageResponse<DigitalObject> getDigitalObjects(UUID collectionUuid, PageRequest pageRequest)
+      throws HttpException {
+    return doGetRequestForPagedObjectList(
+        String.format("/latest/collections/%s/digitalobjects", collectionUuid),
+        pageRequest,
+        DigitalObject.class);
+  }
+
   public SearchPageResponse<DigitalObject> getDigitalObjects(
       UUID collectionUuid, SearchPageRequest searchPageRequest) throws HttpException {
     return doGetSearchRequestForPagedObjectList(

@@ -46,6 +46,12 @@ public class CudamiProjectsClient extends CudamiBaseClient<Project> {
     doDeleteRequestForString(String.format("/latest/projects/%s", uuid));
   }
 
+  @Deprecated(since = "5.0", forRemoval = true)
+  /** @deprecated Please use {@link #find(SearchPageRequest)} instead */
+  public PageResponse<Project> find(PageRequest pageRequest) throws HttpException {
+    return doGetRequestForPagedObjectList("/latest/projects", pageRequest);
+  }
+
   public SearchPageResponse<Project> find(SearchPageRequest searchPageRequest)
       throws HttpException {
     return doGetSearchRequestForPagedObjectList("/latest/projects", searchPageRequest);

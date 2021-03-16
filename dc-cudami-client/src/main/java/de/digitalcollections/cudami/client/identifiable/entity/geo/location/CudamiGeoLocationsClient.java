@@ -27,6 +27,12 @@ public class CudamiGeoLocationsClient extends CudamiBaseClient<GeoLocation> {
     return new GeoLocation();
   }
 
+  @Deprecated(since = "5.0", forRemoval = true)
+  /** @deprecated Please use {@link #find(SearchPageRequest)} instead */
+  public PageResponse<GeoLocation> find(PageRequest pageRequest) throws HttpException {
+    return doGetRequestForPagedObjectList("/latest/geolocations", pageRequest);
+  }
+
   public SearchPageResponse<GeoLocation> find(SearchPageRequest searchPageRequest)
       throws HttpException {
     return doGetSearchRequestForPagedObjectList("/latest/geolocations", searchPageRequest);

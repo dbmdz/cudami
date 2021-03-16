@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiBaseClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.net.http.HttpClient;
@@ -27,6 +29,12 @@ public class CudamiCorporateBodiesClient extends CudamiBaseClient<CorporateBody>
 
   public CorporateBody fetchAndSaveByGndId(String gndId) throws HttpException {
     return doPostRequestForObject(String.format("/latest/corporatebodies/gnd/%s", gndId));
+  }
+
+  @Deprecated(since = "5.0", forRemoval = true)
+  /** @deprecated Please use {@link #find(SearchPageRequest)} instead */
+  public PageResponse<CorporateBody> find(PageRequest pageRequest) throws HttpException {
+    return doGetRequestForPagedObjectList("/latest/corporatebodies", pageRequest);
   }
 
   public SearchPageResponse<CorporateBody> find(SearchPageRequest searchPageRequest)

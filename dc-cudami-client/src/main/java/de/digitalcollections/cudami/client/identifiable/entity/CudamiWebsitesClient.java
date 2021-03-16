@@ -28,6 +28,12 @@ public class CudamiWebsitesClient extends CudamiBaseClient<Website> {
     return new Website();
   }
 
+  @Deprecated(since = "5.0", forRemoval = true)
+  /** @deprecated Please use {@link #find(SearchPageRequest)} instead */
+  public PageResponse<Website> find(PageRequest pageRequest) throws HttpException {
+    return doGetRequestForPagedObjectList("/latest/websites", pageRequest);
+  }
+
   public SearchPageResponse<Website> find(SearchPageRequest searchPageRequest)
       throws HttpException {
     return doGetSearchRequestForPagedObjectList("/latest/websites", searchPageRequest);
