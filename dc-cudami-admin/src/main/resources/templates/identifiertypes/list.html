@@ -8,16 +8,24 @@
     <title th:text="#{identifier_types}">Identifier types</title>
   </head>
   <body>
-    <section layout:fragment="content">
-      <div id="list"></div>
-      <script th:src="@{/js/identifier-type-list.bundle.js}"></script>
-      <script th:inline="javascript">
-        IdentifierTypeList({
-          apiContextPath: /*[[@{/}]]*/ '',
-          id: "list",
-          uiLocale: /*[[${#locale.language}]]*/
-        });
-      </script>
-    </section>
+    <th:block layout:fragment="content">
+      <div class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-12">
+              <div id="list"></div>
+              <script th:src="@{/js/identifier-type-list.bundle.js}"></script>
+              <script th:inline="javascript">
+                IdentifierTypeList({
+                  apiContextPath: /*[[@{/}]]*/ '',
+                  id: "list",
+                  uiLocale: /*[[${#locale.language}]]*/
+                });
+              </script>
+            </div>
+          </div>
+        </div>
+      </div>
+    </th:block>
   </body>
 </html>
