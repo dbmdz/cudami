@@ -86,7 +86,7 @@ class AddLinkDialog extends Component {
                 label="URL"
                 name="link-url"
                 onChange={(value) => this.setAttribute('href', value.trim())}
-                pattern="^(https?://|/).*$"
+                pattern="^(https?://|/|mailto:).*$"
                 required
                 value={attributes.href}
               />
