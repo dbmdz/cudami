@@ -27,7 +27,8 @@ public class CudamiGeoLocationsClient extends CudamiBaseClient<GeoLocation> {
     return new GeoLocation();
   }
 
-  public SearchPageResponse<GeoLocation> find(SearchPageRequest searchPageRequest) throws HttpException {
+  public SearchPageResponse<GeoLocation> find(SearchPageRequest searchPageRequest)
+      throws HttpException {
     return doGetSearchRequestForPagedObjectList("/latest/geolocations", searchPageRequest);
   }
 

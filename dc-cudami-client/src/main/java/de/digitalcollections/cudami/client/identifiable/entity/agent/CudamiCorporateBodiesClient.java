@@ -29,7 +29,8 @@ public class CudamiCorporateBodiesClient extends CudamiBaseClient<CorporateBody>
     return doPostRequestForObject(String.format("/latest/corporatebodies/gnd/%s", gndId));
   }
 
-  public SearchPageResponse<CorporateBody> find(SearchPageRequest searchPageRequest) throws HttpException {
+  public SearchPageResponse<CorporateBody> find(SearchPageRequest searchPageRequest)
+      throws HttpException {
     return doGetSearchRequestForPagedObjectList("/latest/corporatebodies", searchPageRequest);
   }
 

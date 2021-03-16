@@ -358,7 +358,8 @@ public class CollectionController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize, new Sorting());
+    SearchPageRequest searchPageRequest =
+        new SearchPageRequest(searchTerm, pageNumber, pageSize, new Sorting());
 
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);

@@ -330,7 +330,8 @@ public class CudamiBaseClient<T extends Object> {
 
   protected SearchPageResponse<T> doGetSearchRequestForPagedObjectList(
       String requestUrl, SearchPageRequest searchPageRequest) throws HttpException {
-    return doGetSearchRequestForPagedObjectList(requestUrl, searchPageRequest, (Class<T>) getClass());
+    return doGetSearchRequestForPagedObjectList(
+        requestUrl, searchPageRequest, (Class<T>) getClass());
   }
 
   protected String doPatchRequestForString(String requestUrl) throws HttpException {

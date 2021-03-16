@@ -43,7 +43,8 @@ public interface CollectionRepository
 
   PageResponse<DigitalObject> getDigitalObjects(UUID collectionUuid, PageRequest pageRequest);
 
-  SearchPageResponse<DigitalObject> getDigitalObjects(UUID collectionUuid, SearchPageRequest searchPageRequest);
+  SearchPageResponse<DigitalObject> getDigitalObjects(
+      UUID collectionUuid, SearchPageRequest searchPageRequest);
 
   List<CorporateBody> getRelatedCorporateBodies(UUID uuid, Filtering filtering);
 

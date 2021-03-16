@@ -52,7 +52,8 @@ public interface CollectionService extends NodeService<Collection>, EntityServic
     return getDigitalObjects(collection.getUuid(), searchPageRequest);
   }
 
-  SearchPageResponse<DigitalObject> getDigitalObjects(UUID collectionUuid, SearchPageRequest searchPageRequest);
+  SearchPageResponse<DigitalObject> getDigitalObjects(
+      UUID collectionUuid, SearchPageRequest searchPageRequest);
 
   List<CorporateBody> getRelatedCorporateBodies(UUID uuid, Filtering filtering);
 

@@ -28,7 +28,8 @@ public class CudamiWebsitesClient extends CudamiBaseClient<Website> {
     return new Website();
   }
 
-  public SearchPageResponse<Website> find(SearchPageRequest searchPageRequest) throws HttpException {
+  public SearchPageResponse<Website> find(SearchPageRequest searchPageRequest)
+      throws HttpException {
     return doGetSearchRequestForPagedObjectList("/latest/websites", searchPageRequest);
   }
 

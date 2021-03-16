@@ -46,7 +46,8 @@ public class CudamiProjectsClient extends CudamiBaseClient<Project> {
     doDeleteRequestForString(String.format("/latest/projects/%s", uuid));
   }
 
-  public SearchPageResponse<Project> find(SearchPageRequest searchPageRequest) throws HttpException {
+  public SearchPageResponse<Project> find(SearchPageRequest searchPageRequest)
+      throws HttpException {
     return doGetSearchRequestForPagedObjectList("/latest/projects", searchPageRequest);
   }
 

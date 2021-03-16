@@ -316,7 +316,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
     if (StringUtils.hasText(searchPageRequest.getQuery())) {
       commonSql +=
-              " LEFT JOIN LATERAL jsonb_object_keys("
+          " LEFT JOIN LATERAL jsonb_object_keys("
               + doTableAlias
               + ".label) lbl(keys) ON "
               + doTableAlias
@@ -337,7 +337,6 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     } else {
       commonSql += " WHERE cd.collection_uuid = :uuid";
     }
-
 
     StringBuilder innerQuery = new StringBuilder("SELECT cd.sortindex AS idx, *" + commonSql);
     addFiltering(searchPageRequest, innerQuery);
@@ -394,8 +393,6 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
     return new PageResponse<>(result, pageRequest, total);
   }
-
-
 
   @Override
   public Collection getParent(UUID uuid) {
