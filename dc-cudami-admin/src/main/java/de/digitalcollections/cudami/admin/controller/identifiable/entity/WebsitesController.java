@@ -10,6 +10,7 @@ import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -93,10 +94,11 @@ public class WebsitesController extends AbstractController {
   @ResponseBody
   public PageResponse<Website> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws HttpException {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-    return service.find(pageRequest);
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    return service.find(searchPageRequest);
   }
 
   @GetMapping("/api/websites/{uuid}")

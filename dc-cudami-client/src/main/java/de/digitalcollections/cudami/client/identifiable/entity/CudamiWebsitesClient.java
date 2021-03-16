@@ -7,6 +7,8 @@ import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
@@ -26,8 +28,8 @@ public class CudamiWebsitesClient extends CudamiBaseClient<Website> {
     return new Website();
   }
 
-  public PageResponse<Website> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/websites", pageRequest);
+  public SearchPageResponse<Website> find(SearchPageRequest searchPageRequest) throws HttpException {
+    return doGetSearchRequestForPagedObjectList("/latest/websites", searchPageRequest);
   }
 
   public Website findOne(UUID uuid) throws HttpException {
