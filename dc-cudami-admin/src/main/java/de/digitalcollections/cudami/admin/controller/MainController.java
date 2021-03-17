@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.admin.controller;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import de.digitalcollections.model.security.User;
-import java.util.Date;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -32,8 +31,6 @@ public class MainController {
 
   @GetMapping(value = {"", "/"})
   public String printWelcome(Model model) {
-    model.addAttribute("time", new Date());
-
     Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     if (principal instanceof UserDetails) {
       try {
