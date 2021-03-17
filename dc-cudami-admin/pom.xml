@@ -21,9 +21,9 @@
 
     <version.dc-commons-server>4.1.1</version.dc-commons-server>
     <version.dc-commons-springboot>4.1.1</version.dc-commons-springboot>
-    <!--<version.dc-commons-springdata>4.1.2</version.dc-commons-springdata>-->
     <version.dc-commons-springmvc>4.1.2</version.dc-commons-springmvc>
     <version.thymeleaf-spring-data-dialect>3.4.1</version.thymeleaf-spring-data-dialect>
+    <version.webjar-admin-lte>3.1.0-rc</version.webjar-admin-lte>
     <version.webjar-bootstrap>4.6.0</version.webjar-bootstrap>
     <version.webjar-bootswatch>4.6.0</version.webjar-bootswatch>
     <version.webjar-fontawesome>5.15.2</version.webjar-fontawesome>
@@ -32,7 +32,9 @@
     <version.webjar-jquery>3.5.1</version.webjar-jquery>
     <version.webjar-jquery-ui>1.12.1</version.webjar-jquery-ui>
     <version.webjar-respond>1.4.2</version.webjar-respond>
+    <version.webjar-source-sans-pro>4.2.2</version.webjar-source-sans-pro>
     <version.webjar-url-search-params-polyfill>8.1.0</version.webjar-url-search-params-polyfill>
+    <version.webjar-webjars-locator>0.40</version.webjar-webjars-locator>
 
     <!-- plugins -->
     <version.frontend-maven-plugin>1.11.2</version.frontend-maven-plugin>
@@ -55,11 +57,6 @@
       <artifactId>dc-commons-springboot</artifactId>
       <version>${version.dc-commons-springboot}</version>
     </dependency>
-<!--    <dependency>
-      <groupId>de.digitalcollections.commons</groupId>
-      <artifactId>dc-commons-springdata</artifactId>
-      <version>${version.dc-commons-springdata}</version>
-    </dependency>-->
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-springmvc</artifactId>
@@ -189,6 +186,11 @@
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
+      <artifactId>AdminLTE</artifactId>
+      <version>${version.webjar-admin-lte}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
       <artifactId>font-awesome</artifactId>
       <version>${version.webjar-fontawesome}</version>
     </dependency>
@@ -196,6 +198,11 @@
       <groupId>org.webjars</groupId>
       <artifactId>html5shiv</artifactId>
       <version>${version.webjar-html5shiv}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>webjars-locator</artifactId>
+      <version>${version.webjar-webjars-locator}</version>
     </dependency>
     <dependency>
       <groupId>org.webjars.bower</groupId>
@@ -211,6 +218,11 @@
       <groupId>org.webjars.npm</groupId>
       <artifactId>bootswatch</artifactId>
       <version>${version.webjar-bootswatch}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>fontsource__source-sans-pro</artifactId>
+      <version>${version.webjar-source-sans-pro}</version>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>

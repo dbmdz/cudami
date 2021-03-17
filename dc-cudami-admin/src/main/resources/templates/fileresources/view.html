@@ -7,94 +7,97 @@
     <title th:text="|#{fileresources}: #{file} '${fileresource.filename}'|">Files: File 'image001.jpg'</title>
   </head>
   <body>
-    <section layout:fragment="content" th:object="${fileresource}">
-
-      <div class="row">
-        <div class="col-sm-6">
-          <h1 th:text="|#{file} '*{filename}'|">File 'image001.jpg'</h1>
-        </div>
-        <div class="col-sm-6">
-          <div class="float-right">
-            <a class="btn btn-secondary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
+  <th:block layout:fragment="content" th:object="${fileresource}">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-6">
+            <h1 th:text="|#{file} '*{filename}'|">File 'image001.jpg'</h1>
+          </div>
+          <div class="col-sm-6">
+            <div class="float-right">
+              <a class="btn btn-secondary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="row">
-        <div class="col-sm-12">
-          <hr/>
+        <div class="row">
+          <div class="col-sm-12">
+            <hr/>
+          </div>
         </div>
-      </div>
 
-      <div class="row main-content">
-        <div class="col-sm-12">
-          <ul class="nav nav-tabs" role="tablist">
-            <li class="nav-item" th:each="language,iter : ${existingLanguages}">
-              <a class="language-switcher nav-link" th:classappend="${iter.index} == 0 ? active" th:href="${'#' + language}" data-toggle="tab" th:text="${language.getDisplayName(#locale)}" role="tab">language</a>
-            </li>
-          </ul>
-          <div class="tab-content">
-            <div th:each="language,iter : ${existingLanguages}" th:id="${language}" class="tab-pane" th:classappend="${iter.index} == 0 ? active">
-              <div class="card">
-                <div class="card-body bg-light">
-                  <div th:replace="fragments/identifiable::renderTeaser(${fileresource}, ${language})"></div>
+        <div class="row main-content">
+          <div class="col-sm-12">
+            <ul class="nav nav-tabs" role="tablist">
+              <li class="nav-item" th:each="language,iter : ${existingLanguages}">
+                <a class="language-switcher nav-link" th:classappend="${iter.index} == 0 ? active" th:href="${'#' + language}" data-toggle="tab" th:text="${language.getDisplayName(#locale)}" role="tab">language</a>
+              </li>
+            </ul>
+            <div class="tab-content">
+              <div th:each="language,iter : ${existingLanguages}" th:id="${language}" class="tab-pane" th:classappend="${iter.index} == 0 ? active">
+                <div class="card">
+                  <div class="card-body bg-light">
+                    <div th:replace="fragments/identifiable::renderTeaser(${fileresource}, ${language})"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">&nbsp;</div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="container-fluid rows-striped">
+              <div class="row">
+                <div class="col-md-3"><label class="font-weight-bold" th:text="#{id}">ID</label></div>
+                <div class="col-md-9"><span th:text="*{uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
+              </div>
+              <div class="row">
+                <div class="col-md-3"><label class="font-weight-bold" th:text="#{filename}">Filename</label></div>
+                <div class="col-md-9"><span th:text="*{filename}">image001.jpg</span></div>
+              </div>
+              <div class="row">
+                <div class="col-md-3"><label class="font-weight-bold" th:text="#{mimetype}">Mimetype</label></div>
+                <div class="col-md-9"><span th:text="*{mimeType.getTypeName()}">image/jpeg</span></div>
+              </div>
+              <div class="row">
+                <div class="col-md-3"><label class="font-weight-bold" th:text="#{fileResourceType}">Type</label></div>
+                <div class="col-md-9"><span th:text="*{fileResourceType}">VIDEO</span></div>
+              </div>
+              <div class="row">
+                <div class="col-md-3"><label class="font-weight-bold" th:text="#{filesize}">Filesize</label></div>
+                <div class="col-md-9"><span th:text="${@fileHelper.bytesToSize(fileresource.sizeInBytes)}"></span></div>
+              </div>
+              <div class="row">
+                <div class="col-md-3"><label class="font-weight-bold" th:text="#{uri}">URI</label></div>
+                <div class="col-md-9"><span th:text="*{uri}">file:///home/ralf/cudami/fileResources/application/undefined/114f/998e/57a8/4f9a/a45b/59c6/7d5f/0f70/114f998e-57a8-4f9a-a45b-59c67d5f0f70</span></div>
+              </div>
+              <div class="row">
+                <div class="col-md-3"><label class="font-weight-bold" th:text="#{created}">created</label></div>
+                <div class="col-md-9">
+                  <span th:with="df=#{dateTime.format},dateTime=*{created}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-3"><label class="font-weight-bold" th:text="#{last_modified}">last modified</label></div>
+                <div class="col-md-9">
+                  <span th:with="df=#{dateTime.format},dateTime=*{lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col-sm-12">&nbsp;</div>
-      </div>
-      <div class="row">
-        <div class="col-sm-12">
-          <div class="container-fluid rows-striped">
-            <div class="row">
-              <div class="col-md-3"><label class="font-weight-bold" th:text="#{id}">ID</label></div>
-              <div class="col-md-9"><span th:text="*{uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
-            </div>
-            <div class="row">
-              <div class="col-md-3"><label class="font-weight-bold" th:text="#{filename}">Filename</label></div>
-              <div class="col-md-9"><span th:text="*{filename}">image001.jpg</span></div>
-            </div>
-            <div class="row">
-              <div class="col-md-3"><label class="font-weight-bold" th:text="#{mimetype}">Mimetype</label></div>
-              <div class="col-md-9"><span th:text="*{mimeType.getTypeName()}">image/jpeg</span></div>
-            </div>
-            <div class="row">
-              <div class="col-md-3"><label class="font-weight-bold" th:text="#{fileResourceType}">Type</label></div>
-              <div class="col-md-9"><span th:text="*{fileResourceType}">VIDEO</span></div>
-            </div>
-            <div class="row">
-              <div class="col-md-3"><label class="font-weight-bold" th:text="#{filesize}">Filesize</label></div>
-              <div class="col-md-9"><span th:text="${@fileHelper.bytesToSize(fileresource.sizeInBytes)}"></span></div>
-            </div>
-            <div class="row">
-              <div class="col-md-3"><label class="font-weight-bold" th:text="#{uri}">URI</label></div>
-              <div class="col-md-9"><span th:text="*{uri}">file:///home/ralf/cudami/fileResources/application/undefined/114f/998e/57a8/4f9a/a45b/59c6/7d5f/0f70/114f998e-57a8-4f9a-a45b-59c67d5f0f70</span></div>
-            </div>
-            <div class="row">
-              <div class="col-md-3"><label class="font-weight-bold" th:text="#{created}">created</label></div>
-              <div class="col-md-9">
-                <span th:with="df=#{dateTime.format},dateTime=*{created}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-3"><label class="font-weight-bold" th:text="#{last_modified}">last modified</label></div>
-              <div class="col-md-9">
-                <span th:with="df=#{dateTime.format},dateTime=*{lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <section layout:fragment="beforeBodyEnds">
-      <script>
-        addLanguageChangeHandler()
-        moveEditButtonToNavbar()
-      </script>
-    </section>
-  </body>
+    </div>
+  </th:block>
+  <section layout:fragment="beforeBodyEnds">
+    <script>
+      addLanguageChangeHandler()
+      moveEditButtonToNavbar()
+    </script>
+  </section>
+</body>
 </html>

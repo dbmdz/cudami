@@ -7,18 +7,26 @@
     <title th:text="|#{corporateBodies}: #{corporateBody_create}|">Corporate bodies: Create a new corporate body</title>
   </head>
   <body>
-    <section layout:fragment="content">
-      <div id="editor"></div>
-      <script th:src="@{/js/identifiable-editor.bundle.js}"></script>
-      <script th:inline="javascript">
-        IdentifiableEditor({
-          activeLanguage: /*[[${activeLanguage}]]*/,
-          apiContextPath: /*[[@{/}]]*/ '',
-          id: "editor",
-          type: "corporateBody",
-          uiLocale: /*[[${#locale.language}]]*/
-        });
-      </script>
-    </section>
+    <th:block layout:fragment="content">
+      <div class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-12">
+              <div id="editor"></div>
+              <script th:src="@{/js/identifiable-editor.bundle.js}"></script>
+              <script th:inline="javascript">
+                IdentifiableEditor({
+                  activeLanguage: /*[[${activeLanguage}]]*/,
+                  apiContextPath: /*[[@{/}]]*/ '',
+                  id: "editor",
+                  type: "corporateBody",
+                  uiLocale: /*[[${#locale.language}]]*/
+                });
+              </script>
+            </div>
+          </div>
+        </div>
+      </div>
+    </th:block>
   </body>
 </html>
