@@ -32,6 +32,7 @@
     <version.webjar-jquery>3.5.1</version.webjar-jquery>
     <version.webjar-jquery-ui>1.12.1</version.webjar-jquery-ui>
     <version.webjar-respond>1.4.2</version.webjar-respond>
+    <version.webjar-source-sans-pro>4.2.2</version.webjar-source-sans-pro>
     <version.webjar-url-search-params-polyfill>8.1.0</version.webjar-url-search-params-polyfill>
 
     <!-- plugins -->
@@ -221,6 +222,11 @@
       <groupId>org.webjars.npm</groupId>
       <artifactId>bootswatch</artifactId>
       <version>${version.webjar-bootswatch}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>fontsource__source-sans-pro</artifactId>
+      <version>4.2.2</version>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
