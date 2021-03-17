@@ -16,12 +16,12 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java }}
-#      - uses: actions/cache@v2
-#        env:
-#          cache-name: cache-maven-artifacts
-#        with:
-#          path: ~/.m2/repository
-#          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+      - uses: actions/cache@v2
+        env:
+          cache-name: cache-maven-artifacts
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
       - name: Check Java codestyle
         run: mvn com.coveo:fmt-maven-plugin:check
       - uses: actions/setup-node@v2-beta
@@ -32,7 +32,7 @@ jobs:
         run: npm install && npm run format-check
         working-directory: dc-cudami-editor
       - name: Build with Maven
-        run: mvn -B verify
+        run: mvn -B -U verify -Pproduction
   publish:
     if: github.event_name == 'push' && contains(github.ref, 'main')
     runs-on: ubuntu-latest
@@ -46,18 +46,18 @@ jobs:
           server-id: ossrh-snapshots
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
-#      - uses: actions/cache@v2
-#        env:
-#          cache-name: cache-maven-artifacts
-#        with:
-#          path: ~/.m2/repository
-#          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+      - uses: actions/cache@v2
+        env:
+          cache-name: cache-maven-artifacts
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
       - name: Install XML utils
         run: sudo apt install libxml2-utils
       - name: Set project version
         run: echo "PROJECT_VERSION=$(xmllint --xpath '/*[local-name()="project"]/*[local-name()="version"]/text()' pom.xml)" >> $GITHUB_ENV
       - name: Publish to the Maven Central Repository
-        run: if [[ "$PROJECT_VERSION" =~ .*SNAPSHOT ]]; then mvn -B deploy; fi
+        run: if [[ "$PROJECT_VERSION" =~ .*SNAPSHOT ]]; then mvn -B deploy -DskipTests; fi
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
