@@ -24,6 +24,7 @@
     <!--<version.dc-commons-springdata>4.1.2</version.dc-commons-springdata>-->
     <version.dc-commons-springmvc>4.1.2</version.dc-commons-springmvc>
     <version.thymeleaf-spring-data-dialect>3.4.1</version.thymeleaf-spring-data-dialect>
+    <version.webjar-admin-lte>3.1.0-rc</version.webjar-admin-lte>
     <version.webjar-bootstrap>4.6.0</version.webjar-bootstrap>
     <version.webjar-bootswatch>4.6.0</version.webjar-bootswatch>
     <version.webjar-fontawesome>5.15.2</version.webjar-fontawesome>
@@ -34,6 +35,7 @@
     <version.webjar-respond>1.4.2</version.webjar-respond>
     <version.webjar-source-sans-pro>4.2.2</version.webjar-source-sans-pro>
     <version.webjar-url-search-params-polyfill>8.1.0</version.webjar-url-search-params-polyfill>
+    <version.webjar-webjars-locator>0.40</version.webjar-webjars-locator>
 
     <!-- plugins -->
     <version.frontend-maven-plugin>1.11.2</version.frontend-maven-plugin>
@@ -191,7 +193,7 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>AdminLTE</artifactId>
-      <version>3.1.0-rc</version>
+      <version>${version.webjar-admin-lte}</version>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
@@ -206,7 +208,7 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>webjars-locator</artifactId>
-      <version>0.40</version>
+      <version>${version.webjar-webjars-locator}</version>
     </dependency>
     <dependency>
       <groupId>org.webjars.bower</groupId>
