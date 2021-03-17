@@ -32,7 +32,7 @@ jobs:
         run: npm install && npm run format-check
         working-directory: dc-cudami-editor
       - name: Build with Maven
-        run: mvn -B -U verify
+        run: mvn -B -U verify -Pproduction
   publish:
     if: github.event_name == 'push' && contains(github.ref, 'main')
     runs-on: ubuntu-latest
