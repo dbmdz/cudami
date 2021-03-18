@@ -115,11 +115,13 @@ public class CudamiCollectionsClient extends CudamiBaseClient<Collection> {
     return doGetRequestForObject(String.format("/latest/collections/%d", refId));
   }
 
+  @Deprecated(since = "5.0", forRemoval = true)
+  /** @deprecated Please use {@link #findTopCollections(SearchPageRequest)} instead */
   public PageResponse<Collection> findTopCollections(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/collections/top", pageRequest);
   }
 
-  public PageResponse<Collection> findTopCollections(SearchPageRequest searchPageRequest)
+  public SearchPageResponse<Collection> findTopCollections(SearchPageRequest searchPageRequest)
       throws HttpException {
     return doGetSearchRequestForPagedObjectList("/latest/collections/top", searchPageRequest);
   }

@@ -31,7 +31,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -135,18 +134,14 @@ public class CollectionsController extends AbstractController {
 
   @GetMapping("/api/collections")
   @ResponseBody
-  public PageResponse<Collection> findAllTop(
+  public SearchPageResponse<Collection> findAllTop(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws HttpException {
-    if (StringUtils.hasText(searchTerm)) {
-      SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-      return service.findTopCollections(searchPageRequest);
-    }
 
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-    return service.findTopCollections(pageRequest);
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    return service.findTopCollections(searchPageRequest);
   }
 
   @GetMapping({

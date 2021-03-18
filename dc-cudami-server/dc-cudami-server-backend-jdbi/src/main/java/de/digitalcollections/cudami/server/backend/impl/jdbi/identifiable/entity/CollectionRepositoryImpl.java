@@ -315,7 +315,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("uuid", collectionUuid);
 
-    if (StringUtils.hasText(searchPageRequest.getQuery())) {
+    String searchTerm = searchPageRequest.getQuery();
+    if (StringUtils.hasText(searchTerm)) {
       commonSql +=
           " LEFT JOIN LATERAL jsonb_object_keys("
               + doTableAlias
@@ -334,7 +335,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
               + doTableAlias
               + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')"
               + " AND cd.collection_uuid = :uuid";
-      argumentMappings.put("searchTerm", searchPageRequest.getQuery());
+      argumentMappings.put("searchTerm", searchTerm);
     } else {
       commonSql += " WHERE cd.collection_uuid = :uuid";
     }
@@ -509,16 +510,16 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     String searchTerm = searchPageRequest.getQuery();
     if (searchTerm == null) {
       return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
-    } else {
-      commonSql +=
-          " AND ("
-          + tableAlias
-          + ".label->>lbl.keys ILIKE '%' || :searchTerm || '%'"
-          + " OR "
-          + tableAlias
-          + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')";
-      return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
     }
+
+    commonSql +=
+        " AND ("
+        + tableAlias
+        + ".label->>lbl.keys ILIKE '%' || :searchTerm || '%'"
+        + " OR "
+        + tableAlias
+        + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')";
+    return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
   }
 
   @Override
