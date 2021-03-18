@@ -386,11 +386,11 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
     commonSql +=
         " AND ("
-        + tableAlias
-        + ".label->>lbl.keys ILIKE '%' || :searchTerm || '%'"
-        + " OR "
-        + tableAlias
-        + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')";
+            + tableAlias
+            + ".label->>lbl.keys ILIKE '%' || :searchTerm || '%'"
+            + " OR "
+            + tableAlias
+            + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')";
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
   }
 

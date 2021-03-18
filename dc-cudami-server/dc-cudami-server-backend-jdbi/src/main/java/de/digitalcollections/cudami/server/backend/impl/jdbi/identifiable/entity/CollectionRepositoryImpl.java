@@ -506,7 +506,6 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + tableAlias
             + ".uuid))";
 
-
     String searchTerm = searchPageRequest.getQuery();
     if (searchTerm == null) {
       return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
@@ -514,11 +513,11 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
     commonSql +=
         " AND ("
-        + tableAlias
-        + ".label->>lbl.keys ILIKE '%' || :searchTerm || '%'"
-        + " OR "
-        + tableAlias
-        + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')";
+            + tableAlias
+            + ".label->>lbl.keys ILIKE '%' || :searchTerm || '%'"
+            + " OR "
+            + tableAlias
+            + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')";
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
   }
 

@@ -236,7 +236,7 @@ public class CollectionsController extends AbstractController {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
-  
+
   @GetMapping({"/api/collections/search", "/api/subcollections/search"})
   @ResponseBody
   public SearchPageResponse<Collection> search(
