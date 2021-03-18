@@ -115,8 +115,15 @@ public class CudamiCollectionsClient extends CudamiBaseClient<Collection> {
     return doGetRequestForObject(String.format("/latest/collections/%d", refId));
   }
 
+  @Deprecated(since = "5.0", forRemoval = true)
+  /** @deprecated Please use {@link #findTopCollections(SearchPageRequest)} instead */
   public PageResponse<Collection> findTopCollections(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/collections/top", pageRequest);
+  }
+
+  public SearchPageResponse<Collection> findTopCollections(SearchPageRequest searchPageRequest)
+      throws HttpException {
+    return doGetSearchRequestForPagedObjectList("/latest/collections/top", searchPageRequest);
   }
 
   public PageResponse<Collection> getActiveSubcollections(UUID uuid, PageRequest pageRequest)
@@ -133,11 +140,21 @@ public class CudamiCollectionsClient extends CudamiBaseClient<Collection> {
             String.format("/latest/collections/%s/breadcrumb", uuid), BreadcrumbNavigation.class);
   }
 
+  @Deprecated(since = "5.0", forRemoval = true)
+  /** @deprecated Please use {@link #getDigitalObjects(UUID, SearchPageRequest)} instead */
   public PageResponse<DigitalObject> getDigitalObjects(UUID collectionUuid, PageRequest pageRequest)
       throws HttpException {
     return doGetRequestForPagedObjectList(
         String.format("/latest/collections/%s/digitalobjects", collectionUuid),
         pageRequest,
+        DigitalObject.class);
+  }
+
+  public SearchPageResponse<DigitalObject> getDigitalObjects(
+      UUID collectionUuid, SearchPageRequest searchPageRequest) throws HttpException {
+    return doGetSearchRequestForPagedObjectList(
+        String.format("/latest/collections/%s/digitalobjects", collectionUuid),
+        searchPageRequest,
         DigitalObject.class);
   }
 

@@ -10,6 +10,7 @@ export default function ({
   enableChangeOfOrder,
   enableMove,
   enableRemove,
+  enableSearch,
   existingLanguages,
   id,
   parentType,
@@ -27,6 +28,7 @@ export default function ({
       enableChangeOfOrder={enableChangeOfOrder}
       enableMove={enableMove}
       enableRemove={enableRemove}
+      enableSearch={enableSearch}
       existingLanguages={existingLanguages}
       parentType={parentType}
       parentUuid={parentUuid}

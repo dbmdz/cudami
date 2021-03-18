@@ -11,6 +11,7 @@ import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.Sorting;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.util.List;
@@ -101,13 +102,14 @@ public class TopicController {
   public PageResponse<Topic> findAllTop(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
+      searchPageRequest.setSorting(sorting);
     }
-    return service.getRootNodes(pageRequest);
+    return service.findRootNodes(searchPageRequest);
   }
 
   @ApiMethod(description = "Get topic by uuid (and optional locale)")

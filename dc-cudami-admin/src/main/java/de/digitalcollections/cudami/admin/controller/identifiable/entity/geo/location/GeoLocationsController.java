@@ -7,8 +7,8 @@ import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.entity.geo.location.CudamiGeoLocationsClient;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
-import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
 import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,10 +49,11 @@ public class GeoLocationsController extends AbstractController {
   @ResponseBody
   public PageResponse<GeoLocation> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws HttpException {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-    return service.find(pageRequest);
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    return service.find(searchPageRequest);
   }
 
   @GetMapping("/geolocations")

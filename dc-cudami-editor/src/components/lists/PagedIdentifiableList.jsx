@@ -20,6 +20,7 @@ import AppContext from '../AppContext'
 import AddAttachedIdentifiablesDialog from '../dialogs/AddAttachedIdentifiablesDialog'
 import RemoveAttachedIdentifiableDialog from '../dialogs/RemoveAttachedIdentifiableDialog'
 import FeedbackMessage from '../FeedbackMessage'
+import IdentifiableSearch from '../IdentifiableSearch'
 import LanguageTab from '../LanguageTab'
 import Pagination from '../Pagination'
 import CollectionList from './CollectionList'
@@ -51,6 +52,7 @@ class PagedIdentifiableList extends Component {
       numberOfPages: 0,
       pageNumber: 0,
       totalElements: 0,
+      searchTerm: '',
     }
   }
 
@@ -105,6 +107,20 @@ class PagedIdentifiableList extends Component {
       type
     )
     return successful
+  }
+
+  executeSearch = async () => {
+    const {content, pageSize, totalElements} = await this.loadIdentifiables(
+      0,
+      this.pageSize,
+      this.state.searchTerm
+    )
+    this.setState({
+      identifiables: content,
+      numberOfPages: Math.ceil(totalElements / pageSize),
+      pageNumber: 0,
+      totalElements,
+    })
   }
 
   getLabelValue = (label) => {
@@ -252,7 +268,8 @@ class PagedIdentifiableList extends Component {
         parentUuid,
         type,
         pageNumber,
-        pageSize
+        pageSize,
+        this.state.searchTerm
       )
     }
     return await loadRootIdentifiables(
@@ -260,7 +277,8 @@ class PagedIdentifiableList extends Component {
       mockApi,
       type,
       pageNumber,
-      pageSize
+      pageSize,
+      this.state.searchTerm
     )
   }
 
@@ -336,6 +354,7 @@ class PagedIdentifiableList extends Component {
       enableChangeOfOrder,
       enableMove,
       enableRemove,
+      enableSearch,
       mockApi,
       parentType,
       parentUuid,
@@ -354,6 +373,7 @@ class PagedIdentifiableList extends Component {
       dialogsOpen,
       numberOfPages,
       pageNumber,
+      searchTerm,
       totalElements,
     } = this.state
     const showChangeOfOrder =
@@ -425,6 +445,13 @@ class PagedIdentifiableList extends Component {
                   {t('save')}
                 </Button>
               )}
+              {enableSearch && (
+                <IdentifiableSearch
+                  onChange={(value) => this.setState({searchTerm: value})}
+                  onSubmit={this.executeSearch}
+                  value={searchTerm}
+                />
+              )}
             </div>
             {this.getListComponent()}
             <Pagination
@@ -479,6 +506,7 @@ PagedIdentifiableList.defaultProps = {
   enableChangeOfOrder: false,
   enableMove: false,
   enableRemove: false,
+  enableSearch: false,
   mockApi: false,
   showEdit: false,
   showNew: false,

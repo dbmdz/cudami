@@ -70,10 +70,12 @@ public class DigitalObjectsController extends AbstractController {
   @ResponseBody
   public PageResponse<DigitalObject> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws HttpException {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-    return service.find(pageRequest);
+
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    return service.find(searchPageRequest);
   }
 
   @GetMapping("/api/digitalobjects/search")

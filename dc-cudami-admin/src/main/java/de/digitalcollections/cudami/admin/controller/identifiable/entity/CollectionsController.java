@@ -134,12 +134,14 @@ public class CollectionsController extends AbstractController {
 
   @GetMapping("/api/collections")
   @ResponseBody
-  public PageResponse<Collection> findAllTop(
+  public SearchPageResponse<Collection> findAllTop(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws HttpException {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-    return service.findTopCollections(pageRequest);
+
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    return service.findTopCollections(searchPageRequest);
   }
 
   @GetMapping({
@@ -163,9 +165,10 @@ public class CollectionsController extends AbstractController {
   public PageResponse<DigitalObject> getDigitalObjects(
       @PathVariable UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws HttpException {
-    return service.getDigitalObjects(uuid, new PageRequest(pageNumber, pageSize));
+    return service.getDigitalObjects(uuid, new SearchPageRequest(searchTerm, pageNumber, pageSize));
   }
 
   @GetMapping("/api/collections/{uuid}/subcollections")

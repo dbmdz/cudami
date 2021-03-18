@@ -4,8 +4,8 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.Sorting;
 import java.util.List;
 import java.util.Locale;
@@ -67,13 +67,14 @@ public class CorporateBodyController {
   public PageResponse<CorporateBody> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
+      searchPageRequest.setSorting(sorting);
     }
-    return corporateBodyService.find(pageRequest);
+    return corporateBodyService.find(searchPageRequest);
   }
 
   // Test-URL: http://localhost:9000/latest/corporatebodies/599a120c-2dd5-11e8-b467-0ed5f89f718b
