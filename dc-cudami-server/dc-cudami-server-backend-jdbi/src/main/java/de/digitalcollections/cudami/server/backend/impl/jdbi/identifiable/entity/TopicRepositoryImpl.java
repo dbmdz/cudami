@@ -15,6 +15,7 @@ import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import de.digitalcollections.model.view.BreadcrumbNode;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -374,21 +375,23 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
             + ".description) dsc(keys) ON "
             + tableAlias
             + ".description IS NOT NULL"
-            + " WHERE (("
-            + tableAlias
-            + ".label->>lbl.keys ILIKE '%' || :searchTerm || '%'"
-            + " OR "
-            + tableAlias
-            + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')"
-            + " AND "
+            + " WHERE ("
             + " NOT EXISTS (SELECT FROM topic_topics WHERE child_topic_uuid = "
             + tableAlias
             + ".uuid))";
     String searchTerm = searchPageRequest.getQuery();
     if (searchTerm == null) {
-      searchTerm = "";
+      return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
+    } else {
+      commonSql +=
+          " AND ("
+          + tableAlias
+          + ".label->>lbl.keys ILIKE '%' || :searchTerm || '%'"
+          + " OR "
+          + tableAlias
+          + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')";
+      return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
     }
-    return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
   }
 
   @Override
