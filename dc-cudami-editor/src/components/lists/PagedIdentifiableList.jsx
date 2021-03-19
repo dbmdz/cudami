@@ -29,6 +29,7 @@ import DigitalObjectList from './DigitalObjectList'
 import GeoLocationList from './GeoLocationList'
 import PersonList from './PersonList'
 import ProjectList from './ProjectList'
+import TopicList from './TopicList'
 import WebpageList from './WebpageList'
 import WebsiteList from './WebsiteList'
 
@@ -140,6 +141,7 @@ class PagedIdentifiableList extends Component {
       person: PersonList,
       project: ProjectList,
       subcollection: CollectionList,
+      topic: TopicList,
       webpage: WebpageList,
       website: WebsiteList,
     }

@@ -191,6 +191,8 @@
       "upload": "selecting and uploading a file from the local hard disk",
       "url": "embedding a file from the internet by using a valid URL"
     },
+    "topic": "Topic",
+    "topics": "Topics",
     "totalElements": {
       "collections": "found {{ count }} collection",
       "collections_plural": "found {{ count }} collections",
@@ -210,6 +212,7 @@
       "renderingTemplates_plural": "found {{ count }} design templates",
       "subcollections": "found {{ count }} collection",
       "subcollections_plural": "found {{ count }} collections",
+      "topics": "found {{ count }} topics",
       "webpages": "found {{ count }} webpage",
       "webpages_plural": "found {{ count }} webpages",
       "websites": "found {{ count }} website",
