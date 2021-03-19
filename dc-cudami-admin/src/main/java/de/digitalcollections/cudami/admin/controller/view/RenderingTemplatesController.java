@@ -38,9 +38,9 @@ public class RenderingTemplatesController extends AbstractController {
   private final CudamiLocalesClient localeService;
   private final CudamiRenderingTemplatesClient service;
 
-  public RenderingTemplatesController(CudamiClient cudamiClient) {
-    this.localeService = cudamiClient.forLocales();
-    this.service = cudamiClient.forRenderingTemplates();
+  public RenderingTemplatesController(CudamiClient client) {
+    this.localeService = client.forLocales();
+    this.service = client.forRenderingTemplates();
   }
 
   @ModelAttribute("menu")

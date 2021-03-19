@@ -14,7 +14,6 @@ import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,12 +38,11 @@ public class CorporateBodiesController extends AbstractController {
   private final CudamiLocalesClient localeService;
   private final CudamiCorporateBodiesClient service;
 
-  @Autowired
   public CorporateBodiesController(
-      LanguageSortingHelper languageSortingHelper, CudamiClient cudamiClient) {
+      LanguageSortingHelper languageSortingHelper, CudamiClient client) {
     this.languageSortingHelper = languageSortingHelper;
-    this.localeService = cudamiClient.forLocales();
-    this.service = cudamiClient.forCorporateBodies();
+    this.localeService = client.forLocales();
+    this.service = client.forCorporateBodies();
   }
 
   @GetMapping("/corporatebodies/new")

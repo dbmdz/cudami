@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiDigitalObjectsClient;
 import de.digitalcollections.model.identifiable.entity.Collection;
@@ -19,7 +18,6 @@ import de.digitalcollections.model.paging.Sorting;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,15 +31,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class DigitalObjectsController extends AbstractController {
 
-  private final CudamiDigitalObjectsClient service;
-  private final CudamiLocalesClient localeService;
   private final LanguageSortingHelper languageSortingHelper;
+  private final CudamiDigitalObjectsClient service;
 
-  @Autowired
   public DigitalObjectsController(
       LanguageSortingHelper languageSortingHelper, CudamiClient client) {
     this.languageSortingHelper = languageSortingHelper;
-    this.localeService = client.forLocales();
     this.service = client.forDigitalObjects();
   }
 
@@ -73,7 +68,6 @@ public class DigitalObjectsController extends AbstractController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws HttpException {
-
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     return service.find(searchPageRequest);
   }
