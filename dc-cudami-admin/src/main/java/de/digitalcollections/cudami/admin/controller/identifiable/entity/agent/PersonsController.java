@@ -40,10 +40,10 @@ public class PersonsController extends AbstractController {
   private final CudamiPersonsClient service;
 
   @Autowired
-  public PersonsController(LanguageSortingHelper languageSortingHelper, CudamiClient cudamiClient) {
+  public PersonsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
     this.languageSortingHelper = languageSortingHelper;
-    this.localeService = cudamiClient.forLocales();
-    this.service = cudamiClient.forPersons();
+    this.localeService = client.forLocales();
+    this.service = client.forPersons();
   }
 
   @GetMapping("/persons/new")

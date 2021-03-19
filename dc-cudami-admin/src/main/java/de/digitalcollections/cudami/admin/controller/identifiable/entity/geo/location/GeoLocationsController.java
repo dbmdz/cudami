@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity.geo.lo
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.entity.geo.location.CudamiGeoLocationsClient;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
@@ -12,7 +11,6 @@ import de.digitalcollections.model.paging.SearchPageRequest;
 import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,15 +26,11 @@ public class GeoLocationsController extends AbstractController {
   private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationsController.class);
 
   private final LanguageSortingHelper languageSortingHelper;
-  private final CudamiLocalesClient localeService;
   private final CudamiGeoLocationsClient service;
 
-  @Autowired
-  public GeoLocationsController(
-      LanguageSortingHelper languageSortingHelper, CudamiClient cudamiClient) {
+  public GeoLocationsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
     this.languageSortingHelper = languageSortingHelper;
-    this.localeService = cudamiClient.forLocales();
-    this.service = cudamiClient.forGeoLocations();
+    this.service = client.forGeoLocations();
   }
 
   @GetMapping("/api/geolocations/new")

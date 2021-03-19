@@ -23,7 +23,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -51,12 +50,10 @@ public class CollectionsController extends AbstractController {
   private final CudamiLocalesClient localeService;
   private final CudamiCollectionsClient service;
 
-  @Autowired
-  public CollectionsController(
-      LanguageSortingHelper languageSortingHelper, CudamiClient cudamiClient) {
+  public CollectionsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
     this.languageSortingHelper = languageSortingHelper;
-    this.localeService = cudamiClient.forLocales();
-    this.service = cudamiClient.forCollections();
+    this.localeService = client.forLocales();
+    this.service = client.forCollections();
   }
 
   @PostMapping("/api/collections/{uuid}/digitalobjects")

@@ -6,7 +6,6 @@ import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClient;
 import de.digitalcollections.model.identifiable.Identifiable;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,9 +16,8 @@ public class IdentifiableController extends AbstractController {
 
   CudamiIdentifiablesClient service;
 
-  @Autowired
-  public IdentifiableController(CudamiClient cudamiClient) {
-    this.service = cudamiClient.forIdentifiables();
+  public IdentifiableController(CudamiClient client) {
+    this.service = client.forIdentifiables();
   }
 
   @GetMapping(value = "/identifiables")

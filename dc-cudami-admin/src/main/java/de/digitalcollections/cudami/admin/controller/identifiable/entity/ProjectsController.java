@@ -16,7 +16,6 @@ import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -44,12 +43,10 @@ public class ProjectsController extends AbstractController {
   private final CudamiLocalesClient localeService;
   private final CudamiProjectsClient service;
 
-  @Autowired
-  public ProjectsController(
-      LanguageSortingHelper languageSortingHelper, CudamiClient cudamiClient) {
+  public ProjectsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
     this.languageSortingHelper = languageSortingHelper;
-    this.localeService = cudamiClient.forLocales();
-    this.service = cudamiClient.forProjects();
+    this.localeService = client.forLocales();
+    this.service = client.forProjects();
   }
 
   @ModelAttribute("menu")

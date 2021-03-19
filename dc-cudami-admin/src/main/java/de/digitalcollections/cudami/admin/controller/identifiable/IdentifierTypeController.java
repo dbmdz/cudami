@@ -11,7 +11,6 @@ import java.util.UUID;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
@@ -37,10 +36,9 @@ public class IdentifierTypeController extends AbstractController {
 
   CudamiIdentifierTypesClient service;
 
-  @Autowired
-  public IdentifierTypeController(MessageSource messageSource, CudamiClient cudamiClient) {
+  public IdentifierTypeController(MessageSource messageSource, CudamiClient client) {
     this.messageSource = messageSource;
-    this.service = cudamiClient.forIdentifierTypes();
+    this.service = client.forIdentifierTypes();
   }
 
   @ModelAttribute("menu")

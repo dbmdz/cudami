@@ -19,7 +19,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,12 +43,10 @@ public class WebpagesController extends AbstractController {
   private final CudamiLocalesClient localeService;
   private final CudamiWebpagesClient service;
 
-  @Autowired
-  public WebpagesController(
-      LanguageSortingHelper languageSortingHelper, CudamiClient cudamiClient) {
+  public WebpagesController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
     this.languageSortingHelper = languageSortingHelper;
-    this.localeService = cudamiClient.forLocales();
-    this.service = cudamiClient.forWebpages();
+    this.localeService = client.forLocales();
+    this.service = client.forWebpages();
   }
 
   @GetMapping("/webpages/new")

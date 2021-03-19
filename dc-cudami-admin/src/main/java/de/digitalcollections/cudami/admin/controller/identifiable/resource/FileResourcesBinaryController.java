@@ -13,7 +13,6 @@ import org.apache.tomcat.util.http.fileupload.FileItemStream;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,9 +27,8 @@ public class FileResourcesBinaryController extends AbstractController {
 
   CudamiFileResourcesBinaryClient service;
 
-  @Autowired
-  public FileResourcesBinaryController(CudamiClient cudamiClient) {
-    this.service = cudamiClient.forFileResourcesBinary();
+  public FileResourcesBinaryController(CudamiClient client) {
+    this.service = client.forFileResourcesBinary();
   }
 
   @ModelAttribute("menu")
