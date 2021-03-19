@@ -110,6 +110,7 @@ File `cudami/dc-cudami-admin/src/main/resources/templates/persons/list.html`:
   <script th:inline="javascript">
     IdentifiableList({
       apiContextPath: /*[[@{/}]]*/ '',
+      enableSearch: true,
       existingLanguages: /*[[${existingLanguages}]]*/,
       id: "list",
       showEdit: true,
@@ -125,6 +126,9 @@ File `cudami/dc-cudami-admin/src/main/resources/templates/persons/list.html`:
 This initializes an `IdentifiableList`-React-Component, defined in `cudami/dc-cudami-editor/src/lib/IdentifiableList.jsx`.
 
 Inside this the render method is called for the React-component `PagedIdentifiableList` defined in `cudami/dc-cudami-editor/src/components/PagedIdentifiableList.jsx`
+
+If you don't need a search field within the result table, just leave out the directive `enableSearch: true` or
+set it to `false`.
 
 * Add Identifiable-specific table rendering
 
@@ -336,3 +340,7 @@ In `cudami/dc-cudami-editor/src/locales/en/translation.json`
   }
 }
 ```
+
+For searching within a table, you need to add the query parameter `searchTerm` to the
+controller methods (e.g. `/api/collections`) and change the return type from
+`PageResponse` to `SearchPageResponse`.
