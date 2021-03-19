@@ -288,14 +288,21 @@ In `cudami/dc-cudami-admin/src/main/java/de/digitalcollections/cudami/admin/cont
 ```
 @GetMapping("/api/persons")
 @ResponseBody
-public PageResponse<Person> findAll(
+public SearchPageResponse<Person> findAll(
     @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-    @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+    @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+    @RequestParam(name = "searchTerm", required = false) String searchTerm)
     throws HttpException {
-  PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-  return service.find(pageRequest);
+  SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+  return service.find(searchPageRequest);
 }
 ```
+
+If you don't need to search within the list, you should remove the parameter `searchTerm`,
+work with `PageRequest` and  return a `PageResponse` instead.
+
+
+
 
 * Add internationalized texts
 
@@ -340,7 +347,3 @@ In `cudami/dc-cudami-editor/src/locales/en/translation.json`
   }
 }
 ```
-
-For searching within a table, you need to add the query parameter `searchTerm` to the
-controller methods (e.g. `/api/collections`) and change the return type from
-`PageResponse` to `SearchPageResponse`.
