@@ -45,7 +45,7 @@ public class RenderingTemplatesController extends AbstractController {
 
   @ModelAttribute("menu")
   protected String module() {
-    return "renderingTemplates";
+    return "renderingtemplates";
   }
 
   @GetMapping("/renderingtemplates/new")
