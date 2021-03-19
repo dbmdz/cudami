@@ -86,6 +86,15 @@ public class ArticleController {
     return new ResponseEntity<>(article, HttpStatus.OK);
   }
 
+  @ApiMethod(description = "Get languages of all articles")
+  @GetMapping(
+      value = {"/latest/articles/languages", "/v2/articles/languages"},
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  @ApiResponseObject
+  public List<Locale> getLanguages() {
+    return this.articleService.getLanguages();
+  }
+
   @ApiMethod(description = "Save a newly created article")
   @PostMapping(
       value = {"/latest/articles", "/v2/articles"},

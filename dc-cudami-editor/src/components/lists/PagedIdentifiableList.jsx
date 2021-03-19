@@ -23,6 +23,7 @@ import FeedbackMessage from '../FeedbackMessage'
 import IdentifiableSearch from '../IdentifiableSearch'
 import LanguageTab from '../LanguageTab'
 import Pagination from '../Pagination'
+import ArticleList from './ArticleList'
 import CollectionList from './CollectionList'
 import CorporateBodyList from './CorporateBodyList'
 import DigitalObjectList from './DigitalObjectList'
@@ -134,6 +135,7 @@ class PagedIdentifiableList extends Component {
 
   getListComponent = () => {
     const LIST_COMPONENT_MAPPING = {
+      article: ArticleList,
       collection: CollectionList,
       corporateBody: CorporateBodyList,
       digitalObject: DigitalObjectList,

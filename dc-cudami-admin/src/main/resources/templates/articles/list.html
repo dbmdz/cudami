@@ -8,75 +8,28 @@
     <title th:text="#{articles}">Articles</title>
   </head>
   <body>
-  <th:block layout:fragment="content">
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0" th:text="#{articles}">Articles</h1>
-          </div>
-          <div class="col-sm-6">
-<!--            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-            </ol>-->
-          </div> 
-        </div>
-      </div>
-    </div>
-
-    <!-- Main content -->
-    <div class="content">
-      <div class="container-fluid">
-        <div th:replace="fragments/feedback-messages :: global-bootstrap4"></div>
-
-        <div class="row">
-          <div class="col-sm-6">
-            <div th:replace="fragments/pagination-navigation :: pagination-bootstrap4"></div>
-          </div>
-          <div class="col-sm-6">
-            <div class="float-right">
-              <a class="btn btn-secondary" th:href="@{/articles/new}" th:text="#{btn_new}">New</a>
+    <th:block layout:fragment="content">
+      <div class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-12">
+              <div id="list"></div>
+              <script th:src="@{/js/identifiable-list.bundle.js}"></script>
+              <script th:inline="javascript">
+                IdentifiableList({
+                  apiContextPath: /*[[@{/}]]*/ '',
+                  existingLanguages: /*[[${existingLanguages}]]*/,
+                  id: "list",
+                  showEdit: true,
+                  showNew: true,
+                  type: "article",
+                  uiLocale: /*[[${#locale.language}]]*/
+                });
+              </script>
             </div>
           </div>
         </div>
-
-        <div class="row">
-          <div class="col-sm-12">
-
-            <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
-              <thead>
-                <tr sd:page-object="${page.page}">
-                  <th class="text-right" th:text="#{abbr_number}">Nr.</th>
-                  <th></th>
-                  <th class="center" th:text="#{label}">Label</th>
-                  <th class="center" th:text="#{last_modified}">last modified</th>
-                  <th class="center" th:text="#{actions}">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr th:each="article, stats: ${page.content}">
-                  <td class="text-right" th:text="(${page.number - 1} * ${page.size}) + ${stats.index + 1}">1</td>
-                  <td class="center">
-              <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${article.previewImage}, ${article.previewImageRenderingHints}, ${#locale}, 30)"></th:block>
-              </td>
-              <td>
-                <a th:href="@{'/articles/' + ${article.uuid}}" th:if="${article.label}" th:text="${article.label.text}">bavarikon</a>
-              </td>
-              <td>
-                <span class="float-right" th:with="df=#{dateTime.format},dateTime=${article.lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
-              </td>
-              <td class="center">
-                <a th:href="@{'/articles/' + ${article.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
-                <a th:href="@{'/articles/' + ${article.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
-              </td>
-              </tr>
-              </tbody>
-            </table>
-            <div th:replace="fragments/pagination-navigation :: pagination-bootstrap4"></div>
-          </div>
-        </div>
       </div>
-    </div>
-  </th:block>
-</body>
+    </th:block>
+  </body>
 </html>

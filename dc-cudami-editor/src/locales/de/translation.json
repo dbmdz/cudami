@@ -42,6 +42,8 @@
     "alignmentLeft": "links (mit Textumlauf)",
     "alignmentRight": "rechts (mit Textumlauf)",
     "altText": "Alt-Text",
+    "article": "Artikel",
+    "articles": "Artikel",
     "blocks": {
       "blockquote": "Zitat einfügen",
       "bulletList": "In Aufzählungsliste umwandeln",
@@ -194,6 +196,7 @@
     "topic": "Thema",
     "topics": "Themen",
     "totalElements": {
+      "articles": "{{ count }} Artikel gefunden",
       "collections": "{{ count }} Sammlung gefunden",
       "collections_plural": "{{ count }} Sammlungen gefunden",
       "corporateBodys": "{{ count }} Institution gefunden",
@@ -212,7 +215,8 @@
       "renderingTemplates_plural": "{{ count }} Gestaltungsvorlagen gefunden",
       "subcollections": "{{ count }} Sammlung gefunden",
       "subcollections_plural": "{{ count }} Sammlungen gefunden",
-      "topics": "{{ count }} Themen gefunden",
+      "topics": "{{ count }} Thema gefunden",
+      "topics_plural": "{{ count }} Themen gefunden",
       "webpages": "{{ count }} Webseite gefunden",
       "webpages_plural": "{{ count }} Webseiten gefunden",
       "websites": "{{ count }} Website gefunden",
