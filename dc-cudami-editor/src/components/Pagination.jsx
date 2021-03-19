@@ -43,7 +43,7 @@ const Pagination = ({
         previousLabel="&laquo;"
         previousLinkClassName="page-link"
       />
-      {showTotalElements > 0 && (
+      {showTotalElements && (
         <span className="ml-2">
           {t(`totalElements.${type}s`, {count: totalElements})}
         </span>
