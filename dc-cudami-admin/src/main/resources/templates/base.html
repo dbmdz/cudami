@@ -100,7 +100,9 @@
               <!-- Add icons to the links using the .nav-icon class
                    with font-awesome or any other icon font library -->
               <th:block sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
-                <li class="nav-item">
+                <li class="nav-item"
+                    th:classappend="${menu?.matches('(identifiertypes|licenses|renderingtemplates|users)')} ? menu-open"
+                >
                   <a href="#" class="nav-link">
                     <!--                    <i class="nav-icon fas fa-tachometer-alt"></i>-->
                     <p>
@@ -110,25 +112,41 @@
                   </a>
                   <ul class="nav nav-treeview">
                     <li class="nav-item">
-                      <a th:href="@{/users}" th:title="#{users}" class="nav-link">
+                      <a class="nav-link"
+                         th:classappend="${menu == 'users'} ? active"
+                         th:href="@{/users}"
+                         th:title="#{users}"
+                      >
                         <i class="fas fa-users nav-icon"></i>
                         <p th:text="#{users}">Users</p>
                       </a>
                     </li>
                     <li class="nav-item">
-                      <a th:href="@{/identifiertypes}" th:title="#{identifier_types}" class="nav-link">
+                      <a class="nav-link"
+                         th:classappend="${menu == 'identifiertypes'} ? active"
+                         th:href="@{/identifiertypes}"
+                         th:title="#{identifier_types}"
+                      >
                         <i class="fas fa-barcode nav-icon"></i>
                         <p th:text="#{identifier_types}">Identifier types</p>
                       </a>
                     </li>
                     <li class="nav-item">
-                      <a th:href="@{/licenses}" th:title="#{licenses}" class="nav-link">
+                      <a class="nav-link"
+                         th:classappend="${menu == 'licenses'} ? active"
+                         th:href="@{/licenses}"
+                         th:title="#{licenses}"
+                      >
                         <i class="fas fa-copyright nav-icon"></i>
                         <p th:text="#{licenses}">Licenses</p>
                       </a>
                     </li>
                     <li class="nav-item">
-                      <a th:href="@{/renderingtemplates}" th:title="#{rendering_templates}" class="nav-link">
+                      <a class="nav-link"
+                         th:classappend="${menu == 'renderingtemplates'} ? active"
+                         th:href="@{/renderingtemplates}"
+                         th:title="#{rendering_templates}"
+                      >
                         <i class="fas fa-palette nav-icon"></i>
                         <p th:text="#{rendering_templates}">Rendering templates</p>
                       </a>
@@ -146,19 +164,31 @@
                   </a>
                   <ul class="nav nav-treeview">
                     <li class="nav-item">
-                      <a th:href="@{/websites}" th:title="#{websites}" class="nav-link">
+                      <a class="nav-link"
+                         th:classappend="${menu == 'websites'} ? active"
+                         th:href="@{/websites}"
+                         th:title="#{websites}"
+                      >
                         <i class="fas fa-globe nav-icon"></i>
                         <p th:text="#{websites}">Websites</p>
                       </a>
                     </li>
                     <li class="nav-item">
-                      <a th:href="@{/collections}" th:title="#{collections}" class="nav-link">
+                      <a class="nav-link"
+                         th:classappend="${menu == 'collections'} ? active"
+                         th:href="@{/collections}"
+                         th:title="#{collections}"
+                      >
                         <i class="fas fa-list nav-icon"></i>
                         <p th:text="#{collections}">Collections</p>
                       </a>
                     </li>
                     <li class="nav-item">
-                      <a th:href="@{/topics}" th:title="#{topics}" class="nav-link">
+                      <a class="nav-link"
+                         th:classappend="${menu == 'topics'} ? active"
+                         th:href="@{/topics}"
+                         th:title="#{topics}"
+                      >
                         <i class="fas fa-sitemap nav-icon"></i>
                         <p th:text="#{topics}">Topics</p>
                       </a>
@@ -175,19 +205,31 @@
                   </a>
                   <ul class="nav nav-treeview">
                     <li class="nav-item">
-                      <a th:href="@{/articles}" th:title="#{articles}" class="nav-link">
+                      <a class="nav-link"
+                         th:classappend="${menu == 'articles'} ? active"
+                         th:href="@{/articles}"
+                         th:title="#{articles}"
+                      >
                         <i class="far fa-newspaper nav-icon"></i>
                         <p th:text="#{articles}">Articles</p>
                       </a>
                     </li>
                     <li class="nav-item">
-                      <a th:href="@{/digitalobjects}" th:title="#{digital_objects}" class="nav-link">
+                      <a class="nav-link"
+                         th:classappend="${menu == 'digitalobjects'} ? active"
+                         th:href="@{/digitalobjects}"
+                         th:title="#{digital_objects}"
+                      >
                         <i class="fas fa-cubes nav-icon"></i>
                         <p th:text="#{digital_objects}">Digital Objects</p>
                       </a>
                     </li>
                     <li class="nav-item">
-                      <a th:href="@{/projects}" th:title="#{digitization_projects}" class="nav-link">
+                      <a class="nav-link"
+                         th:classappend="${menu == 'projects'} ? active"
+                         th:href="@{/projects}"
+                         th:title="#{digitization_projects}"
+                      >
                         <i class="fas fa-industry nav-icon"></i>
                         <p th:text="#{digitization_projects}">(Digitization-)Projects</p>
                       </a>
@@ -228,19 +270,31 @@
                       </a>
                     </li>-->
                     <li class="nav-item">
-                      <a th:href="@{/persons}" th:title="#{persons}" class="nav-link">
+                      <a class="nav-link"
+                         th:classappend="${menu == 'persons'} ? active"
+                         th:href="@{/persons}"
+                         th:title="#{persons}"
+                      >
                         <i class="fas fa-users nav-icon"></i>
                         <p th:text="#{persons}">Persons</p>
                       </a>
                     </li>
                     <li class="nav-item">
-                      <a th:href="@{/corporatebodies}" th:title="#{corporateBodies}" class="nav-link">
+                      <a class="nav-link"
+                         th:classappend="${menu == 'corporatebodies'} ? active"
+                         th:href="@{/corporatebodies}"
+                         th:title="#{corporateBodies}"
+                      >
                         <i class="fas fa-university nav-icon"></i>
                         <p th:text="#{corporateBodies}">Corporate bodies</p>
                       </a>
                     </li>
                     <li class="nav-item">
-                      <a th:href="@{/geolocations}" th:title="#{geolocations}" class="nav-link">
+                      <a class="nav-link"
+                         th:classappend="${menu == 'geolocations'} ? active"
+                         th:href="@{/geolocations}"
+                         th:title="#{geolocations}"
+                      >
                         <i class="fas fa-map-marker-alt nav-icon"></i>
                         <p th:text="#{geolocations}">Geolocations</p>
                       </a>
@@ -257,7 +311,11 @@
                   </a>
                   <ul class="nav nav-treeview">
                     <li class="nav-item">
-                      <a th:href="@{/fileresources}" th:title="#{fileresources}" class="nav-link">
+                      <a class="nav-link"
+                         th:classappend="${menu == 'fileresources'} ? active"
+                         th:href="@{/fileresources}"
+                         th:title="#{fileresources}"
+                      >
                         <i class="fa fa-file nav-icon"></i>
                         <p th:text="#{fileresources}">Fileresources</p>
                       </a>
@@ -294,7 +352,7 @@
       <footer class="main-footer">
         <!-- To the right -->
         <div class="float-right d-none d-sm-inline text-muted">
-        v<small th:text="${version}">1.0.0</small>
+        <small th:text="'v' + ${version}">1.0.0</small>
         </div>
         <!-- Default to the left -->
         <small><a href="https://github.com/dbmdz/cudami">cudami Digital Asset Management System</a>.</small>
