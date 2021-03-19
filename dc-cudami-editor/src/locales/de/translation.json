@@ -191,6 +191,8 @@
       "upload": "Auswählen und Hochladen einer Datei von der lokalen Festplatte",
       "url": "Einbinden einer Datei aus dem Internet durch Eingabe einer gültigen URL"
     },
+    "topic": "Thema",
+    "topics": "Themen",
     "totalElements": {
       "collections": "{{ count }} Sammlung gefunden",
       "collections_plural": "{{ count }} Sammlungen gefunden",
@@ -210,6 +212,7 @@
       "renderingTemplates_plural": "{{ count }} Gestaltungsvorlagen gefunden",
       "subcollections": "{{ count }} Sammlung gefunden",
       "subcollections_plural": "{{ count }} Sammlungen gefunden",
+      "topics": "{{ count }} Themen gefunden",
       "webpages": "{{ count }} Webseite gefunden",
       "webpages_plural": "{{ count }} Webseiten gefunden",
       "websites": "{{ count }} Website gefunden",
