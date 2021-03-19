@@ -42,6 +42,8 @@
     "alignmentLeft": "left (with text wrapping)",
     "alignmentRight": "right (with text wrapping)",
     "altText": "Alt text",
+    "article": "Article",
+    "articles": "Articles",
     "blocks": {
       "blockquote": "Add block quote",
       "bulletList": "Change to bulleted list",
@@ -194,6 +196,8 @@
     "topic": "Topic",
     "topics": "Topics",
     "totalElements": {
+      "articles": "found {{ count }} article",
+      "articles_plural": "found {{ count }} articles",
       "collections": "found {{ count }} collection",
       "collections_plural": "found {{ count }} collections",
       "corporateBodys": "found {{ count }} corporate body",
@@ -212,7 +216,8 @@
       "renderingTemplates_plural": "found {{ count }} design templates",
       "subcollections": "found {{ count }} collection",
       "subcollections_plural": "found {{ count }} collections",
-      "topics": "found {{ count }} topics",
+      "topics": "found {{ count }} topic",
+      "topics_plural": "found {{ count }} topics",
       "webpages": "found {{ count }} webpage",
       "webpages_plural": "found {{ count }} webpages",
       "websites": "found {{ count }} website",

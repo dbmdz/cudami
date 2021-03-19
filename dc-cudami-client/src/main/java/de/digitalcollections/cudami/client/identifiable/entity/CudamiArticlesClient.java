@@ -47,6 +47,10 @@ public class CudamiArticlesClient extends CudamiBaseClient<Article> {
         String.format("/latest/articles/identifier/%s:%s.json", namespace, id));
   }
 
+  public List<Locale> getLanguages() throws HttpException {
+    return this.doGetRequestForObjectList("/latest/articles/languages", Locale.class);
+  }
+
   public List getRelatedFileResources(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
         String.format("/latest/entities/%s/related/fileresources", uuid), FileResource.class);

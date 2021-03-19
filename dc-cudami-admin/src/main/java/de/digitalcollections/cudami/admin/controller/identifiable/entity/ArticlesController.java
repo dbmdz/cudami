@@ -1,9 +1,6 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.paging.PageConverter;
-import de.digitalcollections.cudami.admin.paging.PageWrapper;
-import de.digitalcollections.cudami.admin.paging.PageableConverter;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -19,9 +16,6 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -90,6 +84,16 @@ public class ArticlesController extends AbstractController {
     return "articles/edit";
   }
 
+  @GetMapping("/api/articles")
+  @ResponseBody
+  public PageResponse<Article> findAll(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      throws HttpException {
+    final PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+    return this.service.find(pageRequest);
+  }
+
   @GetMapping("/api/articles/{uuid}")
   @ResponseBody
   public Article get(@PathVariable UUID uuid) throws HttpException {
@@ -97,12 +101,11 @@ public class ArticlesController extends AbstractController {
   }
 
   @GetMapping("/articles")
-  public String list(Model model, @PageableDefault(size = 25) Pageable pageable)
-      throws HttpException {
-    final PageRequest pageRequest = PageableConverter.convert(pageable);
-    final PageResponse pageResponse = service.find(pageRequest);
-    Page page = PageConverter.convert(pageResponse, pageRequest);
-    model.addAttribute("page", new PageWrapper(page, "/articles"));
+  public String list(Model model) throws HttpException {
+    final Locale locale = LocaleContextHolder.getLocale();
+    model.addAttribute(
+        "existingLanguages",
+        this.languageSortingHelper.sortLanguages(locale, this.service.getLanguages()));
     return "articles/list";
   }
 
