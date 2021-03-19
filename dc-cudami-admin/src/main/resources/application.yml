@@ -64,18 +64,6 @@ spring:
     # Order of the template resolver in the chain. (order 1 is the common classpath resolver)
     template-resolver-order: 2
 
-webjars:
-  versions:
-    bootstrap: '@version.webjar-bootstrap@'
-    bootswatch: '@version.webjar-bootswatch@'
-    font-awesome: '@version.webjar-fontawesome@'
-    html5shiv: '@version.webjar-html5shiv@'
-    ie10-viewport-bug-workaround: '@version.webjar-ie10-viewport-bug-workaround@'
-    jquery: '@version.webjar-jquery@'
-    jquery-ui: '@version.webjar-jquery-ui@'
-    respond: '@version.webjar-respond@'
-    url-search-params-polyfill: '@version.webjar-url-search-params-polyfill@'
-
 ---
 
 spring:
