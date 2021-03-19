@@ -445,7 +445,7 @@ class PagedIdentifiableList extends Component {
                   {t('save')}
                 </Button>
               )}
-              {enableSearch && (
+              {enableSearch && totalElements > 0 && (
                 <IdentifiableSearch
                   onChange={(value) => this.setState({searchTerm: value})}
                   onSubmit={this.executeSearch}
