@@ -27,25 +27,7 @@
           <li class="nav-item">
             <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
           </li>
-<!--          <li class="nav-item d-none d-sm-inline-block">
-            <a href="index3.html" class="nav-link">Home</a>
-          </li>
-          <li class="nav-item d-none d-sm-inline-block">
-            <a href="#" class="nav-link">Contact</a>
-          </li>-->
         </ul>
-
-        <!-- SEARCH FORM -->
-<!--        <form class="form-inline ml-3">
-          <div class="input-group input-group-sm">
-            <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
-            <div class="input-group-append">
-              <button class="btn btn-navbar" type="submit">
-                <i class="fas fa-search"></i>
-              </button>
-            </div>
-          </div>
-        </form>-->
 
         <!-- Right navbar links -->
         <ul class="navbar-nav ml-auto">
@@ -74,11 +56,6 @@
               <i class="fas fa-expand-arrows-alt"></i>
             </a>
           </li>
-<!--          <li class="nav-item">
-            <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
-              <i class="fas fa-th-large"></i>
-            </a>
-          </li>-->
         </ul>
       </nav>
       <!-- /.navbar -->
@@ -104,7 +81,6 @@
                     th:classappend="${menu?.matches('(identifiertypes|licenses|renderingtemplates|users)')} ? menu-open"
                 >
                   <a href="#" class="nav-link">
-                    <!--                    <i class="nav-icon fas fa-tachometer-alt"></i>-->
                     <p>
                       Administration
                       <i class="right fas fa-angle-left"></i>
@@ -131,7 +107,7 @@
                         <p th:text="#{identifier_types}">Identifier types</p>
                       </a>
                     </li>
-                    <li class="nav-item">
+                    <!--<li class="nav-item">
                       <a class="nav-link"
                          th:classappend="${menu == 'licenses'} ? active"
                          th:href="@{/licenses}"
@@ -140,7 +116,7 @@
                         <i class="fas fa-copyright nav-icon"></i>
                         <p th:text="#{licenses}">Licenses</p>
                       </a>
-                    </li>
+                    </li>-->
                     <li class="nav-item">
                       <a class="nav-link"
                          th:classappend="${menu == 'renderingtemplates'} ? active"
@@ -157,8 +133,8 @@
               <th:block sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_CONTENT_MANAGER')">
                 <li class="nav-item menu-open">
                   <a href="#" class="nav-link">
-                    <!--                    <i class="nav-icon fas fa-tachometer-alt"></i>-->
-                    <p><span th:text="#{presentation}">Presentation</span>
+                    <p>
+                      <span th:text="#{presentation}">Presentation</span>
                       <i class="right fas fa-angle-left"></i>
                     </p>
                   </a>
@@ -198,8 +174,8 @@
 
                 <li class="nav-item menu-open">
                   <a href="#" class="nav-link">
-                    <!--                    <i class="nav-icon fas fa-tachometer-alt"></i>-->
-                    <p><span th:text="#{production}">Production</span>
+                    <p>
+                      <span th:text="#{production}">Production</span>
                       <i class="right fas fa-angle-left"></i>
                     </p>
                   </a>
@@ -239,8 +215,8 @@
 
                 <li class="nav-item menu-open">
                   <a href="#" class="nav-link">
-                    <!--                    <i class="nav-icon fas fa-tachometer-alt"></i>-->
-                    <p><span th:text="#{objects}">Objects</span>
+                    <p>
+                      <span th:text="#{objects}">Objects</span>
                       <i class="right fas fa-angle-left"></i>
                     </p>
                   </a>
@@ -304,8 +280,8 @@
 
                 <li class="nav-item menu-open">
                   <a href="#" class="nav-link">
-                    <!--                    <i class="nav-icon fas fa-tachometer-alt"></i>-->
-                    <p><span th:text="#{resources}">Resources</span>
+                    <p>
+                      <span th:text="#{resources}">Resources</span>
                       <i class="right fas fa-angle-left"></i>
                     </p>
                   </a>
