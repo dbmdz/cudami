@@ -1,47 +1,55 @@
 package de.digitalcollections.cudami.server.controller.v2.identifiable.web;
 
-import static org.hamcrest.core.StringContains.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
-import de.digitalcollections.cudami.server.config.SpringConfigWeb;
 import de.digitalcollections.model.identifiable.web.Webpage;
+import de.digitalcollections.model.text.LocalizedStructuredContent;
+import de.digitalcollections.model.text.StructuredContent;
+import de.digitalcollections.model.text.contentblock.Text;
+import java.util.Locale;
 import java.util.UUID;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 
 @DisplayName("The WebpageController v2")
-@WebMvcTest(controllers = V2WebpageController.class, excludeAutoConfiguration = SecurityAutoConfiguration.class)
-@ComponentScan(basePackageClasses = V2WebpageController.class)
-@ContextConfiguration(classes = SpringConfigWeb.class)
+@ActiveProfiles("TEST")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class V2WebpageControllerTest {
-
-  @Autowired
-  private MockMvc mockMvc;
 
   @MockBean
   WebpageService webpageService;
 
+  @MockBean
+  DataSource dataSource;    // Required, whyever...
+
+  @Autowired
+  private TestRestTemplate testRestTemplate;
+
   @DisplayName("Returns a webpage in v2 json format for UUID only, when json is demanded explicitly")
   @Test
   public void returnWebpageV2Json() throws Exception {
+    LocalizedStructuredContent content = new LocalizedStructuredContent();
+    StructuredContent structuredContentDe = new StructuredContent();
+    structuredContentDe.addContentBlock(new Text("Hallo"));
+    content.put(Locale.GERMAN, structuredContentDe);
     Webpage webpage = new Webpage();
+    webpage.setText(content);
     when(webpageService.get(any(UUID.class))).thenReturn(webpage);
 
-    mockMvc.perform(get("/v2/webpages/123e4567-e89b-12d3-a456-426614174000.json")).andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(content().string(containsString("{\"identifiers\":[],\"type\":\"RESOURCE\"}")));
+    ResponseEntity<String> entity = this.testRestTemplate.getForEntity("/v2/webpages/123e4567-e89b-12d3-a456-426614174000.json", String.class);
+    assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+    assertThat(entity.getBody()).isEqualTo("{\"identifiers\":[],\"type\":\"RESOURCE\",\"text\":{\"localizedStructuredContent\":{\"de\":{\"type\":\"doc\",\"content\":[{\"type\":\"text\",\"text\":\"Hallo\"}]}}}}");
   }
 }
