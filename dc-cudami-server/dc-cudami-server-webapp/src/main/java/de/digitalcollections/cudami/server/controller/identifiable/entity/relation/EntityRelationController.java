@@ -23,10 +23,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The entity relations controller", name = "Entity relations controller")
 public class EntityRelationController {
 
-  private final EntityRelationService service;
+  private final EntityRelationService entityRelationService;
 
-  public EntityRelationController(EntityRelationService service) {
-    this.service = service;
+  public EntityRelationController(EntityRelationService entityRelationservice) {
+    this.entityRelationService = entityRelationservice;
   }
 
   @ApiMethod(description = "Get paged, sorted, filtered relations")
@@ -45,7 +45,7 @@ public class EntityRelationController {
           Filtering.defaultBuilder().filter("predicate").isEquals(predicate).build();
       pageRequest.add(filtering);
     }
-    return service.find(pageRequest);
+    return entityRelationService.find(pageRequest);
   }
 
   @ApiMethod(
@@ -64,7 +64,7 @@ public class EntityRelationController {
       throw new IllegalArgumentException(
           "Mismatching arguments. SubjectUuid must match the Uuid of the subject of the first item");
     }
-    return service.save(entityRelations);
+    return entityRelationService.save(entityRelations);
   }
 
   @ApiMethod(description = "Connect a list of entity pairs with a predicate each")
@@ -73,6 +73,6 @@ public class EntityRelationController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   List<EntityRelation> saveEntityRelations(@RequestBody List<EntityRelation> entityRelations) {
-    return service.save(entityRelations);
+    return entityRelationService.save(entityRelations);
   }
 }

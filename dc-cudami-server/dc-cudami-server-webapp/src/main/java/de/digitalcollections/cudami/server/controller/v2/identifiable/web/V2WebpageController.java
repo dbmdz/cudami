@@ -28,10 +28,10 @@ public class V2WebpageController {
 
   private final DigitalCollectionsObjectMapper objectMapper = new DigitalCollectionsObjectMapper();
 
-  private final WebpageService service;
+  private final WebpageService webpageService;
 
-  public V2WebpageController(WebpageService service) {
-    this.service = service;
+  public V2WebpageController(WebpageService webpageService1) {
+    this.webpageService = webpageService1;
   }
 
   private JSONObject convertLocalizedStructuredContentJson(JSONObject json) {
@@ -95,9 +95,9 @@ public class V2WebpageController {
   private Webpage loadWebpage(Locale pLocale, UUID uuid) throws IdentifiableServiceException {
     Webpage webpage;
     if (pLocale == null) {
-      webpage = service.get(uuid);
+      webpage = webpageService.get(uuid);
     } else {
-      webpage = service.get(uuid, pLocale);
+      webpage = webpageService.get(uuid, pLocale);
     }
     return webpage;
   }

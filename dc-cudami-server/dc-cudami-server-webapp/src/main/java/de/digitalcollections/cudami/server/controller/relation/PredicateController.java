@@ -18,17 +18,17 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The predicates controller", name = "Predicates controller")
 public class PredicateController {
 
-  private final PredicateService service;
+  private final PredicateService predicateService;
 
-  public PredicateController(PredicateService service) {
-    this.service = service;
+  public PredicateController(PredicateService predicateService) {
+    this.predicateService = predicateService;
   }
 
   @ApiMethod(description = "Get all predicates")
   @GetMapping(value = {"/latest/predicates", "/v3/predicates"})
   @ApiResponseObject
   public List<Predicate> getPredicates() {
-    return service.findAll();
+    return predicateService.findAll();
   }
 
   @ApiMethod(description = "create or update a predicate, identified by its value")
@@ -43,6 +43,6 @@ public class PredicateController {
       throw new IllegalArgumentException("value of path does not match value of predicate");
     }
 
-    return service.save(predicate);
+    return predicateService.save(predicate);
   }
 }

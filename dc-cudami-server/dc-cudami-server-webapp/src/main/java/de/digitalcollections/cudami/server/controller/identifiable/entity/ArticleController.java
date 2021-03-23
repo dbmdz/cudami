@@ -32,10 +32,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The article controller", name = "Article controller")
 public class ArticleController {
 
-  private final ArticleService service;
+  private final ArticleService articleService;
 
-  public ArticleController(ArticleService service) {
-    this.service = service;
+  public ArticleController(ArticleService articleService) {
+    this.articleService = articleService;
   }
 
   @ApiMethod(description = "Get all articles")
@@ -52,7 +52,7 @@ public class ArticleController {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.find(pageRequest);
+    return articleService.find(pageRequest);
   }
 
   // Test-URL: http://localhost:9000/latest/articles/599a120c-2dd5-11e8-b467-0ed5f89f718b
@@ -79,9 +79,9 @@ public class ArticleController {
 
     Article article;
     if (pLocale == null) {
-      article = service.get(uuid);
+      article = articleService.get(uuid);
     } else {
-      article = service.get(uuid, pLocale);
+      article = articleService.get(uuid, pLocale);
     }
     return new ResponseEntity<>(article, HttpStatus.OK);
   }
@@ -93,7 +93,7 @@ public class ArticleController {
   @ApiResponseObject
   public Article save(@RequestBody Article article, BindingResult errors)
       throws IdentifiableServiceException {
-    return service.save(article);
+    return articleService.save(article);
   }
 
   @ApiMethod(description = "Update an article")
@@ -104,6 +104,6 @@ public class ArticleController {
   public Article update(@PathVariable UUID uuid, @RequestBody Article article, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, article.getUuid());
-    return service.update(article);
+    return articleService.update(article);
   }
 }

@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The version controller", name = "Version controller")
 public class VersionController {
 
-  private final VersionService service;
+  private final VersionService versionService;
 
-  public VersionController(VersionService service) {
-    this.service = service;
+  public VersionController(VersionService versionService) {
+    this.versionService = versionService;
   }
 
   @ApiMethod(description = "Get version by uuid")
@@ -30,7 +30,7 @@ public class VersionController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Version findById(@PathVariable UUID uuid) {
-    return service.get(uuid);
+    return versionService.get(uuid);
   }
 
   @ApiMethod(description = "Update the version status")
@@ -40,6 +40,6 @@ public class VersionController {
   @ApiResponseObject
   public Version update(@PathVariable UUID uuid, @RequestBody Version version, BindingResult errors)
       throws Exception {
-    return service.update(version);
+    return versionService.update(version);
   }
 }

@@ -26,10 +26,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The identifier types controller", name = "Identifier types controller")
 public class IdentifierTypeController {
 
-  private final IdentifierTypeService service;
+  private final IdentifierTypeService identifierTypeService;
 
-  public IdentifierTypeController(IdentifierTypeService service) {
-    this.service = service;
+  public IdentifierTypeController(IdentifierTypeService identifierTypeService) {
+    this.identifierTypeService = identifierTypeService;
   }
 
   @ApiMethod(description = "Get all identifier types")
@@ -46,7 +46,7 @@ public class IdentifierTypeController {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.find(pageRequest);
+    return identifierTypeService.find(pageRequest);
   }
 
   @ApiMethod(description = "get identifier type by uuid")
@@ -55,7 +55,7 @@ public class IdentifierTypeController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public IdentifierType findById(@PathVariable UUID uuid) {
-    return service.get(uuid);
+    return identifierTypeService.get(uuid);
   }
 
   @ApiMethod(description = "save a newly created identifier type")
@@ -64,7 +64,7 @@ public class IdentifierTypeController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public IdentifierType save(@RequestBody IdentifierType identifierType, BindingResult errors) {
-    return service.save(identifierType);
+    return identifierTypeService.save(identifierType);
   }
 
   @ApiMethod(description = "update an identifier type")
@@ -75,6 +75,6 @@ public class IdentifierTypeController {
   public IdentifierType update(
       @PathVariable UUID uuid, @RequestBody IdentifierType identifierType, BindingResult errors) {
     assert Objects.equals(uuid, identifierType.getUuid());
-    return service.update(identifierType);
+    return identifierTypeService.update(identifierType);
   }
 }

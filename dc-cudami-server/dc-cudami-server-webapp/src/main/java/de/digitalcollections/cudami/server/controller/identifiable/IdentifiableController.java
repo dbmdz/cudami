@@ -25,10 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The identifiable controller", name = "Identifiable controller")
 public class IdentifiableController {
 
-  private final IdentifiableService service;
+  private final IdentifiableService identifiableService;
 
-  public IdentifiableController(@Qualifier("identifiableService") IdentifiableService service) {
-    this.service = service;
+  public IdentifiableController(
+      @Qualifier("identifiableService") IdentifiableService identifiableService) {
+    this.identifiableService = identifiableService;
   }
 
   @ApiMethod(
@@ -48,7 +49,7 @@ public class IdentifiableController {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.find(pageRequest);
+    return identifiableService.find(pageRequest);
   }
 
   @ApiMethod(description = "Find limited amount of identifiables containing searchTerm in label")
@@ -59,7 +60,7 @@ public class IdentifiableController {
   public List<Identifiable> find(
       @RequestParam(name = "searchTerm") String searchTerm,
       @RequestParam(name = "maxResults", required = false, defaultValue = "25") int maxResults) {
-    List<Identifiable> identifiables = service.find(searchTerm, maxResults);
+    List<Identifiable> identifiables = identifiableService.find(searchTerm, maxResults);
     return identifiables;
   }
 
@@ -69,7 +70,7 @@ public class IdentifiableController {
       produces = "application/json")
   @ApiResponseObject
   public Identifiable findById(@PathVariable UUID uuid) {
-    return service.get(uuid);
+    return identifiableService.get(uuid);
   }
 
   @ApiMethod(
@@ -85,7 +86,7 @@ public class IdentifiableController {
   public ResponseEntity<Identifiable> getByIdentifier(
       @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
 
-    Identifiable result = service.getByIdentifier(namespace, id);
+    Identifiable result = identifiableService.getByIdentifier(namespace, id);
     if (result == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }

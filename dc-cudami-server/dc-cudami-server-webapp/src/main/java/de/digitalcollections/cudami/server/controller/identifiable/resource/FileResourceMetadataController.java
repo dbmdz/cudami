@@ -41,11 +41,12 @@ public class FileResourceMetadataController {
   private static final Logger LOGGER =
       LoggerFactory.getLogger(FileResourceMetadataController.class);
 
-  private final FileResourceMetadataService<FileResource> service;
+  private final FileResourceMetadataService<FileResource> metadataService;
 
   public FileResourceMetadataController(
-      @Qualifier("fileResourceMetadataService") FileResourceMetadataService<FileResource> service) {
-    this.service = service;
+      @Qualifier("fileResourceMetadataService")
+          FileResourceMetadataService<FileResource> metadataService) {
+    this.metadataService = metadataService;
   }
 
   @ApiMethod(description = "Get all fileresources")
@@ -62,7 +63,7 @@ public class FileResourceMetadataController {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.find(pageRequest);
+    return metadataService.find(pageRequest);
   }
 
   @ApiMethod(
@@ -115,7 +116,7 @@ public class FileResourceMetadataController {
           Filtering.defaultBuilder().filter("mimeType").startsWith(prefix).build();
       pageRequest.add(filtering);
     }
-    return service.find(pageRequest);
+    return metadataService.find(pageRequest);
   }
 
   @ApiMethod(
@@ -140,9 +141,9 @@ public class FileResourceMetadataController {
       throws IdentifiableServiceException {
     FileResource fileResource;
     if (pLocale == null) {
-      fileResource = service.get(uuid);
+      fileResource = metadataService.get(uuid);
     } else {
-      fileResource = service.get(uuid, pLocale);
+      fileResource = metadataService.get(uuid, pLocale);
     }
     return new ResponseEntity<>(fileResource, HttpStatus.OK);
   }
@@ -160,7 +161,7 @@ public class FileResourceMetadataController {
   public ResponseEntity<FileResource> getByIdentifier(
       @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
 
-    FileResource fileResource = service.getByIdentifier(namespace, id);
+    FileResource fileResource = metadataService.getByIdentifier(namespace, id);
     return new ResponseEntity<>(fileResource, HttpStatus.OK);
   }
 
@@ -171,7 +172,7 @@ public class FileResourceMetadataController {
   @ApiResponseObject
   public FileResource save(@RequestBody FileResource fileResource)
       throws IdentifiableServiceException {
-    return service.save(fileResource);
+    return metadataService.save(fileResource);
   }
 
   @ApiMethod(description = "Update a fileresource")
@@ -183,6 +184,6 @@ public class FileResourceMetadataController {
       @PathVariable UUID uuid, @RequestBody FileResource fileResource, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, fileResource.getUuid());
-    return service.update(fileResource);
+    return metadataService.update(fileResource);
   }
 }

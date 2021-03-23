@@ -42,10 +42,10 @@ public class PersonController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PersonController.class);
 
-  private final PersonService service;
+  private final PersonService personService;
 
-  public PersonController(PersonService service) {
-    this.service = service;
+  public PersonController(PersonService personService) {
+    this.personService = personService;
   }
 
   @ApiMethod(description = "count all persons")
@@ -54,7 +54,7 @@ public class PersonController {
       produces = "application/json")
   @ApiResponseObject
   public long count() {
-    return service.count();
+    return personService.count();
   }
 
   @ApiMethod(description = "get all persons")
@@ -83,9 +83,9 @@ public class PersonController {
       searchPageRequest.setFiltering(filtering);
     }
     if (initial == null) {
-      return service.find(searchPageRequest);
+      return personService.find(searchPageRequest);
     }
-    return service.findByLanguageAndInitial(searchPageRequest, language, initial);
+    return personService.findByLanguageAndInitial(searchPageRequest, language, initial);
   }
 
   @ApiMethod(description = "get all persons born at given geo location")
@@ -107,7 +107,7 @@ public class PersonController {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.findByLocationOfBirth(pageRequest, uuid);
+    return personService.findByLocationOfBirth(pageRequest, uuid);
   }
 
   @ApiMethod(description = "get all persons died at given geo location")
@@ -129,7 +129,7 @@ public class PersonController {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.findByLocationOfDeath(pageRequest, uuid);
+    return personService.findByLocationOfDeath(pageRequest, uuid);
   }
 
   @ApiMethod(
@@ -158,9 +158,9 @@ public class PersonController {
 
     Person result;
     if (pLocale == null) {
-      result = service.get(uuid);
+      result = personService.get(uuid);
     } else {
-      result = service.get(uuid, pLocale);
+      result = personService.get(uuid, pLocale);
     }
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
@@ -176,7 +176,7 @@ public class PersonController {
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)
       throws IdentifiableServiceException {
-    Person result = service.getByIdentifier(namespace, id);
+    Person result = personService.getByIdentifier(namespace, id);
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
@@ -189,7 +189,7 @@ public class PersonController {
   @ApiResponseObject
   public Set<DigitalObject> getDigitalObjects(@PathVariable("uuid") UUID uuid)
       throws IdentifiableServiceException {
-    return service.getDigitalObjects(uuid);
+    return personService.getDigitalObjects(uuid);
   }
 
   @ApiMethod(description = "Get languages of all persons")
@@ -198,7 +198,7 @@ public class PersonController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<Locale> getLanguages() {
-    return service.getLanguages();
+    return personService.getLanguages();
   }
 
   @ApiMethod(
@@ -209,7 +209,7 @@ public class PersonController {
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @ApiResponseObject
   public Set<Work> getWorks(@PathVariable("uuid") UUID uuid) throws IdentifiableServiceException {
-    return service.getWorks(uuid);
+    return personService.getWorks(uuid);
   }
 
   @ApiMethod(description = "save a newly created person")
@@ -219,7 +219,7 @@ public class PersonController {
   @ApiResponseObject
   public Person save(@RequestBody Person person, BindingResult errors)
       throws IdentifiableServiceException {
-    return service.save(person);
+    return personService.save(person);
   }
 
   @ApiMethod(description = "update a person")
@@ -231,6 +231,6 @@ public class PersonController {
       @PathVariable("uuid") UUID uuid, @RequestBody Person person, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, person.getUuid());
-    return service.update(person);
+    return personService.update(person);
   }
 }

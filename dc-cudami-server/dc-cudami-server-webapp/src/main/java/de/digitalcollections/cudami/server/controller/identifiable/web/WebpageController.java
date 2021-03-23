@@ -40,12 +40,12 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The webpage controller", name = "Webpage controller")
 public class WebpageController {
 
-  private final WebpageService service;
   private final LocaleService localeService;
+  private final WebpageService webpageService;
 
-  public WebpageController(WebpageService service, LocaleService localeService) {
-    this.service = service;
+  public WebpageController(LocaleService localeService, WebpageService webpageService) {
     this.localeService = localeService;
+    this.webpageService = webpageService;
   }
 
   @ApiMethod(description = "Add file resource related to webpage")
@@ -57,7 +57,7 @@ public class WebpageController {
   @ResponseStatus(value = HttpStatus.OK)
   @ApiResponseObject
   public void addRelatedFileResource(@PathVariable UUID uuid, @PathVariable UUID fileResourceUuid) {
-    service.addRelatedFileresource(uuid, fileResourceUuid);
+    webpageService.addRelatedFileresource(uuid, fileResourceUuid);
   }
 
   @ApiMethod(description = "Get all webpages")
@@ -84,7 +84,7 @@ public class WebpageController {
             .add("publicationEnd", publicationEnd)
             .build();
     pageRequest.setFiltering(filtering);
-    return service.find(pageRequest);
+    return webpageService.find(pageRequest);
   }
 
   @ApiMethod(description = "Get the breadcrumb for a webpage")
@@ -108,10 +108,10 @@ public class WebpageController {
     BreadcrumbNavigation breadcrumbNavigation;
 
     if (pLocale == null) {
-      breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
+      breadcrumbNavigation = webpageService.getBreadcrumbNavigation(uuid);
     } else {
       breadcrumbNavigation =
-          service.getBreadcrumbNavigation(uuid, pLocale, localeService.getDefaultLocale());
+          webpageService.getBreadcrumbNavigation(uuid, pLocale, localeService.getDefaultLocale());
     }
 
     if (breadcrumbNavigation == null || breadcrumbNavigation.getNavigationItems().isEmpty()) {
@@ -130,7 +130,7 @@ public class WebpageController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
-    return service.getRelatedFileResources(uuid);
+    return webpageService.getRelatedFileResources(uuid);
   }
 
   // Test-URL: http://localhost:9000/latest/webpages/599a120c-2dd5-11e8-b467-0ed5f89f718b
@@ -162,15 +162,15 @@ public class WebpageController {
     Webpage webpage;
     if (active != null) {
       if (pLocale == null) {
-        webpage = service.getActive(uuid);
+        webpage = webpageService.getActive(uuid);
       } else {
-        webpage = service.getActive(uuid, pLocale);
+        webpage = webpageService.getActive(uuid, pLocale);
       }
     } else {
       if (pLocale == null) {
-        webpage = service.get(uuid);
+        webpage = webpageService.get(uuid);
       } else {
-        webpage = service.get(uuid, pLocale);
+        webpage = webpageService.get(uuid, pLocale);
       }
     }
     return new ResponseEntity<>(webpage, HttpStatus.OK);
@@ -198,9 +198,9 @@ public class WebpageController {
       pageRequest.setSorting(sorting);
     }
     if (active != null) {
-      return service.getActiveChildren(uuid, pageRequest);
+      return webpageService.getActiveChildren(uuid, pageRequest);
     }
-    return service.getChildren(uuid, pageRequest);
+    return webpageService.getChildren(uuid, pageRequest);
   }
 
   @ApiMethod(description = "Get (active or all) children of a webpage recursivly as JSON")
@@ -219,9 +219,9 @@ public class WebpageController {
           String active) {
     List<Webpage> children;
     if (active != null) {
-      children = service.getActiveChildren(uuid);
+      children = webpageService.getActiveChildren(uuid);
     } else {
-      children = service.getChildren(uuid);
+      children = webpageService.getChildren(uuid);
     }
     for (Webpage child : children) {
       child.setChildren(getWebpageChildrenTree(child.getUuid(), active));
@@ -241,7 +241,7 @@ public class WebpageController {
           @PathVariable("uuid")
           UUID uuid)
       throws IdentifiableServiceException {
-    return service.getParent(uuid);
+    return webpageService.getParent(uuid);
   }
 
   @ApiMethod(description = "Get website of a webpage as JSON")
@@ -256,7 +256,7 @@ public class WebpageController {
           @PathVariable("uuid")
           UUID uuid)
       throws IdentifiableServiceException {
-    return service.getWebsite(uuid);
+    return webpageService.getWebsite(uuid);
   }
 
   @ApiMethod(description = "Save a newly created webpage")
@@ -270,7 +270,7 @@ public class WebpageController {
   public Webpage saveWithParentWebpage(
       @PathVariable UUID parentWebpageUuid, @RequestBody Webpage webpage, BindingResult errors)
       throws IdentifiableServiceException {
-    return service.saveWithParent(webpage, parentWebpageUuid);
+    return webpageService.saveWithParent(webpage, parentWebpageUuid);
   }
 
   @ApiMethod(description = "Save a newly created top-level webpage")
@@ -284,7 +284,7 @@ public class WebpageController {
   public Webpage saveWithParentWebsite(
       @PathVariable UUID parentWebsiteUuid, @RequestBody Webpage webpage, BindingResult errors)
       throws IdentifiableServiceException {
-    return service.saveWithParentWebsite(webpage, parentWebsiteUuid);
+    return webpageService.saveWithParentWebsite(webpage, parentWebsiteUuid);
   }
 
   @ApiMethod(description = "Update a webpage")
@@ -295,7 +295,7 @@ public class WebpageController {
   public Webpage update(@PathVariable UUID uuid, @RequestBody Webpage webpage, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, webpage.getUuid());
-    return service.update(webpage);
+    return webpageService.update(webpage);
   }
 
   @ApiMethod(description = "Update the order of a webpage's children")
@@ -306,7 +306,7 @@ public class WebpageController {
   public ResponseEntity updateChildrenOrder(
       @ApiPathParam(description = "UUID of the webpage") @PathVariable("uuid") UUID uuid,
       @ApiPathParam(description = "List of the children") @RequestBody List<Webpage> rootPages) {
-    boolean successful = service.updateChildrenOrder(uuid, rootPages);
+    boolean successful = webpageService.updateChildrenOrder(uuid, rootPages);
 
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);

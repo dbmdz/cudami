@@ -30,14 +30,14 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The entity controller", name = "Entity controller")
 public class EntityController<E extends Entity> {
 
-  private final EntityService<Entity> service;
   private final EntityRelationService entityRelationService;
+  private final EntityService<Entity> entityService;
 
   public EntityController(
-      @Qualifier("entityService") EntityService<Entity> service,
-      EntityRelationService entityRelationService) {
-    this.service = service;
+      EntityRelationService entityRelationService,
+      @Qualifier("entityService") EntityService<Entity> entityService) {
     this.entityRelationService = entityRelationService;
+    this.entityService = entityService;
   }
 
   @ApiMethod(description = "Get count of entities")
@@ -46,7 +46,7 @@ public class EntityController<E extends Entity> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public long count() {
-    return service.count();
+    return entityService.count();
   }
 
   @ApiMethod(description = "Get all entities")
@@ -70,7 +70,7 @@ public class EntityController<E extends Entity> {
           Filtering.defaultBuilder().add("entityType", entityTypeCriterion).build();
       pageRequest.setFiltering(filtering);
     }
-    return service.find(pageRequest);
+    return entityService.find(pageRequest);
   }
 
   @ApiMethod(
@@ -96,7 +96,7 @@ public class EntityController<E extends Entity> {
           Filtering.defaultBuilder().add("entityType", entityTypeCriterion).build();
       pageRequest.setFiltering(filtering);
     }
-    return service.find(pageRequest);
+    return entityService.find(pageRequest);
   }
 
   @ApiMethod(description = "Get entity by uuid")
@@ -108,7 +108,7 @@ public class EntityController<E extends Entity> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Entity findById(@PathVariable UUID uuid) {
-    return service.get(uuid);
+    return entityService.get(uuid);
   }
 
   @ApiMethod(description = "Get entity by namespace and id")
@@ -118,7 +118,7 @@ public class EntityController<E extends Entity> {
   @ApiResponseObject
   public Entity findByIdentifier(@PathVariable String namespace, @PathVariable String id)
       throws IdentifiableServiceException {
-    Entity entity = service.getByIdentifier(namespace, id);
+    Entity entity = entityService.getByIdentifier(namespace, id);
     return entity;
   }
 
@@ -128,7 +128,7 @@ public class EntityController<E extends Entity> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Entity findByRefId(@PathVariable long refId) {
-    Entity entity = service.getByRefId(refId);
+    Entity entity = entityService.getByRefId(refId);
     if (entity == null) {
       return null;
     }
@@ -149,7 +149,7 @@ public class EntityController<E extends Entity> {
   @ApiResponseObject
   public List<Entity> findRandomEntities(
       @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
-    return service.getRandom(count);
+    return entityService.getRandom(count);
   }
 
   @ApiMethod(description = "Get related file resources of entity")
@@ -161,7 +161,7 @@ public class EntityController<E extends Entity> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
-    return service.getRelatedFileResources(uuid);
+    return entityService.getRelatedFileResources(uuid);
   }
 
   @ApiMethod(description = "Get relations for an entity (being the subject)")

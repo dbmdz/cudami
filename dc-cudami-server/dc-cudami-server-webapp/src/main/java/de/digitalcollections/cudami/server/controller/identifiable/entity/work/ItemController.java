@@ -38,10 +38,10 @@ public class ItemController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ItemController.class);
 
-  private final ItemService service;
+  private final ItemService itemService;
 
-  public ItemController(ItemService service) {
-    this.service = service;
+  public ItemController(ItemService itemService) {
+    this.itemService = itemService;
   }
 
   @ApiMethod(description = "count all items")
@@ -50,7 +50,7 @@ public class ItemController {
       produces = "application/json")
   @ApiResponseObject
   public long count() {
-    return service.count();
+    return itemService.count();
   }
 
   @ApiMethod(description = "get all items")
@@ -70,9 +70,9 @@ public class ItemController {
       pageRequest.setSorting(sorting);
     }
     if (initial == null) {
-      return service.find(pageRequest);
+      return itemService.find(pageRequest);
     }
-    return service.findByLanguageAndInitial(pageRequest, language, initial);
+    return itemService.findByLanguageAndInitial(pageRequest, language, initial);
   }
 
   @ApiMethod(
@@ -98,9 +98,9 @@ public class ItemController {
 
     Item result;
     if (pLocale == null) {
-      result = service.get(uuid);
+      result = itemService.get(uuid);
     } else {
-      result = service.get(uuid, pLocale);
+      result = itemService.get(uuid, pLocale);
     }
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
@@ -116,7 +116,7 @@ public class ItemController {
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)
       throws IdentifiableServiceException {
-    Item result = service.getByIdentifier(namespace, id);
+    Item result = itemService.getByIdentifier(namespace, id);
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
@@ -127,7 +127,7 @@ public class ItemController {
   @ApiResponseObject
   public Item save(@RequestBody Item item, BindingResult errors)
       throws IdentifiableServiceException {
-    return service.save(item);
+    return itemService.save(item);
   }
 
   @ApiMethod(description = "update an item")
@@ -141,7 +141,7 @@ public class ItemController {
       throw new IllegalArgumentException("UUID mismatch of new and existing item");
     }
 
-    return service.update(item);
+    return itemService.update(item);
   }
 
   @ApiMethod(description = "Get digital objects of this item")
@@ -151,7 +151,7 @@ public class ItemController {
   @ApiResponseObject
   public Set<DigitalObject> getDigitalObjects(
       @ApiPathParam(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid) {
-    return service.getDigitalObjects(uuid);
+    return itemService.getDigitalObjects(uuid);
   }
 
   @ApiMethod(description = "Get works embodied in an item")
@@ -161,7 +161,7 @@ public class ItemController {
   @ApiResponseObject
   public Set<Work> getWorks(
       @ApiPathParam(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid) {
-    return service.getWorks(uuid);
+    return itemService.getWorks(uuid);
   }
 
   @ApiMethod(description = "Add work to an item")
@@ -173,7 +173,7 @@ public class ItemController {
       @ApiPathParam(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid,
       @ApiPathParam(name = "workUuid", description = "UUID of the work") @PathVariable
           UUID workUuid) {
-    return service.addWork(uuid, workUuid);
+    return itemService.addWork(uuid, workUuid);
   }
 
   @ApiMethod(description = "Add digital object to an item")
@@ -189,6 +189,6 @@ public class ItemController {
       @ApiPathParam(name = "digitalObjectUuid", description = "UUID of the digital object")
           @PathVariable
           UUID digitalObjectUuid) {
-    return service.addDigitalObject(uuid, digitalObjectUuid);
+    return itemService.addDigitalObject(uuid, digitalObjectUuid);
   }
 }

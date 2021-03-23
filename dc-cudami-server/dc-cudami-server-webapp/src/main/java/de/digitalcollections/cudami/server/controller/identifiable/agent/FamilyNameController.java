@@ -37,10 +37,10 @@ public class FamilyNameController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FamilyNameController.class);
 
-  private final FamilyNameService service;
+  private final FamilyNameService familyNameService;
 
-  public FamilyNameController(FamilyNameService service) {
-    this.service = service;
+  public FamilyNameController(FamilyNameService familyNameservice) {
+    this.familyNameService = familyNameservice;
   }
 
   @ApiMethod(description = "get all family names")
@@ -61,9 +61,9 @@ public class FamilyNameController {
       pageRequest.setSorting(sorting);
     }
     if (initial == null) {
-      return service.find(pageRequest);
+      return familyNameService.find(pageRequest);
     }
-    return service.findByLanguageAndInitial(pageRequest, language, initial);
+    return familyNameService.findByLanguageAndInitial(pageRequest, language, initial);
   }
 
   @ApiMethod(
@@ -89,9 +89,9 @@ public class FamilyNameController {
 
     FamilyName result;
     if (pLocale == null) {
-      result = service.get(uuid);
+      result = familyNameService.get(uuid);
     } else {
-      result = service.get(uuid, pLocale);
+      result = familyNameService.get(uuid, pLocale);
     }
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
@@ -107,7 +107,7 @@ public class FamilyNameController {
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)
       throws IdentifiableServiceException {
-    FamilyName result = service.getByIdentifier(namespace, id);
+    FamilyName result = familyNameService.getByIdentifier(namespace, id);
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
@@ -118,7 +118,7 @@ public class FamilyNameController {
   @ApiResponseObject
   public FamilyName save(@RequestBody FamilyName familyName, BindingResult errors)
       throws IdentifiableServiceException {
-    return service.save(familyName);
+    return familyNameService.save(familyName);
   }
 
   @ApiMethod(description = "update a familyname")
@@ -130,6 +130,6 @@ public class FamilyNameController {
       @PathVariable("uuid") UUID uuid, @RequestBody FamilyName familyName, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, familyName.getUuid());
-    return service.update(familyName);
+    return familyNameService.update(familyName);
   }
 }

@@ -33,10 +33,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The website controller", name = "Website controller")
 public class WebsiteController {
 
-  private final WebsiteService service;
+  private final WebsiteService websiteService;
 
-  public WebsiteController(WebsiteService service) {
-    this.service = service;
+  public WebsiteController(WebsiteService websiteService) {
+    this.websiteService = websiteService;
   }
 
   @ApiMethod(description = "Get count of content trees")
@@ -45,7 +45,7 @@ public class WebsiteController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public long count() {
-    return service.count();
+    return websiteService.count();
   }
 
   @ApiMethod(description = "Get all websites")
@@ -63,7 +63,7 @@ public class WebsiteController {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
     }
-    return service.find(searchPageRequest);
+    return websiteService.find(searchPageRequest);
   }
 
   @ApiMethod(description = "Get website by uuid")
@@ -72,7 +72,7 @@ public class WebsiteController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Website findById(@PathVariable UUID uuid) {
-    return service.get(uuid);
+    return websiteService.get(uuid);
   }
 
   @ApiMethod(description = "Get languages of all websites")
@@ -81,7 +81,7 @@ public class WebsiteController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<Locale> getLanguages() {
-    return service.getLanguages();
+    return websiteService.getLanguages();
   }
 
   @ApiMethod(description = "Get paged root pages of a website")
@@ -104,7 +104,7 @@ public class WebsiteController {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.getRootPages(uuid, pageRequest);
+    return websiteService.getRootPages(uuid, pageRequest);
   }
 
   @ApiMethod(description = "Save a newly created website")
@@ -114,7 +114,7 @@ public class WebsiteController {
   @ApiResponseObject
   public Website save(@RequestBody Website website, BindingResult errors)
       throws IdentifiableServiceException {
-    return service.save(website);
+    return websiteService.save(website);
   }
 
   @ApiMethod(description = "Update a website")
@@ -125,7 +125,7 @@ public class WebsiteController {
   public Website update(@PathVariable UUID uuid, @RequestBody Website website, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, website.getUuid());
-    return service.update(website);
+    return websiteService.update(website);
   }
 
   @ApiMethod(description = "Update the order of a website's rootpages")
@@ -139,7 +139,7 @@ public class WebsiteController {
     Website website = new Website();
     website.setUuid(uuid);
 
-    boolean successful = service.updateRootPagesOrder(website, rootPages);
+    boolean successful = websiteService.updateRootPagesOrder(website, rootPages);
 
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);

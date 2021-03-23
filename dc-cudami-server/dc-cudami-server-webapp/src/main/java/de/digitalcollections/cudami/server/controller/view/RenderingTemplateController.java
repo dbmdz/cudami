@@ -22,10 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RenderingTemplateController {
 
-  private final RenderingTemplateService service;
+  private final RenderingTemplateService renderingTemplateService;
 
-  public RenderingTemplateController(RenderingTemplateService service) {
-    this.service = service;
+  public RenderingTemplateController(RenderingTemplateService renderingTemplateService) {
+    this.renderingTemplateService = renderingTemplateService;
   }
 
   @GetMapping(
@@ -40,21 +40,21 @@ public class RenderingTemplateController {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.find(pageRequest);
+    return renderingTemplateService.find(pageRequest);
   }
 
   @GetMapping(
       value = {"/latest/renderingtemplates/{uuid}", "/v3/renderingtemplates/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public RenderingTemplate findOne(@PathVariable UUID uuid) {
-    return service.findOne(uuid);
+    return renderingTemplateService.findOne(uuid);
   }
 
   @PostMapping(
       value = {"/latest/renderingtemplates", "/v3/renderingtemplates"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public RenderingTemplate save(@RequestBody RenderingTemplate template, BindingResult errors) {
-    return service.save(template);
+    return renderingTemplateService.save(template);
   }
 
   @PutMapping(
@@ -63,6 +63,6 @@ public class RenderingTemplateController {
   public RenderingTemplate update(
       @PathVariable UUID uuid, @RequestBody RenderingTemplate template, BindingResult errors) {
     assert Objects.equals(uuid, template.getUuid());
-    return service.update(template);
+    return renderingTemplateService.update(template);
   }
 }

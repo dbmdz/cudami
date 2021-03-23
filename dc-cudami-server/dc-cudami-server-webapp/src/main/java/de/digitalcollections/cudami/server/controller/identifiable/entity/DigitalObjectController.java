@@ -39,10 +39,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The digital object controller", name = "Digital object controller")
 public class DigitalObjectController {
 
-  private final DigitalObjectService service;
+  private final DigitalObjectService digitalObjectService;
 
-  public DigitalObjectController(DigitalObjectService service) {
-    this.service = service;
+  public DigitalObjectController(DigitalObjectService digitalObjectService) {
+    this.digitalObjectService = digitalObjectService;
   }
 
   @ApiMethod(description = "Get count of digital objects")
@@ -51,7 +51,7 @@ public class DigitalObjectController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public long count() {
-    return service.count();
+    return digitalObjectService.count();
   }
 
   @ApiMethod(description = "Delete a digital object with all its relations")
@@ -61,7 +61,7 @@ public class DigitalObjectController {
   @ApiResponseObject
   public ResponseEntity delete(
       @ApiPathParam(description = "UUID of the digital object") @PathVariable("uuid") UUID uuid) {
-    boolean successful = service.delete(uuid);
+    boolean successful = digitalObjectService.delete(uuid);
 
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -83,7 +83,7 @@ public class DigitalObjectController {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.find(pageRequest);
+    return digitalObjectService.find(pageRequest);
   }
 
   @ApiMethod(
@@ -94,7 +94,7 @@ public class DigitalObjectController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<DigitalObject> findAllReduced() {
-    return service.findAllReduced();
+    return digitalObjectService.findAllReduced();
   }
 
   @ApiMethod(description = "Get digital object by uuid")
@@ -103,7 +103,7 @@ public class DigitalObjectController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public DigitalObject findById(@PathVariable UUID uuid) {
-    return service.get(uuid);
+    return digitalObjectService.get(uuid);
   }
 
   @ApiMethod(description = "Get digital object by namespace and id")
@@ -119,7 +119,7 @@ public class DigitalObjectController {
           String namespace,
       @ApiPathParam(description = "value of the identifier") @PathVariable("id") String id)
       throws IdentifiableServiceException {
-    return service.getByIdentifier(namespace, id);
+    return digitalObjectService.getByIdentifier(namespace, id);
     //    if (digitalObject == null) {
     //      // FIXME throw resource not found http exception
     //      throw new IdentifiableServiceException(
@@ -145,7 +145,7 @@ public class DigitalObjectController {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.find(pageRequest);
+    return digitalObjectService.find(pageRequest);
   }
 
   @ApiMethod(description = "Get item for digital object by digital object uuid")
@@ -154,7 +154,7 @@ public class DigitalObjectController {
       produces = "application/json")
   @ApiResponseObject
   public Item findItemOfDigitalObject(@PathVariable UUID uuid) {
-    return service.getItem(uuid);
+    return digitalObjectService.getItem(uuid);
   }
 
   @ApiMethod(description = "Find limited amount of random digital objects")
@@ -164,7 +164,7 @@ public class DigitalObjectController {
   @ApiResponseObject
   public List<DigitalObject> findRandomDigitalObjects(
       @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
-    return service.getRandom(count);
+    return digitalObjectService.getRandom(count);
   }
 
   @ApiMethod(description = "Get (active) paged collections of a digital objects")
@@ -185,9 +185,9 @@ public class DigitalObjectController {
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);
     if (active != null) {
-      return service.getActiveCollections(digitalObject, pageRequest);
+      return digitalObjectService.getActiveCollections(digitalObject, pageRequest);
     }
-    return service.getCollections(digitalObject, pageRequest);
+    return digitalObjectService.getCollections(digitalObject, pageRequest);
   }
 
   @ApiMethod(description = "Get file resources of a digital object")
@@ -199,7 +199,7 @@ public class DigitalObjectController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<FileResource> getFileResources(@PathVariable UUID uuid) {
-    return service.getFileResources(uuid);
+    return digitalObjectService.getFileResources(uuid);
   }
 
   @ApiMethod(description = "Get image file resources of a digital object")
@@ -211,7 +211,7 @@ public class DigitalObjectController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<ImageFileResource> getImageFileResources(@PathVariable UUID uuid) {
-    return service.getImageFileResources(uuid);
+    return digitalObjectService.getImageFileResources(uuid);
   }
 
   @ApiMethod(description = "Get paged projects of a digital objects")
@@ -227,7 +227,7 @@ public class DigitalObjectController {
 
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);
-    return service.getProjects(digitalObject, pageRequest);
+    return digitalObjectService.getProjects(digitalObject, pageRequest);
   }
 
   @ApiMethod(description = "Save a newly created digital object")
@@ -237,7 +237,7 @@ public class DigitalObjectController {
   @ApiResponseObject
   public DigitalObject save(@RequestBody DigitalObject digitalObject, BindingResult errors)
       throws IdentifiableServiceException {
-    return service.save(digitalObject);
+    return digitalObjectService.save(digitalObject);
   }
 
   @ApiMethod(description = "Save list of fileresources for a given digital object")
@@ -251,7 +251,7 @@ public class DigitalObjectController {
   public List<FileResource> saveFileResources(
       @ApiPathParam(description = "UUID of the digital object") @PathVariable("uuid") UUID uuid,
       @RequestBody List<FileResource> fileResources) {
-    return service.saveFileResources(uuid, fileResources);
+    return digitalObjectService.saveFileResources(uuid, fileResources);
   }
 
   @ApiMethod(description = "Update a digital object")
@@ -265,7 +265,7 @@ public class DigitalObjectController {
       BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, digitalObject.getUuid());
-    return service.update(digitalObject);
+    return digitalObjectService.update(digitalObject);
   }
 
   @ApiMethod(description = "Get languages of all digital objects")
@@ -274,6 +274,6 @@ public class DigitalObjectController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<Locale> getLanguages() {
-    return service.getLanguages();
+    return digitalObjectService.getLanguages();
   }
 }
