@@ -35,7 +35,7 @@
           <th:block th:unless="${#locale.language == 'en'}"><a id="change-locale" th:href="@{''(language=en)}" class="nav-link">English</a></th:block>
           <th:block th:if="${#locale.language == 'en'}"><a id="change-locale" th:href="@{''(language=de)}" class="nav-link">Deutsch</a></th:block>
           </li>
-          <li class="dropdown nav-item">
+          <li class="dropdown nav-item" sec:authorize="isAuthenticated()">
             <a href="#" class="dropdown-toggle nav-link" id="userMenuDropdownButton" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
               <span id="currentUserName" sec:authentication="name"></span> <span class="caret"></span>
               <span style="display:none;" sec:authentication="principal.authorities">[ROLE_USER, ROLE_ADMIN]</span>
