@@ -11,7 +11,6 @@ import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
@@ -125,14 +124,6 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
       default:
         return null;
     }
-  }
-
-  @Override
-  public List<Locale> getLanguages() {
-    String query =
-        "SELECT DISTINCT languages FROM websites as w, jsonb_object_keys(w.label) as languages";
-    List<Locale> result = dbi.withHandle(h -> h.createQuery(query).mapTo(Locale.class).list());
-    return result;
   }
 
   @Override
