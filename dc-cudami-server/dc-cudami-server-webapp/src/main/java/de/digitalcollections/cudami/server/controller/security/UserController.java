@@ -13,7 +13,6 @@ import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +27,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The user controller", name = "User controller")
 public class UserController {
 
-  @Autowired private UserService service;
+  private final UserService service;
+
+  public UserController(UserService service) {
+    this.service = service;
+  }
 
   @ApiMethod(description = "Get all users with given role and enabled status")
   @GetMapping(

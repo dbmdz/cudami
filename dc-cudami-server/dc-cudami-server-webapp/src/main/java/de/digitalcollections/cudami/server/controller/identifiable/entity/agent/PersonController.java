@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.agent;
 
-import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.PersonService;
 import de.digitalcollections.model.filter.FilterCriterion;
@@ -25,7 +24,6 @@ import org.jsondoc.core.annotation.ApiQueryParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -44,8 +42,11 @@ public class PersonController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PersonController.class);
 
-  @Autowired LocaleService localeService;
-  @Autowired PersonService personService;
+  private final PersonService service;
+
+  public PersonController(PersonService service) {
+    this.service = service;
+  }
 
   @ApiMethod(description = "count all persons")
   @GetMapping(
@@ -53,7 +54,7 @@ public class PersonController {
       produces = "application/json")
   @ApiResponseObject
   public long count() {
-    return personService.count();
+    return service.count();
   }
 
   @ApiMethod(description = "get all persons")
@@ -82,9 +83,9 @@ public class PersonController {
       searchPageRequest.setFiltering(filtering);
     }
     if (initial == null) {
-      return personService.find(searchPageRequest);
+      return service.find(searchPageRequest);
     }
-    return personService.findByLanguageAndInitial(searchPageRequest, language, initial);
+    return service.findByLanguageAndInitial(searchPageRequest, language, initial);
   }
 
   @ApiMethod(description = "get all persons born at given geo location")
@@ -106,7 +107,7 @@ public class PersonController {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return personService.findByLocationOfBirth(pageRequest, uuid);
+    return service.findByLocationOfBirth(pageRequest, uuid);
   }
 
   @ApiMethod(description = "get all persons died at given geo location")
@@ -128,7 +129,7 @@ public class PersonController {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return personService.findByLocationOfDeath(pageRequest, uuid);
+    return service.findByLocationOfDeath(pageRequest, uuid);
   }
 
   @ApiMethod(
@@ -157,9 +158,9 @@ public class PersonController {
 
     Person result;
     if (pLocale == null) {
-      result = personService.get(uuid);
+      result = service.get(uuid);
     } else {
-      result = personService.get(uuid, pLocale);
+      result = service.get(uuid, pLocale);
     }
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
@@ -175,7 +176,7 @@ public class PersonController {
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)
       throws IdentifiableServiceException {
-    Person result = personService.getByIdentifier(namespace, id);
+    Person result = service.getByIdentifier(namespace, id);
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
@@ -188,7 +189,7 @@ public class PersonController {
   @ApiResponseObject
   public Set<DigitalObject> getDigitalObjects(@PathVariable("uuid") UUID uuid)
       throws IdentifiableServiceException {
-    return personService.getDigitalObjects(uuid);
+    return service.getDigitalObjects(uuid);
   }
 
   @ApiMethod(description = "Get languages of all persons")
@@ -197,7 +198,7 @@ public class PersonController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<Locale> getLanguages() {
-    return personService.getLanguages();
+    return service.getLanguages();
   }
 
   @ApiMethod(
@@ -208,7 +209,7 @@ public class PersonController {
       produces = {MediaType.APPLICATION_JSON_VALUE})
   @ApiResponseObject
   public Set<Work> getWorks(@PathVariable("uuid") UUID uuid) throws IdentifiableServiceException {
-    return personService.getWorks(uuid);
+    return service.getWorks(uuid);
   }
 
   @ApiMethod(description = "save a newly created person")
@@ -218,7 +219,7 @@ public class PersonController {
   @ApiResponseObject
   public Person save(@RequestBody Person person, BindingResult errors)
       throws IdentifiableServiceException {
-    return personService.save(person);
+    return service.save(person);
   }
 
   @ApiMethod(description = "update a person")
@@ -230,6 +231,6 @@ public class PersonController {
       @PathVariable("uuid") UUID uuid, @RequestBody Person person, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, person.getUuid());
-    return personService.update(person);
+    return service.update(person);
   }
 }

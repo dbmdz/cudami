@@ -12,7 +12,6 @@ import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,9 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The identifiable controller", name = "Identifiable controller")
 public class IdentifiableController {
 
-  @Autowired
-  @Qualifier("identifiableServiceImpl")
-  private IdentifiableService service;
+  private final IdentifiableService service;
+
+  public IdentifiableController(@Qualifier("identifiableService") IdentifiableService service) {
+    this.service = service;
+  }
 
   @ApiMethod(
       description =

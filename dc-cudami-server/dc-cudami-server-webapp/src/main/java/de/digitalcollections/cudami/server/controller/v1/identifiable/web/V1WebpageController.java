@@ -16,7 +16,6 @@ import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiPathParam;
 import org.jsondoc.core.annotation.ApiQueryParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +30,11 @@ public class V1WebpageController {
 
   private final DigitalCollectionsObjectMapper objectMapper = new DigitalCollectionsObjectMapper();
 
-  @Autowired private WebpageService webpageService;
+  private final WebpageService service;
+
+  public V1WebpageController(WebpageService service) {
+    this.service = service;
+  }
 
   private JSONObject convertLocalizedStructuredContentJson(JSONObject json) {
     JSONObject localizedStructuredContent = new JSONObject();
@@ -112,9 +115,9 @@ public class V1WebpageController {
   private Webpage loadWebpage(Locale pLocale, UUID uuid) throws IdentifiableServiceException {
     Webpage webpage;
     if (pLocale == null) {
-      webpage = webpageService.get(uuid);
+      webpage = service.get(uuid);
     } else {
-      webpage = webpageService.get(uuid, pLocale);
+      webpage = service.get(uuid, pLocale);
     }
     return webpage;
   }

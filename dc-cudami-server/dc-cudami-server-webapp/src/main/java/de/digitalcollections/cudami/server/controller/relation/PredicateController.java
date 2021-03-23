@@ -7,7 +7,6 @@ import java.util.List;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The predicates controller", name = "Predicates controller")
 public class PredicateController {
 
-  @Autowired private PredicateService service;
+  private final PredicateService service;
+
+  public PredicateController(PredicateService service) {
+    this.service = service;
+  }
 
   @ApiMethod(description = "Get all predicates")
   @GetMapping(value = {"/latest/predicates", "/v3/predicates"})

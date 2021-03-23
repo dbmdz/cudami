@@ -16,7 +16,6 @@ import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiPathParam;
 import org.jsondoc.core.annotation.ApiQueryParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +32,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The article controller", name = "Article controller")
 public class ArticleController {
 
-  @Autowired private ArticleService articleService;
+  private final ArticleService service;
+
+  public ArticleController(ArticleService service) {
+    this.service = service;
+  }
 
   @ApiMethod(description = "Get all articles")
   @GetMapping(
@@ -49,7 +52,7 @@ public class ArticleController {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return articleService.find(pageRequest);
+    return service.find(pageRequest);
   }
 
   // Test-URL: http://localhost:9000/latest/articles/599a120c-2dd5-11e8-b467-0ed5f89f718b
@@ -76,9 +79,9 @@ public class ArticleController {
 
     Article article;
     if (pLocale == null) {
-      article = articleService.get(uuid);
+      article = service.get(uuid);
     } else {
-      article = articleService.get(uuid, pLocale);
+      article = service.get(uuid, pLocale);
     }
     return new ResponseEntity<>(article, HttpStatus.OK);
   }
@@ -90,7 +93,7 @@ public class ArticleController {
   @ApiResponseObject
   public Article save(@RequestBody Article article, BindingResult errors)
       throws IdentifiableServiceException {
-    return articleService.save(article);
+    return service.save(article);
   }
 
   @ApiMethod(description = "Update an article")
@@ -101,6 +104,6 @@ public class ArticleController {
   public Article update(@PathVariable UUID uuid, @RequestBody Article article, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, article.getUuid());
-    return articleService.update(article);
+    return service.update(article);
   }
 }

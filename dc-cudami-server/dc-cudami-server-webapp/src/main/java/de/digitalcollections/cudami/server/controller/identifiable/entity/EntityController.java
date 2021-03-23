@@ -19,7 +19,6 @@ import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,11 +30,15 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The entity controller", name = "Entity controller")
 public class EntityController<E extends Entity> {
 
-  @Autowired
-  @Qualifier("entityServiceImpl")
-  private EntityService<Entity> service;
+  private final EntityService<Entity> service;
+  private final EntityRelationService entityRelationService;
 
-  @Autowired private EntityRelationService entityRelationService;
+  public EntityController(
+      @Qualifier("entityService") EntityService<Entity> service,
+      EntityRelationService entityRelationService) {
+    this.service = service;
+    this.entityRelationService = entityRelationService;
+  }
 
   @ApiMethod(description = "Get count of entities")
   @GetMapping(

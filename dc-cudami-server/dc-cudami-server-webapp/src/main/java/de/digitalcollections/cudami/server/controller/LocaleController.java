@@ -6,7 +6,6 @@ import java.util.Locale;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,7 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The locale/language controller", name = "Locale and language controller")
 public class LocaleController {
 
-  @Autowired private LocaleService service;
+  private final LocaleService service;
+
+  public LocaleController(LocaleService service) {
+    this.service = service;
+  }
 
   @ApiMethod(description = "Get default language")
   @GetMapping(value = {"/latest/languages/default", "/v2/languages/default"})

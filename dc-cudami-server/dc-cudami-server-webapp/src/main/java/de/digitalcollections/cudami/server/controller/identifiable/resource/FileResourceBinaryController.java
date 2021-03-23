@@ -1,9 +1,8 @@
 package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
-import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceBinaryService;
-import de.digitalcollections.cudami.server.business.impl.service.identifiable.resource.FileResourceMetadataServiceImpl;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.io.IOException;
@@ -19,7 +18,6 @@ import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,11 +27,15 @@ public class FileResourceBinaryController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FileResourceBinaryController.class);
 
-  @Autowired FileResourceMetadataServiceImpl fileResourceService;
+  private final FileResourceBinaryService binaryService;
+  private final FileResourceMetadataService<FileResource> metadataService;
 
-  @Autowired FileResourceBinaryService fileUploadService;
-
-  @Autowired LocaleService localeService;
+  public FileResourceBinaryController(
+      FileResourceBinaryService binaryService,
+      FileResourceMetadataService<FileResource> metadataService) {
+    this.binaryService = binaryService;
+    this.metadataService = metadataService;
+  }
 
   @PostMapping(value = {"/latest/files", "/v2/files"})
   @ApiResponseObject
@@ -58,11 +60,11 @@ public class FileResourceBinaryController {
           originalFilename = URLDecoder.decode(originalFilename, StandardCharsets.UTF_8.toString());
           String contentType = item.getContentType();
 
-          fileResource = fileResourceService.createByMimeType(MimeType.fromTypename(contentType));
+          fileResource = metadataService.createByMimeType(MimeType.fromTypename(contentType));
           fileResource.setFilename(originalFilename);
           LOGGER.info("filename = " + fileResource.getFilename());
 
-          fileResource = fileUploadService.save(fileResource, stream);
+          fileResource = binaryService.save(fileResource, stream);
           LOGGER.info(
               "saved file '"
                   + fileResource.getUri().toString()

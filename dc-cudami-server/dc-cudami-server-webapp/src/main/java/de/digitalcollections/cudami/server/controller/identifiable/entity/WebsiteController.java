@@ -17,7 +17,6 @@ import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiPathParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +33,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The website controller", name = "Website controller")
 public class WebsiteController {
 
-  @Autowired private WebsiteService service;
+  private final WebsiteService service;
+
+  public WebsiteController(WebsiteService service) {
+    this.service = service;
+  }
 
   @ApiMethod(description = "Get count of content trees")
   @GetMapping(

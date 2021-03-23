@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 
-import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
@@ -21,7 +20,6 @@ import org.jsondoc.core.annotation.ApiQueryParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,9 +38,11 @@ public class ItemController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ItemController.class);
 
-  @Autowired ItemService service;
+  private final ItemService service;
 
-  @Autowired LocaleService localeService;
+  public ItemController(ItemService service) {
+    this.service = service;
+  }
 
   @ApiMethod(description = "count all items")
   @GetMapping(
