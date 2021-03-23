@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.controller.identifiable.agent;
 
-import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.agent.GivenNameService;
 import de.digitalcollections.model.identifiable.agent.GivenName;
@@ -19,7 +18,6 @@ import org.jsondoc.core.annotation.ApiQueryParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -39,9 +37,11 @@ public class GivenNameController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GivenNameController.class);
 
-  @Autowired GivenNameService givenNameService;
+  private final GivenNameService service;
 
-  @Autowired LocaleService localeService;
+  public GivenNameController(GivenNameService service) {
+    this.service = service;
+  }
 
   @ApiMethod(description = "get all given names")
   @GetMapping(
@@ -61,9 +61,9 @@ public class GivenNameController {
       pageRequest.setSorting(sorting);
     }
     if (initial == null) {
-      return givenNameService.find(pageRequest);
+      return service.find(pageRequest);
     }
-    return givenNameService.findByLanguageAndInitial(pageRequest, language, initial);
+    return service.findByLanguageAndInitial(pageRequest, language, initial);
   }
 
   @ApiMethod(
@@ -89,9 +89,9 @@ public class GivenNameController {
 
     GivenName result;
     if (pLocale == null) {
-      result = givenNameService.get(uuid);
+      result = service.get(uuid);
     } else {
-      result = givenNameService.get(uuid, pLocale);
+      result = service.get(uuid, pLocale);
     }
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
@@ -107,7 +107,7 @@ public class GivenNameController {
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)
       throws IdentifiableServiceException {
-    GivenName result = givenNameService.getByIdentifier(namespace, id);
+    GivenName result = service.getByIdentifier(namespace, id);
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
@@ -118,7 +118,7 @@ public class GivenNameController {
   @ApiResponseObject
   public GivenName save(@RequestBody GivenName givenName, BindingResult errors)
       throws IdentifiableServiceException {
-    return givenNameService.save(givenName);
+    return service.save(givenName);
   }
 
   @ApiMethod(description = "update a givenname")
@@ -130,6 +130,6 @@ public class GivenNameController {
       @PathVariable("uuid") UUID uuid, @RequestBody GivenName givenName, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, givenName.getUuid());
-    return givenNameService.update(givenName);
+    return service.update(givenName);
   }
 }

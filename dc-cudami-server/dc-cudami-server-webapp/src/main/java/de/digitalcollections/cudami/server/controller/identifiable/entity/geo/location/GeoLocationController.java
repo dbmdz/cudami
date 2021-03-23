@@ -18,7 +18,6 @@ import org.jsondoc.core.annotation.ApiQueryParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,7 +37,11 @@ public class GeoLocationController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationController.class);
 
-  @Autowired private GeoLocationService geoLocationService;
+  private final GeoLocationService service;
+
+  public GeoLocationController(GeoLocationService service) {
+    this.service = service;
+  }
 
   @ApiMethod(description = "count all geolocations")
   @GetMapping(
@@ -46,7 +49,7 @@ public class GeoLocationController {
       produces = "application/json")
   @ApiResponseObject
   public long count() {
-    return geoLocationService.count();
+    return service.count();
   }
 
   @ApiMethod(description = "get all geo locations")
@@ -68,9 +71,9 @@ public class GeoLocationController {
       searchPageRequest.setSorting(sorting);
     }
     if (language == null && initial == null) {
-      return geoLocationService.find(searchPageRequest);
+      return service.find(searchPageRequest);
     }
-    return geoLocationService.findByLanguageAndInitial(searchPageRequest, language, initial);
+    return service.findByLanguageAndInitial(searchPageRequest, language, initial);
   }
 
   @ApiMethod(
@@ -96,9 +99,9 @@ public class GeoLocationController {
 
     GeoLocation result;
     if (pLocale == null) {
-      result = geoLocationService.get(uuid);
+      result = service.get(uuid);
     } else {
-      result = geoLocationService.get(uuid, pLocale);
+      result = service.get(uuid, pLocale);
     }
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
@@ -114,7 +117,7 @@ public class GeoLocationController {
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)
       throws IdentifiableServiceException {
-    GeoLocation result = geoLocationService.getByIdentifier(namespace, id);
+    GeoLocation result = service.getByIdentifier(namespace, id);
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
@@ -124,7 +127,7 @@ public class GeoLocationController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<Locale> getLanguages() {
-    return geoLocationService.getLanguages();
+    return service.getLanguages();
   }
 
   @ApiMethod(description = "save a newly created geolocation")
@@ -134,7 +137,7 @@ public class GeoLocationController {
   @ApiResponseObject
   public GeoLocation save(@RequestBody GeoLocation geoLocation, BindingResult errors)
       throws IdentifiableServiceException {
-    return geoLocationService.save(geoLocation);
+    return service.save(geoLocation);
   }
 
   @ApiMethod(description = "update a geolocation")
@@ -146,6 +149,6 @@ public class GeoLocationController {
       @PathVariable("uuid") UUID uuid, @RequestBody GeoLocation geoLocation, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, geoLocation.getUuid());
-    return geoLocationService.update(geoLocation);
+    return service.update(geoLocation);
   }
 }

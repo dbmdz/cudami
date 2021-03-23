@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.controller.identifiable.agent;
 
-import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.agent.FamilyNameService;
 import de.digitalcollections.model.identifiable.agent.FamilyName;
@@ -19,7 +18,6 @@ import org.jsondoc.core.annotation.ApiQueryParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -39,9 +37,11 @@ public class FamilyNameController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FamilyNameController.class);
 
-  @Autowired FamilyNameService familyNameService;
+  private final FamilyNameService service;
 
-  @Autowired LocaleService localeService;
+  public FamilyNameController(FamilyNameService service) {
+    this.service = service;
+  }
 
   @ApiMethod(description = "get all family names")
   @GetMapping(
@@ -61,9 +61,9 @@ public class FamilyNameController {
       pageRequest.setSorting(sorting);
     }
     if (initial == null) {
-      return familyNameService.find(pageRequest);
+      return service.find(pageRequest);
     }
-    return familyNameService.findByLanguageAndInitial(pageRequest, language, initial);
+    return service.findByLanguageAndInitial(pageRequest, language, initial);
   }
 
   @ApiMethod(
@@ -89,9 +89,9 @@ public class FamilyNameController {
 
     FamilyName result;
     if (pLocale == null) {
-      result = familyNameService.get(uuid);
+      result = service.get(uuid);
     } else {
-      result = familyNameService.get(uuid, pLocale);
+      result = service.get(uuid, pLocale);
     }
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
@@ -107,7 +107,7 @@ public class FamilyNameController {
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)
       throws IdentifiableServiceException {
-    FamilyName result = familyNameService.getByIdentifier(namespace, id);
+    FamilyName result = service.getByIdentifier(namespace, id);
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
@@ -118,7 +118,7 @@ public class FamilyNameController {
   @ApiResponseObject
   public FamilyName save(@RequestBody FamilyName familyName, BindingResult errors)
       throws IdentifiableServiceException {
-    return familyNameService.save(familyName);
+    return service.save(familyName);
   }
 
   @ApiMethod(description = "update a familyname")
@@ -130,6 +130,6 @@ public class FamilyNameController {
       @PathVariable("uuid") UUID uuid, @RequestBody FamilyName familyName, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, familyName.getUuid());
-    return familyNameService.update(familyName);
+    return service.update(familyName);
   }
 }

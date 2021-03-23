@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
-import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.model.filter.Filtering;
@@ -22,7 +21,6 @@ import org.jsondoc.core.annotation.ApiQueryParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -43,11 +41,12 @@ public class FileResourceMetadataController {
   private static final Logger LOGGER =
       LoggerFactory.getLogger(FileResourceMetadataController.class);
 
-  @Autowired
-  @Qualifier("fileResourceMetadataServiceImpl")
-  private FileResourceMetadataService<FileResource> fileResourceService;
+  private final FileResourceMetadataService<FileResource> service;
 
-  @Autowired private LocaleService localeService;
+  public FileResourceMetadataController(
+      @Qualifier("fileResourceMetadataService") FileResourceMetadataService<FileResource> service) {
+    this.service = service;
+  }
 
   @ApiMethod(description = "Get all fileresources")
   @GetMapping(
@@ -63,7 +62,7 @@ public class FileResourceMetadataController {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return fileResourceService.find(pageRequest);
+    return service.find(pageRequest);
   }
 
   @ApiMethod(
@@ -116,7 +115,7 @@ public class FileResourceMetadataController {
           Filtering.defaultBuilder().filter("mimeType").startsWith(prefix).build();
       pageRequest.add(filtering);
     }
-    return fileResourceService.find(pageRequest);
+    return service.find(pageRequest);
   }
 
   @ApiMethod(
@@ -141,9 +140,9 @@ public class FileResourceMetadataController {
       throws IdentifiableServiceException {
     FileResource fileResource;
     if (pLocale == null) {
-      fileResource = fileResourceService.get(uuid);
+      fileResource = service.get(uuid);
     } else {
-      fileResource = fileResourceService.get(uuid, pLocale);
+      fileResource = service.get(uuid, pLocale);
     }
     return new ResponseEntity<>(fileResource, HttpStatus.OK);
   }
@@ -161,7 +160,7 @@ public class FileResourceMetadataController {
   public ResponseEntity<FileResource> getByIdentifier(
       @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
 
-    FileResource fileResource = fileResourceService.getByIdentifier(namespace, id);
+    FileResource fileResource = service.getByIdentifier(namespace, id);
     return new ResponseEntity<>(fileResource, HttpStatus.OK);
   }
 
@@ -172,7 +171,7 @@ public class FileResourceMetadataController {
   @ApiResponseObject
   public FileResource save(@RequestBody FileResource fileResource)
       throws IdentifiableServiceException {
-    return fileResourceService.save(fileResource);
+    return service.save(fileResource);
   }
 
   @ApiMethod(description = "Update a fileresource")
@@ -184,6 +183,6 @@ public class FileResourceMetadataController {
       @PathVariable UUID uuid, @RequestBody FileResource fileResource, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, fileResource.getUuid());
-    return fileResourceService.update(fileResource);
+    return service.update(fileResource);
   }
 }

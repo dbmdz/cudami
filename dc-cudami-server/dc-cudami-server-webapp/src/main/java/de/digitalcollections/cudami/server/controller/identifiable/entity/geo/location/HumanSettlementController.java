@@ -18,7 +18,6 @@ import org.jsondoc.core.annotation.ApiQueryParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,7 +37,11 @@ public class HumanSettlementController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HumanSettlementController.class);
 
-  @Autowired HumanSettlementService humanSettlementService;
+  private final HumanSettlementService service;
+
+  public HumanSettlementController(HumanSettlementService service) {
+    this.service = service;
+  }
 
   @ApiMethod(description = "get all human settlements")
   @GetMapping(
@@ -58,9 +61,9 @@ public class HumanSettlementController {
       pageRequest.setSorting(sorting);
     }
     if (initial == null) {
-      return humanSettlementService.find(pageRequest);
+      return service.find(pageRequest);
     }
-    return humanSettlementService.findByLanguageAndInitial(pageRequest, language, initial);
+    return service.findByLanguageAndInitial(pageRequest, language, initial);
   }
 
   @ApiMethod(
@@ -89,9 +92,9 @@ public class HumanSettlementController {
 
     HumanSettlement result;
     if (pLocale == null) {
-      result = humanSettlementService.get(uuid);
+      result = service.get(uuid);
     } else {
-      result = humanSettlementService.get(uuid, pLocale);
+      result = service.get(uuid, pLocale);
     }
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
@@ -107,7 +110,7 @@ public class HumanSettlementController {
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)
       throws IdentifiableServiceException {
-    HumanSettlement result = humanSettlementService.getByIdentifier(namespace, id);
+    HumanSettlement result = service.getByIdentifier(namespace, id);
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
@@ -118,7 +121,7 @@ public class HumanSettlementController {
   @ApiResponseObject
   public HumanSettlement save(@RequestBody HumanSettlement humanSettlement, BindingResult errors)
       throws IdentifiableServiceException {
-    return humanSettlementService.save(humanSettlement);
+    return service.save(humanSettlement);
   }
 
   @ApiMethod(description = "update a human settlement")
@@ -132,6 +135,6 @@ public class HumanSettlementController {
       BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, humanSettlement.getUuid());
-    return humanSettlementService.update(humanSettlement);
+    return service.update(humanSettlement);
   }
 }

@@ -22,7 +22,6 @@ import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiPathParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +39,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The digital object controller", name = "Digital object controller")
 public class DigitalObjectController {
 
-  @Autowired private DigitalObjectService service;
+  private final DigitalObjectService service;
+
+  public DigitalObjectController(DigitalObjectService service) {
+    this.service = service;
+  }
 
   @ApiMethod(description = "Get count of digital objects")
   @GetMapping(

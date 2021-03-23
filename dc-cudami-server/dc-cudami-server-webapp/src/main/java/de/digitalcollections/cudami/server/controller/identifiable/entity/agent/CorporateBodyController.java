@@ -17,7 +17,6 @@ import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiPathParam;
 import org.jsondoc.core.annotation.ApiQueryParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -36,11 +35,10 @@ public class CorporateBodyController {
 
   private static final Pattern GNDID_PATTERN = Pattern.compile("(\\d+(-.)?)|(\\d+X)");
 
-  private final CorporateBodyService corporateBodyService;
+  private final CorporateBodyService service;
 
-  @Autowired
-  public CorporateBodyController(CorporateBodyService corporateBodyService) {
-    this.corporateBodyService = corporateBodyService;
+  public CorporateBodyController(CorporateBodyService service) {
+    this.service = service;
   }
 
   @ApiMethod(description = "Fetch a corporate body by GND-ID from external system and save it")
@@ -56,7 +54,7 @@ public class CorporateBodyController {
     if (!GNDID_PATTERN.matcher(gndId).matches()) {
       throw new IllegalArgumentException("Invalid GND ID: " + gndId);
     }
-    return corporateBodyService.fetchAndSaveByGndId(gndId);
+    return service.fetchAndSaveByGndId(gndId);
   }
 
   @ApiMethod(description = "Get all corporate bodies")
@@ -74,7 +72,7 @@ public class CorporateBodyController {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
     }
-    return corporateBodyService.find(searchPageRequest);
+    return service.find(searchPageRequest);
   }
 
   // Test-URL: http://localhost:9000/latest/corporatebodies/599a120c-2dd5-11e8-b467-0ed5f89f718b
@@ -104,9 +102,9 @@ public class CorporateBodyController {
 
     CorporateBody corporateBody;
     if (pLocale == null) {
-      corporateBody = corporateBodyService.get(uuid);
+      corporateBody = service.get(uuid);
     } else {
-      corporateBody = corporateBodyService.get(uuid, pLocale);
+      corporateBody = service.get(uuid, pLocale);
     }
     return new ResponseEntity<>(corporateBody, HttpStatus.OK);
   }
@@ -124,7 +122,7 @@ public class CorporateBodyController {
           String namespace,
       @ApiPathParam(description = "id of identifier") @PathVariable("id") String id)
       throws IdentifiableServiceException {
-    return corporateBodyService.getByIdentifier(namespace, id);
+    return service.getByIdentifier(namespace, id);
   }
 
   @ApiMethod(description = "Get corporate body by refId")
@@ -135,7 +133,7 @@ public class CorporateBodyController {
   public CorporateBody getByRefId(
       @ApiPathParam(description = "reference id") @PathVariable("refId") long refId)
       throws IdentifiableServiceException {
-    return corporateBodyService.getByRefId(refId);
+    return service.getByRefId(refId);
   }
 
   @ApiMethod(description = "Get languages of all corporatebodies")
@@ -144,7 +142,7 @@ public class CorporateBodyController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<Locale> getLanguages() {
-    return corporateBodyService.getLanguages();
+    return service.getLanguages();
   }
 
   @ApiMethod(description = "Save a newly created corporate body")
@@ -154,7 +152,7 @@ public class CorporateBodyController {
   @ApiResponseObject
   public CorporateBody save(@RequestBody CorporateBody corporateBody, BindingResult errors)
       throws IdentifiableServiceException {
-    return corporateBodyService.save(corporateBody);
+    return service.save(corporateBody);
   }
 
   @ApiMethod(description = "Update a corporate body")
@@ -172,6 +170,6 @@ public class CorporateBodyController {
       BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, corporateBody.getUuid());
-    return corporateBodyService.update(corporateBody);
+    return service.update(corporateBody);
   }
 }

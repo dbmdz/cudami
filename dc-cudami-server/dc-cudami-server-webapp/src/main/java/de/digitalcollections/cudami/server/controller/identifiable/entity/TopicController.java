@@ -23,7 +23,6 @@ import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiPathParam;
 import org.jsondoc.core.annotation.ApiQueryParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,9 +40,13 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The topic controller", name = "Topic controller")
 public class TopicController {
 
-  @Autowired private LocaleService localeService;
+  private final TopicService service;
+  private final LocaleService localeService;
 
-  @Autowired private TopicService service;
+  public TopicController(TopicService service, LocaleService localeService) {
+    this.service = service;
+    this.localeService = localeService;
+  }
 
   @ApiMethod(description = "Add an existing topic to an existing parent topic")
   @PostMapping(

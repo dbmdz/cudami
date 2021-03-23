@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.r
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceBinaryRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceBinaryService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.model.exception.ResourceIOException;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.file.MimeType;
@@ -20,12 +21,12 @@ public class FileResourceBinaryServiceImpl implements FileResourceBinaryService 
   private static final Logger LOGGER = LoggerFactory.getLogger(FileResourceBinaryServiceImpl.class);
 
   private final FileResourceBinaryRepository binaryRepository;
-  private final FileResourceMetadataServiceImpl metadataService;
+  private final FileResourceMetadataService<FileResource> metadataService;
 
   public FileResourceBinaryServiceImpl(
       FileResourceBinaryRepository binaryRepository,
-      @Qualifier("fileResourceMetadataServiceImpl")
-          FileResourceMetadataServiceImpl metadataService) {
+      @Qualifier("fileResourceMetadataService")
+          FileResourceMetadataService<FileResource> metadataService) {
     this.binaryRepository = binaryRepository;
     this.metadataService = metadataService;
   }

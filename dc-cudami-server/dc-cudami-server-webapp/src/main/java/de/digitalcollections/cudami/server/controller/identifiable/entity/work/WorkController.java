@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 
-import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
@@ -20,7 +19,6 @@ import org.jsondoc.core.annotation.ApiQueryParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -39,9 +37,11 @@ public class WorkController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WorkController.class);
 
-  @Autowired WorkService service;
+  private final WorkService service;
 
-  @Autowired LocaleService localeService;
+  public WorkController(WorkService service) {
+    this.service = service;
+  }
 
   @ApiMethod(description = "count all works")
   @GetMapping(

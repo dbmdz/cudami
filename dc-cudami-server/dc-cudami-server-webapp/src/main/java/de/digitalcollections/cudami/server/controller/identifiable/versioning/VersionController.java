@@ -6,7 +6,6 @@ import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The version controller", name = "Version controller")
 public class VersionController {
 
-  @Autowired VersionService versionService;
+  private final VersionService service;
+
+  public VersionController(VersionService service) {
+    this.service = service;
+  }
 
   @ApiMethod(description = "Get version by uuid")
   @GetMapping(
@@ -27,7 +30,7 @@ public class VersionController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Version findById(@PathVariable UUID uuid) {
-    return versionService.get(uuid);
+    return service.get(uuid);
   }
 
   @ApiMethod(description = "Update the version status")
@@ -37,6 +40,6 @@ public class VersionController {
   @ApiResponseObject
   public Version update(@PathVariable UUID uuid, @RequestBody Version version, BindingResult errors)
       throws Exception {
-    return versionService.update(version);
+    return service.update(version);
   }
 }
