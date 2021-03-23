@@ -30,8 +30,8 @@ public class V2WebpageController {
 
   private final WebpageService webpageService;
 
-  public V2WebpageController(WebpageService webpageService1) {
-    this.webpageService = webpageService1;
+  public V2WebpageController(WebpageService webpageService) {
+    this.webpageService = webpageService;
   }
 
   private JSONObject convertLocalizedStructuredContentJson(JSONObject json) {

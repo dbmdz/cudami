@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.commons.springmvc.thymeleaf.SpacesDialect;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import java.time.format.DateTimeFormatter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -19,12 +18,6 @@ import org.thymeleaf.dialect.AbstractProcessorDialect;
 
 @Configuration
 public class SpringConfigWeb implements WebMvcConfigurer {
-
-  @Value("${server.port:80}")
-  Integer port;
-
-  @Value("${info.app.project.version:unknown}")
-  String projectVersion;
 
   @Bean
   @Primary
