@@ -37,10 +37,10 @@ public class HumanSettlementController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HumanSettlementController.class);
 
-  private final HumanSettlementService service;
+  private final HumanSettlementService humanSettlementService;
 
-  public HumanSettlementController(HumanSettlementService service) {
-    this.service = service;
+  public HumanSettlementController(HumanSettlementService humanSettlementService) {
+    this.humanSettlementService = humanSettlementService;
   }
 
   @ApiMethod(description = "get all human settlements")
@@ -61,9 +61,9 @@ public class HumanSettlementController {
       pageRequest.setSorting(sorting);
     }
     if (initial == null) {
-      return service.find(pageRequest);
+      return humanSettlementService.find(pageRequest);
     }
-    return service.findByLanguageAndInitial(pageRequest, language, initial);
+    return humanSettlementService.findByLanguageAndInitial(pageRequest, language, initial);
   }
 
   @ApiMethod(
@@ -92,9 +92,9 @@ public class HumanSettlementController {
 
     HumanSettlement result;
     if (pLocale == null) {
-      result = service.get(uuid);
+      result = humanSettlementService.get(uuid);
     } else {
-      result = service.get(uuid, pLocale);
+      result = humanSettlementService.get(uuid, pLocale);
     }
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
@@ -110,7 +110,7 @@ public class HumanSettlementController {
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)
       throws IdentifiableServiceException {
-    HumanSettlement result = service.getByIdentifier(namespace, id);
+    HumanSettlement result = humanSettlementService.getByIdentifier(namespace, id);
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
@@ -121,7 +121,7 @@ public class HumanSettlementController {
   @ApiResponseObject
   public HumanSettlement save(@RequestBody HumanSettlement humanSettlement, BindingResult errors)
       throws IdentifiableServiceException {
-    return service.save(humanSettlement);
+    return humanSettlementService.save(humanSettlement);
   }
 
   @ApiMethod(description = "update a human settlement")
@@ -135,6 +135,6 @@ public class HumanSettlementController {
       BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, humanSettlement.getUuid());
-    return service.update(humanSettlement);
+    return humanSettlementService.update(humanSettlement);
   }
 }

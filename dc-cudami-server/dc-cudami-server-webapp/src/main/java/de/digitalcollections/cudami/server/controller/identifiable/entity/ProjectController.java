@@ -35,10 +35,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The project controller", name = "Project controller")
 public class ProjectController {
 
-  private final ProjectService service;
+  private final ProjectService projectService;
 
   public ProjectController(ProjectService projectService) {
-    this.service = projectService;
+    this.projectService = projectService;
   }
 
   @ApiMethod(description = "Add an existing digital object to an existing project")
@@ -59,7 +59,7 @@ public class ProjectController {
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(digitalObjectUuid);
 
-    boolean successful = service.addDigitalObject(project, digitalObject);
+    boolean successful = projectService.addDigitalObject(project, digitalObject);
 
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -79,7 +79,7 @@ public class ProjectController {
     Project project = new Project();
     project.setUuid(projectUuid);
 
-    boolean successful = service.addDigitalObjects(project, digitalObjects);
+    boolean successful = projectService.addDigitalObjects(project, digitalObjects);
 
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -96,7 +96,7 @@ public class ProjectController {
   public ResponseEntity deleteProject(
       @ApiPathParam(description = "UUID of the project") @PathVariable("uuid") UUID uuid) {
 
-    service.delete(uuid);
+    projectService.delete(uuid);
 
     return new ResponseEntity<>(HttpStatus.OK);
   }
@@ -116,7 +116,7 @@ public class ProjectController {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
     }
-    return service.find(searchPageRequest);
+    return projectService.find(searchPageRequest);
   }
 
   @ApiMethod(description = "Get all projects as list")
@@ -126,7 +126,7 @@ public class ProjectController {
   @ApiResponseObject
   public List<Project> findAllReducedAsList() {
     // TODO test if reduced is sufficient for use cases...
-    return service.findAllReduced();
+    return projectService.findAllReduced();
   }
 
   @ApiMethod(description = "Get project by namespace and id")
@@ -139,7 +139,7 @@ public class ProjectController {
   @ApiResponseObject
   public Project findByIdentifier(@PathVariable String namespace, @PathVariable String id)
       throws IdentifiableServiceException {
-    return service.getByIdentifier(namespace, id);
+    return projectService.getByIdentifier(namespace, id);
   }
 
   // Test-URL: http://localhost:9000/latest/projects/599a120c-2dd5-11e8-b467-0ed5f89f718b
@@ -166,9 +166,9 @@ public class ProjectController {
 
     Project project;
     if (pLocale == null) {
-      project = service.get(uuid);
+      project = projectService.get(uuid);
     } else {
-      project = service.get(uuid, pLocale);
+      project = projectService.get(uuid, pLocale);
     }
     return new ResponseEntity<>(project, HttpStatus.OK);
   }
@@ -186,7 +186,7 @@ public class ProjectController {
 
     Project project = new Project();
     project.setUuid(projectUuid);
-    return service.getDigitalObjects(project, pageRequest);
+    return projectService.getDigitalObjects(project, pageRequest);
   }
 
   @ApiMethod(description = "Remove an existing digital object from an existing project")
@@ -207,7 +207,7 @@ public class ProjectController {
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(digitalObjectUuid);
 
-    boolean successful = service.removeDigitalObject(project, digitalObject);
+    boolean successful = projectService.removeDigitalObject(project, digitalObject);
 
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -222,7 +222,7 @@ public class ProjectController {
   @ApiResponseObject
   public Project save(@RequestBody Project project, BindingResult errors)
       throws IdentifiableServiceException {
-    return service.save(project);
+    return projectService.save(project);
   }
 
   @ApiMethod(description = "Save existing digital objects into an existing project")
@@ -237,7 +237,7 @@ public class ProjectController {
     Project project = new Project();
     project.setUuid(projectUuid);
 
-    boolean successful = service.saveDigitalObjects(project, digitalObjects);
+    boolean successful = projectService.saveDigitalObjects(project, digitalObjects);
 
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -253,7 +253,7 @@ public class ProjectController {
   public Project update(@PathVariable UUID uuid, @RequestBody Project project, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, project.getUuid());
-    return service.update(project);
+    return projectService.update(project);
   }
 
   @ApiMethod(description = "Get languages of all projects")
@@ -262,6 +262,6 @@ public class ProjectController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<Locale> getLanguages() {
-    return service.getLanguages();
+    return projectService.getLanguages();
   }
 }

@@ -37,10 +37,10 @@ public class GivenNameController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GivenNameController.class);
 
-  private final GivenNameService service;
+  private final GivenNameService givenNameService;
 
-  public GivenNameController(GivenNameService service) {
-    this.service = service;
+  public GivenNameController(GivenNameService givenNameService) {
+    this.givenNameService = givenNameService;
   }
 
   @ApiMethod(description = "get all given names")
@@ -61,9 +61,9 @@ public class GivenNameController {
       pageRequest.setSorting(sorting);
     }
     if (initial == null) {
-      return service.find(pageRequest);
+      return givenNameService.find(pageRequest);
     }
-    return service.findByLanguageAndInitial(pageRequest, language, initial);
+    return givenNameService.findByLanguageAndInitial(pageRequest, language, initial);
   }
 
   @ApiMethod(
@@ -89,9 +89,9 @@ public class GivenNameController {
 
     GivenName result;
     if (pLocale == null) {
-      result = service.get(uuid);
+      result = givenNameService.get(uuid);
     } else {
-      result = service.get(uuid, pLocale);
+      result = givenNameService.get(uuid, pLocale);
     }
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
@@ -107,7 +107,7 @@ public class GivenNameController {
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)
       throws IdentifiableServiceException {
-    GivenName result = service.getByIdentifier(namespace, id);
+    GivenName result = givenNameService.getByIdentifier(namespace, id);
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
@@ -118,7 +118,7 @@ public class GivenNameController {
   @ApiResponseObject
   public GivenName save(@RequestBody GivenName givenName, BindingResult errors)
       throws IdentifiableServiceException {
-    return service.save(givenName);
+    return givenNameService.save(givenName);
   }
 
   @ApiMethod(description = "update a givenname")
@@ -130,6 +130,6 @@ public class GivenNameController {
       @PathVariable("uuid") UUID uuid, @RequestBody GivenName givenName, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, givenName.getUuid());
-    return service.update(givenName);
+    return givenNameService.update(givenName);
   }
 }

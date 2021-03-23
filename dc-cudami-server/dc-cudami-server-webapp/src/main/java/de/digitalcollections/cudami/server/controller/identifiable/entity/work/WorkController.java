@@ -37,10 +37,10 @@ public class WorkController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WorkController.class);
 
-  private final WorkService service;
+  private final WorkService workService;
 
-  public WorkController(WorkService service) {
-    this.service = service;
+  public WorkController(WorkService workService) {
+    this.workService = workService;
   }
 
   @ApiMethod(description = "count all works")
@@ -49,7 +49,7 @@ public class WorkController {
       produces = "application/json")
   @ApiResponseObject
   public long count() {
-    return service.count();
+    return workService.count();
   }
 
   @ApiMethod(description = "get all works")
@@ -69,9 +69,9 @@ public class WorkController {
       pageRequest.setSorting(sorting);
     }
     if (initial == null) {
-      return service.find(pageRequest);
+      return workService.find(pageRequest);
     }
-    return service.findByLanguageAndInitial(pageRequest, language, initial);
+    return workService.findByLanguageAndInitial(pageRequest, language, initial);
   }
 
   @ApiMethod(
@@ -99,9 +99,9 @@ public class WorkController {
 
     Work result;
     if (pLocale == null) {
-      result = service.get(uuid);
+      result = workService.get(uuid);
     } else {
-      result = service.get(uuid, pLocale);
+      result = workService.get(uuid, pLocale);
     }
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
@@ -117,7 +117,7 @@ public class WorkController {
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)
       throws IdentifiableServiceException {
-    Work result = service.getByIdentifier(namespace, id);
+    Work result = workService.getByIdentifier(namespace, id);
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
@@ -128,7 +128,7 @@ public class WorkController {
   @ApiResponseObject
   public Work save(@RequestBody Work work, BindingResult errors)
       throws IdentifiableServiceException {
-    return service.save(work);
+    return workService.save(work);
   }
 
   @ApiMethod(description = "update a work")
@@ -142,7 +142,7 @@ public class WorkController {
       throw new IllegalArgumentException("UUID mismatch of new and existing work");
     }
 
-    return service.update(work);
+    return workService.update(work);
   }
 
   @ApiMethod(description = "Get creators of a work")
@@ -151,7 +151,7 @@ public class WorkController {
       produces = "application/json")
   @ApiResponseObject
   public List<Agent> getCreators(@PathVariable UUID uuid) {
-    return service.getCreators(uuid);
+    return workService.getCreators(uuid);
   }
 
   @ApiMethod(description = "Get items of a work")
@@ -160,6 +160,6 @@ public class WorkController {
       produces = "application/json")
   @ApiResponseObject
   public List<Item> getItems(@PathVariable UUID uuid) {
-    return service.getItems(uuid);
+    return workService.getItems(uuid);
   }
 }

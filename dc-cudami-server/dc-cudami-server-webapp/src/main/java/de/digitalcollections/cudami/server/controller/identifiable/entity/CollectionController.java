@@ -45,11 +45,11 @@ public class CollectionController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionController.class);
 
-  private final CollectionService service;
+  private final CollectionService collectionService;
   private final LocaleService localeService;
 
-  public CollectionController(CollectionService service, LocaleService localeService) {
-    this.service = service;
+  public CollectionController(CollectionService collectionService, LocaleService localeService) {
+    this.collectionService = collectionService;
     this.localeService = localeService;
   }
 
@@ -72,7 +72,7 @@ public class CollectionController {
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(digitalObjectUuid);
 
-    boolean successful = service.addDigitalObject(collection, digitalObject);
+    boolean successful = collectionService.addDigitalObject(collection, digitalObject);
 
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -96,7 +96,7 @@ public class CollectionController {
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);
 
-    boolean successful = service.addDigitalObjects(collection, digitalObjects);
+    boolean successful = collectionService.addDigitalObjects(collection, digitalObjects);
 
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -122,7 +122,7 @@ public class CollectionController {
     Collection subcollection = new Collection();
     subcollection.setUuid(subcollectionUuid);
 
-    boolean successful = service.addChild(collection, subcollection);
+    boolean successful = collectionService.addChild(collection, subcollection);
 
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -145,7 +145,7 @@ public class CollectionController {
     Collection collection = new Collection();
     collection.setUuid(uuid);
 
-    boolean successful = service.addChildren(collection, subcollections);
+    boolean successful = collectionService.addChildren(collection, subcollections);
 
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -159,7 +159,7 @@ public class CollectionController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public long count() {
-    return service.count();
+    return collectionService.count();
   }
 
   @ApiMethod(description = "Get all collections")
@@ -178,9 +178,9 @@ public class CollectionController {
       pageRequest.setSorting(sorting);
     }
     if (active != null) {
-      return service.findActive(pageRequest);
+      return collectionService.findActive(pageRequest);
     }
-    return service.find(pageRequest);
+    return collectionService.find(pageRequest);
   }
 
   @ApiMethod(description = "Get all top collections")
@@ -198,7 +198,7 @@ public class CollectionController {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
     }
-    return service.findRootNodes(searchPageRequest);
+    return collectionService.findRootNodes(searchPageRequest);
   }
 
   @ApiMethod(description = "Get collection by namespace and id")
@@ -211,7 +211,7 @@ public class CollectionController {
   @ApiResponseObject
   public Collection findByIdentifier(@PathVariable String namespace, @PathVariable String id)
       throws IdentifiableServiceException {
-    return service.getByIdentifier(namespace, id);
+    return collectionService.getByIdentifier(namespace, id);
   }
 
   @ApiMethod(description = "Get collection by refId")
@@ -221,7 +221,7 @@ public class CollectionController {
       @ApiPathParam(description = "refId of the collection, e.g. <tt>42</tt>") @PathVariable
           long refId)
       throws IdentifiableServiceException {
-    Collection collection = service.getByRefId(refId);
+    Collection collection = collectionService.getByRefId(refId);
     return findByUuid(collection.getUuid(), null, null);
   }
 
@@ -257,15 +257,15 @@ public class CollectionController {
     Collection collection;
     if (active != null) {
       if (pLocale == null) {
-        collection = service.getActive(uuid);
+        collection = collectionService.getActive(uuid);
       } else {
-        collection = service.getActive(uuid, pLocale);
+        collection = collectionService.getActive(uuid, pLocale);
       }
     } else {
       if (pLocale == null) {
-        collection = service.get(uuid);
+        collection = collectionService.get(uuid);
       } else {
-        collection = service.get(uuid, pLocale);
+        collection = collectionService.get(uuid, pLocale);
       }
     }
     return new ResponseEntity<>(collection, HttpStatus.OK);
@@ -290,9 +290,9 @@ public class CollectionController {
       pageRequest.setSorting(sorting);
     }
     if (active != null) {
-      return service.findActive(pageRequest);
+      return collectionService.findActive(pageRequest);
     }
-    return service.find(pageRequest);
+    return collectionService.find(pageRequest);
   }
 
   @ApiMethod(description = "Get the breadcrumb for a collection")
@@ -316,10 +316,11 @@ public class CollectionController {
     BreadcrumbNavigation breadcrumbNavigation;
 
     if (pLocale == null) {
-      breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
+      breadcrumbNavigation = collectionService.getBreadcrumbNavigation(uuid);
     } else {
       breadcrumbNavigation =
-          service.getBreadcrumbNavigation(uuid, pLocale, localeService.getDefaultLocale());
+          collectionService.getBreadcrumbNavigation(
+              uuid, pLocale, localeService.getDefaultLocale());
     }
 
     if (breadcrumbNavigation == null || breadcrumbNavigation.getNavigationItems().isEmpty()) {
@@ -348,7 +349,7 @@ public class CollectionController {
 
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);
-    return service.getDigitalObjects(collection, searchPageRequest);
+    return collectionService.getDigitalObjects(collection, searchPageRequest);
   }
 
   @ApiMethod(description = "Get the first created parent of a collection")
@@ -357,7 +358,7 @@ public class CollectionController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Collection getParent(@PathVariable UUID uuid) {
-    return service.getParent(uuid);
+    return collectionService.getParent(uuid);
   }
 
   @ApiMethod(description = "Get parent collections")
@@ -368,7 +369,7 @@ public class CollectionController {
   public List<Collection> getParents(
       @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid) {
-    return service.getParents(collectionUuid);
+    return collectionService.getParents(collectionUuid);
   }
 
   @ApiMethod(
@@ -384,7 +385,7 @@ public class CollectionController {
       @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid") UUID uuid,
       @RequestParam(name = "predicate", required = true) FilterCriterion<String> predicate) {
     Filtering filtering = Filtering.defaultBuilder().add("predicate", predicate).build();
-    return service.getRelatedCorporateBodies(uuid, filtering);
+    return collectionService.getRelatedCorporateBodies(uuid, filtering);
   }
 
   @ApiMethod(description = "Get (active or all) paged subcollections of a collection")
@@ -403,9 +404,9 @@ public class CollectionController {
       @RequestParam(name = "active", required = false) String active) {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (active != null) {
-      return service.getActiveChildren(collectionUuid, pageRequest);
+      return collectionService.getActiveChildren(collectionUuid, pageRequest);
     }
-    return service.getChildren(collectionUuid, pageRequest);
+    return collectionService.getChildren(collectionUuid, pageRequest);
   }
 
   @ApiMethod(description = "Get languages of all top collections")
@@ -414,7 +415,7 @@ public class CollectionController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<Locale> getTopCollectionsLanguages() {
-    return service.getRootNodesLanguages();
+    return collectionService.getRootNodesLanguages();
   }
 
   @ApiMethod(description = "Remove an existing digital object from an existing collection")
@@ -436,7 +437,7 @@ public class CollectionController {
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(digitalObjectUuid);
 
-    boolean successful = service.removeDigitalObject(collection, digitalObject);
+    boolean successful = collectionService.removeDigitalObject(collection, digitalObject);
 
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -462,7 +463,7 @@ public class CollectionController {
     Collection subcollection = new Collection();
     subcollection.setUuid(subcollectionUuid);
 
-    boolean successful = service.removeChild(collection, subcollection);
+    boolean successful = collectionService.removeChild(collection, subcollection);
 
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -477,7 +478,7 @@ public class CollectionController {
   @ApiResponseObject
   public Collection save(@RequestBody Collection collection, BindingResult errors)
       throws IdentifiableServiceException {
-    return service.save(collection);
+    return collectionService.save(collection);
   }
 
   @ApiMethod(description = "Save existing digital objects into an existing collection")
@@ -496,7 +497,7 @@ public class CollectionController {
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);
 
-    boolean successful = service.saveDigitalObjects(collection, digitalObjects);
+    boolean successful = collectionService.saveDigitalObjects(collection, digitalObjects);
 
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -518,7 +519,7 @@ public class CollectionController {
           UUID parentUuid,
       @RequestBody Collection collection)
       throws IdentifiableServiceException {
-    return service.saveWithParent(collection, parentUuid);
+    return collectionService.saveWithParent(collection, parentUuid);
   }
 
   @ApiMethod(description = "Update an collection")
@@ -530,6 +531,6 @@ public class CollectionController {
       @PathVariable UUID uuid, @RequestBody Collection collection, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, collection.getUuid());
-    return service.update(collection);
+    return collectionService.update(collection);
   }
 }

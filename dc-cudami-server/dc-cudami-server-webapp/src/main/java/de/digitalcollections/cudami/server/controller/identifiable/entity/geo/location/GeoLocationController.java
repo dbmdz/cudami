@@ -37,10 +37,10 @@ public class GeoLocationController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationController.class);
 
-  private final GeoLocationService service;
+  private final GeoLocationService geoLocationService;
 
-  public GeoLocationController(GeoLocationService service) {
-    this.service = service;
+  public GeoLocationController(GeoLocationService geoLocationservice) {
+    this.geoLocationService = geoLocationservice;
   }
 
   @ApiMethod(description = "count all geolocations")
@@ -49,7 +49,7 @@ public class GeoLocationController {
       produces = "application/json")
   @ApiResponseObject
   public long count() {
-    return service.count();
+    return geoLocationService.count();
   }
 
   @ApiMethod(description = "get all geo locations")
@@ -71,9 +71,9 @@ public class GeoLocationController {
       searchPageRequest.setSorting(sorting);
     }
     if (language == null && initial == null) {
-      return service.find(searchPageRequest);
+      return geoLocationService.find(searchPageRequest);
     }
-    return service.findByLanguageAndInitial(searchPageRequest, language, initial);
+    return geoLocationService.findByLanguageAndInitial(searchPageRequest, language, initial);
   }
 
   @ApiMethod(
@@ -99,9 +99,9 @@ public class GeoLocationController {
 
     GeoLocation result;
     if (pLocale == null) {
-      result = service.get(uuid);
+      result = geoLocationService.get(uuid);
     } else {
-      result = service.get(uuid, pLocale);
+      result = geoLocationService.get(uuid, pLocale);
     }
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
@@ -117,7 +117,7 @@ public class GeoLocationController {
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)
       throws IdentifiableServiceException {
-    GeoLocation result = service.getByIdentifier(namespace, id);
+    GeoLocation result = geoLocationService.getByIdentifier(namespace, id);
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
@@ -127,7 +127,7 @@ public class GeoLocationController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<Locale> getLanguages() {
-    return service.getLanguages();
+    return geoLocationService.getLanguages();
   }
 
   @ApiMethod(description = "save a newly created geolocation")
@@ -137,7 +137,7 @@ public class GeoLocationController {
   @ApiResponseObject
   public GeoLocation save(@RequestBody GeoLocation geoLocation, BindingResult errors)
       throws IdentifiableServiceException {
-    return service.save(geoLocation);
+    return geoLocationService.save(geoLocation);
   }
 
   @ApiMethod(description = "update a geolocation")
@@ -149,6 +149,6 @@ public class GeoLocationController {
       @PathVariable("uuid") UUID uuid, @RequestBody GeoLocation geoLocation, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, geoLocation.getUuid());
-    return service.update(geoLocation);
+    return geoLocationService.update(geoLocation);
   }
 }

@@ -27,10 +27,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(description = "The user controller", name = "User controller")
 public class UserController {
 
-  private final UserService service;
+  private final UserService userService;
 
-  public UserController(UserService service) {
-    this.service = service;
+  public UserController(UserService userService) {
+    this.userService = userService;
   }
 
   @ApiMethod(description = "Get all users with given role and enabled status")
@@ -41,7 +41,7 @@ public class UserController {
   @ApiResponseObject
   public List<User> getByRoleAndStatus(
       @RequestParam(name = "role") Role role, @RequestParam(name = "enabled") boolean enabled) {
-    return service.findActiveAdminUsers();
+    return userService.findActiveAdminUsers();
   }
 
   @ApiMethod(description = "Get all users")
@@ -58,7 +58,7 @@ public class UserController {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.find(pageRequest);
+    return userService.find(pageRequest);
   }
 
   @ApiMethod(description = "Get user by uuid")
@@ -67,7 +67,7 @@ public class UserController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public User findById(@PathVariable UUID uuid) {
-    return service.get(uuid);
+    return userService.get(uuid);
   }
 
   @ApiMethod(description = "Get user by email address")
@@ -77,7 +77,7 @@ public class UserController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public User findByName(@RequestParam(name = "email") String email) {
-    return service.loadUserByUsername(email);
+    return userService.loadUserByUsername(email);
   }
 
   @ApiMethod(description = "Save a newly created user")
@@ -86,7 +86,7 @@ public class UserController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public User save(@RequestBody User user, BindingResult errors) {
-    return service.save(user, errors);
+    return userService.save(user, errors);
   }
 
   @ApiMethod(description = "Update a user")
@@ -96,6 +96,6 @@ public class UserController {
   @ApiResponseObject
   public User update(@PathVariable UUID uuid, @RequestBody User user, BindingResult errors) {
     assert Objects.equals(uuid, user.getUuid());
-    return service.update(user, errors);
+    return userService.update(user, errors);
   }
 }

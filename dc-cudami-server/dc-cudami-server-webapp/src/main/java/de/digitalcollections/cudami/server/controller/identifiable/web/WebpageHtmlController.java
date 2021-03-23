@@ -9,7 +9,6 @@ import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiPathParam;
 import org.jsondoc.core.annotation.ApiQueryParam;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,7 +20,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Api(description = "The webpage HTML controller", name = "Webpage HTML controller")
 public class WebpageHtmlController {
 
-  @Autowired private WebpageService webpageService;
+  private final WebpageService webpageService;
+
+  public WebpageHtmlController(WebpageService webpageService) {
+    this.webpageService = webpageService;
+  }
 
   @ApiMethod(description = "Get a webpage as HTML")
   @GetMapping(
