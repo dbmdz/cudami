@@ -10,6 +10,7 @@ import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -57,6 +58,10 @@ public class CudamiFileResourcesMetadataClient extends CudamiBaseClient<FileReso
   public FileResource findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
         String.format("/latest/fileresources/identifier/%s:%s.json", namespace, id));
+  }
+
+  public List<Locale> getLanguages() throws HttpException {
+    return doGetRequestForObjectList("/latest/fileresources/languages", Locale.class);
   }
 
   public FileResource save(FileResource fileResource) throws HttpException {
