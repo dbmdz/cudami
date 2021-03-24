@@ -79,7 +79,7 @@ const WebpageForm = ({
           <Col sm="3">
             <DateInput
               id="publication-start-date"
-              label={t('publicationStatus.startDate')}
+              label={t('publicationStatus:startDate')}
               onChange={(date) => onUpdate({publicationStart: date})}
               value={publicationStart}
             />
@@ -87,7 +87,7 @@ const WebpageForm = ({
           <Col sm="3">
             <DateInput
               id="publication-end-date"
-              label={t('publicationStatus.endDate')}
+              label={t('publicationStatus:endDate')}
               onChange={(date) => onUpdate({publicationEnd: date})}
               value={publicationEnd}
             />

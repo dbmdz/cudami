@@ -38,8 +38,8 @@ const CollectionList = ({
             <FaImage />
           </th>
           <th className="text-center">{t('label')}</th>
-          <th className="text-center">{t('publicationStatus.startDate')}</th>
-          <th className="text-center">{t('publicationStatus.endDate')}</th>
+          <th className="text-center">{t('publicationStatus:startDate')}</th>
+          <th className="text-center">{t('publicationStatus:endDate')}</th>
           <th className="text-center">{t('lastModified')}</th>
           <th className="text-center">{t('actions')}</th>
         </tr>

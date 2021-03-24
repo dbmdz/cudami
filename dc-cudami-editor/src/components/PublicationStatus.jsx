@@ -26,7 +26,7 @@ const PublicationStatus = ({publicationEnd, publicationStart}) => {
   return (
     <FaCircle
       className={`text-${color}`}
-      title={t(`publicationStatus.${publicationStatus}`)}
+      title={t(`publicationStatus:${publicationStatus}`)}
     />
   )
 }
