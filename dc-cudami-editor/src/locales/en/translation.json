@@ -91,7 +91,8 @@
     "editWebpage": "Edit webpage",
     "editWebsite": "Edit website {{ url }}",
     "enterMetadata": "Enter metadata",
-    "file": "File",
+    "filename": "Filename",
+    "filesize": "Filesize",
     "forExample": "e.g.",
     "height": "Height",
     "history": {
@@ -134,6 +135,7 @@
       "superscript": "Superscript",
       "underline": "Underline"
     },
+    "mimeType": "Mimetype",
     "move": "Move",
     "moveSubcollections": "Move sub collection",
     "moveTo": {
@@ -185,6 +187,8 @@
       "corporateBodys_plural": "found {{ count }} corporate bodies",
       "digitalObjects": "found {{ count }} digital object",
       "digitalObjects_plural": "found {{ count }} digital objects",
+      "fileResources": "found {{ count }} file",
+      "fileResources_plural": "found {{ count }} files",
       "geoLocations": "found {{ count }} geolocation",
       "geoLocations_plural": "found {{ count }} geolocations",
       "identifierTypes": "found {{ count }} identifier type",
@@ -220,6 +224,8 @@
     "corporateBody_plural": "Corporate bodies",
     "digitalObject": "Digital object",
     "digitalObject_plural": "Digital objects",
+    "fileResource": "File",
+    "fileResource_plural": "Files",
     "geoLocation": "Geolocation",
     "geoLocation_plural": "Geolocations",
     "identifierType": "Identifier type",
