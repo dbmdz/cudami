@@ -393,9 +393,9 @@ class PagedIdentifiableList extends Component {
         <Row>
           <Col>
             {parentType ? (
-              <h2>{t(`${type}s`, {context: parentType})}</h2>
+              <h2>{t(`types:${type}`, {context: parentType, count: 0})}</h2>
             ) : (
-              <h1>{t(`${type}s`)}</h1>
+              <h1>{t(`types:${type}`, {count: 0})}</h1>
             )}
           </Col>
           <Col className="text-right">
