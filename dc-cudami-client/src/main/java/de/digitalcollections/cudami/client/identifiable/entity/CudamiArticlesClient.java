@@ -7,6 +7,8 @@ import de.digitalcollections.model.identifiable.entity.Article;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
@@ -28,6 +30,10 @@ public class CudamiArticlesClient extends CudamiBaseClient<Article> {
 
   public PageResponse<Article> find(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/articles", pageRequest);
+  }
+
+  public SearchPageResponse<Article> find(SearchPageRequest pageRequest) throws HttpException {
+    return this.doGetSearchRequestForPagedObjectList("/latest/articles", pageRequest);
   }
 
   public Article findOne(UUID uuid) throws HttpException {
