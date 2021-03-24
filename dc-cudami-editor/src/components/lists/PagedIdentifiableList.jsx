@@ -392,10 +392,11 @@ class PagedIdentifiableList extends Component {
       >
         <Row>
           <Col>
+            {/* We want to force the usage of the plural form here */}
             {parentType ? (
-              <h2>{t(`types:${type}`, {context: parentType, count: 0})}</h2>
+              <h2>{t(`types:${type}_plural`, {context: parentType})}</h2>
             ) : (
-              <h1>{t(`types:${type}`, {count: 0})}</h1>
+              <h1>{t(`types:${type}_plural`)}</h1>
             )}
           </Col>
           <Col className="text-right">
