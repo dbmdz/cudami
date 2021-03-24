@@ -9,8 +9,8 @@ import de.digitalcollections.cudami.client.identifiable.entity.CudamiTopicsClien
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.List;
@@ -97,9 +97,10 @@ public class TopicsController extends AbstractController {
   @ResponseBody
   public PageResponse<Topic> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws HttpException {
-    final PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+    final SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     return this.service.find(pageRequest);
   }
 
