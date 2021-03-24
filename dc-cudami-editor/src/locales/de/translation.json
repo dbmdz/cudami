@@ -135,7 +135,7 @@
       "superscript": "Hochgestellt",
       "underline": "Unterstrichen"
     },
-    "mimeType": "Mimetype",
+    "mimeType": "MIME-Type",
     "move": "Verschieben",
     "moveSubcollections": "Untergeordnete Sammlung verschieben",
     "moveTo": {
