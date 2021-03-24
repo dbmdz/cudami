@@ -26,17 +26,17 @@ const DateInput = ({id, label, onChange, value}) => {
         {label}
       </Label>
       <DatePicker
-        calendarAriaLabel={t('datePicker.toggleCalendar')}
-        clearAriaLabel={t('datePicker.clearDate')}
-        dayAriaLabel={t('datePicker.day')}
+        calendarAriaLabel={t('datePicker:toggleCalendar')}
+        clearAriaLabel={t('datePicker:clearDate')}
+        dayAriaLabel={t('datePicker:day')}
         id={id}
         locale={uiLocale}
-        monthAriaLabel={t('datePicker.month')}
-        nativeInputAriaLabel={t('datePicker.date')}
+        monthAriaLabel={t('datePicker:month')}
+        nativeInputAriaLabel={t('datePicker:date')}
         onChange={(date) => onChange(formatDate(date))}
         required={false}
         value={value && new Date(value)}
-        yearAriaLabel={t('datePicker.year')}
+        yearAriaLabel={t('datePicker:year')}
       />
     </FormGroup>
   )

@@ -1,4 +1,12 @@
 {
+  "datePicker": {
+    "clearDate": "Clear date",
+    "date": "Date",
+    "day": "Day",
+    "month": "Month",
+    "toggleCalendar": "Toggle calendar",
+    "year": "Year"
+  },
   "feedback": {
     "collectionNotFound": "Collection was not found.",
     "digitalObjectAddedSuccessfully": "The selected digital object has been added successfully.",
@@ -16,6 +24,13 @@
     "subcollectionRemovedSuccessfully": "{{ name }} has been removed successfully.",
     "uploadFailed": "An error occurred while uploading.",
     "uploadSuccessful": "$t({{ mediaType }}, capitalize) uploaded successfully."
+  },
+  "publicationStatus": {
+    "currentlyPublished": "currently published",
+    "endDate": "End of publication",
+    "noLongerPublished": "no longer published",
+    "notYetPublished": "not yet published",
+    "startDate": "Start of publication"
   },
   "translation": {
     "actions": "Actions",
@@ -62,14 +77,6 @@
     "createTopic": "Create a new topic",
     "createWebpage": "Create a new webpage",
     "createWebsite": "Create a new website",
-    "datePicker": {
-      "clearDate": "Clear date",
-      "date": "Date",
-      "day": "Day",
-      "month": "Month",
-      "toggleCalendar": "Toggle calendar",
-      "year": "Year"
-    },
     "defineRenderingHints": "Define rendering hints",
     "description": "Abstract",
     "digitalObject": "Digital object",
@@ -155,13 +162,6 @@
     "persons": "Persons",
     "project": "Project",
     "projects": "Projects",
-    "publicationStatus": {
-      "currentlyPublished": "currently published",
-      "endDate": "End of publication",
-      "noLongerPublished": "no longer published",
-      "notYetPublished": "not yet published",
-      "startDate": "Start of publication"
-    },
     "removeFrom": {
       "collection": "remove from collection"
     },
