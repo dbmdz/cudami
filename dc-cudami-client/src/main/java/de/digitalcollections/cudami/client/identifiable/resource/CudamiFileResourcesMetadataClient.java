@@ -38,7 +38,7 @@ public class CudamiFileResourcesMetadataClient extends CudamiBaseClient<FileReso
 
   public SearchPageResponse<FileResource> find(SearchPageRequest searchPageRequest)
       throws HttpException {
-    return doGetSearchRequestForPagedObjectList("/latest/fileresources/search", searchPageRequest);
+    return doGetSearchRequestForPagedObjectList("/latest/fileresources", searchPageRequest);
   }
 
   public List<FileResource> find(String searchTerm, int maxResults) throws HttpException {
