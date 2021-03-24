@@ -135,7 +135,7 @@
       "superscript": "Superscript",
       "underline": "Underline"
     },
-    "mimeType": "Mimetype",
+    "mimeType": "MIME type",
     "move": "Move",
     "moveSubcollections": "Move sub collection",
     "moveTo": {
