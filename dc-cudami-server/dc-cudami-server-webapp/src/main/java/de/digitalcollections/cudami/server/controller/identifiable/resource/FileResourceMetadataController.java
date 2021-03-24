@@ -165,6 +165,15 @@ public class FileResourceMetadataController {
     return new ResponseEntity<>(fileResource, HttpStatus.OK);
   }
 
+  @ApiMethod(description = "Get languages of all websites")
+  @GetMapping(
+      value = {"/latest/fileresources/languages", "/v2/fileresources/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public List<Locale> getLanguages() {
+    return metadataService.getLanguages();
+  }
+
   @ApiMethod(description = "Save a newly created fileresource")
   @PostMapping(
       value = {"/latest/fileresources", "/v2/fileresources"},
