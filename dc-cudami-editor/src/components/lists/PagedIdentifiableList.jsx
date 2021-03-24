@@ -27,6 +27,7 @@ import ArticleList from './ArticleList'
 import CollectionList from './CollectionList'
 import CorporateBodyList from './CorporateBodyList'
 import DigitalObjectList from './DigitalObjectList'
+import FileResourceList from './FileResourceList'
 import GeoLocationList from './GeoLocationList'
 import PersonList from './PersonList'
 import ProjectList from './ProjectList'
@@ -139,6 +140,7 @@ class PagedIdentifiableList extends Component {
       collection: CollectionList,
       corporateBody: CorporateBodyList,
       digitalObject: DigitalObjectList,
+      fileResource: FileResourceList,
       geoLocation: GeoLocationList,
       person: PersonList,
       project: ProjectList,

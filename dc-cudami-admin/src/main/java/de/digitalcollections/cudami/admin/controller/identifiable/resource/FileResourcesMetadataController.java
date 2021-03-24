@@ -1,9 +1,6 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.resource;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.paging.PageConverter;
-import de.digitalcollections.cudami.admin.paging.PageWrapper;
-import de.digitalcollections.cudami.admin.paging.PageableConverter;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -12,7 +9,6 @@ import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResou
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
@@ -23,10 +19,6 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -98,6 +90,17 @@ public class FileResourcesMetadataController extends AbstractController {
     return "fileresources/edit";
   }
 
+  @GetMapping("/api/fileresources")
+  @ResponseBody
+  public PageResponse<FileResource> findAll(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      throws HttpException {
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    return service.find(searchPageRequest);
+  }
+
   @GetMapping("/api/fileresources/{uuid}")
   @ResponseBody
   public FileResource get(@PathVariable UUID uuid) throws HttpException {
@@ -105,18 +108,11 @@ public class FileResourcesMetadataController extends AbstractController {
   }
 
   @GetMapping("/fileresources")
-  public String list(
-      Model model,
-      @PageableDefault(
-              sort = {"filename"},
-              direction = Sort.Direction.ASC,
-              size = 25)
-          Pageable pageable)
-      throws HttpException {
-    final PageRequest pageRequest = PageableConverter.convert(pageable);
-    final PageResponse pageResponse = service.find(pageRequest);
-    Page page = PageConverter.convert(pageResponse, pageRequest);
-    model.addAttribute("page", new PageWrapper(page, "/fileresources"));
+  public String list(Model model) throws HttpException {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
+    model.addAttribute(
+        "existingLanguages",
+        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages()));
     return "fileresources/list";
   }
 

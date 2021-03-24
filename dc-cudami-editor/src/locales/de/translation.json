@@ -91,7 +91,8 @@
     "editWebpage": "Webseite bearbeiten",
     "editWebsite": "Website {{ url }} bearbeiten",
     "enterMetadata": "Metadaten eingeben",
-    "file": "Datei",
+    "filename": "Dateiname",
+    "filesize": "Dateigröße",
     "forExample": "z.B.",
     "height": "Höhe",
     "history": {
@@ -134,6 +135,7 @@
       "superscript": "Hochgestellt",
       "underline": "Unterstrichen"
     },
+    "mimeType": "Mimetype",
     "move": "Verschieben",
     "moveSubcollections": "Untergeordnete Sammlung verschieben",
     "moveTo": {
@@ -184,6 +186,8 @@
       "corporateBodys_plural": "{{ count }} Institutionen gefunden",
       "digitalObjects": "{{ count }} Digitalisat gefunden",
       "digitalObjects_plural": "{{ count }} Digitalisate gefunden",
+      "fileResources": "{{ count }} Datei gefunden",
+      "fileResources_plural": "{{ count }} Dateien gefunden",
       "geoLocations": "{{ count }} Ort gefunden",
       "geoLocations_plural": "{{ count }} Orte gefunden",
       "identifierTypes": "{{ count }} Identifikatortyp gefunden",
@@ -219,6 +223,8 @@
     "corporateBody_plural": "Institutionen",
     "digitalObject": "Digitalisat (digitales Objekt)",
     "digitalObject_plural": "Digitalisate (digitale Objekte)",
+    "fileResource": "Datei",
+    "fileResource_plural": "Dateien",
     "geoLocation": "Ort",
     "geoLocation_plural": "Orte",
     "identifierType": "Identifikatortyp",
