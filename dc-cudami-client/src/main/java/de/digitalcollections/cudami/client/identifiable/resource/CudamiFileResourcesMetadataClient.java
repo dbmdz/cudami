@@ -30,6 +30,8 @@ public class CudamiFileResourcesMetadataClient extends CudamiBaseClient<FileReso
     return new FileResource();
   }
 
+  @Deprecated(since = "5.0", forRemoval = true)
+  /** @deprecated Please use {@link #find(SearchPageRequest)} instead */
   public PageResponse<FileResource> find(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/fileresources", pageRequest);
   }
