@@ -118,7 +118,11 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
   @Override
   public SearchPageResponse<F> find(SearchPageRequest searchPageRequest) {
     String commonSql = getCommonFileResourceSearchSql(tableName, tableAlias);
-    return find(searchPageRequest, commonSql, Map.of("searchTerm", searchPageRequest.getQuery()));
+    String searchTerm = searchPageRequest.getQuery();
+    if (searchTerm == null) {
+      searchTerm = "";
+    }
+    return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
   }
 
   @Override
