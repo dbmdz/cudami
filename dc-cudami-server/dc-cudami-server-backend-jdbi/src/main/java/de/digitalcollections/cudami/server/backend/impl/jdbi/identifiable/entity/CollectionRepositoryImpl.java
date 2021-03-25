@@ -507,7 +507,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + ".uuid))";
 
     String searchTerm = searchPageRequest.getQuery();
-    if (searchTerm == null) {
+    if (!StringUtils.hasText(searchTerm)) {
       return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
     }
 

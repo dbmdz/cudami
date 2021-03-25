@@ -15,6 +15,7 @@ import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -25,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 @Repository
 public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
@@ -329,20 +331,23 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
             + ".description) dsc(keys) ON "
             + tableAlias
             + ".description IS NOT NULL"
-            + " WHERE (("
+            + " WHERE ("
+            + " NOT EXISTS (SELECT FROM webpage_webpages WHERE child_webpage_uuid = "
+            + tableAlias
+            + ".uuid))";
+
+    String searchTerm = searchPageRequest.getQuery();
+    if (!StringUtils.hasText(searchTerm)) {
+      return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
+    }
+
+    commonSql +=
+        " AND ("
             + tableAlias
             + ".label->>lbl.keys ILIKE '%' || :searchTerm || '%'"
             + " OR "
             + tableAlias
-            + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')"
-            + " AND "
-            + " NOT EXISTS (SELECT FROM webpage_webpages WHERE child_webpage_uuid = "
-            + tableAlias
-            + ".uuid))";
-    String searchTerm = searchPageRequest.getQuery();
-    if (searchTerm == null) {
-      searchTerm = "";
-    }
+            + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')";
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
   }
 

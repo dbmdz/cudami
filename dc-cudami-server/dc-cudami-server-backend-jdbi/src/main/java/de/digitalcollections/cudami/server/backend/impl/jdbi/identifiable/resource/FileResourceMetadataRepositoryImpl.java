@@ -7,6 +7,7 @@ import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.jdbi.v3.core.Jdbi;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 @Repository
 public class FileResourceMetadataRepositoryImpl<F extends FileResource>
@@ -117,10 +119,10 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
 
   @Override
   public SearchPageResponse<F> find(SearchPageRequest searchPageRequest) {
-    String commonSql = getCommonFileResourceSearchSql(tableName, tableAlias);
     String searchTerm = searchPageRequest.getQuery();
-    if (searchTerm == null) {
-      searchTerm = "";
+    String commonSql = getCommonFileResourceSearchSql(tableName, tableAlias, searchTerm);
+    if (!StringUtils.hasText(searchTerm)) {
+      return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
     }
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
   }
@@ -152,7 +154,8 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
     }
   }
 
-  public String getCommonFileResourceSearchSql(String tableName, String tableAlias) {
+  public String getCommonFileResourceSearchSql(
+      String tableName, String tableAlias, String searchTerm) {
     String commonSql =
         " FROM "
             + tableName
@@ -167,17 +170,20 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
             + tableAlias
             + ".description) d(keys) ON "
             + tableAlias
-            + ".description IS NOT NULL"
-            + " WHERE ("
-            + tableAlias
-            + ".label->>l.keys ILIKE '%' || :searchTerm || '%'"
-            + " OR "
-            + tableAlias
-            + ".description->>d.keys ILIKE '%' || :searchTerm || '%'"
-            + " OR "
-            + tableAlias
-            + ".filename ILIKE '%' || :searchTerm || '%')";
-    return commonSql;
+            + ".description IS NOT NULL";
+    if (!StringUtils.hasText(searchTerm)) {
+      return commonSql;
+    }
+    return commonSql
+        + " WHERE ("
+        + tableAlias
+        + ".label->>l.keys ILIKE '%' || :searchTerm || '%'"
+        + " OR "
+        + tableAlias
+        + ".description->>d.keys ILIKE '%' || :searchTerm || '%'"
+        + " OR "
+        + tableAlias
+        + ".filename ILIKE '%' || :searchTerm || '%')";
   }
 
   @Override
