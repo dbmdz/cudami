@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 @Repository
 public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements TopicRepository {
@@ -379,8 +380,9 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
             + " NOT EXISTS (SELECT FROM topic_topics WHERE child_topic_uuid = "
             + tableAlias
             + ".uuid))";
+
     String searchTerm = searchPageRequest.getQuery();
-    if (searchTerm == null) {
+    if (!StringUtils.hasText(searchTerm)) {
       return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
     }
 
