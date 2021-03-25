@@ -1,11 +1,12 @@
 package de.digitalcollections.cudami.server.controller.v2.identifiable.web;
 
-import static de.digitalcollections.cudami.server.assertj.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
-import de.digitalcollections.cudami.server.controller.BaseRestControllerTest;
+import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.StructuredContent;
@@ -16,14 +17,10 @@ import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
-@DisplayName("The WebpageController v2")
-class V2WebpageControllerTest extends BaseRestControllerTest {
-
-  @MockBean WebpageService webpageService;
+@WebMvcTest(V2WebpageController.class)
+public class AnotherWebpageV2ControllerTest extends BaseControllerTest {
 
   @DisplayName(
       "Returns a webpage in v2 json format for UUID only, when json is demanded explicitly")
@@ -38,11 +35,9 @@ class V2WebpageControllerTest extends BaseRestControllerTest {
     webpage.setText(content);
     when(webpageService.get(any(UUID.class))).thenReturn(webpage);
 
-    ResponseEntity<String> entity =
-        this.testRestTemplate.getForEntity(
-            path, String.class);
-    assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
-    assertThat(entity.getHeaders()).hasContentType(ContentType.APPLICATION_JSON);
-    assertThat(entity.getBody()).isSemanticallyEqualToJsonFromFile(path);
+    mockMvc.perform(get(path))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(ContentType.APPLICATION_JSON.getMimeType()))
+        .andExpect(content().json(getJsonFromFileResource(path)));
   }
 }
