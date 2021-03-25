@@ -9,14 +9,10 @@ import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.StructuredContent;
 import de.digitalcollections.model.text.contentblock.Text;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Locale;
 import java.util.UUID;
 import javax.sql.DataSource;
+import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -56,15 +52,7 @@ class V2WebpageControllerTest {
 
     ResponseEntity<String> entity = this.testRestTemplate.getForEntity("/v2/webpages/123e4567-e89b-12d3-a456-426614174000.json", String.class);
     assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-    //assertThat(entity.getBody()).isEqualTo("{\"identifiers\":[],\"type\":\"RESOURCE\",\"text\":{\"localizedStructuredContent\":{\"de\":{\"type\":\"doc\",\"content\":[{\"type\":\"text\",\"text\":\"Hallo\"}]}}}}");
-    assertThat(entity.getBody()).isSemanticallyEqualTo(getExpectedJson(expectedJsonSource));
-  }
-
-  private String getExpectedJson(String expectedJsonSource) throws IOException, URISyntaxException {
-    ClassLoader classLoader = getClass().getClassLoader();
-    URL resource = classLoader.getResource("json/" + expectedJsonSource);
-
-    return Files.readString(Path.of(resource.toURI()));
+    assertThat(entity.getHeaders()).hasContentType(ContentType.APPLICATION_JSON);
+    assertThat(entity.getBody()).isSemanticallyEqualToJsonFromFile(expectedJsonSource);
   }
 }

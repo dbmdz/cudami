@@ -2,6 +2,11 @@ package de.digitalcollections.cudami.server.assertj;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.assertj.core.api.AbstractAssert;
 
 public class SerializedJsonAssert extends AbstractAssert<SerializedJsonAssert, String> {
@@ -34,5 +39,11 @@ public class SerializedJsonAssert extends AbstractAssert<SerializedJsonAssert, S
           objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(expected),
           objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(actual));
     }
+  }
+
+  public void isSemanticallyEqualToJsonFromFile(String expectedJsonSource) throws URISyntaxException, IOException {
+    ClassLoader classLoader = getClass().getClassLoader();
+    URL resource = classLoader.getResource("json/" + expectedJsonSource);
+    isSemanticallyEqualTo(Files.readString(Path.of(resource.toURI())));
   }
 }
