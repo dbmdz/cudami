@@ -26,6 +26,7 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -380,17 +381,20 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             + tableAlias
             + ".description) dsc(keys) ON "
             + tableAlias
-            + ".description IS NOT NULL"
-            + " WHERE ("
+            + ".description IS NOT NULL";
+
+    String searchTerm = searchPageRequest.getQuery();
+    if (searchTerm == null) {
+      return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
+    }
+
+    commonSql +=
+        " WHERE ("
             + tableAlias
             + ".label->>lbl.keys ILIKE '%' || :searchTerm || '%'"
             + " OR "
             + tableAlias
             + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')";
-    String searchTerm = searchPageRequest.getQuery();
-    if (searchTerm == null) {
-      searchTerm = "";
-    }
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
   }
 

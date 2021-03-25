@@ -379,6 +379,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
             + " NOT EXISTS (SELECT FROM topic_topics WHERE child_topic_uuid = "
             + tableAlias
             + ".uuid))";
+
     String searchTerm = searchPageRequest.getQuery();
     if (searchTerm == null) {
       return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
