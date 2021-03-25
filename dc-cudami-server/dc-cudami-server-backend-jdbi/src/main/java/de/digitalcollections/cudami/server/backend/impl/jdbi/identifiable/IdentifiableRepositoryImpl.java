@@ -360,8 +360,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   protected SearchPageResponse<I> find(
       SearchPageRequest searchPageRequest, String commonSql, Map<String, Object> argumentMappings) {
-    StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
+    StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".*" + commonSql);
     addFiltering(searchPageRequest, innerQuery);
+    innerQuery.append(" GROUP BY ").append(tableAlias).append(".uuid");
     addPageRequestParams(searchPageRequest, innerQuery);
     String orderBy = getOrderBy(searchPageRequest.getSorting());
     if (StringUtils.hasText(orderBy)) {
@@ -369,7 +370,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     }
     List<I> result = retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, orderBy);
 
-    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    StringBuilder countQuery =
+        new StringBuilder("SELECT count(distinct " + tableAlias + ".uuid)" + commonSql);
     addFiltering(searchPageRequest, countQuery);
     long total = retrieveCount(countQuery, argumentMappings);
 
