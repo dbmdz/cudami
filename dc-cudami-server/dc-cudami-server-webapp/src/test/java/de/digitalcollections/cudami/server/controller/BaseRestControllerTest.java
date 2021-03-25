@@ -8,10 +8,10 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("TEST")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = {SpringConfigBusinessForTest.class, SpringConfigBackendForTest.class})
-public abstract class BaseControllerTest {
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    classes = {SpringConfigBusinessForTest.class, SpringConfigBackendForTest.class})
+public abstract class BaseRestControllerTest {
 
-  @Autowired
-  protected TestRestTemplate testRestTemplate;
-
+  @Autowired protected TestRestTemplate testRestTemplate;
 }

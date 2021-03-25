@@ -5,7 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
-import de.digitalcollections.cudami.server.controller.BaseControllerTest;
+import de.digitalcollections.cudami.server.controller.BaseRestControllerTest;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.StructuredContent;
@@ -21,7 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @DisplayName("The WebpageController v2")
-class V2WebpageControllerTest extends BaseControllerTest {
+class V2WebpageControllerTest extends BaseRestControllerTest {
 
   @MockBean WebpageService webpageService;
 
