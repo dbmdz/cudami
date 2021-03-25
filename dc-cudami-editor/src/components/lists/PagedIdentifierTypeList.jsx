@@ -21,7 +21,7 @@ const PagedIdentifierTypeList = ({apiContextPath = '/', mockApi = false}) => {
     <>
       <Row>
         <Col>
-          <h1>{t('identifierTypes')}</h1>
+          <h1>{t('types:identifierType_plural')}</h1>
         </Col>
         <Col className="text-right">
           <Button href={`${apiContextPath}${typeToEndpointMapping[type]}/new`}>

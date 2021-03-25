@@ -31,7 +31,7 @@ const PagedRenderingTemplateList = ({
     <>
       <Row>
         <Col>
-          <h1>{t('renderingTemplates')}</h1>
+          <h1>{t('types:renderingTemplate_plural')}</h1>
         </Col>
         <Col className="text-right">
           <Button href={`${apiContextPath}${typeToEndpointMapping[type]}/new`}>
