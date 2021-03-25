@@ -22,26 +22,27 @@ public class SerializedJsonAssert extends AbstractAssert<SerializedJsonAssert, S
     this.actual = objectMapper.readValue(actualSerializedJson, Object.class);
   }
 
-
   public void isSemanticallyEqualTo(String expectedSerializedJson) throws JsonProcessingException {
     Object expected = objectMapper.readValue(expectedSerializedJson, Object.class);
 
-    if (actual==null && expected !=null) {
+    if (actual == null && expected != null) {
       failWithMessage("Expected non null json data");
     }
 
-    if (actual!=null && expected ==null) {
+    if (actual != null && expected == null) {
       failWithMessage("Expected null json data");
     }
 
     if (!actual.equals(expected)) {
-      failWithMessage("actual and expected differ, see formatted difference:\nExpected=%s\nActual=%s",
+      failWithMessage(
+          "actual and expected differ, see formatted difference:\nExpected=%s\nActual=%s",
           objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(expected),
           objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(actual));
     }
   }
 
-  public void isSemanticallyEqualToJsonFromFile(String expectedJsonSource) throws URISyntaxException, IOException {
+  public void isSemanticallyEqualToJsonFromFile(String expectedJsonSource)
+      throws URISyntaxException, IOException {
     ClassLoader classLoader = getClass().getClassLoader();
     URL resource = classLoader.getResource("json/" + expectedJsonSource);
     isSemanticallyEqualTo(Files.readString(Path.of(resource.toURI())));

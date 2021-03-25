@@ -29,16 +29,14 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class V2WebpageControllerTest {
 
-  @MockBean
-  WebpageService webpageService;
+  @MockBean WebpageService webpageService;
 
-  @MockBean
-  DataSource dataSource;    // Required, whyever...
+  @MockBean DataSource dataSource; // Required, whyever...
 
-  @Autowired
-  private TestRestTemplate testRestTemplate;
+  @Autowired private TestRestTemplate testRestTemplate;
 
-  @DisplayName("Returns a webpage in v2 json format for UUID only, when json is demanded explicitly")
+  @DisplayName(
+      "Returns a webpage in v2 json format for UUID only, when json is demanded explicitly")
   @ParameterizedTest
   @CsvSource({"webpagev2.json"})
   public void returnWebpageV2Json(String expectedJsonSource) throws Exception {
@@ -50,7 +48,9 @@ class V2WebpageControllerTest {
     webpage.setText(content);
     when(webpageService.get(any(UUID.class))).thenReturn(webpage);
 
-    ResponseEntity<String> entity = this.testRestTemplate.getForEntity("/v2/webpages/123e4567-e89b-12d3-a456-426614174000.json", String.class);
+    ResponseEntity<String> entity =
+        this.testRestTemplate.getForEntity(
+            "/v2/webpages/123e4567-e89b-12d3-a456-426614174000.json", String.class);
     assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(entity.getHeaders()).hasContentType(ContentType.APPLICATION_JSON);
     assertThat(entity.getBody()).isSemanticallyEqualToJsonFromFile(expectedJsonSource);

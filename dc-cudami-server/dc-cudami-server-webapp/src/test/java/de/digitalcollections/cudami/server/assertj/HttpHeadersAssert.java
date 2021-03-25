@@ -13,11 +13,10 @@ public class HttpHeadersAssert extends AbstractAssert<HttpHeadersAssert, HttpHea
     this.actualHttpHeaders = actualHttpHeaders;
   }
 
-  /**
-   * This check only cares about the mime type, not the charset
-   */
-  public void hasContentType(ContentType expectedContentType)  {
-    if ((actualHttpHeaders == null || actualHttpHeaders.getContentType() == null) && expectedContentType != null) {
+  /** This check only cares about the mime type, not the charset */
+  public void hasContentType(ContentType expectedContentType) {
+    if ((actualHttpHeaders == null || actualHttpHeaders.getContentType() == null)
+        && expectedContentType != null) {
       failWithMessage("Expected non null content type");
     }
     if (actualHttpHeaders.getContentType() != null && expectedContentType == null) {
@@ -25,8 +24,11 @@ public class HttpHeadersAssert extends AbstractAssert<HttpHeadersAssert, HttpHea
     }
 
     if (!actualHttpHeaders.getContentType().toString().equals(expectedContentType.getMimeType())) {
-      failWithMessage("Different content types. Expected=" + expectedContentType.getMimeType()
-          + ", actual=" + actualHttpHeaders.getContentType().toString());
+      failWithMessage(
+          "Different content types. Expected="
+              + expectedContentType.getMimeType()
+              + ", actual="
+              + actualHttpHeaders.getContentType().toString());
     }
   }
 }

@@ -8,7 +8,8 @@ import org.springframework.http.MediaType;
 
 public class Assertions {
 
-  public static SerializedJsonAssert assertThat(String serializedJson) throws JsonProcessingException {
+  public static SerializedJsonAssert assertThat(String serializedJson)
+      throws JsonProcessingException {
     return new SerializedJsonAssert(serializedJson);
   }
 
@@ -23,5 +24,4 @@ public class Assertions {
   public static HttpHeadersAssert assertThat(HttpHeaders headers) {
     return new HttpHeadersAssert(headers);
   }
-
 }
