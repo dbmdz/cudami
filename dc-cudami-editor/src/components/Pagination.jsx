@@ -45,7 +45,7 @@ const Pagination = ({
       />
       {showTotalElements && (
         <span className="ml-2">
-          {t(`totalElements.${type}s`, {count: totalElements})}
+          {t(`pagination:totalElements.${type}`, {count: totalElements})}
         </span>
       )}
     </div>
