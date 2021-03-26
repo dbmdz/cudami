@@ -82,7 +82,6 @@ class MediaSelector extends Component {
       const response = await uploadFile(
         this.context.apiContextPath,
         file,
-        this.context.mockApi,
         (progress) => this.setState({progress})
       )
       onChange({
@@ -240,11 +239,10 @@ class MediaSelector extends Component {
                   })
                 }}
                 placeholder={t('selectMedia.searchTerm', {mediaType})}
-                search={(contextPath, mock, searchTerm, pageNumber, pageSize) =>
+                search={(contextPath, searchTerm, pageNumber, pageSize) =>
                   searchMedia(
                     contextPath,
                     mediaType,
-                    mock,
                     searchTerm,
                     pageNumber,
                     pageSize

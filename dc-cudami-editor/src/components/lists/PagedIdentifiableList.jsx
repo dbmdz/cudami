@@ -60,10 +60,9 @@ class PagedIdentifiableList extends Component {
   }
 
   async componentDidMount() {
-    const {apiContextPath, mockApi} = this.props
-    const identifierTypes = await getIdentifierTypes(apiContextPath, mockApi)
+    const identifierTypes = await getIdentifierTypes(this.props.apiContextPath)
     const {content, pageSize, totalElements} = await this.loadIdentifiables(0)
-    const defaultLanguage = await loadDefaultLanguage(apiContextPath, mockApi)
+    const defaultLanguage = await loadDefaultLanguage(this.props.apiContextPath)
     this.setState({
       defaultLanguage,
       identifiables: content,
@@ -87,10 +86,9 @@ class PagedIdentifiableList extends Component {
   }
 
   addIdentifiable = async (parentUuid, uuid) => {
-    const {apiContextPath, mockApi, parentType, type} = this.props
+    const {apiContextPath, parentType, type} = this.props
     const successful = await addAttachedIdentifiable(
       apiContextPath,
-      mockApi,
       parentType,
       parentUuid,
       type,
@@ -100,10 +98,9 @@ class PagedIdentifiableList extends Component {
   }
 
   addIdentifiables = async (identifiables) => {
-    const {apiContextPath, mockApi, parentType, parentUuid, type} = this.props
+    const {apiContextPath, parentType, parentUuid, type} = this.props
     const successful = await addAttachedIdentifiables(
       apiContextPath,
-      mockApi,
       identifiables,
       parentType,
       parentUuid,
@@ -265,11 +262,10 @@ class PagedIdentifiableList extends Component {
   }
 
   loadIdentifiables = async (pageNumber, pageSize = this.pageSize) => {
-    const {apiContextPath, mockApi, parentType, parentUuid, type} = this.props
+    const {apiContextPath, parentType, parentUuid, type} = this.props
     if (parentType && parentUuid) {
       return await loadAttachedIdentifiables(
         apiContextPath,
-        mockApi,
         parentType,
         parentUuid,
         type,
@@ -280,7 +276,6 @@ class PagedIdentifiableList extends Component {
     }
     return await loadRootIdentifiables(
       apiContextPath,
-      mockApi,
       type,
       pageNumber,
       pageSize,
@@ -289,10 +284,9 @@ class PagedIdentifiableList extends Component {
   }
 
   removeIdentifiable = async (parentUuid, uuid) => {
-    const {apiContextPath, mockApi, parentType, type} = this.props
+    const {apiContextPath, parentType, type} = this.props
     const successful = await removeAttachedIdentifiable(
       apiContextPath,
-      mockApi,
       parentType,
       parentUuid,
       type,
@@ -302,10 +296,9 @@ class PagedIdentifiableList extends Component {
   }
 
   saveChangeOfOrder = async () => {
-    const {apiContextPath, mockApi, parentType, parentUuid, type} = this.props
+    const {apiContextPath, parentType, parentUuid, type} = this.props
     const successful = await updateAttachedIdentifiablesOrder(
       apiContextPath,
-      mockApi,
       this.state.identifiables,
       parentType,
       parentUuid,
@@ -361,7 +354,6 @@ class PagedIdentifiableList extends Component {
       enableMove,
       enableRemove,
       enableSearch,
-      mockApi,
       parentType,
       parentUuid,
       showNew,
@@ -389,9 +381,7 @@ class PagedIdentifiableList extends Component {
       createUrl = `${createUrl}?parentType=${parentType}&parentUuid=${parentUuid}`
     }
     return (
-      <AppContext.Provider
-        value={{apiContextPath, defaultLanguage, mockApi, uiLocale}}
-      >
+      <AppContext.Provider value={{apiContextPath, defaultLanguage, uiLocale}}>
         <Row>
           <Col>
             {/*
@@ -517,7 +507,6 @@ PagedIdentifiableList.defaultProps = {
   enableMove: false,
   enableRemove: false,
   enableSearch: false,
-  mockApi: false,
   showEdit: false,
   showNew: false,
 }

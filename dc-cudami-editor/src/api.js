@@ -17,15 +17,11 @@ export const typeToEndpointMapping = {
 
 export async function addAttachedIdentifiable(
   contextPath,
-  mock,
   parentType,
   parentUuid,
   type,
   uuid
 ) {
-  if (mock) {
-    return true
-  }
   const url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}/${uuid}`
   try {
     const response = await fetch(url, {
@@ -42,15 +38,11 @@ export async function addAttachedIdentifiable(
 
 export async function addAttachedIdentifiables(
   contextPath,
-  mock,
   identifiables,
   parentType,
   parentUuid,
   type
 ) {
-  if (mock) {
-    return true
-  }
   const url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}`
   try {
     const response = await fetch(url, {
@@ -67,11 +59,8 @@ export async function addAttachedIdentifiables(
   }
 }
 
-export async function findByIdentifier(contextPath, mock, id, namespace, type) {
-  let url = `${contextPath}api/${typeToEndpointMapping[type]}/identifier/${namespace}:${id}`
-  if (mock) {
-    url = `/__mock__/${type}.json`
-  }
+export async function findByIdentifier(contextPath, id, namespace, type) {
+  const url = `${contextPath}api/${typeToEndpointMapping[type]}/identifier/${namespace}:${id}`
   try {
     const response = await fetch(url)
     if (!response.ok) {
@@ -84,11 +73,8 @@ export async function findByIdentifier(contextPath, mock, id, namespace, type) {
   }
 }
 
-export async function getIdentifierTypes(contextPath, mock) {
-  let url = `${contextPath}api/identifiertypes`
-  if (mock) {
-    url = '/__mock__/identifierTypes.json'
-  }
+export async function getIdentifierTypes(contextPath) {
+  const url = `${contextPath}api/identifiertypes`
   try {
     const response = await fetch(url)
     const json = await response.json()
@@ -100,7 +86,6 @@ export async function getIdentifierTypes(contextPath, mock) {
 
 export async function loadAttachedIdentifiables(
   contextPath,
-  mock,
   parentType,
   parentUuid,
   type,
@@ -111,9 +96,6 @@ export async function loadAttachedIdentifiables(
   let url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}?pageNumber=${pageNumber}&pageSize=${pageSize}`
   if (searchTerm) {
     url = `${url}&searchTerm=${searchTerm}`
-  }
-  if (mock) {
-    url = `/__mock__/${type}s.json`
   }
   try {
     const response = await fetch(url)
@@ -135,10 +117,7 @@ export async function loadAttachedIdentifiables(
   }
 }
 
-export async function loadAvailableLanguages(contextPath, mock) {
-  if (mock) {
-    return ['es', 'fr']
-  }
+export async function loadAvailableLanguages(contextPath) {
   const url = `${contextPath}api/languages`
   try {
     const result = await fetch(url)
@@ -148,10 +127,7 @@ export async function loadAvailableLanguages(contextPath, mock) {
   }
 }
 
-export async function loadDefaultLanguage(contextPath, mock) {
-  if (mock) {
-    return 'en'
-  }
+export async function loadDefaultLanguage(contextPath) {
   const url = `${contextPath}api/languages/default`
   try {
     const result = await fetch(url)
@@ -161,12 +137,8 @@ export async function loadDefaultLanguage(contextPath, mock) {
   }
 }
 
-export async function loadIdentifiable(contextPath, mock, type, uuid = 'new') {
-  let url = `${contextPath}api/${typeToEndpointMapping[type]}/${uuid}`
-  if (mock) {
-    url =
-      uuid === 'new' ? `/__mock__/new/${type}.json` : `/__mock__/${type}.json`
-  }
+export async function loadIdentifiable(contextPath, type, uuid = 'new') {
+  const url = `${contextPath}api/${typeToEndpointMapping[type]}/${uuid}`
   try {
     const result = await fetch(url)
     return result.json()
@@ -177,7 +149,6 @@ export async function loadIdentifiable(contextPath, mock, type, uuid = 'new') {
 
 export async function loadRootIdentifiables(
   contextPath,
-  mock,
   type,
   pageNumber,
   pageSize,
@@ -186,9 +157,6 @@ export async function loadRootIdentifiables(
   let url = `${contextPath}api/${typeToEndpointMapping[type]}?pageNumber=${pageNumber}&pageSize=${pageSize}`
   if (searchTerm) {
     url = `${url}&searchTerm=${searchTerm}`
-  }
-  if (mock) {
-    url = `/__mock__/${type}s.json`
   }
   try {
     const response = await fetch(url)
@@ -210,15 +178,11 @@ export async function loadRootIdentifiables(
 
 export async function removeAttachedIdentifiable(
   contextPath,
-  mock,
   parentType,
   parentUuid,
   type,
   uuid
 ) {
-  if (mock) {
-    return true
-  }
   const url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}/${uuid}`
   try {
     const response = await fetch(url, {
@@ -233,11 +197,7 @@ export async function removeAttachedIdentifiable(
   }
 }
 
-export async function saveFileResource(contextPath, fileResource, mock) {
-  if (mock) {
-    const result = await fetch('/__mock__/fileResource.json')
-    return result.json()
-  }
+export async function saveFileResource(contextPath, fileResource) {
   const savedFileResource = await saveIdentifiable(
     contextPath,
     fileResource,
@@ -284,16 +244,12 @@ export async function saveIdentifiable(
 
 export async function searchIdentifiables(
   contextPath,
-  mock,
   searchTerm,
   type,
   pageNumber = 0,
   pageSize = 10
 ) {
-  let url = `${contextPath}api/${typeToEndpointMapping[type]}/search?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
-  if (mock) {
-    url = `/__mock__/${type}s.json`
-  }
+  const url = `${contextPath}api/${typeToEndpointMapping[type]}/search?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
   try {
     const response = await fetch(url)
     const json = await response.json()
@@ -312,15 +268,11 @@ export async function searchIdentifiables(
 export async function searchMedia(
   contextPath,
   mediaType,
-  mock,
   searchTerm,
   pageNumber = 0,
   pageSize = 10
 ) {
-  let url = `${contextPath}api/fileresources/type/${mediaType}?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
-  if (mock) {
-    url = `/__mock__/${mediaType}s.json`
-  }
+  const url = `${contextPath}api/fileresources/type/${mediaType}?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
   try {
     const result = await fetch(url)
     const json = await result.json()
@@ -338,15 +290,11 @@ export async function searchMedia(
 
 export async function updateAttachedIdentifiablesOrder(
   contextPath,
-  mock,
   identifiables,
   parentType,
   parentUuid,
   type
 ) {
-  if (mock) {
-    return true
-  }
   const url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}`
   try {
     const response = await fetch(url, {
@@ -363,11 +311,7 @@ export async function updateAttachedIdentifiablesOrder(
   }
 }
 
-export async function updateFileResource(contextPath, fileResource, mock) {
-  if (mock) {
-    const result = await fetch('/__mock__/fileResource.json')
-    return result.json()
-  }
+export async function updateFileResource(contextPath, fileResource) {
   const updatedFileResource = await updateIdentifiable(
     contextPath,
     fileResource,
@@ -405,12 +349,7 @@ export async function updateIdentifiable(
   }
 }
 
-export async function uploadFile(contextPath, file, mock, updateProgress) {
-  if (mock) {
-    const result = await fetch('/__mock__/fileResource.json')
-    updateProgress(100)
-    return result.json()
-  }
+export async function uploadFile(contextPath, file, updateProgress) {
   return new Promise((resolve, reject) => {
     const request = new XMLHttpRequest()
     for (let eventType of ['abort', 'error', 'timeout']) {

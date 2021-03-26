@@ -24,14 +24,9 @@ import InputWithLabel from '../InputWithLabel'
 import LanguageTab from '../LanguageTab'
 import ActionButtons from './ActionButtons'
 
-const loadData = async (context, mock, uuid) => {
-  const defaultLanguage = await loadDefaultLanguage(context, mock)
-  let template = await loadIdentifiable(
-    context,
-    mock,
-    'renderingTemplate',
-    uuid
-  )
+const loadData = async (context, uuid) => {
+  const defaultLanguage = await loadDefaultLanguage(context)
+  let template = await loadIdentifiable(context, 'renderingTemplate', uuid)
   return {
     defaultLanguage,
     template,
@@ -48,18 +43,12 @@ const submitData = async (context, data, uuid) => {
   window.location.href = `${context}${typeToEndpointMapping[type]}`
 }
 
-const RenderingTemplateForm = ({
-  apiContextPath = '/',
-  mockApi = false,
-  uuid,
-}) => {
+const RenderingTemplateForm = ({apiContextPath = '/', uuid}) => {
   useEffect(() => {
-    loadData(apiContextPath, mockApi, uuid).then(
-      ({defaultLanguage, template}) => {
-        setDefaultLanguage(defaultLanguage)
-        setTemplate(template)
-      }
-    )
+    loadData(apiContextPath, uuid).then(({defaultLanguage, template}) => {
+      setDefaultLanguage(defaultLanguage)
+      setTemplate(template)
+    })
   }, [])
   const [defaultLanguage, setDefaultLanguage] = useState('')
   const [template, setTemplate] = useState(null)

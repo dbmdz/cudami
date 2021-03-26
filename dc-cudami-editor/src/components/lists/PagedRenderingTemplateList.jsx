@@ -8,10 +8,7 @@ import LanguageTab from '../LanguageTab'
 import Pagination from '../Pagination'
 import ActionButtons from './ActionButtons'
 
-const PagedRenderingTemplateList = ({
-  apiContextPath = '/',
-  mockApi = false,
-}) => {
+const PagedRenderingTemplateList = ({apiContextPath = '/'}) => {
   const type = 'renderingTemplate'
   const {
     content: templates,
@@ -19,10 +16,10 @@ const PagedRenderingTemplateList = ({
     pageNumber,
     setPageNumber,
     totalElements,
-  } = usePagination(apiContextPath, mockApi, type)
+  } = usePagination(apiContextPath, type)
   const [defaultLanguage, setDefaultLanguage] = useState('')
   useEffect(() => {
-    loadDefaultLanguage(apiContextPath, mockApi).then((defaultLanguage) =>
+    loadDefaultLanguage(apiContextPath).then((defaultLanguage) =>
       setDefaultLanguage(defaultLanguage)
     )
   }, [])
