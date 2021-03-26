@@ -30,8 +30,8 @@ public class V2WebpageController {
 
   private final WebpageService webpageService;
 
-  public V2WebpageController(WebpageService webpageService1) {
-    this.webpageService = webpageService1;
+  public V2WebpageController(WebpageService webpageService) {
+    this.webpageService = webpageService;
   }
 
   private JSONObject convertLocalizedStructuredContentJson(JSONObject json) {
@@ -89,6 +89,7 @@ public class V2WebpageController {
       result.put("text", convertLocalizedStructuredContentJson(result.getJSONObject("text")));
     }
     result.put("type", "RESOURCE");
+    result.put("entityPartType", "WEBPAGE");
     return new ResponseEntity<>(result.toString(), HttpStatus.OK);
   }
 

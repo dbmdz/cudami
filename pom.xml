@@ -263,6 +263,31 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>io.github.phillipuniverse</groupId>
+        <artifactId>githook-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>install</goal>
+            </goals>
+            <configuration>
+              <hooks>
+                <pre-commit>
+                  if ! mvn com.coveo:fmt-maven-plugin:check ; then
+                  mvn com.coveo:fmt-maven-plugin:format
+                  echo -e "\e[31mCode has been reformatted to match code style\e[0m"
+                  echo -e "\e[31mPlease use git add … to add modified files\e[0m"
+                  echo "Your commit message was:"
+                  cat .git/COMMIT_EDITMSG
+                  exit 1
+                  fi
+                </pre-commit>
+              </hooks>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>com.coveo</groupId>
         <artifactId>fmt-maven-plugin</artifactId>
         <version>${version.maven-fmt-plugin}</version>
