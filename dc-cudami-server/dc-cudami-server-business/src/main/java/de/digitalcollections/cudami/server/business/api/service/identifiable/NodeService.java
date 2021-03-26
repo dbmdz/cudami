@@ -35,7 +35,7 @@ public interface NodeService<N extends Identifiable> extends IdentifiableService
     }
     List<UUID> childrenUuids =
         children.stream()
-            .filter(c -> c.getUuid() == null)
+            .filter(c -> c.getUuid() != null)
             .map(c -> c.getUuid())
             .collect(Collectors.toList());
     return addChildren(parent.getUuid(), childrenUuids);
