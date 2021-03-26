@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
+import {FaHashtag} from 'react-icons/fa'
 import {Button, Card, CardBody, Col, Nav, Row, Table} from 'reactstrap'
 
 import {loadDefaultLanguage, typeToEndpointMapping} from '../../api'
@@ -14,8 +15,9 @@ const PagedRenderingTemplateList = ({apiContextPath = '/'}) => {
     content: templates,
     numberOfPages,
     pageNumber,
-    setPageNumber,
+    pageSize,
     totalElements,
+    setPageNumber,
   } = usePagination(apiContextPath, type)
   const [defaultLanguage, setDefaultLanguage] = useState('')
   useEffect(() => {
@@ -56,6 +58,9 @@ const PagedRenderingTemplateList = ({apiContextPath = '/'}) => {
           <Table bordered className="mb-0" hover responsive size="sm" striped>
             <thead>
               <tr>
+                <th className="text-right">
+                  <FaHashtag />
+                </th>
                 <th className="text-center">{t('label')}</th>
                 <th className="text-center">{t('description')}</th>
                 <th className="text-center">{t('name')}</th>
@@ -63,8 +68,11 @@ const PagedRenderingTemplateList = ({apiContextPath = '/'}) => {
               </tr>
             </thead>
             <tbody>
-              {templates.map(({description, label, name, uuid}) => (
+              {templates.map(({description, label, name, uuid}, index) => (
                 <tr key={uuid}>
+                  <td className="text-right">
+                    {index + 1 + pageNumber * pageSize}
+                  </td>
                   <td>{label?.[defaultLanguage]}</td>
                   <td>{description?.[defaultLanguage]}</td>
                   <td>{name}</td>
