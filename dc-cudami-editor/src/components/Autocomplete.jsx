@@ -55,7 +55,6 @@ class Autocomplete extends Component {
     this.setState({loading: true})
     const {suggestions, totalElements} = await this.props.search(
       this.context.apiContextPath,
-      this.context.mockApi,
       searchTerm,
       0,
       this.maxElements

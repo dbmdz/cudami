@@ -7,7 +7,7 @@ import usePagination from '../../hooks/usePagination'
 import Pagination from '../Pagination'
 import ActionButtons from './ActionButtons'
 
-const PagedIdentifierTypeList = ({apiContextPath = '/', mockApi = false}) => {
+const PagedIdentifierTypeList = ({apiContextPath = '/'}) => {
   const type = 'identifierType'
   const {
     content: identifierTypes,
@@ -15,7 +15,7 @@ const PagedIdentifierTypeList = ({apiContextPath = '/', mockApi = false}) => {
     pageNumber,
     setPageNumber,
     totalElements,
-  } = usePagination(apiContextPath, mockApi, type)
+  } = usePagination(apiContextPath, type)
   const {t} = useTranslation()
   return (
     <>

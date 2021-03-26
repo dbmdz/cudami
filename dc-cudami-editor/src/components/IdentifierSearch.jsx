@@ -33,7 +33,6 @@ class IdentifierSearch extends Component {
     const {namespace, setFeedbackMessage, type} = this.props
     const result = await findByIdentifier(
       this.context.apiContextPath,
-      this.context.mockApi,
       this.state.id,
       namespace,
       type

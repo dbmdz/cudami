@@ -61,18 +61,10 @@ class IdentifiableForm extends Component {
   }
 
   async componentDidMount() {
-    const {apiContextPath, mockApi, t, type, uuid} = this.props
-    const availableLanguages = await loadAvailableLanguages(
-      apiContextPath,
-      mockApi
-    )
-    const defaultLanguage = await loadDefaultLanguage(apiContextPath, mockApi)
-    let identifiable = await loadIdentifiable(
-      apiContextPath,
-      mockApi,
-      type,
-      uuid
-    )
+    const {apiContextPath, t, type, uuid} = this.props
+    const availableLanguages = await loadAvailableLanguages(apiContextPath)
+    const defaultLanguage = await loadDefaultLanguage(apiContextPath)
+    let identifiable = await loadIdentifiable(apiContextPath, type, uuid)
     const initialIdentifiable = {
       description: {},
       label: {
@@ -248,7 +240,7 @@ class IdentifiableForm extends Component {
   }
 
   render() {
-    const {apiContextPath, mockApi, uiLocale} = this.props
+    const {apiContextPath, uiLocale} = this.props
     const {
       activeLanguage,
       availableLanguages,
@@ -261,7 +253,6 @@ class IdentifiableForm extends Component {
         value={{
           apiContextPath,
           defaultLanguage,
-          mockApi,
           uiLocale,
         }}
       >
@@ -311,7 +302,6 @@ class IdentifiableForm extends Component {
 
 IdentifiableForm.defaultProps = {
   apiContextPath: '/',
-  mockApi: false,
 }
 
 export default withTranslation()(IdentifiableForm)

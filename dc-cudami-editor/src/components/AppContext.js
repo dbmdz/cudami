@@ -5,8 +5,6 @@ export default createContext({
   apiContextPath: '/',
   // the defined default language for multilanguage fields, will be fetched from the api
   defaultLanguage: 'en',
-  // a flag whether the api calls should be mocked, the mock data is located in /public/__mock__
-  mockApi: false,
   // the defined ui locale
   uiLocale: 'en',
 })

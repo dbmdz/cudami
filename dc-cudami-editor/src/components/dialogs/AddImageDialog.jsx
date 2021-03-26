@@ -56,7 +56,6 @@ class AddImageDialog extends Component {
   async componentDidMount() {
     const newFileResource = await loadIdentifiable(
       this.context.apiContextPath,
-      this.context.mockApi,
       'fileResource'
     )
     const initialFileResource = {
@@ -112,17 +111,15 @@ class AddImageDialog extends Component {
   }
 
   submitFileResource = async () => {
-    const {apiContextPath, mockApi} = this.context
     let resourceId = this.state.fileResource.uuid
     if (!resourceId) {
       const {uuid} = await saveFileResource(
-        apiContextPath,
-        this.state.fileResource,
-        mockApi
+        this.context.apiContextPath,
+        this.state.fileResource
       )
       resourceId = uuid
     } else if (this.state.doUpdateRequest) {
-      updateFileResource(apiContextPath, this.state.fileResource, mockApi)
+      updateFileResource(this.context.apiContextPath, this.state.fileResource)
     }
     return resourceId
   }

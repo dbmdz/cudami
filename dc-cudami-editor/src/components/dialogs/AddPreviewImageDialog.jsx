@@ -72,7 +72,6 @@ class AddPreviewImageDialog extends Component {
   async componentDidMount() {
     const newFileResource = await loadIdentifiable(
       this.context.apiContextPath,
-      this.context.mockApi,
       'fileResource'
     )
     const initialFileResource = {
@@ -116,19 +115,16 @@ class AddPreviewImageDialog extends Component {
   }
 
   submitFileResource = async () => {
-    const {apiContextPath, mockApi} = this.context
     let fileResource = this.state.fileResource
     if (!fileResource.uuid) {
       fileResource = await saveFileResource(
-        apiContextPath,
-        this.state.fileResource,
-        mockApi
+        this.context.apiContextPath,
+        this.state.fileResource
       )
     } else if (this.state.doUpdateRequest) {
       fileResource = await updateFileResource(
-        apiContextPath,
-        this.state.fileResource,
-        mockApi
+        this.context.apiContextPath,
+        this.state.fileResource
       )
     }
     return fileResource

@@ -119,16 +119,9 @@ class AddAttachedIdentifiablesDialog extends Component {
                   {showAutocomplete ? (
                     <Autocomplete
                       onSelect={this.addIdentifiableToList}
-                      search={(
-                        contextPath,
-                        mock,
-                        searchTerm,
-                        pageNumber,
-                        pageSize
-                      ) =>
+                      search={(contextPath, searchTerm, pageNumber, pageSize) =>
                         searchIdentifiables(
                           contextPath,
-                          mock,
                           searchTerm,
                           type,
                           pageNumber,

@@ -31,7 +31,6 @@ class FileResourceUploadForm extends Component {
           const response = await uploadFile(
             this.context.apiContextPath,
             this.state.file,
-            this.context.mockApi,
             this.updateProgress
           )
           onUpdate(response)

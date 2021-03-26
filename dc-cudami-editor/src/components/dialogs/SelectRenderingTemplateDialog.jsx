@@ -19,7 +19,7 @@ import Pagination from '../Pagination'
 
 const SelectRenderingTemplateDialog = ({isOpen, onSelect, toggle}) => {
   const type = 'renderingTemplate'
-  const {apiContextPath, defaultLanguage, mockApi} = useContext(AppContext)
+  const {apiContextPath, defaultLanguage} = useContext(AppContext)
   const {
     content: templates,
     isLoading,
@@ -27,7 +27,7 @@ const SelectRenderingTemplateDialog = ({isOpen, onSelect, toggle}) => {
     pageNumber,
     setPageNumber,
     totalElements,
-  } = usePagination(apiContextPath, mockApi, type)
+  } = usePagination(apiContextPath, type)
   const {t} = useTranslation()
   if (isLoading) {
     return <Spinner color="secondary" />
