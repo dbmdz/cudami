@@ -29,7 +29,18 @@ public abstract class BaseControllerTest {
 
   protected String getHtmlFromFileResource(String path) throws URISyntaxException, IOException {
     ClassLoader classLoader = getClass().getClassLoader();
-    URL resource = classLoader.getResource("html" + path);
+    String filename = "html" + path;
+    if (filename.contains("pLocale=")) {
+      // Remove the pLocale part from the filename, since the localization is part of the service
+      // and not a domain of the controller. So, our tests will never return different localized
+      // contents for the same UUID
+      filename = filename.replaceFirst("(\\?|&)pLocale=.*?(&|$)", "");
+    }
+
+    URL resource = classLoader.getResource(filename);
+    if (resource == null) {
+      throw new RuntimeException("Cannot read " + filename);
+    }
     return Files.readAllLines(Path.of(resource.toURI())).stream()
         .map(l -> l.replaceAll("^\\s+", ""))
         .collect(Collectors.joining());

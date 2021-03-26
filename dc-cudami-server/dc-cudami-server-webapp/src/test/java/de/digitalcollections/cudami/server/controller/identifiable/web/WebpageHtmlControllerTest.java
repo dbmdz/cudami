@@ -1,8 +1,10 @@
 package de.digitalcollections.cudami.server.controller.identifiable.web;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -18,6 +20,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,7 +32,11 @@ public class WebpageHtmlControllerTest extends BaseControllerTest {
 
   @DisplayName("returns a webpage in v3 html format for UUID")
   @ParameterizedTest
-  @ValueSource(strings = {"/v3/webpages/fae19e02-5fa8-4b5e-8bd8-ff5456371e53.html"})
+  @ValueSource(
+      strings = {
+        "/v3/webpages/fae19e02-5fa8-4b5e-8bd8-ff5456371e53.html",
+        "/v3/webpages/fae19e02-5fa8-4b5e-8bd8-ff5456371e53.html?pLocale=de_DE"
+      })
   public void returnWebpageV3Html(String path) throws Exception {
     LocalizedStructuredContent content = new LocalizedStructuredContent();
     StructuredContent structuredContentDe = new StructuredContent();
@@ -77,10 +84,16 @@ public class WebpageHtmlControllerTest extends BaseControllerTest {
     webpage.setType(IdentifiableType.ENTITY);
     webpage.setChildren(List.of());
 
-    when(webpageService.get(any(UUID.class))).thenReturn(webpage);
+    if (path.contains("?pLocale")) {
+      Locale requestedLocale = LocaleUtils.toLocale(path.split("=")[1]);
+      when(webpageService.get(any(UUID.class), eq(requestedLocale))).thenReturn(webpage);
+    } else {
+      when(webpageService.get(any(UUID.class))).thenReturn(webpage);
+    }
 
     mockMvc
         .perform(get(path))
+        .andDo(print())
         .andExpect(status().isOk())
         .andExpect(content().contentType(ContentType.TEXT_HTML.getMimeType() + ";charset=UTF-8"))
         .andExpect(content().string(getHtmlFromFileResource(path)));
