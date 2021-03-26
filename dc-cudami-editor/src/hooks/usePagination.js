@@ -7,8 +7,9 @@ const usePagination = (apiContextPath, type) => {
   const [isLoading, setIsLoading] = useState(false)
   const [numberOfPages, setNumberOfPages] = useState(0)
   const [pageNumber, setPageNumber] = useState(0)
+  const [pageSize, setPageSize] = useState(20)
   const [totalElements, setTotalElements] = useState(0)
-  const loadData = async (context, pageNumber, pageSize = 20) => {
+  const loadData = async (context, pageNumber, pageSize) => {
     const {content, totalElements} = await loadRootIdentifiables(
       context,
       type,
@@ -23,7 +24,7 @@ const usePagination = (apiContextPath, type) => {
   }
   useEffect(() => {
     setIsLoading(true)
-    loadData(apiContextPath, pageNumber)
+    loadData(apiContextPath, pageNumber, pageSize)
       .then(({content, numberOfPages, totalElements}) => {
         setNumberOfPages(numberOfPages)
         setContent(content)
@@ -38,8 +39,10 @@ const usePagination = (apiContextPath, type) => {
     isLoading,
     numberOfPages,
     pageNumber,
-    setPageNumber,
+    pageSize,
     totalElements,
+    setPageNumber,
+    setPageSize,
   }
 }
 

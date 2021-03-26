@@ -1,5 +1,6 @@
 import React from 'react'
 import {useTranslation} from 'react-i18next'
+import {FaHashtag} from 'react-icons/fa'
 import {Button, Card, CardBody, Col, Row, Table} from 'reactstrap'
 
 import {typeToEndpointMapping} from '../../api'
@@ -13,8 +14,9 @@ const PagedIdentifierTypeList = ({apiContextPath = '/'}) => {
     content: identifierTypes,
     numberOfPages,
     pageNumber,
-    setPageNumber,
+    pageSize,
     totalElements,
+    setPageNumber,
   } = usePagination(apiContextPath, type)
   const {t} = useTranslation()
   return (
@@ -42,6 +44,9 @@ const PagedIdentifierTypeList = ({apiContextPath = '/'}) => {
           <Table bordered className="mb-0" hover responsive size="sm" striped>
             <thead>
               <tr>
+                <th className="text-right">
+                  <FaHashtag />
+                </th>
                 <th className="text-center">{t('label')}</th>
                 <th className="text-center">{t('namespace')}</th>
                 <th className="text-center">{t('pattern')}</th>
@@ -49,20 +54,25 @@ const PagedIdentifierTypeList = ({apiContextPath = '/'}) => {
               </tr>
             </thead>
             <tbody>
-              {identifierTypes.map(({label, namespace, pattern, uuid}) => (
-                <tr key={uuid}>
-                  <td>{label}</td>
-                  <td>{namespace}</td>
-                  <td>{pattern}</td>
-                  <td className="text-center">
-                    <ActionButtons
-                      editUrl={`${apiContextPath}${typeToEndpointMapping[type]}/${uuid}/edit`}
-                      showEdit
-                      showView={false}
-                    />
-                  </td>
-                </tr>
-              ))}
+              {identifierTypes.map(
+                ({label, namespace, pattern, uuid}, index) => (
+                  <tr key={uuid}>
+                    <td className="text-right">
+                      {index + 1 + pageNumber * pageSize}
+                    </td>
+                    <td>{label}</td>
+                    <td>{namespace}</td>
+                    <td>{pattern}</td>
+                    <td className="text-center">
+                      <ActionButtons
+                        editUrl={`${apiContextPath}${typeToEndpointMapping[type]}/${uuid}/edit`}
+                        showEdit
+                        showView={false}
+                      />
+                    </td>
+                  </tr>
+                )
+              )}
             </tbody>
           </Table>
           <Pagination
