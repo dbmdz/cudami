@@ -27,7 +27,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 @WebMvcTest(V2WebpageController.class)
-public class AnotherWebpageV2ControllerTest extends BaseControllerTest {
+public class V2WebpageControllerTest extends BaseControllerTest {
 
   @DisplayName(
       "returns a webpage in v2 json format for UUID, with or without json suffix in the url")
