@@ -7,15 +7,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
+import de.digitalcollections.cudami.server.model.ParagraphBuilder;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.StructuredContent;
-import de.digitalcollections.model.text.contentblock.HardBreak;
-import de.digitalcollections.model.text.contentblock.Mark;
-import de.digitalcollections.model.text.contentblock.Paragraph;
-import de.digitalcollections.model.text.contentblock.Text;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
@@ -116,49 +113,5 @@ public class V2WebpageControllerTest extends BaseControllerTest {
         .andExpect(status().isOk())
         .andExpect(content().contentType(ContentType.APPLICATION_JSON.getMimeType()))
         .andExpect(content().json(getJsonFromFileResource(path)));
-  }
-
-  // ---------------------------------------------------------------
-  private static class ParagraphBuilder {
-
-    Paragraph paragraph = new Paragraph();
-
-    public ParagraphBuilder addText(String text) {
-      paragraph.addContentBlock(new Text(text));
-      return this;
-    }
-
-    public ParagraphBuilder addText(String text, String... marks) {
-      paragraph.addContentBlock(new Text(text, marks));
-      return this;
-    }
-
-    public ParagraphBuilder addHardBreak() {
-      paragraph.addContentBlock(new HardBreak());
-      return this;
-    }
-
-    public ParagraphBuilder addLink(String text, String href) {
-      Text linkText = new Text(text);
-      Mark mark = new Mark("link");
-      mark.addAttribute("href", href);
-      linkText.addMark(mark);
-      paragraph.addContentBlock(linkText);
-      return this;
-    }
-
-    public ParagraphBuilder addLinkWithTitle(String text, String href, String title) {
-      Text linkText = new Text(text);
-      Mark mark = new Mark("link");
-      mark.addAttribute("href", href);
-      mark.addAttribute("title", title);
-      linkText.addMark(mark);
-      paragraph.addContentBlock(linkText);
-      return this;
-    }
-
-    public Paragraph build() {
-      return paragraph;
-    }
   }
 }

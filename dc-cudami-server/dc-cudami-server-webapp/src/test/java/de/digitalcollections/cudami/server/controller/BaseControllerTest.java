@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,6 +25,14 @@ public abstract class BaseControllerTest {
     String suffix = (path.endsWith(".json") ? "" : ".json");
     URL resource = classLoader.getResource("json" + path + suffix);
     return Files.readString(Path.of(resource.toURI()));
+  }
+
+  protected String getHtmlFromFileResource(String path) throws URISyntaxException, IOException {
+    ClassLoader classLoader = getClass().getClassLoader();
+    URL resource = classLoader.getResource("html" + path);
+    return Files.readAllLines(Path.of(resource.toURI())).stream()
+        .map(l -> l.replaceAll("^\\s+", ""))
+        .collect(Collectors.joining());
   }
 
   protected UUID extractFirstUuidFromPath(String path) {
