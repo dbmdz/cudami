@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.controller;
 
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -19,6 +20,8 @@ public abstract class BaseControllerTest {
   @Autowired protected MockMvc mockMvc;
 
   @MockBean protected WebpageService webpageService;
+
+  @MockBean protected WebsiteService websiteService;
 
   protected String getJsonFromFileResource(String path) throws URISyntaxException, IOException {
     ClassLoader classLoader = getClass().getClassLoader();
