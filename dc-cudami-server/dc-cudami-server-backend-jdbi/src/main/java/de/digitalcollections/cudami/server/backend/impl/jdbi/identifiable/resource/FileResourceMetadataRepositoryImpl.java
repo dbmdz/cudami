@@ -155,22 +155,14 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
             + tableName
             + " AS "
             + tableAlias
-            + " LEFT JOIN LATERAL jsonb_object_keys("
-            + tableAlias
-            + ".label) l(keys) ON "
-            + tableAlias
-            + ".label IS NOT NULL"
-            + " LEFT JOIN LATERAL jsonb_object_keys("
-            + tableAlias
-            + ".description) d(keys) ON "
-            + tableAlias
-            + ".description IS NOT NULL"
             + " WHERE ("
+            + "jsonb_path_exists("
             + tableAlias
-            + ".label->>l.keys ILIKE '%' || :searchTerm || '%'"
+            + ".label, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath)"
             + " OR "
+            + "jsonb_path_exists("
             + tableAlias
-            + ".description->>d.keys ILIKE '%' || :searchTerm || '%'"
+            + ".description, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath)"
             + " OR "
             + tableAlias
             + ".filename ILIKE '%' || :searchTerm || '%')";

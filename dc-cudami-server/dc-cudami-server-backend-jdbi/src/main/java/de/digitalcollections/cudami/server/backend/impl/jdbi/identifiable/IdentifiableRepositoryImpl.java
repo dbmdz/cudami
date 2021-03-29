@@ -334,35 +334,28 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   @Override
   public SearchPageResponse<I> find(SearchPageRequest searchPageRequest) {
-    String commonSql =
-        " FROM "
-            + tableName
-            + " AS "
+    String commonSql = " FROM " + tableName + " AS " + tableAlias;
+    String searchTerm = searchPageRequest.getQuery();
+    if (!StringUtils.hasText(searchTerm)) {
+      return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
+    }
+
+    commonSql +=
+        " WHERE ("
+            + "jsonb_path_exists("
             + tableAlias
-            + " LEFT JOIN LATERAL jsonb_object_keys("
-            + tableAlias
-            + ".label) lbl(keys) ON "
-            + tableAlias
-            + ".label IS NOT NULL"
-            + " LEFT JOIN LATERAL jsonb_object_keys("
-            + tableAlias
-            + ".description) dsc(keys) ON "
-            + tableAlias
-            + ".description IS NOT NULL"
-            + " WHERE ("
-            + tableAlias
-            + ".label->>lbl.keys ILIKE '%' || :searchTerm || '%'"
+            + ".label, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath)"
             + " OR "
+            + "jsonb_path_exists("
             + tableAlias
-            + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')";
-    return find(searchPageRequest, commonSql, Map.of("searchTerm", searchPageRequest.getQuery()));
+            + ".description, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath))";
+    return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
   }
 
   protected SearchPageResponse<I> find(
       SearchPageRequest searchPageRequest, String commonSql, Map<String, Object> argumentMappings) {
     StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".*" + commonSql);
     addFiltering(searchPageRequest, innerQuery);
-    innerQuery.append(" GROUP BY ").append(tableAlias).append(".uuid");
     addPageRequestParams(searchPageRequest, innerQuery);
     String orderBy = getOrderBy(searchPageRequest.getSorting());
     if (StringUtils.hasText(orderBy)) {
@@ -371,7 +364,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     List<I> result = retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, orderBy);
 
     StringBuilder countQuery =
-        new StringBuilder("SELECT count(distinct " + tableAlias + ".uuid)" + commonSql);
+        new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
     addFiltering(searchPageRequest, countQuery);
     long total = retrieveCount(countQuery, argumentMappings);
 
