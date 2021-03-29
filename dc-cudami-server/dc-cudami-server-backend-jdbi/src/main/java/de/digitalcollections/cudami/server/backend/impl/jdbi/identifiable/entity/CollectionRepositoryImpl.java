@@ -318,22 +318,14 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     String searchTerm = searchPageRequest.getQuery();
     if (StringUtils.hasText(searchTerm)) {
       commonSql +=
-          " LEFT JOIN LATERAL jsonb_object_keys("
+          " WHERE ("
+              + "jsonb_path_exists("
               + doTableAlias
-              + ".label) lbl(keys) ON "
-              + doTableAlias
-              + ".label IS NOT NULL"
-              + " LEFT JOIN LATERAL jsonb_object_keys("
-              + doTableAlias
-              + ".description) dsc(keys) ON "
-              + doTableAlias
-              + ".description IS NOT NULL"
-              + " WHERE ("
-              + doTableAlias
-              + ".label->>lbl.keys ILIKE '%' || :searchTerm || '%'"
+              + ".label, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath)"
               + " OR "
+              + "jsonb_path_exists("
               + doTableAlias
-              + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')"
+              + ".description, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath))"
               + " AND cd.collection_uuid = :uuid";
       argumentMappings.put("searchTerm", searchTerm);
     } else {
@@ -491,16 +483,6 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + tableName
             + " AS "
             + tableAlias
-            + " LEFT JOIN LATERAL jsonb_object_keys("
-            + tableAlias
-            + ".label) lbl(keys) ON "
-            + tableAlias
-            + ".label IS NOT NULL"
-            + " LEFT JOIN LATERAL jsonb_object_keys("
-            + tableAlias
-            + ".description) dsc(keys) ON "
-            + tableAlias
-            + ".description IS NOT NULL"
             + " WHERE ("
             + " NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = "
             + tableAlias
@@ -513,11 +495,13 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
     commonSql +=
         " AND ("
+            + "jsonb_path_exists("
             + tableAlias
-            + ".label->>lbl.keys ILIKE '%' || :searchTerm || '%'"
+            + ".label, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath)"
             + " OR "
+            + "jsonb_path_exists("
             + tableAlias
-            + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')";
+            + ".description, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath))";
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
   }
 

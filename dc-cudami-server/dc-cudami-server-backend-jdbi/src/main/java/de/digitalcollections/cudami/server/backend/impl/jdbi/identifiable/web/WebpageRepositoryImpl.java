@@ -321,16 +321,6 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
             + tableName
             + " AS "
             + tableAlias
-            + " LEFT JOIN LATERAL jsonb_object_keys("
-            + tableAlias
-            + ".label) lbl(keys) ON "
-            + tableAlias
-            + ".label IS NOT NULL"
-            + " LEFT JOIN LATERAL jsonb_object_keys("
-            + tableAlias
-            + ".description) dsc(keys) ON "
-            + tableAlias
-            + ".description IS NOT NULL"
             + " WHERE ("
             + " NOT EXISTS (SELECT FROM webpage_webpages WHERE child_webpage_uuid = "
             + tableAlias
@@ -343,11 +333,13 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
 
     commonSql +=
         " AND ("
+            + "jsonb_path_exists("
             + tableAlias
-            + ".label->>lbl.keys ILIKE '%' || :searchTerm || '%'"
+            + ".label, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath)"
             + " OR "
+            + "jsonb_path_exists("
             + tableAlias
-            + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')";
+            + ".description, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath))";
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
   }
 
