@@ -313,4 +313,13 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     DigitalObject result = findOne(digitalObject.getUuid());
     return result;
   }
+
+  public void setCollectionRepository(CollectionRepositoryImpl collectionRepositoryImpl) {
+    this.collectionRepositoryImpl = collectionRepositoryImpl;
+  }
+
+  public void setFileResourceMetadataRepository(
+      FileResourceMetadataRepositoryImpl<FileResource> fileResourceMetadataRepositoryImpl) {
+    this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
+  }
 }
