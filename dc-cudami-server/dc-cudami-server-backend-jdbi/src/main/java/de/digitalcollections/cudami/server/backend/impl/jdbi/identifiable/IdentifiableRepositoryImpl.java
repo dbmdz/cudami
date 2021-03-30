@@ -373,10 +373,19 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
     }
 
+    // FYI: [JSON Path
+    // Functions](https://www.postgresql.org/docs/12/functions-json.html#FUNCTIONS-SQLJSON-PATH)
+    // and [Data type](https://www.postgresql.org/docs/12/datatype-json.html#DATATYPE-JSONPATH)
     commonSql +=
         " WHERE ("
             + "jsonb_path_exists("
             + tableAlias
+            // To insert `:searchTerm` into the `jsonpath` we must split it up;
+            // the cast is necessary otherwise Postgres does not recognise it as `jsonpath` (that is
+            // just a string practically).
+            // Finds (case insensitively) labels that contain the search term, see `like_regex`
+            // example in
+            // https://www.postgresql.org/docs/12/functions-json.html#FUNCTIONS-SQLJSON-PATH
             + ".label, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath)"
             + " OR "
             + "jsonb_path_exists("
