@@ -28,7 +28,7 @@
     "extends": "react-app"
   },
   "dependencies": {
-    "@aeaton/prosemirror-footnotes": "^0.1.0",
+    "@aeaton/prosemirror-footnotes": "^2.0.1",
     "@aeaton/react-prosemirror": "^0.22.1",
     "@babel/runtime": "^7.13.10",
     "bootstrap": "^4.6.0",
