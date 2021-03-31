@@ -22,6 +22,10 @@ import org.springframework.http.MediaType;
 @DisplayName("The V3WebpageController")
 class V3WebpageControllerTest extends BaseWebpageControllerTest {
 
+  // TODO: test /latest/webpages/<uuid>/children
+  // TODO: test webpages and webpages/childen with active flag
+  // TODO: test latest/webpages/<uuid>/childrentree with and withput active flag
+
   @DisplayName("returns a webpage in explicit (url) v3 json format for UUID")
   @ParameterizedTest
   @ValueSource(
