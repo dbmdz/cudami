@@ -94,6 +94,10 @@ public class V1WebpageController {
           Locale pLocale)
       throws IdentifiableServiceException, JsonProcessingException {
     Webpage webpage = loadWebpage(pLocale, uuid);
+    if (webpage == null) {
+      return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+    }
+
     webpage.setCreated(null);
     webpage.setLastModified(null);
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(webpage));
@@ -109,6 +113,7 @@ public class V1WebpageController {
       result.put("text", convertLocalizedStructuredContentJson(result.getJSONObject("text")));
     }
     result.put("type", "RESOURCE");
+    result.put("entityPartType", "WEBPAGE");
     return new ResponseEntity<>(result.toString(), HttpStatus.OK);
   }
 

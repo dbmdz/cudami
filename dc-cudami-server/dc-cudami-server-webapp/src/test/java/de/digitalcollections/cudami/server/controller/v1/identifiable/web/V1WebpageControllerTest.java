@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.server.controller.v2.identifiable.web;
+package de.digitalcollections.cudami.server.controller.v1.identifiable.web;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -16,18 +16,17 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
-@WebMvcTest(V2WebpageController.class)
-public class V2WebpageControllerTest extends BaseWebpageControllerTest {
+@WebMvcTest(V1WebpageController.class)
+class V1WebpageControllerTest extends BaseWebpageControllerTest {
 
-  @DisplayName(
-      "returns a webpage in v2 json format for UUID, with or without json suffix in the url")
+  @DisplayName("returns a webpage in v1 json format for UUID")
   @ParameterizedTest
   @ValueSource(
       strings = {
-        "/v2/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa.json",
-        "/v2/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa"
+        "/v1/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa.json",
+        "/v1/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa"
       })
-  public void returnWebpageV2Json(String path) throws Exception {
+  public void returnWebpageV1Json(String path) throws Exception {
     Webpage expected = createWebpage(path);
     when(webpageService.get(any(UUID.class))).thenReturn(expected);
 
@@ -38,17 +37,35 @@ public class V2WebpageControllerTest extends BaseWebpageControllerTest {
         .andExpect(content().json(getJsonFromFileResource(path)));
   }
 
-  @DisplayName(
-      "returns a localized webpage in v2 json format for UUID, with or without json suffix in the url")
+  @DisplayName("returns a localized webpage in v1 json format for UUID")
   @ParameterizedTest
   @ValueSource(
       strings = {
-        "/v2/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa.json?pLocale=de",
-        "/v2/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa?pLocale=de"
+        "/v1/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa.json?pLocale=de_DE",
+        "/v1/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa?pLocale=de_DE"
       })
-  public void returnLocalizedWebpageV2Json(String path) throws Exception {
+  public void returnLocalizedWebpageV1Json(String path) throws Exception {
     Webpage expected = createWebpage(path);
     when(webpageService.get(any(UUID.class), any(Locale.class))).thenReturn(expected);
+
+    mockMvc
+        .perform(get(path))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(ContentType.APPLICATION_JSON.getMimeType()))
+        .andExpect(content().json(getJsonFromFileResource(path)));
+  }
+
+  @DisplayName(
+      "returns a localized webpage in v1 json format for UUID and a wrong locale parameter")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v1/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa.json?locale=de_DE",
+        "/v1/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa?locale=de_DE"
+      })
+  public void returnWrongLocalizedWebpageV1Json(String path) throws Exception {
+    Webpage expected = createWebpage(path);
+    when(webpageService.get(any(UUID.class))).thenReturn(expected);
 
     mockMvc
         .perform(get(path))
