@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
 import java.io.IOException;
@@ -20,15 +21,19 @@ public abstract class BaseControllerTest {
 
   @Autowired protected MockMvc mockMvc;
 
-  @MockBean protected WebpageService webpageService;
-
-  @MockBean protected WebsiteService websiteService;
-
+  @MockBean protected DigitalObjectService digitalObjectService;
   @MockBean protected LocaleService localeService;
+  @MockBean protected WebpageService webpageService;
+  @MockBean protected WebsiteService websiteService;
 
   protected String getJsonFromFileResource(String sourcePath) throws IOException {
     ClassLoader classLoader = getClass().getClassLoader();
     String path = sourcePath.replaceAll("[?&].*", "");
+    UUID uuid = extractFirstUuidFromPath(sourcePath);
+    if (uuid != null) {
+      // replace slash behind the first UUID with an underscore
+      path = path.replaceAll(uuid.toString() + "/", uuid.toString() + "_");
+    }
 
     String suffix = (path.endsWith(".json") ? "" : ".json");
     String fullPath = "json" + path + suffix;
