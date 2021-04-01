@@ -6,10 +6,13 @@ import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.StructuredContent;
+import de.digitalcollections.model.view.RenderingHints;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 
 public class BaseWebpageControllerTest extends BaseControllerTest {
 
@@ -88,5 +91,26 @@ public class BaseWebpageControllerTest extends BaseControllerTest {
     webpage.setLastModified(LocalDateTime.parse("2019-01-18T10:26:17.527"));
 
     return webpage;
+  }
+
+  protected Webpage createMetaWebpage(
+      String created,
+      Map<Locale, String> labelMap,
+      String lastModified,
+      String uuid,
+      String publicationStart,
+      boolean showInNavigation) {
+    Webpage webPage = new Webpage();
+    webPage.setCreated(LocalDateTime.parse(created));
+    LocalizedText label = new LocalizedText();
+    labelMap.entrySet().forEach(e -> label.setText(e.getKey(), e.getValue()));
+    webPage.setLabel(label);
+    webPage.setLastModified(LocalDateTime.parse(lastModified));
+    webPage.setUuid(UUID.fromString(uuid));
+    webPage.setPublicationStart(LocalDate.parse(publicationStart));
+    RenderingHints renderingHints = new RenderingHints();
+    renderingHints.setShowInPageNavigation(showInNavigation);
+    webPage.setRenderingHints(renderingHints);
+    return webPage;
   }
 }

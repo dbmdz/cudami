@@ -8,7 +8,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import de.digitalcollections.cudami.server.controller.BaseWebpageControllerTest;
 import de.digitalcollections.model.identifiable.web.Webpage;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Disabled;
@@ -156,5 +160,50 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
         .andExpect(
             content().contentType(ContentType.APPLICATION_XML.getMimeType() + ";charset=UTF-8"))
         .andExpect(content().xml(getXmlFromFileResource(path)));
+  }
+
+  @DisplayName("returns the children of a webpage")
+  @ParameterizedTest
+  @ValueSource(strings = {"/v3/webpages/157f5428-5a5a-4d47-971e-f092f1836246/children"})
+  public void returnChildrenOfAWebpage(String path) throws Exception {
+    List<Webpage> webpages =
+        List.of(
+            createMetaWebpage(
+                "2020-07-07T17:09:33.375772",
+                Map.of(Locale.GERMAN, "Kontakt", Locale.ENGLISH, "Contact"),
+                "2021-03-23T11:22:05.314403",
+                "5f92d901-8171-49da-9b6c-7201f545e944",
+                "2020-07-07",
+                false),
+            createMetaWebpage(
+                "2019-09-09T15:02:35.186941",
+                Map.of(Locale.GERMAN, "Impressum", Locale.ENGLISH, "Imprint"),
+                "2021-03-22T09:13:58.513396",
+                "7d2244c7-9e8a-40ed-9806-5618b6e64a87",
+                "2020-07-07",
+                true),
+            createMetaWebpage(
+                "2019-09-09T15:03:02.077221",
+                Map.of(Locale.GERMAN, "Datenschutzerklärung", Locale.ENGLISH, "Privacy Policy"),
+                "2021-03-22T09:16:23.327765",
+                "452ae4e9-b10f-4824-9b75-29f32ac89c34",
+                "2020-07-07",
+                true),
+            createMetaWebpage(
+                "2020-03-12T12:38:45.902257",
+                Map.of(Locale.GERMAN, "Barrierefreiheit", Locale.ENGLISH, "Accessibility"),
+                "2021-03-22T09:17:40.237713",
+                "fc8a8363-4091-412f-8cc6-5e2386deea94",
+                "2020-07-07",
+                true));
+
+    PageResponse<Webpage> children = buildStandardPageResponse(Webpage.class, webpages);
+    when(webpageService.getChildren(any(UUID.class), any(PageRequest.class))).thenReturn(children);
+
+    mockMvc
+        .perform(get(path))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(ContentType.APPLICATION_JSON.getMimeType()))
+        .andExpect(content().json(getJsonFromFileResource(path)));
   }
 }

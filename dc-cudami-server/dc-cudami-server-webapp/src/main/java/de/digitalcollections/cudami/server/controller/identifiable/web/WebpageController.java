@@ -178,7 +178,7 @@ public class WebpageController {
 
   @ApiMethod(description = "Get (active or all) paged children of a webpage as JSON")
   @GetMapping(
-      value = {"/latest/webpages/{uuid}/children", "/v3/webpages/{uuid}/children"},
+      value = {"/latest/webpages/{uuid}/children"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Webpage> getWebpageChildren(

@@ -1,14 +1,20 @@
 package de.digitalcollections.cudami.server.controller;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageRequestBuilder;
+import de.digitalcollections.model.paging.PageResponse;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,8 +27,10 @@ public abstract class BaseControllerTest {
 
   @Autowired protected MockMvc mockMvc;
 
+  @MockBean protected CollectionService collectionService;
   @MockBean protected DigitalObjectService digitalObjectService;
   @MockBean protected LocaleService localeService;
+  @MockBean protected ProjectService projectService;
   @MockBean protected WebpageService webpageService;
   @MockBean protected WebsiteService websiteService;
 
@@ -96,5 +104,14 @@ public abstract class BaseControllerTest {
       return UUID.fromString(matcher.group(0));
     }
     return null;
+  }
+
+  protected <T> PageResponse<T> buildStandardPageResponse(Class<T> type, List content) {
+    PageResponse pageResponse = new PageResponse();
+    pageResponse.setContent(content);
+    pageResponse.setTotalElements(content.size());
+    PageRequest pageRequest = new PageRequestBuilder().pageSize(25).pageNumber(0).build();
+    pageResponse.setPageRequest(pageRequest);
+    return pageResponse;
   }
 }
