@@ -206,4 +206,9 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
         .andExpect(content().contentType(ContentType.APPLICATION_JSON.getMimeType()))
         .andExpect(content().json(getJsonFromFileResource(path)));
   }
+
+  @DisplayName("returns a website")
+  @ParameterizedTest
+  @ValueSource(strings = {"/v3/webpages/6d52141c-5c5d-48b4-aee8-7df5404d245e/website"})
+  public void returnWebsite(String path) throws Exception {}
 }
