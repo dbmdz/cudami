@@ -4,17 +4,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
-import de.digitalcollections.model.identifiable.entity.Website;
+import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.Sorting;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
+import org.jsondoc.core.annotation.ApiPathParam;
 import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,75 +26,58 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * This controller is only responsible for the incompatible v2 endpoints, which differ from the
+ * This controller is only responsible for the incompatible v3 endpoints, which differ from the
  * latest endpoint
  */
 @RestController
-@Api(description = "The website controller Version 2", name = "Website controller v2")
-public class V2WebsiteController {
+@Api(description = "The website controller Version 3", name = "Website controller v3")
+public class V3WebsiteController {
 
   private final DigitalCollectionsObjectMapper objectMapper = new DigitalCollectionsObjectMapper();
 
   private final WebsiteService websiteService;
 
-  public V2WebsiteController(WebsiteService websiteService) {
+  public V3WebsiteController(WebsiteService websiteService) {
     this.websiteService = websiteService;
   }
 
-  @ApiMethod(description = "Get all websites")
+  @ApiMethod(description = "Get paged root pages of a website")
   @GetMapping(
-      value = {"/v2/websites"},
+      value = {"/v3/websites/{uuid}/rootpages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
-  public ResponseEntity<String> findAll(
+  public ResponseEntity<String> getRootPages(
+      @ApiPathParam(
+              description =
+                  "UUID of the parent webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
       throws JsonProcessingException {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
+      pageRequest.setSorting(sorting);
     }
-    SearchPageResponse response = websiteService.find(searchPageRequest);
+
+    PageResponse<Webpage> response = websiteService.getRootPages(uuid, pageRequest);
     if (response == null) {
       return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
     // Fix the attributes, which are missing or different in new model
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(response));
-    JSONArray websites = (JSONArray) result.get("content");
-    for (Iterator it = websites.iterator(); it.hasNext(); ) {
-      JSONObject website = (JSONObject) it.next();
-      website.put("className", "de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl");
-    }
-
-    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
-  }
-
-  @ApiMethod(description = "Get website by uuid")
-  @GetMapping(
-      value = {"/v2/websites/{uuid}", "/v2/websites/{uuid}.json"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
-  public String findById(@PathVariable UUID uuid) throws JsonProcessingException {
-    Website website = websiteService.get(uuid);
-    if (website == null) {
-      return null;
-    }
-
-    // Fix the attributes, which are missing or different in new model
-    JSONObject result = new JSONObject(objectMapper.writeValueAsString(website));
-    result.put("type", "ENTITY");
-    result.put("entityType", "WEBSITE");
-    JSONArray rootPages = (JSONArray) result.get("rootPages");
+    JSONArray rootPages = (JSONArray) result.get("content");
     for (Iterator it = rootPages.iterator(); it.hasNext(); ) {
       JSONObject rootPage = (JSONObject) it.next();
+      rootPage.put(
+          "className", "de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl");
       rootPage.put("type", "ENTITY_PART");
       rootPage.put("entityPartType", "WEBPAGE");
     }
 
-    return result.toString();
+    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
   }
 }

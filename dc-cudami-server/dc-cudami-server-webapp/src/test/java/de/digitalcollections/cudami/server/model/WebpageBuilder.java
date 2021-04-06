@@ -2,7 +2,11 @@ package de.digitalcollections.cudami.server.model;
 
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.web.Webpage;
+import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.text.StructuredContent;
+import de.digitalcollections.model.text.contentblock.ContentBlock;
+import de.digitalcollections.model.text.contentblock.Paragraph;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -49,6 +53,19 @@ public class WebpageBuilder {
 
   public WebpageBuilder setPublicationStart(String publicationStart) {
     webpage.setPublicationStart(LocalDate.parse(publicationStart));
+    return this;
+  }
+
+  public WebpageBuilder setSimpleDescription(Map<String, String> localizedContentMap) {
+    LocalizedStructuredContent description = new LocalizedStructuredContent();
+    for (Map.Entry<String, String> entry : localizedContentMap.entrySet()) {
+      StructuredContent localizedDescription = new StructuredContent();
+      ContentBlock paragraph = new Paragraph(entry.getValue());
+      localizedDescription.addContentBlock(paragraph);
+      description.put(LocaleUtils.toLocale(entry.getKey()), localizedDescription);
+    }
+
+    webpage.setDescription(description);
     return this;
   }
 }

@@ -9,8 +9,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.cudami.server.model.DescriptionBuilder;
 import de.digitalcollections.cudami.server.model.WebpageBuilder;
+import de.digitalcollections.cudami.server.model.WebsiteBuilder;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.entity.Website;
+import de.digitalcollections.model.paging.Direction;
+import de.digitalcollections.model.paging.NullHandling;
+import de.digitalcollections.model.paging.OrderBuilder;
+import de.digitalcollections.model.paging.PageRequestBuilder;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.paging.SortingBuilder;
 import de.digitalcollections.model.text.LocalizedText;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -75,6 +83,56 @@ class V2WebsiteControllerTest extends BaseControllerTest {
                 .build()));
 
     when(websiteService.get(any(UUID.class))).thenReturn(website);
+
+    mockMvc
+        .perform(get(path))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(ContentType.APPLICATION_JSON.getMimeType()))
+        .andExpect(content().json(getJsonFromFileResource(path)));
+  }
+
+  @DisplayName("returns a paged list of websites")
+  @ParameterizedTest
+  @ValueSource(strings = {"/v2/websites?pageNumber=0&pageSize=1"})
+  public void pagedWebsites(String path) throws Exception {
+    SearchPageResponse<Website> expected = new SearchPageResponse();
+    expected.setTotalElements(82);
+    expected.setPageRequest(
+        new PageRequestBuilder()
+            .pageSize(1)
+            .pageNumber(0)
+            .sorting(
+                new SortingBuilder()
+                    .order(
+                        new OrderBuilder()
+                            .direction(Direction.ASC)
+                            .property("label")
+                            .subProperty("de")
+                            .nullHandling(NullHandling.NATIVE)
+                            .build())
+                    .order(
+                        new OrderBuilder()
+                            .direction(Direction.ASC)
+                            .property("label")
+                            .subProperty("")
+                            .nullHandling(NullHandling.NATIVE)
+                            .build())
+                    .build())
+            .build());
+    List<Website> websites =
+        List.of(
+            new WebsiteBuilder()
+                .setCreated("2018-05-02T13:32:52.582")
+                .setSimpleDescription(Map.of(Locale.GERMAN, ""))
+                .setLabel(Map.of("de", "Testseite"))
+                .setLastModified("2018-09-11T09:47:40.311")
+                .setUuid("e91464a1-588b-434b-a88e-b6a1c3824c85")
+                .setRefId(71)
+                .setUrl("https://www.digitale-sammlungen.de/")
+                .build());
+    expected.setContent(websites);
+
+    when(websiteService.find(any(SearchPageRequest.class))).thenReturn(expected);
 
     mockMvc
         .perform(get(path))

@@ -50,7 +50,7 @@ public class WebsiteController {
 
   @ApiMethod(description = "Get all websites")
   @GetMapping(
-      value = {"/latest/websites", "/v2/websites"},
+      value = {"/latest/websites"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Website> findAll(
@@ -86,7 +86,7 @@ public class WebsiteController {
 
   @ApiMethod(description = "Get paged root pages of a website")
   @GetMapping(
-      value = {"/latest/websites/{uuid}/rootpages", "/v3/websites/{uuid}/rootpages"},
+      value = {"/latest/websites/{uuid}/rootpages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public SearchPageResponse<Webpage> getRootPages(
