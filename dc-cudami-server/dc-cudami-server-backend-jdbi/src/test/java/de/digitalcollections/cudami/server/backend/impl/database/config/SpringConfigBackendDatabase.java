@@ -25,6 +25,7 @@ import org.testcontainers.utility.DockerImageName;
 public class SpringConfigBackendDatabase {
 
   private static final DockerImageName DOCKER_IMAGE_NAME = new DockerImageName("postgres:12");
+  private static Boolean isMigrated = false;
 
   @Container
   public static PostgreSQLContainer postgreSQLContainer =
@@ -62,15 +63,20 @@ public class SpringConfigBackendDatabase {
     jdbi.installPlugin(new PostgresPlugin());
     jdbi.installPlugin(new JsonbJdbiPlugin(objectMapper));
 
-    Map<String, String> placeholders = Map.of("iiifBaseUrl", "foo");
-    Flyway flyway =
-        Flyway.configure()
-            .dataSource(dataSource)
-            .placeholders(placeholders)
-            .locations(
-                "classpath:/de/digitalcollections/cudami/server/backend/impl/database/migration")
-            .load();
-    flyway.migrate();
+    if (!isMigrated) {
+      synchronized (isMigrated) {
+        Map<String, String> placeholders = Map.of("iiifBaseUrl", "foo");
+        Flyway flyway =
+            Flyway.configure()
+                .dataSource(dataSource)
+                .placeholders(placeholders)
+                .locations(
+                    "classpath:/de/digitalcollections/cudami/server/backend/impl/database/migration")
+                .load();
+        flyway.migrate();
+        isMigrated = true;
+      }
+    }
 
     return jdbi;
   }
