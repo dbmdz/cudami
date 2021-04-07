@@ -21,7 +21,8 @@ public class CudamiHumanSettlementsClient extends CudamiBaseClient<HumanSettleme
   }
 
   public long count() throws HttpException {
-    return -1; // URL /latest/human_settlements/count does not exist
+    // No GET endpoint for /latest/human_settlements/count available!
+    throw new HttpException("/latest/human_settlements/count", 404);
   }
 
   public PageResponse<HumanSettlementImpl> find(PageRequest pageRequest) throws HttpException {

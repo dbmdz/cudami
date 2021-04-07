@@ -17,7 +17,8 @@ public class CudamiGivenNamesClient extends CudamiBaseClient<GivenNameImpl> {
   }
 
   public long count() throws HttpException {
-    return -1; // URL /latest/givennames/count does not exist yet!
+    // No GET endpoint for /latest/givennames/count available!
+    throw new HttpException("/latest/givennames/count", 404);
   }
 
   public GivenName create() {

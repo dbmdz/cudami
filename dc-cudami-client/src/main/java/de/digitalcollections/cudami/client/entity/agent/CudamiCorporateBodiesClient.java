@@ -21,7 +21,8 @@ public class CudamiCorporateBodiesClient extends CudamiBaseClient<CorporateBodyI
   }
 
   public long count() throws HttpException {
-    return -1; // URL /latest/corporatebodies/count does not exist
+    // No GET endpoint for /latest/corporatebodies/count available!
+    throw new HttpException("/latest/corporatebodies/count", 404);
   }
 
   public PageResponse<CorporateBodyImpl> find(PageRequest pageRequest) throws HttpException {

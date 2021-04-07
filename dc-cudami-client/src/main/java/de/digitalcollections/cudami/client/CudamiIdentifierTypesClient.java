@@ -24,17 +24,18 @@ public class CudamiIdentifierTypesClient extends CudamiBaseClient<IdentifierType
   }
 
   public long count() throws HttpException {
-    return Long.parseLong(doGetRequestForString("/latest/identifiertypes/count"));
+    // No GET endpoint for /latest/identifiertypes/count available!
+    throw new HttpException("/latest/identifiertypes/count", 404);
   }
 
   public PageResponse<IdentifierTypeImpl> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/identifiertypes", pageRequest);
+    return doGetRequestForPagedObjectList("/v2/identifiertypes", pageRequest);
   }
 
   public SearchPageResponse<IdentifierTypeImpl> find(SearchPageRequest searchPageRequest)
       throws HttpException {
-    return doGetSearchRequestForPagedObjectList(
-        "/latest/identifiertypes/search", searchPageRequest);
+    // No GET endpoint for /latest/identifiertypes/search available!
+    throw new HttpException("/latest/identifiertypes/search", 404);
   }
 
   public List<IdentifierTypeImpl> find(String searchTerm, int maxResults) throws HttpException {
@@ -45,25 +46,25 @@ public class CudamiIdentifierTypesClient extends CudamiBaseClient<IdentifierType
   }
 
   public IdentifierType findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/identifiertypes/%s", uuid));
+    return doGetRequestForObject(String.format("/v2/identifiertypes/%s", uuid));
   }
 
   public IdentifierType findOne(UUID uuid, String locale) throws HttpException {
-    return doGetRequestForObject(
-        String.format("/latest/identifiertypes/%s?locale=%s", uuid, locale));
+    return doGetRequestForObject(String.format("/v2/identifiertypes/%s?locale=%s", uuid, locale));
   }
 
   public IdentifierType findOneByIdentifier(String namespace, String id) throws HttpException {
-    return doGetRequestForObject(
-        String.format("/latest/identifiertypes/identifier/%s:%s.json", namespace, id));
+    // No GET endpoint for /latest/identifiertypes/identifier/%s:%s.json available!
+    throw new HttpException(
+        String.format("/latest/identifiertypes/identifier/%s:%s.json", namespace, id), 404);
   }
 
   public IdentifierType save(IdentifierType identifierType) throws HttpException {
-    return doPostRequestForObject("/latest/identifiertypes", (IdentifierTypeImpl) identifierType);
+    return doPostRequestForObject("/v2/identifiertypes", (IdentifierTypeImpl) identifierType);
   }
 
   public IdentifierType update(UUID uuid, IdentifierType identifierType) throws HttpException {
     return doPutRequestForObject(
-        String.format("/latest/identifiertypes/%s", uuid), (IdentifierTypeImpl) identifierType);
+        String.format("/v2/identifiertypes/%s", uuid), (IdentifierTypeImpl) identifierType);
   }
 }

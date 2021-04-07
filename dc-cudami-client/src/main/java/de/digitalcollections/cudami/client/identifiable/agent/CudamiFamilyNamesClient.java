@@ -17,7 +17,8 @@ public class CudamiFamilyNamesClient extends CudamiBaseClient<FamilyNameImpl> {
   }
 
   public long count() throws HttpException {
-    return -1; // URL /latest/familynames/count does not exist!
+    // No GET endpoint for /latest/familynames/count available!
+    throw new HttpException("/latest/familynames/count", 404);
   }
 
   public FamilyName create() {

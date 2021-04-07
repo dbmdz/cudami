@@ -97,7 +97,10 @@ public class EntityController<E extends Entity> {
 
   @ApiMethod(description = "Get entity by namespace and id")
   @GetMapping(
-      value = {"/latest/entities/identifier/{namespace}:{id}"},
+      value = {
+        "/latest/entities/identifier/{namespace}:{id}",
+        "/v3/entities/identifier/{namespace}:{id}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Entity findByIdentifier(@PathVariable String namespace, @PathVariable String id)
@@ -108,7 +111,7 @@ public class EntityController<E extends Entity> {
 
   @ApiMethod(description = "Get entity by reference id")
   @GetMapping(
-      value = {"/latest/entities/{refId:[0-9]+}"},
+      value = {"/latest/entities/{refId:[0-9]+}", "/v3/entities/{refId:[0-9]+}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Entity findByRefId(@PathVariable long refId) {

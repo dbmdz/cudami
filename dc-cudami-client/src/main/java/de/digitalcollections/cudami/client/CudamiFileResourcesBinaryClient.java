@@ -69,7 +69,7 @@ public class CudamiFileResourcesBinaryClient {
 
   private FileResource doPost(HttpEntity entity) throws HttpException {
     try {
-      HttpPost post = new HttpPost(serverUri + "/latest/files");
+      HttpPost post = new HttpPost(serverUri + "/v2/files");
       post.setEntity(entity);
       HttpClient client = HttpClientBuilder.create().build();
       HttpResponse response = client.execute(post);

@@ -23,36 +23,37 @@ public class CudamiTopicsClient extends CudamiBaseClient<TopicImpl> {
   }
 
   public long count() throws HttpException {
-    return Long.parseLong(doGetRequestForString("/latest/topics/count"));
+    return Long.parseLong(doGetRequestForString("/v2/topics/count"));
   }
 
   public PageResponse<TopicImpl> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/topics", pageRequest);
+    return doGetRequestForPagedObjectList("/v2/topics", pageRequest);
   }
 
   public Topic findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/topics/%s", uuid));
+    return doGetRequestForObject(String.format("/v2/topics/%s", uuid));
   }
 
   public Topic findOne(UUID uuid, String locale) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/topics/%s?locale=%s", uuid, locale));
+    return doGetRequestForObject(String.format("/v2/topics/%s?locale=%s", uuid, locale));
   }
 
   public Topic findOneByIdentifier(String namespace, String id) throws HttpException {
-    return doGetRequestForObject(
-        String.format("/latest/topics/identifier/%s:%s.json", namespace, id));
+    // No GET endpoint for /latest/topics/identifier/%s:%s.json available!
+    throw new HttpException(
+        String.format("/latest/topics/identifier/%s:%s.json", namespace, id), 404);
   }
 
   public List<Subtopic> getSubtopics(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
-        String.format("/latest/topics/%s/subtopics", uuid), SubtopicImpl.class);
+        String.format("/v2/topics/%s/subtopics", uuid), SubtopicImpl.class);
   }
 
   public Topic save(Topic topic) throws HttpException {
-    return doPostRequestForObject("/latest/topics", (TopicImpl) topic);
+    return doPostRequestForObject("/v2/topics", (TopicImpl) topic);
   }
 
   public Topic update(UUID uuid, Topic topic) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/topics/%s", uuid), (TopicImpl) topic);
+    return doPutRequestForObject(String.format("/v2/topics/%s", uuid), (TopicImpl) topic);
   }
 }

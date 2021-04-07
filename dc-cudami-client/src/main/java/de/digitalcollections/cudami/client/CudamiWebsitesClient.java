@@ -24,48 +24,48 @@ public class CudamiWebsitesClient extends CudamiBaseClient<WebsiteImpl> {
   }
 
   public long count() throws HttpException {
-    return Long.parseLong(doGetRequestForString("/latest/websites/count"));
+    return Long.parseLong(doGetRequestForString("/v2/websites/count"));
   }
 
   public PageResponse<WebsiteImpl> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/websites", pageRequest);
+    return doGetRequestForPagedObjectList("/v2/websites", pageRequest);
   }
 
   public Website findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/websites/%s", uuid));
+    return doGetRequestForObject(String.format("/v2/websites/%s", uuid));
   }
 
   public Website findOne(UUID uuid, String locale) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/websites/%s?locale=%s", uuid, locale));
+    return doGetRequestForObject(String.format("/v2/websites/%s?locale=%s", uuid, locale));
   }
 
   public Website findOneByIdentifier(String namespace, String id) throws HttpException {
-    return doGetRequestForObject(
-        String.format("/latest/websites/identifier/%s:%s.json", namespace, id));
+    // No GET endpoint for /latest/websites/identifier/%s:%s.json available!
+    throw new HttpException(
+        String.format("/latest/websites/identifier/%s:%s.json", namespace, id), 404);
   }
 
   public List<Locale> getLanguages() throws HttpException {
-    return doGetRequestForObjectList("/latest/websites/languages", Locale.class);
+    return doGetRequestForObjectList("/v2/websites/languages", Locale.class);
   }
 
   public PageResponse<Webpage> getRootPages(UUID uuid, PageRequest pageRequest)
       throws HttpException {
     return doGetRequestForPagedObjectList(
-        String.format("/latest/websites/%s/rootpages", uuid), pageRequest, WebpageImpl.class);
+        String.format("/v3/websites/%s/rootpages", uuid), pageRequest, WebpageImpl.class);
   }
 
   public Website save(Website website) throws HttpException {
-    return doPostRequestForObject("/latest/websites", (WebsiteImpl) website);
+    return doPostRequestForObject("/v2/websites", (WebsiteImpl) website);
   }
 
   public Website update(UUID uuid, Website website) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/websites/%s", uuid), (WebsiteImpl) website);
+    return doPutRequestForObject(String.format("/v2/websites/%s", uuid), (WebsiteImpl) website);
   }
 
   public boolean updateRootPagesOrder(UUID websiteUuid, List<Webpage> rootpages)
       throws HttpException {
     return Boolean.parseBoolean(
-        doPutRequestForString(
-            String.format("/latest/websites/%s/rootpages", websiteUuid), rootpages));
+        doPutRequestForString(String.format("/v3/websites/%s/rootpages", websiteUuid), rootpages));
   }
 }
