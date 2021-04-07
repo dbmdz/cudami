@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 ### Changed
 
 - Migrating all "latest" API calls in dc-cudami-client to use the
-  versionated endpoints.
+  versioned endpoints.
 
 ## [4.4.4](https://github.com/dbmdz/cudami/releases/tag/4.4.4) - 2021-04-01
 
