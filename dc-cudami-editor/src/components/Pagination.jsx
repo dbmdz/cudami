@@ -14,7 +14,7 @@ const Pagination = ({
 }) => {
   const {t} = useTranslation()
   if (totalElements === 0) {
-    return null
+    return <div />
   }
   return (
     <div className="justify-content-start">
