@@ -31,9 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
-@Testcontainers
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
     webEnvironment = WebEnvironment.MOCK,
