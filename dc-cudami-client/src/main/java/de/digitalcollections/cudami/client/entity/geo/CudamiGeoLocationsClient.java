@@ -21,16 +21,16 @@ public class CudamiGeoLocationsClient extends CudamiBaseClient<GeoLocationImpl> 
   }
 
   public long count() throws HttpException {
-    return Long.parseLong(doGetRequestForString("/latest/geolocations/count"));
+    return Long.parseLong(doGetRequestForString("/v2/geolocations/count"));
   }
 
   public PageResponse<GeoLocationImpl> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/geolocations", pageRequest);
+    return doGetRequestForPagedObjectList("/v2/geolocations", pageRequest);
   }
 
   public PageResponse findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial) throws HttpException {
-    return findByLanguageAndInitial("/latest/geolocations", pageRequest, language, initial);
+    return findByLanguageAndInitial("/v2/geolocations", pageRequest, language, initial);
   }
 
   public PageResponse<GeoLocationImpl> findByLanguageAndInitial(
@@ -43,7 +43,7 @@ public class CudamiGeoLocationsClient extends CudamiBaseClient<GeoLocationImpl> 
       String initial)
       throws HttpException {
     return findByLanguageAndInitial(
-        "/latest/geolocations",
+        "/v2/geolocations",
         pageNumber,
         pageSize,
         sortField,
@@ -54,20 +54,20 @@ public class CudamiGeoLocationsClient extends CudamiBaseClient<GeoLocationImpl> 
   }
 
   public GeoLocation findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/geolocations/%s", uuid));
+    return doGetRequestForObject(String.format("/v2/geolocations/%s", uuid));
   }
 
   public GeoLocation findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-        String.format("/latest/geolocations/identifier?namespace=%s&id=%s", namespace, id));
+        String.format("/v2/geolocations/identifier?namespace=%s&id=%s", namespace, id));
   }
 
   public GeoLocation save(GeoLocation geoLocation) throws HttpException {
-    return doPostRequestForObject("/latest/geolocations", (GeoLocationImpl) geoLocation);
+    return doPostRequestForObject("/v2/geolocations", (GeoLocationImpl) geoLocation);
   }
 
   public GeoLocation update(UUID uuid, GeoLocation geoLocation) throws HttpException {
     return doPutRequestForObject(
-        String.format("/latest/geolocations/%s", uuid), (GeoLocationImpl) geoLocation);
+        String.format("/v2/geolocations/%s", uuid), (GeoLocationImpl) geoLocation);
   }
 }
