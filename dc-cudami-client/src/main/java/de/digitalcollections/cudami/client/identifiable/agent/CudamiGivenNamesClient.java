@@ -17,7 +17,8 @@ public class CudamiGivenNamesClient extends CudamiBaseClient<GivenNameImpl> {
   }
 
   public long count() throws HttpException {
-    return Long.parseLong(doGetRequestForString("/latest/givennames/count"));
+    // No GET endpoint for /latest/givennames/count available!
+    throw new HttpException("/latest/givennames/count", 404);
   }
 
   public GivenName create() {
@@ -25,12 +26,12 @@ public class CudamiGivenNamesClient extends CudamiBaseClient<GivenNameImpl> {
   }
 
   public PageResponse<GivenNameImpl> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/givennames", pageRequest);
+    return doGetRequestForPagedObjectList("/v2/givennames", pageRequest);
   }
 
   public PageResponse findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial) throws HttpException {
-    return findByLanguageAndInitial("/latest/givennames", pageRequest, language, initial);
+    return findByLanguageAndInitial("/v2/givennames", pageRequest, language, initial);
   }
 
   public PageResponse<GivenNameImpl> findByLanguageAndInitial(
@@ -43,7 +44,7 @@ public class CudamiGivenNamesClient extends CudamiBaseClient<GivenNameImpl> {
       String initial)
       throws HttpException {
     return findByLanguageAndInitial(
-        "/latest/givennames",
+        "/v2/givennames",
         pageNumber,
         pageSize,
         sortField,
@@ -54,20 +55,20 @@ public class CudamiGivenNamesClient extends CudamiBaseClient<GivenNameImpl> {
   }
 
   public GivenName findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/givennames/%s", uuid));
+    return doGetRequestForObject(String.format("/v2/givennames/%s", uuid));
   }
 
   public GivenName findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-        String.format("/latest/givennames/identifier?namespace=%s&id=%s", namespace, id));
+        String.format("/v2/givennames/identifier?namespace=%s&id=%s", namespace, id));
   }
 
   public GivenName save(GivenName givenName) throws HttpException {
-    return doPostRequestForObject("/latest/givennames", (GivenNameImpl) givenName);
+    return doPostRequestForObject("/v2/givennames", (GivenNameImpl) givenName);
   }
 
   public GivenName update(UUID uuid, GivenName givenName) throws HttpException {
     return doPutRequestForObject(
-        String.format("/latest/givennames/%s", uuid), (GivenNameImpl) givenName);
+        String.format("/v2/givennames/%s", uuid), (GivenNameImpl) givenName);
   }
 }

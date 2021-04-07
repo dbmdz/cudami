@@ -21,30 +21,30 @@ public class CudamiUsersClient extends CudamiBaseClient<UserImpl> {
   }
 
   public PageResponse<UserImpl> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/users", pageRequest);
+    return doGetRequestForPagedObjectList("/v2/users", pageRequest);
   }
 
   public List<UserImpl> findActiveAdminUsers() throws HttpException {
-    return doGetRequestForObjectList("/latest/users?role=ADMIN&enabled=true");
+    return doGetRequestForObjectList("/v2/users?role=ADMIN&enabled=true");
   }
 
   public List<UserImpl> findAll() throws HttpException {
-    return doGetRequestForObjectList("/latest/users");
+    return doGetRequestForObjectList("/v2/users");
   }
 
   public User findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/users/%s", uuid));
+    return doGetRequestForObject(String.format("/v2/users/%s", uuid));
   }
 
   public User findOneByEmail(String email) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/users?email=%s", email));
+    return doGetRequestForObject(String.format("/v2/users?email=%s", email));
   }
 
   public User save(User user) throws HttpException {
-    return doPostRequestForObject("/latest/users", (UserImpl) user);
+    return doPostRequestForObject("/v2/users", (UserImpl) user);
   }
 
   public User update(UUID uuid, User user) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/users/%s", uuid), (UserImpl) user);
+    return doPutRequestForObject(String.format("/v2/users/%s", uuid), (UserImpl) user);
   }
 }

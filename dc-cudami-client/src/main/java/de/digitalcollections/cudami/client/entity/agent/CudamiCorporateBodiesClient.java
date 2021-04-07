@@ -21,37 +21,37 @@ public class CudamiCorporateBodiesClient extends CudamiBaseClient<CorporateBodyI
   }
 
   public long count() throws HttpException {
-    return Long.parseLong(doGetRequestForString("/latest/corporatebodies/count"));
+    // No GET endpoint for /latest/corporatebodies/count available!
+    throw new HttpException("/latest/corporatebodies/count", 404);
   }
 
   public PageResponse<CorporateBodyImpl> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/corporatebodies", pageRequest);
+    return doGetRequestForPagedObjectList("/v2/corporatebodies", pageRequest);
   }
 
   public CorporateBody findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/corporatebodies/%s", uuid));
+    return doGetRequestForObject(String.format("/v2/corporatebodies/%s", uuid));
   }
 
   public CorporateBody findOne(UUID uuid, String locale) throws HttpException {
-    return doGetRequestForObject(
-        String.format("/latest/corporatebodies/%s?pLocale=%s", uuid, locale));
+    return doGetRequestForObject(String.format("/v2/corporatebodies/%s?pLocale=%s", uuid, locale));
   }
 
   public CorporateBody findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-        String.format("/latest/corporatebodies/identifier/%s:%s.json", namespace, id));
+        String.format("/v3/corporatebodies/identifier/%s:%s.json", namespace, id));
   }
 
   public CorporateBody fetchAndSaveByGndId(String gndId) throws HttpException {
-    return doPostRequestForObject(String.format("/latest/corporatebodies/gnd/%s", gndId));
+    return doPostRequestForObject(String.format("/v3/corporatebodies/gnd/%s", gndId));
   }
 
   public CorporateBody save(CorporateBody corporateBody) throws HttpException {
-    return doPostRequestForObject("/latest/corporatebodies", (CorporateBodyImpl) corporateBody);
+    return doPostRequestForObject("/v2/corporatebodies", (CorporateBodyImpl) corporateBody);
   }
 
   public CorporateBody update(UUID uuid, CorporateBody corporateBody) throws HttpException {
     return doPutRequestForObject(
-        String.format("/latest/corporatebodies/%s", uuid), (CorporateBodyImpl) corporateBody);
+        String.format("/v2/corporatebodies/%s", uuid), (CorporateBodyImpl) corporateBody);
   }
 }

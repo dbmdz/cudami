@@ -24,16 +24,16 @@ public class CudamiPersonsClient extends CudamiBaseClient<PersonImpl> {
   }
 
   public long count() throws HttpException {
-    return Long.parseLong(doGetRequestForString("/latest/persons/count"));
+    return Long.parseLong(doGetRequestForString("/v2/persons/count"));
   }
 
   public PageResponse<PersonImpl> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/persons", pageRequest);
+    return doGetRequestForPagedObjectList("/v2/persons", pageRequest);
   }
 
   public PageResponse findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial) throws HttpException {
-    return findByLanguageAndInitial("/latest/persons", pageRequest, language, initial);
+    return findByLanguageAndInitial("/v2/persons", pageRequest, language, initial);
   }
 
   public PageResponse<PersonImpl> findByLanguageAndInitial(
@@ -46,7 +46,7 @@ public class CudamiPersonsClient extends CudamiBaseClient<PersonImpl> {
       String initial)
       throws HttpException {
     return findByLanguageAndInitial(
-        "/latest/persons",
+        "/v2/persons",
         pageNumber,
         pageSize,
         sortField,
@@ -59,39 +59,39 @@ public class CudamiPersonsClient extends CudamiBaseClient<PersonImpl> {
   public PageResponse<PersonImpl> findByPlaceOfBirth(PageRequest pageRequest, UUID uuidGeoLocation)
       throws HttpException {
     return doGetRequestForPagedObjectList(
-        "/latest/persons/placeofbirth/" + uuidGeoLocation.toString(), pageRequest);
+        "/v2/persons/placeofbirth/" + uuidGeoLocation.toString(), pageRequest);
   }
 
   public PageResponse<PersonImpl> findByPlaceOfDeath(PageRequest pageRequest, UUID uuidGeoLocation)
       throws HttpException {
     return doGetRequestForPagedObjectList(
-        "/latest/persons/placeofdeath/" + uuidGeoLocation.toString(), pageRequest);
+        "/v2/persons/placeofdeath/" + uuidGeoLocation.toString(), pageRequest);
   }
 
   public Person findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/persons/%s", uuid));
+    return doGetRequestForObject(String.format("/v2/persons/%s", uuid));
   }
 
   public Person findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-        String.format("/latest/persons/identifier?namespace=%s&id=%s", namespace, id));
+        String.format("/v2/persons/identifier?namespace=%s&id=%s", namespace, id));
   }
 
   public List getDigitalObjects(UUID uuidPerson) throws HttpException {
     return doGetRequestForObjectList(
-        String.format("/latest/persons/%s/digitalobjects", uuidPerson), DigitalObjectImpl.class);
+        String.format("/v2/persons/%s/digitalobjects", uuidPerson), DigitalObjectImpl.class);
   }
 
   public List getWorks(UUID uuidPerson) throws HttpException {
     return doGetRequestForObjectList(
-        String.format("/latest/persons/%s/works", uuidPerson), WorkImpl.class);
+        String.format("/v2/persons/%s/works", uuidPerson), WorkImpl.class);
   }
 
   public Person save(Person person) throws HttpException {
-    return doPostRequestForObject("/latest/persons", (PersonImpl) person);
+    return doPostRequestForObject("/v2/persons", (PersonImpl) person);
   }
 
   public Person update(UUID uuid, Person person) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/persons/%s", uuid), (PersonImpl) person);
+    return doPutRequestForObject(String.format("/v2/persons/%s", uuid), (PersonImpl) person);
   }
 }

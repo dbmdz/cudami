@@ -30,15 +30,15 @@ public class CudamiSubtopicsClient extends CudamiBaseClient<SubtopicImpl> {
   }
 
   public long count() throws HttpException {
-    return Long.parseLong(doGetRequestForString("/latest/subtopics/count"));
+    return Long.parseLong(doGetRequestForString("/v2/subtopics/count"));
   }
 
   public PageResponse<SubtopicImpl> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/subtopics", pageRequest);
+    return doGetRequestForPagedObjectList("/v2/subtopics", pageRequest);
   }
 
   public Subtopic findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/subtopics/%s", uuid));
+    return doGetRequestForObject(String.format("/v2/subtopics/%s", uuid));
   }
 
   public Subtopic findOne(UUID uuid, Locale locale) throws HttpException {
@@ -46,75 +46,77 @@ public class CudamiSubtopicsClient extends CudamiBaseClient<SubtopicImpl> {
   }
 
   public Subtopic findOne(UUID uuid, String locale) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/subtopics/%s?locale=%s", uuid, locale));
+    return doGetRequestForObject(String.format("/v2/subtopics/%s?locale=%s", uuid, locale));
   }
 
   public Subtopic findOneByIdentifier(String namespace, String id) throws HttpException {
-    return doGetRequestForObject(
-        String.format("/latest/subtopics/identifier/%s:%s.json", namespace, id));
+    // No GET endpoint for /latest/subtopics/identifier/%s:%s.json available!
+    throw new HttpException(
+        String.format("/latest/subtopics/identifier/%s:%s.json", namespace, id), 404);
   }
 
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws HttpException {
     return (BreadcrumbNavigation)
         doGetRequestForObject(
-            String.format("/latest/subtopics/%s/breadcrumb", uuid), BreadcrumbNavigationImpl.class);
+            String.format("/v3/subtopics/%s/breadcrumb", uuid), BreadcrumbNavigationImpl.class);
   }
 
   public List<SubtopicImpl> getChildren(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(String.format("/latest/subtopics/%s/children", uuid));
+    return doGetRequestForObjectList(String.format("/v2/subtopics/%s/children", uuid));
   }
 
   public PageResponse<SubtopicImpl> getChildren(UUID uuid, PageRequest pageRequest)
       throws HttpException {
     return doGetRequestForPagedObjectList(
-        String.format("/latest/subtopics/%s/children", uuid), pageRequest);
+        String.format("/v2/subtopics/%s/children", uuid), pageRequest);
   }
 
   public List getEntities(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
-        String.format("/latest/subtopics/%s/entities", uuid), EntityImpl.class);
+        String.format("/v2/subtopics/%s/entities", uuid), EntityImpl.class);
   }
 
   public List getFileResources(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
-        String.format("/latest/subtopics/%s/fileresources", uuid), FileResourceImpl.class);
+        String.format("/v2/subtopics/%s/fileresources", uuid), FileResourceImpl.class);
   }
 
   public Subtopic getParent(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/subtopics/%s/parent", uuid));
+    return doGetRequestForObject(String.format("/v2/subtopics/%s/parent", uuid));
   }
 
   public List getRelatedFileResources(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
-        String.format("/latest/entities/%s/related/fileresources", uuid), FileResourceImpl.class);
+        String.format("/v2/entities/%s/related/fileresources", uuid), FileResourceImpl.class);
   }
 
   public List<SubtopicImpl> getSubtopicsOfEntity(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(String.format("/latest/subtopics/entity/%s", uuid));
+    return doGetRequestForObjectList(String.format("/v2/subtopics/entity/%s", uuid));
   }
 
   public List<SubtopicImpl> getSubtopicsOfFileResource(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(String.format("/latest/subtopics/fileresource/%s", uuid));
+    return doGetRequestForObjectList(String.format("/v2/subtopics/fileresource/%s", uuid));
   }
 
   public Topic getTopic(UUID rootWebpageUuid) throws HttpException {
     return (Topic)
         doGetRequestForObject(
-            String.format("/latest/subtopics/%s/topic", rootWebpageUuid), TopicImpl.class);
+            String.format("/v3/subtopics/%s/topic", rootWebpageUuid), TopicImpl.class);
   }
 
   public Subtopic save(Subtopic subtopic) throws HttpException {
-    return doPostRequestForObject("/latest/subtopics", (SubtopicImpl) subtopic);
+    // No POST endpoint for /latest/subtopics available!
+    throw new HttpException("/latest/subtopics", 404);
   }
 
   public List<Entity> saveEntities(UUID uuid, List entities) throws HttpException {
     return doPostRequestForObjectList(
-        String.format("/latest/subtopics/%s/entities", uuid), entities, EntityImpl.class);
+        String.format("/v2/subtopics/%s/entities", uuid), entities, EntityImpl.class);
   }
 
   public List<FileResource> saveFileResources(UUID uuid, List fileResources) throws HttpException {
     return doPostRequestForObjectList(
-        String.format("/latest/subtopics/%s/fileresources", uuid),
+        String.format("/v2/subtopics/%s/fileresources", uuid),
         fileResources,
         FileResourceImpl.class);
   }
@@ -122,18 +124,16 @@ public class CudamiSubtopicsClient extends CudamiBaseClient<SubtopicImpl> {
   public Subtopic saveWithParentTopic(Subtopic subtopic, UUID parentTopicUuid)
       throws HttpException {
     return doPostRequestForObject(
-        String.format("/latest/topics/%s/subtopic", parentTopicUuid), (SubtopicImpl) subtopic);
+        String.format("/v2/topics/%s/subtopic", parentTopicUuid), (SubtopicImpl) subtopic);
   }
 
   public Subtopic saveWithParentSubtopic(Subtopic subtopic, UUID parentSubtopicUuid)
       throws HttpException {
     return doPostRequestForObject(
-        String.format("/latest/subtopics/%s/subtopic", parentSubtopicUuid),
-        (SubtopicImpl) subtopic);
+        String.format("/v2/subtopics/%s/subtopic", parentSubtopicUuid), (SubtopicImpl) subtopic);
   }
 
   public Subtopic update(UUID uuid, Subtopic subtopic) throws HttpException {
-    return doPutRequestForObject(
-        String.format("/latest/subtopics/%s", uuid), (SubtopicImpl) subtopic);
+    return doPutRequestForObject(String.format("/v2/subtopics/%s", uuid), (SubtopicImpl) subtopic);
   }
 }

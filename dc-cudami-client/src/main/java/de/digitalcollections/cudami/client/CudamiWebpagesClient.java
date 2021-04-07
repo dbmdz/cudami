@@ -27,20 +27,21 @@ public class CudamiWebpagesClient extends CudamiBaseClient<WebpageImpl> {
   }
 
   public long count() throws HttpException {
-    return Long.parseLong(doGetRequestForString("/latest/webpages/count"));
+    // No GET endpoint for /latest/webpages/count available!
+    throw new HttpException("/latest/webpages/count", 404);
   }
 
   public PageResponse<WebpageImpl> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/webpages", pageRequest);
+    return doGetRequestForPagedObjectList("/v2/webpages", pageRequest);
   }
 
   public Webpage findActiveOne(UUID uuid, Locale locale) throws HttpException {
     return doGetRequestForObject(
-        String.format("/latest/webpages/%s?active=true&pLocale=%s", uuid, locale));
+        String.format("/v3/webpages/%s?active=true&pLocale=%s", uuid, locale));
   }
 
   public Webpage findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/webpages/%s", uuid));
+    return doGetRequestForObject(String.format("/v3/webpages/%s", uuid));
   }
 
   public Webpage findOne(UUID uuid, Locale locale) throws HttpException {
@@ -48,86 +49,87 @@ public class CudamiWebpagesClient extends CudamiBaseClient<WebpageImpl> {
   }
 
   public Webpage findOne(UUID uuid, String locale) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/webpages/%s?pLocale=%s", uuid, locale));
+    return doGetRequestForObject(String.format("/v3/webpages/%s?pLocale=%s", uuid, locale));
   }
 
   public Webpage findOneByIdentifier(String namespace, String id) throws HttpException {
-    return doGetRequestForObject(
-        String.format("/latest/webpages/identifier/%s:%s.json", namespace, id));
+    // No GET endpoint for /latest/webpages/identifier/%s:%s.json available!
+    throw new HttpException(
+        String.format("/latest/webpages/identifier/%s:%s.json", namespace, id), 404);
   }
 
   public PageResponse<WebpageImpl> getActiveChildren(UUID uuid, PageRequest pageRequest)
       throws HttpException {
     return doGetRequestForPagedObjectList(
-        String.format("/latest/webpages/%s/children?active=true", uuid),
+        String.format("/v3/webpages/%s/children?active=true", uuid),
         pageRequest,
         WebpageImpl.class);
   }
 
   public List<WebpageImpl> getActiveChildrenTree(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
-        String.format("/latest/webpages/%s/childrentree?active=true", uuid));
+        String.format("/v3/webpages/%s/childrentree?active=true", uuid));
   }
 
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws HttpException {
     return (BreadcrumbNavigation)
         doGetRequestForObject(
-            String.format("/latest/webpages/%s/breadcrumb", uuid), BreadcrumbNavigationImpl.class);
+            String.format("/v3/webpages/%s/breadcrumb", uuid), BreadcrumbNavigationImpl.class);
   }
 
   public List<WebpageImpl> getChildren(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(String.format("/latest/webpages/%s/children", uuid));
+    return doGetRequestForObjectList(String.format("/v3/webpages/%s/children", uuid));
   }
 
   public List<WebpageImpl> getChildrenTree(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(String.format("/latest/webpages/%s/childrentree", uuid));
+    return doGetRequestForObjectList(String.format("/v3/webpages/%s/childrentree", uuid));
   }
 
   public PageResponse<WebpageImpl> getChildren(UUID uuid, PageRequest pageRequest)
       throws HttpException {
     return doGetRequestForPagedObjectList(
-        String.format("/latest/webpages/%s/children", uuid), pageRequest);
+        String.format("/v3/webpages/%s/children", uuid), pageRequest);
   }
 
   public Webpage getParent(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/webpages/%s/parent", uuid));
+    return doGetRequestForObject(String.format("/v3/webpages/%s/parent", uuid));
   }
 
   public List getRelatedFileResources(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
-        String.format("/latest/entities/%s/related/fileresources", uuid), FileResourceImpl.class);
+        String.format("/v2/entities/%s/related/fileresources", uuid), FileResourceImpl.class);
   }
 
   public Website getWebsite(UUID rootWebpageUuid) throws HttpException {
     return (Website)
         doGetRequestForObject(
-            String.format("/latest/webpages/%s/website", rootWebpageUuid), WebsiteImpl.class);
+            String.format("/v3/webpages/%s/website", rootWebpageUuid), WebsiteImpl.class);
   }
 
   public Webpage save(Webpage webpage) throws HttpException {
-    return doPostRequestForObject("/latest/webpages", (WebpageImpl) webpage);
+    // No POST endpoint for /latest/webpages available!
+    throw new HttpException("/latest/webpages", 404);
   }
 
   public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid)
       throws HttpException {
     return doPostRequestForObject(
-        String.format("/latest/websites/%s/webpage", parentWebsiteUuid), (WebpageImpl) webpage);
+        String.format("/v2/websites/%s/webpage", parentWebsiteUuid), (WebpageImpl) webpage);
   }
 
   public Webpage saveWithParentWebpage(Webpage webpage, UUID parentWebpageUuid)
       throws HttpException {
     return doPostRequestForObject(
-        String.format("/latest/webpages/%s/webpage", parentWebpageUuid), (WebpageImpl) webpage);
+        String.format("/v2/webpages/%s/webpage", parentWebpageUuid), (WebpageImpl) webpage);
   }
 
   public Webpage update(UUID uuid, Webpage webpage) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/webpages/%s", uuid), (WebpageImpl) webpage);
+    return doPutRequestForObject(String.format("/v2/webpages/%s", uuid), (WebpageImpl) webpage);
   }
 
   public boolean updateChildrenOrder(UUID webpageUuid, List<Webpage> children)
       throws HttpException {
     return Boolean.parseBoolean(
-        doPutRequestForString(
-            String.format("/latest/webpages/%s/children", webpageUuid), children));
+        doPutRequestForString(String.format("/v3/webpages/%s/children", webpageUuid), children));
   }
 }

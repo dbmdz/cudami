@@ -13,19 +13,19 @@ public class CudamiLocalesClient extends CudamiBaseClient<Locale> {
   }
 
   public List<String> findAllLanguages() throws HttpException {
-    return doGetRequestForObjectList("/latest/languages", String.class);
+    return doGetRequestForObjectList("/v2/languages", String.class);
   }
 
   public Locale getDefaultLanguage() throws HttpException {
-    return doGetRequestForObject("/latest/languages/default");
+    return doGetRequestForObject("/v2/languages/default");
   }
 
   @SuppressWarnings("unchecked")
   public List<String> findAllLocales() throws HttpException {
-    return doGetRequestForObjectList("/latest/locales", String.class);
+    return doGetRequestForObjectList("/v2/locales", String.class);
   }
 
   public String getDefaultLocale() throws HttpException {
-    return doGetRequestForString("/latest/locales/default");
+    return doGetRequestForString("/v2/locales/default");
   }
 }

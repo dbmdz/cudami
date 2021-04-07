@@ -25,16 +25,17 @@ public class CudamiIdentifiablesClient extends CudamiBaseClient<IdentifiableImpl
   }
 
   public long count() throws HttpException {
-    return Long.parseLong(doGetRequestForString("/latest/identifiables/count"));
+    // No GET endpoint for /latest/identifiables/count available!
+    throw new HttpException("/latest/identifiables/count", 404);
   }
 
   public PageResponse<IdentifiableImpl> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/identifiables", pageRequest);
+    return doGetRequestForPagedObjectList("/v2/identifiables", pageRequest);
   }
 
   public SearchPageResponse<IdentifiableImpl> find(SearchPageRequest searchPageRequest)
       throws HttpException {
-    return doGetSearchRequestForPagedObjectList("/latest/identifiables/search", searchPageRequest);
+    return doGetSearchRequestForPagedObjectList("/v2/identifiables/search", searchPageRequest);
   }
 
   public List<IdentifiableImpl> find(String searchTerm, int maxResults) throws HttpException {
@@ -45,12 +46,12 @@ public class CudamiIdentifiablesClient extends CudamiBaseClient<IdentifiableImpl
   }
 
   public Identifiable findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/identifiables/%s", uuid));
+    return doGetRequestForObject(String.format("/v2/identifiables/%s", uuid));
   }
 
   public Identifiable findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-        String.format("/latest/identifiables/identifier/%s:%s.json", namespace, id));
+        String.format("/v2/identifiables/identifier/%s:%s.json", namespace, id));
   }
 
   public Identifiable findOne(UUID uuid, Locale locale) throws HttpException {
@@ -58,15 +59,16 @@ public class CudamiIdentifiablesClient extends CudamiBaseClient<IdentifiableImpl
   }
 
   public Identifiable findOne(UUID uuid, String locale) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/identifiables/%s?locale=%s", uuid, locale));
+    return doGetRequestForObject(String.format("/v2/identifiables/%s?locale=%s", uuid, locale));
   }
 
   public Identifiable save(Identifiable identifiable) throws HttpException {
-    return doPostRequestForObject("/latest/identifiables", (IdentifiableImpl) identifiable);
+    // No POST endpoint for /latest/fileresources/search available!
+    throw new HttpException("/latest/identifiables", 404);
   }
 
   public Identifiable update(UUID uuid, Identifiable identifiable) throws HttpException {
-    return doPutRequestForObject(
-        String.format("/latest/identifiables/%s", uuid), (IdentifiableImpl) identifiable);
+    // No PUT endpoint for /latest/fileresources/search available!
+    throw new HttpException(String.format("/latest/identifiables/%s", uuid), 404);
   }
 }

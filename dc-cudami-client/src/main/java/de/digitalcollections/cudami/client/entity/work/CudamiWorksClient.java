@@ -26,16 +26,16 @@ public class CudamiWorksClient extends CudamiBaseClient<WorkImpl> {
   }
 
   public long count() throws HttpException {
-    return Long.parseLong(doGetRequestForString("/latest/works/count"));
+    return Long.parseLong(doGetRequestForString("/v2/works/count"));
   }
 
   public PageResponse<WorkImpl> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/works", pageRequest);
+    return doGetRequestForPagedObjectList("/v2/works", pageRequest);
   }
 
   public PageResponse findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial) throws HttpException {
-    return findByLanguageAndInitial("/latest/works", pageRequest, language, initial);
+    return findByLanguageAndInitial("/v2/works", pageRequest, language, initial);
   }
 
   public PageResponse<WorkImpl> findByLanguageAndInitial(
@@ -48,7 +48,7 @@ public class CudamiWorksClient extends CudamiBaseClient<WorkImpl> {
       String initial)
       throws HttpException {
     return findByLanguageAndInitial(
-        "/latest/works",
+        "/v2/works",
         pageNumber,
         pageSize,
         sortField,
@@ -59,29 +59,29 @@ public class CudamiWorksClient extends CudamiBaseClient<WorkImpl> {
   }
 
   public Work findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/works/%s", uuid));
+    return doGetRequestForObject(String.format("/v2/works/%s", uuid));
   }
 
   public Work findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-        String.format("/latest/works/identifier?namespace=%s&id=%s", namespace, id));
+        String.format("/v2/works/identifier?namespace=%s&id=%s", namespace, id));
   }
 
   public Set<Agent> getCreators(UUID uuid) throws HttpException {
     return (Set<Agent>)
         doGetRequestForObjectList(
-            String.format("/latest/works/%s/creators", uuid), DigitalObjectImpl.class);
+            String.format("/v2/works/%s/creators", uuid), DigitalObjectImpl.class);
   }
 
   public List getItems(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(String.format("/latest/works/%s/items", uuid), ItemImpl.class);
+    return doGetRequestForObjectList(String.format("/v2/works/%s/items", uuid), ItemImpl.class);
   }
 
   public Work save(Work work) throws HttpException {
-    return doPostRequestForObject("/latest/works", (WorkImpl) work);
+    return doPostRequestForObject("/v2/works", (WorkImpl) work);
   }
 
   public Work update(UUID uuid, Work work) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/works/%s", uuid), (WorkImpl) work);
+    return doPutRequestForObject(String.format("/v2/works/%s", uuid), (WorkImpl) work);
   }
 }

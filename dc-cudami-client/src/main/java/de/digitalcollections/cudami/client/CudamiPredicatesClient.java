@@ -16,14 +16,13 @@ public class CudamiPredicatesClient extends CudamiBaseClient<PredicateImpl> {
   }
 
   public List<Predicate> findAllPredicates() throws HttpException {
-    return doGetRequestForObjectList("/latest/predicates", Predicate.class);
+    return doGetRequestForObjectList("/v3/predicates", Predicate.class);
   }
 
   public Predicate save(Predicate predicate) throws HttpException {
     return doPutRequestForObject(
         String.format(
-            "/latest/predicates/%s",
-            URLEncoder.encode(predicate.getValue(), StandardCharsets.UTF_8)),
+            "/v3/predicates/%s", URLEncoder.encode(predicate.getValue(), StandardCharsets.UTF_8)),
         (PredicateImpl) predicate);
   }
 }
