@@ -24,7 +24,7 @@ import org.testcontainers.utility.DockerImageName;
 @ComponentScan(basePackages = {"de.digitalcollections.cudami.server.backend.impl.jdbi"})
 public class SpringConfigBackendDatabase {
 
-  private static final DockerImageName DOCKER_IMAGE_NAME = new DockerImageName("postgres:12");
+  private static final DockerImageName DOCKER_IMAGE_NAME = DockerImageName.parse("postgres:12");
   private static Boolean isMigrated = false;
 
   @Container
