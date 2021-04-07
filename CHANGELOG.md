@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.5.0-SNAPSHOT]
+
+### Changed
+
+- Migrating all "latest" API calls in dc-cudami-client to use the
+  versionated endpoints.
+
+## [4.4.4](https://github.com/dbmdz/cudami/releases/tag/4.4.4) - 2021-04-01
+
+### Changed
+
+- Bugfix for identifiables search
+
 ## [4.4.3](https://github.com/dbmdz/cudami/releases/tag/4.4.3) - 2021-03-25
 
 ### Changed
