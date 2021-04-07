@@ -56,6 +56,7 @@ class PagedIdentifiableList extends Component {
       pageNumber: 0,
       totalElements: 0,
       searchTerm: '',
+      showSearch: true,
     }
   }
 
@@ -69,6 +70,7 @@ class PagedIdentifiableList extends Component {
       identifierTypes,
       numberOfPages: Math.ceil(totalElements / pageSize),
       totalElements,
+      showSearch: totalElements > 0,
     })
   }
 
@@ -373,6 +375,7 @@ class PagedIdentifiableList extends Component {
       pageNumber,
       searchTerm,
       totalElements,
+      showSearch,
     } = this.state
     const showChangeOfOrder =
       enableChangeOfOrder && !changeOfOrderActive && totalElements > 1
@@ -445,11 +448,12 @@ class PagedIdentifiableList extends Component {
                   {t('save')}
                 </Button>
               )}
-              {enableSearch && totalElements > 0 && (
+              {enableSearch && showSearch && (
                 <IdentifiableSearch
                   onChange={(value) => this.setState({searchTerm: value})}
                   onSubmit={this.executeSearch}
                   value={searchTerm}
+                  isHighlighted={totalElements < 1}
                 />
               )}
             </div>

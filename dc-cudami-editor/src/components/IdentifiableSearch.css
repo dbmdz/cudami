@@ -1,0 +1,11 @@
+@charset "UTF-8";
+
+.position-centered {
+  top: 0px;
+  bottom: 0px;
+  right: 0px;
+}
+
+.border-width-3 {
+  border-width: 3px !important;
+}
