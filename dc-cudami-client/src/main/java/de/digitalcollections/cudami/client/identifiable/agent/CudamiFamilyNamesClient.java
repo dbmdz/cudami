@@ -17,7 +17,7 @@ public class CudamiFamilyNamesClient extends CudamiBaseClient<FamilyNameImpl> {
   }
 
   public long count() throws HttpException {
-    return Long.parseLong(doGetRequestForString("/latest/familynames/count"));
+    return -1; // URL /latest/familynames/count does not exist!
   }
 
   public FamilyName create() {
@@ -25,12 +25,12 @@ public class CudamiFamilyNamesClient extends CudamiBaseClient<FamilyNameImpl> {
   }
 
   public PageResponse<FamilyNameImpl> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/familynames", pageRequest);
+    return doGetRequestForPagedObjectList("/v2/familynames", pageRequest);
   }
 
   public PageResponse findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial) throws HttpException {
-    return findByLanguageAndInitial("/latest/familynames", pageRequest, language, initial);
+    return findByLanguageAndInitial("/v2/familynames", pageRequest, language, initial);
   }
 
   public PageResponse<FamilyNameImpl> findByLanguageAndInitial(
@@ -43,7 +43,7 @@ public class CudamiFamilyNamesClient extends CudamiBaseClient<FamilyNameImpl> {
       String initial)
       throws HttpException {
     return findByLanguageAndInitial(
-        "/latest/familynames",
+        "/v2/familynames",
         pageNumber,
         pageSize,
         sortField,
@@ -54,20 +54,20 @@ public class CudamiFamilyNamesClient extends CudamiBaseClient<FamilyNameImpl> {
   }
 
   public FamilyName findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/familynames/%s", uuid));
+    return doGetRequestForObject(String.format("/v2/familynames/%s", uuid));
   }
 
   public FamilyName findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-        String.format("/latest/familynames/identifier?namespace=%s&id=%s", namespace, id));
+        String.format("/v2/familynames/identifier?namespace=%s&id=%s", namespace, id));
   }
 
   public FamilyName save(FamilyName familyName) throws HttpException {
-    return doPostRequestForObject("/latest/familynames", (FamilyNameImpl) familyName);
+    return doPostRequestForObject("/v2/familynames", (FamilyNameImpl) familyName);
   }
 
   public FamilyName update(UUID uuid, FamilyName familyName) throws HttpException {
     return doPutRequestForObject(
-        String.format("/latest/familynames/%s", uuid), (FamilyNameImpl) familyName);
+        String.format("/v2/familynames/%s", uuid), (FamilyNameImpl) familyName);
   }
 }
