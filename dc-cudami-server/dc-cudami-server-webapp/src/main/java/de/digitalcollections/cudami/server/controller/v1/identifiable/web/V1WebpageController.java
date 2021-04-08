@@ -95,7 +95,7 @@ public class V1WebpageController {
       throws IdentifiableServiceException, JsonProcessingException {
     Webpage webpage = loadWebpage(pLocale, uuid);
     if (webpage == null) {
-      return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     webpage.setCreated(null);
