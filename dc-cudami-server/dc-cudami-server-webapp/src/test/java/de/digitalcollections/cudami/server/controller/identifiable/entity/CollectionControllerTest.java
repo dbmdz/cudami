@@ -3,9 +3,6 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
@@ -25,7 +22,6 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -87,10 +83,6 @@ class CollectionControllerTest extends BaseControllerTest {
     when(collectionService.getDigitalObjects(eq(collection), any(SearchPageRequest.class)))
         .thenReturn(response);
 
-    mockMvc
-        .perform(get(path))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(ContentType.APPLICATION_JSON.getMimeType()))
-        .andExpect(content().json(getJsonFromFileResource(path)));
+    testJson(path);
   }
 }

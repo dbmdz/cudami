@@ -2,17 +2,12 @@ package de.digitalcollections.cudami.server.controller.identifiable.web;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
 import de.digitalcollections.cudami.server.controller.BaseWebpageControllerTest;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import java.util.Locale;
 import java.util.UUID;
-import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -36,12 +31,7 @@ public class WebpageHtmlControllerTest extends BaseWebpageControllerTest {
     when(webpageService.get(any(UUID.class))).thenReturn(expected);
     when(webpageService.get(any(UUID.class), any(Locale.class))).thenReturn(expected);
 
-    mockMvc
-        .perform(get(path))
-        .andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(ContentType.TEXT_HTML.getMimeType() + ";charset=UTF-8"))
-        .andExpect(content().string(getHtmlFromFileResource(path)));
+    testHtml(path);
   }
 
   @DisplayName("returns a webpage in v3 html format for UUID")
@@ -56,11 +46,6 @@ public class WebpageHtmlControllerTest extends BaseWebpageControllerTest {
     when(webpageService.get(any(UUID.class))).thenReturn(expected);
     when(webpageService.get(any(UUID.class), any(Locale.class))).thenReturn(expected);
 
-    mockMvc
-        .perform(get(path))
-        .andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(ContentType.TEXT_HTML.getMimeType() + ";charset=UTF-8"))
-        .andExpect(content().string(getHtmlFromFileResource(path)));
+    testHtml(path);
   }
 }

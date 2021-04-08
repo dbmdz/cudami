@@ -1,15 +1,11 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import java.util.List;
 import java.util.Locale;
-import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -29,10 +25,6 @@ class WebsiteControllerTest extends BaseControllerTest {
     List<Locale> expected = List.of(Locale.GERMAN);
     when(websiteService.getLanguages()).thenReturn(expected);
 
-    mockMvc
-        .perform(get(path))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(ContentType.APPLICATION_JSON.getMimeType()))
-        .andExpect(content().json(getJsonFromFileResource(path)));
+    testJson(path);
   }
 }
