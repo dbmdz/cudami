@@ -2,16 +2,12 @@ package de.digitalcollections.cudami.server.controller.v1.identifiable.web;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
 import de.digitalcollections.cudami.server.controller.BaseWebpageControllerTest;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import java.util.Locale;
 import java.util.UUID;
-import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -33,12 +29,7 @@ class V1WebpageControllerTest extends BaseWebpageControllerTest {
   public void returnWebpageV1Json(String path) throws Exception {
     Webpage expected = createWebpage(path);
     when(webpageService.get(any(UUID.class))).thenReturn(expected);
-
-    mockMvc
-        .perform(get(path))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(ContentType.APPLICATION_JSON.getMimeType()))
-        .andExpect(content().json(getJsonFromFileResource(path)));
+    testJson(path);
   }
 
   @DisplayName("returns a localized webpage in v1 json format for UUID")
@@ -51,12 +42,7 @@ class V1WebpageControllerTest extends BaseWebpageControllerTest {
   public void returnLocalizedWebpageV1Json(String path) throws Exception {
     Webpage expected = createWebpage(path);
     when(webpageService.get(any(UUID.class), any(Locale.class))).thenReturn(expected);
-
-    mockMvc
-        .perform(get(path))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(ContentType.APPLICATION_JSON.getMimeType()))
-        .andExpect(content().json(getJsonFromFileResource(path)));
+    testJson(path);
   }
 
   @DisplayName(
@@ -70,11 +56,6 @@ class V1WebpageControllerTest extends BaseWebpageControllerTest {
   public void returnWrongLocalizedWebpageV1Json(String path) throws Exception {
     Webpage expected = createWebpage(path);
     when(webpageService.get(any(UUID.class))).thenReturn(expected);
-
-    mockMvc
-        .perform(get(path))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(ContentType.APPLICATION_JSON.getMimeType()))
-        .andExpect(content().json(getJsonFromFileResource(path)));
+    testJson(path);
   }
 }

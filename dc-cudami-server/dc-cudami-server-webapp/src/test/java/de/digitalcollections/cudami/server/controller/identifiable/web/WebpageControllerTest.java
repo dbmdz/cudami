@@ -2,9 +2,6 @@ package de.digitalcollections.cudami.server.controller.identifiable.web;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
@@ -13,7 +10,6 @@ import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.text.LocalizedText;
 import java.util.Locale;
 import java.util.UUID;
-import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -43,10 +39,6 @@ class WebpageControllerTest extends BaseControllerTest {
 
     when(webpageService.getWebsite(any(UUID.class))).thenReturn(expected);
 
-    mockMvc
-        .perform(get(path))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(ContentType.APPLICATION_JSON.getMimeType()))
-        .andExpect(content().json(getJsonFromFileResource(path)));
+    testJson(path);
   }
 }
