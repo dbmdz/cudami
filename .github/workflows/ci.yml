@@ -1,8 +1,8 @@
 on:
   push:
-    branches: [ release/v4.4 ]
+    branches: [ release/v4.5 ]
   pull_request:
-    branches: [ release/v4.4 ]
+    branches: [ release/v4.5 ]
 
 jobs:
   build:
@@ -34,7 +34,7 @@ jobs:
       - name: Build with Maven
         run: mvn -B -U verify
   publish:
-    if: github.event_name == 'push' && contains(github.ref, 'release/v4.4')
+    if: github.event_name == 'push' && contains(github.ref, 'release/v4.5')
     runs-on: ubuntu-latest
     needs: build
     steps:
