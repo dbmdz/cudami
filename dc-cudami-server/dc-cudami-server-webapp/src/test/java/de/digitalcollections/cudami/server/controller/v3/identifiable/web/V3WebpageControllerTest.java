@@ -6,6 +6,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
 import de.digitalcollections.cudami.server.controller.BaseWebpageControllerTest;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.PageRequest;
@@ -20,16 +22,19 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 
 @WebMvcTest(V3WebpageController.class)
 @DisplayName("The V3WebpageController")
 class V3WebpageControllerTest extends BaseWebpageControllerTest {
 
+  @MockBean private LocaleService localeService;
+  @MockBean private WebpageService webpageService;
+
   // TODO: test /latest/webpages/<uuid>/children
   // TODO: test webpages and webpages/childen with active flag
   // TODO: test latest/webpages/<uuid>/childrentree with and withput active flag
-
   @DisplayName("returns a webpage in explicit (url) v3 json format for UUID")
   @ParameterizedTest
   @ValueSource(

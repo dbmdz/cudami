@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.cudami.server.model.DescriptionBuilder;
 import de.digitalcollections.cudami.server.model.WebpageBuilder;
@@ -32,9 +33,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 @WebMvcTest(V2WebsiteController.class)
 class V2WebsiteControllerTest extends BaseControllerTest {
+
+  @MockBean private WebsiteService websiteService;
 
   @DisplayName(
       "returns a website in v2 json format for UUID, with or without json suffix in the url")

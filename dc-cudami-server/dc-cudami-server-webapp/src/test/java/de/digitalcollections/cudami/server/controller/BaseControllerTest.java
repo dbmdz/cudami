@@ -1,11 +1,5 @@
 package de.digitalcollections.cudami.server.controller;
 
-import de.digitalcollections.cudami.server.business.api.service.LocaleService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageRequestBuilder;
 import de.digitalcollections.model.paging.PageResponse;
@@ -20,19 +14,45 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 public abstract class BaseControllerTest {
 
   @Autowired protected MockMvc mockMvc;
 
-  @MockBean protected CollectionService collectionService;
-  @MockBean protected DigitalObjectService digitalObjectService;
-  @MockBean protected LocaleService localeService;
-  @MockBean protected ProjectService projectService;
-  @MockBean protected WebpageService webpageService;
-  @MockBean protected WebsiteService websiteService;
+  protected <T> PageResponse<T> buildStandardPageResponse(Class<T> type, List content) {
+    PageResponse pageResponse = new PageResponse();
+    pageResponse.setContent(content);
+    pageResponse.setTotalElements(content.size());
+    PageRequest pageRequest = new PageRequestBuilder().pageSize(25).pageNumber(0).build();
+    pageResponse.setPageRequest(pageRequest);
+    return pageResponse;
+  }
+
+  protected UUID extractFirstUuidFromPath(String path) {
+    Pattern uuidPattern =
+        Pattern.compile("(\\b[0-9a-f]{8}\\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\\b[0-9a-f]{12})");
+    Matcher matcher = uuidPattern.matcher(path);
+    if (matcher.find()) {
+      return UUID.fromString(matcher.group(0));
+    }
+    return null;
+  }
+
+  protected String getHtmlFromFileResource(String sourcePath)
+      throws URISyntaxException, IOException {
+    ClassLoader classLoader = getClass().getClassLoader();
+    String path = sourcePath.replaceAll("[?&].*", "");
+
+    String filename = "html" + path;
+    URL resource = classLoader.getResource(filename);
+    if (resource == null) {
+      throw new RuntimeException("Cannot read " + filename);
+    }
+    return Files.readAllLines(Path.of(resource.toURI())).stream()
+        .map(l -> l.replaceAll("^\\s+", ""))
+        .collect(Collectors.joining());
+  }
 
   protected String getJsonFromFileResource(String sourcePath) throws IOException {
     ClassLoader classLoader = getClass().getClassLoader();
@@ -60,21 +80,6 @@ public abstract class BaseControllerTest {
     }
   }
 
-  protected String getHtmlFromFileResource(String sourcePath)
-      throws URISyntaxException, IOException {
-    ClassLoader classLoader = getClass().getClassLoader();
-    String path = sourcePath.replaceAll("[?&].*", "");
-
-    String filename = "html" + path;
-    URL resource = classLoader.getResource(filename);
-    if (resource == null) {
-      throw new RuntimeException("Cannot read " + filename);
-    }
-    return Files.readAllLines(Path.of(resource.toURI())).stream()
-        .map(l -> l.replaceAll("^\\s+", ""))
-        .collect(Collectors.joining());
-  }
-
   protected String getXmlFromFileResource(String sourcePath) throws IOException {
     ClassLoader classLoader = getClass().getClassLoader();
     String path = sourcePath.replaceAll("[?&].*", "");
@@ -94,24 +99,5 @@ public abstract class BaseControllerTest {
               + e,
           e);
     }
-  }
-
-  protected UUID extractFirstUuidFromPath(String path) {
-    Pattern uuidPattern =
-        Pattern.compile("(\\b[0-9a-f]{8}\\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\\b[0-9a-f]{12})");
-    Matcher matcher = uuidPattern.matcher(path);
-    if (matcher.find()) {
-      return UUID.fromString(matcher.group(0));
-    }
-    return null;
-  }
-
-  protected <T> PageResponse<T> buildStandardPageResponse(Class<T> type, List content) {
-    PageResponse pageResponse = new PageResponse();
-    pageResponse.setContent(content);
-    pageResponse.setTotalElements(content.size());
-    PageRequest pageRequest = new PageRequestBuilder().pageSize(25).pageNumber(0).build();
-    pageResponse.setPageRequest(pageRequest);
-    return pageResponse;
   }
 }

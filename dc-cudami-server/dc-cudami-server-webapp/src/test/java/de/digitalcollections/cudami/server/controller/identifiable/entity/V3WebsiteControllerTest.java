@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.cudami.server.controller.BaseWebpageControllerTest;
 import de.digitalcollections.cudami.server.model.WebpageBuilder;
 import de.digitalcollections.model.identifiable.web.Webpage;
@@ -21,10 +22,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 @WebMvcTest(V3WebsiteController.class)
 @DisplayName("The V3WebsiteController")
 public class V3WebsiteControllerTest extends BaseWebpageControllerTest {
+
+  @MockBean private WebsiteService websiteService;
 
   @DisplayName("returns the paged rootpages")
   @ParameterizedTest
