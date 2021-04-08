@@ -20,8 +20,8 @@ public abstract class BaseControllerTest {
 
   @Autowired protected MockMvc mockMvc;
 
-  protected <T> PageResponse<T> buildStandardPageResponse(Class<T> type, List content) {
-    PageResponse pageResponse = new PageResponse();
+  protected <T> PageResponse<T> buildStandardPageResponse(Class<T> type, List<T> content) {
+    PageResponse<T> pageResponse = new PageResponse<>();
     pageResponse.setContent(content);
     pageResponse.setTotalElements(content.size());
     PageRequest pageRequest = new PageRequestBuilder().pageSize(25).pageNumber(0).build();
@@ -41,63 +41,47 @@ public abstract class BaseControllerTest {
 
   protected String getHtmlFromFileResource(String sourcePath)
       throws URISyntaxException, IOException {
-    ClassLoader classLoader = getClass().getClassLoader();
     String path = sourcePath.replaceAll("[?&].*", "");
-
-    String filename = "html" + path;
-    URL resource = classLoader.getResource(filename);
-    if (resource == null) {
-      throw new RuntimeException("Cannot read " + filename);
-    }
-    return Files.readAllLines(Path.of(resource.toURI())).stream()
+    String fullPath = "html" + path;
+    Path pathToRessource = getPath(fullPath);
+    return Files.readAllLines(pathToRessource).stream()
         .map(l -> l.replaceAll("^\\s+", ""))
         .collect(Collectors.joining());
   }
 
   protected String getJsonFromFileResource(String sourcePath) throws IOException {
-    ClassLoader classLoader = getClass().getClassLoader();
     String path = sourcePath.replaceAll("[?&].*", "");
     UUID uuid = extractFirstUuidFromPath(sourcePath);
     if (uuid != null) {
       // replace slash behind the first UUID with an underscore
       path = path.replaceAll(uuid.toString() + "/", uuid.toString() + "_");
     }
-
     String suffix = (path.endsWith(".json") ? "" : ".json");
     String fullPath = "json" + path + suffix;
+    Path pathToResource = getPath(fullPath);
+    return Files.readString(pathToResource);
+  }
+
+  private Path getPath(String fullPath) throws RuntimeException {
+    ClassLoader classLoader = getClass().getClassLoader();
     URL resource = classLoader.getResource(fullPath);
-    try {
-      return Files.readString(Path.of(resource.toURI()));
-    } catch (Exception e) {
-      throw new IOException(
-          "Cannot read expected json for sourcePath="
-              + sourcePath
-              + " from resource path="
-              + fullPath
-              + ": "
-              + e,
-          e);
+    if (resource == null) {
+      throw new RuntimeException("Cannot read " + fullPath + " (null)");
     }
+    final Path pathToResource;
+    try {
+      pathToResource = Path.of(resource.toURI());
+    } catch (URISyntaxException ex) {
+      throw new RuntimeException("Cannot read " + fullPath + " (URI syntax wrong)");
+    }
+    return pathToResource;
   }
 
   protected String getXmlFromFileResource(String sourcePath) throws IOException {
-    ClassLoader classLoader = getClass().getClassLoader();
     String path = sourcePath.replaceAll("[?&].*", "");
-
     String suffix = (path.endsWith(".xml") ? "" : ".xml");
     String fullPath = "xml" + path + suffix;
-    URL resource = classLoader.getResource(fullPath);
-    try {
-      return Files.readString(Path.of(resource.toURI()));
-    } catch (Exception e) {
-      throw new IOException(
-          "Cannot read expected xml for sourcePath="
-              + sourcePath
-              + " from resource path="
-              + fullPath
-              + ": "
-              + e,
-          e);
-    }
+    Path pathToResource = getPath(fullPath);
+    return Files.readString(pathToResource);
   }
 }
