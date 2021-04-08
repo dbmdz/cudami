@@ -64,7 +64,7 @@ public class V3WebsiteController {
 
     PageResponse<Webpage> response = websiteService.getRootPages(uuid, pageRequest);
     if (response == null) {
-      return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     // Fix the attributes, which are missing or different in new model

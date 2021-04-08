@@ -85,7 +85,7 @@ public class V3WebpageController {
     }
 
     if (webpage == null) {
-      return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(webpage));
@@ -120,7 +120,7 @@ public class V3WebpageController {
           String active)
       throws IdentifiableServiceException, IOException {
 
-    return new ResponseEntity<>(null, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+    return new ResponseEntity<>(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
 
     /*
     ResponseEntity<String> jsonResponse = getWebpageJson(uuid, pLocale, active);
