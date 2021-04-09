@@ -98,6 +98,14 @@ public abstract class BaseControllerTest {
         .andExpect(content().json(getJsonFromFileResource(path)));
   }
 
+  protected void testJson(String path, String expectedJsonPath) throws Exception {
+    mockMvc
+        .perform(get(path))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(ContentType.APPLICATION_JSON.getMimeType()))
+        .andExpect(content().json(getJsonFromFileResource(expectedJsonPath)));
+  }
+
   protected void testHtml(String path) throws Exception {
     mockMvc
         .perform(get(path))
