@@ -1,0 +1,30 @@
+{
+  "content": [],
+  "pageRequest": {
+    "pageNumber": 0,
+    "pageSize": 1,
+    "sorting": {
+      "orders": [
+        {
+          "direction": "ASC",
+          "ignoreCase": false,
+          "nullHandling": "NATIVE",
+          "property": "label",
+          "subProperty": "de",
+          "ascending": true,
+          "descending": false
+        },
+        {
+          "direction": "ASC",
+          "ignoreCase": false,
+          "nullHandling": "NATIVE",
+          "property": "label",
+          "subProperty": "",
+          "ascending": true,
+          "descending": false
+        }
+      ]
+    }
+  },
+  "totalElements": 0
+}

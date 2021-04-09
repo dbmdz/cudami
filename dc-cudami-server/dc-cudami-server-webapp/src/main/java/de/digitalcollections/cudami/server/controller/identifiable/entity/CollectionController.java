@@ -164,7 +164,7 @@ public class CollectionController {
 
   @ApiMethod(description = "Get all collections")
   @GetMapping(
-      value = {"/latest/collections", "/v2/collections"},
+      value = {"/latest/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Collection> findAll(
