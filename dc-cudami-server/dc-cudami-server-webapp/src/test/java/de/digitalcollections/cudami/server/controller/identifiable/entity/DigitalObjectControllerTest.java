@@ -71,24 +71,26 @@ class DigitalObjectControllerTest extends BaseControllerTest {
 
   @DisplayName("returns a digital object by its identifier")
   @ParameterizedTest
-  @ValueSource(
-      strings = {
-          "/v2/digitalobjects/identifier/mdz-obj:bsb10000001"
-      })
+  @ValueSource(strings = {"/v2/digitalobjects/identifier/mdz-obj:bsb10000001"})
   public void getDigitalObjectByIdentifier(String path) throws Exception {
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setCreated(LocalDateTime.parse("2020-08-21T07:49:37.004443"));
-    Identifier identifier = new Identifier(UUID.fromString("1c419226-8d61-4efa-923a-7fbaf961eb9d"),"mdz-obj","bsb10000001");
+    Identifier identifier =
+        new Identifier(
+            UUID.fromString("1c419226-8d61-4efa-923a-7fbaf961eb9d"), "mdz-obj", "bsb10000001");
     identifier.setUuid(UUID.fromString("53e3e619-47a3-4110-84f7-acba12a52298"));
     digitalObject.addIdentifier(identifier);
-    digitalObject.setLabel("Actorum Bohemicorum, ... Theil, Das ist: Warhaffte vnd eigentliche Beschreibung aller fürnembsten vnd denckwürdigsten Historien vnd Geschichten, Welche sich im Königreich Böheim vnd dessen incorporirten Ländern ... begeben vnd zugetragen haben : Auß allerhand glaubwürdigen Publicis scriptis in eine feine richtige Ordnung zusammen verfasset, jetzo mit fleiß ubersehen, gemehret vnd auffs newe zugerichtet");
+    digitalObject.setLabel(
+        "Actorum Bohemicorum, ... Theil, Das ist: Warhaffte vnd eigentliche Beschreibung aller fürnembsten vnd denckwürdigsten Historien vnd Geschichten, Welche sich im Königreich Böheim vnd dessen incorporirten Ländern ... begeben vnd zugetragen haben : Auß allerhand glaubwürdigen Publicis scriptis in eine feine richtige Ordnung zusammen verfasset, jetzo mit fleiß ubersehen, gemehret vnd auffs newe zugerichtet");
     digitalObject.setLastModified(LocalDateTime.parse("2020-08-21T07:49:37.00445"));
     ImageFileResource previewImage = new ImageFileResource();
     previewImage.setFilename("default.jpg");
     previewImage.setUuid(UUID.fromString("abe16b03-c5d5-41a6-9475-f742e06ae881"));
     previewImage.setFileResourceType(FileResourceType.IMAGE);
     previewImage.setMimeType(MimeType.MIME_IMAGE);
-    previewImage.setUri(URI.create("https://api-dev.digitale-sammlungen.de/iiif/image/v2/bsb10000001_00003/full/250,/0/default.jpg"));
+    previewImage.setUri(
+        URI.create(
+            "https://api-dev.digitale-sammlungen.de/iiif/image/v2/bsb10000001_00003/full/250,/0/default.jpg"));
     digitalObject.setPreviewImage(previewImage);
     digitalObject.setUuid(UUID.fromString("1c419226-8d61-4efa-923a-7fbaf961eb9d"));
     digitalObject.setEntityType(EntityType.DIGITAL_OBJECT);

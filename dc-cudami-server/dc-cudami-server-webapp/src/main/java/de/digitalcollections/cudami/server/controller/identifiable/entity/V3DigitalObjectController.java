@@ -38,16 +38,15 @@ public class V3DigitalObjectController {
 
   @ApiMethod(description = "Get (active) paged collections of a digital objects")
   @GetMapping(
-      value = {
-          "/v3/digitalobjects/{uuid}/collections"
-      },
+      value = {"/v3/digitalobjects/{uuid}/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public ResponseEntity<String> getCollections(
       @ApiPathParam(description = "UUID of the digital object") @PathVariable("uuid") UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "active", required = false) String active) throws JsonProcessingException {
+      @RequestParam(name = "active", required = false) String active)
+      throws JsonProcessingException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize, new Sorting());
 
     DigitalObject digitalObject = new DigitalObject();
@@ -72,5 +71,4 @@ public class V3DigitalObjectController {
 
     return new ResponseEntity<>(result.toString(), HttpStatus.OK);
   }
-
 }

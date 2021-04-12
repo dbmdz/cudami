@@ -169,9 +169,7 @@ public class DigitalObjectController {
 
   @ApiMethod(description = "Get (active) paged collections of a digital objects")
   @GetMapping(
-      value = {
-        "/latest/digitalobjects/{uuid}/collections"
-      },
+      value = {"/latest/digitalobjects/{uuid}/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Collection> getCollections(
