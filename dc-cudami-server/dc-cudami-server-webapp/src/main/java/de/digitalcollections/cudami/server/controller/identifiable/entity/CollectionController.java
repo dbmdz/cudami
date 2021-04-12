@@ -334,7 +334,6 @@ public class CollectionController {
   @GetMapping(
       value = {
         "/latest/collections/{uuid}/digitalobjects",
-        "/v3/collections/{uuid}/digitalobjects"
       },
       produces = "application/json")
   @ApiResponseObject
