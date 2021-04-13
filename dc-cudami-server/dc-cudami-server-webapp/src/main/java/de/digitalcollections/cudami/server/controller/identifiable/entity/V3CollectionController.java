@@ -8,6 +8,8 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
@@ -65,6 +67,40 @@ public class V3CollectionController {
       JSONObject digitalobject = (JSONObject) it.next();
       digitalobject.put(
           "className", "de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl");
+    }
+
+    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+  }
+
+  @ApiMethod(description = "Get (active or all) paged subcollections of a collection")
+  @GetMapping(
+      value = {"/v3/collections/{uuid}/subcollections"},
+      produces = "application/json")
+  @ApiResponseObject
+  public ResponseEntity<String> getSubcollections(
+      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
+          UUID collectionUuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "active", required = false) String active)
+      throws JsonProcessingException {
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+
+    PageResponse<Collection> response;
+
+    if (active != null) {
+      response = collectionService.getActiveChildren(collectionUuid, pageRequest);
+    } else {
+      response = collectionService.getChildren(collectionUuid, pageRequest);
+    }
+
+    // Fix the attributes, which are missing or different in new model
+    JSONObject result = new JSONObject(objectMapper.writeValueAsString(response));
+    JSONArray digitalobjects = (JSONArray) result.get("content");
+    for (Iterator it = digitalobjects.iterator(); it.hasNext(); ) {
+      JSONObject digitalobject = (JSONObject) it.next();
+      digitalobject.put(
+          "className", "de.digitalcollections.model.impl.identifiable.entity.CollectionImpl");
     }
 
     return new ResponseEntity<>(result.toString(), HttpStatus.OK);

@@ -389,10 +389,7 @@ public class CollectionController {
 
   @ApiMethod(description = "Get (active or all) paged subcollections of a collection")
   @GetMapping(
-      value = {
-        "/latest/collections/{uuid}/subcollections",
-        "/v3/collections/{uuid}/subcollections"
-      },
+      value = {"/latest/collections/{uuid}/subcollections"},
       produces = "application/json")
   @ApiResponseObject
   public PageResponse<Collection> getSubcollections(

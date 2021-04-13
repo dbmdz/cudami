@@ -13,7 +13,4 @@ class CollectionControllerTest extends BaseControllerTest {
 
   @MockBean private CollectionService collectionService;
   @MockBean private LocaleService localeService;
-
-  // TODO: Test latest/collections/<uuid>/subcollections with and without active flag
-
 }
