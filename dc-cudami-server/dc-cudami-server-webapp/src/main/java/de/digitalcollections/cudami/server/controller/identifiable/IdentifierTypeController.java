@@ -34,7 +34,7 @@ public class IdentifierTypeController {
 
   @ApiMethod(description = "Get all identifier types")
   @GetMapping(
-      value = {"/latest/identifiertypes", "/v2/identifiertypes"},
+      value = {"/latest/identifiertypes"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<IdentifierType> findAll(
