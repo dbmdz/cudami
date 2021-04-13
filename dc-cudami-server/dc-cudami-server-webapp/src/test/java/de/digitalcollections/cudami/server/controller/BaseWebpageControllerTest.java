@@ -99,7 +99,7 @@ public class BaseWebpageControllerTest extends BaseControllerTest {
       String lastModified,
       String uuid,
       String publicationStart,
-      boolean showInNavigation) {
+      Boolean showInNavigation) {
     Webpage webPage = new Webpage();
     webPage.setCreated(LocalDateTime.parse(created));
     LocalizedText label = new LocalizedText();
@@ -108,9 +108,12 @@ public class BaseWebpageControllerTest extends BaseControllerTest {
     webPage.setLastModified(LocalDateTime.parse(lastModified));
     webPage.setUuid(UUID.fromString(uuid));
     webPage.setPublicationStart(LocalDate.parse(publicationStart));
-    RenderingHints renderingHints = new RenderingHints();
-    renderingHints.setShowInPageNavigation(showInNavigation);
-    webPage.setRenderingHints(renderingHints);
+
+    if (showInNavigation != null) {
+      RenderingHints renderingHints = new RenderingHints();
+      renderingHints.setShowInPageNavigation(showInNavigation);
+      webPage.setRenderingHints(renderingHints);
+    }
     return webPage;
   }
 }
