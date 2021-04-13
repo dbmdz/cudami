@@ -68,7 +68,7 @@ public class WebsiteController {
 
   @ApiMethod(description = "Get website by uuid")
   @GetMapping(
-      value = {"/latest/websites/{uuid}", "/v5/websites/{uuid}"},
+      value = {"/latest/websites/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public Website findById(@PathVariable UUID uuid) {
