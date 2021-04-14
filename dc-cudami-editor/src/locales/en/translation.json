@@ -26,8 +26,8 @@
     "uploadSuccessful": "$t({{ mediaType }}, capitalize) uploaded successfully.",
     "userActivatedSuccessfully": "User \"{{ email }}\" was successfully activated.",
     "userDeactivatedSuccessfully": "User \"{{ email }}\" was successfully deactivated.",
-    "userNotActivatedSuccessfully": "While activationg user \"{{ email }}\" an error occurred.",
-    "userNotDeactivatedSuccessfully": "While deactivationg user \"{{ email }}\" an error occurred."
+    "userNotActivatedSuccessfully": "An error occurred during activation of user \"{{ email }}\".",
+    "userNotDeactivatedSuccessfully": "An error occurred during deactivation of user \"{{ email }}\"."
   },
   "pagination": {
     "totalElements": {
