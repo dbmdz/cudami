@@ -1,73 +1,59 @@
 package de.digitalcollections.cudami.server.model;
 
+import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.Website;
+import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
-import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.StructuredContent;
 import de.digitalcollections.model.text.contentblock.ContentBlock;
 import de.digitalcollections.model.text.contentblock.Paragraph;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
-import org.apache.commons.lang3.LocaleUtils;
 import org.flywaydb.core.internal.util.StringUtils;
 
-public class WebsiteBuilder {
+public class WebsiteBuilder extends EntityBuilder<Website, WebsiteBuilder> {
 
-  Website website = new Website();
-
-  public Website build() {
-    return website;
+  @Override
+  protected Website createEntity() {
+    return new Website();
   }
 
-  public WebsiteBuilder setCreated(String created) {
-    website.setCreated(LocalDateTime.parse(created));
-    return this;
+  @Override
+  protected EntityType getEntityType() {
+    return EntityType.WEBSITE;
   }
 
-  public WebsiteBuilder setSimpleDescription(Map<Locale, String> localizedContentMap) {
-    LocalizedStructuredContent description = new LocalizedStructuredContent();
-    for (Map.Entry<Locale, String> entry : localizedContentMap.entrySet()) {
-      StructuredContent localizedDescription = new StructuredContent();
-      String text = entry.getValue();
-      ContentBlock paragraph = StringUtils.hasText(text) ? new Paragraph(text) : new Paragraph();
-      localizedDescription.addContentBlock(paragraph);
-      description.put(entry.getKey(), localizedDescription);
+  @Deprecated
+  public WebsiteBuilder withSimpleDescription(Locale locale, String text) {
+    LocalizedStructuredContent description = entity.getDescription();
+    if (description == null) {
+      description = new LocalizedStructuredContent();
     }
-
-    website.setDescription(description);
-    return this;
-  }
-
-  public WebsiteBuilder setLabel(Map<String, String> localizedContentMap) {
-    LocalizedText label = new LocalizedText();
-    for (Map.Entry<String, String> entry : localizedContentMap.entrySet()) {
-      label.setText(LocaleUtils.toLocale(entry.getKey()), entry.getValue());
+    StructuredContent localizedDescription = description.get(locale);
+    if (localizedDescription == null) {
+      localizedDescription = new StructuredContent();
     }
-    website.setLabel(label);
+    ContentBlock paragraph = StringUtils.hasText(text) ? new Paragraph(text) : new Paragraph();
+    localizedDescription.addContentBlock(paragraph);
+    description.put(locale, localizedDescription);
+    entity.setDescription(description);
     return this;
   }
 
-  public WebsiteBuilder setLastModified(String lastModified) {
-    website.setLastModified(LocalDateTime.parse(lastModified));
+  public WebsiteBuilder withUrl(String url) throws MalformedURLException {
+    entity.setUrl(new URL(url));
     return this;
   }
 
-  public WebsiteBuilder setUuid(String uuidStr) {
-    website.setUuid(UUID.fromString(uuidStr));
+  public WebsiteBuilder withDescription(LocalizedStructuredContent description) {
+    entity.setDescription(description);
     return this;
   }
 
-  public WebsiteBuilder setRefId(long refId) {
-    website.setRefId(refId);
-    return this;
-  }
-
-  public WebsiteBuilder setUrl(String url) throws MalformedURLException {
-    website.setUrl(new URL(url));
+  public WebsiteBuilder withRootPages(List<Webpage> rootPages) {
+    entity.setRootPages(rootPages);
     return this;
   }
 }
