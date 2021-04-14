@@ -78,7 +78,7 @@ class AddPreviewImageDialog extends Component {
       ...newFileResource,
       fileResourceType: 'IMAGE',
       label: {[this.props.activeLanguage]: ''},
-      mimeType: 'image/png',
+      mimeType: 'image/*',
       uri: '',
     }
     this.setState({

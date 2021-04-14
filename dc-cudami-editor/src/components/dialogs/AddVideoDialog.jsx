@@ -61,7 +61,7 @@ class AddVideoDialog extends Component {
       ...newFileResource,
       fileResourceType: 'VIDEO',
       label: {[this.props.activeLanguage]: ''},
-      mimeType: 'video/mp4',
+      mimeType: 'video/*',
       uri: '',
     }
     this.setState({
