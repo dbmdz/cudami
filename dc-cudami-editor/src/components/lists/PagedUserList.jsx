@@ -43,9 +43,8 @@ const PagedUserList = ({apiContextPath = '/'}) => {
         values: {email: user.email},
       })
     }
-    const mutated = [...users]
-    mutated[index].enabled = !user.enabled
-    setContent(mutated)
+    users[index].enabled = !user.enabled
+    setContent(users)
     setFeedbackMessage({
       color: 'success',
       key: user.enabled
