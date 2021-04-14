@@ -6,10 +6,11 @@ import {useTranslation} from 'react-i18next'
 import {FaSearch, FaTimes} from 'react-icons/fa'
 import {Button, Form, Input, InputGroup, InputGroupAddon} from 'reactstrap'
 
-const IdentifiableSearch = ({onChange, onSubmit, value, isHighlighted}) => {
+const IdentifiableSearch = ({isHighlighted, onChange, onSubmit, value}) => {
   const {t} = useTranslation()
   return (
     <Form
+      className="mb-1"
       onSubmit={(evt) => {
         evt.preventDefault()
         onSubmit()
@@ -20,7 +21,7 @@ const IdentifiableSearch = ({onChange, onSubmit, value, isHighlighted}) => {
           <Input
             className={classNames(
               'pr-5',
-              isHighlighted && ['border', 'border-danger', 'border-width-3']
+              isHighlighted && value && ['border', 'border-danger']
             )}
             onChange={(evt) => onChange(evt.target.value)}
             placeholder={t('searchTerm')}
@@ -31,11 +32,9 @@ const IdentifiableSearch = ({onChange, onSubmit, value, isHighlighted}) => {
             className={classNames(
               'position-absolute',
               'position-centered',
-              'mr-0',
-              'bg-transparent',
-              'border-0',
               !value && 'd-none'
             )}
+            color="link"
             type="button"
             onClick={() => onChange('')}
           >
