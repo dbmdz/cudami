@@ -21,7 +21,7 @@ const IdentifiableSearch = ({isHighlighted, onChange, onSubmit, value}) => {
           <Input
             className={classNames(
               'pr-5',
-              isHighlighted && value && ['border', 'border-danger']
+              isHighlighted && ['border', 'border-danger']
             )}
             onChange={(evt) => onChange(evt.target.value)}
             placeholder={t('searchTerm')}
