@@ -34,7 +34,7 @@
     "bootstrap": "^4.6.0",
     "classnames": "^2.2.6",
     "filesize": "^6.1.0",
-    "i18next": "^20.1.0",
+    "i18next": "^20.2.1",
     "lodash": "^4.17.21",
     "object.fromentries": "^2.0.4",
     "prosemirror-commands": "^1.1.7",
