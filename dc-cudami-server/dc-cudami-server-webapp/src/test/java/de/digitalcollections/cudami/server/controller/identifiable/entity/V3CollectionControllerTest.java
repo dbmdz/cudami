@@ -7,31 +7,17 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
+import de.digitalcollections.cudami.server.model.CollectionBuilder;
+import de.digitalcollections.cudami.server.model.DigitalObjectBuilder;
+import de.digitalcollections.cudami.server.model.PageResponseBuilder;
+import de.digitalcollections.cudami.server.model.SearchPageResponseBuilder;
 import de.digitalcollections.model.file.MimeType;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.FilterOperation;
-import de.digitalcollections.model.filter.Filtering;
-import de.digitalcollections.model.identifiable.IdentifiableType;
-import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.identifiable.entity.EntityType;
-import de.digitalcollections.model.identifiable.resource.FileResourceType;
-import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageRequestBuilder;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.text.LocalizedStructuredContent;
-import de.digitalcollections.model.text.LocalizedText;
-import de.digitalcollections.model.text.StructuredContent;
-import de.digitalcollections.model.text.contentblock.Paragraph;
-import de.digitalcollections.model.view.RenderingHintsPreviewImage;
-import java.net.URI;
-import java.net.URL;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -56,46 +42,33 @@ public class V3CollectionControllerTest extends BaseControllerTest {
       })
   // @Disabled("requires Re-Mapping of the digitalObject class name")
   public void digitalObjectsForCollection(String path) throws Exception {
-    DigitalObject digitalObject = new DigitalObject();
-    digitalObject.setCreated(LocalDateTime.parse("2020-09-29T10:58:30.458925"));
-    Identifier mdzObjIdentifier =
-        new Identifier(
-            UUID.fromString("66cdabfc-5b15-44f5-a01e-41aa8be2b9e2"), "mdz-obj", "bsb00000610");
-    mdzObjIdentifier.setUuid(UUID.fromString("5a4c1a74-40c9-4175-8f25-e5267eddaabc"));
-    digitalObject.addIdentifier(mdzObjIdentifier);
-    digitalObject.setLabel(
-        "Die neuesten Schlager aus: Wenn Liebe erwacht : Hollandweibchen, Liebe im Schnee, Strohwitwe ... und viele andere ; Schlager u. Modelieder zum Mitsingen");
-    digitalObject.setLastModified(LocalDateTime.parse("2020-09-29T10:58:30.458928"));
-    ImageFileResource previewImage = new ImageFileResource();
-    previewImage.setUuid(UUID.fromString("94091a4d-c3ce-448c-93d1-7e86d8c3448a"));
-    previewImage.setType(IdentifiableType.RESOURCE);
-    previewImage.setFilename("/iiif/image/v2/bsb00000610_00002/full/250,/0/default.jpg");
-    previewImage.setFileResourceType(FileResourceType.IMAGE);
-    previewImage.setMimeType(MimeType.MIME_IMAGE);
-    previewImage.setReadonly(false);
-    previewImage.setSizeInBytes(0);
-    previewImage.setUri(
-        URI.create(
-            "https://api-dev.digitale-sammlungen.de/iiif/image/v2/bsb00000610_00002/full/250,/0/default.jpg"));
-    previewImage.setHeight(0);
-    previewImage.setWidth(0);
-    digitalObject.setPreviewImage(previewImage);
-    digitalObject.setType(IdentifiableType.ENTITY);
-    digitalObject.setUuid(UUID.fromString("66cdabfc-5b15-44f5-a01e-41aa8be2b9e2"));
-    digitalObject.setEntityType(EntityType.DIGITAL_OBJECT);
-    digitalObject.setRefId(441);
+    SearchPageResponse<DigitalObject> expected =
+        (SearchPageResponse<DigitalObject>)
+            new SearchPageResponseBuilder()
+                .forPageSize(1)
+                .withTotalElements(319)
+                .withContent(
+                    List.of(
+                        new DigitalObjectBuilder()
+                            .createdAt("2020-09-29T10:58:30.458925")
+                            .withIdentifier(
+                                "mdz-obj", "bsb00000610", "5a4c1a74-40c9-4175-8f25-e5267eddaabc")
+                            .withLabel(
+                                "Die neuesten Schlager aus: Wenn Liebe erwacht : Hollandweibchen, Liebe im Schnee, Strohwitwe ... und viele andere ; Schlager u. Modelieder zum Mitsingen")
+                            .lastModifiedAt("2020-09-29T10:58:30.458928")
+                            .withPreviewImage(
+                                "/iiif/image/v2/bsb00000610_00002/full/250,/0/default.jpg",
+                                "94091a4d-c3ce-448c-93d1-7e86d8c3448a",
+                                "https://api-dev.digitale-sammlungen.de/iiif/image/v2/bsb00000610_00002/full/250,/0/default.jpg")
+                            .withUuid("66cdabfc-5b15-44f5-a01e-41aa8be2b9e2")
+                            .withRefId(441)
+                            .build()))
+                .build();
 
-    Collection collection = new Collection();
-    collection.setUuid(extractFirstUuidFromPath(path));
-
-    SearchPageResponse<DigitalObject> response = new SearchPageResponse();
-    response.setContent(List.of(digitalObject));
-    PageRequest pageRequest = new PageRequestBuilder().pageSize(1).build();
-    response.setPageRequest(pageRequest);
-    response.setTotalElements(319);
+    Collection collection = new CollectionBuilder().atPath(path).build();
 
     when(collectionService.getDigitalObjects(eq(collection), any(SearchPageRequest.class)))
-        .thenReturn(response);
+        .thenReturn(expected);
 
     testJson(path);
   }
@@ -107,73 +80,41 @@ public class V3CollectionControllerTest extends BaseControllerTest {
         "/v3/collections/a6193be6-1048-4c86-be54-7a99dbbb586c/subcollections?active=true&pageNumber=0&pageSize=1"
       })
   public void subcollections(String path) throws Exception {
-    Collection collection = new Collection();
-    collection.setCreated(LocalDateTime.parse("2020-07-10T12:12:33.099312"));
-    LocalizedStructuredContent description = new LocalizedStructuredContent();
-    StructuredContent descriptionParagraphDe = new StructuredContent();
-    descriptionParagraphDe.addContentBlock(
-        new Paragraph(
-            "Mittelalterliche und neuzeitliche Handschriften aus aller Welt, Briefe und Autographen, Musikhandschriften"));
-    description.put(Locale.GERMAN, descriptionParagraphDe);
-    StructuredContent descriptionParagraphEn = new StructuredContent();
-    descriptionParagraphEn.addContentBlock(
-        new Paragraph(
-            "Medieval and modern manuscripts from all over the world, letters and autographs, music manuscripts"));
-    description.put(Locale.ENGLISH, descriptionParagraphEn);
-    collection.setDescription(description);
-    LocalizedText label = new LocalizedText();
-    label.put(Locale.GERMAN, "Handschriften");
-    label.put(Locale.ENGLISH, "Manuscripts");
-    collection.setLabel(label);
-    collection.setLastModified(LocalDateTime.parse("2020-11-05T17:00:27.181566"));
-    ImageFileResource previewImage = new ImageFileResource();
-    previewImage.setUuid(UUID.fromString("fb167832-e1d2-4729-a3b9-f68af5fca0c3"));
-    previewImage.setType(IdentifiableType.RESOURCE);
-    previewImage.setFilename("Hauptsammlung_Handschriften.jpg");
-    previewImage.setFileResourceType(FileResourceType.IMAGE);
-    previewImage.setHttpBaseUrl(
-        new URL(
-            "https://api.digitale-sammlungen.de/iiif/image/v2/fb167832-e1d2-4729-a3b9-f68af5fca0c3"));
-    previewImage.setMimeType(MimeType.MIME_IMAGE_JPEG);
-    previewImage.setReadonly(false);
-    previewImage.setSizeInBytes(0);
-    previewImage.setUri(
-        new URI("file:///cudami/image/jpg/fb16/7832/e1d2/4729/a3b9/f68a/f5fc/a0c3/resource.jpg"));
-    previewImage.setHeight(0);
-    previewImage.setWidth(0);
-    collection.setPreviewImage(previewImage);
-    RenderingHintsPreviewImage previewImageRenderingHints = new RenderingHintsPreviewImage();
-    previewImageRenderingHints.setOpenLinkInNewWindow(true);
-    collection.setPreviewImageRenderingHints(previewImageRenderingHints);
-    collection.setType(IdentifiableType.ENTITY);
-    collection.setUuid(UUID.fromString("888db95f-f837-4b17-bd3c-c00fd8c5205c"));
-    collection.setEntityType(EntityType.COLLECTION);
-    collection.setRefId(115);
-    collection.setPublicationStart(LocalDate.parse("2020-10-01"));
-
-    PageResponse<Collection> response = new PageResponse();
-    response.setContent(List.of(collection));
-    SearchPageRequest pageRequest = new SearchPageRequest();
-    pageRequest.setPageNumber(0);
-    pageRequest.setPageSize(1);
-    response.setTotalElements(8);
-    Filtering filtering = new Filtering();
-    FilterCriterion filterCriterionStart =
-        new FilterCriterion(
-            "publicationStart",
-            FilterOperation.LESS_THAN_OR_EQUAL_TO_AND_SET,
-            LocalDate.parse("2021-04-12"));
-    FilterCriterion filterCriterionEnd =
-        new FilterCriterion(
-            "publicationEnd",
-            FilterOperation.GREATER_THAN_OR_NOT_SET,
-            LocalDate.parse("2021-04-12"));
-    filtering.setFilterCriteria(List.of(filterCriterionStart, filterCriterionEnd));
-    pageRequest.setFiltering(filtering);
-    response.setPageRequest(pageRequest);
+    PageResponse<Collection> expected =
+        new PageResponseBuilder(Collection.class)
+            .forRequestPage(0)
+            .forPageSize(1)
+            .withStartDateFilterCriterion("publicationStart", "2021-04-12")
+            .withEndDateFilterCriterion("publicationEnd", "2021-04-12")
+            .withTotalElements(8)
+            .withContent(
+                List.of(
+                    new CollectionBuilder()
+                        .createdAt("2020-07-10T12:12:33.099312")
+                        .withDescription(
+                            Locale.GERMAN,
+                            "Mittelalterliche und neuzeitliche Handschriften aus aller Welt, Briefe und Autographen, Musikhandschriften")
+                        .withDescription(
+                            Locale.ENGLISH,
+                            "Medieval and modern manuscripts from all over the world, letters and autographs, music manuscripts")
+                        .withLabel(Locale.GERMAN, "Handschriften")
+                        .withLabel(Locale.ENGLISH, "Manuscripts")
+                        .lastModifiedAt("2020-11-05T17:00:27.181566")
+                        .withPreviewImage(
+                            "Hauptsammlung_Handschriften.jpg",
+                            "fb167832-e1d2-4729-a3b9-f68af5fca0c3",
+                            "file:///cudami/image/jpg/fb16/7832/e1d2/4729/a3b9/f68a/f5fc/a0c3/resource.jpg",
+                            MimeType.MIME_IMAGE_JPEG,
+                            "https://api.digitale-sammlungen.de/iiif/image/v2/fb167832-e1d2-4729-a3b9-f68af5fca0c3")
+                        .withOpenPreviewImageInNewWindow()
+                        .withUuid("888db95f-f837-4b17-bd3c-c00fd8c5205c")
+                        .withRefId(115)
+                        .withPublicationStart("2020-10-01")
+                        .build()))
+            .build();
 
     when(collectionService.getActiveChildren(any(UUID.class), any(PageRequest.class)))
-        .thenReturn(response);
+        .thenReturn(expected);
 
     testJson(path);
   }
