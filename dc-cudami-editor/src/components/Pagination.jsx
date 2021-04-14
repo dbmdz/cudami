@@ -17,7 +17,7 @@ const Pagination = ({
     return <div />
   }
   return (
-    <div className="justify-content-start">
+    <div>
       <ReactPaginate
         activeClassName="active"
         breakClassName="page-item"

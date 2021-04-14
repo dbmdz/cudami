@@ -1,9 +1,5 @@
 .position-centered {
-  top: 0px;
-  bottom: 0px;
-  right: 0px;
-}
-
-.border-width-3 {
-  border-width: 3px !important;
+  top: 0;
+  bottom: 0;
+  right: 0;
 }

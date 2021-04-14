@@ -450,10 +450,10 @@ class PagedIdentifiableList extends Component {
               )}
               {enableSearch && showSearch && (
                 <IdentifiableSearch
+                  isHighlighted={totalElements === 0}
                   onChange={(value) => this.setState({searchTerm: value})}
                   onSubmit={this.executeSearch}
                   value={searchTerm}
-                  isHighlighted={totalElements === 0}
                 />
               )}
             </div>
