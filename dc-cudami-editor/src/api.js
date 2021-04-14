@@ -11,6 +11,7 @@ export const typeToEndpointMapping = {
   renderingTemplate: 'renderingtemplates',
   subcollection: 'subcollections',
   topic: 'topics',
+  user: 'users',
   webpage: 'webpages',
   website: 'websites',
 }
@@ -52,6 +53,23 @@ export async function addAttachedIdentifiables(
         credentials: 'same-origin',
       },
       method: 'POST',
+    })
+    return response.ok
+  } catch (err) {
+    return false
+  }
+}
+
+export async function changeUserStatus(contextPath, uuid, enabled) {
+  const url = `${contextPath}api/users/${uuid}`
+  try {
+    const response = await fetch(url, {
+      body: JSON.stringify({enabled}),
+      headers: {
+        'Content-Type': 'application/json',
+        credentials: 'same-origin',
+      },
+      method: 'PATCH',
     })
     return response.ok
   } catch (err) {

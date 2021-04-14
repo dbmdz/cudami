@@ -8,6 +8,7 @@ module.exports = {
     IdentifierTypeList: './src/lib/IdentifierTypeList.jsx',
     RenderingTemplateEditor: './src/lib/RenderingTemplateEditor.jsx',
     RenderingTemplateList: './src/lib/RenderingTemplateList.jsx',
+    UserList: './src/lib/UserList.jsx',
   },
   module: {
     rules: [

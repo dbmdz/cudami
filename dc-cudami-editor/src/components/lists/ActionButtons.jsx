@@ -4,6 +4,7 @@ import {FaExchangeAlt, FaEye, FaPencilAlt, FaUnlink} from 'react-icons/fa'
 import {Button, ButtonGroup} from 'reactstrap'
 
 const ActionButtons = ({
+  children,
   editUrl,
   enableMove,
   enableRemove,
@@ -56,6 +57,7 @@ const ActionButtons = ({
           </Button>
         )}
       </ButtonGroup>
+      {children && <ButtonGroup>{children}</ButtonGroup>}
     </>
   )
 }
