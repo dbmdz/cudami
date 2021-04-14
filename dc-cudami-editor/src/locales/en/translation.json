@@ -24,8 +24,10 @@
     "subcollectionRemovedSuccessfully": "{{ name }} has been removed successfully.",
     "uploadFailed": "An error occurred while uploading.",
     "uploadSuccessful": "$t({{ mediaType }}, capitalize) uploaded successfully.",
-    "userActivatedSuccessfully": "User \"{{ email }}\" successfully activated",
-    "userDeactivatedSuccessfully": "User \"{{ email }}\" successfully deactivated"
+    "userActivatedSuccessfully": "User \"{{ email }}\" was successfully activated.",
+    "userDeactivatedSuccessfully": "User \"{{ email }}\" was successfully deactivated.",
+    "userNotActivatedSuccessfully": "While activationg user \"{{ email }}\" an error occurred.",
+    "userNotDeactivatedSuccessfully": "While deactivationg user \"{{ email }}\" an error occurred."
   },
   "pagination": {
     "totalElements": {

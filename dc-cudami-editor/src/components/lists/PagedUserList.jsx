@@ -37,7 +37,9 @@ const PagedUserList = ({apiContextPath = '/'}) => {
     if (!successful) {
       return setFeedbackMessage({
         color: 'danger',
-        key: 'foo',
+        key: user.enabled
+          ? 'userNotDeactivatedSuccessfully'
+          : 'userNotActivatedSuccessfully',
         values: {email: user.email},
       })
     }
