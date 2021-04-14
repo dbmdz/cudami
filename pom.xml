@@ -92,6 +92,7 @@
     <version.unbescape>1.1.6.RELEASE</version.unbescape>
 
     <!-- plugins -->
+    <version.githook-maven-plugin>1.0.5</version.githook-maven-plugin>
     <version.jacoco-maven-plugin>0.8.6</version.jacoco-maven-plugin>
     <version.maven-failsafe-plugin>3.0.0-M5</version.maven-failsafe-plugin>
     <version.maven-fmt-plugin>2.10</version.maven-fmt-plugin>
@@ -265,6 +266,7 @@
       <plugin>
         <groupId>io.github.phillipuniverse</groupId>
         <artifactId>githook-maven-plugin</artifactId>
+        <version>${version.githook-maven-plugin}</version>
         <executions>
           <execution>
             <goals>
