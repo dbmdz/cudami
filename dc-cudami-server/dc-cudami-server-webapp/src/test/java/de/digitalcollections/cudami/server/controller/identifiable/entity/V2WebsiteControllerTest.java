@@ -86,16 +86,15 @@ class V2WebsiteControllerTest extends BaseControllerTest {
                 .forAscendingOrderedField("label")
                 .withTotalElements(82)
                 .withContent(
-                    List.of(
-                        new WebsiteBuilder()
-                            .createdAt("2018-05-02T13:32:52.582")
-                            .withDescription(Locale.GERMAN, "")
-                            .withLabel(Locale.GERMAN, "Testseite")
-                            .lastModifiedAt("2018-09-11T09:47:40.311")
-                            .withUuid("e91464a1-588b-434b-a88e-b6a1c3824c85")
-                            .withRefId(71)
-                            .withUrl("https://www.digitale-sammlungen.de/")
-                            .build()))
+                    new WebsiteBuilder()
+                        .createdAt("2018-05-02T13:32:52.582")
+                        .withDescription(Locale.GERMAN, "")
+                        .withLabel(Locale.GERMAN, "Testseite")
+                        .lastModifiedAt("2018-09-11T09:47:40.311")
+                        .withUuid("e91464a1-588b-434b-a88e-b6a1c3824c85")
+                        .withRefId(71)
+                        .withUrl("https://www.digitale-sammlungen.de/")
+                        .build())
                 .build();
 
     when(websiteService.find(any(SearchPageRequest.class))).thenReturn(expected);

@@ -87,29 +87,28 @@ public class V3CollectionControllerTest extends BaseControllerTest {
             .forEndDate("publicationEnd", "2021-04-12")
             .withTotalElements(8)
             .withContent(
-                List.of(
-                    new CollectionBuilder()
-                        .createdAt("2020-07-10T12:12:33.099312")
-                        .withDescription(
-                            Locale.GERMAN,
-                            "Mittelalterliche und neuzeitliche Handschriften aus aller Welt, Briefe und Autographen, Musikhandschriften")
-                        .withDescription(
-                            Locale.ENGLISH,
-                            "Medieval and modern manuscripts from all over the world, letters and autographs, music manuscripts")
-                        .withLabel(Locale.GERMAN, "Handschriften")
-                        .withLabel(Locale.ENGLISH, "Manuscripts")
-                        .lastModifiedAt("2020-11-05T17:00:27.181566")
-                        .withPreviewImage(
-                            "Hauptsammlung_Handschriften.jpg",
-                            "fb167832-e1d2-4729-a3b9-f68af5fca0c3",
-                            "file:///cudami/image/jpg/fb16/7832/e1d2/4729/a3b9/f68a/f5fc/a0c3/resource.jpg",
-                            MimeType.MIME_IMAGE_JPEG,
-                            "https://api.digitale-sammlungen.de/iiif/image/v2/fb167832-e1d2-4729-a3b9-f68af5fca0c3")
-                        .withOpenPreviewImageInNewWindow()
-                        .withUuid("888db95f-f837-4b17-bd3c-c00fd8c5205c")
-                        .withRefId(115)
-                        .withPublicationStart("2020-10-01")
-                        .build()))
+                new CollectionBuilder()
+                    .createdAt("2020-07-10T12:12:33.099312")
+                    .withDescription(
+                        Locale.GERMAN,
+                        "Mittelalterliche und neuzeitliche Handschriften aus aller Welt, Briefe und Autographen, Musikhandschriften")
+                    .withDescription(
+                        Locale.ENGLISH,
+                        "Medieval and modern manuscripts from all over the world, letters and autographs, music manuscripts")
+                    .withLabel(Locale.GERMAN, "Handschriften")
+                    .withLabel(Locale.ENGLISH, "Manuscripts")
+                    .lastModifiedAt("2020-11-05T17:00:27.181566")
+                    .withPreviewImage(
+                        "Hauptsammlung_Handschriften.jpg",
+                        "fb167832-e1d2-4729-a3b9-f68af5fca0c3",
+                        "file:///cudami/image/jpg/fb16/7832/e1d2/4729/a3b9/f68a/f5fc/a0c3/resource.jpg",
+                        MimeType.MIME_IMAGE_JPEG,
+                        "https://api.digitale-sammlungen.de/iiif/image/v2/fb167832-e1d2-4729-a3b9-f68af5fca0c3")
+                    .withOpenPreviewImageInNewWindow()
+                    .withUuid("888db95f-f837-4b17-bd3c-c00fd8c5205c")
+                    .withRefId(115)
+                    .withPublicationStart("2020-10-01")
+                    .build())
             .build();
 
     when(collectionService.getActiveChildren(any(UUID.class), any(PageRequest.class)))
