@@ -10,7 +10,6 @@ import de.digitalcollections.cudami.server.model.RenderingTemplateBuilder;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.view.RenderingTemplate;
-import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -38,14 +37,12 @@ class V3RenderingTemplateControllerTest extends BaseControllerTest {
                 .forAscendingOrderedField("name")
                 .withTotalElements(2)
                 .withContent(
-                    List.of(
-                        new RenderingTemplateBuilder()
-                            .withName("accordion")
-                            .withUuid("ba62495c-fb69-4d4a-9ca0-19e106a11aa7")
-                            .withDescription(
-                                Locale.GERMAN, "Template für ein Akkordion (z.B. FAQs)")
-                            .withLabel(Locale.GERMAN, "Akkordeon")
-                            .build()))
+                    new RenderingTemplateBuilder()
+                        .withName("accordion")
+                        .withUuid("ba62495c-fb69-4d4a-9ca0-19e106a11aa7")
+                        .withDescription(Locale.GERMAN, "Template für ein Akkordion (z.B. FAQs)")
+                        .withLabel(Locale.GERMAN, "Akkordeon")
+                        .build())
                 .build();
 
     when(renderingTemplateService.find(any(PageRequest.class))).thenReturn(expected);
