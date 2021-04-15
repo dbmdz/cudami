@@ -6,8 +6,8 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
+import de.digitalcollections.cudami.server.model.WebsiteBuilder;
 import de.digitalcollections.model.identifiable.entity.Website;
-import de.digitalcollections.model.text.LocalizedText;
 import java.util.Locale;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -31,11 +31,12 @@ class WebpageControllerTest extends BaseControllerTest {
         "/latest/webpages/6d52141c-5c5d-48b4-aee8-7df5404d245e/website"
       })
   public void pagedRootpages(String path) throws Exception {
-
-    Website expected = new Website();
-    expected.setLabel(new LocalizedText(Locale.GERMAN, "MDZ Homepage Relaunch"));
-    expected.setUuid(UUID.fromString("7a2f1935-c5b8-40fb-8622-c675de0a6242"));
-    expected.setRefId(29);
+    Website expected =
+        new WebsiteBuilder()
+            .withLabel(Locale.GERMAN, "MDZ Homepage Relaunch")
+            .withUuid("7a2f1935-c5b8-40fb-8622-c675de0a6242")
+            .withRefId(29)
+            .build();
 
     when(webpageService.getWebsite(any(UUID.class))).thenReturn(expected);
 

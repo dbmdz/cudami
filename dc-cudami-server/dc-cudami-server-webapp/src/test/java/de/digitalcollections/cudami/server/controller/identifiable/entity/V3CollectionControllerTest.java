@@ -40,7 +40,6 @@ public class V3CollectionControllerTest extends BaseControllerTest {
       strings = {
         "/v3/collections/a014a33b-6803-4b17-a876-a8f68758f2a7/digitalobjects?pageNumber=0&pageSize=1"
       })
-  // @Disabled("requires Re-Mapping of the digitalObject class name")
   public void digitalObjectsForCollection(String path) throws Exception {
     SearchPageResponse<DigitalObject> expected =
         (SearchPageResponse<DigitalObject>)
@@ -84,8 +83,8 @@ public class V3CollectionControllerTest extends BaseControllerTest {
         new PageResponseBuilder(Collection.class)
             .forRequestPage(0)
             .forPageSize(1)
-            .withStartDateFilterCriterion("publicationStart", "2021-04-12")
-            .withEndDateFilterCriterion("publicationEnd", "2021-04-12")
+            .forStartDate("publicationStart", "2021-04-12")
+            .forEndDate("publicationEnd", "2021-04-12")
             .withTotalElements(8)
             .withContent(
                 List.of(

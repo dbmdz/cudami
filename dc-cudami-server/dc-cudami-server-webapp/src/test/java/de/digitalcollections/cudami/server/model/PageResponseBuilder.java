@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.server.model;
 import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.FilterOperation;
 import de.digitalcollections.model.filter.Filtering;
-import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.NullHandling;
 import de.digitalcollections.model.paging.Order;
@@ -15,8 +14,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PageResponseBuilder<
-    T extends Entity, B extends PageResponse<T>, C extends PageResponseBuilder> {
+public class PageResponseBuilder<T, B extends PageResponse<T>, C extends PageResponseBuilder> {
 
   B pageResponse;
   PageRequest pageRequest = new PageRequest();
@@ -42,6 +40,12 @@ public class PageResponseBuilder<
       pageRequest.setSorting(sorting);
     }
 
+    if (pageResponse.getTotalElements() == 0
+        && pageResponse.getContent() != null
+        && !pageResponse.getContent().isEmpty()) {
+      pageResponse.setTotalElements(pageResponse.getContent().size());
+    }
+
     pageResponse.setPageRequest(pageRequest);
     return pageResponse;
   }
@@ -57,6 +61,11 @@ public class PageResponseBuilder<
     return (C) this;
   }
 
+  public C withContent(T content) {
+    pageResponse.setContent(List.of(content));
+    return (C) this;
+  }
+
   public C forRequestPage(int requestPage) {
     pageRequest.setPageNumber(requestPage);
     return (C) this;
@@ -67,7 +76,7 @@ public class PageResponseBuilder<
     return (C) this;
   }
 
-  public C withStartDateFilterCriterion(String fieldName, String startDate) {
+  public C forStartDate(String fieldName, String startDate) {
     FilterCriterion filterCriterionStart =
         new FilterCriterion(
             fieldName, FilterOperation.LESS_THAN_OR_EQUAL_TO_AND_SET, LocalDate.parse(startDate));
@@ -78,7 +87,7 @@ public class PageResponseBuilder<
     return (C) this;
   }
 
-  public C withEndDateFilterCriterion(String fieldName, String endDate) {
+  public C forEndDate(String fieldName, String endDate) {
     FilterCriterion filterCriterionEnd =
         new FilterCriterion(
             fieldName, FilterOperation.GREATER_THAN_OR_NOT_SET, LocalDate.parse(endDate));
@@ -89,10 +98,10 @@ public class PageResponseBuilder<
     return (C) this;
   }
 
-  public C withOrder(String fieldName, String subfield, Direction direction) {
+  public C forAscendingOrderedField(String fieldName, String subfield) {
     Order order =
         new OrderBuilder()
-            .direction(direction)
+            .direction(Direction.ASC)
             .ignoreCase(false)
             .nullHandling(NullHandling.NATIVE)
             .property(fieldName)
@@ -105,8 +114,8 @@ public class PageResponseBuilder<
     return (C) this;
   }
 
-  public C withOrder(String fieldName, Direction direction) {
-    return withOrder(fieldName, "", direction);
+  public C forAscendingOrderedField(String fieldName) {
+    return forAscendingOrderedField(fieldName, "");
   }
 
   public C withTotalElements(long totalElements) {

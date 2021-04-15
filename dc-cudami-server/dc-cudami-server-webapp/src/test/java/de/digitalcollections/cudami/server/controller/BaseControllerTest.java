@@ -26,6 +26,7 @@ public abstract class BaseControllerTest {
 
   @Autowired private MockMvc mockMvc;
 
+  @Deprecated
   protected <T> PageResponse<T> buildStandardPageResponse(Class<T> type, List<T> content) {
     PageResponse<T> pageResponse = new PageResponse<>();
     pageResponse.setContent(content);
