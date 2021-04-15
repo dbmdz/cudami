@@ -4,7 +4,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
-import de.digitalcollections.cudami.server.controller.BaseWebpageControllerTest;
+import de.digitalcollections.cudami.server.controller.BaseControllerTest;
+import de.digitalcollections.cudami.server.model.WebpageBuilder;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import java.util.Locale;
 import java.util.UUID;
@@ -15,7 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 @WebMvcTest(V1WebpageController.class)
-class V1WebpageControllerTest extends BaseWebpageControllerTest {
+class V1WebpageControllerTest extends BaseControllerTest {
 
   @MockBean private WebpageService webpageService;
 
@@ -27,7 +28,7 @@ class V1WebpageControllerTest extends BaseWebpageControllerTest {
         "/v1/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa"
       })
   public void returnWebpageV1Json(String path) throws Exception {
-    Webpage expected = createWebpage(path);
+    Webpage expected = WebpageBuilder.createPrefilledWebpage(path);
     when(webpageService.get(any(UUID.class))).thenReturn(expected);
     testJson(path);
   }
@@ -40,7 +41,7 @@ class V1WebpageControllerTest extends BaseWebpageControllerTest {
         "/v1/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa?pLocale=de_DE"
       })
   public void returnLocalizedWebpageV1Json(String path) throws Exception {
-    Webpage expected = createWebpage(path);
+    Webpage expected = WebpageBuilder.createPrefilledWebpage(path);
     when(webpageService.get(any(UUID.class), any(Locale.class))).thenReturn(expected);
     testJson(path);
   }
@@ -54,7 +55,7 @@ class V1WebpageControllerTest extends BaseWebpageControllerTest {
         "/v1/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa?locale=de_DE"
       })
   public void returnWrongLocalizedWebpageV1Json(String path) throws Exception {
-    Webpage expected = createWebpage(path);
+    Webpage expected = WebpageBuilder.createPrefilledWebpage(path);
     when(webpageService.get(any(UUID.class))).thenReturn(expected);
     testJson(path);
   }

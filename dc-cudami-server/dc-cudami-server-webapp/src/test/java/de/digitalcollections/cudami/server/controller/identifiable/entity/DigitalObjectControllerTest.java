@@ -37,8 +37,8 @@ class DigitalObjectControllerTest extends BaseControllerTest {
             .withoutContent()
             .forRequestPage(0)
             .forPageSize(1000)
-            .withStartDateFilterCriterion("c.publication_start", "2021-03-31")
-            .withEndDateFilterCriterion("c.publication_end", "2021-03-31")
+            .forStartDate("c.publication_start", "2021-03-31")
+            .forEndDate("c.publication_end", "2021-03-31")
             .build();
 
     DigitalObject digitalObject = new DigitalObjectBuilder().atPath(path).build();

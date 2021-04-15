@@ -4,7 +4,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
-import de.digitalcollections.cudami.server.controller.BaseWebpageControllerTest;
+import de.digitalcollections.cudami.server.controller.BaseControllerTest;
+import de.digitalcollections.cudami.server.model.WebpageBuilder;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import java.util.Locale;
 import java.util.UUID;
@@ -15,7 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 @WebMvcTest(V2WebpageController.class)
-public class V2WebpageControllerTest extends BaseWebpageControllerTest {
+public class V2WebpageControllerTest extends BaseControllerTest {
 
   @MockBean protected WebpageService webpageService;
 
@@ -28,7 +29,7 @@ public class V2WebpageControllerTest extends BaseWebpageControllerTest {
         "/v2/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa"
       })
   public void returnWebpageV2Json(String path) throws Exception {
-    Webpage expected = createWebpage(path);
+    Webpage expected = WebpageBuilder.createPrefilledWebpage(path);
     when(webpageService.get(any(UUID.class))).thenReturn(expected);
     testJson(path);
   }
@@ -42,7 +43,7 @@ public class V2WebpageControllerTest extends BaseWebpageControllerTest {
         "/v2/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa?pLocale=de"
       })
   public void returnLocalizedWebpageV2Json(String path) throws Exception {
-    Webpage expected = createWebpage(path);
+    Webpage expected = WebpageBuilder.createPrefilledWebpage(path);
     when(webpageService.get(any(UUID.class), any(Locale.class))).thenReturn(expected);
     testJson(path);
   }

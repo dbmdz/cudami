@@ -10,7 +10,6 @@ import de.digitalcollections.cudami.server.model.CollectionBuilder;
 import de.digitalcollections.cudami.server.model.PageResponseBuilder;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.entity.Collection;
-import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import java.util.List;
@@ -39,8 +38,8 @@ public class V2CollectionControllerTest extends BaseControllerTest {
     PageResponse<Collection> expected =
         new PageResponseBuilder<>()
             .forPageSize(1)
-            .withOrder("label", "de", Direction.ASC)
-            .withOrder("label", Direction.ASC)
+            .forAscendingOrderedField("label", "de")
+            .forAscendingOrderedField("label")
             .withTotalElements(139)
             .withContent(
                 List.of(
@@ -81,8 +80,8 @@ public class V2CollectionControllerTest extends BaseControllerTest {
     PageResponse<Collection> expected =
         new PageResponseBuilder<>()
             .forPageSize(1)
-            .withOrder("label", "de", Direction.ASC)
-            .withOrder("label", Direction.ASC)
+            .forAscendingOrderedField("label", "de")
+            .forAscendingOrderedField("label")
             .withoutContent()
             .build();
 

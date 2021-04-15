@@ -8,7 +8,6 @@ import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.cudami.server.model.ProjectBuilder;
 import de.digitalcollections.cudami.server.model.SearchPageResponseBuilder;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.List;
@@ -45,8 +44,8 @@ public class V2ProjectControllerTest extends BaseControllerTest {
                             .withUuid("ae2a0a61-5255-46d4-8acf-cfddd3527338")
                             .withRefId(1300623)
                             .build()))
-                .withOrder("label", "de", Direction.ASC)
-                .withOrder("label", Direction.ASC)
+                .forAscendingOrderedField("label", "de")
+                .forAscendingOrderedField("label")
                 .build();
 
     when(projectService.find(any(SearchPageRequest.class))).thenReturn(expected);
