@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.v3.identifiable.web;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
@@ -8,6 +9,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.web
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.cudami.server.model.PageResponseBuilder;
 import de.digitalcollections.cudami.server.model.WebpageBuilder;
+import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
@@ -180,6 +182,96 @@ class V3WebpageControllerTest extends BaseControllerTest {
                 .build();
 
     when(webpageService.getChildren(any(UUID.class), any(PageRequest.class))).thenReturn(expected);
+    testJson(path);
+  }
+
+  @DisplayName("returns a webpage with a tree of its children")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v3/webpages/ead664b6-5fcc-414e-b3bb-133f0af1acb8/childrentree",
+        "/v3/webpages/ead664b6-5fcc-414e-b3bb-133f0af1acb8/childrentree?active=true"
+      })
+  public void returnWebpageWithChildrentree(String path) throws Exception {
+    List<Webpage> expected =
+        List.of(
+            new WebpageBuilder()
+                .createdAt("2019-10-31T11:25:10.696785")
+                .withDescription("de", "Test-Text")
+                .withLabel(Locale.GERMAN, "Test")
+                .lastModifiedAt("2020-10-20T14:36:29.017223")
+                .withPreviewImage(
+                    "test.jpg",
+                    "b2fdfbc2-833c-4e11-a80c-a3331d09e10b",
+                    "file:///cudami/image/jpg/b2fd/fbc2/833c/4e11/a80c/a333/1d09/e10b/resource.jpg",
+                    MimeType.MIME_IMAGE_JPEG,
+                    "https://api.digitale-sammlungen.de/iiif/image/v2/b2fdfbc2-833c-4e11-a80c-a3331d09e10b")
+                .withAltText(Locale.GERMAN, "test alt")
+                .withOpenLinkInNewWindow()
+                .withUuid("4c202033-60e2-4a21-9fd7-660cadae95d5")
+                .withPublicationStartAt("2020-10-01")
+                .withChildren(
+                    List.of(
+                        new WebpageBuilder()
+                            .createdAt("2019-10-31T11:26:26.357575")
+                            .withLabel(Locale.GERMAN, "Technologien und Softwareentwicklung")
+                            .lastModifiedAt("2021-01-11T14:20:33.920896")
+                            .withUuid("d329196f-1a5e-4e45-aa7a-857417f2fb5b")
+                            .withPublicationStartAt("2019-12-09")
+                            .notShownInNavigation()
+                            .withChildren(
+                                List.of(
+                                    new WebpageBuilder()
+                                        .createdAt("2019-12-09T13:40:54.644153")
+                                        .withLabel(Locale.GERMAN, "IIIF und Mirador")
+                                        .lastModifiedAt("2019-12-09T13:41:28.196622")
+                                        .withUuid("24500113-d0ce-4411-ad2d-db92c7c6939f")
+                                        .withPublicationStartAt("2019-12-09")
+                                        .build()))
+                            .build(),
+                        new WebpageBuilder()
+                            .createdAt("2019-10-31T11:26:41.189086")
+                            .withLabel(Locale.GERMAN, "Test1")
+                            .lastModifiedAt("2019-12-09T14:02:08.693881")
+                            .withUuid("b383e248-82d5-405b-b33b-9d879913044a")
+                            .withPublicationStartAt("2019-12-09")
+                            .build(),
+                        new WebpageBuilder()
+                            .createdAt("2019-10-31T11:26:52.877568")
+                            .withLabel(Locale.GERMAN, "Test2")
+                            .withLabel(Locale.ENGLISH, "test2")
+                            .lastModifiedAt("2021-01-11T15:27:36.011534")
+                            .withUuid("f1ef5feb-3d19-4888-b67e-2efae4bda2ab")
+                            .withPublicationStartAt("2020-11-02")
+                            .shownInNavigation()
+                            .withTemplateName("timeline")
+                            .build()))
+                .build(),
+            new WebpageBuilder()
+                .createdAt("2019-10-31T11:27:58.409698")
+                .withLabel(Locale.GERMAN, "Hilfe")
+                .lastModifiedAt("2020-10-19T16:08:52.672063")
+                .withUuid("8f0b1760-a03e-47b0-862a-0f234e5a79d4")
+                .withPublicationStartAt("2020-10-19")
+                .withChildren(
+                    List.of(
+                        new WebpageBuilder()
+                            .createdAt("2019-10-31T11:28:14.191666")
+                            .withLabel(Locale.GERMAN, "Hilfe zur Suche")
+                            .lastModifiedAt("2021-02-11T10:52:01.433945")
+                            .withUuid("5c26f7ca-5a36-47ee-9bed-4cb816c49e79")
+                            .withPublicationStartAt("2019-11-05")
+                            .shownInNavigation()
+                            .build()))
+                .build());
+
+    when(webpageService.getChildrenTree(
+            eq(UUID.fromString("ead664b6-5fcc-414e-b3bb-133f0af1acb8"))))
+        .thenReturn(expected);
+    when(webpageService.getActiveChildrenTree(
+            eq(UUID.fromString("ead664b6-5fcc-414e-b3bb-133f0af1acb8"))))
+        .thenReturn(expected);
+
     testJson(path);
   }
 

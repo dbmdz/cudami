@@ -50,7 +50,11 @@ class DigitalObjectControllerTest extends BaseControllerTest {
 
   @DisplayName("returns a digital object by its identifier")
   @ParameterizedTest
-  @ValueSource(strings = {"/v2/digitalobjects/identifier/mdz-obj:bsb10000001"})
+  @ValueSource(
+      strings = {
+        "/v2/digitalobjects/identifier/mdz-obj:bsb10000001",
+        "/v2/digitalobjects/identifier/mdz-obj:bsb10000001.json"
+      })
   public void getDigitalObjectByIdentifier(String path) throws Exception {
 
     DigitalObject expected =

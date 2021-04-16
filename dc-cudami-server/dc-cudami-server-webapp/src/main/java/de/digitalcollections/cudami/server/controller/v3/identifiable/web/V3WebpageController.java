@@ -182,4 +182,50 @@ public class V3WebpageController {
     result.put("content", contentDesc);
     return new ResponseEntity<>(result.toString(), HttpStatus.OK);
   }
+
+  @ApiMethod(description = "Get (active or all) children of a webpage recursivly as JSON")
+  @GetMapping(
+      value = {"/v3/webpages/{uuid}/childrentree"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public ResponseEntity<String> getWebpageChildrenTree(
+      @ApiPathParam(
+              description =
+                  "UUID of the root webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @ApiQueryParam(name = "active", description = "If set, only active children will be returned")
+          @RequestParam(name = "active", required = false)
+          String active)
+      throws JsonProcessingException {
+    List<Webpage> childrenList;
+    if (active != null) {
+      childrenList = webpageService.getActiveChildrenTree(uuid);
+    } else {
+      childrenList = webpageService.getChildrenTree(uuid);
+    }
+
+    JSONArray resultList = new JSONArray(objectMapper.writeValueAsString(childrenList));
+    resultList = fixWebpageChildren(resultList);
+    return new ResponseEntity<>(resultList.toString(), HttpStatus.OK);
+  }
+
+  private JSONArray fixWebpageChildren(JSONArray webpages) {
+    for (int i = 0; i < webpages.length(); i++) {
+      JSONObject webpage = webpages.getJSONObject(i);
+      webpage.put("type", "ENTITY_PART");
+      webpage.put("entityPartType", "WEBPAGE");
+
+      if (webpage.has("children")) {
+        JSONArray children = webpage.getJSONArray("children");
+        if (children != null && children.length() > 0) {
+          children = fixWebpageChildren(children);
+          webpage.put("children", children);
+        }
+      } else {
+        webpage.put("children", List.of());
+      }
+    }
+    return webpages;
+  }
 }

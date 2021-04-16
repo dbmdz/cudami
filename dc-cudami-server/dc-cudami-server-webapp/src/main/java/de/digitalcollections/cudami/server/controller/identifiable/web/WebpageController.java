@@ -205,7 +205,7 @@ public class WebpageController {
 
   @ApiMethod(description = "Get (active or all) children of a webpage recursivly as JSON")
   @GetMapping(
-      value = {"/latest/webpages/{uuid}/childrentree", "/v3/webpages/{uuid}/childrentree"},
+      value = {"/latest/webpages/{uuid}/childrentree"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public List<Webpage> getWebpageChildrenTree(
