@@ -1,12 +1,14 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.cudami.server.model.CollectionBuilder;
+import de.digitalcollections.cudami.server.model.ProjectBuilder;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import java.util.Locale;
@@ -51,5 +53,26 @@ class EntityControllerTest extends BaseControllerTest {
     when(entityService.getByRefId(anyLong())).thenReturn(expected);
 
     testJson(path);
+  }
+
+  @DisplayName("returns an entity, e.g. a project, by its identifier")
+  @ParameterizedTest
+  @ValueSource(strings = {"/latest/entities/identifier/mdz-proj:1328176523.json"})
+  public void returnByIdentifier(String path) {
+    Entity expected =
+        new ProjectBuilder()
+            .createdAt("2020-09-30T16:25:09.365401")
+            .withIdentifier("mdz-proj", "1328176523", "54edc946-5e10-495a-bda2-cdc2ebd4e3d6")
+            .withLabel(
+                Locale.GERMAN,
+                "Notendrucke des 16. und 17. Jahrhunderts mit mehrstimmiger Musik in der BSB")
+            .withLabel(
+                Locale.ENGLISH,
+                "Printed sources of polyphonic music (1501-1700) from the Bavarian State Library: digitization and online presentation")
+            .lastModifiedAt("2021-04-16T04:15:00.961914")
+            .withUuid("d76bb26f-bd7d-4ade-be48-a2139d49dbf1")
+            .withRefId(1300518)
+            .build();
+    when(entityService.getByIdentifier(eq("mdz-proj"), eq("1328176523"))).thenReturn(expected);
   }
 }
