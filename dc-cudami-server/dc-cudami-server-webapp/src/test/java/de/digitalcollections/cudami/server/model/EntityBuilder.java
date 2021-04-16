@@ -130,6 +130,16 @@ public class EntityBuilder<T extends Entity, B extends EntityBuilder> extends Ab
     return (B) this;
   }
 
+  public B withoutOpenPreviewInNewWindow() {
+    RenderingHintsPreviewImage previewImageRenderingHints = entity.getPreviewImageRenderingHints();
+    if (previewImageRenderingHints == null) {
+      previewImageRenderingHints = new RenderingHintsPreviewImage();
+    }
+    previewImageRenderingHints.setOpenLinkInNewWindow(false);
+    entity.setPreviewImageRenderingHints(previewImageRenderingHints);
+    return (B) this;
+  }
+
   public B withUuidFromPath(String path) {
     entity.setUuid(extractFirstUuidFromPath(path));
     return (B) this;
@@ -141,6 +151,21 @@ public class EntityBuilder<T extends Entity, B extends EntityBuilder> extends Ab
       previewImageRenderingHints = new RenderingHintsPreviewImage();
     }
     previewImageRenderingHints.setAltText(entity.getLabel());
+    entity.setPreviewImageRenderingHints(previewImageRenderingHints);
+    return (B) this;
+  }
+
+  public B withAltText(Locale locale, String text) {
+    RenderingHintsPreviewImage previewImageRenderingHints = entity.getPreviewImageRenderingHints();
+    if (previewImageRenderingHints == null) {
+      previewImageRenderingHints = new RenderingHintsPreviewImage();
+    }
+    LocalizedText altText = previewImageRenderingHints.getAltText();
+    if (altText == null) {
+      altText = new LocalizedText();
+    }
+    altText.setText(locale, text);
+    previewImageRenderingHints.setAltText(altText);
     entity.setPreviewImageRenderingHints(previewImageRenderingHints);
     return (B) this;
   }
