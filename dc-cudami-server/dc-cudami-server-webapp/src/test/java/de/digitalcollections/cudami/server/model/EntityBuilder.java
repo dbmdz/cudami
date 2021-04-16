@@ -180,6 +180,21 @@ public class EntityBuilder<T extends Entity, B extends EntityBuilder> extends Ab
     return (B) this;
   }
 
+  public B withTitle(Locale locale, String text) {
+    RenderingHintsPreviewImage previewImageRenderingHints = entity.getPreviewImageRenderingHints();
+    if (previewImageRenderingHints == null) {
+      previewImageRenderingHints = new RenderingHintsPreviewImage();
+    }
+    LocalizedText title = previewImageRenderingHints.getTitle();
+    if (title == null) {
+      title = new LocalizedText();
+    }
+    title.setText(locale, text);
+    previewImageRenderingHints.setTitle(title);
+    entity.setPreviewImageRenderingHints(previewImageRenderingHints);
+    return (B) this;
+  }
+
   public B withDescription(Locale locale, String text) {
     LocalizedStructuredContent description = entity.getDescription();
     if (description == null) {

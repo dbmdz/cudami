@@ -114,6 +114,14 @@ public class PageResponseBuilder<T, B extends PageResponse<T>, C extends PageRes
     return (C) this;
   }
 
+  public C forEqualPredicate(String fieldName, String predicate) {
+    if (filterCriteria == null) {
+      filterCriteria = new ArrayList<>();
+    }
+    filterCriteria.add(new FilterCriterion(fieldName, FilterOperation.EQUALS, predicate));
+    return (C) this;
+  }
+
   public C forAscendingOrderedField(String fieldName) {
     return forAscendingOrderedField(fieldName, "");
   }
