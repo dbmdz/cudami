@@ -132,9 +132,13 @@ class V3WebpageControllerTest extends BaseControllerTest {
     testXml(path);
   }
 
-  @DisplayName("returns the children of a webpage")
+  @DisplayName("returns the (active) children of a webpage")
   @ParameterizedTest
-  @ValueSource(strings = {"/v3/webpages/157f5428-5a5a-4d47-971e-f092f1836246/children"})
+  @ValueSource(
+      strings = {
+        "/v3/webpages/157f5428-5a5a-4d47-971e-f092f1836246/children",
+        "/v3/webpages/157f5428-5a5a-4d47-971e-f092f1836246/children?active=true"
+      })
   public void returnChildrenOfAWebpage(String path) throws Exception {
     PageResponse<Webpage> expected =
         (PageResponse)
@@ -182,6 +186,8 @@ class V3WebpageControllerTest extends BaseControllerTest {
                 .build();
 
     when(webpageService.getChildren(any(UUID.class), any(PageRequest.class))).thenReturn(expected);
+    when(webpageService.getActiveChildren(any(UUID.class), any(PageRequest.class)))
+        .thenReturn(expected);
     testJson(path);
   }
 
