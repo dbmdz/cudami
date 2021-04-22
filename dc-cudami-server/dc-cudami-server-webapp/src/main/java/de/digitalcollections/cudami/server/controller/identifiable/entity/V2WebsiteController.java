@@ -1,16 +1,14 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
+import de.digitalcollections.cudami.server.controller.AbstractLegacyController;
 import de.digitalcollections.model.identifiable.entity.Website;
-import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
@@ -30,9 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @Api(description = "The website controller Version 2", name = "Website controller v2")
-public class V2WebsiteController {
-
-  private final DigitalCollectionsObjectMapper objectMapper = new DigitalCollectionsObjectMapper();
+public class V2WebsiteController extends AbstractLegacyController {
 
   private final WebsiteService websiteService;
 
@@ -61,6 +57,9 @@ public class V2WebsiteController {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    return new ResponseEntity<>(fixPageResponse(response), HttpStatus.OK);
+
+    /*
     // Fix the attributes, which are missing or different in new model
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(response));
     JSONArray websites = (JSONArray) result.get("content");
@@ -70,6 +69,8 @@ public class V2WebsiteController {
     }
 
     return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+
+     */
   }
 
   @ApiMethod(description = "Get website by uuid")
@@ -83,6 +84,9 @@ public class V2WebsiteController {
       return null;
     }
 
+    return fixEmbeddedObject(new JSONObject(objectMapper.writeValueAsString(website))).toString();
+
+    /*
     // Fix the attributes, which are missing or different in new model
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(website));
     result.put("type", "ENTITY");
@@ -95,5 +99,7 @@ public class V2WebsiteController {
     }
 
     return result.toString();
+
+     */
   }
 }

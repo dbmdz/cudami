@@ -108,10 +108,7 @@ public class DigitalObjectController {
 
   @ApiMethod(description = "Get digital object by namespace and id")
   @GetMapping(
-      value = {
-        "/latest/digitalobjects/identifier/{namespace}:{id}",
-        "/v2/digitalobjects/identifier/{namespace}:{id}"
-      },
+      value = {"/latest/digitalobjects/identifier/{namespace}:{id}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public DigitalObject findByIdentifier(

@@ -17,15 +17,15 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-@WebMvcTest(V5WebsiteController.class)
-@DisplayName("The V5WebsiteController")
-public class V5WebsiteControllerTest extends BaseControllerTest {
+@WebMvcTest(V4WebsiteController.class)
+@DisplayName("The V4WebsiteController")
+public class V4WebsiteControllerTest extends BaseControllerTest {
 
   @MockBean private WebsiteService websiteService;
 
   @DisplayName("returns a website by its uuid")
   @ParameterizedTest
-  @ValueSource(strings = {"/v5/websites/7a2f1935-c5b8-40fb-8622-c675de0a6242"})
+  @ValueSource(strings = {"/v4/websites/7a2f1935-c5b8-40fb-8622-c675de0a6242"})
   public void websiteByUuid(String path) throws Exception {
     Website expected =
         new WebsiteBuilder()

@@ -6,8 +6,8 @@ import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
+import de.digitalcollections.cudami.server.controller.AbstractLegacyController;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
@@ -31,12 +31,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Api(description = "The V3 webpage controller", name = "V3 Webpage controller")
-public class V3WebpageController {
+public class V3WebpageController extends AbstractLegacyController {
 
   private final LocaleService localeService;
   private final WebpageService webpageService;
 
-  private final DigitalCollectionsObjectMapper objectMapper = new DigitalCollectionsObjectMapper();
   // private final XmlMapper xmlMapper = new XmlMapper();
 
   public V3WebpageController(LocaleService localeService, WebpageService webpageService) {
@@ -88,10 +87,10 @@ public class V3WebpageController {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    JSONObject result = new JSONObject(objectMapper.writeValueAsString(webpage));
-    result.put("type", "ENTITY_PART");
-    result.put("entityPartType", "WEBPAGE");
-    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+    return new ResponseEntity<>(fixSimpleObject(webpage, "ENTITY_PART", "WEBPAGE"), HttpStatus.OK);
+
+    // tring result = fixSimpleObject(webpage, "ENTITY_PART", "WEBPAGE");
+    // return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
   @ApiMethod(
@@ -165,22 +164,13 @@ public class V3WebpageController {
       pageResponse = webpageService.getChildren(uuid, pageRequest);
     }
 
-    JSONObject result = new JSONObject(objectMapper.writeValueAsString(pageResponse));
-    JSONArray contentSrc = result.getJSONArray("content");
-    JSONArray contentDesc = new JSONArray();
+    // String result = fixPageResponseChildren(pageResponse, "webpage",
+    //    "de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl",
+    //    "ENTITY_PART", "WEBPAGE");
 
-    // Fix className, type and entityPartType for each element within content
-    for (int i = 0; i < contentSrc.length(); i++) {
-      JSONObject webpage = contentSrc.getJSONObject(i);
-      webpage.put(
-          "className", "de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl");
-      webpage.put("type", "ENTITY_PART");
-      webpage.put("entityPartType", "WEBPAGE");
-      contentDesc.put(i, webpage);
-    }
+    // return new ResponseEntity<>(result, HttpStatus.OK);
 
-    result.put("content", contentDesc);
-    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+    return new ResponseEntity<>(fixPageResponse(pageResponse), HttpStatus.OK);
   }
 
   @ApiMethod(description = "Get (active or all) children of a webpage recursivly as JSON")

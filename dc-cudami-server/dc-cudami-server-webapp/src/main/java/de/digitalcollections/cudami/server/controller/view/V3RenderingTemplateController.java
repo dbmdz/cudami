@@ -1,16 +1,13 @@
 package de.digitalcollections.cudami.server.controller.view;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.openjson.JSONArray;
-import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.view.RenderingTemplateService;
-import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
+import de.digitalcollections.cudami.server.controller.AbstractLegacyController;
 import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.Sorting;
 import de.digitalcollections.model.view.RenderingTemplate;
-import java.util.Iterator;
 import java.util.List;
 import org.jsondoc.core.annotation.Api;
 import org.springframework.http.HttpStatus;
@@ -24,9 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(
     description = "The rendering template controller Version 3",
     name = "Rendering template controller v3")
-public class V3RenderingTemplateController {
+public class V3RenderingTemplateController extends AbstractLegacyController {
 
-  private final DigitalCollectionsObjectMapper objectMapper = new DigitalCollectionsObjectMapper();
   private final RenderingTemplateService renderingTemplateService;
 
   public V3RenderingTemplateController(RenderingTemplateService renderingTemplateService) {
@@ -48,6 +44,7 @@ public class V3RenderingTemplateController {
     }
     PageResponse<RenderingTemplate> response = renderingTemplateService.find(pageRequest);
 
+    /*
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(response));
     JSONArray digitalobjects = (JSONArray) result.get("content");
     for (Iterator it = digitalobjects.iterator(); it.hasNext(); ) {
@@ -55,6 +52,8 @@ public class V3RenderingTemplateController {
       digitalobject.put("className", "de.digitalcollections.model.impl.view.RenderingTemplate");
     }
 
-    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+     */
+
+    return new ResponseEntity<>(fixPageResponse(response), HttpStatus.OK);
   }
 }

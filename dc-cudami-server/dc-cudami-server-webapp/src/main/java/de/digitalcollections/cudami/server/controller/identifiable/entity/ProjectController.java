@@ -142,12 +142,11 @@ public class ProjectController {
     return projectService.getByIdentifier(namespace, id);
   }
 
-  // Test-URL: http://localhost:9000/latest/projects/599a120c-2dd5-11e8-b467-0ed5f89f718b
   @ApiMethod(
       description =
           "Get an project as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
-      value = {"/latest/projects/{uuid}", "/v2/projects/{uuid}"},
+      value = {"/latest/projects/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   @ApiResponseObject
   public ResponseEntity<Project> findByUuid(

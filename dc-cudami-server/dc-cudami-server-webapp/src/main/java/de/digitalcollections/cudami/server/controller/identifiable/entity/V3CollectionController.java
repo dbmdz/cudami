@@ -1,21 +1,20 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.openjson.JSONArray;
-import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
+import de.digitalcollections.cudami.server.controller.AbstractLegacyController;
+import de.digitalcollections.model.filter.FilterCriterion;
+import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
+import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
@@ -32,9 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Api(description = "The collection controller V3", name = "Collection controller V3")
-public class V3CollectionController {
-
-  private final DigitalCollectionsObjectMapper objectMapper = new DigitalCollectionsObjectMapper();
+public class V3CollectionController extends AbstractLegacyController {
 
   private final CollectionService collectionService;
   private final LocaleService localeService;
@@ -64,12 +61,17 @@ public class V3CollectionController {
     SearchPageResponse<DigitalObject> response =
         collectionService.getDigitalObjects(collection, searchPageRequest);
 
+    return new ResponseEntity<>(fixPageResponse(response), HttpStatus.OK);
+
+    /*
     // Fix the attributes, which are missing or different in new model
     JSONObject result =
         fixPageResponse(
             response, "de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl");
 
     return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+
+     */
   }
 
   @ApiMethod(description = "Get (active or all) paged subcollections of a collection")
@@ -93,9 +95,9 @@ public class V3CollectionController {
     } else {
       response = collectionService.getChildren(collectionUuid, pageRequest);
     }
-    JSONObject result = fixPageResponse(response);
+    // JSONObject result = oldfixPageResponse(response);
 
-    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+    return new ResponseEntity<>(fixPageResponse(response), HttpStatus.OK);
   }
 
   @ApiMethod(description = "Get all collections")
@@ -122,26 +124,27 @@ public class V3CollectionController {
     }
 
     // Fix the attributes, which are missing or different in new model
-    JSONObject result = fixPageResponse(response);
-    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+    // JSONObject result = oldfixPageResponse(response);
+    return new ResponseEntity<>(fixPageResponse(response), HttpStatus.OK);
   }
 
-  private JSONObject fixPageResponse(
-      PageResponse<? extends Entity> response, String expectedClassName)
+  @ApiMethod(
+      description = "Get all related - by the given predicate - corporate bodies of a collection")
+  @GetMapping(
+      value = {"/v3/collections/{uuid}/related/corporatebodies"},
+      produces = "application/json")
+  @ApiResponseObject
+  public ResponseEntity<String> getRelatedCorporateBodies(
+      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid") UUID uuid,
+      @RequestParam(name = "predicate", required = true) FilterCriterion<String> predicate)
       throws JsonProcessingException {
-    // Fix the attributes, which are missing or different in new model
-    JSONObject result = new JSONObject(objectMapper.writeValueAsString(response));
-    JSONArray digitalobjects = (JSONArray) result.get("content");
-    for (Iterator it = digitalobjects.iterator(); it.hasNext(); ) {
-      JSONObject digitalobject = (JSONObject) it.next();
-      digitalobject.put("className", expectedClassName);
+    Filtering filtering = Filtering.defaultBuilder().add("predicate", predicate).build();
+    List<CorporateBody> result = collectionService.getRelatedCorporateBodies(uuid, filtering);
+    if (result == null) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-    return result;
-  }
 
-  private JSONObject fixPageResponse(PageResponse<? extends Entity> response)
-      throws JsonProcessingException {
-    return fixPageResponse(
-        response, "de.digitalcollections.model.impl.identifiable.entity.CollectionImpl");
+    // FIXME: A plain list is again something, which is not covered yet
+    return new ResponseEntity(fixSimpleObjectList(result), HttpStatus.OK);
   }
 }

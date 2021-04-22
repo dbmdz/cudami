@@ -374,10 +374,7 @@ public class CollectionController {
   @ApiMethod(
       description = "Get all related - by the given predicate - corporate bodies of a collection")
   @GetMapping(
-      value = {
-        "/latest/collections/{uuid}/related/corporatebodies",
-        "/v3/collections/{uuid}/related/corporatebodies"
-      },
+      value = {"/latest/collections/{uuid}/related/corporatebodies"},
       produces = "application/json")
   @ApiResponseObject
   public List<CorporateBody> getRelatedCorporateBodies(

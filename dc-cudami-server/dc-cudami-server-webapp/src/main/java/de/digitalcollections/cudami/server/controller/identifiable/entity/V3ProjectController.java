@@ -1,16 +1,13 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.openjson.JSONArray;
-import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
+import de.digitalcollections.cudami.server.controller.AbstractLegacyController;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.Sorting;
-import java.util.Iterator;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
@@ -25,9 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Api(description = "The V3 project controller", name = "Project controller version 3")
-public class V3ProjectController {
-
-  private final DigitalCollectionsObjectMapper objectMapper = new DigitalCollectionsObjectMapper();
+public class V3ProjectController extends AbstractLegacyController {
 
   private final ProjectService projectService;
 
@@ -51,15 +46,6 @@ public class V3ProjectController {
     project.setUuid(projectUuid);
     PageResponse<DigitalObject> response = projectService.getDigitalObjects(project, pageRequest);
 
-    // Fix the attributes, which are missing or different in new model
-    JSONObject result = new JSONObject(objectMapper.writeValueAsString(response));
-    JSONArray projects = (JSONArray) result.get("content");
-    for (Iterator it = projects.iterator(); it.hasNext(); ) {
-      JSONObject projectObject = (JSONObject) it.next();
-      projectObject.put(
-          "className", "de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl");
-    }
-
-    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+    return new ResponseEntity<>(fixPageResponse(response), HttpStatus.OK);
   }
 }

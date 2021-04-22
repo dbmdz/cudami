@@ -5,8 +5,8 @@ import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
+import de.digitalcollections.cudami.server.controller.AbstractLegacyController;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -26,9 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Api(description = "The V1 webpage controller", name = "V1 Webpage controller")
-public class V1WebpageController {
-
-  private final DigitalCollectionsObjectMapper objectMapper = new DigitalCollectionsObjectMapper();
+public class V1WebpageController extends AbstractLegacyController {
 
   private final WebpageService webpageService;
 
@@ -98,6 +96,20 @@ public class V1WebpageController {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    JSONObject result = fixEmbeddedObject(new JSONObject(objectMapper.writeValueAsString(webpage)));
+    result.put("type", "RESOURCE");
+    result.put("entityPartType", "WEBPAGE");
+
+    if (result.has("label")) {
+      result.put("label", convertLocalizedTextJson(result.getJSONObject("label")));
+    }
+    if (result.has("text")) {
+      result.put("text", convertLocalizedStructuredContentJson(result.getJSONObject("text")));
+    }
+    System.err.println(result.toString());
+    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+
+    /*
     webpage.setCreated(null);
     webpage.setLastModified(null);
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(webpage));
@@ -115,6 +127,8 @@ public class V1WebpageController {
     result.put("type", "RESOURCE");
     result.put("entityPartType", "WEBPAGE");
     return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+
+     */
   }
 
   private Webpage loadWebpage(Locale pLocale, UUID uuid) throws IdentifiableServiceException {

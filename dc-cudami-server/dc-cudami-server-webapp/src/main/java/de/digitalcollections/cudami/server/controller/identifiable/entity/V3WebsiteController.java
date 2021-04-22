@@ -1,16 +1,13 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.openjson.JSONArray;
-import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
+import de.digitalcollections.cudami.server.controller.AbstractLegacyController;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.Sorting;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import org.jsondoc.core.annotation.Api;
@@ -31,9 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @Api(description = "The website controller Version 3", name = "Website controller v3")
-public class V3WebsiteController {
-
-  private final DigitalCollectionsObjectMapper objectMapper = new DigitalCollectionsObjectMapper();
+public class V3WebsiteController extends AbstractLegacyController {
 
   private final WebsiteService websiteService;
 
@@ -67,6 +62,9 @@ public class V3WebsiteController {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    return new ResponseEntity<>(fixPageResponse(response), HttpStatus.OK);
+
+    /*
     // Fix the attributes, which are missing or different in new model
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(response));
     JSONArray rootPages = (JSONArray) result.get("content");
@@ -79,5 +77,7 @@ public class V3WebsiteController {
     }
 
     return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+
+     */
   }
 }
