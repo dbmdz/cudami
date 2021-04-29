@@ -211,6 +211,11 @@ public class EntityBuilder<T extends Entity, B extends EntityBuilder> extends Ab
     return (B) this;
   }
 
+  public B withCustomAttribute(String key, Object value) {
+    entity.setCustomAttribute(key, value);
+    return (B) this;
+  }
+
   public T build() {
     // Each identifier must get the UUID of the identifiable
     if (identifiers != null && !identifiers.isEmpty()) {

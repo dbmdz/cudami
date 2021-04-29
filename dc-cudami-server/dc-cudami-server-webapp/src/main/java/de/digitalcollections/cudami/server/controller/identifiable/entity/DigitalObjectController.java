@@ -71,7 +71,7 @@ public class DigitalObjectController {
 
   @ApiMethod(description = "Get all digital objects")
   @GetMapping(
-      value = {"/latest/digitalobjects", "/v2/digitalobjects"},
+      value = {"/latest/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<DigitalObject> findAll(
