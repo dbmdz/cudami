@@ -5,9 +5,9 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
 import java.util.List;
 import java.util.Locale;
@@ -89,7 +89,7 @@ public class WebsiteController {
       value = {"/latest/websites/{uuid}/rootpages", "/v3/websites/{uuid}/rootpages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
-  public PageResponse<Webpage> getRootPages(
+  public SearchPageResponse<Webpage> getRootPages(
       @ApiPathParam(
               description =
                   "UUID of the parent webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
@@ -97,14 +97,15 @@ public class WebsiteController {
           UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
       throws IdentifiableServiceException {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
+      searchPageRequest.setSorting(sorting);
     }
-    return websiteService.getRootPages(uuid, pageRequest);
+    return websiteService.findRootPages(uuid, searchPageRequest);
   }
 
   @ApiMethod(description = "Save a newly created website")
