@@ -352,32 +352,25 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + doTableAlias
             + " LEFT JOIN collection_digitalobjects AS cd ON "
             + doTableAlias
-            + ".uuid = cd.digitalobject_uuid";
-
+            + ".uuid = cd.digitalobject_uuid"
+            + " WHERE cd.collection_uuid = :uuid";
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("uuid", collectionUuid);
 
     String searchTerm = searchPageRequest.getQuery();
     if (StringUtils.hasText(searchTerm)) {
-      commonSql +=
-          " WHERE ("
-              + "jsonb_path_exists("
-              + doTableAlias
-              + ".label, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath)"
-              + " OR "
-              + "jsonb_path_exists("
-              + doTableAlias
-              + ".description, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath))"
-              + " AND cd.collection_uuid = :uuid";
+      commonSql += " AND " + getCommonSearchSql(doTableAlias);
       argumentMappings.put("searchTerm", searchTerm);
-    } else {
-      commonSql += " WHERE cd.collection_uuid = :uuid";
     }
 
     StringBuilder innerQuery = new StringBuilder("SELECT cd.sortindex AS idx, *" + commonSql);
     addFiltering(searchPageRequest, innerQuery);
-    searchPageRequest.setSorting(null);
-    innerQuery.append(" ORDER BY idx ASC");
+
+    String orderBy = null;
+    if (searchPageRequest.getSorting() == null) {
+      orderBy = "ORDER BY idx ASC";
+      innerQuery.append(" ").append(orderBy);
+    }
     addPageRequestParams(searchPageRequest, innerQuery);
 
     List<DigitalObject> result =
@@ -385,7 +378,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             argumentMappings,
-            "ORDER BY idx ASC");
+            orderBy);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(searchPageRequest, countQuery);
@@ -535,15 +528,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
       return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
     }
 
-    commonSql +=
-        " AND ("
-            + "jsonb_path_exists("
-            + tableAlias
-            + ".label, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath)"
-            + " OR "
-            + "jsonb_path_exists("
-            + tableAlias
-            + ".description, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath))";
+    commonSql += " AND " + getCommonSearchSql(tableAlias);
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
   }
 

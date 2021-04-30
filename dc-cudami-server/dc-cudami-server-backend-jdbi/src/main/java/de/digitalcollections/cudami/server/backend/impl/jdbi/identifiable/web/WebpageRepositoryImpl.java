@@ -373,15 +373,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
       return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
     }
 
-    commonSql +=
-        " AND ("
-            + "jsonb_path_exists("
-            + tableAlias
-            + ".label, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath)"
-            + " OR "
-            + "jsonb_path_exists("
-            + tableAlias
-            + ".description, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath))";
+    commonSql += " AND " + getCommonSearchSql(tableAlias);
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
   }
 
