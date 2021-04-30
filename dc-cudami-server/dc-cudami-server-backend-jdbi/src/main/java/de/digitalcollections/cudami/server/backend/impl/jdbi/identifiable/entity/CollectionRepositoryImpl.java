@@ -156,6 +156,48 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
+  public SearchPageResponse<Collection> findChildren(
+      UUID uuid, SearchPageRequest searchPageRequest) {
+    String commonSql =
+        " FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + " INNER JOIN collection_collections cc ON "
+            + tableAlias
+            + ".uuid = cc.child_collection_uuid"
+            + " WHERE cc.parent_collection_uuid = :uuid";
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", uuid);
+
+    String searchTerm = searchPageRequest.getQuery();
+    if (StringUtils.hasText(searchTerm)) {
+      commonSql += " AND " + getCommonSearchSql(tableAlias);
+      argumentMappings.put("searchTerm", searchTerm);
+    }
+
+    StringBuilder innerQuery = new StringBuilder("SELECT cc.sortindex AS idx, *" + commonSql);
+    addFiltering(searchPageRequest, innerQuery);
+
+    String orderBy = null;
+    if (searchPageRequest.getSorting() == null) {
+      orderBy = "ORDER BY idx ASC";
+      innerQuery.append(" ").append(orderBy);
+    }
+    addPageRequestParams(searchPageRequest, innerQuery);
+
+    List<Collection> result =
+        retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, orderBy);
+
+    StringBuilder countQuery =
+        new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
+    addFiltering(searchPageRequest, countQuery);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new SearchPageResponse<>(result, searchPageRequest, total);
+  }
+
+  @Override
   public Collection findOne(UUID uuid, Filtering filtering) {
     Collection collection = super.findOne(uuid, filtering);
 

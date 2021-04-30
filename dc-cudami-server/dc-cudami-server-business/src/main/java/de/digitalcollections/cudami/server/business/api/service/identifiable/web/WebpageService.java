@@ -7,6 +7,8 @@ import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
@@ -27,6 +29,8 @@ public interface WebpageService extends NodeService<Webpage> {
             .build();
     return filtering;
   }
+
+  SearchPageResponse<Webpage> findActiveChildren(UUID uuid, SearchPageRequest pageRequest);
 
   Webpage getActive(UUID uuid);
 
