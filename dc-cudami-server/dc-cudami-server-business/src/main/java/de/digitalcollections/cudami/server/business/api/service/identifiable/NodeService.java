@@ -86,6 +86,8 @@ public interface NodeService<N extends Identifiable> extends IdentifiableService
 
   PageResponse<N> getChildren(UUID uuid, PageRequest pageRequest);
 
+  SearchPageResponse<N> findChildren(UUID uuid, SearchPageRequest pageRequest);
+
   default N getParent(N node) {
     if (node == null) {
       return null;

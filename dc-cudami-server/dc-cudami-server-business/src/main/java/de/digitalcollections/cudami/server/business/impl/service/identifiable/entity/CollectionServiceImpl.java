@@ -57,6 +57,19 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
+  public SearchPageResponse<Collection> findActiveChildren(
+      UUID uuid, SearchPageRequest pageRequest) {
+    Filtering filtering = filteringForActive();
+    pageRequest.add(filtering);
+    return findChildren(uuid, pageRequest);
+  }
+
+  @Override
+  public SearchPageResponse<Collection> findChildren(UUID nodeUuid, SearchPageRequest pageRequest) {
+    return ((NodeRepository<Collection>) repository).findChildren(nodeUuid, pageRequest);
+  }
+
+  @Override
   public Collection getActive(UUID uuid) {
     Filtering filtering = filteringForActive();
     Collection collection = ((CollectionRepository) repository).findOne(uuid, filtering);

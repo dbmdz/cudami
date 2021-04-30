@@ -16,6 +16,7 @@ import de.digitalcollections.model.view.BreadcrumbNavigation;
 import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -122,6 +123,47 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
           preparedBatch.execute();
         });
     return true;
+  }
+
+  @Override
+  public SearchPageResponse<Webpage> findChildren(UUID uuid, SearchPageRequest searchPageRequest) {
+    String commonSql =
+        " FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + " INNER JOIN webpage_webpages cc ON "
+            + tableAlias
+            + ".uuid = cc.child_webpage_uuid"
+            + " WHERE cc.parent_webpage_uuid = :uuid";
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", uuid);
+
+    String searchTerm = searchPageRequest.getQuery();
+    if (StringUtils.hasText(searchTerm)) {
+      commonSql += " AND " + getCommonSearchSql(tableAlias);
+      argumentMappings.put("searchTerm", searchTerm);
+    }
+
+    StringBuilder innerQuery = new StringBuilder("SELECT cc.sortindex AS idx, *" + commonSql);
+    addFiltering(searchPageRequest, innerQuery);
+
+    String orderBy = null;
+    if (searchPageRequest.getSorting() == null) {
+      orderBy = "ORDER BY idx ASC";
+      innerQuery.append(" ").append(orderBy);
+    }
+    addPageRequestParams(searchPageRequest, innerQuery);
+
+    List<Webpage> result =
+        retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, orderBy);
+
+    StringBuilder countQuery =
+        new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
+    addFiltering(searchPageRequest, countQuery);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new SearchPageResponse<>(result, searchPageRequest, total);
   }
 
   @Override
