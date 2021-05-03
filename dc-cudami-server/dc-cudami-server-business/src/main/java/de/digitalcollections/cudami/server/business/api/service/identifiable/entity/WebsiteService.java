@@ -10,7 +10,7 @@ import java.util.UUID;
 /** Service for Website. */
 public interface WebsiteService extends EntityService<Website> {
 
-  SearchPageResponse<Webpage> findRootPages(UUID uuid, SearchPageRequest pageRequest);
+  SearchPageResponse<Webpage> findRootPages(UUID uuid, SearchPageRequest searchPageRequest);
 
   default List<Webpage> getRootPages(Website website) {
     if (website == null) {

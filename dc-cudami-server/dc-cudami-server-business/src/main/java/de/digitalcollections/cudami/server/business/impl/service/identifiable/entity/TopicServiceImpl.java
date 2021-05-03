@@ -37,8 +37,8 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
-  public SearchPageResponse<Topic> findChildren(UUID uuid, SearchPageRequest pageRequest) {
-    return ((NodeRepository<Topic>) repository).findChildren(uuid, pageRequest);
+  public SearchPageResponse<Topic> findChildren(UUID uuid, SearchPageRequest searchPageRequest) {
+    return ((NodeRepository<Topic>) repository).findChildren(uuid, searchPageRequest);
   }
 
   @Override

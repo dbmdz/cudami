@@ -38,15 +38,16 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   }
 
   @Override
-  public SearchPageResponse<Webpage> findActiveChildren(UUID uuid, SearchPageRequest pageRequest) {
+  public SearchPageResponse<Webpage> findActiveChildren(
+      UUID uuid, SearchPageRequest searchPageRequest) {
     Filtering filtering = filteringForActive();
-    pageRequest.add(filtering);
-    return findChildren(uuid, pageRequest);
+    searchPageRequest.add(filtering);
+    return findChildren(uuid, searchPageRequest);
   }
 
   @Override
-  public SearchPageResponse<Webpage> findChildren(UUID uuid, SearchPageRequest pageRequest) {
-    return ((NodeRepository<Webpage>) repository).findChildren(uuid, pageRequest);
+  public SearchPageResponse<Webpage> findChildren(UUID uuid, SearchPageRequest searchPageRequest) {
+    return ((NodeRepository<Webpage>) repository).findChildren(uuid, searchPageRequest);
   }
 
   // TODO: test if webpages work as expected (using now IdentifiableServiceImpl logic)

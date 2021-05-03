@@ -36,7 +36,7 @@ public interface CollectionService extends NodeService<Collection>, EntityServic
 
   SearchPageResponse<Collection> findActive(SearchPageRequest searchPageRequest);
 
-  SearchPageResponse<Collection> findActiveChildren(UUID uuid, SearchPageRequest pageRequest);
+  SearchPageResponse<Collection> findActiveChildren(UUID uuid, SearchPageRequest searchPageRequest);
 
   Collection getActive(UUID uuid);
 

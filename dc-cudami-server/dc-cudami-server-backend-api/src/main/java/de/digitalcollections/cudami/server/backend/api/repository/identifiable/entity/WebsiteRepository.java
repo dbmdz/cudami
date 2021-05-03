@@ -10,7 +10,7 @@ import java.util.UUID;
 /** Repository for Website persistence handling. */
 public interface WebsiteRepository extends EntityRepository<Website> {
 
-  SearchPageResponse<Webpage> findRootPages(UUID uuid, SearchPageRequest pageRequest);
+  SearchPageResponse<Webpage> findRootPages(UUID uuid, SearchPageRequest searchPageRequest);
 
   default List<Webpage> getRootPages(Website website) {
     if (website == null) {

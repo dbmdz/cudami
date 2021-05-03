@@ -38,10 +38,10 @@ public class CudamiWebpagesClient extends CudamiBaseClient<Webpage> {
         String.format("/latest/webpages/%s?active=true&pLocale=%s", uuid, locale));
   }
 
-  public PageResponse<Webpage> findActiveSubpages(UUID uuid, SearchPageRequest pageRequest)
+  public PageResponse<Webpage> findActiveSubpages(UUID uuid, SearchPageRequest searchPageRequest)
       throws HttpException {
     return doGetSearchRequestForPagedObjectList(
-        String.format("/latest/webpages/%s/children?active=true", uuid), pageRequest);
+        String.format("/latest/webpages/%s/children?active=true", uuid), searchPageRequest);
   }
 
   public Webpage findOne(UUID uuid) throws HttpException {
@@ -61,10 +61,10 @@ public class CudamiWebpagesClient extends CudamiBaseClient<Webpage> {
         String.format("/latest/webpages/identifier/%s:%s.json", namespace, id));
   }
 
-  public PageResponse<Webpage> findSubpages(UUID uuid, SearchPageRequest pageRequest)
+  public PageResponse<Webpage> findSubpages(UUID uuid, SearchPageRequest searchPageRequest)
       throws HttpException {
     return doGetSearchRequestForPagedObjectList(
-        String.format("/latest/webpages/%s/children", uuid), pageRequest);
+        String.format("/latest/webpages/%s/children", uuid), searchPageRequest);
   }
 
   public PageResponse<Webpage> getActiveChildren(UUID uuid, PageRequest pageRequest)
