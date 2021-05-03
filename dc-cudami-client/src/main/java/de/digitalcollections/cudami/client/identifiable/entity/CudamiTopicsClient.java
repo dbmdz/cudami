@@ -55,6 +55,17 @@ public class CudamiTopicsClient extends CudamiBaseClient<Topic> {
     return doGetRequestForObject(String.format("/latest/topics/%d", refId));
   }
 
+  public PageResponse<Topic> findSubtopics(UUID uuid, SearchPageRequest pageRequest)
+      throws HttpException {
+    return doGetSearchRequestForPagedObjectList(
+        String.format("/latest/topics/%s/children", uuid), pageRequest);
+  }
+
+  public SearchPageResponse<Topic> findTopCollections(SearchPageRequest searchPageRequest)
+      throws HttpException {
+    return doGetSearchRequestForPagedObjectList("/latest/topics/top", searchPageRequest);
+  }
+
   public PageResponse<Topic> findTopTopics(PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList("/latest/topics/top", pageRequest);
   }
@@ -97,6 +108,7 @@ public class CudamiTopicsClient extends CudamiBaseClient<Topic> {
     return doGetRequestForObjectList(
         String.format("/latest/entities/%s/related/fileresources", uuid), FileResource.class);
   }
+
   /**
    * @param uuid
    * @return

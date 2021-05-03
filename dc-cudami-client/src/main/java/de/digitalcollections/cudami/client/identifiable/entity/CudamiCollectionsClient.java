@@ -94,6 +94,12 @@ public class CudamiCollectionsClient extends CudamiBaseClient<Collection> {
         String.format("/latest/collections/%s?active=true&pLocale=%s", uuid, locale));
   }
 
+  public PageResponse<Collection> findActiveSubcollections(UUID uuid, SearchPageRequest pageRequest)
+      throws HttpException {
+    return doGetSearchRequestForPagedObjectList(
+        String.format("/latest/collections/%s/subcollections?active=true", uuid), pageRequest);
+  }
+
   public Collection findOne(UUID uuid) throws HttpException {
     return doGetRequestForObject(String.format("/latest/collections/%s", uuid));
   }
@@ -113,6 +119,12 @@ public class CudamiCollectionsClient extends CudamiBaseClient<Collection> {
 
   public Collection findOneByRefId(long refId) throws HttpException {
     return doGetRequestForObject(String.format("/latest/collections/%d", refId));
+  }
+
+  public PageResponse<Collection> findSubcollections(UUID uuid, SearchPageRequest pageRequest)
+      throws HttpException {
+    return doGetSearchRequestForPagedObjectList(
+        String.format("/latest/collections/%s/subcollections", uuid), pageRequest);
   }
 
   @Deprecated(since = "5.0", forRemoval = true)
