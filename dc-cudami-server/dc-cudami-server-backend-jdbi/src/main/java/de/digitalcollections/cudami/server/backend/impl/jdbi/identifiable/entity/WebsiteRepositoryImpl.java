@@ -106,7 +106,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   }
 
   @Override
-  public SearchPageResponse<Webpage> findRootPages(UUID uuid, SearchPageRequest pageRequest) {
+  public SearchPageResponse<Webpage> findRootPages(UUID uuid, SearchPageRequest searchPageRequest) {
     final String wpTableAlias = webpageRepositoryImpl.getTableAlias();
     final String wpTableName = webpageRepositoryImpl.getTableName();
 
@@ -122,21 +122,21 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("uuid", uuid);
 
-    String searchTerm = pageRequest.getQuery();
+    String searchTerm = searchPageRequest.getQuery();
     if (StringUtils.hasText(searchTerm)) {
       commonSql += " AND " + getCommonSearchSql(wpTableAlias);
       argumentMappings.put("searchTerm", searchTerm);
     }
 
     StringBuilder innerQuery = new StringBuilder("SELECT ww.sortindex AS idx, *" + commonSql);
-    addFiltering(pageRequest, innerQuery);
+    addFiltering(searchPageRequest, innerQuery);
 
     String orderBy = null;
-    if (pageRequest.getSorting() == null) {
+    if (searchPageRequest.getSorting() == null) {
       orderBy = "ORDER BY idx ASC";
       innerQuery.append(" ").append(orderBy);
     }
-    addPageRequestParams(pageRequest, innerQuery);
+    addPageRequestParams(searchPageRequest, innerQuery);
 
     List<Webpage> result =
         webpageRepositoryImpl.retrieveList(
@@ -146,10 +146,10 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
             orderBy);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(pageRequest, countQuery);
+    addFiltering(searchPageRequest, countQuery);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new SearchPageResponse<>(result, pageRequest, total);
+    return new SearchPageResponse<>(result, searchPageRequest, total);
   }
 
   @Override

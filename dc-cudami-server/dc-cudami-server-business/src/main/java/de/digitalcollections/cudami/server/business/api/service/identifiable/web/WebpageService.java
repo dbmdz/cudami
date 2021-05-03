@@ -30,7 +30,7 @@ public interface WebpageService extends NodeService<Webpage> {
     return filtering;
   }
 
-  SearchPageResponse<Webpage> findActiveChildren(UUID uuid, SearchPageRequest pageRequest);
+  SearchPageResponse<Webpage> findActiveChildren(UUID uuid, SearchPageRequest searchPageRequest);
 
   Webpage getActive(UUID uuid);
 
