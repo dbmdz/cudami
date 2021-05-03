@@ -155,7 +155,7 @@ public class TopicController {
     return findById(topic.getUuid(), null);
   }
 
-  @ApiMethod(description = "Get (active or all) paged subcollections of a collection")
+  @ApiMethod(description = "Get (active or all) paged subtopics of a topic")
   @GetMapping(
       value = {
         "/v5/topics/{uuid}/subtopics",
@@ -163,7 +163,7 @@ public class TopicController {
       produces = "application/json")
   @ApiResponseObject
   public PageResponse<Topic> getSubtopics(
-      @ApiPathParam(description = "UUID of the topic") @PathVariable("uuid") UUID collectionUuid,
+      @ApiPathParam(description = "UUID of the topic") @PathVariable("uuid") UUID topicUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
@@ -173,7 +173,7 @@ public class TopicController {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
     }
-    return topicService.findChildren(collectionUuid, searchPageRequest);
+    return topicService.findChildren(topicUuid, searchPageRequest);
   }
 
   @ApiMethod(description = "Get the breadcrumb for a topic")
