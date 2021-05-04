@@ -407,6 +407,22 @@ class PagedIdentifiableList extends Component {
                 {t('add')}
               </Button>
             )}
+            {showChangeOfOrder && (
+              <Button
+                className={showNew || enableAdd ? 'ml-1' : ''}
+                onClick={this.activateChangeOfOrder}
+              >
+                {t('changeOrder')}
+              </Button>
+            )}
+            {changeOfOrderActive && (
+              <Button
+                className={showNew || enableAdd ? 'ml-1' : ''}
+                onClick={this.saveChangeOfOrder}
+              >
+                {t('save')}
+              </Button>
+            )}
           </Col>
         </Row>
         {!parentType && <hr />}
@@ -438,16 +454,6 @@ class PagedIdentifiableList extends Component {
                 totalElements={totalElements}
                 type={type}
               />
-              {showChangeOfOrder && (
-                <Button className="mb-2" onClick={this.activateChangeOfOrder}>
-                  {t('changeOrder')}
-                </Button>
-              )}
-              {changeOfOrderActive && (
-                <Button className="mb-2" onClick={this.saveChangeOfOrder}>
-                  {t('save')}
-                </Button>
-              )}
               {enableSearch && showSearch && (
                 <IdentifiableSearch
                   isHighlighted={totalElements === 0 && searchTerm}
