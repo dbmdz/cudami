@@ -83,6 +83,7 @@ class PagedIdentifiableList extends Component {
       changeOfOrderActive: true,
       identifiables: content,
       numberOfPages: Math.ceil(totalElements / pageSize),
+      showSearch: false,
       totalElements,
     })
   }
@@ -323,6 +324,7 @@ class PagedIdentifiableList extends Component {
       },
       identifiables: content,
       numberOfPages: Math.ceil(totalElements / pageSize),
+      showSearch: true,
       totalElements,
     })
   }
