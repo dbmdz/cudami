@@ -10,7 +10,6 @@ import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
@@ -141,6 +140,18 @@ public class CollectionsController extends AbstractController {
     return service.findTopCollections(searchPageRequest);
   }
 
+  @GetMapping("/api/collections/{uuid}/digitalobjects")
+  @ResponseBody
+  public PageResponse<DigitalObject> findDigitalObjects(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      throws HttpException {
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    return service.getDigitalObjects(uuid, searchPageRequest);
+  }
+
   @GetMapping({
     "/api/collections/identifier/{namespace}:{id}",
     "/api/subcollections/identifier/{namespace}:{id}"
@@ -151,31 +162,22 @@ public class CollectionsController extends AbstractController {
     return service.findOneByIdentifier(namespace, id);
   }
 
-  @GetMapping("/api/collections/{uuid}")
+  @GetMapping("/api/collections/{uuid}/subcollections")
   @ResponseBody
-  public Collection get(@PathVariable UUID uuid) throws HttpException {
-    return service.findOne(uuid);
-  }
-
-  @GetMapping("/api/collections/{uuid}/digitalobjects")
-  @ResponseBody
-  public PageResponse<DigitalObject> getDigitalObjects(
+  public PageResponse<Collection> findSubcollections(
       @PathVariable UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws HttpException {
-    return service.getDigitalObjects(uuid, new SearchPageRequest(searchTerm, pageNumber, pageSize));
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    return service.findSubcollections(uuid, searchPageRequest);
   }
 
-  @GetMapping("/api/collections/{uuid}/subcollections")
+  @GetMapping("/api/collections/{uuid}")
   @ResponseBody
-  public PageResponse<Collection> getSubcollections(
-      @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
-      throws HttpException {
-    return service.getSubcollections(uuid, new PageRequest(pageNumber, pageSize));
+  public Collection get(@PathVariable UUID uuid) throws HttpException {
+    return service.findOne(uuid);
   }
 
   @GetMapping("/collections")
