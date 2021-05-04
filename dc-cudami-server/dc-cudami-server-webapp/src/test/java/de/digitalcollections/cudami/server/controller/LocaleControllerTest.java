@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller;
 
 import static org.junit.jupiter.api.condition.JRE.JAVA_11;
+import static org.junit.jupiter.api.condition.JRE.JAVA_14;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
@@ -38,6 +39,16 @@ class LocaleControllerTest extends BaseControllerTest {
     testJson(path, "/v2/languages/languages.json");
   }
 
+  @EnabledForJreRange(min = JAVA_14) // Delivers a different set of languages on other JREs
+  @DisplayName("returns all languages")
+  @ParameterizedTest
+  @ValueSource(strings = {"/v2/languages"})
+  public void allLanguagesJdk14(String path) throws Exception {
+    when(localeService.getSupportedLanguages()).thenReturn(Arrays.asList(Locale.getISOLanguages()));
+
+    testJson(path, "/v2/languages/languages14.json");
+  }
+
   @DisplayName("returns the default locale")
   @ParameterizedTest
   @ValueSource(strings = {"/v2/locales/default"})
@@ -56,5 +67,16 @@ class LocaleControllerTest extends BaseControllerTest {
         .thenReturn(Arrays.asList(Locale.getAvailableLocales()));
 
     testJson(path, "/v2/locales/locales.json");
+  }
+
+  @EnabledForJreRange(min = JAVA_14) // Delivers a different set of locales on other JREs
+  @DisplayName("returns all locales")
+  @ParameterizedTest
+  @ValueSource(strings = {"/v2/locales"})
+  public void allLocalesJdk14(String path) throws Exception {
+    when(localeService.getSupportedLocales())
+        .thenReturn(Arrays.asList(Locale.getAvailableLocales()));
+
+    testJson(path, "/v2/locales/locales14.json");
   }
 }
