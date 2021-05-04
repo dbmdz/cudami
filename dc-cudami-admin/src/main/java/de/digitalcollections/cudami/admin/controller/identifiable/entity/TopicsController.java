@@ -95,13 +95,13 @@ public class TopicsController extends AbstractController {
 
   @GetMapping("/api/topics")
   @ResponseBody
-  public PageResponse<Topic> findAll(
+  public PageResponse<Topic> findAllTop(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws HttpException {
-    final SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    return this.service.find(pageRequest);
+    SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    return this.service.findTopCollections(pageRequest);
   }
 
   @GetMapping("/api/topics/{uuid}")
