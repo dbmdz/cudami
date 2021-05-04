@@ -5,11 +5,11 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
-import de.digitalcollections.cudami.server.model.PageResponseBuilder;
+import de.digitalcollections.cudami.server.model.SearchPageResponseBuilder;
 import de.digitalcollections.cudami.server.model.WebpageBuilder;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -32,9 +32,9 @@ public class V3WebsiteControllerTest extends BaseControllerTest {
         "/v3/websites/7a2f1935-c5b8-40fb-8622-c675de0a6242/rootpages?pageNumber=0&pageSize=20"
       })
   public void pagedRootpages(String path) throws Exception {
-    PageResponse<Webpage> expected =
-        (PageResponse<Webpage>)
-            new PageResponseBuilder()
+    SearchPageResponse<Webpage> expected =
+        (SearchPageResponse<Webpage>)
+            new SearchPageResponseBuilder()
                 .forPageSize(25)
                 .forRequestPage(0)
                 .withTotalElements(4)
@@ -77,7 +77,8 @@ public class V3WebsiteControllerTest extends BaseControllerTest {
                             .build()))
                 .build();
 
-    when(websiteService.getRootPages(any(UUID.class), any(PageRequest.class))).thenReturn(expected);
+    when(websiteService.findRootPages(any(UUID.class), any(SearchPageRequest.class)))
+        .thenReturn(expected);
 
     testJson(path);
   }
