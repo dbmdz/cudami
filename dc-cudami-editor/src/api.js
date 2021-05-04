@@ -10,6 +10,7 @@ export const typeToEndpointMapping = {
   project: 'projects',
   renderingTemplate: 'renderingtemplates',
   subcollection: 'subcollections',
+  subtopic: 'subtopics',
   topic: 'topics',
   user: 'users',
   webpage: 'webpages',

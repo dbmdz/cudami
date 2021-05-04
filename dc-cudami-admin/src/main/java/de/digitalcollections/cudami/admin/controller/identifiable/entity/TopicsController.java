@@ -16,6 +16,7 @@ import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -53,7 +54,7 @@ public class TopicsController extends AbstractController {
     return "topics";
   }
 
-  @GetMapping("/topics/new")
+  @GetMapping({"/subtopics/new", "/topics/new"})
   public String create(
       Model model,
       @RequestParam(name = "parentType", required = false) String parentType,
@@ -71,7 +72,7 @@ public class TopicsController extends AbstractController {
     return service.create();
   }
 
-  @GetMapping("/topics/{uuid}/edit")
+  @GetMapping({"/subtopics/{uuid}/edit", "/topics/{uuid}/edit"})
   public String edit(
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
@@ -102,6 +103,18 @@ public class TopicsController extends AbstractController {
       throws HttpException {
     SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     return this.service.findTopCollections(pageRequest);
+  }
+
+  @GetMapping("/api/topics/{uuid}/subtopics")
+  @ResponseBody
+  public PageResponse<Topic> findSubtopic(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      throws HttpException {
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    return service.findSubtopics(uuid, searchPageRequest);
   }
 
   @GetMapping("/api/topics/{uuid}")
@@ -148,23 +161,30 @@ public class TopicsController extends AbstractController {
     }
   }
 
-  @GetMapping({"/topics/{refId:[0-9]+}", "/subtopics/{refId:[0-9]+}"})
+  @GetMapping({"/subtopics/{refId:[0-9]+}", "/topics/{refId:[0-9]+}"})
   public String viewByRefId(@PathVariable long refId, Model model) throws HttpException {
     Topic topic = service.findOneByRefId(refId);
     return view(topic.getUuid(), model);
   }
 
   @GetMapping({
-    "/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-    "/subtopics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+    "/subtopics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+    "/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
   })
   public String view(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Topic topic = service.findOne(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, topic.getLabel().getLocales());
+    List<Locale> existingSubtopicLanguages =
+        topic.getChildren().stream()
+            .flatMap(child -> child.getLabel().getLocales().stream())
+            .collect(Collectors.toList());
 
     model.addAttribute("existingLanguages", existingLanguages);
+    model.addAttribute(
+        "existingSubtopicLanguages",
+        languageSortingHelper.sortLanguages(displayLocale, existingSubtopicLanguages));
     model.addAttribute("topic", topic);
 
     List<FileResource> relatedFileResources = service.getFileResources(uuid);

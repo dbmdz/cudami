@@ -145,6 +145,7 @@ class PagedIdentifiableList extends Component {
       person: PersonList,
       project: ProjectList,
       subcollection: CollectionList,
+      subtopic: TopicList,
       topic: TopicList,
       webpage: WebpageList,
       website: WebsiteList,

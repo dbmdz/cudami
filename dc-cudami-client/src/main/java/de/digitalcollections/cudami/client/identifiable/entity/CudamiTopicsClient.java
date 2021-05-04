@@ -58,7 +58,7 @@ public class CudamiTopicsClient extends CudamiBaseClient<Topic> {
   public PageResponse<Topic> findSubtopics(UUID uuid, SearchPageRequest searchPageRequest)
       throws HttpException {
     return doGetSearchRequestForPagedObjectList(
-        String.format("/latest/topics/%s/children", uuid), searchPageRequest);
+        String.format("/v5/topics/%s/subtopics", uuid), searchPageRequest);
   }
 
   public SearchPageResponse<Topic> findTopCollections(SearchPageRequest searchPageRequest)
