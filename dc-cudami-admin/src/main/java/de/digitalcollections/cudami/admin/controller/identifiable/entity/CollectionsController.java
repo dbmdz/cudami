@@ -23,8 +23,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -270,9 +268,7 @@ public class CollectionsController extends AbstractController {
     "/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
     "/subcollections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
   })
-  public String view(
-      @PathVariable UUID uuid, @PageableDefault(size = 25) Pageable pageable, Model model)
-      throws HttpException {
+  public String view(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Collection collection = service.findOne(uuid);
     List<Locale> existingLanguages =
@@ -299,10 +295,8 @@ public class CollectionsController extends AbstractController {
   }
 
   @GetMapping({"/collections/{refId:[0-9]+}", "/subcollections/{refId:[0-9]+}"})
-  public String viewByRefId(
-      @PathVariable long refId, @PageableDefault(size = 25) Pageable pageable, Model model)
-      throws HttpException {
+  public String viewByRefId(@PathVariable long refId, Model model) throws HttpException {
     Collection collection = service.findOneByRefId(refId);
-    return view(collection.getUuid(), pageable, model);
+    return view(collection.getUuid(), model);
   }
 }
