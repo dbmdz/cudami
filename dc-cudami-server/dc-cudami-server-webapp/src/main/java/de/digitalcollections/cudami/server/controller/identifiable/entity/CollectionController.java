@@ -164,7 +164,7 @@ public class CollectionController {
 
   @ApiMethod(description = "Get all collections")
   @GetMapping(
-      value = {"/latest/collections", "/v2/collections"},
+      value = {"/latest/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Collection> findAll(
@@ -334,7 +334,6 @@ public class CollectionController {
   @GetMapping(
       value = {
         "/latest/collections/{uuid}/digitalobjects",
-        "/v3/collections/{uuid}/digitalobjects"
       },
       produces = "application/json")
   @ApiResponseObject
@@ -390,10 +389,7 @@ public class CollectionController {
 
   @ApiMethod(description = "Get (active or all) paged subcollections of a collection")
   @GetMapping(
-      value = {
-        "/latest/collections/{uuid}/subcollections",
-        "/v3/collections/{uuid}/subcollections"
-      },
+      value = {"/latest/collections/{uuid}/subcollections"},
       produces = "application/json")
   @ApiResponseObject
   public PageResponse<Collection> getSubcollections(

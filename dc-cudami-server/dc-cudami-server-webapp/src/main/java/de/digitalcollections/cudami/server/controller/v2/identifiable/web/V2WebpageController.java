@@ -74,6 +74,10 @@ public class V2WebpageController {
           Locale pLocale)
       throws IdentifiableServiceException, JsonProcessingException {
     Webpage webpage = loadWebpage(pLocale, uuid);
+    if (webpage == null) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
     webpage.setCreated(null);
     webpage.setLastModified(null);
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(webpage));

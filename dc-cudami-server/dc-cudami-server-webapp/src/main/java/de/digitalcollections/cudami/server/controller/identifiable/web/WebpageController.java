@@ -139,7 +139,7 @@ public class WebpageController {
       description =
           "Get a webpage as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
-      value = {"/latest/webpages/{uuid}", "/v3/webpages/{uuid}"},
+      value = {"/latest/webpages/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   @ApiResponseObject
   public ResponseEntity<Webpage> getWebpage(
@@ -179,7 +179,7 @@ public class WebpageController {
 
   @ApiMethod(description = "Get (active or all) paged children of a webpage as JSON")
   @GetMapping(
-      value = {"/latest/webpages/{uuid}/children", "/v3/webpages/{uuid}/children"},
+      value = {"/latest/webpages/{uuid}/children"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Webpage> getSubpages(
