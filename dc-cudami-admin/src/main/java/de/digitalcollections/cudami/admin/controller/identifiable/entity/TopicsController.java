@@ -132,7 +132,7 @@ public class TopicsController extends AbstractController {
     return "topics/list";
   }
 
-  @PostMapping("/api/topics/new")
+  @PostMapping("/api/topics")
   public ResponseEntity save(
       @RequestBody Topic topic,
       @RequestParam(name = "parentUuid", required = false) UUID parentUuid) {

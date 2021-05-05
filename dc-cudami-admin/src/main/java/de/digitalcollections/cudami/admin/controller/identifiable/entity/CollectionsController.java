@@ -215,7 +215,7 @@ public class CollectionsController extends AbstractController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @PostMapping("/api/collections/new")
+  @PostMapping("/api/collections")
   public ResponseEntity save(
       @RequestBody Collection collection,
       @RequestParam(name = "parentType", required = false) String parentType,

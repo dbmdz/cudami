@@ -234,7 +234,7 @@ export async function saveIdentifiable(
   type,
   redirect = true
 ) {
-  let url = `${contextPath}api/${typeToEndpointMapping[type]}/new`
+  let url = `${contextPath}api/${typeToEndpointMapping[type]}`
   if (parentType && parentUuid) {
     url = `${url}?parentType=${parentType}&parentUuid=${parentUuid}`
   }
