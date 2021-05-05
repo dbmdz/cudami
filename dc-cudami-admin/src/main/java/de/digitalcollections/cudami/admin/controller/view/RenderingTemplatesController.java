@@ -93,7 +93,7 @@ public class RenderingTemplatesController extends AbstractController {
     return "renderingtemplates/list";
   }
 
-  @PostMapping("/api/renderingtemplates/new")
+  @PostMapping("/api/renderingtemplates")
   public ResponseEntity save(@RequestBody RenderingTemplate template) {
     try {
       RenderingTemplate templateDb = service.save(template);

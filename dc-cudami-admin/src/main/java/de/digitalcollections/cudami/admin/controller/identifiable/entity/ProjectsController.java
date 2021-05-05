@@ -139,7 +139,7 @@ public class ProjectsController extends AbstractController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @PostMapping("/api/projects/new")
+  @PostMapping("/api/projects")
   public ResponseEntity save(@RequestBody Project project) {
     try {
       Project projectDb = service.save(project);

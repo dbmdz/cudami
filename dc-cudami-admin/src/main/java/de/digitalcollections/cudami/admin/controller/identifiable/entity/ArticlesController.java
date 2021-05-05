@@ -110,7 +110,7 @@ public class ArticlesController extends AbstractController {
     return "articles/list";
   }
 
-  @PostMapping("/api/articles/new")
+  @PostMapping("/api/articles")
   public ResponseEntity save(@RequestBody Article article) {
     try {
       Article articleDb = service.save(article);

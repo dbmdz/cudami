@@ -112,7 +112,7 @@ public class WebpagesController extends AbstractController {
     return "webpages";
   }
 
-  @PostMapping("/api/webpages/new")
+  @PostMapping("/api/webpages")
   public ResponseEntity save(
       @RequestBody Webpage webpage,
       @RequestParam("parentType") String parentType,

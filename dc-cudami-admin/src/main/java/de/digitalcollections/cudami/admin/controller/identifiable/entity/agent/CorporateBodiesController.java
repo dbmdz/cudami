@@ -110,7 +110,7 @@ public class CorporateBodiesController extends AbstractController {
     return "corporatebodies";
   }
 
-  @PostMapping("/api/corporatebodies/new")
+  @PostMapping("/api/corporatebodies")
   public ResponseEntity save(@RequestBody CorporateBody corporateBody) {
     try {
       CorporateBody corporateBodyDb = service.save(corporateBody);

@@ -124,7 +124,7 @@ public class WebsitesController extends AbstractController {
     return "websites/list";
   }
 
-  @PostMapping("/api/websites/new")
+  @PostMapping("/api/websites")
   public ResponseEntity save(@RequestBody Website website) {
     try {
       Website websiteDb = service.save(website);
