@@ -119,19 +119,17 @@ export async function loadAttachedIdentifiables(
   try {
     const response = await fetch(url)
     const json = await response.json()
-    const {content, pageRequest, totalElements, searchTerm} = json
+    const {content, pageRequest, totalElements} = json
     return {
       content,
       pageSize: pageRequest.pageSize,
       totalElements,
-      searchTerm,
     }
   } catch (err) {
     return {
       content: [],
       pageSize: 0,
       totalElements: 0,
-      searchTerm: '',
     }
   }
 }
