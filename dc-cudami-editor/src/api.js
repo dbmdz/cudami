@@ -3,6 +3,7 @@ export const typeToEndpointMapping = {
   collection: 'collections',
   corporateBody: 'corporatebodies',
   digitalObject: 'digitalobjects',
+  entity: 'entities',
   fileResource: 'fileresources',
   geoLocation: 'geolocations',
   identifierType: 'identifiertypes',

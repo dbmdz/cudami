@@ -67,8 +67,8 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
-  public List<FileResource> getFileResources(UUID topicUuid) {
-    return ((TopicRepository) repository).getFileResources(topicUuid);
+  public PageResponse<FileResource> getFileResources(UUID topicUuid, PageRequest pageRequest) {
+    return ((TopicRepository) repository).getFileResources(topicUuid, pageRequest);
   }
 
   @Override
@@ -112,7 +112,8 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
-  public List<FileResource> saveFileResources(UUID topicUuid, List<FileResource> fileResources) {
+  public PageResponse<FileResource> saveFileResources(
+      UUID topicUuid, List<FileResource> fileResources) {
     return ((TopicRepository) repository).saveFileResources(topicUuid, fileResources);
   }
 

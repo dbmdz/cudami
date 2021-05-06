@@ -82,98 +82,21 @@
           </div>
         </div>
 
-        <div class="row">
+        <div class="mt-3 row">
           <div class="col-sm-12">
-            <h3 th:text="#{entities}">Entities</h3>
-
-            <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
-              <thead>
-                <tr>
-                  <th class="text-right" th:text="#{abbr_number}">Nr.</th>
-                  <th></th>
-                  <th class="center" th:text="#{label}">Label</th>
-                  <th class="center" th:text="#{last_modified}">last modified</th>
-                  <!-- TODO
-                  <th class="center" th:text="#{actions}">Actions</th>
-                  -->
-                </tr>
-              </thead>
-              <tbody>
-                <tr th:each="relatedEntity, stats : ${relatedEntities}">
-                  <td class="text-right" th:text="${stats.index + 1}">1</td>
-                  <td class="center">
-              <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${relatedEntity.previewImage}, ${relatedEntity.previewImageRenderingHints}, ${#locale}, 30)"></th:block>
-              </td>
-              <td>
-                <!-- TODO
-                <a th:href="@{'/entities/' + ${relatedEntity.uuid}}" th:text="${relatedEntity.label.text}">Label</a>
-                -->
-                <span th:text="${relatedEntity.label.text}">Label</span>
-              </td>
-              <td>
-                <span class="float-right" th:with="df=#{dateTime.format},dateTime=${relatedEntity.lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
-              </td>
-              <!-- TODO
-              <td class="center">
-                <a th:href="@{'/entities/' + ${relatedEntity.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
-                <a th:href="@{'/entities/' + ${relatedEntity.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
-              </td>
-              -->
-              </tr>
-              </tbody>
-            </table>
+            <div id="entities-list"></div>
           </div>
         </div>
 
-        <div class="row">
+        <div class="mt-3 row">
           <div class="col-sm-12">
-            <h3 th:text="#{files}">Files</h3>
-
-            <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
-              <thead>
-                <tr>
-                  <th class="text-right" th:text="#{abbr_number}">Nr.</th>
-                  <th></th>
-                  <th class="center" th:text="#{label}">Label</th>
-                  <th class="center" th:text="#{last_modified}">last modified</th>
-                  <th class="center" th:text="#{mimetype}">Mimetype</th>
-                  <!-- TODO
-                  <th class="center" th:text="#{actions}">Actions</th>
-                  -->
-                </tr>
-              </thead>
-              <tbody>
-                <tr th:each="relatedFileResource, stats : ${relatedFileResources}">
-                  <td class="text-right" th:text="${stats.index + 1}">1</td>
-                  <td class="center">
-              <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${relatedFileResource.previewImage}, ${relatedFileResource.previewImageRenderingHints}, ${#locale}, 30)"></th:block>
-              </td>
-              <td>
-                <!-- TODO
-                <a th:href="@{'/fileresources/' + ${relatedFileResource.uuid}}" th:text="${relatedFileResource.label.text}">Label</a>
-                -->
-                <span th:text="${relatedFileResource.label.text}">Label</span>
-              </td>
-              <td>
-                <span th:text="${relatedFileResource.mimeType}">image/jpeg</span>
-              </td>
-              <td>
-                <span class="float-right" th:with="df=#{dateTime.format},dateTime=${relatedFileResource.lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
-              </td>
-              <!-- TODO
-              <td class="center">
-                <a th:href="@{'/fileresources/' + ${relatedFileResource.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
-                <a th:href="@{'/fileresources/' + ${relatedFileResource.uuid} + '/edit'}" th:title="#{tooltip_edit}"><span class="fas fa-pencil-alt actionButton"></span></a>
-              </td>
-              -->
-              </tr>
-              </tbody>
-            </table>
+            <div id="files-list"></div>
           </div>
         </div>
       </div>
     </div>
   </th:block>
+
   <section layout:fragment="beforeBodyEnds">
     <script>
       addLanguageChangeHandler()
@@ -184,14 +107,43 @@
       IdentifiableList({
         apiContextPath: /*[[@{/}]]*/ '',
         enableSearch: true,
-        existingLanguages: /*[[${existingSubtopicLanguages}]]*/,
+        existingLanguages: /*[[${existingSubtopicLanguages}]]*/ [],
         id: "subtopic-list",
         parentType: "topic",
-        parentUuid: /*[[*{uuid}]]*/,
+        parentUuid: /*[[*{uuid}]]*/ '',
         showEdit: true,
         showNew: true,
         type: "subtopic",
-        uiLocale: /*[[${#locale.language}]]*/
+        uiLocale: /*[[${#locale.language}]]*/ ''
+      });
+      
+      IdentifiableList({
+        apiContextPath: /*[[@{/}]]*/ '',
+        enableAdd: false,
+        enableMove: false,
+        enableRemove: false,
+        id: "entities-list",
+        parentType: "topic",
+        parentUuid: /*[[*{uuid}]]*/ '',
+        showEdit: false,
+        showNew: false,
+        type: "entity",
+        uiLocale: /*[[${#locale.language}]]*/ ''
+      });
+      
+      IdentifiableList({
+        apiContextPath: /*[[@{/}]]*/ '',
+        enableAdd: true,
+        enableMove: true,
+        enableRemove: true,
+        existingLanguages: /*[[${subtopicsLanguages}]]*/ [],
+        id: "files-list",
+        parentType: "topic",
+        parentUuid: /*[[*{uuid}]]*/ '',
+        showEdit: false,
+        showNew: false,
+        type: "fileResource",
+        uiLocale: /*[[${#locale.language}]]*/ ''
       });
     </script>
   </section>

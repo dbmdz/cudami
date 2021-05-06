@@ -251,8 +251,11 @@ public class TopicController {
       value = {"/latest/topics/{uuid}/fileresources", "/v3/topics/{uuid}/fileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
-  public List<FileResource> getFileResources(@PathVariable UUID uuid) {
-    return topicService.getFileResources(uuid);
+  public PageResponse<FileResource> getFileResources(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
+    return topicService.getFileResources(uuid, new PageRequest(pageNumber, pageSize));
   }
 
   @ApiMethod(description = "Get parent topic of topic")
@@ -347,8 +350,9 @@ public class TopicController {
       value = {"/latest/topics/{uuid}/fileresources", "/v3/topics/{uuid}/fileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
-  public List<FileResource> saveFileresources(
+  public PageResponse<FileResource> saveFileresources(
       @PathVariable UUID uuid, @RequestBody List<FileResource> fileResources) {
+    // FIXME
     return topicService.saveFileResources(uuid, fileResources);
   }
 

@@ -9,6 +9,7 @@ import de.digitalcollections.cudami.client.identifiable.entity.CudamiTopicsClien
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
@@ -123,6 +124,26 @@ public class TopicsController extends AbstractController {
     return service.findOne(uuid);
   }
 
+  @GetMapping("/api/topics/{uuid}/entities")
+  @ResponseBody
+  public PageResponse<Entity> getAttachedEntites(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      throws HttpException {
+    return this.service.getEntities(uuid, new PageRequest(pageNumber, pageSize));
+  }
+
+  @GetMapping("/api/topics/{uuid}/fileresources")
+  @ResponseBody
+  public PageResponse<FileResource> getRelatedFileResources(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      throws HttpException {
+    return this.service.getFileResources(uuid, new PageRequest(pageNumber, pageSize));
+  }
+
   @GetMapping("/topics")
   public String list(Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
@@ -187,14 +208,7 @@ public class TopicsController extends AbstractController {
         languageSortingHelper.sortLanguages(displayLocale, existingSubtopicLanguages));
     model.addAttribute("topic", topic);
 
-    List<FileResource> relatedFileResources = service.getFileResources(uuid);
-    model.addAttribute("relatedFileResources", relatedFileResources);
-
-    List<Entity> relatedEntities = service.getAllEntities(uuid);
-    model.addAttribute("relatedEntities", relatedEntities);
-
     BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
-
     List<BreadcrumbNode> breadcrumbs = breadcrumbNavigation.getNavigationItems();
     model.addAttribute("breadcrumbs", breadcrumbs);
 

@@ -326,30 +326,39 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<FileResource> getFileResources(UUID topicUuid) {
+  public PageResponse<FileResource> getFileResources(UUID topicUuid, PageRequest pageRequest) {
     final String frTableAlias = fileResourceMetadataRepositoryImpl.getTableAlias();
     final String frTableName = fileResourceMetadataRepositoryImpl.getTableName();
+    String commonSql =
+        " FROM "
+            + frTableName
+            + " AS "
+            + frTableAlias
+            + " INNER JOIN topic_fileresources tf ON "
+            + frTableAlias
+            + ".uuid = tf.fileresource_uuid"
+            + " WHERE tf.topic_uuid = :uuid";
 
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT tf.sortindex AS idx, * FROM "
-                + frTableName
-                + " AS "
-                + frTableAlias
-                + " INNER JOIN topic_fileresources tf ON "
-                + frTableAlias
-                + ".uuid = tf.fileresource_uuid"
-                + " WHERE tf.topic_uuid = :uuid"
-                + " ORDER BY idx ASC");
+    StringBuilder innerQuery = new StringBuilder("SELECT tf.sortindex AS idx, * ");
+    innerQuery.append(commonSql);
+    this.fileResourceMetadataRepositoryImpl.addFiltering(pageRequest, innerQuery);
+    innerQuery.append(" ORDER BY idx ASC");
+    pageRequest.setSorting(null);
+    this.addPageRequestParams(pageRequest, innerQuery);
 
+    Map<String, Object> argMap = Map.of("uuid", topicUuid);
     List<FileResource> result =
         fileResourceMetadataRepositoryImpl.retrieveList(
             fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
-            Map.of("uuid", topicUuid),
+            argMap,
             "ORDER BY idx ASC");
 
-    return result;
+    long total =
+        this.fileResourceMetadataRepositoryImpl.retrieveCount(
+            new StringBuilder("SELECT count(*) " + commonSql), argMap);
+
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override
@@ -530,7 +539,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<FileResource> saveFileResources(UUID topicUuid, List<FileResource> fileResources) {
+  public PageResponse<FileResource> saveFileResources(
+      UUID topicUuid, List<FileResource> fileResources) {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
         h ->
@@ -555,7 +565,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
             preparedBatch.execute();
           });
     }
-    return getFileResources(topicUuid);
+    // FIXME: when `PageRequest` is extended to request "allPages"
+    return getFileResources(topicUuid, new PageRequest(0, 100));
   }
 
   @Override
