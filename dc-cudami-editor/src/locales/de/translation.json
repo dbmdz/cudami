@@ -242,6 +242,8 @@
     "corporateBody_plural": "Institutionen",
     "digitalObject": "Digitalisat (digitales Objekt)",
     "digitalObject_plural": "Digitalisate (digitale Objekte)",
+    "entity": "Objekt",
+    "entity_plural": "Objekte",
     "fileResource": "Datei",
     "fileResource_plural": "Dateien",
     "geoLocation": "Ort",

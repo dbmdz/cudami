@@ -242,6 +242,8 @@
     "corporateBody_plural": "Corporate bodies",
     "digitalObject": "Digital object",
     "digitalObject_plural": "Digital objects",
+    "entity": "Entity",
+    "entity_plural": "Entities",
     "fileResource": "File",
     "fileResource_plural": "Files",
     "geoLocation": "Geolocation",

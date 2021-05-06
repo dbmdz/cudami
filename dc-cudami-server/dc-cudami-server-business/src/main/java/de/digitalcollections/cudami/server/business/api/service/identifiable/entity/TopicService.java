@@ -23,14 +23,14 @@ public interface TopicService extends NodeService<Topic>, EntityService<Topic> {
 
   PageResponse<Entity> getEntities(UUID topicUuid, PageRequest pageRequest);
 
-  default List<FileResource> getFileResources(Topic topic) {
+  default PageResponse<FileResource> getFileResources(Topic topic, PageRequest pageRequest) {
     if (topic == null) {
       return null;
     }
-    return getFileResources(topic.getUuid());
+    return getFileResources(topic.getUuid(), pageRequest);
   }
 
-  List<FileResource> getFileResources(UUID topicUuid);
+  PageResponse<FileResource> getFileResources(UUID topicUuid, PageRequest pageRequest);
 
   default List<Topic> getTopicsOfEntity(Entity entity) {
     if (entity == null) {
@@ -59,12 +59,13 @@ public interface TopicService extends NodeService<Topic>, EntityService<Topic> {
 
   List<Entity> saveEntities(UUID topicUuid, List<Entity> entities);
 
-  default List<FileResource> saveFileResources(Topic topic, List<FileResource> fileResources) {
+  default PageResponse<FileResource> saveFileResources(
+      Topic topic, List<FileResource> fileResources) {
     if (topic == null) {
       return null;
     }
     return saveFileResources(topic.getUuid(), fileResources);
   }
 
-  List<FileResource> saveFileResources(UUID topicUuid, List<FileResource> fileResources);
+  PageResponse<FileResource> saveFileResources(UUID topicUuid, List<FileResource> fileResources);
 }
