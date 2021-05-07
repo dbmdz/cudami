@@ -103,7 +103,7 @@ public class ProjectController {
 
   @ApiMethod(description = "Get all projects in reduced form (no identifiers)")
   @GetMapping(
-      value = {"/latest/projects", "/v2/projects"},
+      value = {"/latest/projects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<Project> findAll(

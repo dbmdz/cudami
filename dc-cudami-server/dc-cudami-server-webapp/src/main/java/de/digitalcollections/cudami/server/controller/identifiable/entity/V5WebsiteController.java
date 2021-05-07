@@ -32,7 +32,7 @@ public class V5WebsiteController {
 
   @ApiMethod(description = "Get website by uuid")
   @GetMapping(
-      value = {"/latest/websites/{uuid}", "/v5/websites/{uuid}"},
+      value = {"/v5/websites/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public ResponseEntity<String> findById(@PathVariable UUID uuid) throws JsonProcessingException {
