@@ -24,7 +24,6 @@ const EntityList = ({
 }) => {
   const {t} = useTranslation()
   const {apiContextPath, uiLocale} = useContext(AppContext)
-  //TODO: find the right path and implement functions on server
   const viewBaseUrl = `${apiContextPath}${typeToEndpointMapping[type]}`
   return (
     <Table bordered className="mb-0" hover responsive size="sm" striped>
