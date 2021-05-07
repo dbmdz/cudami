@@ -2,13 +2,15 @@ package de.digitalcollections.cudami.server.backend.api.repository.identifiable.
 
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.List;
 import java.util.UUID;
 
 /** Repository for Website persistence handling. */
 public interface WebsiteRepository extends EntityRepository<Website> {
+
+  SearchPageResponse<Webpage> findRootPages(UUID uuid, SearchPageRequest searchPageRequest);
 
   default List<Webpage> getRootPages(Website website) {
     if (website == null) {
@@ -18,8 +20,6 @@ public interface WebsiteRepository extends EntityRepository<Website> {
   }
 
   List<Webpage> getRootPages(UUID uuid);
-
-  PageResponse<Webpage> getRootPages(UUID uuid, PageRequest pageRequest);
 
   default boolean updateRootPagesOrder(Website website, List<Webpage> rootPages) {
     if (website == null || rootPages == null) {

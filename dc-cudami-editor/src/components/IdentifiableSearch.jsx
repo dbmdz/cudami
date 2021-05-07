@@ -1,24 +1,46 @@
+import './IdentifiableSearch.css'
+
+import classNames from 'classnames'
 import React from 'react'
 import {useTranslation} from 'react-i18next'
-import {FaSearch} from 'react-icons/fa'
+import {FaSearch, FaTimes} from 'react-icons/fa'
 import {Button, Form, Input, InputGroup, InputGroupAddon} from 'reactstrap'
 
-const IdentifiableSearch = ({onChange, onSubmit, value}) => {
+const IdentifiableSearch = ({isHighlighted, onChange, onSubmit, value}) => {
   const {t} = useTranslation()
   return (
     <Form
+      className="mb-1"
       onSubmit={(evt) => {
         evt.preventDefault()
         onSubmit()
       }}
     >
-      <InputGroup>
-        <Input
-          onChange={(evt) => onChange(evt.target.value)}
-          placeholder={t('searchTerm')}
-          type="text"
-          value={value}
-        />
+      <InputGroup className="flex-nowrap">
+        <div className="position-relative">
+          <Input
+            className={classNames(
+              'pr-5',
+              isHighlighted && ['border', 'border-danger']
+            )}
+            onChange={(evt) => onChange(evt.target.value)}
+            placeholder={t('searchTerm')}
+            type="text"
+            value={value}
+          />
+          <Button
+            className={classNames(
+              'position-absolute',
+              'position-centered',
+              !value && 'd-none'
+            )}
+            color="link"
+            type="button"
+            onClick={() => onChange('')}
+          >
+            <FaTimes color="gray" />
+          </Button>
+        </div>
         <InputGroupAddon addonType="append">
           <Button color="primary" type="submit">
             <FaSearch />

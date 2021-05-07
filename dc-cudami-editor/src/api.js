@@ -10,7 +10,9 @@ export const typeToEndpointMapping = {
   project: 'projects',
   renderingTemplate: 'renderingtemplates',
   subcollection: 'subcollections',
+  subtopic: 'subtopics',
   topic: 'topics',
+  user: 'users',
   webpage: 'webpages',
   website: 'websites',
 }
@@ -59,6 +61,23 @@ export async function addAttachedIdentifiables(
   }
 }
 
+export async function changeUserStatus(contextPath, uuid, enabled) {
+  const url = `${contextPath}api/users/${uuid}`
+  try {
+    const response = await fetch(url, {
+      body: JSON.stringify({enabled}),
+      headers: {
+        'Content-Type': 'application/json',
+        credentials: 'same-origin',
+      },
+      method: 'PATCH',
+    })
+    return response.ok
+  } catch (err) {
+    return false
+  }
+}
+
 export async function findByIdentifier(contextPath, id, namespace, type) {
   const url = `${contextPath}api/${typeToEndpointMapping[type]}/identifier/${namespace}:${id}`
   try {
@@ -100,19 +119,17 @@ export async function loadAttachedIdentifiables(
   try {
     const response = await fetch(url)
     const json = await response.json()
-    const {content, pageRequest, totalElements, searchTerm} = json
+    const {content, pageRequest, totalElements} = json
     return {
       content,
       pageSize: pageRequest.pageSize,
       totalElements,
-      searchTerm,
     }
   } catch (err) {
     return {
       content: [],
       pageSize: 0,
       totalElements: 0,
-      searchTerm: '',
     }
   }
 }
@@ -217,7 +234,7 @@ export async function saveIdentifiable(
   type,
   redirect = true
 ) {
-  let url = `${contextPath}api/${typeToEndpointMapping[type]}/new`
+  let url = `${contextPath}api/${typeToEndpointMapping[type]}`
   if (parentType && parentUuid) {
     url = `${url}?parentType=${parentType}&parentUuid=${parentUuid}`
   }

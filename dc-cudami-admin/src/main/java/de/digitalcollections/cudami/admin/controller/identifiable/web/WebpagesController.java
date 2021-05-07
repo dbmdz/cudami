@@ -9,8 +9,8 @@ import de.digitalcollections.cudami.client.identifiable.web.CudamiWebpagesClient
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.List;
@@ -89,20 +89,22 @@ public class WebpagesController extends AbstractController {
     return "webpages/edit";
   }
 
+  @GetMapping("/api/webpages/{uuid}/webpages")
+  @ResponseBody
+  public PageResponse<Webpage> findSubpages(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      throws HttpException {
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    return service.findSubpages(uuid, searchPageRequest);
+  }
+
   @GetMapping("/api/webpages/{uuid}")
   @ResponseBody
   public Webpage get(@PathVariable UUID uuid) throws HttpException {
     return service.findOne(uuid);
-  }
-
-  @GetMapping("/api/webpages/{uuid}/webpages")
-  @ResponseBody
-  public PageResponse<Webpage> getSubpages(
-      @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
-      throws HttpException {
-    return service.getChildren(uuid, new PageRequest(pageNumber, pageSize));
   }
 
   @ModelAttribute("menu")
@@ -110,7 +112,7 @@ public class WebpagesController extends AbstractController {
     return "webpages";
   }
 
-  @PostMapping("/api/webpages/new")
+  @PostMapping("/api/webpages")
   public ResponseEntity save(
       @RequestBody Webpage webpage,
       @RequestParam("parentType") String parentType,

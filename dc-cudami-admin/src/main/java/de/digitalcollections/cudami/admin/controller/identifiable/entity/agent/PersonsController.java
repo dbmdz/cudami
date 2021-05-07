@@ -111,7 +111,7 @@ public class PersonsController extends AbstractController {
     return "persons";
   }
 
-  @PostMapping("/api/persons/new")
+  @PostMapping("/api/persons")
   public ResponseEntity save(@RequestBody Person person) {
     try {
       Person personDb = service.save(person);

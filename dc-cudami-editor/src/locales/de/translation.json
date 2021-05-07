@@ -23,7 +23,11 @@
     "subcollectionMovedSuccessfully": "{{ name }} wurde erfolgreich nach <0>{{ targetName }}</0> verschoben.",
     "subcollectionRemovedSuccessfully": "{{ name }} wurde erfolgreich entfernt.",
     "uploadFailed": "Beim Hochladen ist ein Fehler aufgetreten.",
-    "uploadSuccessful": "$t({{ mediaType }}) erfolgreich hochgeladen."
+    "uploadSuccessful": "$t({{ mediaType }}) erfolgreich hochgeladen.",
+    "userActivatedSuccessfully": "Benutzer \"{{ email }}\" wurde erfolgreich aktiviert.",
+    "userDeactivatedSuccessfully": "Benutzer \"{{ email }}\" wurde erfolgreich deaktiviert.",
+    "userNotActivatedSuccessfully": "Beim Aktivieren von Benutzer \"{{ email }}\" ist ein Fehler aufgetreten.",
+    "userNotDeactivatedSuccessfully": "Beim Deaktivieren von Benutzer \"{{ email }}\" ist ein Fehler aufgetreten."
   },
   "pagination": {
     "totalElements": {
@@ -48,8 +52,11 @@
       "renderingTemplate_plural": "{{ count }} Gestaltungsvorlagen gefunden",
       "subcollection": "{{ count }} Sammlung gefunden",
       "subcollection_plural": "{{ count }} Sammlungen gefunden",
+      "subtopic": "{{ count }} Thema gefunden",
+      "subtopic_plural": "{{ count }} Themen gefunden",
       "topic": "{{ count }} Thema gefunden",
       "topic_plural": "{{ count }} Themen gefunden",
+      "user": "{{ count }} Benutzer gefunden",
       "webpage": "{{ count }} Webseite gefunden",
       "webpage_plural": "{{ count }} Webseiten gefunden",
       "website": "{{ count }} Website gefunden",
@@ -65,6 +72,7 @@
   },
   "translation": {
     "actions": "Aktionen",
+    "activated": "aktiviert",
     "add": "Hinzufügen",
     "addDigitalObjects": "Digitalisate hinzufügen",
     "addLanguage": "Sprache hinzufügen",
@@ -96,6 +104,7 @@
       "digitalObjectFromProject": "Sind Sie sicher, dass Sie das Digitalisat aus dem Projekt entfernen wollen?",
       "subcollectionFromCollection": "Sind Sie sicher, dass Sie die untergeordnete Sammlung aus der Sammlung entfernen wollen?"
     },
+    "confirmUserDeactivation": "Sind Sie sicher, dass Sie den Benutzer \"{{ email }}\" deaktivieren wollen?",
     "createArticle": "Neuen Artikel anlegen",
     "createCollection": "Neue Sammlung anlegen",
     "createCorporateBody": "Neue Institution anlegen",
@@ -105,6 +114,7 @@
     "createTopic": "Neues Thema anlegen",
     "createWebpage": "Neue Webseite anlegen",
     "createWebsite": "Neue Website anlegen",
+    "deactivated": "deaktiviert",
     "defineRenderingHints": "Darstellungshinweise festlegen",
     "description": "Kurzbeschreibung",
     "dragAndDropImage": "Datei zum Hochladen hier hereinziehen und ablegen",
@@ -124,6 +134,7 @@
     "enterMetadata": "Metadaten eingeben",
     "filename": "Dateiname",
     "filesize": "Dateigröße",
+    "firstname": "Vorname",
     "forExample": "z.B.",
     "height": "Höhe",
     "history": {
@@ -156,6 +167,7 @@
     "invalidLabels": "Bitte füllen Sie in den folgenden Sprachen das Feld \"$t(label)\" noch aus):",
     "label": "Titel",
     "lastModified": "letzte Änderung",
+    "lastname": "Nachname",
     "marks": {
       "code": "Code-Stil",
       "em": "Kursiv",
@@ -187,6 +199,7 @@
       "collection": "aus Sammlung entfernen"
     },
     "removePreviewImage": "Vorschaubild entfernen",
+    "roles": "Rolle(n)",
     "save": "Speichern",
     "searchTerm": "Suchbegriff",
     "selectMedia": {
@@ -210,6 +223,7 @@
       "url": "Einbinden einer Datei aus dem Internet durch Eingabe einer gültigen URL"
     },
     "uploadFileResource": "Neue Datei hochladen",
+    "username": "Benutzername",
     "video": "Video",
     "view": "anzeigen",
     "warning": "Warnung",
@@ -239,8 +253,12 @@
     "renderingTemplate_plural": "Gestaltungsvorlagen",
     "subcollection": "Untergeordnete Sammlung",
     "subcollection_plural": "Untergeordnete Sammlungen",
+    "subtopic": "Untergeordnetes Thema",
+    "subtopic_plural": "Untergeordnete Themen",
     "topic": "Thema",
     "topic_plural": "Themen",
+    "user": "Benutzer",
+    "user_plural": "Benutzer",
     "webpage_webpage": "Untergeordnete Webseite",
     "webpage_webpage_plural": "Untergeordnete Webseiten",
     "webpage_website": "Webseite",

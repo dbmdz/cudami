@@ -23,7 +23,11 @@
     "subcollectionMovedSuccessfully": "{{ name }} has been moved successfully to <0>{{ targetName }}</0>.",
     "subcollectionRemovedSuccessfully": "{{ name }} has been removed successfully.",
     "uploadFailed": "An error occurred while uploading.",
-    "uploadSuccessful": "$t({{ mediaType }}, capitalize) uploaded successfully."
+    "uploadSuccessful": "$t({{ mediaType }}, capitalize) uploaded successfully.",
+    "userActivatedSuccessfully": "User \"{{ email }}\" was successfully activated.",
+    "userDeactivatedSuccessfully": "User \"{{ email }}\" was successfully deactivated.",
+    "userNotActivatedSuccessfully": "An error occurred during activation of user \"{{ email }}\".",
+    "userNotDeactivatedSuccessfully": "An error occurred during deactivation of user \"{{ email }}\"."
   },
   "pagination": {
     "totalElements": {
@@ -51,6 +55,8 @@
       "subcollection_plural": "found {{ count }} collections",
       "topic": "found {{ count }} topic",
       "topic_plural": "found {{ count }} topics",
+      "user": "found {{ count }} user",
+      "user_plural": "found {{ count }} users",
       "webpage": "found {{ count }} webpage",
       "webpage_plural": "found {{ count }} webpages",
       "website": "found {{ count }} website",
@@ -66,6 +72,7 @@
   },
   "translation": {
     "actions": "Actions",
+    "activated": "activated",
     "add": "Add",
     "addDigitalObjects": "Add digital objects",
     "addLanguage": "Add language",
@@ -97,6 +104,7 @@
       "digitalObjectFromProject": "Are you sure that you want to remove this digital object from the project?",
       "subcollectionFromCollection": "Are you sure that you want to remove this sub collection from the collection?"
     },
+    "confirmUserDeactivation": "Are you sure, that you want to deactivate user \"{{ email }}\"?",
     "createArticle": "Create a new article",
     "createCollection": "Create a new collection",
     "createCorporateBody": "Create a new corporate body",
@@ -106,6 +114,7 @@
     "createTopic": "Create a new topic",
     "createWebpage": "Create a new webpage",
     "createWebsite": "Create a new website",
+    "deactivated": "deactivated",
     "defineRenderingHints": "Define rendering hints",
     "description": "Abstract",
     "dragAndDropImage": "Drag and drop file to upload here",
@@ -125,6 +134,7 @@
     "enterMetadata": "Enter metadata",
     "filename": "Filename",
     "filesize": "Filesize",
+    "firstname": "Firstname",
     "forExample": "e.g.",
     "height": "Height",
     "history": {
@@ -157,6 +167,7 @@
     "invalidLabels": "Please fill in the field \"$t(label)\" in the following languages:",
     "label": "Label",
     "lastModified": "last modified",
+    "lastname": "Lastname",
     "marks": {
       "code": "Code style",
       "em": "Italic",
@@ -188,6 +199,7 @@
       "collection": "remove from collection"
     },
     "removePreviewImage": "Remove preview image",
+    "roles": "Role(s)",
     "save": "Save",
     "searchTerm": "Search term",
     "selectMedia": {
@@ -211,6 +223,7 @@
       "url": "embedding a file from the internet by using a valid URL"
     },
     "uploadFileResource": "Upload a new file",
+    "username": "Username",
     "video": "video",
     "view": "view",
     "warning": "Warning",
@@ -242,6 +255,8 @@
     "subcollection_plural": "Sub collections",
     "topic": "Topic",
     "topic_plural": "Topics",
+    "user": "User",
+    "user_plural": "Users",
     "webpage_webpage": "Sub webpage",
     "webpage_webpage_plural": "Sub webpages",
     "webpage_website": "Webpage",

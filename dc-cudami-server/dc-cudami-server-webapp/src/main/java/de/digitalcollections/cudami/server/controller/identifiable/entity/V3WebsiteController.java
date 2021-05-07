@@ -7,8 +7,8 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
 import java.util.Iterator;
 import java.util.List;
@@ -56,13 +56,13 @@ public class V3WebsiteController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
       throws JsonProcessingException {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+    SearchPageRequest searchPageRequest = new SearchPageRequest(null, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
+      searchPageRequest.setSorting(sorting);
     }
 
-    PageResponse<Webpage> response = websiteService.getRootPages(uuid, pageRequest);
+    SearchPageResponse<Webpage> response = websiteService.findRootPages(uuid, searchPageRequest);
     if (response == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }

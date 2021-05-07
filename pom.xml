@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.4.4</version>
+    <version>2.4.5</version>
   </parent>
 
   <groupId>de.digitalcollections.cudami</groupId>
@@ -77,28 +77,29 @@
 
     <version.assertj-core>3.19.0</version.assertj-core>
     <version.commons-beanutils>1.9.4</version.commons-beanutils>
-    <version.commons-lang3>3.11</version.commons-lang3>
+    <version.commons-lang3>3.12.0</version.commons-lang3>
     <version.dc-model>9.0.0-SNAPSHOT</version.dc-model>
-    <version.flyway>7.5.4</version.flyway>
+    <version.flyway>7.7.1</version.flyway>
     <version.javax.servlet-api>4.0.1</version.javax.servlet-api>
     <version.junit>5.7.1</version.junit>
     <version.logstash-logback-encoder>6.6</version.logstash-logback-encoder>
-    <version.mockito-core>3.8.0</version.mockito-core>
+    <version.mockito-core>3.9.0</version.mockito-core>
     <version.openjson>1.0.12</version.openjson>
     <version.passay>1.6.0</version.passay>
-    <version.postgresql>42.2.19</version.postgresql>
+    <version.postgresql>42.2.20</version.postgresql>
     <version.slf4j>1.7.30</version.slf4j>
-    <version.spotbugs>4.2.2</version.spotbugs>
+    <version.spotbugs>4.2.3</version.spotbugs>
     <version.unbescape>1.1.6.RELEASE</version.unbescape>
 
     <!-- plugins -->
-    <version.jacoco-maven-plugin>0.8.6</version.jacoco-maven-plugin>
+    <version.githook-maven-plugin>1.0.5</version.githook-maven-plugin>
+    <version.jacoco-maven-plugin>0.8.7</version.jacoco-maven-plugin>
     <version.maven-failsafe-plugin>3.0.0-M5</version.maven-failsafe-plugin>
     <version.maven-fmt-plugin>2.10</version.maven-fmt-plugin>
     <version.maven-gpg-plugin>1.6</version.maven-gpg-plugin>
     <version.maven-surefire-plugin>3.0.0-M5</version.maven-surefire-plugin>
     <version.nexus-staging-maven-plugin>1.6.8</version.nexus-staging-maven-plugin>
-    <version.spotbugs-maven-plugin>4.2.2</version.spotbugs-maven-plugin>
+    <version.spotbugs-maven-plugin>4.2.3</version.spotbugs-maven-plugin>
   </properties>
 
   <dependencyManagement>
@@ -265,6 +266,7 @@
       <plugin>
         <groupId>io.github.phillipuniverse</groupId>
         <artifactId>githook-maven-plugin</artifactId>
+        <version>${version.githook-maven-plugin}</version>
         <executions>
           <execution>
             <goals>

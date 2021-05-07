@@ -7,9 +7,10 @@ import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -19,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 @Repository
 public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
@@ -104,6 +106,53 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   }
 
   @Override
+  public SearchPageResponse<Webpage> findRootPages(UUID uuid, SearchPageRequest searchPageRequest) {
+    final String wpTableAlias = webpageRepositoryImpl.getTableAlias();
+    final String wpTableName = webpageRepositoryImpl.getTableName();
+
+    String commonSql =
+        " FROM "
+            + wpTableName
+            + " AS "
+            + wpTableAlias
+            + " LEFT JOIN website_webpages ww ON "
+            + wpTableAlias
+            + ".uuid = ww.webpage_uuid"
+            + " WHERE ww.website_uuid = :uuid";
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", uuid);
+
+    String searchTerm = searchPageRequest.getQuery();
+    if (StringUtils.hasText(searchTerm)) {
+      commonSql += " AND " + getCommonSearchSql(wpTableAlias);
+      argumentMappings.put("searchTerm", searchTerm);
+    }
+
+    StringBuilder innerQuery = new StringBuilder("SELECT ww.sortindex AS idx, *" + commonSql);
+    addFiltering(searchPageRequest, innerQuery);
+
+    String orderBy = null;
+    if (searchPageRequest.getSorting() == null) {
+      orderBy = "ORDER BY idx ASC";
+      innerQuery.append(" ").append(orderBy);
+    }
+    addPageRequestParams(searchPageRequest, innerQuery);
+
+    List<Webpage> result =
+        webpageRepositoryImpl.retrieveList(
+            webpageRepositoryImpl.getSqlSelectReducedFields(),
+            innerQuery,
+            argumentMappings,
+            orderBy);
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    addFiltering(searchPageRequest, countQuery);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new SearchPageResponse<>(result, searchPageRequest, total);
+  }
+
+  @Override
   protected List<String> getAllowedOrderByFields() {
     List<String> allowedOrderByFields = super.getAllowedOrderByFields();
     allowedOrderByFields.addAll(Arrays.asList("url"));
@@ -149,45 +198,6 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
             Map.of("uuid", uuid),
             null);
     return result;
-  }
-
-  @Override
-  public PageResponse<Webpage> getRootPages(UUID uuid, PageRequest pageRequest) {
-    final String wpTableAlias = webpageRepositoryImpl.getTableAlias();
-    final String wpTableName = webpageRepositoryImpl.getTableName();
-
-    String commonSql =
-        " FROM "
-            + wpTableName
-            + " AS "
-            + wpTableAlias
-            + " INNER JOIN website_webpages ww ON "
-            + wpTableAlias
-            + ".uuid = ww.webpage_uuid"
-            + " WHERE ww.website_uuid = :uuid";
-
-    StringBuilder innerQuery = new StringBuilder("SELECT ww.sortindex AS idx, *" + commonSql);
-    addFiltering(pageRequest, innerQuery);
-
-    String orderBy = null;
-    if (pageRequest.getSorting() == null) {
-      orderBy = "ORDER BY idx ASC";
-      innerQuery.append(" " + orderBy);
-    }
-    addPageRequestParams(pageRequest, innerQuery);
-
-    List<Webpage> result =
-        webpageRepositoryImpl.retrieveList(
-            webpageRepositoryImpl.getSqlSelectReducedFields(),
-            innerQuery,
-            Map.of("uuid", uuid),
-            orderBy);
-
-    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(pageRequest, countQuery);
-    long total = retrieveCount(countQuery, Map.of("uuid", uuid));
-
-    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override

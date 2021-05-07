@@ -15,7 +15,8 @@
 
   <properties>
     <version.dc-commons-jdbi>4.2.0-SNAPSHOT</version.dc-commons-jdbi>
-    <version.jdbi>3.18.0</version.jdbi>
+    <version.jdbi>3.18.1</version.jdbi>
+    <version.testcontainers>1.15.3</version.testcontainers>
   </properties>
 
   <dependencies>
@@ -39,6 +40,11 @@
     <dependency>
       <groupId>de.digitalcollections.model</groupId>
       <artifactId>dc-model-jackson</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.flywaydb</groupId>
@@ -70,6 +76,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <version>1.10.19</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <scope>runtime</scope>
@@ -93,6 +105,34 @@
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>${version.testcontainers}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <version>${version.testcontainers}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>${version.testcontainers}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

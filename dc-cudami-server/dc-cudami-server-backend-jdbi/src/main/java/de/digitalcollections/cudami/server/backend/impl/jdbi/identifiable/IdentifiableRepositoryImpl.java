@@ -367,34 +367,13 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   @Override
   public SearchPageResponse<I> find(SearchPageRequest searchPageRequest) {
-    String commonSql =
-        " FROM "
-            + tableName
-            + " AS "
-            + tableAlias
-            + " LEFT JOIN LATERAL jsonb_object_keys("
-            + tableAlias
-            + ".label) lbl(keys) ON "
-            + tableAlias
-            + ".label IS NOT NULL"
-            + " LEFT JOIN LATERAL jsonb_object_keys("
-            + tableAlias
-            + ".description) dsc(keys) ON "
-            + tableAlias
-            + ".description IS NOT NULL";
-
+    String commonSql = " FROM " + tableName + " AS " + tableAlias;
     String searchTerm = searchPageRequest.getQuery();
     if (!StringUtils.hasText(searchTerm)) {
       return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
     }
 
-    commonSql +=
-        " WHERE ("
-            + tableAlias
-            + ".label->>lbl.keys ILIKE '%' || :searchTerm || '%'"
-            + " OR "
-            + tableAlias
-            + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')";
+    commonSql += " WHERE " + getCommonSearchSql(tableAlias);
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
   }
 
@@ -402,7 +381,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       SearchPageRequest searchPageRequest, String commonSql, Map<String, Object> argumentMappings) {
     StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".*" + commonSql);
     addFiltering(searchPageRequest, innerQuery);
-    innerQuery.append(" GROUP BY ").append(tableAlias).append(".uuid");
     addPageRequestParams(searchPageRequest, innerQuery);
     String orderBy = getOrderBy(searchPageRequest.getSorting());
     if (StringUtils.hasText(orderBy)) {
@@ -411,7 +389,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     List<I> result = retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, orderBy);
 
     StringBuilder countQuery =
-        new StringBuilder("SELECT count(distinct " + tableAlias + ".uuid)" + commonSql);
+        new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
     addFiltering(searchPageRequest, countQuery);
     long total = retrieveCount(countQuery, argumentMappings);
 
@@ -536,6 +514,26 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       default:
         return null;
     }
+  }
+
+  protected String getCommonSearchSql(String tblAlias) {
+    // FYI: [JSON Path
+    // Functions](https://www.postgresql.org/docs/12/functions-json.html#FUNCTIONS-SQLJSON-PATH)
+    // and [Data type](https://www.postgresql.org/docs/12/datatype-json.html#DATATYPE-JSONPATH)
+    return "("
+        + "jsonb_path_exists("
+        + tblAlias
+        // To insert `:searchTerm` into the `jsonpath` we must split it up;
+        // the cast is necessary otherwise Postgres does not recognise it as `jsonpath` (that is
+        // just a string practically).
+        // Finds (case insensitively) labels that contain the search term, see `like_regex`
+        // example in
+        // https://www.postgresql.org/docs/12/functions-json.html#FUNCTIONS-SQLJSON-PATH
+        + ".label, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath)"
+        + " OR "
+        + "jsonb_path_exists("
+        + tblAlias
+        + ".description, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath))";
   }
 
   public int getIndex(List<? extends Identifiable> list, Identifiable identifiable) {

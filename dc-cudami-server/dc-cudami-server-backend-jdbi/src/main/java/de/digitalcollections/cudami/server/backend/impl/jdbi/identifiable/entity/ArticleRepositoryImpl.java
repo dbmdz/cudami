@@ -212,7 +212,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
           handle -> {
             PreparedBatch preparedBatch =
                 handle.prepareBatch(
-                    "INSERT INTO article_creators(work_uuid, agent_uuid, sortIndex) VALUES(:uuid, :agentUuid, :sortIndex)");
+                    "INSERT INTO article_creators(article_uuid, agent_uuid, sortIndex) VALUES(:uuid, :agentUuid, :sortIndex)");
             for (Agent agent : creators) {
               preparedBatch
                   .bind("uuid", articleUuid)

@@ -16,6 +16,7 @@ import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -110,6 +111,47 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
           preparedBatch.execute();
         });
     return true;
+  }
+
+  @Override
+  public SearchPageResponse<Topic> findChildren(UUID uuid, SearchPageRequest searchPageRequest) {
+    String commonSql =
+        " FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + " INNER JOIN topic_topics cc ON "
+            + tableAlias
+            + ".uuid = cc.child_topic_uuid"
+            + " WHERE cc.parent_topic_uuid = :uuid";
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", uuid);
+
+    String searchTerm = searchPageRequest.getQuery();
+    if (StringUtils.hasText(searchTerm)) {
+      commonSql += " AND " + getCommonSearchSql(tableAlias);
+      argumentMappings.put("searchTerm", searchTerm);
+    }
+
+    StringBuilder innerQuery = new StringBuilder("SELECT cc.sortindex AS idx, *" + commonSql);
+    addFiltering(searchPageRequest, innerQuery);
+
+    String orderBy = null;
+    if (searchPageRequest.getSorting() == null) {
+      orderBy = "ORDER BY idx ASC";
+      innerQuery.append(" ").append(orderBy);
+    }
+    addPageRequestParams(searchPageRequest, innerQuery);
+
+    List<Topic> result =
+        retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, orderBy);
+
+    StringBuilder countQuery =
+        new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
+    addFiltering(searchPageRequest, countQuery);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new SearchPageResponse<>(result, searchPageRequest, total);
   }
 
   @Override
@@ -366,16 +408,6 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
             + tableName
             + " AS "
             + tableAlias
-            + " LEFT JOIN LATERAL jsonb_object_keys("
-            + tableAlias
-            + ".label) lbl(keys) ON "
-            + tableAlias
-            + ".label IS NOT NULL"
-            + " LEFT JOIN LATERAL jsonb_object_keys("
-            + tableAlias
-            + ".description) dsc(keys) ON "
-            + tableAlias
-            + ".description IS NOT NULL"
             + " WHERE ("
             + " NOT EXISTS (SELECT FROM topic_topics WHERE child_topic_uuid = "
             + tableAlias
@@ -386,13 +418,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
       return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
     }
 
-    commonSql +=
-        " AND ("
-            + tableAlias
-            + ".label->>lbl.keys ILIKE '%' || :searchTerm || '%'"
-            + " OR "
-            + tableAlias
-            + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')";
+    commonSql += " AND " + getCommonSearchSql(tableAlias);
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
   }
 

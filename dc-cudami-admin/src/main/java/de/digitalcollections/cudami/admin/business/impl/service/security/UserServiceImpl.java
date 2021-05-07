@@ -45,18 +45,6 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
   }
 
   @Override
-  public User activate(UUID uuid) throws ServiceException {
-    try {
-      User user = client.findOne(uuid);
-      user.setEnabled(true);
-      user = client.update(user.getUuid(), user);
-      return user;
-    } catch (HttpException ex) {
-      throw new ServiceException(ex.getMessage(), ex);
-    }
-  }
-
-  @Override
   public void afterPropertiesSet() throws Exception {
     this.uniqueUsernameValidator = new UniqueUsernameValidator(this);
   }
@@ -94,18 +82,6 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
     roles.add(Role.ADMIN);
     user.setRoles(roles);
     return user;
-  }
-
-  @Override
-  public User deactivate(UUID uuid) throws ServiceException {
-    try {
-      User user = client.findOne(uuid);
-      user.setEnabled(false);
-      user = client.update(user.getUuid(), user);
-      return user;
-    } catch (HttpException ex) {
-      throw new ServiceException(ex.getMessage(), ex);
-    }
   }
 
   @Override
@@ -207,6 +183,18 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
       }
     }
     return user;
+  }
+
+  @Override
+  public boolean setStatus(UUID uuid, boolean enabled) {
+    try {
+      User user = client.findOne(uuid);
+      user.setEnabled(enabled);
+      client.update(user.getUuid(), user);
+      return true;
+    } catch (HttpException ex) {
+      return false;
+    }
   }
 
   // TODO: Simplify user management

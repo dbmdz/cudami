@@ -397,12 +397,18 @@ public class CollectionController {
           UUID collectionUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "active", required = false) String active) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-    if (active != null) {
-      return collectionService.getActiveChildren(collectionUuid, pageRequest);
+      @RequestParam(name = "active", required = false) String active,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      searchPageRequest.setSorting(sorting);
     }
-    return collectionService.getChildren(collectionUuid, pageRequest);
+    if (active != null) {
+      return collectionService.findActiveChildren(collectionUuid, searchPageRequest);
+    }
+    return collectionService.findChildren(collectionUuid, searchPageRequest);
   }
 
   @ApiMethod(description = "Get languages of all top collections")

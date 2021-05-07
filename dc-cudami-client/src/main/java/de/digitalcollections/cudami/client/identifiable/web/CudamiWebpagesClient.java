@@ -8,6 +8,7 @@ import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.net.http.HttpClient;
 import java.util.List;
@@ -37,6 +38,12 @@ public class CudamiWebpagesClient extends CudamiBaseClient<Webpage> {
         String.format("/latest/webpages/%s?active=true&pLocale=%s", uuid, locale));
   }
 
+  public PageResponse<Webpage> findActiveSubpages(UUID uuid, SearchPageRequest searchPageRequest)
+      throws HttpException {
+    return doGetSearchRequestForPagedObjectList(
+        String.format("/latest/webpages/%s/children?active=true", uuid), searchPageRequest);
+  }
+
   public Webpage findOne(UUID uuid) throws HttpException {
     return doGetRequestForObject(String.format("/latest/webpages/%s", uuid));
   }
@@ -52,6 +59,12 @@ public class CudamiWebpagesClient extends CudamiBaseClient<Webpage> {
   public Webpage findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
         String.format("/latest/webpages/identifier/%s:%s.json", namespace, id));
+  }
+
+  public PageResponse<Webpage> findSubpages(UUID uuid, SearchPageRequest searchPageRequest)
+      throws HttpException {
+    return doGetSearchRequestForPagedObjectList(
+        String.format("/latest/webpages/%s/children", uuid), searchPageRequest);
   }
 
   public PageResponse<Webpage> getActiveChildren(UUID uuid, PageRequest pageRequest)

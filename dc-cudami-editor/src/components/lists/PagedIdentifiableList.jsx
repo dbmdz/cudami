@@ -56,6 +56,7 @@ class PagedIdentifiableList extends Component {
       pageNumber: 0,
       totalElements: 0,
       searchTerm: '',
+      showSearch: true,
     }
   }
 
@@ -69,6 +70,7 @@ class PagedIdentifiableList extends Component {
       identifierTypes,
       numberOfPages: Math.ceil(totalElements / pageSize),
       totalElements,
+      showSearch: totalElements > 0,
     })
   }
 
@@ -81,6 +83,7 @@ class PagedIdentifiableList extends Component {
       changeOfOrderActive: true,
       identifiables: content,
       numberOfPages: Math.ceil(totalElements / pageSize),
+      showSearch: false,
       totalElements,
     })
   }
@@ -142,6 +145,7 @@ class PagedIdentifiableList extends Component {
       person: PersonList,
       project: ProjectList,
       subcollection: CollectionList,
+      subtopic: TopicList,
       topic: TopicList,
       webpage: WebpageList,
       website: WebsiteList,
@@ -321,6 +325,7 @@ class PagedIdentifiableList extends Component {
       },
       identifiables: content,
       numberOfPages: Math.ceil(totalElements / pageSize),
+      showSearch: true,
       totalElements,
     })
   }
@@ -373,6 +378,7 @@ class PagedIdentifiableList extends Component {
       pageNumber,
       searchTerm,
       totalElements,
+      showSearch,
     } = this.state
     const showChangeOfOrder =
       enableChangeOfOrder && !changeOfOrderActive && totalElements > 1
@@ -402,6 +408,22 @@ class PagedIdentifiableList extends Component {
                 onClick={() => this.toggleDialog('addAttachedIdentifiables')}
               >
                 {t('add')}
+              </Button>
+            )}
+            {showChangeOfOrder && (
+              <Button
+                className={showNew || enableAdd ? 'ml-1' : ''}
+                onClick={this.activateChangeOfOrder}
+              >
+                {t('changeOrder')}
+              </Button>
+            )}
+            {changeOfOrderActive && (
+              <Button
+                className={showNew || enableAdd ? 'ml-1' : ''}
+                onClick={this.saveChangeOfOrder}
+              >
+                {t('save')}
               </Button>
             )}
           </Col>
@@ -435,18 +457,9 @@ class PagedIdentifiableList extends Component {
                 totalElements={totalElements}
                 type={type}
               />
-              {showChangeOfOrder && (
-                <Button className="mb-2" onClick={this.activateChangeOfOrder}>
-                  {t('changeOrder')}
-                </Button>
-              )}
-              {changeOfOrderActive && (
-                <Button className="mb-2" onClick={this.saveChangeOfOrder}>
-                  {t('save')}
-                </Button>
-              )}
-              {enableSearch && totalElements > 0 && (
+              {enableSearch && showSearch && (
                 <IdentifiableSearch
+                  isHighlighted={totalElements === 0 && searchTerm}
                   onChange={(value) => this.setState({searchTerm: value})}
                   onSubmit={this.executeSearch}
                   value={searchTerm}

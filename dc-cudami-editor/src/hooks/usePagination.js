@@ -26,8 +26,8 @@ const usePagination = (apiContextPath, type) => {
     setIsLoading(true)
     loadData(apiContextPath, pageNumber, pageSize)
       .then(({content, numberOfPages, totalElements}) => {
-        setNumberOfPages(numberOfPages)
         setContent(content)
+        setNumberOfPages(numberOfPages)
         setTotalElements(totalElements)
       })
       .finally(() => {
@@ -41,6 +41,7 @@ const usePagination = (apiContextPath, type) => {
     pageNumber,
     pageSize,
     totalElements,
+    setContent,
     setPageNumber,
     setPageSize,
   }

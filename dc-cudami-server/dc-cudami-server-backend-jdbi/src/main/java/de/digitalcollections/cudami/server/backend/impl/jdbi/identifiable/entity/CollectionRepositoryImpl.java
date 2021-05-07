@@ -156,6 +156,48 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
+  public SearchPageResponse<Collection> findChildren(
+      UUID uuid, SearchPageRequest searchPageRequest) {
+    String commonSql =
+        " FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + " INNER JOIN collection_collections cc ON "
+            + tableAlias
+            + ".uuid = cc.child_collection_uuid"
+            + " WHERE cc.parent_collection_uuid = :uuid";
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", uuid);
+
+    String searchTerm = searchPageRequest.getQuery();
+    if (StringUtils.hasText(searchTerm)) {
+      commonSql += " AND " + getCommonSearchSql(tableAlias);
+      argumentMappings.put("searchTerm", searchTerm);
+    }
+
+    StringBuilder innerQuery = new StringBuilder("SELECT cc.sortindex AS idx, *" + commonSql);
+    addFiltering(searchPageRequest, innerQuery);
+
+    String orderBy = null;
+    if (searchPageRequest.getSorting() == null) {
+      orderBy = "ORDER BY idx ASC";
+      innerQuery.append(" ").append(orderBy);
+    }
+    addPageRequestParams(searchPageRequest, innerQuery);
+
+    List<Collection> result =
+        retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, orderBy);
+
+    StringBuilder countQuery =
+        new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
+    addFiltering(searchPageRequest, countQuery);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new SearchPageResponse<>(result, searchPageRequest, total);
+  }
+
+  @Override
   public Collection findOne(UUID uuid, Filtering filtering) {
     Collection collection = super.findOne(uuid, filtering);
 
@@ -310,40 +352,25 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + doTableAlias
             + " LEFT JOIN collection_digitalobjects AS cd ON "
             + doTableAlias
-            + ".uuid = cd.digitalobject_uuid";
-
+            + ".uuid = cd.digitalobject_uuid"
+            + " WHERE cd.collection_uuid = :uuid";
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("uuid", collectionUuid);
 
     String searchTerm = searchPageRequest.getQuery();
     if (StringUtils.hasText(searchTerm)) {
-      commonSql +=
-          " LEFT JOIN LATERAL jsonb_object_keys("
-              + doTableAlias
-              + ".label) lbl(keys) ON "
-              + doTableAlias
-              + ".label IS NOT NULL"
-              + " LEFT JOIN LATERAL jsonb_object_keys("
-              + doTableAlias
-              + ".description) dsc(keys) ON "
-              + doTableAlias
-              + ".description IS NOT NULL"
-              + " WHERE ("
-              + doTableAlias
-              + ".label->>lbl.keys ILIKE '%' || :searchTerm || '%'"
-              + " OR "
-              + doTableAlias
-              + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')"
-              + " AND cd.collection_uuid = :uuid";
+      commonSql += " AND " + getCommonSearchSql(doTableAlias);
       argumentMappings.put("searchTerm", searchTerm);
-    } else {
-      commonSql += " WHERE cd.collection_uuid = :uuid";
     }
 
     StringBuilder innerQuery = new StringBuilder("SELECT cd.sortindex AS idx, *" + commonSql);
     addFiltering(searchPageRequest, innerQuery);
-    searchPageRequest.setSorting(null);
-    innerQuery.append(" ORDER BY idx ASC");
+
+    String orderBy = null;
+    if (searchPageRequest.getSorting() == null) {
+      orderBy = "ORDER BY idx ASC";
+      innerQuery.append(" ").append(orderBy);
+    }
     addPageRequestParams(searchPageRequest, innerQuery);
 
     List<DigitalObject> result =
@@ -351,7 +378,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             argumentMappings,
-            "ORDER BY idx ASC");
+            orderBy);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(searchPageRequest, countQuery);
@@ -491,16 +518,6 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + tableName
             + " AS "
             + tableAlias
-            + " LEFT JOIN LATERAL jsonb_object_keys("
-            + tableAlias
-            + ".label) lbl(keys) ON "
-            + tableAlias
-            + ".label IS NOT NULL"
-            + " LEFT JOIN LATERAL jsonb_object_keys("
-            + tableAlias
-            + ".description) dsc(keys) ON "
-            + tableAlias
-            + ".description IS NOT NULL"
             + " WHERE ("
             + " NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = "
             + tableAlias
@@ -511,13 +528,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
       return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
     }
 
-    commonSql +=
-        " AND ("
-            + tableAlias
-            + ".label->>lbl.keys ILIKE '%' || :searchTerm || '%'"
-            + " OR "
-            + tableAlias
-            + ".description->>dsc.keys ILIKE '%' || :searchTerm || '%')";
+    commonSql += " AND " + getCommonSearchSql(tableAlias);
     return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
   }
 

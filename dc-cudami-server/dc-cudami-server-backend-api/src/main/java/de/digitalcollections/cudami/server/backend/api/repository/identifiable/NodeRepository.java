@@ -59,6 +59,8 @@ public interface NodeRepository<N extends Identifiable> extends IdentifiableRepo
 
   PageResponse<N> getChildren(UUID nodeUuid, PageRequest pageRequest);
 
+  SearchPageResponse<N> findChildren(UUID uuid, SearchPageRequest searchPageRequest);
+
   N getParent(UUID nodeUuid);
 
   List<N> getParents(UUID uuid);

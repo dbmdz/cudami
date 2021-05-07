@@ -8,7 +8,6 @@ import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiWebsitesClient;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import java.util.List;
@@ -98,20 +97,22 @@ public class WebsitesController extends AbstractController {
     return service.find(searchPageRequest);
   }
 
+  @GetMapping("/api/websites/{uuid}/webpages")
+  @ResponseBody
+  public PageResponse<Webpage> findRootpages(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      throws HttpException {
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    return service.findRootPages(uuid, searchPageRequest);
+  }
+
   @GetMapping("/api/websites/{uuid}")
   @ResponseBody
   public Website get(@PathVariable UUID uuid) throws HttpException {
     return service.findOne(uuid);
-  }
-
-  @GetMapping("/api/websites/{uuid}/webpages")
-  @ResponseBody
-  public PageResponse<Webpage> getRootpages(
-      @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
-      throws HttpException {
-    return service.getRootPages(uuid, new PageRequest(pageNumber, pageSize));
   }
 
   @GetMapping("/websites")
@@ -123,7 +124,7 @@ public class WebsitesController extends AbstractController {
     return "websites/list";
   }
 
-  @PostMapping("/api/websites/new")
+  @PostMapping("/api/websites")
   public ResponseEntity save(@RequestBody Website website) {
     try {
       Website websiteDb = service.save(website);

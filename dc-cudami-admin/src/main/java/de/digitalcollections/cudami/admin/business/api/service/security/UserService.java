@@ -18,15 +18,11 @@ public interface UserService<U extends User> extends UserDetailsService {
 
   long count();
 
-  U activate(UUID uuid) throws ServiceException;
-
   U create();
 
   U create(U user, String password1, String password2, Errors results) throws ServiceException;
 
   U createAdminUser();
-
-  U deactivate(UUID uuid) throws ServiceException;
 
   boolean doesActiveAdminUserExist() throws ServiceException;
 
@@ -38,6 +34,8 @@ public interface UserService<U extends User> extends UserDetailsService {
   U findByEmail(String email) throws ServiceException;
 
   U findOne(UUID uuid) throws ServiceException;
+
+  boolean setStatus(UUID uuid, boolean enabled);
 
   //  U save(U user);
   //  U update(U user);

@@ -116,7 +116,7 @@ public class FileResourcesMetadataController extends AbstractController {
     return "fileresources/list";
   }
 
-  @PostMapping("/api/fileresources/new")
+  @PostMapping("/api/fileresources")
   public ResponseEntity save(@RequestBody FileResource fileResource) {
     try {
       FileResource fileResourceDb = service.save(fileResource);

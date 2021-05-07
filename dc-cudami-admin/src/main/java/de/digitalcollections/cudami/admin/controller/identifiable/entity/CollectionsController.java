@@ -10,7 +10,6 @@ import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
@@ -24,8 +23,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -141,6 +138,18 @@ public class CollectionsController extends AbstractController {
     return service.findTopCollections(searchPageRequest);
   }
 
+  @GetMapping("/api/collections/{uuid}/digitalobjects")
+  @ResponseBody
+  public PageResponse<DigitalObject> findDigitalObjects(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      throws HttpException {
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    return service.getDigitalObjects(uuid, searchPageRequest);
+  }
+
   @GetMapping({
     "/api/collections/identifier/{namespace}:{id}",
     "/api/subcollections/identifier/{namespace}:{id}"
@@ -151,31 +160,22 @@ public class CollectionsController extends AbstractController {
     return service.findOneByIdentifier(namespace, id);
   }
 
-  @GetMapping("/api/collections/{uuid}")
+  @GetMapping("/api/collections/{uuid}/subcollections")
   @ResponseBody
-  public Collection get(@PathVariable UUID uuid) throws HttpException {
-    return service.findOne(uuid);
-  }
-
-  @GetMapping("/api/collections/{uuid}/digitalobjects")
-  @ResponseBody
-  public PageResponse<DigitalObject> getDigitalObjects(
+  public PageResponse<Collection> findSubcollections(
       @PathVariable UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws HttpException {
-    return service.getDigitalObjects(uuid, new SearchPageRequest(searchTerm, pageNumber, pageSize));
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    return service.findSubcollections(uuid, searchPageRequest);
   }
 
-  @GetMapping("/api/collections/{uuid}/subcollections")
+  @GetMapping("/api/collections/{uuid}")
   @ResponseBody
-  public PageResponse<Collection> getSubcollections(
-      @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
-      throws HttpException {
-    return service.getSubcollections(uuid, new PageRequest(pageNumber, pageSize));
+  public Collection get(@PathVariable UUID uuid) throws HttpException {
+    return service.findOne(uuid);
   }
 
   @GetMapping("/collections")
@@ -215,7 +215,7 @@ public class CollectionsController extends AbstractController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @PostMapping("/api/collections/new")
+  @PostMapping("/api/collections")
   public ResponseEntity save(
       @RequestBody Collection collection,
       @RequestParam(name = "parentType", required = false) String parentType,
@@ -268,9 +268,7 @@ public class CollectionsController extends AbstractController {
     "/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
     "/subcollections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
   })
-  public String view(
-      @PathVariable UUID uuid, @PageableDefault(size = 25) Pageable pageable, Model model)
-      throws HttpException {
+  public String view(@PathVariable UUID uuid, Model model) throws HttpException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Collection collection = service.findOne(uuid);
     List<Locale> existingLanguages =
@@ -297,10 +295,8 @@ public class CollectionsController extends AbstractController {
   }
 
   @GetMapping({"/collections/{refId:[0-9]+}", "/subcollections/{refId:[0-9]+}"})
-  public String viewByRefId(
-      @PathVariable long refId, @PageableDefault(size = 25) Pageable pageable, Model model)
-      throws HttpException {
+  public String viewByRefId(@PathVariable long refId, Model model) throws HttpException {
     Collection collection = service.findOneByRefId(refId);
-    return view(collection.getUuid(), pageable, model);
+    return view(collection.getUuid(), model);
   }
 }

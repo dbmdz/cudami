@@ -38,6 +38,19 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
     return ((NodeRepository<Webpage>) repository).addChildren(parentUuid, childrenUuids);
   }
 
+  @Override
+  public SearchPageResponse<Webpage> findActiveChildren(
+      UUID uuid, SearchPageRequest searchPageRequest) {
+    Filtering filtering = filteringForActive();
+    searchPageRequest.add(filtering);
+    return findChildren(uuid, searchPageRequest);
+  }
+
+  @Override
+  public SearchPageResponse<Webpage> findChildren(UUID uuid, SearchPageRequest searchPageRequest) {
+    return ((NodeRepository<Webpage>) repository).findChildren(uuid, searchPageRequest);
+  }
+
   // TODO: test if webpages work as expected (using now IdentifiableServiceImpl logic)
   //  @Override
   //  public Webpage get(UUID uuid, Locale locale) throws IdentifiableServiceException {

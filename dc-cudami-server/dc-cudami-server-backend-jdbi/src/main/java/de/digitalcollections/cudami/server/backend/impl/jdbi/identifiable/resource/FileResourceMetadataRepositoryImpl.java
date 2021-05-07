@@ -156,31 +156,19 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
 
   public String getCommonFileResourceSearchSql(
       String tableName, String tableAlias, String searchTerm) {
-    String commonSql =
-        " FROM "
-            + tableName
-            + " AS "
-            + tableAlias
-            + " LEFT JOIN LATERAL jsonb_object_keys("
-            + tableAlias
-            + ".label) l(keys) ON "
-            + tableAlias
-            + ".label IS NOT NULL"
-            + " LEFT JOIN LATERAL jsonb_object_keys("
-            + tableAlias
-            + ".description) d(keys) ON "
-            + tableAlias
-            + ".description IS NOT NULL";
+    String commonSql = " FROM " + tableName + " AS " + tableAlias;
     if (!StringUtils.hasText(searchTerm)) {
       return commonSql;
     }
     return commonSql
         + " WHERE ("
+        + "jsonb_path_exists("
         + tableAlias
-        + ".label->>l.keys ILIKE '%' || :searchTerm || '%'"
+        + ".label, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath)"
         + " OR "
+        + "jsonb_path_exists("
         + tableAlias
-        + ".description->>d.keys ILIKE '%' || :searchTerm || '%'"
+        + ".description, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath)"
         + " OR "
         + tableAlias
         + ".filename ILIKE '%' || :searchTerm || '%')";

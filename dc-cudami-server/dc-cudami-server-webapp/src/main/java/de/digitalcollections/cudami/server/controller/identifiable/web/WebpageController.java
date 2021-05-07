@@ -11,6 +11,7 @@ import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.Sorting;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.time.LocalDate;
@@ -181,7 +182,7 @@ public class WebpageController {
       value = {"/latest/webpages/{uuid}/children"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
-  public PageResponse<Webpage> getWebpageChildren(
+  public PageResponse<Webpage> getSubpages(
       @ApiPathParam(
               description =
                   "UUID of the parent webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
@@ -190,17 +191,18 @@ public class WebpageController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "active", required = false) String active)
+      @RequestParam(name = "active", required = false) String active,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws IdentifiableServiceException {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
+      searchPageRequest.setSorting(sorting);
     }
     if (active != null) {
-      return webpageService.getActiveChildren(uuid, pageRequest);
+      return webpageService.findActiveChildren(uuid, searchPageRequest);
     }
-    return webpageService.getChildren(uuid, pageRequest);
+    return webpageService.findChildren(uuid, searchPageRequest);
   }
 
   @ApiMethod(description = "Get (active or all) children of a webpage recursivly as JSON")

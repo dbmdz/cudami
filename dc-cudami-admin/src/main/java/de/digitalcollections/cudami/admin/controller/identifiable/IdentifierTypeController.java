@@ -141,7 +141,7 @@ public class IdentifierTypeController extends AbstractController {
     return service.find(pageRequest);
   }
 
-  @GetMapping(value = "/identifiertypes")
+  @GetMapping("/identifiertypes")
   public String list() {
     return "identifiertypes/list";
   }

@@ -52,6 +52,12 @@ public class CudamiWebsitesClient extends CudamiBaseClient<Website> {
         String.format("/latest/websites/identifier/%s:%s.json", namespace, id));
   }
 
+  public PageResponse<Webpage> findRootPages(UUID uuid, SearchPageRequest searchPageRequest)
+      throws HttpException {
+    return doGetSearchRequestForPagedObjectList(
+        String.format("/latest/websites/%s/rootpages", uuid), searchPageRequest, Webpage.class);
+  }
+
   public List<Locale> getLanguages() throws HttpException {
     return doGetRequestForObjectList("/latest/websites/languages", Locale.class);
   }

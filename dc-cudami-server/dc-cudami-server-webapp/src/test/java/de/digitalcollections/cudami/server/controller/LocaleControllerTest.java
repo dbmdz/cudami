@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.EnabledOnJre;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -39,7 +40,7 @@ class LocaleControllerTest extends BaseControllerTest {
     testJson(path, "/v2/languages/languages.json");
   }
 
-  @EnabledForJreRange(min = JAVA_14) // Delivers a different set of languages on other JREs
+  @EnabledOnJre(JAVA_14) // Delivers a different set of languages on other JREs
   @DisplayName("returns all languages")
   @ParameterizedTest
   @ValueSource(strings = {"/v2/languages"})
@@ -69,7 +70,7 @@ class LocaleControllerTest extends BaseControllerTest {
     testJson(path, "/v2/locales/locales.json");
   }
 
-  @EnabledForJreRange(min = JAVA_14) // Delivers a different set of locales on other JREs
+  @EnabledOnJre(JAVA_14) // Delivers a different set of locales on other JREs
   @DisplayName("returns all locales")
   @ParameterizedTest
   @ValueSource(strings = {"/v2/locales"})
