@@ -24,17 +24,16 @@ import InputWithLabel from '../InputWithLabel'
 import LanguageTab from '../LanguageTab'
 import ActionButtons from './ActionButtons'
 
-const loadData = async (context, uuid) => {
+const loadData = async (context, type, uuid) => {
   const defaultLanguage = await loadDefaultLanguage(context)
-  let template = await loadIdentifiable(context, 'renderingTemplate', uuid)
+  const template = await loadIdentifiable(context, type, uuid)
   return {
     defaultLanguage,
     template,
   }
 }
 
-const submitData = async (context, data, uuid) => {
-  const type = 'renderingTemplate'
+const submitData = async (context, data, type, uuid) => {
   if (uuid) {
     await updateIdentifiable(context, data, type, false)
   } else {
@@ -44,8 +43,9 @@ const submitData = async (context, data, uuid) => {
 }
 
 const RenderingTemplateForm = ({apiContextPath = '/', uuid}) => {
+  const type = 'renderingTemplate'
   useEffect(() => {
-    loadData(apiContextPath, uuid).then(({defaultLanguage, template}) => {
+    loadData(apiContextPath, type, uuid).then(({defaultLanguage, template}) => {
       setDefaultLanguage(defaultLanguage)
       setTemplate(template)
     })
@@ -63,7 +63,7 @@ const RenderingTemplateForm = ({apiContextPath = '/', uuid}) => {
       id={formId}
       onSubmit={(evt) => {
         evt.preventDefault()
-        submitData(apiContextPath, template, uuid)
+        submitData(apiContextPath, template, type, uuid)
       }}
     >
       <Row>
