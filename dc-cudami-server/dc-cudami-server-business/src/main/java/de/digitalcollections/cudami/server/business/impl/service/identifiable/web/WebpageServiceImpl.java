@@ -16,6 +16,7 @@ import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,10 +93,26 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   }
 
   @Override
+  public List<Webpage> getActiveChildrenTree(UUID uuid) {
+    List<Webpage> webpages = getActiveChildren(uuid);
+    return webpages.stream()
+        .peek(w -> w.setChildren(getActiveChildrenTree(w.getUuid())))
+        .collect(Collectors.toList());
+  }
+
+  @Override
   public PageResponse<Webpage> getActiveChildren(UUID uuid, PageRequest pageRequest) {
     Filtering filtering = filteringForActive();
     pageRequest.add(filtering);
     return getChildren(uuid, pageRequest);
+  }
+
+  @Override
+  public List<Webpage> getChildrenTree(UUID uuid) {
+    List<Webpage> webpages = getChildren(uuid);
+    return webpages.stream()
+        .peek(w -> w.setChildren(getChildrenTree(w.getUuid())))
+        .collect(Collectors.toList());
   }
 
   @Override

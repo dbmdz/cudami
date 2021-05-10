@@ -36,7 +36,21 @@ public interface WebpageService extends NodeService<Webpage> {
 
   Webpage getActive(UUID uuid, Locale pLocale);
 
+  /**
+   * Returns a list of children (non recursive)
+   *
+   * @param uuid UUID of the parent webpage
+   * @return List of children Webpages
+   */
   List<Webpage> getActiveChildren(UUID uuid);
+
+  /**
+   * Returns a list of active children, with recursivly all children have their active children set
+   *
+   * @param uuid UUID of the parent webpage
+   * @return List of acrive children Webpages
+   */
+  List<Webpage> getActiveChildrenTree(UUID uuid);
 
   PageResponse<Webpage> getActiveChildren(UUID uuid, PageRequest pageRequest);
 
@@ -44,4 +58,12 @@ public interface WebpageService extends NodeService<Webpage> {
 
   Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid)
       throws IdentifiableServiceException;
+
+  /**
+   * Returns a list of children, with recursively all children have their children set
+   *
+   * @param uuid UUID of the parent webpage
+   * @return List of active children webpages
+   */
+  List<Webpage> getChildrenTree(UUID uuid);
 }

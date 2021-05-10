@@ -31,7 +31,7 @@ public class EntityRelationController {
 
   @ApiMethod(description = "Get paged, sorted, filtered relations")
   @GetMapping(
-      value = {"/latest/entities/relations", "/v3/entities/relations"},
+      value = {"/latest/entities/relations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
   public PageResponse<EntityRelation> getEntitiesRelations(

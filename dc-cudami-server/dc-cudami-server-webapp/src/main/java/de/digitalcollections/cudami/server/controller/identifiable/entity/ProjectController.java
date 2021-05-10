@@ -175,7 +175,7 @@ public class ProjectController {
 
   @ApiMethod(description = "Get paged digital objects of a project")
   @GetMapping(
-      value = {"/latest/projects/{uuid}/digitalobjects", "/v3/projects/{uuid}/digitalobjects"},
+      value = {"/latest/projects/{uuid}/digitalobjects"},
       produces = "application/json")
   @ApiResponseObject
   public PageResponse<DigitalObject> getDigitalObjects(

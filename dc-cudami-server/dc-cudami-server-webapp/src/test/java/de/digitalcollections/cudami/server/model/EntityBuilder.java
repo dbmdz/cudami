@@ -130,6 +130,16 @@ public class EntityBuilder<T extends Entity, B extends EntityBuilder> extends Ab
     return (B) this;
   }
 
+  public B withoutOpenPreviewInNewWindow() {
+    RenderingHintsPreviewImage previewImageRenderingHints = entity.getPreviewImageRenderingHints();
+    if (previewImageRenderingHints == null) {
+      previewImageRenderingHints = new RenderingHintsPreviewImage();
+    }
+    previewImageRenderingHints.setOpenLinkInNewWindow(false);
+    entity.setPreviewImageRenderingHints(previewImageRenderingHints);
+    return (B) this;
+  }
+
   public B withUuidFromPath(String path) {
     entity.setUuid(extractFirstUuidFromPath(path));
     return (B) this;
@@ -145,12 +155,42 @@ public class EntityBuilder<T extends Entity, B extends EntityBuilder> extends Ab
     return (B) this;
   }
 
+  public B withAltText(Locale locale, String text) {
+    RenderingHintsPreviewImage previewImageRenderingHints = entity.getPreviewImageRenderingHints();
+    if (previewImageRenderingHints == null) {
+      previewImageRenderingHints = new RenderingHintsPreviewImage();
+    }
+    LocalizedText altText = previewImageRenderingHints.getAltText();
+    if (altText == null) {
+      altText = new LocalizedText();
+    }
+    altText.setText(locale, text);
+    previewImageRenderingHints.setAltText(altText);
+    entity.setPreviewImageRenderingHints(previewImageRenderingHints);
+    return (B) this;
+  }
+
   public B withTitleFromLabel() {
     RenderingHintsPreviewImage previewImageRenderingHints = entity.getPreviewImageRenderingHints();
     if (previewImageRenderingHints == null) {
       previewImageRenderingHints = new RenderingHintsPreviewImage();
     }
     previewImageRenderingHints.setTitle(entity.getLabel());
+    entity.setPreviewImageRenderingHints(previewImageRenderingHints);
+    return (B) this;
+  }
+
+  public B withTitle(Locale locale, String text) {
+    RenderingHintsPreviewImage previewImageRenderingHints = entity.getPreviewImageRenderingHints();
+    if (previewImageRenderingHints == null) {
+      previewImageRenderingHints = new RenderingHintsPreviewImage();
+    }
+    LocalizedText title = previewImageRenderingHints.getTitle();
+    if (title == null) {
+      title = new LocalizedText();
+    }
+    title.setText(locale, text);
+    previewImageRenderingHints.setTitle(title);
     entity.setPreviewImageRenderingHints(previewImageRenderingHints);
     return (B) this;
   }
@@ -168,6 +208,11 @@ public class EntityBuilder<T extends Entity, B extends EntityBuilder> extends Ab
     localizedDescription.addContentBlock(paragraph);
     description.put(locale, localizedDescription);
     entity.setDescription(description);
+    return (B) this;
+  }
+
+  public B withCustomAttribute(String key, Object value) {
+    entity.setCustomAttribute(key, value);
     return (B) this;
   }
 
