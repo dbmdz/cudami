@@ -219,15 +219,14 @@ public class WebpageController {
       @ApiQueryParam(name = "active", description = "If set, only active children will be returned")
           @RequestParam(name = "active", required = false)
           String active) {
+
     List<Webpage> children;
     if (active != null) {
-      children = webpageService.getActiveChildren(uuid);
+      children = webpageService.getActiveChildrenTree(uuid);
     } else {
-      children = webpageService.getChildren(uuid);
+      children = webpageService.getChildrenTree(uuid);
     }
-    for (Webpage child : children) {
-      child.setChildren(getWebpageChildrenTree(child.getUuid(), active));
-    }
+
     return children;
   }
 
