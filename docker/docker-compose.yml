@@ -8,7 +8,6 @@ services:
       POSTGRES_USER: "cudami"
       POSTGRES_PASSWORD: "somepassword"
       POSTGRES_DB: "cudami"
-    shm_size: '1g'
   iiif:
     build:
       args:
