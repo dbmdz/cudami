@@ -6,8 +6,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
-import de.digitalcollections.cudami.admin.propertyeditor.LocalizedStructuredContentEditor;
-import de.digitalcollections.cudami.admin.propertyeditor.LocalizedTextEditor;
 import de.digitalcollections.cudami.admin.propertyeditor.RoleEditor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +15,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(MainController.class)
 public class MainControllerTest {
-
-  @MockBean private LocalizedStructuredContentEditor localizedStructuredContentEditor;
-
-  @MockBean private LocalizedTextEditor localizedTextEditor;
 
   @Autowired private MockMvc mockMvc;
 
