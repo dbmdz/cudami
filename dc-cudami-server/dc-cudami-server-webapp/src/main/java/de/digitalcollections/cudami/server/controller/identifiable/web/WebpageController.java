@@ -220,14 +220,9 @@ public class WebpageController {
           @RequestParam(name = "active", required = false)
           String active) {
 
-    List<Webpage> children;
-    if (active != null) {
-      children = webpageService.getActiveChildrenTree(uuid);
-    } else {
-      children = webpageService.getChildrenTree(uuid);
-    }
-
-    return children;
+    return (active != null)
+        ? webpageService.getActiveChildrenTree(uuid)
+        : webpageService.getChildrenTree(uuid);
   }
 
   @ApiMethod(description = "Get parent of a webpage as JSON")
