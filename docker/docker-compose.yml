@@ -8,6 +8,8 @@ services:
       POSTGRES_USER: "cudami"
       POSTGRES_PASSWORD: "somepassword"
       POSTGRES_DB: "cudami"
+    # see https://docs.docker.com/compose/compose-file/compose-file-v2/#shm_size for documentation
+    shm_size: "1g"
   iiif:
     build:
       args:
