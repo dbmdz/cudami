@@ -27,9 +27,6 @@ export async function addAttachedIdentifiable(
   const url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}/${uuid}`
   try {
     const response = await fetch(url, {
-      headers: {
-        credentials: 'same-origin',
-      },
       method: 'POST',
     })
     return response.ok
@@ -51,7 +48,6 @@ export async function addAttachedIdentifiables(
       body: JSON.stringify(identifiables),
       headers: {
         'Content-Type': 'application/json',
-        credentials: 'same-origin',
       },
       method: 'POST',
     })
@@ -68,7 +64,6 @@ export async function changeUserStatus(contextPath, uuid, enabled) {
       body: JSON.stringify({enabled}),
       headers: {
         'Content-Type': 'application/json',
-        credentials: 'same-origin',
       },
       method: 'PATCH',
     })
@@ -203,9 +198,6 @@ export async function removeAttachedIdentifiable(
   const url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}/${uuid}`
   try {
     const response = await fetch(url, {
-      headers: {
-        credentials: 'same-origin',
-      },
       method: 'DELETE',
     })
     return response.ok
@@ -243,7 +235,6 @@ export async function saveIdentifiable(
       body: JSON.stringify(identifiable),
       headers: {
         'Content-Type': 'application/json',
-        credentials: 'same-origin',
       },
       method: 'POST',
     })
@@ -318,7 +309,6 @@ export async function updateAttachedIdentifiablesOrder(
       body: JSON.stringify(identifiables),
       headers: {
         'Content-Type': 'application/json',
-        credentials: 'same-origin',
       },
       method: 'PUT',
     })
@@ -350,7 +340,6 @@ export async function updateIdentifiable(
       body: JSON.stringify(identifiable),
       headers: {
         'Content-Type': 'application/json',
-        credentials: 'same-origin',
       },
       method: 'PUT',
     })
