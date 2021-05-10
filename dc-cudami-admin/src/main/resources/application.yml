@@ -30,6 +30,13 @@ management:
 server:
   port: 9898
   server-header: "@project.name@ v@project.version@"
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        secure: false
+      timeout: 10h
+      tracking-modes: cookie
 
 # upload config: see org.springframework.boot.autoconfigure.web.MultipartProperties
 spring:
@@ -65,6 +72,12 @@ spring:
     template-resolver-order: 2
 
 ---
+
+server:
+  servlet:
+    session:
+      cookie:
+        secure: true
 
 spring:
   config:
