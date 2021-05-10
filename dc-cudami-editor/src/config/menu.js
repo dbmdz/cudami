@@ -14,15 +14,17 @@ import icons from './icons'
 import schema from './schema'
 import {markActive} from './utils'
 
-const blockActive = (type, attrs = {}) => (state) => {
-  const {$from, to, node} = state.selection
+const blockActive =
+  (type, attrs = {}) =>
+  (state) => {
+    const {$from, to, node} = state.selection
 
-  if (node) {
-    return node.hasMarkup(type, attrs)
+    if (node) {
+      return node.hasMarkup(type, attrs)
+    }
+
+    return to <= $from.end() && $from.parent.hasMarkup(type, attrs)
   }
-
-  return to <= $from.end() && $from.parent.hasMarkup(type, attrs)
-}
 
 const canInsert = (type) => (state) => {
   const {$from} = state.selection
