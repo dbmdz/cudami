@@ -66,7 +66,7 @@
     "@fisker/prettier-config": "^4.0.4",
     "eslint-plugin-react": "^7.23.2",
     "import-sort-style-module": "^6.0.0",
-    "prettier": "^2.2.1",
+    "prettier": "^2.3.0",
     "prettier-plugin-import-sort": "^0.0.6",
     "webpack-cli": "^4.6.0",
     "webpack-merge": "^5.7.3"
