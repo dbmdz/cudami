@@ -29,13 +29,8 @@ const handleClick = (
   )
   const message = 'editor.show-preview-image-dialog'
   if (currentPreviewImage && currentRenderingHints) {
-    const {
-      altText,
-      caption,
-      openLinkInNewWindow,
-      targetLink,
-      title,
-    } = currentRenderingHints
+    const {altText, caption, openLinkInNewWindow, targetLink, title} =
+      currentRenderingHints
     publish(message, {
       attributes: {
         altText: altText?.[language],

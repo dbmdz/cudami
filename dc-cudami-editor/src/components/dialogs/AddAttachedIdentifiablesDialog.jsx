@@ -56,15 +56,8 @@ class AddAttachedIdentifiablesDialog extends Component {
   }
 
   render() {
-    const {
-      action,
-      identifierTypes,
-      isOpen,
-      maxElements,
-      onSubmit,
-      t,
-      type,
-    } = this.props
+    const {action, identifierTypes, isOpen, maxElements, onSubmit, t, type} =
+      this.props
     const {feedbackMessage, identifiables, selectedOption} = this.state
     const showAutocomplete = selectedOption < this.fixedOptions.length
     const showInputFields =
@@ -175,9 +168,8 @@ class AddAttachedIdentifiablesDialog extends Component {
                             color="link"
                             onClick={() =>
                               this.setState({
-                                identifiables: this.removeIdentifiableFromList(
-                                  index
-                                ),
+                                identifiables:
+                                  this.removeIdentifiableFromList(index),
                               })
                             }
                           >
