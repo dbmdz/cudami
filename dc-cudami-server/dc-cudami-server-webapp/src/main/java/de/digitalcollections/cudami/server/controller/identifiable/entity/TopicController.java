@@ -258,6 +258,24 @@ public class TopicController {
     return topicService.getFileResources(uuid, new PageRequest(pageNumber, pageSize));
   }
 
+  @ApiMethod(description = "Get all languages of entities of a topic")
+  @GetMapping(
+      value = "/v5/topics/{uuid}/entities/languages",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public List<Locale> getLanguagesOfEntities(@PathVariable UUID uuid) {
+    return this.topicService.getLanguagesOfEntities(uuid);
+  }
+
+  @ApiMethod(description = "Get all languages of file resources of a topic")
+  @GetMapping(
+      value = "/v5/topics/{uuid}/fileresources/languages",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public List<Locale> getLanguagesOfFileResources(@PathVariable UUID uuid) {
+    return this.topicService.getLanguagesOfFileResources(uuid);
+  }
+
   @ApiMethod(description = "Get parent topic of topic")
   @GetMapping(
       value = {"/latest/topics/{uuid}/parent", "/v3/topics/{uuid}/parent"},

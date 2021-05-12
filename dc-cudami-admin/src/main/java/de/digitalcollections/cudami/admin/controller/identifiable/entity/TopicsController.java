@@ -196,17 +196,26 @@ public class TopicsController extends AbstractController {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Topic topic = service.findOne(uuid);
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, topic.getLabel().getLocales());
+        this.languageSortingHelper.sortLanguages(displayLocale, topic.getLabel().getLocales());
     List<Locale> existingSubtopicLanguages =
         topic.getChildren().stream()
             .flatMap(child -> child.getLabel().getLocales().stream())
             .collect(Collectors.toList());
+    List<Locale> existingEntityLanguages = this.service.getLanguagesOfEntities(uuid),
+        existingFileResourceLanguages = this.service.getLanguagesOfFileResources(uuid);
 
-    model.addAttribute("existingLanguages", existingLanguages);
-    model.addAttribute(
-        "existingSubtopicLanguages",
-        languageSortingHelper.sortLanguages(displayLocale, existingSubtopicLanguages));
-    model.addAttribute("topic", topic);
+    model
+        .addAttribute("existingLanguages", existingLanguages)
+        .addAttribute(
+            "existingSubtopicLanguages",
+            this.languageSortingHelper.sortLanguages(displayLocale, existingSubtopicLanguages))
+        .addAttribute("topic", topic)
+        .addAttribute(
+            "existingEntityLanguages",
+            this.languageSortingHelper.sortLanguages(displayLocale, existingEntityLanguages))
+        .addAttribute(
+            "existingFileResourceLanguages",
+            this.languageSortingHelper.sortLanguages(displayLocale, existingFileResourceLanguages));
 
     BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
     List<BreadcrumbNode> breadcrumbs = breadcrumbNavigation.getNavigationItems();

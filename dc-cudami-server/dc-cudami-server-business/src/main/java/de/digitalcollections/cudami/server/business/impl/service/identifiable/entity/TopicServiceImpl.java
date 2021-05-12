@@ -72,6 +72,16 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
+  public List<Locale> getLanguagesOfEntities(UUID topicUuid) {
+    return ((TopicRepository) repository).getLanguagesOfEntities(topicUuid);
+  }
+
+  @Override
+  public List<Locale> getLanguagesOfFileResources(UUID topicUuid) {
+    return ((TopicRepository) repository).getLanguagesOfFileResources(topicUuid);
+  }
+
+  @Override
   public Topic getParent(UUID nodeUuid) {
     return ((NodeRepository<Topic>) repository).getParent(nodeUuid);
   }

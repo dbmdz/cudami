@@ -7,6 +7,7 @@ import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 /** Repository for Topic persistence handling. */
@@ -31,6 +32,10 @@ public interface TopicRepository extends NodeRepository<Topic>, EntityRepository
   }
 
   PageResponse<FileResource> getFileResources(UUID topicUuid, PageRequest pageRequest);
+
+  List<Locale> getLanguagesOfEntities(UUID topicUuid);
+
+  List<Locale> getLanguagesOfFileResources(UUID topicUuid);
 
   default List<Topic> getTopicsOfEntity(Entity entity) {
     if (entity == null) {
