@@ -362,6 +362,46 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
+  public List<Locale> getLanguagesOfEntities(UUID topicUuid) {
+    String entityTableName = this.entityRepositoryImpl.getTableName(),
+        entityTableAlias = this.entityRepositoryImpl.getTableAlias();
+    String sql =
+        "SELECT DISTINCT jsonb_object_keys("
+            + entityTableAlias
+            + ".label) AS languages "
+            + "FROM "
+            + entityTableName
+            + " AS "
+            + entityTableAlias
+            + " INNER JOIN topic_entities te ON "
+            + entityTableAlias
+            + ".uuid = te.entity_uuid "
+            + "WHERE te.topic_uuid = :uuid";
+    return this.dbi.withHandle(
+        h -> h.createQuery(sql).bind("uuid", topicUuid).mapTo(Locale.class).list());
+  }
+
+  @Override
+  public List<Locale> getLanguagesOfFileResources(UUID topicUuid) {
+    String fileResourceTableName = this.fileResourceMetadataRepositoryImpl.getTableName(),
+        fileResourceTableAlias = this.fileResourceMetadataRepositoryImpl.getTableAlias();
+    String sql =
+        "SELECT DISTINCT jsonb_object_keys("
+            + fileResourceTableAlias
+            + ".label) AS languages "
+            + "FROM "
+            + fileResourceTableName
+            + " AS "
+            + fileResourceTableAlias
+            + " INNER JOIN topic_fileresources tf ON "
+            + fileResourceTableAlias
+            + ".uuid = tf.fileresource_uuid "
+            + "WHERE tf.topic_uuid = :uuid";
+    return this.dbi.withHandle(
+        h -> h.createQuery(sql).bind("uuid", topicUuid).mapTo(Locale.class).list());
+  }
+
+  @Override
   public Topic getParent(UUID nodeUuid) {
     String sqlAdditionalJoins =
         " INNER JOIN topic_topics tt ON " + tableAlias + ".uuid = tt.parent_topic_uuid";

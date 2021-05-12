@@ -101,6 +101,16 @@ public class CudamiTopicsClient extends CudamiBaseClient<Topic> {
         String.format("/latest/topics/%s/fileresources", uuid), pageRequest, FileResource.class);
   }
 
+  public List<Locale> getLanguagesOfEntities(UUID topicUuid) throws HttpException {
+    return this.doGetRequestForObjectList(
+        String.format("/v5/topics/%s/entities/languages", topicUuid), Locale.class);
+  }
+
+  public List<Locale> getLanguagesOfFileResources(UUID topicUuid) throws HttpException {
+    return this.doGetRequestForObjectList(
+        String.format("/v5/topics/%s/fileresources/languages", topicUuid), Locale.class);
+  }
+
   public Topic getParent(UUID uuid) throws HttpException {
     return doGetRequestForObject(String.format("/latest/topics/%s/parent", uuid));
   }
