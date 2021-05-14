@@ -284,9 +284,13 @@ class IdentifiableForm extends Component {
       availableLanguages,
       defaultLanguage,
       dialogsOpen,
+      identifiable,
       invalidLanguages,
     } = this.state
-    return this.state.identifiable ? (
+    if (!identifiable) {
+      return null
+    }
+    return (
       <AppContext.Provider
         value={{
           apiContextPath,
