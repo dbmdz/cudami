@@ -76,6 +76,7 @@ const CorporateBodyForm = ({
             {existingLanguages.map((language) => (
               <LanguageTab
                 activeLanguage={activeLanguage}
+                enableRemove={existingLanguages.length > 1}
                 key={language}
                 language={language}
                 toggle={onToggleLanguage}
