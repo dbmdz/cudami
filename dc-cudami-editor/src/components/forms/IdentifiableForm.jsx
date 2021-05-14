@@ -1,6 +1,8 @@
 import '../../polyfills'
 
 import kebabCase from 'lodash/kebabCase'
+import omit from 'lodash/omit'
+import sortBy from 'lodash/sortBy'
 import React, {Component} from 'react'
 import {withTranslation} from 'react-i18next'
 
@@ -19,6 +21,7 @@ import AddLinkDialog from '../dialogs/AddLinkDialog'
 import AddPreviewImageDialog from '../dialogs/AddPreviewImageDialog'
 import AddTableDialog from '../dialogs/AddTableDialog'
 import AddVideoDialog from '../dialogs/AddVideoDialog'
+import RemoveLanguageDialog from '../dialogs/RemoveLanguageDialog'
 import FormErrors from '../FormErrors'
 import ArticleForm from './ArticleForm'
 import CollectionForm from './CollectionForm'
@@ -53,6 +56,7 @@ class IdentifiableForm extends Component {
         addPreviewImage: false,
         addTable: false,
         addVideo: false,
+        removeLanguage: false,
       },
       existingLanguages: props.existingLanguages ?? [props.activeLanguage],
       identifiable: null,
@@ -191,6 +195,40 @@ class IdentifiableForm extends Component {
     return true
   }
 
+  removeLanguage = (language) => {
+    const {
+      activeLanguage,
+      availableLanguages,
+      existingLanguages,
+      identifiable,
+    } = this.state
+    const newState = {
+      availableLanguages: sortBy(
+        [
+          ...availableLanguages,
+          {
+            displayName: this.props.t(`languageNames:${language}`),
+            name: language,
+          },
+        ],
+        'displayName'
+      ),
+      existingLanguages: existingLanguages.filter((l) => l != language),
+      identifiable: {
+        ...identifiable,
+        description: omit(identifiable.description, [language]),
+        label: omit(identifiable.label, [language]),
+      },
+    }
+    if (language === activeLanguage) {
+      newState.activeLanguage = newState.existingLanguages[0]
+    }
+    if (identifiable.text) {
+      newState.identifiable.text = omit(identifiable.text, [language])
+    }
+    this.setState(newState)
+  }
+
   submitIdentifiable = () => {
     if (this.isFormValid()) {
       const {apiContextPath, parentType, parentUuid, type} = this.props
@@ -294,9 +332,14 @@ class IdentifiableForm extends Component {
             isOpen={dialogsOpen.addPreviewImage}
             onToggle={() => this.toggleDialog('addPreviewImage')}
           />
+          <RemoveLanguageDialog
+            isOpen={dialogsOpen.removeLanguage}
+            onConfirm={this.removeLanguage}
+            toggle={() => this.toggleDialog('removeLanguage')}
+          />
         </div>
       </AppContext.Provider>
-    ) : null
+    )
   }
 }
 

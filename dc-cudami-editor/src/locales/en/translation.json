@@ -99,6 +99,7 @@
     "chooseFile": "Choose file",
     "chooseLanguage": "Choose a language",
     "chooseRenderingTemplate": "Choose a design template",
+    "confirmLanguageRemoval": "Are you sure, that you want to remove the content of \"{{ language }}\"?",
     "confirmRemove": {
       "digitalObjectFromCollection": "Are you sure that you want to remove this digital object from the collection?",
       "digitalObjectFromProject": "Are you sure that you want to remove this digital object from the project?",
