@@ -23,7 +23,7 @@ function addLanguageChangeHandler() {
     var urlParams = editUrl.length > 1 ? new URLSearchParams(editUrl[1]) : new URLSearchParams('')
     urlParams.set('activeLanguage', selectedLanguage);
     editUrl = [editUrl[0], urlParams.toString()]
-    $('#edit-button').attr('href', editUrl.join('?'))
+    $('#edit-button, #sticky-edit-button').attr('href', editUrl.join('?'))
   })
 }
 
@@ -46,9 +46,7 @@ function moveEditButtonToNavbar() {
   var editButton = document.getElementById('edit-button')
   var editButtonInNavbar = document.createElement('li')
   editButtonInNavbar.classList.add('border-left', 'ml-2', 'nav-item', 'pl-3')
-  editButtonInNavbar.innerHTML = `<a class="btn btn-secondary" href="${editButton.getAttribute(
-    'href'
-  )}">${editButton.innerText}</a>`
+  editButtonInNavbar.innerHTML = `<a class="btn btn-secondary" id="sticky-edit-button">${editButton.innerText}</a>`
   var observer = new IntersectionObserver(
     (entry, _) => {
       var inView = entry[0].isIntersecting && entry[0].intersectionRatio >= 1
@@ -59,6 +57,9 @@ function moveEditButtonToNavbar() {
       } else {
         editButton.classList.add('invisible')
         editButton.classList.remove('visible')
+        editButtonInNavbar
+          .querySelector('a')
+          .setAttribute('href', editButton.getAttribute('href'))
         navbar.querySelector('.navbar-nav').appendChild(editButtonInNavbar)
       }
     },
