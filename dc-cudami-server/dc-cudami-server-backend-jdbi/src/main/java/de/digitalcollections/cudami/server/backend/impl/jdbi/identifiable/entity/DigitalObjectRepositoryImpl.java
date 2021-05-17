@@ -17,6 +17,7 @@ import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -218,6 +219,48 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             filtering,
             Map.of("uuid", digitalObjectUuid));
     return result;
+  }
+
+  @Override
+  public List<Locale> getLanguagesOfCollections(UUID uuid) {
+    String collectionTable = this.collectionRepositoryImpl.getTableName(),
+        collectionAlias = this.collectionRepositoryImpl.getTableAlias();
+
+    String sql =
+        "SELECT DISTINCT jsonb_object_keys("
+            + collectionAlias
+            + ".label) as languages"
+            + " FROM "
+            + collectionTable
+            + " AS "
+            + collectionAlias
+            + " LEFT JOIN collection_digitalobjects AS cd ON "
+            + collectionAlias
+            + ".uuid = cd.collection_uuid"
+            + " WHERE cd.digitalobject_uuid = :uuid";
+    return this.dbi.withHandle(
+        h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Locale.class).list());
+  }
+
+  @Override
+  public List<Locale> getLanguagesOfProjects(UUID uuid) {
+    String projectTable = this.projectRepositoryImpl.getTableName(),
+        projectAlias = this.projectRepositoryImpl.getTableAlias();
+
+    String sql =
+        "SELECT DISTINCT jsonb_object_keys("
+            + projectAlias
+            + ".label) as languages"
+            + " FROM "
+            + projectTable
+            + " AS "
+            + projectAlias
+            + " LEFT JOIN project_digitalobjects AS pd ON "
+            + projectAlias
+            + ".uuid = pd.project_uuid"
+            + " WHERE pd.digitalobject_uuid = :uuid";
+    return this.dbi.withHandle(
+        h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Locale.class).list());
   }
 
   @Override

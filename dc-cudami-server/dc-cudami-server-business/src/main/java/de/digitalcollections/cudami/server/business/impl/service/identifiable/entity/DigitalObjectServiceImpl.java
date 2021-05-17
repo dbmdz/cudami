@@ -14,6 +14,7 @@ import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +98,16 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   @Override
   public Item getItem(UUID digitalObjectUuid) {
     return ((DigitalObjectRepository) repository).getItem(digitalObjectUuid);
+  }
+
+  @Override
+  public List<Locale> getLanguagesOfCollections(UUID uuid) {
+    return ((DigitalObjectRepository) this.repository).getLanguagesOfCollections(uuid);
+  }
+
+  @Override
+  public List<Locale> getLanguagesOfProjects(UUID uuid) {
+    return ((DigitalObjectRepository) this.repository).getLanguagesOfProjects(uuid);
   }
 
   @Override

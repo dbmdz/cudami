@@ -18,7 +18,12 @@
             </ol>
           </div>
         </div>
+      </div>
+    </div>
 
+    <!-- Main content -->
+    <div class="content">
+      <div class="container-fluid">
         <div class="row">
           <div class="col-sm-12">
             <h1 th:text="|#{digital_object}|">...</h1>
@@ -31,12 +36,6 @@
           </div>
         </div>
 
-      </div>
-    </div>
-
-    <!-- Main content -->
-    <div class="content">
-      <div class="container-fluid">
         <div class="row">
           <div class="col-sm-12">
             <div class="container-fluid rows-striped">
@@ -66,95 +65,49 @@
           </div>
         </div>
 
-        <div class="row main-content">
-          <div class="col-sm-6">
-            <h2 th:text="#{collections}">Collections</h2>
-          </div>
-          <div class="col-sm-6">
-            <div class="float-right">
-            </div>
-          </div>
-        </div>
-
-        <div class="row">
+        <div class="mt-3 row">
           <div class="col-sm-12">
-
-            <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
-              <thead>
-                <tr>
-                  <th class="text-right" th:text="#{abbr_number}">Nr.</th>
-                  <th></th>
-                  <th class="center" th:text="#{label}">Label</th>
-                  <th class="center" th:text="#{last_modified}">last modified</th>
-                  <th class="center" th:text="#{actions}">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr th:each="collection, stats : ${collections}">
-                  <td class="text-right" th:text="${stats.index + 1}">1</td>
-                  <td class="center">
-              <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${collection.previewImage}, ${collection.previewImageRenderingHints}, ${#locale}, 50)"></th:block>
-              </td>
-              <td>
-                <a th:href="@{'/collections/' + ${collection.uuid}}" th:if="${collection.label}" th:text="${collection.label.text}">Collection X</a>
-              </td>
-              <td>
-                <span class="float-right" th:with="df=#{dateTime.format},dateTime=${collection.lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
-              </td>
-              <td class="center">
-                <a th:href="@{'/collections/' + ${collection.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
-              </td>
-              </tr>
-              </tbody>
-            </table>
+            <div id="collections-list"></div>
           </div>
         </div>
-
-        <div class="row main-content">
-          <div class="col-sm-6">
-            <h2 th:text="#{digitization_projects}">Digitization Projects</h2>
-          </div>
-          <div class="col-sm-6">
-            <div class="float-right">
-            </div>
-          </div>
-        </div>
-
-        <div class="row">
+        
+        <div class="mt-3 row">
           <div class="col-sm-12">
-
-            <table class="table table-bordered table-sm table-striped table-hover table-responsive-md">
-              <thead>
-                <tr>
-                  <th class="text-right" th:text="#{abbr_number}">Nr.</th>
-                  <th></th>
-                  <th class="center" th:text="#{label}">Label</th>
-                  <th class="center" th:text="#{last_modified}">last modified</th>
-                  <th class="center" th:text="#{actions}">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr th:each="project, stats : ${projects}">
-                  <td class="text-right" th:text="${stats.index + 1}">1</td>
-                  <td class="center">
-              <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${project.previewImage}, ${project.previewImageRenderingHints}, ${#locale}, 50)"></th:block>
-              </td>
-              <td>
-                <a th:href="@{'/projects/' + ${project.uuid}}" th:if="${project.label}" th:text="${project.label.text}">Project X</a>
-              </td>
-              <td>
-                <span class="float-right" th:with="df=#{dateTime.format},dateTime=${project.lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
-              </td>
-              <td class="center">
-                <a th:href="@{'/projects/' + ${project.uuid}}" th:title="#{tooltip_view}"><span class="far fa-eye actionButton"></span></a>
-              </td>
-              </tr>
-              </tbody>
-            </table>
+            <div id="projects-list"></div>
           </div>
         </div>
+
       </div>
     </div>
   </th:block>
+  <section layout:fragment="beforeBodyEnds">
+    <script>
+      addLanguageChangeHandler()
+    </script>
+    <script th:src="@{/js/identifiable-list.bundle.js}"></script>
+    <script th:inline="javascript">
+      IdentifiableList({
+        apiContextPath: /*[[@{/}]]*/ '',
+        enableSearch: false,
+        existingLanguages: /*[[${existingCollectionLanguages}]]*/ [],
+        id: "collections-list",
+        parentType: "digitalObject",
+        parentUuid: /*[[*{uuid}]]*/ '',
+        type: "collection",
+        uiLocale: /*[[${#locale.language}]]*/ ''
+      });
+
+      IdentifiableList({
+        apiContextPath: /*[[@{/}]]*/ '',
+        enableSearch: false,
+        existingLanguages: /*[[${existingProjectLanguages}]]*/ [],
+        id: "projects-list",
+        parentType: "digitalObject",
+        parentUuid: /*[[*{uuid}]]*/ '',
+        type: "project",
+        uiLocale: /*[[${#locale.language}]]*/ ''
+      });
+    </script>
+  </section>
 </body>
 </html>

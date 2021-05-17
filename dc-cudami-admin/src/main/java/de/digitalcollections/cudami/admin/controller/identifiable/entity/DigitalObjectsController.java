@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,6 +51,30 @@ public class DigitalObjectsController extends AbstractController {
   public DigitalObject findOneByIdentifier(@PathVariable String namespace, @PathVariable String id)
       throws HttpException {
     return service.findOneByIdentifier(namespace, id);
+  }
+
+  @GetMapping(
+      value = "/api/digitalobjects/{uuid}/collections",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseBody
+  public PageResponse<Collection> getAssociatedCollections(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      throws HttpException {
+    return this.service.getCollections(uuid, new PageRequest(pageNumber, pageSize));
+  }
+
+  @GetMapping(
+      value = "/api/digitalobjects/{uuid}/projects",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseBody
+  public PageResponse<Project> getAssociatedProjects(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      throws HttpException {
+    return this.service.getProjects(uuid, new PageRequest(pageNumber, pageSize));
   }
 
   @GetMapping("/digitalobjects")
@@ -96,15 +121,12 @@ public class DigitalObjectsController extends AbstractController {
     DigitalObject digitalObject = service.findOne(uuid);
     model.addAttribute("digitalObject", digitalObject);
 
-    final PageResponse<Collection> pageResponseCollections =
-        service.getCollections(uuid, new PageRequest(0, 100));
-    List<Collection> collections = pageResponseCollections.getContent();
-    model.addAttribute("collections", collections);
+    List<Locale> existingCollectionLanguages = this.service.getLanguagesOfCollections(uuid),
+        existingProjectLanguages = this.service.getLanguagesOfProjects(uuid);
 
-    final PageResponse<Project> pageResponseProjects =
-        service.getProjects(uuid, new PageRequest(0, 100));
-    List<Project> projects = pageResponseProjects.getContent();
-    model.addAttribute("projects", projects);
+    model
+        .addAttribute("existingCollectionLanguages", existingCollectionLanguages)
+        .addAttribute("existingProjectLanguages", existingProjectLanguages);
 
     return "digitalobjects/view";
   }
