@@ -11,10 +11,8 @@ import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.Sorting;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -29,12 +27,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@OpenAPIDefinition(
-    info =
-        @Info(
-            title = "Collection controller",
-            version = "2",
-            description = "The Collection controller, version 2"))
 public class V2CollectionController {
 
   private final DigitalCollectionsObjectMapper objectMapper = new DigitalCollectionsObjectMapper();

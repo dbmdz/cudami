@@ -1,5 +1,7 @@
 package de.digitalcollections.cudami.server;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
 import org.jsondoc.spring.boot.starter.EnableJSONDoc;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,6 +16,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
   activates key behaviors such as setting up a DispatcherServlet.
 - @ComponentScan tells Spring to look for other components, configurations, and services in the current package (and subpackages), allowing it to find controllers, too.
 */
+@OpenAPIDefinition(
+    info =
+    @Info(
+        title = "Cudami",
+        version = "5",
+        description = "The Cultural Digital Asset Management System"))
 public class Application {
 
   public static void main(String[] args) throws Exception {
