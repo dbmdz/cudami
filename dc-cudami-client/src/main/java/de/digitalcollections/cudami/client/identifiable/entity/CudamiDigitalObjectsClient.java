@@ -102,6 +102,16 @@ public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObject> 
         doGetRequestForObject(String.format("/latest/digitalobjects/%s/item", uuid), Item.class);
   }
 
+  public List<Locale> getLanguagesOfCollections(UUID uuid) throws HttpException {
+    return doGetRequestForObjectList(
+        String.format("/v5/digitalobjects/%s/collections/languages", uuid), Locale.class);
+  }
+
+  public List<Locale> getLanguagesOfProjects(UUID uuid) throws HttpException {
+    return doGetRequestForObjectList(
+        String.format("/v5/digitalobjects/%s/projects/languages", uuid), Locale.class);
+  }
+
   public PageResponse<Project> getProjects(UUID uuid, PageRequest pageRequest)
       throws HttpException {
     return doGetRequestForPagedObjectList(

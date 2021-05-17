@@ -9,6 +9,7 @@ import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 /** Service for Digital Object. */
@@ -46,6 +47,10 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
   }
 
   Item getItem(UUID digitalObjectUuid);
+
+  List<Locale> getLanguagesOfCollections(UUID uuid);
+
+  List<Locale> getLanguagesOfProjects(UUID uuid);
 
   default PageResponse<Project> getProjects(DigitalObject digitalObject, PageRequest pageRequest) {
     return getProjects(digitalObject.getUuid(), pageRequest);

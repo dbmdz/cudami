@@ -211,6 +211,24 @@ public class DigitalObjectController {
     return digitalObjectService.getImageFileResources(uuid);
   }
 
+  @ApiMethod(description = "Get all languages of a digital object's collections")
+  @GetMapping(
+      value = "/v5/digitalobjects/{uuid}/collections/languages",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public List<Locale> getLanguagesOfCollections(@PathVariable UUID uuid) {
+    return this.digitalObjectService.getLanguagesOfCollections(uuid);
+  }
+
+  @ApiMethod(description = "Get all languages of a digital object's projects")
+  @GetMapping(
+      value = "/v5/digitalobjects/{uuid}/projects/languages",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public List<Locale> getLanguagesOfProjects(@PathVariable UUID uuid) {
+    return this.digitalObjectService.getLanguagesOfProjects(uuid);
+  }
+
   @ApiMethod(description = "Get paged projects of a digital objects")
   @GetMapping(
       value = {"/latest/digitalobjects/{uuid}/projects", "/v3/digitalobjects/{uuid}/projects"},
