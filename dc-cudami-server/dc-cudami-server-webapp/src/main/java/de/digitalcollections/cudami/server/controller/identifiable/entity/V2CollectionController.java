@@ -145,11 +145,8 @@ public class V2CollectionController {
               name = "sortBy",
               description =
                   "the sorting specification; if unset, default to alphabetically ascending sorting of the field 'label')",
-              schema =
-                  @Schema(
-                      type = "array",
-                      subTypes = {Order.class},
-                      implementation = Order.class))
+              example = "label_de.desc.nullsfirst",
+              schema = @Schema(type = "string"))
           @RequestParam(name = "sortBy", required = false, defaultValue = "")
           List<Order> sortBy,
       @Parameter(
