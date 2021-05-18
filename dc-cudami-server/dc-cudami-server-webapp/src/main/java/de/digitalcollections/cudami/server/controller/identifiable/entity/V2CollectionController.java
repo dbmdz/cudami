@@ -1,12 +1,12 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.model.identifiable.entity.Collection;
-import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
@@ -29,14 +29,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class V2CollectionController {
 
-  private final DigitalCollectionsObjectMapper objectMapper = new DigitalCollectionsObjectMapper();
-
+  private final ObjectMapper objectMapper;
   private final CollectionService collectionService;
   private final LocaleService localeService;
 
-  public V2CollectionController(CollectionService collectionService, LocaleService localeService) {
+  public V2CollectionController(
+      CollectionService collectionService, LocaleService localeService, ObjectMapper objectMapper) {
     this.collectionService = collectionService;
     this.localeService = localeService;
+    this.objectMapper = objectMapper;
   }
 
   @Operation(
@@ -139,7 +140,7 @@ public class V2CollectionController {
                   "the sorting specification; if unset, default to alphabetically ascending sorting of the field 'label')",
               example = "label_de.desc.nullsfirst",
               schema = @Schema(type = "string"))
-          @RequestParam(name = "sortBy", required = false, defaultValue = "")
+          @RequestParam(name = "sortBy", required = false)
           List<Order> sortBy,
       @Parameter(
               name = "active",
