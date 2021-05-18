@@ -38,6 +38,8 @@
       "corporateBody_plural": "{{ count }} Institutionen gefunden",
       "digitalObject": "{{ count }} Digitalisat gefunden",
       "digitalObject_plural": "{{ count }} Digitalisate gefunden",
+      "entity": "{{ count }} Objekt gefunden",
+      "entity_plural": "{{ count }} Objekte gefunden",
       "fileResource": "{{ count }} Datei gefunden",
       "fileResource_plural": "{{ count }} Dateien gefunden",
       "geoLocation": "{{ count }} Ort gefunden",

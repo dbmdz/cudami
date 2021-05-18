@@ -39,6 +39,8 @@
       "corporateBody_plural": "found {{ count }} corporate bodies",
       "digitalObject": "found {{ count }} digital object",
       "digitalObject_plural": "found {{ count }} digital objects",
+      "entity": "found {{ count }} entity",
+      "entity_plural": "found {{ count }} entities",
       "fileResource": "found {{ count }} file",
       "fileResource_plural": "found {{ count }} files",
       "geoLocation": "found {{ count }} geolocation",
