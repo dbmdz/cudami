@@ -368,9 +368,8 @@ public class TopicController {
       value = {"/latest/topics/{uuid}/fileresources", "/v3/topics/{uuid}/fileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiResponseObject
-  public PageResponse<FileResource> saveFileresources(
+  public List<FileResource> saveFileresources(
       @PathVariable UUID uuid, @RequestBody List<FileResource> fileResources) {
-    // FIXME
     return topicService.saveFileResources(uuid, fileResources);
   }
 

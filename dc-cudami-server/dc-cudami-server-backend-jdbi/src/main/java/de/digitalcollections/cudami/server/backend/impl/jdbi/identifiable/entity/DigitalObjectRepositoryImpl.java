@@ -223,8 +223,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   @Override
   public List<Locale> getLanguagesOfCollections(UUID uuid) {
-    String collectionTable = this.collectionRepositoryImpl.getTableName(),
-        collectionAlias = this.collectionRepositoryImpl.getTableAlias();
+    String collectionTable = this.collectionRepositoryImpl.getTableName();
+    String collectionAlias = this.collectionRepositoryImpl.getTableAlias();
 
     String sql =
         "SELECT DISTINCT jsonb_object_keys("
@@ -244,8 +244,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   @Override
   public List<Locale> getLanguagesOfProjects(UUID uuid) {
-    String projectTable = this.projectRepositoryImpl.getTableName(),
-        projectAlias = this.projectRepositoryImpl.getTableAlias();
+    String projectTable = this.projectRepositoryImpl.getTableName();
+    String projectAlias = this.projectRepositoryImpl.getTableAlias();
 
     String sql =
         "SELECT DISTINCT jsonb_object_keys("

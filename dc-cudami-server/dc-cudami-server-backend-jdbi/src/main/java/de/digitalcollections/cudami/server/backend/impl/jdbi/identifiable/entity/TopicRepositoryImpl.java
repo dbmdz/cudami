@@ -15,11 +15,14 @@ import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import de.digitalcollections.model.view.BreadcrumbNode;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
@@ -326,6 +329,21 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
+  public List<FileResource> getFileResources(UUID topicUuid) {
+    PageResponse<FileResource> response;
+    PageRequest request = new PageRequest(0, 100);
+    Set<FileResource> fileResources = new HashSet<>();
+    do {
+      response = this.getFileResources(topicUuid, request);
+      if (response == null || !response.hasContent()) {
+        break;
+      }
+      fileResources.addAll(response.getContent());
+    } while ((request = response.nextPageRequest()) != null);
+    return new ArrayList<>(fileResources);
+  }
+
+  @Override
   public PageResponse<FileResource> getFileResources(UUID topicUuid, PageRequest pageRequest) {
     final String frTableAlias = fileResourceMetadataRepositoryImpl.getTableAlias();
     final String frTableName = fileResourceMetadataRepositoryImpl.getTableName();
@@ -363,8 +381,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
   @Override
   public List<Locale> getLanguagesOfEntities(UUID topicUuid) {
-    String entityTableName = this.entityRepositoryImpl.getTableName(),
-        entityTableAlias = this.entityRepositoryImpl.getTableAlias();
+    String entityTableName = this.entityRepositoryImpl.getTableName();
+    String entityTableAlias = this.entityRepositoryImpl.getTableAlias();
     String sql =
         "SELECT DISTINCT jsonb_object_keys("
             + entityTableAlias
@@ -383,8 +401,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
   @Override
   public List<Locale> getLanguagesOfFileResources(UUID topicUuid) {
-    String fileResourceTableName = this.fileResourceMetadataRepositoryImpl.getTableName(),
-        fileResourceTableAlias = this.fileResourceMetadataRepositoryImpl.getTableAlias();
+    String fileResourceTableName = this.fileResourceMetadataRepositoryImpl.getTableName();
+    String fileResourceTableAlias = this.fileResourceMetadataRepositoryImpl.getTableAlias();
     String sql =
         "SELECT DISTINCT jsonb_object_keys("
             + fileResourceTableAlias
@@ -579,8 +597,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public PageResponse<FileResource> saveFileResources(
-      UUID topicUuid, List<FileResource> fileResources) {
+  public List<FileResource> saveFileResources(UUID topicUuid, List<FileResource> fileResources) {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
         h ->
@@ -605,8 +622,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
             preparedBatch.execute();
           });
     }
-    // FIXME: when `PageRequest` is extended to request "allPages"
-    return getFileResources(topicUuid, new PageRequest(0, 100));
+    return getFileResources(topicUuid);
   }
 
   @Override

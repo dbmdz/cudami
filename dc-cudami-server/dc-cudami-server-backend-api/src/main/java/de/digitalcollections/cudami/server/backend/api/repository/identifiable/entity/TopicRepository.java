@@ -24,12 +24,14 @@ public interface TopicRepository extends NodeRepository<Topic>, EntityRepository
 
   public PageResponse<Entity> getEntities(UUID topicUuid, PageRequest pageRequest);
 
-  default PageResponse<FileResource> getFileResources(Topic topic, PageRequest pageRequest) {
+  default List<FileResource> getFileResources(Topic topic) {
     if (topic == null) {
       return null;
     }
-    return getFileResources(topic.getUuid(), pageRequest);
+    return getFileResources(topic.getUuid());
   }
+
+  List<FileResource> getFileResources(UUID topicUuid);
 
   PageResponse<FileResource> getFileResources(UUID topicUuid, PageRequest pageRequest);
 
@@ -64,13 +66,12 @@ public interface TopicRepository extends NodeRepository<Topic>, EntityRepository
 
   List<Entity> saveEntities(UUID topicUuid, List<Entity> entities);
 
-  default PageResponse<FileResource> saveFileResources(
-      Topic topic, List<FileResource> fileResources) {
+  default List<FileResource> saveFileResources(Topic topic, List<FileResource> fileResources) {
     if (topic == null) {
       return null;
     }
     return saveFileResources(topic.getUuid(), fileResources);
   }
 
-  PageResponse<FileResource> saveFileResources(UUID topicUuid, List<FileResource> fileResources);
+  List<FileResource> saveFileResources(UUID topicUuid, List<FileResource> fileResources);
 }
