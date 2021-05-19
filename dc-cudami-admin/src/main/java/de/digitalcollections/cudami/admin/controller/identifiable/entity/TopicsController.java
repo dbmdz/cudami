@@ -201,8 +201,8 @@ public class TopicsController extends AbstractController {
         topic.getChildren().stream()
             .flatMap(child -> child.getLabel().getLocales().stream())
             .collect(Collectors.toList());
-    List<Locale> existingEntityLanguages = this.service.getLanguagesOfEntities(uuid),
-        existingFileResourceLanguages = this.service.getLanguagesOfFileResources(uuid);
+    List<Locale> existingEntityLanguages = this.service.getLanguagesOfEntities(uuid);
+    List<Locale> existingFileResourceLanguages = this.service.getLanguagesOfFileResources(uuid);
 
     model
         .addAttribute("existingLanguages", existingLanguages)
