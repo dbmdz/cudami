@@ -38,6 +38,15 @@ public class ArticleController {
     this.articleService = articleService;
   }
 
+  @ApiMethod(description = "Get count of articles")
+  @GetMapping(
+      value = {"/latest/articles/count", "/v2/articles/count"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiResponseObject
+  public long count() {
+    return articleService.count();
+  }
+
   @ApiMethod(description = "Get all articles")
   @GetMapping(
       value = {"/latest/articles", "/v2/articles"},

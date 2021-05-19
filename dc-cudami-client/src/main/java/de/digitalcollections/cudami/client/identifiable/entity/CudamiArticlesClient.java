@@ -20,7 +20,7 @@ public class CudamiArticlesClient extends CudamiBaseClient<Article> {
     super(http, serverUrl, Article.class, mapper);
   }
 
-  long count() throws HttpException {
+  public long count() throws HttpException {
     return Long.parseLong(doGetRequestForString("/latest/articles/count"));
   }
 
