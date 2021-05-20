@@ -14,11 +14,10 @@ import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
-import org.jsondoc.core.annotation.Api;
-import org.jsondoc.core.annotation.ApiMethod;
-import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Api(description = "The entity controller", name = "Entity controller")
+@Tag(description = "The entity controller", name = "Entity controller")
 public class EntityController<E extends Entity> {
 
   private final EntityRelationService entityRelationService;
@@ -40,20 +39,18 @@ public class EntityController<E extends Entity> {
     this.entityService = entityService;
   }
 
-  @ApiMethod(description = "Get count of entities")
+  @Operation(summary = "Get count of entities")
   @GetMapping(
       value = {"/latest/entities/count", "/v3/entities/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public long count() {
     return entityService.count();
   }
 
-  @ApiMethod(description = "Get all entities")
+  @Operation(summary = "Get all entities")
   @GetMapping(
       value = {"/latest/entities", "/v3/entities"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public PageResponse<Entity> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
@@ -73,12 +70,11 @@ public class EntityController<E extends Entity> {
     return entityService.find(pageRequest);
   }
 
-  @ApiMethod(
-      description = "Find limited amount of entities containing searchTerm in label or description")
+  @Operation(
+      summary = "Find limited amount of entities containing searchTerm in label or description")
   @GetMapping(
       value = {"/latest/entities/search", "/v2/entities/search"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public SearchPageResponse<Entity> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
@@ -99,34 +95,31 @@ public class EntityController<E extends Entity> {
     return entityService.find(pageRequest);
   }
 
-  @ApiMethod(description = "Get entity by uuid")
+  @Operation(summary = "Get entity by uuid")
   @GetMapping(
       value = {
         "/latest/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v2/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public Entity findById(@PathVariable UUID uuid) {
     return entityService.get(uuid);
   }
 
-  @ApiMethod(description = "Get entity by namespace and id")
+  @Operation(summary = "Get entity by namespace and id")
   @GetMapping(
       value = {"/latest/entities/identifier/{namespace}:{id}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public Entity findByIdentifier(@PathVariable String namespace, @PathVariable String id)
       throws IdentifiableServiceException {
     Entity entity = entityService.getByIdentifier(namespace, id);
     return entity;
   }
 
-  @ApiMethod(description = "Get entity by reference id")
+  @Operation(summary = "Get entity by reference id")
   @GetMapping(
       value = {"/latest/entities/{refId:[0-9]+}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public Entity findByRefId(@PathVariable long refId) {
     Entity entity = entityService.getByRefId(refId);
     if (entity == null) {
@@ -142,33 +135,30 @@ public class EntityController<E extends Entity> {
     return entity;
   }
 
-  @ApiMethod(description = "Find limited amount of random entites")
+  @Operation(summary = "Find limited amount of random entites")
   @GetMapping(
       value = {"/latest/entities/random", "/v2/entities/random"},
       produces = "application/json")
-  @ApiResponseObject
   public List<Entity> findRandomEntities(
       @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
     return entityService.getRandom(count);
   }
 
-  @ApiMethod(description = "Get related file resources of entity")
+  @Operation(summary = "Get related file resources of entity")
   @GetMapping(
       value = {
         "/latest/entities/{uuid}/related/fileresources",
         "/v2/entities/{uuid}/related/fileresources"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
     return entityService.getRelatedFileResources(uuid);
   }
 
-  @ApiMethod(description = "Get relations for an entity (being the subject)")
+  @Operation(summary = "Get relations for an entity (being the subject)")
   @GetMapping(
       value = {"/latest/entities/relations/{uuid}", "/v2/entities/relations/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   List<EntityRelation> getRelations(@PathVariable UUID uuid) {
     return entityRelationService.getBySubject(uuid);
   }

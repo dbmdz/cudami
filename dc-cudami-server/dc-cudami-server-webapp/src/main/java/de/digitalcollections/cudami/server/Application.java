@@ -2,11 +2,9 @@ package de.digitalcollections.cudami.server;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
-import org.jsondoc.spring.boot.starter.EnableJSONDoc;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@EnableJSONDoc
 @SpringBootApplication
 /*
 @SpringBootApplication is a convenience annotation that adds all of the following:

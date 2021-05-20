@@ -9,15 +9,13 @@ import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.Sorting;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
-import org.jsondoc.core.annotation.Api;
-import org.jsondoc.core.annotation.ApiMethod;
-import org.jsondoc.core.annotation.ApiPathParam;
-import org.jsondoc.core.annotation.ApiQueryParam;
-import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Api(description = "The project controller", name = "Project controller")
+@Tag(description = "The project controller", name = "Project controller")
 public class ProjectController {
 
   private final ProjectService projectService;
@@ -41,17 +39,18 @@ public class ProjectController {
     this.projectService = projectService;
   }
 
-  @ApiMethod(description = "Add an existing digital object to an existing project")
+  @Operation(summary = "Add an existing digital object to an existing project")
   @PostMapping(
       value = {
         "/latest/projects/{uuid}/digitalobjects/{digitalObjectUuid}",
         "/v3/projects/{uuid}/digitalobjects/{digitalObjectUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public ResponseEntity addDigitalObject(
-      @ApiPathParam(description = "UUID of the project") @PathVariable("uuid") UUID projectUuid,
-      @ApiPathParam(description = "UUID of the digital object") @PathVariable("digitalObjectUuid")
+      @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
+          UUID projectUuid,
+      @Parameter(example = "", description = "UUID of the digital object")
+          @PathVariable("digitalObjectUuid")
           UUID digitalObjectUuid) {
     Project project = new Project();
     project.setUuid(projectUuid);
@@ -67,14 +66,14 @@ public class ProjectController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @ApiMethod(description = "Add existing digital objects to an existing project")
+  @Operation(summary = "Add existing digital objects to an existing project")
   @PostMapping(
       value = {"/latest/projects/{uuid}/digitalobjects", "/v3/projects/{uuid}/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public ResponseEntity addDigitalObjects(
-      @ApiPathParam(description = "UUID of the project") @PathVariable("uuid") UUID projectUuid,
-      @ApiPathParam(description = "List of the digital objects") @RequestBody
+      @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
+          UUID projectUuid,
+      @Parameter(example = "", description = "List of the digital objects") @RequestBody
           List<DigitalObject> digitalObjects) {
     Project project = new Project();
     project.setUuid(projectUuid);
@@ -87,25 +86,24 @@ public class ProjectController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @ApiMethod(
-      description = "Delete an existing project and the identifiers, which belong to this project")
+  @Operation(
+      summary = "Delete an existing project and the identifiers, which belong to this project")
   @DeleteMapping(
       value = {"/latest/projects/{uuid}", "/v3/projects/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public ResponseEntity deleteProject(
-      @ApiPathParam(description = "UUID of the project") @PathVariable("uuid") UUID uuid) {
+      @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
+          UUID uuid) {
 
     projectService.delete(uuid);
 
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @ApiMethod(description = "Get all projects in reduced form (no identifiers)")
+  @Operation(summary = "Get all projects in reduced form (no identifiers)")
   @GetMapping(
       value = {"/latest/projects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public PageResponse<Project> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
@@ -119,44 +117,42 @@ public class ProjectController {
     return projectService.find(searchPageRequest);
   }
 
-  @ApiMethod(description = "Get all projects as list")
+  @Operation(summary = "Get all projects as list")
   @GetMapping(
       value = {"/latest/projectlist", "/v2/projectlist"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public List<Project> findAllReducedAsList() {
     // TODO test if reduced is sufficient for use cases...
     return projectService.findAllReduced();
   }
 
-  @ApiMethod(description = "Get project by namespace and id")
+  @Operation(summary = "Get project by namespace and id")
   @GetMapping(
       value = {
         "/latest/projects/identifier/{namespace}:{id}",
         "/v3/projects/identifier/{namespace}:{id}"
       },
       produces = "application/json")
-  @ApiResponseObject
   public Project findByIdentifier(@PathVariable String namespace, @PathVariable String id)
       throws IdentifiableServiceException {
     return projectService.getByIdentifier(namespace, id);
   }
 
   // Test-URL: http://localhost:9000/latest/projects/599a120c-2dd5-11e8-b467-0ed5f89f718b
-  @ApiMethod(
-      description =
+  @Operation(
+      summary =
           "Get an project as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {"/latest/projects/{uuid}", "/v2/projects/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-  @ApiResponseObject
   public ResponseEntity<Project> findByUuid(
-      @ApiPathParam(
+      @Parameter(
+              example = "",
               description =
                   "UUID of the project, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid,
-      @ApiQueryParam(
+      @Parameter(
               name = "pLocale",
               description =
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
@@ -173,13 +169,13 @@ public class ProjectController {
     return new ResponseEntity<>(project, HttpStatus.OK);
   }
 
-  @ApiMethod(description = "Get paged digital objects of a project")
+  @Operation(summary = "Get paged digital objects of a project")
   @GetMapping(
       value = {"/latest/projects/{uuid}/digitalobjects"},
       produces = "application/json")
-  @ApiResponseObject
   public PageResponse<DigitalObject> getDigitalObjects(
-      @ApiPathParam(description = "UUID of the project") @PathVariable("uuid") UUID projectUuid,
+      @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
+          UUID projectUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize, new Sorting());
@@ -189,17 +185,18 @@ public class ProjectController {
     return projectService.getDigitalObjects(project, pageRequest);
   }
 
-  @ApiMethod(description = "Remove an existing digital object from an existing project")
+  @Operation(summary = "Remove an existing digital object from an existing project")
   @DeleteMapping(
       value = {
         "/latest/projects/{uuid}/digitalobjects/{digitalObjectUuid}",
         "/v3/projects/{uuid}/digitalobjects/{digitalObjectUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public ResponseEntity removeDigitalObject(
-      @ApiPathParam(description = "UUID of the project") @PathVariable("uuid") UUID projectUuid,
-      @ApiPathParam(description = "UUID of the digital object") @PathVariable("digitalObjectUuid")
+      @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
+          UUID projectUuid,
+      @Parameter(example = "", description = "UUID of the digital object")
+          @PathVariable("digitalObjectUuid")
           UUID digitalObjectUuid) {
     Project project = new Project();
     project.setUuid(projectUuid);
@@ -215,24 +212,23 @@ public class ProjectController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @ApiMethod(description = "Save a newly created project")
+  @Operation(summary = "Save a newly created project")
   @PostMapping(
       value = {"/latest/projects", "/v2/projects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public Project save(@RequestBody Project project, BindingResult errors)
       throws IdentifiableServiceException {
     return projectService.save(project);
   }
 
-  @ApiMethod(description = "Save existing digital objects into an existing project")
+  @Operation(summary = "Save existing digital objects into an existing project")
   @PutMapping(
       value = {"/latest/projects/{uuid}/digitalobjects", "/v3/projects/{uuid}/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public ResponseEntity saveDigitalObjects(
-      @ApiPathParam(description = "UUID of the project") @PathVariable("uuid") UUID projectUuid,
-      @ApiPathParam(description = "List of the digital objects") @RequestBody
+      @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
+          UUID projectUuid,
+      @Parameter(example = "", description = "List of the digital objects") @RequestBody
           List<DigitalObject> digitalObjects) {
     Project project = new Project();
     project.setUuid(projectUuid);
@@ -245,22 +241,20 @@ public class ProjectController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @ApiMethod(description = "Update an project")
+  @Operation(summary = "Update an project")
   @PutMapping(
       value = {"/latest/projects/{uuid}", "/v2/projects/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public Project update(@PathVariable UUID uuid, @RequestBody Project project, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, project.getUuid());
     return projectService.update(project);
   }
 
-  @ApiMethod(description = "Get languages of all projects")
+  @Operation(summary = "Get languages of all projects")
   @GetMapping(
       value = {"/latest/projects/languages", "/v3/projects/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public List<Locale> getLanguages() {
     return projectService.getLanguages();
   }

@@ -7,15 +7,13 @@ import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.Sorting;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
-import org.jsondoc.core.annotation.Api;
-import org.jsondoc.core.annotation.ApiMethod;
-import org.jsondoc.core.annotation.ApiPathParam;
-import org.jsondoc.core.annotation.ApiQueryParam;
-import org.jsondoc.core.annotation.ApiResponseObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
@@ -32,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Api(description = "The GivenName controller", name = "GivenName controller")
+@Tag(description = "The GivenName controller", name = "GivenName controller")
 public class GivenNameController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GivenNameController.class);
@@ -43,11 +41,10 @@ public class GivenNameController {
     this.givenNameService = givenNameService;
   }
 
-  @ApiMethod(description = "get all given names")
+  @Operation(summary = "get all given names")
   @GetMapping(
       value = {"/latest/givennames", "/v2/givennames"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public PageResponse<GivenName> findAll(
       Pageable pageable,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -66,20 +63,20 @@ public class GivenNameController {
     return givenNameService.findByLanguageAndInitial(pageRequest, language, initial);
   }
 
-  @ApiMethod(
-      description =
+  @Operation(
+      summary =
           "get a givenname as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {"/latest/givennames/{uuid}", "/v2/givennames/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-  @ApiResponseObject
   public ResponseEntity<GivenName> get(
-      @ApiPathParam(
+      @Parameter(
+              example = "",
               description =
                   "UUID of the givenname, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid,
-      @ApiQueryParam(
+      @Parameter(
               name = "pLocale",
               description =
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
@@ -96,13 +93,12 @@ public class GivenNameController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @ApiMethod(
-      description =
+  @Operation(
+      summary =
           "get a givenname as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {"/latest/givennames/identifier", "/v2/givennames/identifier"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-  @ApiResponseObject
   public ResponseEntity<GivenName> getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)
@@ -111,21 +107,19 @@ public class GivenNameController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @ApiMethod(description = "save a newly created givenname")
+  @Operation(summary = "save a newly created givenname")
   @PostMapping(
       value = {"/latest/givennames", "/v2/givennames"},
       produces = "application/json")
-  @ApiResponseObject
   public GivenName save(@RequestBody GivenName givenName, BindingResult errors)
       throws IdentifiableServiceException {
     return givenNameService.save(givenName);
   }
 
-  @ApiMethod(description = "update a givenname")
+  @Operation(summary = "update a givenname")
   @PutMapping(
       value = {"/latest/givennames/{uuid}", "/v2/givennames/{uuid}"},
       produces = "application/json")
-  @ApiResponseObject
   public GivenName update(
       @PathVariable("uuid") UUID uuid, @RequestBody GivenName givenName, BindingResult errors)
       throws IdentifiableServiceException {

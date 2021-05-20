@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -143,7 +142,6 @@ public class V3WebpageController {
   @GetMapping(
       value = {"/v3/webpages/{uuid}"},
       produces = {MediaType.APPLICATION_XML_VALUE})
-  @ApiResponseObject
   public ResponseEntity<String> getWebpageXml(
       @Parameter(
               name = "uuid",

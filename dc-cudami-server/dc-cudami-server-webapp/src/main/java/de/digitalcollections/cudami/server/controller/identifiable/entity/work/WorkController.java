@@ -9,14 +9,12 @@ import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.Sorting;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import org.jsondoc.core.annotation.Api;
-import org.jsondoc.core.annotation.ApiMethod;
-import org.jsondoc.core.annotation.ApiPathParam;
-import org.jsondoc.core.annotation.ApiQueryParam;
-import org.jsondoc.core.annotation.ApiResponseObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -32,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Api(description = "The Work controller", name = "Work controller")
+@Tag(description = "The Work controller", name = "Work controller")
 public class WorkController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WorkController.class);
@@ -43,20 +41,18 @@ public class WorkController {
     this.workService = workService;
   }
 
-  @ApiMethod(description = "count all works")
+  @Operation(summary = "count all works")
   @GetMapping(
       value = {"/latest/works/count", "/v2/works/count"},
       produces = "application/json")
-  @ApiResponseObject
   public long count() {
     return workService.count();
   }
 
-  @ApiMethod(description = "get all works")
+  @Operation(summary = "get all works")
   @GetMapping(
       value = {"/latest/works", "/v2/works"},
       produces = "application/json")
-  @ApiResponseObject
   public PageResponse<Work> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
@@ -74,8 +70,8 @@ public class WorkController {
     return workService.findByLanguageAndInitial(pageRequest, language, initial);
   }
 
-  @ApiMethod(
-      description =
+  @Operation(
+      summary =
           "get a work as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {
@@ -83,13 +79,13 @@ public class WorkController {
         "/v2/works/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-  @ApiResponseObject
   public ResponseEntity<Work> get(
-      @ApiPathParam(
+      @Parameter(
+              example = "",
               description = "UUID of the work, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid,
-      @ApiQueryParam(
+      @Parameter(
               name = "pLocale",
               description =
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
@@ -106,13 +102,12 @@ public class WorkController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @ApiMethod(
-      description =
+  @Operation(
+      summary =
           "get a work as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {"/latest/works/identifier", "/v2/works/identifier"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-  @ApiResponseObject
   public ResponseEntity<Work> getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)
@@ -121,21 +116,19 @@ public class WorkController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @ApiMethod(description = "save a newly created work")
+  @Operation(summary = "save a newly created work")
   @PostMapping(
       value = {"/latest/works", "/v2/works"},
       produces = "application/json")
-  @ApiResponseObject
   public Work save(@RequestBody Work work, BindingResult errors)
       throws IdentifiableServiceException {
     return workService.save(work);
   }
 
-  @ApiMethod(description = "update a work")
+  @Operation(summary = "update a work")
   @PutMapping(
       value = {"/latest/works/{uuid}", "/v2/works/{uuid}"},
       produces = "application/json")
-  @ApiResponseObject
   public Work update(@PathVariable("uuid") UUID uuid, @RequestBody Work work, BindingResult errors)
       throws IdentifiableServiceException {
     if (uuid == null || work == null || !uuid.equals(work.getUuid())) {
@@ -145,20 +138,18 @@ public class WorkController {
     return workService.update(work);
   }
 
-  @ApiMethod(description = "Get creators of a work")
+  @Operation(summary = "Get creators of a work")
   @GetMapping(
       value = {"/latest/works/{uuid}/creators", "/v2/works/{uuid}/creators"},
       produces = "application/json")
-  @ApiResponseObject
   public List<Agent> getCreators(@PathVariable UUID uuid) {
     return workService.getCreators(uuid);
   }
 
-  @ApiMethod(description = "Get items of a work")
+  @Operation(summary = "Get items of a work")
   @GetMapping(
       value = {"/latest/works/{uuid}/items", "/v2/works/{uuid}/items"},
       produces = "application/json")
-  @ApiResponseObject
   public List<Item> getItems(@PathVariable UUID uuid) {
     return workService.getItems(uuid);
   }

@@ -14,16 +14,14 @@ import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.Sorting;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
-import org.jsondoc.core.annotation.Api;
-import org.jsondoc.core.annotation.ApiMethod;
-import org.jsondoc.core.annotation.ApiPathParam;
-import org.jsondoc.core.annotation.ApiQueryParam;
-import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +36,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Api(description = "The webpage controller", name = "Webpage controller")
+@Tag(description = "The webpage controller", name = "Webpage controller")
 public class WebpageController {
 
   private final LocaleService localeService;
@@ -49,23 +47,21 @@ public class WebpageController {
     this.webpageService = webpageService;
   }
 
-  @ApiMethod(description = "Add file resource related to webpage")
+  @Operation(summary = "Add file resource related to webpage")
   @PostMapping(
       value = {
         "/latest/webpages/{uuid}/related/fileresources/{fileResourceUuid}",
         "/v2/webpages/{uuid}/related/fileresources/{fileResourceUuid}"
       })
   @ResponseStatus(value = HttpStatus.OK)
-  @ApiResponseObject
   public void addRelatedFileResource(@PathVariable UUID uuid, @PathVariable UUID fileResourceUuid) {
     webpageService.addRelatedFileresource(uuid, fileResourceUuid);
   }
 
-  @ApiMethod(description = "Get all webpages")
+  @Operation(summary = "Get all webpages")
   @GetMapping(
       value = {"/latest/webpages", "/v2/webpages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public PageResponse<Webpage> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
@@ -88,18 +84,18 @@ public class WebpageController {
     return webpageService.find(pageRequest);
   }
 
-  @ApiMethod(description = "Get the breadcrumb for a webpage")
+  @Operation(summary = "Get the breadcrumb for a webpage")
   @GetMapping(
       value = {"/latest/webpages/{uuid}/breadcrumb", "/v3/webpages/{uuid}/breadcrumb"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public ResponseEntity<BreadcrumbNavigation> getBreadcrumb(
-      @ApiPathParam(
+      @Parameter(
+              example = "",
               description =
                   "UUID of the webpage, e.g. <tt>6119d8e9-9c92-4091-8dcb-bc4053385406</tt>")
           @PathVariable("uuid")
           UUID uuid,
-      @ApiQueryParam(
+      @Parameter(
               name = "pLocale",
               description =
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
@@ -122,41 +118,38 @@ public class WebpageController {
     return new ResponseEntity<>(breadcrumbNavigation, HttpStatus.OK);
   }
 
-  @ApiMethod(description = "Get file resources related to webpage")
+  @Operation(summary = "Get file resources related to webpage")
   @GetMapping(
       value = {
         "/latest/webpages/{uuid}/related/fileresources",
         "/v2/webpages/{uuid}/related/fileresources"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
     return webpageService.getRelatedFileResources(uuid);
   }
 
   // Test-URL: http://localhost:9000/latest/webpages/599a120c-2dd5-11e8-b467-0ed5f89f718b
-  @ApiMethod(
-      description =
+  @Operation(
+      summary =
           "Get a webpage as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {"/latest/webpages/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-  @ApiResponseObject
   public ResponseEntity<Webpage> getWebpage(
-      @ApiPathParam(
+      @Parameter(
+              example = "",
               description =
                   "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid,
-      @ApiQueryParam(
+      @Parameter(
               name = "pLocale",
               description =
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale,
-      @ApiQueryParam(
-              name = "active",
-              description = "If set, object will only be returned if active")
+      @Parameter(name = "active", description = "If set, object will only be returned if active")
           @RequestParam(name = "active", required = false)
           String active)
       throws IdentifiableServiceException {
@@ -177,13 +170,13 @@ public class WebpageController {
     return new ResponseEntity<>(webpage, HttpStatus.OK);
   }
 
-  @ApiMethod(description = "Get (active or all) paged children of a webpage as JSON")
+  @Operation(summary = "Get (active or all) paged children of a webpage as JSON")
   @GetMapping(
       value = {"/latest/webpages/{uuid}/children"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public PageResponse<Webpage> getSubpages(
-      @ApiPathParam(
+      @Parameter(
+              example = "",
               description =
                   "UUID of the parent webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
@@ -205,18 +198,18 @@ public class WebpageController {
     return webpageService.findChildren(uuid, searchPageRequest);
   }
 
-  @ApiMethod(description = "Get (active or all) children of a webpage recursivly as JSON")
+  @Operation(summary = "Get (active or all) children of a webpage recursivly as JSON")
   @GetMapping(
       value = {"/latest/webpages/{uuid}/childrentree"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public List<Webpage> getWebpageChildrenTree(
-      @ApiPathParam(
+      @Parameter(
+              example = "",
               description =
                   "UUID of the root webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid,
-      @ApiQueryParam(name = "active", description = "If set, only active children will be returned")
+      @Parameter(name = "active", description = "If set, only active children will be returned")
           @RequestParam(name = "active", required = false)
           String active) {
 
@@ -225,13 +218,13 @@ public class WebpageController {
         : webpageService.getChildrenTree(uuid);
   }
 
-  @ApiMethod(description = "Get parent of a webpage as JSON")
+  @Operation(summary = "Get parent of a webpage as JSON")
   @GetMapping(
       value = {"/latest/webpages/{uuid}/parent", "/v3/webpages/{uuid}/parent"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public Webpage getWebpageParent(
-      @ApiPathParam(
+      @Parameter(
+              example = "",
               description =
                   "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
@@ -240,13 +233,13 @@ public class WebpageController {
     return webpageService.getParent(uuid);
   }
 
-  @ApiMethod(description = "Get website of a webpage as JSON")
+  @Operation(summary = "Get website of a webpage as JSON")
   @GetMapping(
       value = {"/latest/webpages/{uuid}/website", "/v3/webpages/{uuid}/website"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public Website getWebsite(
-      @ApiPathParam(
+      @Parameter(
+              example = "",
               description =
                   "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
@@ -255,53 +248,50 @@ public class WebpageController {
     return webpageService.getWebsite(uuid);
   }
 
-  @ApiMethod(description = "Save a newly created webpage")
+  @Operation(summary = "Save a newly created webpage")
   @PostMapping(
       value = {
         "/latest/webpages/{parentWebpageUuid}/webpage",
         "/v2/webpages/{parentWebpageUuid}/webpage"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public Webpage saveWithParentWebpage(
       @PathVariable UUID parentWebpageUuid, @RequestBody Webpage webpage, BindingResult errors)
       throws IdentifiableServiceException {
     return webpageService.saveWithParent(webpage, parentWebpageUuid);
   }
 
-  @ApiMethod(description = "Save a newly created top-level webpage")
+  @Operation(summary = "Save a newly created top-level webpage")
   @PostMapping(
       value = {
         "/latest/websites/{parentWebsiteUuid}/webpage",
         "/v2/websites/{parentWebsiteUuid}/webpage"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public Webpage saveWithParentWebsite(
       @PathVariable UUID parentWebsiteUuid, @RequestBody Webpage webpage, BindingResult errors)
       throws IdentifiableServiceException {
     return webpageService.saveWithParentWebsite(webpage, parentWebsiteUuid);
   }
 
-  @ApiMethod(description = "Update a webpage")
+  @Operation(summary = "Update a webpage")
   @PutMapping(
       value = {"/latest/webpages/{uuid}", "/v2/webpages/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public Webpage update(@PathVariable UUID uuid, @RequestBody Webpage webpage, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, webpage.getUuid());
     return webpageService.update(webpage);
   }
 
-  @ApiMethod(description = "Update the order of a webpage's children")
+  @Operation(summary = "Update the order of a webpage's children")
   @PutMapping(
       value = {"/latest/webpages/{uuid}/children", "/v3/webpages/{uuid}/children"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public ResponseEntity updateChildrenOrder(
-      @ApiPathParam(description = "UUID of the webpage") @PathVariable("uuid") UUID uuid,
-      @ApiPathParam(description = "List of the children") @RequestBody List<Webpage> rootPages) {
+      @Parameter(example = "", description = "UUID of the webpage") @PathVariable("uuid") UUID uuid,
+      @Parameter(example = "", description = "List of the children") @RequestBody
+          List<Webpage> rootPages) {
     boolean successful = webpageService.updateChildrenOrder(uuid, rootPages);
 
     if (successful) {

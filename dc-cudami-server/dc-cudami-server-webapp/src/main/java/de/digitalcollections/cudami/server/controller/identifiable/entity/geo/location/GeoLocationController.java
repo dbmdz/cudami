@@ -7,15 +7,13 @@ import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.Sorting;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
-import org.jsondoc.core.annotation.Api;
-import org.jsondoc.core.annotation.ApiMethod;
-import org.jsondoc.core.annotation.ApiPathParam;
-import org.jsondoc.core.annotation.ApiQueryParam;
-import org.jsondoc.core.annotation.ApiResponseObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
@@ -32,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Api(description = "The geo location controller", name = "Geo location controller")
+@Tag(description = "The geo location controller", name = "Geo location controller")
 public class GeoLocationController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationController.class);
@@ -43,20 +41,18 @@ public class GeoLocationController {
     this.geoLocationService = geoLocationservice;
   }
 
-  @ApiMethod(description = "count all geolocations")
+  @Operation(summary = "count all geolocations")
   @GetMapping(
       value = {"/latest/geolocations/count", "/v2/geolocations/count"},
       produces = "application/json")
-  @ApiResponseObject
   public long count() {
     return geoLocationService.count();
   }
 
-  @ApiMethod(description = "get all geo locations")
+  @Operation(summary = "get all geo locations")
   @GetMapping(
       value = {"/latest/geolocations", "/v2/geolocations"},
       produces = "application/json")
-  @ApiResponseObject
   public PageResponse<GeoLocation> findAll(
       Pageable pageable,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -76,20 +72,20 @@ public class GeoLocationController {
     return geoLocationService.findByLanguageAndInitial(searchPageRequest, language, initial);
   }
 
-  @ApiMethod(
-      description =
+  @Operation(
+      summary =
           "get a geolocation as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {"/latest/geolocations/{uuid}", "/v2/geolocations/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-  @ApiResponseObject
   public ResponseEntity<GeoLocation> get(
-      @ApiPathParam(
+      @Parameter(
+              example = "",
               description =
                   "UUID of the geolocation, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid,
-      @ApiQueryParam(
+      @Parameter(
               name = "pLocale",
               description =
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
@@ -106,13 +102,12 @@ public class GeoLocationController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @ApiMethod(
-      description =
+  @Operation(
+      summary =
           "get a geolocation as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {"/latest/geolocations/identifier", "/v2/geolocations/identifier"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-  @ApiResponseObject
   public ResponseEntity<GeoLocation> getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)
@@ -121,30 +116,27 @@ public class GeoLocationController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @ApiMethod(description = "Get languages of all geolocations")
+  @Operation(summary = "Get languages of all geolocations")
   @GetMapping(
       value = {"/latest/geolocations/languages", "/v3/geolocations/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public List<Locale> getLanguages() {
     return geoLocationService.getLanguages();
   }
 
-  @ApiMethod(description = "save a newly created geolocation")
+  @Operation(summary = "save a newly created geolocation")
   @PostMapping(
       value = {"/latest/geolocations", "/v2/geolocations"},
       produces = "application/json")
-  @ApiResponseObject
   public GeoLocation save(@RequestBody GeoLocation geoLocation, BindingResult errors)
       throws IdentifiableServiceException {
     return geoLocationService.save(geoLocation);
   }
 
-  @ApiMethod(description = "update a geolocation")
+  @Operation(summary = "update a geolocation")
   @PutMapping(
       value = {"/latest/geolocations/{uuid}", "/v2/geolocations/{uuid}"},
       produces = "application/json")
-  @ApiResponseObject
   public GeoLocation update(
       @PathVariable("uuid") UUID uuid, @RequestBody GeoLocation geoLocation, BindingResult errors)
       throws IdentifiableServiceException {

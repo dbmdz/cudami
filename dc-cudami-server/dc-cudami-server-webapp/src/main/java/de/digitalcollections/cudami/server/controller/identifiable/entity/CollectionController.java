@@ -15,15 +15,13 @@ import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
-import org.jsondoc.core.annotation.Api;
-import org.jsondoc.core.annotation.ApiMethod;
-import org.jsondoc.core.annotation.ApiPathParam;
-import org.jsondoc.core.annotation.ApiQueryParam;
-import org.jsondoc.core.annotation.ApiResponseObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -40,7 +38,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Api(description = "The collection controller", name = "Collection controller")
+@Tag(description = "The collection controller", name = "Collection controller")
 public class CollectionController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionController.class);
@@ -53,18 +51,18 @@ public class CollectionController {
     this.localeService = localeService;
   }
 
-  @ApiMethod(description = "Add an existing digital object to an existing collection")
+  @Operation(summary = "Add an existing digital object to an existing collection")
   @PostMapping(
       value = {
         "/latest/collections/{uuid}/digitalobjects/{digitalObjectUuid}",
         "/v3/collections/{uuid}/digitalobjects/{digitalObjectUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public ResponseEntity addDigitalObject(
-      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
+      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid,
-      @ApiPathParam(description = "UUID of the digital object") @PathVariable("digitalObjectUuid")
+      @Parameter(example = "", description = "UUID of the digital object")
+          @PathVariable("digitalObjectUuid")
           UUID digitalObjectUuid) {
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);
@@ -80,18 +78,17 @@ public class CollectionController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @ApiMethod(description = "Add existing digital objects to an existing collection")
+  @Operation(summary = "Add existing digital objects to an existing collection")
   @PostMapping(
       value = {
         "/latest/collections/{uuid}/digitalobjects",
         "/v3/collections/{uuid}/digitalobjects"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public ResponseEntity addDigitalObjects(
-      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
+      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid,
-      @ApiPathParam(description = "List of the digital objects") @RequestBody
+      @Parameter(example = "", description = "List of the digital objects") @RequestBody
           List<DigitalObject> digitalObjects) {
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);
@@ -104,17 +101,18 @@ public class CollectionController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @ApiMethod(description = "Add an existing collection to an existing collection")
+  @Operation(summary = "Add an existing collection to an existing collection")
   @PostMapping(
       value = {
         "/latest/collections/{uuid}/subcollections/{subcollectionUuid}",
         "/v3/collections/{uuid}/subcollections/{subcollectionUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public ResponseEntity addSubcollection(
-      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid") UUID uuid,
-      @ApiPathParam(description = "UUID of the subcollection") @PathVariable("subcollectionUuid")
+      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
+          UUID uuid,
+      @Parameter(example = "", description = "UUID of the subcollection")
+          @PathVariable("subcollectionUuid")
           UUID subcollectionUuid) {
     Collection collection = new Collection();
     collection.setUuid(uuid);
@@ -130,17 +128,17 @@ public class CollectionController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @ApiMethod(description = "Add existing collections to an existing collection")
+  @Operation(summary = "Add existing collections to an existing collection")
   @PostMapping(
       value = {
         "/latest/collections/{uuid}/subcollections",
         "/v3/collections/{uuid}/subcollections"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public ResponseEntity addSubcollections(
-      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid") UUID uuid,
-      @ApiPathParam(description = "List of the subcollections") @RequestBody
+      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
+          UUID uuid,
+      @Parameter(example = "", description = "List of the subcollections") @RequestBody
           List<Collection> subcollections) {
     Collection collection = new Collection();
     collection.setUuid(uuid);
@@ -153,20 +151,18 @@ public class CollectionController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @ApiMethod(description = "Get count of collections")
+  @Operation(summary = "Get count of collections")
   @GetMapping(
       value = {"/latest/collections/count", "/v2/collections/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public long count() {
     return collectionService.count();
   }
 
-  @ApiMethod(description = "Get all collections")
+  @Operation(summary = "Get all collections")
   @GetMapping(
       value = {"/latest/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public PageResponse<Collection> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
@@ -183,11 +179,10 @@ public class CollectionController {
     return collectionService.find(pageRequest);
   }
 
-  @ApiMethod(description = "Get all top collections")
+  @Operation(summary = "Get all top collections")
   @GetMapping(
       value = {"/latest/collections/top", "/v2/collections/top"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public PageResponse<Collection> findAllTop(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
@@ -201,24 +196,23 @@ public class CollectionController {
     return collectionService.findRootNodes(searchPageRequest);
   }
 
-  @ApiMethod(description = "Get collection by namespace and id")
+  @Operation(summary = "Get collection by namespace and id")
   @GetMapping(
       value = {
         "/latest/collections/identifier/{namespace}:{id}",
         "/v2/collections/identifier/{namespace}:{id}"
       },
       produces = "application/json")
-  @ApiResponseObject
   public Collection findByIdentifier(@PathVariable String namespace, @PathVariable String id)
       throws IdentifiableServiceException {
     return collectionService.getByIdentifier(namespace, id);
   }
 
-  @ApiMethod(description = "Get collection by refId")
+  @Operation(summary = "Get collection by refId")
   @GetMapping(value = {"/latest/collections/{refId:[0-9]+}"})
-  @ApiResponseObject
   public ResponseEntity<Collection> findByRefId(
-      @ApiPathParam(description = "refId of the collection, e.g. <tt>42</tt>") @PathVariable
+      @Parameter(example = "", description = "refId of the collection, e.g. <tt>42</tt>")
+          @PathVariable
           long refId)
       throws IdentifiableServiceException {
     Collection collection = collectionService.getByRefId(refId);
@@ -226,8 +220,8 @@ public class CollectionController {
   }
 
   // Test-URL: http://localhost:9000/latest/collections/599a120c-2dd5-11e8-b467-0ed5f89f718b
-  @ApiMethod(
-      description =
+  @Operation(
+      summary =
           "Get an collection as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {
@@ -235,22 +229,20 @@ public class CollectionController {
         "/v2/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-  @ApiResponseObject
   public ResponseEntity<Collection> findByUuid(
-      @ApiPathParam(
+      @Parameter(
+              example = "",
               description =
                   "UUID of the collection, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid,
-      @ApiQueryParam(
+      @Parameter(
               name = "pLocale",
               description =
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale,
-      @ApiQueryParam(
-              name = "active",
-              description = "If set, object will only be returned if active")
+      @Parameter(name = "active", description = "If set, object will only be returned if active")
           @RequestParam(name = "active", required = false)
           String active)
       throws IdentifiableServiceException {
@@ -271,13 +263,12 @@ public class CollectionController {
     return new ResponseEntity<>(collection, HttpStatus.OK);
   }
 
-  @ApiMethod(
-      description =
+  @Operation(
+      summary =
           "Find limited amount of (active or all) collections containing searchTerm in label or description")
   @GetMapping(
       value = {"/latest/collections/search", "/v3/collections/search"},
       produces = "application/json")
-  @ApiResponseObject
   public SearchPageResponse<Collection> findCollections(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
@@ -295,18 +286,18 @@ public class CollectionController {
     return collectionService.find(pageRequest);
   }
 
-  @ApiMethod(description = "Get the breadcrumb for a collection")
+  @Operation(summary = "Get the breadcrumb for a collection")
   @GetMapping(
       value = {"/latest/collections/{uuid}/breadcrumb", "/v3/collections/{uuid}/breadcrumb"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public ResponseEntity<BreadcrumbNavigation> getBreadcrumb(
-      @ApiPathParam(
+      @Parameter(
+              example = "",
               description =
                   "UUID of the collection, e.g. <tt>6119d8e9-9c92-4091-8dcb-bc4053385406</tt>")
           @PathVariable("uuid")
           UUID uuid,
-      @ApiQueryParam(
+      @Parameter(
               name = "pLocale",
               description =
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
@@ -330,15 +321,14 @@ public class CollectionController {
     return new ResponseEntity<>(breadcrumbNavigation, HttpStatus.OK);
   }
 
-  @ApiMethod(description = "Get paged digital objects of a collection")
+  @Operation(summary = "Get paged digital objects of a collection")
   @GetMapping(
       value = {
         "/latest/collections/{uuid}/digitalobjects",
       },
       produces = "application/json")
-  @ApiResponseObject
   public SearchPageResponse<DigitalObject> getDigitalObjects(
-      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
+      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
@@ -351,49 +341,46 @@ public class CollectionController {
     return collectionService.getDigitalObjects(collection, searchPageRequest);
   }
 
-  @ApiMethod(description = "Get the first created parent of a collection")
+  @Operation(summary = "Get the first created parent of a collection")
   @GetMapping(
       value = {"/latest/collections/{uuid}/parent", "/v3/collections/{uuid}/parent"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public Collection getParent(@PathVariable UUID uuid) {
     return collectionService.getParent(uuid);
   }
 
-  @ApiMethod(description = "Get parent collections")
+  @Operation(summary = "Get parent collections")
   @GetMapping(
       value = {"/latest/collections/{uuid}/parents", "/v3/collections/{uuid}/parents"},
       produces = "application/json")
-  @ApiResponseObject
   public List<Collection> getParents(
-      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
+      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid) {
     return collectionService.getParents(collectionUuid);
   }
 
-  @ApiMethod(
-      description = "Get all related - by the given predicate - corporate bodies of a collection")
+  @Operation(
+      summary = "Get all related - by the given predicate - corporate bodies of a collection")
   @GetMapping(
       value = {
         "/latest/collections/{uuid}/related/corporatebodies",
         "/v3/collections/{uuid}/related/corporatebodies"
       },
       produces = "application/json")
-  @ApiResponseObject
   public List<CorporateBody> getRelatedCorporateBodies(
-      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid") UUID uuid,
+      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
+          UUID uuid,
       @RequestParam(name = "predicate", required = true) FilterCriterion<String> predicate) {
     Filtering filtering = Filtering.defaultBuilder().add("predicate", predicate).build();
     return collectionService.getRelatedCorporateBodies(uuid, filtering);
   }
 
-  @ApiMethod(description = "Get (active or all) paged subcollections of a collection")
+  @Operation(summary = "Get (active or all) paged subcollections of a collection")
   @GetMapping(
       value = {"/latest/collections/{uuid}/subcollections"},
       produces = "application/json")
-  @ApiResponseObject
   public PageResponse<Collection> getSubcollections(
-      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
+      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
@@ -411,27 +398,26 @@ public class CollectionController {
     return collectionService.findChildren(collectionUuid, searchPageRequest);
   }
 
-  @ApiMethod(description = "Get languages of all top collections")
+  @Operation(summary = "Get languages of all top collections")
   @GetMapping(
       value = {"/latest/collections/top/languages", "/v2/collections/top/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public List<Locale> getTopCollectionsLanguages() {
     return collectionService.getRootNodesLanguages();
   }
 
-  @ApiMethod(description = "Remove an existing digital object from an existing collection")
+  @Operation(summary = "Remove an existing digital object from an existing collection")
   @DeleteMapping(
       value = {
         "/latest/collections/{uuid}/digitalobjects/{digitalObjectUuid}",
         "/v3/collections/{uuid}/digitalobjects/{digitalObjectUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public ResponseEntity removeDigitalObject(
-      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
+      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid,
-      @ApiPathParam(description = "UUID of the digital object") @PathVariable("digitalObjectUuid")
+      @Parameter(example = "", description = "UUID of the digital object")
+          @PathVariable("digitalObjectUuid")
           UUID digitalObjectUuid) {
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);
@@ -447,17 +433,18 @@ public class CollectionController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @ApiMethod(description = "Remove an existing collection from an existing collection")
+  @Operation(summary = "Remove an existing collection from an existing collection")
   @DeleteMapping(
       value = {
         "/latest/collections/{uuid}/subcollections/{subcollectionUuid}",
         "/v3/collections/{uuid}/subcollections/{subcollectionUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public ResponseEntity removeSubcollection(
-      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid") UUID uuid,
-      @ApiPathParam(description = "UUID of the subcollection") @PathVariable("subcollectionUuid")
+      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
+          UUID uuid,
+      @Parameter(example = "", description = "UUID of the subcollection")
+          @PathVariable("subcollectionUuid")
           UUID subcollectionUuid) {
     Collection collection = new Collection();
     collection.setUuid(uuid);
@@ -473,28 +460,26 @@ public class CollectionController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @ApiMethod(description = "Save a newly created collection")
+  @Operation(summary = "Save a newly created collection")
   @PostMapping(
       value = {"/latest/collections", "/v2/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public Collection save(@RequestBody Collection collection, BindingResult errors)
       throws IdentifiableServiceException {
     return collectionService.save(collection);
   }
 
-  @ApiMethod(description = "Save existing digital objects into an existing collection")
+  @Operation(summary = "Save existing digital objects into an existing collection")
   @PutMapping(
       value = {
         "/latest/collections/{uuid}/digitalobjects",
         "/v3/collections/{uuid}/digitalobjects"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public ResponseEntity saveDigitalObjects(
-      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
+      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid,
-      @ApiPathParam(description = "List of the digital objects") @RequestBody
+      @Parameter(example = "", description = "List of the digital objects") @RequestBody
           List<DigitalObject> digitalObjects) {
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);
@@ -507,16 +492,15 @@ public class CollectionController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @ApiMethod(description = "Save a newly created collection with parent collection")
+  @Operation(summary = "Save a newly created collection with parent collection")
   @PostMapping(
       value = {
         "/latest/collections/{parentUuid}/collection",
         "/v2/collections/{parentUuid}/collection"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public Collection saveWithParentCollection(
-      @ApiPathParam(name = "parentUuid", description = "The uuid of the parent collection")
+      @Parameter(name = "parentUuid", description = "The uuid of the parent collection")
           @PathVariable
           UUID parentUuid,
       @RequestBody Collection collection)
@@ -524,11 +508,10 @@ public class CollectionController {
     return collectionService.saveWithParent(collection, parentUuid);
   }
 
-  @ApiMethod(description = "Update an collection")
+  @Operation(summary = "Update an collection")
   @PutMapping(
       value = {"/latest/collections/{uuid}", "/v2/collections/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public Collection update(
       @PathVariable UUID uuid, @RequestBody Collection collection, BindingResult errors)
       throws IdentifiableServiceException {

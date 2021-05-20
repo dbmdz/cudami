@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.res
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InvalidObjectException;
@@ -14,15 +15,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.tomcat.util.http.fileupload.FileItemIterator;
 import org.apache.tomcat.util.http.fileupload.FileItemStream;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
-import org.jsondoc.core.annotation.Api;
-import org.jsondoc.core.annotation.ApiResponseObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Api(description = "The file upload controller", name = "File upload controller")
+@Tag(description = "The file upload controller", name = "File upload controller")
 public class FileResourceBinaryController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FileResourceBinaryController.class);
@@ -38,7 +37,6 @@ public class FileResourceBinaryController {
   }
 
   @PostMapping(value = {"/latest/files", "/v2/files"})
-  @ApiResponseObject
   public FileResource upload(HttpServletRequest request) throws IOException {
     FileResource fileResource = null;
 

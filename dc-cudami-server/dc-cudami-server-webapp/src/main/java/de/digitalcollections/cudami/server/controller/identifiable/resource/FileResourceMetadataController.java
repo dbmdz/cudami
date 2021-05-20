@@ -9,15 +9,13 @@ import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
-import org.jsondoc.core.annotation.Api;
-import org.jsondoc.core.annotation.ApiMethod;
-import org.jsondoc.core.annotation.ApiPathParam;
-import org.jsondoc.core.annotation.ApiQueryParam;
-import org.jsondoc.core.annotation.ApiResponseObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -34,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Api(description = "The fileresource controller", name = "Fileresource controller")
+@Tag(description = "The fileresource controller", name = "Fileresource controller")
 public class FileResourceMetadataController {
 
   private static final Logger LOGGER =
@@ -48,11 +46,10 @@ public class FileResourceMetadataController {
     this.metadataService = metadataService;
   }
 
-  @ApiMethod(description = "Get all fileresources")
+  @Operation(summary = "Get all fileresources")
   @GetMapping(
       value = {"/latest/fileresources", "/v2/fileresources"},
       produces = "application/json")
-  @ApiResponseObject
   public PageResponse<FileResource> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
@@ -66,15 +63,14 @@ public class FileResourceMetadataController {
     return metadataService.find(searchPageRequest);
   }
 
-  @ApiMethod(
-      description =
+  @Operation(
+      summary =
           "Find limited amount of fileresources of given type containing searchTerm in label or description")
   @GetMapping(
       value = {"/latest/fileresources/type/{type}", "/v2/fileresources/type/{type}"},
       produces = "application/json")
-  @ApiResponseObject
   public SearchPageResponse<FileResource> findFileResourcesByType(
-      @ApiPathParam(description = "Type of the fileresource, e.g. <tt>image</tt>")
+      @Parameter(example = "", description = "Type of the fileresource, e.g. <tt>image</tt>")
           @PathVariable("type")
           String type,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -119,20 +115,20 @@ public class FileResourceMetadataController {
     return metadataService.find(pageRequest);
   }
 
-  @ApiMethod(
-      description =
+  @Operation(
+      summary =
           "Get a fileresource as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {"/latest/fileresources/{uuid}", "/v2/fileresources/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-  @ApiResponseObject
   public ResponseEntity<FileResource> get(
-      @ApiPathParam(
+      @Parameter(
+              example = "",
               description =
                   "UUID of the fileresource, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid,
-      @ApiQueryParam(
+      @Parameter(
               name = "pLocale",
               description =
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
@@ -148,8 +144,8 @@ public class FileResourceMetadataController {
     return new ResponseEntity<>(fileResource, HttpStatus.OK);
   }
 
-  @ApiMethod(
-      description =
+  @Operation(
+      summary =
           "Get a fileresource as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {
@@ -157,7 +153,6 @@ public class FileResourceMetadataController {
         "/v2/fileresources/identifier/{namespace}:{id}"
       },
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-  @ApiResponseObject
   public ResponseEntity<FileResource> getByIdentifier(
       @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
 
@@ -165,30 +160,27 @@ public class FileResourceMetadataController {
     return new ResponseEntity<>(fileResource, HttpStatus.OK);
   }
 
-  @ApiMethod(description = "Get languages of all websites")
+  @Operation(summary = "Get languages of all websites")
   @GetMapping(
       value = {"/latest/fileresources/languages", "/v2/fileresources/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public List<Locale> getLanguages() {
     return metadataService.getLanguages();
   }
 
-  @ApiMethod(description = "Save a newly created fileresource")
+  @Operation(summary = "Save a newly created fileresource")
   @PostMapping(
       value = {"/latest/fileresources", "/v2/fileresources"},
       produces = "application/json")
-  @ApiResponseObject
   public FileResource save(@RequestBody FileResource fileResource)
       throws IdentifiableServiceException {
     return metadataService.save(fileResource);
   }
 
-  @ApiMethod(description = "Update a fileresource")
+  @Operation(summary = "Update a fileresource")
   @PutMapping(
       value = {"/latest/fileresources/{uuid}", "/v2/fileresources/{uuid}"},
       produces = "application/json")
-  @ApiResponseObject
   public FileResource update(
       @PathVariable UUID uuid, @RequestBody FileResource fileResource, BindingResult errors)
       throws IdentifiableServiceException {

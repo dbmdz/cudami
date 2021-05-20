@@ -12,16 +12,14 @@ import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.Sorting;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import org.jsondoc.core.annotation.Api;
-import org.jsondoc.core.annotation.ApiMethod;
-import org.jsondoc.core.annotation.ApiPathParam;
-import org.jsondoc.core.annotation.ApiQueryParam;
-import org.jsondoc.core.annotation.ApiResponseObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -37,9 +35,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Api(description = "The Person controller", name = "Person controller")
+@Tag(description = "The Person controller", name = "Person controller")
 public class PersonController {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(PersonController.class);
 
   private final PersonService personService;
@@ -48,20 +45,18 @@ public class PersonController {
     this.personService = personService;
   }
 
-  @ApiMethod(description = "count all persons")
+  @Operation(summary = "count all persons")
   @GetMapping(
       value = {"/latest/persons/count", "/v2/persons/count"},
       produces = "application/json")
-  @ApiResponseObject
   public long count() {
     return personService.count();
   }
 
-  @ApiMethod(description = "get all persons")
+  @Operation(summary = "get all persons")
   @GetMapping(
       value = {"/latest/persons", "/v2/persons"},
       produces = "application/json")
-  @ApiResponseObject
   public PageResponse<Person> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
@@ -88,13 +83,13 @@ public class PersonController {
     return personService.findByLanguageAndInitial(searchPageRequest, language, initial);
   }
 
-  @ApiMethod(description = "get all persons born at given geo location")
+  @Operation(summary = "get all persons born at given geo location")
   @GetMapping(
       value = {"/latest/persons/placeofbirth/{uuid}", "/v2/persons/placeofbirth/{uuid}"},
       produces = "application/json")
-  @ApiResponseObject
   public PageResponse<Person> getByPlaceOfBirth(
-      @ApiPathParam(
+      @Parameter(
+              example = "",
               description =
                   "UUID of the geo location of birth, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
@@ -110,13 +105,13 @@ public class PersonController {
     return personService.findByLocationOfBirth(pageRequest, uuid);
   }
 
-  @ApiMethod(description = "get all persons died at given geo location")
+  @Operation(summary = "get all persons died at given geo location")
   @GetMapping(
       value = {"/latest/persons/placeofdeath/{uuid}", "/v2/persons/placeofdeath/{uuid}"},
       produces = "application/json")
-  @ApiResponseObject
   public PageResponse<Person> getByPlaceOfDeath(
-      @ApiPathParam(
+      @Parameter(
+              example = "",
               description =
                   "UUID of the geo location of death, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
@@ -132,8 +127,8 @@ public class PersonController {
     return personService.findByLocationOfDeath(pageRequest, uuid);
   }
 
-  @ApiMethod(
-      description =
+  @Operation(
+      summary =
           "get a person as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {
@@ -141,14 +136,14 @@ public class PersonController {
         "/v2/persons/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-  @ApiResponseObject
   public ResponseEntity<Person> get(
-      @ApiPathParam(
+      @Parameter(
+              example = "",
               description =
                   "UUID of the person, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid,
-      @ApiQueryParam(
+      @Parameter(
               name = "pLocale",
               description =
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
@@ -165,13 +160,12 @@ public class PersonController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @ApiMethod(
-      description =
+  @Operation(
+      summary =
           "get a person as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {"/latest/persons/identifier", "/v2/persons/identifier"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-  @ApiResponseObject
   public ResponseEntity<Person> getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)
@@ -180,53 +174,48 @@ public class PersonController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @ApiMethod(
-      description =
+  @Operation(
+      summary =
           "get a person's digital objects as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {"/latest/persons/{uuid}/digitalobjects", "/v2/persons/{uuid}/digitalobjects"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
-  @ApiResponseObject
   public Set<DigitalObject> getDigitalObjects(@PathVariable("uuid") UUID uuid)
       throws IdentifiableServiceException {
     return personService.getDigitalObjects(uuid);
   }
 
-  @ApiMethod(description = "Get languages of all persons")
+  @Operation(summary = "Get languages of all persons")
   @GetMapping(
       value = {"/latest/persons/languages", "/v3/persons/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public List<Locale> getLanguages() {
     return personService.getLanguages();
   }
 
-  @ApiMethod(
-      description =
+  @Operation(
+      summary =
           "get a person's works as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {"/latest/persons/{uuid}/works", "/v2/persons/{uuid}/works"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
-  @ApiResponseObject
   public Set<Work> getWorks(@PathVariable("uuid") UUID uuid) throws IdentifiableServiceException {
     return personService.getWorks(uuid);
   }
 
-  @ApiMethod(description = "save a newly created person")
+  @Operation(summary = "save a newly created person")
   @PostMapping(
       value = {"/latest/persons", "/v2/persons"},
       produces = "application/json")
-  @ApiResponseObject
   public Person save(@RequestBody Person person, BindingResult errors)
       throws IdentifiableServiceException {
     return personService.save(person);
   }
 
-  @ApiMethod(description = "update a person")
+  @Operation(summary = "update a person")
   @PutMapping(
       value = {"/latest/persons/{uuid}", "/v2/persons/{uuid}"},
       produces = "application/json")
-  @ApiResponseObject
   public Person update(
       @PathVariable("uuid") UUID uuid, @RequestBody Person person, BindingResult errors)
       throws IdentifiableServiceException {
