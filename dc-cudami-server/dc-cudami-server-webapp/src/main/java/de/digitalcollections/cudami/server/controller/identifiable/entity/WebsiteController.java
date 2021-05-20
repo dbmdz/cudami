@@ -312,8 +312,8 @@ public class WebsiteController {
   // ----------------- Helper classes for Swagger Annotations only, since Swagger Annotations
   // ----------------- cannot yet handle generics
   @Hidden
-  private class PageResponseWebsite extends PageResponse<Website> {}
+  private static class PageResponseWebsite extends PageResponse<Website> {}
 
   @Hidden
-  private class SearchPageResponseWebpage extends SearchPageResponse<Webpage> {}
+  private static class SearchPageResponseWebpage extends SearchPageResponse<Webpage> {}
 }
