@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Iterator;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Tag(
+    name = "V2DigitalObjectController",
+    description = "The DigitalObjectController in legacy version V2")
 public class V2DigitalObjectController {
 
   private final ObjectMapper objectMapper;

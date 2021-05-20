@@ -1,11 +1,13 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -26,5 +28,14 @@ class WebsiteControllerTest extends BaseControllerTest {
     when(websiteService.getLanguages()).thenReturn(expected);
 
     testJson(path);
+  }
+
+  @DisplayName("returns a 404, when no website was found")
+  @ParameterizedTest
+  @ValueSource(strings = {"/v5/websites/7a2f1935-c5b8-40fb-8622-c675de0a6242"})
+  public void websiteByUuid(String path) throws Exception {
+    when(websiteService.get(any(UUID.class))).thenReturn(null);
+
+    testNotFound(path);
   }
 }
