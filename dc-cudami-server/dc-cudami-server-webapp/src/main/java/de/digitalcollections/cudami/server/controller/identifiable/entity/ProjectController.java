@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(description = "The project controller", name = "Project controller")
+@Tag(name = "Project controller")
 public class ProjectController {
 
   private final ProjectService projectService;

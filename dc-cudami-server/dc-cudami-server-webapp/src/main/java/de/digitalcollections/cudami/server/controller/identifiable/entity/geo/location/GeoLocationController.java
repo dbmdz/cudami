@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(description = "The geo location controller", name = "Geo location controller")
+@Tag(name = "Geo location controller")
 public class GeoLocationController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationController.class);

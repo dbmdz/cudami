@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(description = "The corporate body controller", name = "Corporate body controller")
+@Tag(name = "Corporate body controller")
 public class CorporateBodyController {
 
   private static final Pattern GNDID_PATTERN = Pattern.compile("(\\d+(-.)?)|(\\d+X)");

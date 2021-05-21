@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(description = "The locale/language controller", name = "Locale and language controller")
+@Tag(name = "Locale and language controller")
 public class LocaleController {
 
   private final LocaleService localeService;

@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(description = "The user controller", name = "User controller")
+@Tag(name = "User controller")
 public class UserController {
 
   private final UserService userService;

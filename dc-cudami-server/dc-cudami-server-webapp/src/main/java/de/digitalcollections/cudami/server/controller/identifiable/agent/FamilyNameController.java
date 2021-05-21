@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(description = "The FamilyName controller", name = "FamilyName controller")
+@Tag(name = "FamilyName controller")
 public class FamilyNameController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FamilyNameController.class);

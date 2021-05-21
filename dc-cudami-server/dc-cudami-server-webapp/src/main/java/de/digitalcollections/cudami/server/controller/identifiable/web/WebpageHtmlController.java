@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@Tag(description = "The webpage HTML controller", name = "Webpage HTML controller")
+@Tag(name = "Webpage HTML controller")
 public class WebpageHtmlController {
 
   private final WebpageService webpageService;

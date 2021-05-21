@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(description = "The article controller", name = "Article controller")
+@Tag(name = "Article controller")
 public class ArticleController {
 
   private final ArticleService articleService;

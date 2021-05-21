@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(description = "The version controller", name = "Version controller")
+@Tag(name = "Version controller")
 public class VersionController {
 
   private final VersionService versionService;

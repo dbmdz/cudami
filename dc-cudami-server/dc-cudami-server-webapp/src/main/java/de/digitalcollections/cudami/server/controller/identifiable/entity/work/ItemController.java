@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(description = "The Item controller", name = "Item controller")
+@Tag(name = "Item controller")
 public class ItemController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ItemController.class);

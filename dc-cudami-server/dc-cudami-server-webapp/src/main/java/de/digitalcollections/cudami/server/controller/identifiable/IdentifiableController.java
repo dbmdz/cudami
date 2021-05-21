@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(description = "The identifiable controller", name = "Identifiable controller")
+@Tag(name = "Identifiable controller")
 public class IdentifiableController {
 
   private final IdentifiableService identifiableService;

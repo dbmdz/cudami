@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(description = "The digital object controller", name = "Digital object controller")
+@Tag(name = "Digital object controller")
 public class DigitalObjectController {
 
   private final DigitalObjectService digitalObjectService;

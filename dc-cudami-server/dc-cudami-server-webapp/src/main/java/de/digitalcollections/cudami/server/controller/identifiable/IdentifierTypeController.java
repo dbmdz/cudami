@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(description = "The identifier types controller", name = "Identifier types controller")
+@Tag(name = "Identifier types controller")
 public class IdentifierTypeController {
 
   private final IdentifierTypeService identifierTypeService;

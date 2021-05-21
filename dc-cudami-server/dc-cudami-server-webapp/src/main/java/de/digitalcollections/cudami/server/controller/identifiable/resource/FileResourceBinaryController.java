@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(description = "The file upload controller", name = "File upload controller")
+@Tag(name = "File upload controller")
 public class FileResourceBinaryController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FileResourceBinaryController.class);

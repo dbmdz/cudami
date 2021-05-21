@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(description = "The webpage controller", name = "Webpage controller")
+@Tag(name = "Webpage controller")
 public class WebpageController {
 
   private final LocaleService localeService;

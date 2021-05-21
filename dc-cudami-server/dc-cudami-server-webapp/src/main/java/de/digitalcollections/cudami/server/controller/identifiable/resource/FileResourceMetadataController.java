@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(description = "The fileresource controller", name = "Fileresource controller")
+@Tag(name = "Fileresource controller")
 public class FileResourceMetadataController {
 
   private static final Logger LOGGER =

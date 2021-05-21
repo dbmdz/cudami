@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(description = "The topic controller", name = "Topic controller")
+@Tag(name = "Topic controller")
 public class TopicController {
 
   private final LocaleService localeService;
