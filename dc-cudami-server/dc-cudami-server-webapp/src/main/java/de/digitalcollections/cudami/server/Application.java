@@ -19,7 +19,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
         @Info(
             title = "Cudami",
             version = "5",
-            description = "The Cultural Digital Asset Management System"))
+            description = "The Cultural Digital Asset Management System Infrastructure"))
 public class Application {
 
   public static void main(String[] args) throws Exception {
