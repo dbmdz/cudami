@@ -14,9 +14,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,8 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "GivenName controller")
 public class GivenNameController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(GivenNameController.class);
-
   private final GivenNameService givenNameService;
 
   public GivenNameController(GivenNameService givenNameService) {
@@ -46,7 +41,6 @@ public class GivenNameController {
       value = {"/latest/givennames", "/v2/givennames"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<GivenName> findAll(
-      Pageable pageable,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,

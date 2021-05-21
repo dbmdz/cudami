@@ -59,7 +59,6 @@ spring:
     placeholders:
       iiifBaseUrl: "${iiif.image.baseUrl}"
   main:
-    allow-bean-definition-overriding: true
     banner-mode: 'off'
   profiles:
     active: local
