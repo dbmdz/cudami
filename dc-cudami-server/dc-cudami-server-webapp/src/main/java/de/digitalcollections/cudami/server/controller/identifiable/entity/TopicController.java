@@ -249,7 +249,7 @@ public class TopicController {
     return topicService.getFileResources(uuid, new PageRequest(pageNumber, pageSize));
   }
 
-  @Opertation(summary = "Get all languages of entities of a topic")
+  @Operation(summary = "Get all languages of entities of a topic")
   @GetMapping(
       value = "/v5/topics/{uuid}/entities/languages",
       produces = MediaType.APPLICATION_JSON_VALUE)
