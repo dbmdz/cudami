@@ -53,7 +53,6 @@ public class EntityRelationController {
       value = {"/latest/entities/{subjectuuid}/relations", "/v3/entities/{subjectuuid}/relations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   @Deprecated
-
   /** @deprecated use {@link #saveEntityRelations(List)} instead} */
   List<EntityRelation> saveEntityRelationsForSubject(
       @PathVariable("subjectuuid") UUID subjectUuid,
