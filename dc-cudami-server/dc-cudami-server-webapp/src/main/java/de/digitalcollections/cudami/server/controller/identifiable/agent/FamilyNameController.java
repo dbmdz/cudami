@@ -65,7 +65,6 @@ public class FamilyNameController {
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<FamilyName> get(
       @Parameter(
-              example = "",
               description =
                   "UUID of the familyname, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
