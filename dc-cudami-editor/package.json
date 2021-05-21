@@ -62,7 +62,7 @@
     "reactstrap": "^8.9.0"
   },
   "devDependencies": {
-    "@babel/plugin-transform-runtime": "^7.13.15",
+    "@babel/plugin-transform-runtime": "^7.14.3",
     "@fisker/prettier-config": "^4.0.4",
     "eslint-plugin-react": "^7.23.2",
     "import-sort-style-module": "^6.0.0",
