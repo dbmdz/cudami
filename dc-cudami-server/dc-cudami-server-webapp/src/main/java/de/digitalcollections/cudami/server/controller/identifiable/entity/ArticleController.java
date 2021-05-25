@@ -7,15 +7,13 @@ import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.Sorting;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
-import org.jsondoc.core.annotation.Api;
-import org.jsondoc.core.annotation.ApiMethod;
-import org.jsondoc.core.annotation.ApiPathParam;
-import org.jsondoc.core.annotation.ApiQueryParam;
-import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Api(description = "The article controller", name = "Article controller")
+@Tag(name = "Article controller")
 public class ArticleController {
 
   private final ArticleService articleService;
@@ -38,20 +36,18 @@ public class ArticleController {
     this.articleService = articleService;
   }
 
-  @ApiMethod(description = "Get count of articles")
+  @Operation(summary = "Get count of articles")
   @GetMapping(
       value = {"/latest/articles/count", "/v2/articles/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public long count() {
     return articleService.count();
   }
 
-  @ApiMethod(description = "Get all articles")
+  @Operation(summary = "Get all articles")
   @GetMapping(
       value = {"/latest/articles", "/v2/articles"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public PageResponse<Article> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
@@ -66,20 +62,20 @@ public class ArticleController {
   }
 
   // Test-URL: http://localhost:9000/latest/articles/599a120c-2dd5-11e8-b467-0ed5f89f718b
-  @ApiMethod(
-      description =
+  @Operation(
+      summary =
           "Get an article as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {"/latest/articles/{uuid}", "/v2/articles/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-  @ApiResponseObject
   public ResponseEntity<Article> getArticle(
-      @ApiPathParam(
+      @Parameter(
+              example = "",
               description =
                   "UUID of the article, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid,
-      @ApiQueryParam(
+      @Parameter(
               name = "pLocale",
               description =
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
@@ -96,30 +92,27 @@ public class ArticleController {
     return new ResponseEntity<>(article, HttpStatus.OK);
   }
 
-  @ApiMethod(description = "Get languages of all articles")
+  @Operation(summary = "Get languages of all articles")
   @GetMapping(
       value = {"/latest/articles/languages", "/v2/articles/languages"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
-  @ApiResponseObject
   public List<Locale> getLanguages() {
     return this.articleService.getLanguages();
   }
 
-  @ApiMethod(description = "Save a newly created article")
+  @Operation(summary = "Save a newly created article")
   @PostMapping(
       value = {"/latest/articles", "/v2/articles"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public Article save(@RequestBody Article article, BindingResult errors)
       throws IdentifiableServiceException {
     return articleService.save(article);
   }
 
-  @ApiMethod(description = "Update an article")
+  @Operation(summary = "Update an article")
   @PutMapping(
       value = {"/latest/articles/{uuid}", "/v2/articles/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public Article update(@PathVariable UUID uuid, @RequestBody Article article, BindingResult errors)
       throws IdentifiableServiceException {
     assert Objects.equals(uuid, article.getUuid());

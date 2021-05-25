@@ -7,18 +7,13 @@ import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.Sorting;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
-import org.jsondoc.core.annotation.Api;
-import org.jsondoc.core.annotation.ApiMethod;
-import org.jsondoc.core.annotation.ApiPathParam;
-import org.jsondoc.core.annotation.ApiQueryParam;
-import org.jsondoc.core.annotation.ApiResponseObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,10 +27,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Api(description = "The FamilyName controller", name = "FamilyName controller")
+@Tag(name = "FamilyName controller")
 public class FamilyNameController {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(FamilyNameController.class);
 
   private final FamilyNameService familyNameService;
 
@@ -43,13 +36,11 @@ public class FamilyNameController {
     this.familyNameService = familyNameservice;
   }
 
-  @ApiMethod(description = "get all family names")
+  @Operation(summary = "get all family names")
   @GetMapping(
       value = {"/latest/familynames", "/v2/familynames"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public PageResponse<FamilyName> findAll(
-      Pageable pageable,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
@@ -66,27 +57,27 @@ public class FamilyNameController {
     return familyNameService.findByLanguageAndInitial(pageRequest, language, initial);
   }
 
-  @ApiMethod(
-      description =
+  @Operation(
+      summary =
           "get a familyname as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {"/latest/familynames/{uuid}", "/v2/familynames/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-  @ApiResponseObject
   public ResponseEntity<FamilyName> get(
-      @ApiPathParam(
+      @Parameter(
+              example = "",
               description =
                   "UUID of the familyname, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid,
-      @ApiQueryParam(
+      @Parameter(
+              example = "",
               name = "pLocale",
               description =
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws IdentifiableServiceException {
-
     FamilyName result;
     if (pLocale == null) {
       result = familyNameService.get(uuid);
@@ -96,13 +87,12 @@ public class FamilyNameController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @ApiMethod(
-      description =
+  @Operation(
+      summary =
           "get a familyname as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {"/latest/familynames/identifier", "/v2/familynames/identifier"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-  @ApiResponseObject
   public ResponseEntity<FamilyName> getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)
@@ -111,21 +101,19 @@ public class FamilyNameController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @ApiMethod(description = "save a newly created family")
+  @Operation(summary = "save a newly created family")
   @PostMapping(
       value = {"/latest/familynames", "/v2/familynames"},
       produces = "application/json")
-  @ApiResponseObject
   public FamilyName save(@RequestBody FamilyName familyName, BindingResult errors)
       throws IdentifiableServiceException {
     return familyNameService.save(familyName);
   }
 
-  @ApiMethod(description = "update a familyname")
+  @Operation(summary = "update a familyname")
   @PutMapping(
       value = {"/latest/familynames/{uuid}", "/v2/familynames/{uuid}"},
       produces = "application/json")
-  @ApiResponseObject
   public FamilyName update(
       @PathVariable("uuid") UUID uuid, @RequestBody FamilyName familyName, BindingResult errors)
       throws IdentifiableServiceException {

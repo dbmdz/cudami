@@ -7,11 +7,10 @@ import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
-import org.jsondoc.core.annotation.Api;
-import org.jsondoc.core.annotation.ApiMethod;
-import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Api(description = "The identifiable controller", name = "Identifiable controller")
+@Tag(name = "Identifiable controller")
 public class IdentifiableController {
 
   private final IdentifiableService identifiableService;
@@ -32,13 +31,12 @@ public class IdentifiableController {
     this.identifiableService = identifiableService;
   }
 
-  @ApiMethod(
-      description =
+  @Operation(
+      summary =
           "Find limited amount of identifiables containing searchTerm in label or description")
   @GetMapping(
       value = {"/latest/identifiables/search", "/v2/identifiables/search"},
       produces = "application/json")
-  @ApiResponseObject
   public SearchPageResponse<Identifiable> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
@@ -52,11 +50,10 @@ public class IdentifiableController {
     return identifiableService.find(pageRequest);
   }
 
-  @ApiMethod(description = "Find limited amount of identifiables containing searchTerm in label")
+  @Operation(summary = "Find limited amount of identifiables containing searchTerm in label")
   @GetMapping(
       value = {"/latest/identifiables", "/v2/identifiables"},
       produces = "application/json")
-  @ApiResponseObject
   public List<Identifiable> find(
       @RequestParam(name = "searchTerm") String searchTerm,
       @RequestParam(name = "maxResults", required = false, defaultValue = "25") int maxResults) {
@@ -64,17 +61,16 @@ public class IdentifiableController {
     return identifiables;
   }
 
-  @ApiMethod(description = "Get identifiable by uuid")
+  @Operation(summary = "Get identifiable by uuid")
   @GetMapping(
       value = {"/latest/identifiables/{uuid}", "/v2/identifiables/{uuid}"},
       produces = "application/json")
-  @ApiResponseObject
   public Identifiable findById(@PathVariable UUID uuid) {
     return identifiableService.get(uuid);
   }
 
-  @ApiMethod(
-      description =
+  @Operation(
+      summary =
           "get an identifiable as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {
@@ -82,7 +78,6 @@ public class IdentifiableController {
         "/v2/identifiables/identifier/{namespace}:{id}"
       },
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-  @ApiResponseObject
   public ResponseEntity<Identifiable> getByIdentifier(
       @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
 

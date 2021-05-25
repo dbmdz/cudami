@@ -3,12 +3,11 @@ package de.digitalcollections.cudami.server.controller.identifiable.web;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
 import de.digitalcollections.model.identifiable.web.Webpage;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Locale;
 import java.util.UUID;
-import org.jsondoc.core.annotation.Api;
-import org.jsondoc.core.annotation.ApiMethod;
-import org.jsondoc.core.annotation.ApiPathParam;
-import org.jsondoc.core.annotation.ApiQueryParam;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@Api(description = "The webpage HTML controller", name = "Webpage HTML controller")
+@Tag(name = "Webpage HTML controller")
 public class WebpageHtmlController {
 
   private final WebpageService webpageService;
@@ -26,7 +25,7 @@ public class WebpageHtmlController {
     this.webpageService = webpageService;
   }
 
-  @ApiMethod(description = "Get a webpage as HTML")
+  @Operation(summary = "Get a webpage as HTML")
   @GetMapping(
       value = {
         "/latest/webpages/{uuid}.html",
@@ -36,18 +35,19 @@ public class WebpageHtmlController {
       },
       produces = MediaType.TEXT_HTML_VALUE)
   public String getWebpageAsHtml(
-      @ApiPathParam(
+      @Parameter(
+              example = "",
               description =
                   "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid,
-      @ApiQueryParam(
+      @Parameter(
               name = "pLocale",
               description =
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale,
-      @ApiQueryParam(
+      @Parameter(
               name = "renderLabel",
               description =
                   "Switch for (de)activating rendering of webpage label. If 'false', label rendering will be skipped")

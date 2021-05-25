@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
@@ -8,20 +9,22 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-import org.jsondoc.core.annotation.Api;
-import org.jsondoc.core.annotation.ApiMethod;
-import org.jsondoc.core.annotation.ApiPathParam;
-import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,30 +34,71 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Api(description = "The collection controller V3", name = "Collection controller V3")
+@Tag(name = "V3CollectionController", description = "The CollectionController in legacy version V3")
 public class V3CollectionController {
 
-  private final DigitalCollectionsObjectMapper objectMapper = new DigitalCollectionsObjectMapper();
-
+  private final ObjectMapper objectMapper;
   private final CollectionService collectionService;
   private final LocaleService localeService;
 
-  public V3CollectionController(CollectionService collectionService, LocaleService localeService) {
+  public V3CollectionController(
+      CollectionService collectionService, LocaleService localeService, ObjectMapper objectMapper) {
     this.collectionService = collectionService;
     this.localeService = localeService;
+    this.objectMapper = objectMapper;
   }
 
-  @ApiMethod(description = "Get paged digital objects of a collection")
+  @Operation(
+      summary = "Get digital objects of a collection",
+      description = "Get a paged and filtered list of digital objects of a collection",
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            description =
+                "SearchPageResponse&lt;DigitalObject&gt; (<a href=\"https://raw.githubusercontent.com/dbmdz/digitalcollections-model/8.2.1/dc-model/src/main/java/de/digitalcollections/model/api/paging/SearchPageResponse.java\">dc-model &lt; 9.0</a>)",
+            content =
+                @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = String.class),
+                    examples = {
+                      @ExampleObject(
+                          name = "example list",
+                          externalValue =
+                              "https://github.com/dbmdz/cudami/raw/main/dc-cudami-server/dc-cudami-server-webapp/src/test/resources/json/v3/collections/a014a33b-6803-4b17-a876-a8f68758f2a7_digitalobjects.json")
+                    }))
+      })
   @GetMapping(
       value = {"/v3/collections/{uuid}/digitalobjects"},
       produces = "application/json")
-  @ApiResponseObject
   public ResponseEntity<String> getDigitalObjects(
-      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
+      @Parameter(
+              name = "uuid",
+              description = "the UUID of the collection",
+              example = "a014a33b-6803-4b17-a876-a8f68758f2a7",
+              schema = @Schema(implementation = UUID.class))
+          @PathVariable("uuid")
           UUID collectionUuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      @Parameter(
+              name = "pageNumber",
+              description = "the page number (starting with 0); if unset, defaults to 0.",
+              example = "0",
+              schema = @Schema(type = "integer"))
+          @RequestParam(name = "pageNumber", required = false, defaultValue = "0")
+          int pageNumber,
+      @Parameter(
+              name = "pageSize",
+              description = "the page size; if unset, defaults to 25",
+              example = "25",
+              schema = @Schema(type = "integer"))
+          @RequestParam(name = "pageSize", required = false, defaultValue = "25")
+          int pageSize,
+      @Parameter(
+              name = "searchTerm",
+              description = "the search term, of which the result is filtered (substring match)",
+              example = "Test",
+              schema = @Schema(type = "string"))
+          @RequestParam(name = "searchTerm", required = false)
+          String searchTerm)
       throws JsonProcessingException {
     SearchPageRequest searchPageRequest =
         new SearchPageRequest(searchTerm, pageNumber, pageSize, new Sorting());
@@ -72,17 +116,58 @@ public class V3CollectionController {
     return new ResponseEntity<>(result.toString(), HttpStatus.OK);
   }
 
-  @ApiMethod(description = "Get (active or all) paged subcollections of a collection")
+  @Operation(
+      summary = "Get subcollections of a collection",
+      description =
+          "Get a paged and filtered after 'active' state list of subcollections of a collection",
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            description =
+                "PageResponse&lt;Collection&gt; (<a href=\"https://raw.githubusercontent.com/dbmdz/digitalcollections-model/8.2.1/dc-model/src/main/java/de/digitalcollections/model/api/paging/SearchPageResponse.java\">dc-model &lt; 9.0</a>)",
+            content =
+                @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = String.class),
+                    examples = {
+                      @ExampleObject(
+                          name = "example list",
+                          externalValue =
+                              "https://github.com/dbmdz/cudami/raw/main/dc-cudami-server/dc-cudami-server-webapp/src/test/resources/json/v3/collections/collectionlist.json")
+                    }))
+      })
   @GetMapping(
       value = {"/v3/collections/{uuid}/subcollections"},
       produces = "application/json")
-  @ApiResponseObject
   public ResponseEntity<String> getSubcollections(
-      @ApiPathParam(description = "UUID of the collection") @PathVariable("uuid")
+      @Parameter(
+              name = "uuid",
+              description = "the UUID of the collection",
+              example = "a014a33b-6803-4b17-a876-a8f68758f2a7",
+              schema = @Schema(implementation = UUID.class))
+          @PathVariable("uuid")
           UUID collectionUuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "active", required = false) String active)
+      @Parameter(
+              name = "pageNumber",
+              description = "the page number (starting with 0); if unset, defaults to 0.",
+              example = "0",
+              schema = @Schema(type = "integer"))
+          @RequestParam(name = "pageNumber", required = false, defaultValue = "0")
+          int pageNumber,
+      @Parameter(
+              name = "pageSize",
+              description = "the page size; if unset, defaults to 25",
+              example = "25",
+              schema = @Schema(type = "integer"))
+          @RequestParam(name = "pageSize", required = false, defaultValue = "25")
+          int pageSize,
+      @Parameter(
+              name = "active",
+              description = "the set to true, only active subcollections are returned.",
+              example = "true",
+              schema = @Schema(type = "boolean"))
+          @RequestParam(name = "active", required = false)
+          String active)
       throws JsonProcessingException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
 
@@ -98,16 +183,58 @@ public class V3CollectionController {
     return new ResponseEntity<>(result.toString(), HttpStatus.OK);
   }
 
-  @ApiMethod(description = "Get all collections")
+  @Operation(
+      summary = "Get collections",
+      description = "Get a paged and filtered after 'active' state list of collections",
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            description =
+                "PageResponse&lt;Collection&gt; (<a href=\"https://raw.githubusercontent.com/dbmdz/digitalcollections-model/8.2.1/dc-model/src/main/java/de/digitalcollections/model/api/paging/SearchPageResponse.java\">dc-model &lt; 9.0</a>)",
+            content =
+                @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = String.class),
+                    examples = {
+                      @ExampleObject(
+                          name = "example list",
+                          externalValue =
+                              "https://github.com/dbmdz/cudami/raw/main/dc-cudami-server/dc-cudami-server-webapp/src/test/resources/json/v3/collections/collectionlist.json")
+                    }))
+      })
   @GetMapping(
       value = {"/v3/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponseObject
   public ResponseEntity<String> findAll(
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "active", required = false) String active)
+      @Parameter(
+              name = "pageNumber",
+              description = "the page number (starting with 0); if unset, defaults to 0.",
+              example = "0",
+              schema = @Schema(type = "integer"))
+          @RequestParam(name = "pageNumber", required = false, defaultValue = "0")
+          int pageNumber,
+      @Parameter(
+              name = "pageSize",
+              description = "the page size; if unset, defaults to 25",
+              example = "25",
+              schema = @Schema(type = "integer"))
+          @RequestParam(name = "pageSize", required = false, defaultValue = "25")
+          int pageSize,
+      @Parameter(
+              name = "sortBy",
+              description =
+                  "the sorting specification; if unset, default to alphabetically ascending sorting of the field 'label')",
+              example = "label_de.desc.nullsfirst",
+              schema = @Schema(type = "string"))
+          @RequestParam(name = "sortBy", required = false)
+          List<Order> sortBy,
+      @Parameter(
+              name = "active",
+              description = "the set to true, only active subcollections are returned.",
+              example = "true",
+              schema = @Schema(type = "boolean"))
+          @RequestParam(name = "active", required = false)
+          String active)
       throws JsonProcessingException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {

@@ -1,4 +1,4 @@
-# cudami (cultural digital asset management)
+# cudami (cultural digital asset management system)
 
 [![Javadocs](https://javadoc.io/badge/de.digitalcollections.cudami/dc-cudami.svg)](https://javadoc.io/doc/de.digitalcollections.cudami/dc-cudami)
 [![Build Status](https://img.shields.io/travis/dbmdz/cudami/master.svg)](https://travis-ci.org/dbmdz/cudami)
