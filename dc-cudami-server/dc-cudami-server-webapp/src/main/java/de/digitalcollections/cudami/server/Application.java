@@ -17,9 +17,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @OpenAPIDefinition(
     info =
         @Info(
-            title = "Cudami",
+            title = "cudami",
             version = "5",
-            description = "The Cultural Digital Asset Management Infrastructure"))
+            description = "Cultural Digital Asset Management System"))
 public class Application {
 
   public static void main(String[] args) throws Exception {
