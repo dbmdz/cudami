@@ -34,6 +34,7 @@ server:
     session:
       cookie:
         http-only: true
+        name: CUDAMI_SESSION_ID
         secure: false
       timeout: 10h
       tracking-modes: cookie
