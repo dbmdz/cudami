@@ -38,7 +38,7 @@ public class FamilyNameController {
 
   @Operation(summary = "get all family names")
   @GetMapping(
-      value = {"/latest/familynames", "/v2/familynames"},
+      value = {"/v5/familynames"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<FamilyName> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -61,7 +61,7 @@ public class FamilyNameController {
       summary =
           "get a familyname as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
-      value = {"/latest/familynames/{uuid}", "/v2/familynames/{uuid}"},
+      value = {"/v5/familynames/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<FamilyName> get(
       @Parameter(
@@ -91,7 +91,7 @@ public class FamilyNameController {
       summary =
           "get a familyname as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
-      value = {"/latest/familynames/identifier", "/v2/familynames/identifier"},
+      value = {"/v5/familynames/identifier"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<FamilyName> getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
@@ -103,7 +103,7 @@ public class FamilyNameController {
 
   @Operation(summary = "save a newly created family")
   @PostMapping(
-      value = {"/latest/familynames", "/v2/familynames"},
+      value = {"/v5/familynames"},
       produces = "application/json")
   public FamilyName save(@RequestBody FamilyName familyName, BindingResult errors)
       throws IdentifiableServiceException {
@@ -112,7 +112,7 @@ public class FamilyNameController {
 
   @Operation(summary = "update a familyname")
   @PutMapping(
-      value = {"/latest/familynames/{uuid}", "/v2/familynames/{uuid}"},
+      value = {"/v5/familynames/{uuid}"},
       produces = "application/json")
   public FamilyName update(
       @PathVariable("uuid") UUID uuid, @RequestBody FamilyName familyName, BindingResult errors)

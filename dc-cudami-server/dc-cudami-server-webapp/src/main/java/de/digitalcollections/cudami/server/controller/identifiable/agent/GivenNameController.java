@@ -38,7 +38,7 @@ public class GivenNameController {
 
   @Operation(summary = "get all given names")
   @GetMapping(
-      value = {"/latest/givennames", "/v2/givennames"},
+      value = {"/v5/givennames"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<GivenName> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -61,7 +61,7 @@ public class GivenNameController {
       summary =
           "get a givenname as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
-      value = {"/latest/givennames/{uuid}", "/v2/givennames/{uuid}"},
+      value = {"/v5/givennames/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<GivenName> get(
       @Parameter(
@@ -91,7 +91,7 @@ public class GivenNameController {
       summary =
           "get a givenname as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
-      value = {"/latest/givennames/identifier", "/v2/givennames/identifier"},
+      value = {"/v5/givennames/identifier"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<GivenName> getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
@@ -103,7 +103,7 @@ public class GivenNameController {
 
   @Operation(summary = "save a newly created givenname")
   @PostMapping(
-      value = {"/latest/givennames", "/v2/givennames"},
+      value = {"/v5/givennames"},
       produces = "application/json")
   public GivenName save(@RequestBody GivenName givenName, BindingResult errors)
       throws IdentifiableServiceException {
@@ -112,7 +112,7 @@ public class GivenNameController {
 
   @Operation(summary = "update a givenname")
   @PutMapping(
-      value = {"/latest/givennames/{uuid}", "/v2/givennames/{uuid}"},
+      value = {"/v5/givennames/{uuid}"},
       produces = "application/json")
   public GivenName update(
       @PathVariable("uuid") UUID uuid, @RequestBody GivenName givenName, BindingResult errors)
