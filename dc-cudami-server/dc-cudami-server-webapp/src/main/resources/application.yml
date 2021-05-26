@@ -79,8 +79,10 @@ spring:
 
 springdoc:
   swagger-ui:
-    path: /index.html
     disable-swagger-default-url: true
+    operationsSorter: alpha
+    path: /index.html
+    tagsSorter: alpha
   writer-with-order-by-keys: true
 
 ---
