@@ -42,7 +42,7 @@ public class GeoLocationController {
 
   @Operation(summary = "count all geolocations")
   @GetMapping(
-      value = {"/latest/geolocations/count", "/v2/geolocations/count"},
+      value = {"/v5/geolocations/count", "/v2/geolocations/count", "/latest/geolocations/count"},
       produces = "application/json")
   public long count() {
     return geoLocationService.count();
@@ -50,7 +50,7 @@ public class GeoLocationController {
 
   @Operation(summary = "get all geo locations")
   @GetMapping(
-      value = {"/latest/geolocations", "/v2/geolocations"},
+      value = {"/v5/geolocations", "/v2/geolocations", "/latest/geolocations"},
       produces = "application/json")
   public PageResponse<GeoLocation> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -74,7 +74,7 @@ public class GeoLocationController {
       summary =
           "get a geolocation as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
-      value = {"/latest/geolocations/{uuid}", "/v2/geolocations/{uuid}"},
+      value = {"/v5/geolocations/{uuid}", "/v2/geolocations/{uuid}", "/latest/geolocations/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<GeoLocation> get(
       @Parameter(
@@ -104,7 +104,11 @@ public class GeoLocationController {
       summary =
           "get a geolocation as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
-      value = {"/latest/geolocations/identifier", "/v2/geolocations/identifier"},
+      value = {
+        "/v5/geolocations/{uuid}",
+        "/v2/geolocations/identifier",
+        "/latest/geolocations/{uuid}"
+      },
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<GeoLocation> getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
@@ -116,7 +120,11 @@ public class GeoLocationController {
 
   @Operation(summary = "Get languages of all geolocations")
   @GetMapping(
-      value = {"/latest/geolocations/languages", "/v3/geolocations/languages"},
+      value = {
+        "/v5/geolocations/languages",
+        "/v3/geolocations/languages",
+        "/latest/geolocations/languages"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
     return geoLocationService.getLanguages();
@@ -124,7 +132,7 @@ public class GeoLocationController {
 
   @Operation(summary = "save a newly created geolocation")
   @PostMapping(
-      value = {"/latest/geolocations", "/v2/geolocations"},
+      value = {"/v5/geolocations", "/v2/geolocations", "/latest/geolocations"},
       produces = "application/json")
   public GeoLocation save(@RequestBody GeoLocation geoLocation, BindingResult errors)
       throws IdentifiableServiceException {
@@ -133,7 +141,7 @@ public class GeoLocationController {
 
   @Operation(summary = "update a geolocation")
   @PutMapping(
-      value = {"/latest/geolocations/{uuid}", "/v2/geolocations/{uuid}"},
+      value = {"/v5/geolocations/{uuid}", "/v2/geolocations/{uuid}", "/latest/geolocations/{uuid}"},
       produces = "application/json")
   public GeoLocation update(
       @PathVariable("uuid") UUID uuid, @RequestBody GeoLocation geoLocation, BindingResult errors)
