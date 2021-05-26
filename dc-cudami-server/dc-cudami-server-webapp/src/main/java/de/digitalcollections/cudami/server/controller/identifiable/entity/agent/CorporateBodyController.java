@@ -41,7 +41,7 @@ public class CorporateBodyController {
 
   @Operation(summary = "Fetch a corporate body by GND-ID from external system and save it")
   @PostMapping(
-      value = {"/latest/corporatebodies/gnd/{gndId}", "/v3/corporatebodies/gnd/{gndId}"},
+      value = {"/v5/corporatebodies/gnd/{gndId}", "/v3/corporatebodies/gnd/{gndId}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public CorporateBody fetchAndSaveByGndId(
       @Parameter(
@@ -58,7 +58,7 @@ public class CorporateBodyController {
 
   @Operation(summary = "Get all corporate bodies")
   @GetMapping(
-      value = {"/latest/corporatebodies", "/v2/corporatebodies"},
+      value = {"/v5/corporatebodies"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<CorporateBody> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,

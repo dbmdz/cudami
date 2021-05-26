@@ -435,6 +435,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   @Override
+  @Deprecated
+  /** @deprecated use method with SearchPageRequest signature instead */
   public PageResponse<I> findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial) {
     // add special filter

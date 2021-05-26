@@ -20,7 +20,7 @@ public class CudamiCorporateBodiesClient extends CudamiBaseClient<CorporateBody>
   }
 
   public long count() throws HttpException {
-    return Long.parseLong(doGetRequestForString("/latest/corporatebodies/count"));
+    return Long.parseLong(doGetRequestForString("/v5/corporatebodies/count"));
   }
 
   public CorporateBody create() {
@@ -28,18 +28,19 @@ public class CudamiCorporateBodiesClient extends CudamiBaseClient<CorporateBody>
   }
 
   public CorporateBody fetchAndSaveByGndId(String gndId) throws HttpException {
-    return doPostRequestForObject(String.format("/latest/corporatebodies/gnd/%s", gndId));
+    return doPostRequestForObject(String.format("/v5/corporatebodies/gnd/%s", gndId));
   }
 
+  // TODO: Implement with test
   @Deprecated(since = "5.0", forRemoval = true)
   /** @deprecated Please use {@link #find(SearchPageRequest)} instead */
   public PageResponse<CorporateBody> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/corporatebodies", pageRequest);
+    return doGetRequestForPagedObjectList("/v2/corporatebodies", pageRequest);
   }
 
   public SearchPageResponse<CorporateBody> find(SearchPageRequest searchPageRequest)
       throws HttpException {
-    return doGetSearchRequestForPagedObjectList("/latest/corporatebodies", searchPageRequest);
+    return doGetSearchRequestForPagedObjectList("/v5/corporatebodies", searchPageRequest);
   }
 
   public CorporateBody findOne(UUID uuid) throws HttpException {
