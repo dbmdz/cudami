@@ -79,8 +79,9 @@ public class CorporateBodyController {
           "Get an corporate body as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {
-        "/latest/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v2/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+        "/v5/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v2/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/latest/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<CorporateBody> get(
@@ -110,8 +111,9 @@ public class CorporateBodyController {
   @Operation(summary = "Get corporate body by namespace and id")
   @GetMapping(
       value = {
-        "/latest/corporatebodies/identifier/{namespace}:{id}",
-        "/v3/corporatebodies/identifier/{namespace}:{id}"
+        "/v5/corporatebodies/identifier/{namespace}:{id}",
+        "/v3/corporatebodies/identifier/{namespace}:{id}",
+        "/latest/corporatebodies/identifier/{namespace}:{id}"
       },
       produces = "application/json")
   public CorporateBody getByIdentifier(
@@ -124,7 +126,11 @@ public class CorporateBodyController {
 
   @Operation(summary = "Get corporate body by refId")
   @GetMapping(
-      value = {"/latest/corporatebodies/{refId:[0-9]+}", "/v3/corporatebodies/{refId:[0-9]+}"},
+      value = {
+        "/v5/corporatebodies/{refId:[0-9]+}",
+        "/v3/corporatebodies/{refId:[0-9]+}",
+        "/latest/corporatebodies/{refId:[0-9]+}"
+      },
       produces = "application/json")
   public CorporateBody getByRefId(
       @Parameter(example = "", description = "reference id") @PathVariable("refId") long refId)
@@ -134,7 +140,11 @@ public class CorporateBodyController {
 
   @Operation(summary = "Get languages of all corporatebodies")
   @GetMapping(
-      value = {"/latest/corporatebodies/languages", "/v3/corporatebodies/languages"},
+      value = {
+        "/v5/corporatebodies/languages",
+        "/v3/corporatebodies/languages",
+        "/latest/corporatebodies/languages"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
     return corporateBodyService.getLanguages();
@@ -142,7 +152,7 @@ public class CorporateBodyController {
 
   @Operation(summary = "Save a newly created corporate body")
   @PostMapping(
-      value = {"/latest/corporatebodies", "/v2/corporatebodies"},
+      value = {"/v5/corporatebodies", "/v2/corporatebodies", "/latest/corporatebodies"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public CorporateBody save(@RequestBody CorporateBody corporateBody, BindingResult errors)
       throws IdentifiableServiceException {
@@ -151,7 +161,11 @@ public class CorporateBodyController {
 
   @Operation(summary = "Update a corporate body")
   @PutMapping(
-      value = {"/latest/corporatebodies/{uuid}", "/v2/corporatebodies/{uuid}"},
+      value = {
+        "/v5/corporatebodies/{uuid}",
+        "/v2/corporatebodies/{uuid}",
+        "/latest/corporatebodies/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public CorporateBody update(
       @Parameter(
