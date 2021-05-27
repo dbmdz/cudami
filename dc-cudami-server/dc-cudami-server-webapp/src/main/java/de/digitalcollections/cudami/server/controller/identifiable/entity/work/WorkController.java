@@ -43,7 +43,7 @@ public class WorkController {
 
   @Operation(summary = "count all works")
   @GetMapping(
-      value = {"/latest/works/count", "/v2/works/count"},
+      value = {"/v5/works/count", "/v2/works/count", "/latest/works/count"},
       produces = "application/json")
   public long count() {
     return workService.count();
@@ -51,7 +51,7 @@ public class WorkController {
 
   @Operation(summary = "get all works")
   @GetMapping(
-      value = {"/latest/works", "/v2/works"},
+      value = {"/v5/works", "/v2/works", "/latest/works"},
       produces = "application/json")
   public PageResponse<Work> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -75,8 +75,9 @@ public class WorkController {
           "get a work as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {
-        "/latest/works/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v2/works/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+        "/v5/works/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v2/works/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/latest/works/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<Work> get(
@@ -106,7 +107,11 @@ public class WorkController {
       summary =
           "get a work as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
-      value = {"/latest/works/identifier", "/v2/works/identifier"},
+      value = {
+        "/v5/works/identifier",
+        "/v2/works/identifier",
+        "/latest/works/identifier",
+      },
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<Work> getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
@@ -118,7 +123,7 @@ public class WorkController {
 
   @Operation(summary = "save a newly created work")
   @PostMapping(
-      value = {"/latest/works", "/v2/works"},
+      value = {"/v5/works", "/v2/works", "/latest/works"},
       produces = "application/json")
   public Work save(@RequestBody Work work, BindingResult errors)
       throws IdentifiableServiceException {
@@ -127,7 +132,7 @@ public class WorkController {
 
   @Operation(summary = "update a work")
   @PutMapping(
-      value = {"/latest/works/{uuid}", "/v2/works/{uuid}"},
+      value = {"/v5/works/{uuid}", "/v2/works/{uuid}", "/latest/works/{uuid}"},
       produces = "application/json")
   public Work update(@PathVariable("uuid") UUID uuid, @RequestBody Work work, BindingResult errors)
       throws IdentifiableServiceException {
@@ -140,7 +145,11 @@ public class WorkController {
 
   @Operation(summary = "Get creators of a work")
   @GetMapping(
-      value = {"/latest/works/{uuid}/creators", "/v2/works/{uuid}/creators"},
+      value = {
+        "/v5/works/{uuid}/creators",
+        "/v2/works/{uuid}/creators",
+        "/latest/works/{uuid}/creators"
+      },
       produces = "application/json")
   public List<Agent> getCreators(@PathVariable UUID uuid) {
     return workService.getCreators(uuid);
@@ -148,7 +157,7 @@ public class WorkController {
 
   @Operation(summary = "Get items of a work")
   @GetMapping(
-      value = {"/latest/works/{uuid}/items", "/v2/works/{uuid}/items"},
+      value = {"/v5/works/{uuid}/items", "/v2/works/{uuid}/items", "/latest/works/{uuid}/items"},
       produces = "application/json")
   public List<Item> getItems(@PathVariable UUID uuid) {
     return workService.getItems(uuid);

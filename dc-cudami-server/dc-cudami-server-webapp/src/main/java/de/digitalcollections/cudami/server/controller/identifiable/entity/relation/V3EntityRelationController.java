@@ -26,9 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(
-    name = "V3EntityRelationController",
-    description = "The EntityRelationController in legacy version V3")
+@Tag(name = "Entity relations controller")
 public class V3EntityRelationController {
 
   private final EntityRelationService entityRelationService;
@@ -41,8 +39,9 @@ public class V3EntityRelationController {
   }
 
   @Operation(
-      summary = "Get filtered relations",
+      summary = "Get filtered relations (deprecated, use /v5/entities/relations instead)",
       description = "Get a paged, sorted and filtered list of relations",
+      deprecated = true,
       responses = {
         @ApiResponse(
             responseCode = "200",
@@ -60,7 +59,7 @@ public class V3EntityRelationController {
                     }))
       })
   @GetMapping(
-      value = {"/v3/entities/relations"},
+      value = {"/v3/entities/relations", "/latest/entities/relations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> getEntitiesRelations(
       @Parameter(
