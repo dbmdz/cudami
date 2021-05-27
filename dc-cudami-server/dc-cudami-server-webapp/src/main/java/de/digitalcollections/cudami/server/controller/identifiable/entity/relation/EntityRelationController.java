@@ -30,7 +30,7 @@ public class EntityRelationController {
 
   @Operation(summary = "Get paged, sorted, filtered relations")
   @GetMapping(
-      value = {"/latest/entities/relations"},
+      value = {"/v5/entities/relations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<EntityRelation> getEntitiesRelations(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -50,7 +50,11 @@ public class EntityRelationController {
       summary =
           "Connect a list of two entities, which share the same subject; obsolete; please use generic method without subjectuuid in path instead.")
   @PutMapping(
-      value = {"/latest/entities/{subjectuuid}/relations", "/v3/entities/{subjectuuid}/relations"},
+      value = {
+        "/v5/entities/{subjectuuid}/relations",
+        "/v3/entities/{subjectuuid}/relations",
+        "/latest/entities/{subjectuuid}/relations"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   @Deprecated
   /** @deprecated use {@link #saveEntityRelations(List)} instead} */
@@ -66,7 +70,7 @@ public class EntityRelationController {
 
   @Operation(summary = "Connect a list of entity pairs with a predicate each")
   @PutMapping(
-      value = {"/latest/entities/relations", "/v3/entities/relations"},
+      value = {"/v5/entities/relations", "/v3/entities/relations", "/latest/entities/relations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   List<EntityRelation> saveEntityRelations(@RequestBody List<EntityRelation> entityRelations) {
     return entityRelationService.save(entityRelations);

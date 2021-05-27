@@ -18,12 +18,12 @@ public class CudamiEntityRelationsClient extends CudamiBaseClient {
   public PageResponse<EntityRelation> getRelationsByPredicate(
       String predicate, PageRequest pageRequest) throws HttpException {
     return doGetRequestForPagedObjectList(
-        String.format("/latest/entities/relations?predicate=%s", predicate),
+        String.format("/v5/entities/relations?predicate=%s", predicate),
         pageRequest,
         EntityRelation.class);
   }
 
   public List<EntityRelation> saveRelations(List<EntityRelation> relations) throws HttpException {
-    return doPutRequestForObjectList("/latest/entities/relations", relations, EntityRelation.class);
+    return doPutRequestForObjectList("/v5/entities/relations", relations, EntityRelation.class);
   }
 }

@@ -44,7 +44,7 @@ public class ItemController {
 
   @Operation(summary = "count all items")
   @GetMapping(
-      value = {"/latest/items/count", "/v2/items/count"},
+      value = {"/v5/items/count", "/v2/items/count", "/latest/items/count"},
       produces = "application/json")
   public long count() {
     return itemService.count();
@@ -52,7 +52,7 @@ public class ItemController {
 
   @Operation(summary = "get all items")
   @GetMapping(
-      value = {"/latest/items", "/v2/items"},
+      value = {"/v5/items", "/v2/items", "/latest/items"},
       produces = "application/json")
   public PageResponse<Item> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -75,7 +75,7 @@ public class ItemController {
       summary =
           "get an item as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
-      value = {"/latest/items/{uuid}", "/v2/items/{uuid}"},
+      value = {"/v5/items/{uuid}", "/v2/items/{uuid}", "/latest/items/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<Item> get(
       @Parameter(
@@ -104,7 +104,7 @@ public class ItemController {
       summary =
           "get an item as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
-      value = {"/latest/items/identifier", "/v2/items/identifier"},
+      value = {"/v5/items/identifier", "/v2/items/identifier", "/latest/items/identifier"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<Item> getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
@@ -116,7 +116,7 @@ public class ItemController {
 
   @Operation(summary = "save a newly created item")
   @PostMapping(
-      value = {"/latest/items", "/v2/items"},
+      value = {"/v5/items", "/v2/items", "/latest/items"},
       produces = "application/json")
   public Item save(@RequestBody Item item, BindingResult errors)
       throws IdentifiableServiceException {
@@ -125,7 +125,7 @@ public class ItemController {
 
   @Operation(summary = "update an item")
   @PutMapping(
-      value = {"/latest/items/{uuid}", "/v2/items/{uuid}"},
+      value = {"/v5/items/{uuid}", "/v2/items/{uuid}", "/latest/items/{uuid}"},
       produces = "application/json")
   public Item update(@PathVariable("uuid") UUID uuid, @RequestBody Item item, BindingResult errors)
       throws IdentifiableServiceException {

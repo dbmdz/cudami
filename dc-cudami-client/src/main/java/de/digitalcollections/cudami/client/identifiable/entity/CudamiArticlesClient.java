@@ -21,7 +21,7 @@ public class CudamiArticlesClient extends CudamiBaseClient<Article> {
   }
 
   public long count() throws HttpException {
-    return Long.parseLong(doGetRequestForString("/latest/articles/count"));
+    return Long.parseLong(doGetRequestForString("/v5/articles/count"));
   }
 
   public Article create() {
@@ -29,15 +29,15 @@ public class CudamiArticlesClient extends CudamiBaseClient<Article> {
   }
 
   public PageResponse<Article> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/articles", pageRequest);
+    return doGetRequestForPagedObjectList("/v5/articles", pageRequest);
   }
 
   public SearchPageResponse<Article> find(SearchPageRequest pageRequest) throws HttpException {
-    return this.doGetSearchRequestForPagedObjectList("/latest/articles", pageRequest);
+    return this.doGetSearchRequestForPagedObjectList("/v5/articles", pageRequest);
   }
 
   public Article findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/articles/%s", uuid));
+    return doGetRequestForObject(String.format("/v5/articles/%s", uuid));
   }
 
   public Article findOne(UUID uuid, Locale locale) throws HttpException {
@@ -45,28 +45,28 @@ public class CudamiArticlesClient extends CudamiBaseClient<Article> {
   }
 
   public Article findOne(UUID uuid, String locale) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/articles/%s?locale=%s", uuid, locale));
+    return doGetRequestForObject(String.format("/v5/articles/%s?locale=%s", uuid, locale));
   }
 
   public Article findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-        String.format("/latest/articles/identifier/%s:%s.json", namespace, id));
+        String.format("/v5/articles/identifier/%s:%s.json", namespace, id));
   }
 
   public List<Locale> getLanguages() throws HttpException {
-    return this.doGetRequestForObjectList("/latest/articles/languages", Locale.class);
+    return this.doGetRequestForObjectList("/v5/articles/languages", Locale.class);
   }
 
   public List getRelatedFileResources(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
-        String.format("/latest/entities/%s/related/fileresources", uuid), FileResource.class);
+        String.format("/v5/entities/%s/related/fileresources", uuid), FileResource.class);
   }
 
   public Article save(Article article) throws HttpException {
-    return doPostRequestForObject("/latest/articles", article);
+    return doPostRequestForObject("/v5/articles", article);
   }
 
   public Article update(UUID uuid, Article article) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/articles/%s", uuid), article);
+    return doPutRequestForObject(String.format("/v5/articles/%s", uuid), article);
   }
 }

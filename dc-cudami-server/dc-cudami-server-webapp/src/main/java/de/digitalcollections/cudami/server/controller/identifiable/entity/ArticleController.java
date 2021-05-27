@@ -38,7 +38,7 @@ public class ArticleController {
 
   @Operation(summary = "Get count of articles")
   @GetMapping(
-      value = {"/latest/articles/count", "/v2/articles/count"},
+      value = {"/v5/articles/count", "/v2/articles/count", "/latest/articles/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return articleService.count();
@@ -46,7 +46,7 @@ public class ArticleController {
 
   @Operation(summary = "Get all articles")
   @GetMapping(
-      value = {"/latest/articles", "/v2/articles"},
+      value = {"/v5/articles", "/v2/articles", "/latest/articles"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Article> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -66,7 +66,7 @@ public class ArticleController {
       summary =
           "Get an article as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
-      value = {"/latest/articles/{uuid}", "/v2/articles/{uuid}"},
+      value = {"/v5/articles/{uuid}", "/v2/articles/{uuid}", "/latest/articles/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<Article> getArticle(
       @Parameter(
@@ -94,7 +94,7 @@ public class ArticleController {
 
   @Operation(summary = "Get languages of all articles")
   @GetMapping(
-      value = {"/latest/articles/languages", "/v2/articles/languages"},
+      value = {"/v5/articles/languages", "/v2/articles/languages", "/latest/articles/languages"},
       produces = {MediaType.APPLICATION_JSON_VALUE})
   public List<Locale> getLanguages() {
     return this.articleService.getLanguages();
@@ -102,7 +102,7 @@ public class ArticleController {
 
   @Operation(summary = "Save a newly created article")
   @PostMapping(
-      value = {"/latest/articles", "/v2/articles"},
+      value = {"/v5/articles", "/v2/articles", "/latest/articles"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Article save(@RequestBody Article article, BindingResult errors)
       throws IdentifiableServiceException {
@@ -111,7 +111,7 @@ public class ArticleController {
 
   @Operation(summary = "Update an article")
   @PutMapping(
-      value = {"/latest/articles/{uuid}", "/v2/articles/{uuid}"},
+      value = {"/v5/articles/{uuid}", "/v2/articles/{uuid}", "/latest/articles/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Article update(@PathVariable UUID uuid, @RequestBody Article article, BindingResult errors)
       throws IdentifiableServiceException {

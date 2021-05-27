@@ -21,18 +21,18 @@ public class CudamiItemsClient extends CudamiBaseClient<Item> {
   public Boolean addDigitalObject(UUID itemUuid, UUID digitalObjectUuid) throws HttpException {
     return (Boolean)
         doPostRequestForObject(
-            String.format("/latest/items/%s/digitalobjects/%s", itemUuid, digitalObjectUuid),
+            String.format("/v5/items/%s/digitalobjects/%s", itemUuid, digitalObjectUuid),
             Boolean.class);
   }
 
   public boolean addWork(UUID itemUuid, UUID workUuid) throws HttpException {
     return (boolean)
         doPostRequestForObject(
-            String.format("/latest/items/%s/works/%s", itemUuid, workUuid), Boolean.class);
+            String.format("/v5/items/%s/works/%s", itemUuid, workUuid), Boolean.class);
   }
 
   public long count() throws HttpException {
-    return Long.parseLong(doGetRequestForString("/latest/items/count"));
+    return Long.parseLong(doGetRequestForString("/v5/items/count"));
   }
 
   public Item create() {
@@ -40,12 +40,12 @@ public class CudamiItemsClient extends CudamiBaseClient<Item> {
   }
 
   public PageResponse<Item> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/items", pageRequest);
+    return doGetRequestForPagedObjectList("/v5/items", pageRequest);
   }
 
   public PageResponse findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial) throws HttpException {
-    return findByLanguageAndInitial("/latest/items", pageRequest, language, initial);
+    return findByLanguageAndInitial("/v5/items", pageRequest, language, initial);
   }
 
   public PageResponse<Item> findByLanguageAndInitial(
@@ -69,28 +69,28 @@ public class CudamiItemsClient extends CudamiBaseClient<Item> {
   }
 
   public Item findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/items/%s", uuid));
+    return doGetRequestForObject(String.format("/v5/items/%s", uuid));
   }
 
   public Item findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-        String.format("/latest/items/identifier?namespace=%s&id=%s", namespace, id));
+        String.format("/v5/items/identifier?namespace=%s&id=%s", namespace, id));
   }
 
   public List getDigitalObjects(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
-        String.format("/latest/items/%s/digitalobjects", uuid), DigitalObject.class);
+        String.format("/v5/items/%s/digitalobjects", uuid), DigitalObject.class);
   }
 
   public List getWorks(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(String.format("/latest/items/%s/works", uuid), Work.class);
+    return doGetRequestForObjectList(String.format("/v5/items/%s/works", uuid), Work.class);
   }
 
   public Item save(Item item) throws HttpException {
-    return doPostRequestForObject("/latest/items", item);
+    return doPostRequestForObject("/v5/items", item);
   }
 
   public Item update(UUID uuid, Item item) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/items/%s", uuid), item);
+    return doPutRequestForObject(String.format("/v5/items/%s", uuid), item);
   }
 }
