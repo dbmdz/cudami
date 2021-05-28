@@ -42,8 +42,9 @@ public class ProjectController {
   @Operation(summary = "Add an existing digital object to an existing project")
   @PostMapping(
       value = {
-        "/latest/projects/{uuid}/digitalobjects/{digitalObjectUuid}",
-        "/v3/projects/{uuid}/digitalobjects/{digitalObjectUuid}"
+        "/v5/projects/{uuid}/digitalobjects/{digitalObjectUuid}",
+        "/v3/projects/{uuid}/digitalobjects/{digitalObjectUuid}",
+        "/latest/projects/{uuid}/digitalobjects/{digitalObjectUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity addDigitalObject(
@@ -68,7 +69,11 @@ public class ProjectController {
 
   @Operation(summary = "Add existing digital objects to an existing project")
   @PostMapping(
-      value = {"/latest/projects/{uuid}/digitalobjects", "/v3/projects/{uuid}/digitalobjects"},
+      value = {
+        "/v5/projects/{uuid}/digitalobjects",
+        "/v3/projects/{uuid}/digitalobjects",
+        "/latest/projects/{uuid}/digitalobjects"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity addDigitalObjects(
       @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
@@ -89,7 +94,7 @@ public class ProjectController {
   @Operation(
       summary = "Delete an existing project and the identifiers, which belong to this project")
   @DeleteMapping(
-      value = {"/latest/projects/{uuid}", "/v3/projects/{uuid}"},
+      value = {"/v5/projects/{uuid}", "/v3/projects/{uuid}", "/latest/projects/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity deleteProject(
       @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
@@ -102,7 +107,7 @@ public class ProjectController {
 
   @Operation(summary = "Get all projects in reduced form (no identifiers)")
   @GetMapping(
-      value = {"/latest/projects"},
+      value = {"/v5/projects", "/latest/projects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Project> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -119,7 +124,7 @@ public class ProjectController {
 
   @Operation(summary = "Get all projects as list")
   @GetMapping(
-      value = {"/latest/projectlist", "/v2/projectlist"},
+      value = {"/v5/projectlist", "/v2/projectlist", "/latest/projectlist"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Project> findAllReducedAsList() {
     // TODO test if reduced is sufficient for use cases...
@@ -129,8 +134,9 @@ public class ProjectController {
   @Operation(summary = "Get project by namespace and id")
   @GetMapping(
       value = {
-        "/latest/projects/identifier/{namespace}:{id}",
-        "/v3/projects/identifier/{namespace}:{id}"
+        "/v5/projects/identifier/{namespace}:{id}",
+        "/v3/projects/identifier/{namespace}:{id}",
+        "/latest/projects/identifier/{namespace}:{id}"
       },
       produces = "application/json")
   public Project findByIdentifier(@PathVariable String namespace, @PathVariable String id)
@@ -143,7 +149,7 @@ public class ProjectController {
       summary =
           "Get an project as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
-      value = {"/latest/projects/{uuid}", "/v2/projects/{uuid}"},
+      value = {"/v5/projects/{uuid}", "/v2/projects/{uuid}", "/latest/projects/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<Project> findByUuid(
       @Parameter(
@@ -171,7 +177,7 @@ public class ProjectController {
 
   @Operation(summary = "Get paged digital objects of a project")
   @GetMapping(
-      value = {"/latest/projects/{uuid}/digitalobjects"},
+      value = {"/v5/projects/{uuid}/digitalobjects", "/latest/projects/{uuid}/digitalobjects"},
       produces = "application/json")
   public PageResponse<DigitalObject> getDigitalObjects(
       @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
@@ -188,8 +194,9 @@ public class ProjectController {
   @Operation(summary = "Remove an existing digital object from an existing project")
   @DeleteMapping(
       value = {
-        "/latest/projects/{uuid}/digitalobjects/{digitalObjectUuid}",
-        "/v3/projects/{uuid}/digitalobjects/{digitalObjectUuid}"
+        "/v5/projects/{uuid}/digitalobjects/{digitalObjectUuid}",
+        "/v3/projects/{uuid}/digitalobjects/{digitalObjectUuid}",
+        "/latest/projects/{uuid}/digitalobjects/{digitalObjectUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity removeDigitalObject(
@@ -214,7 +221,7 @@ public class ProjectController {
 
   @Operation(summary = "Save a newly created project")
   @PostMapping(
-      value = {"/latest/projects", "/v2/projects"},
+      value = {"/v5/projects", "/v2/projects", "/latest/projects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Project save(@RequestBody Project project, BindingResult errors)
       throws IdentifiableServiceException {
@@ -223,7 +230,11 @@ public class ProjectController {
 
   @Operation(summary = "Save existing digital objects into an existing project")
   @PutMapping(
-      value = {"/latest/projects/{uuid}/digitalobjects", "/v3/projects/{uuid}/digitalobjects"},
+      value = {
+        "/v5/projects/{uuid}/digitalobjects",
+        "/v3/projects/{uuid}/digitalobjects",
+        "/latest/projects/{uuid}/digitalobjects"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity saveDigitalObjects(
       @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
@@ -243,7 +254,7 @@ public class ProjectController {
 
   @Operation(summary = "Update an project")
   @PutMapping(
-      value = {"/latest/projects/{uuid}", "/v2/projects/{uuid}"},
+      value = {"/v5/projects/{uuid}", "/v2/projects/{uuid}", "/latest/projects/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Project update(@PathVariable UUID uuid, @RequestBody Project project, BindingResult errors)
       throws IdentifiableServiceException {
@@ -253,7 +264,7 @@ public class ProjectController {
 
   @Operation(summary = "Get languages of all projects")
   @GetMapping(
-      value = {"/latest/projects/languages", "/v3/projects/languages"},
+      value = {"/v5/projects/languages", "/v3/projects/languages", "/latest/projects/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
     return projectService.getLanguages();

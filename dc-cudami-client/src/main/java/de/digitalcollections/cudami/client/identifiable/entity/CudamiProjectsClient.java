@@ -23,19 +23,18 @@ public class CudamiProjectsClient extends CudamiBaseClient<Project> {
   public boolean addDigitalObject(UUID projectUuid, UUID digitalObjectUuid) throws HttpException {
     return Boolean.parseBoolean(
         doPostRequestForString(
-            String.format(
-                "/latest/projects/%s/digitalobjects/%s", projectUuid, digitalObjectUuid)));
+            String.format("/v5/projects/%s/digitalobjects/%s", projectUuid, digitalObjectUuid)));
   }
 
   public boolean addDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects)
       throws HttpException {
     return Boolean.parseBoolean(
         doPostRequestForString(
-            String.format("/latest/projects/%s/digitalobjects", projectUuid), digitalObjects));
+            String.format("/v5/projects/%s/digitalobjects", projectUuid), digitalObjects));
   }
 
   public long count() throws HttpException {
-    return Long.parseLong(doGetRequestForString("/latest/projects/count"));
+    return Long.parseLong(doGetRequestForString("/v5/projects/count"));
   }
 
   public Project create() {
@@ -43,41 +42,41 @@ public class CudamiProjectsClient extends CudamiBaseClient<Project> {
   }
 
   public void delete(UUID uuid) throws HttpException {
-    doDeleteRequestForString(String.format("/latest/projects/%s", uuid));
+    doDeleteRequestForString(String.format("/v5/projects/%s", uuid));
   }
 
   @Deprecated(since = "5.0", forRemoval = true)
   /** @deprecated Please use {@link #find(SearchPageRequest)} instead */
   public PageResponse<Project> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/projects", pageRequest);
+    return doGetRequestForPagedObjectList("/v5/projects", pageRequest);
   }
 
   public SearchPageResponse<Project> find(SearchPageRequest searchPageRequest)
       throws HttpException {
-    return doGetSearchRequestForPagedObjectList("/latest/projects", searchPageRequest);
+    return doGetSearchRequestForPagedObjectList("/v5/projects", searchPageRequest);
   }
 
   public Project findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/projects/%s", uuid));
+    return doGetRequestForObject(String.format("/v5/projects/%s", uuid));
   }
 
   public Project findOne(UUID uuid, String locale) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/projects/%s?locale=%s", uuid, locale));
+    return doGetRequestForObject(String.format("/v5/projects/%s?locale=%s", uuid, locale));
   }
 
   public Project findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-        String.format("/latest/projects/identifier/%s:%s.json", namespace, id));
+        String.format("/v5/projects/identifier/%s:%s.json", namespace, id));
   }
 
   public List<Project> getAll() throws HttpException {
-    return doGetRequestForObjectList(String.format("/latest/projectlist", Project.class));
+    return doGetRequestForObjectList(String.format("/v5/projectlist", Project.class));
   }
 
   public PageResponse<DigitalObject> getDigitalObjects(UUID projectUuid, PageRequest pageRequest)
       throws HttpException {
     return doGetRequestForPagedObjectList(
-        String.format("/latest/projects/%s/digitalobjects", projectUuid),
+        String.format("/v5/projects/%s/digitalobjects", projectUuid),
         pageRequest,
         DigitalObject.class);
   }
@@ -86,12 +85,11 @@ public class CudamiProjectsClient extends CudamiBaseClient<Project> {
       throws HttpException {
     return Boolean.parseBoolean(
         doDeleteRequestForString(
-            String.format(
-                "/latest/projects/%s/digitalobjects/%s", projectUuid, digitalObjectUuid)));
+            String.format("/v5/projects/%s/digitalobjects/%s", projectUuid, digitalObjectUuid)));
   }
 
   public Project save(Project project) throws HttpException {
-    return doPostRequestForObject("/latest/projects", project);
+    return doPostRequestForObject("/v5/projects", project);
   }
 
   public boolean saveDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects)
@@ -99,16 +97,16 @@ public class CudamiProjectsClient extends CudamiBaseClient<Project> {
     return Boolean.parseBoolean(
         (String)
             doPutRequestForObject(
-                String.format("/latest/projects/%s/digitalobjects", projectUuid),
+                String.format("/v5/projects/%s/digitalobjects", projectUuid),
                 digitalObjects,
                 String.class));
   }
 
   public Project update(UUID uuid, Project project) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/projects/%s", uuid), project);
+    return doPutRequestForObject(String.format("/v5/projects/%s", uuid), project);
   }
 
   public List<Locale> getLanguages() throws HttpException {
-    return doGetRequestForObjectList("/latest/projects/languages", Locale.class);
+    return doGetRequestForObjectList("/v5/projects/languages", Locale.class);
   }
 }

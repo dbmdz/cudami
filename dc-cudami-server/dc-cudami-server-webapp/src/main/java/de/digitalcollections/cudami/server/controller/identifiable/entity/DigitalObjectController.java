@@ -46,7 +46,11 @@ public class DigitalObjectController {
 
   @Operation(summary = "Get count of digital objects")
   @GetMapping(
-      value = {"/latest/digitalobjects/count", "/v2/digitalobjects/count"},
+      value = {
+        "/v5/digitalobjects/count",
+        "/v2/digitalobjects/count",
+        "/latest/digitalobjects/count"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return digitalObjectService.count();
@@ -54,7 +58,11 @@ public class DigitalObjectController {
 
   @Operation(summary = "Delete a digital object with all its relations")
   @DeleteMapping(
-      value = {"/latest/digitalobjects/{uuid}", "/v2/digitalobjects/{uuid}"},
+      value = {
+        "/v5/digitalobjects/{uuid}",
+        "/v2/digitalobjects/{uuid}",
+        "/latest/digitalobjects/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity delete(
       @Parameter(example = "", description = "UUID of the digital object") @PathVariable("uuid")
@@ -69,7 +77,7 @@ public class DigitalObjectController {
 
   @Operation(summary = "Get all digital objects")
   @GetMapping(
-      value = {"/latest/digitalobjects"},
+      value = {"/v5/digitalobjects", "/latest/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<DigitalObject> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -87,7 +95,11 @@ public class DigitalObjectController {
       summary =
           "Get all digital objects, reduced to their metadata fields (only all identifiers and last modification date)")
   @GetMapping(
-      value = {"/latest/digitalobjects/reduced", "/v3/digitalobjects/reduced"},
+      value = {
+        "/v5/digitalobjects/reduced",
+        "/v3/digitalobjects/reduced",
+        "/latest/digitalobjects/reduced"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<DigitalObject> findAllReduced() {
     return digitalObjectService.findAllReduced();
@@ -95,7 +107,11 @@ public class DigitalObjectController {
 
   @Operation(summary = "Get digital object by uuid")
   @GetMapping(
-      value = {"/latest/digitalobjects/{uuid}", "/v2/digitalobjects/{uuid}"},
+      value = {
+        "/v5/digitalobjects/{uuid}",
+        "/v2/digitalobjects/{uuid}",
+        "/latest/digitalobjects/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public DigitalObject findById(@PathVariable UUID uuid) {
     return digitalObjectService.get(uuid);
@@ -104,8 +120,9 @@ public class DigitalObjectController {
   @Operation(summary = "Get digital object by namespace and id")
   @GetMapping(
       value = {
-        "/latest/digitalobjects/identifier/{namespace}:{id}",
-        "/v2/digitalobjects/identifier/{namespace}:{id}"
+        "/v5/digitalobjects/identifier/{namespace}:{id}",
+        "/v2/digitalobjects/identifier/{namespace}:{id}",
+        "/latest/digitalobjects/identifier/{namespace}:{id}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public DigitalObject findByIdentifier(
@@ -128,7 +145,11 @@ public class DigitalObjectController {
       summary =
           "Find limited amount of digital objects containing searchTerm in label or description")
   @GetMapping(
-      value = {"/latest/digitalobjects/search", "/v3/digitalobjects/search"},
+      value = {
+        "/v5/digitalobjects/search",
+        "/v3/digitalobjects/search",
+        "/latest/digitalobjects/search"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public SearchPageResponse<DigitalObject> findDigitalObjects(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -145,7 +166,11 @@ public class DigitalObjectController {
 
   @Operation(summary = "Get item for digital object by digital object uuid")
   @GetMapping(
-      value = {"/latest/digitalobjects/{uuid}/item", "/v2/digitalobjects/{uuid}/item"},
+      value = {
+        "/v5/digitalobjects/{uuid}/item",
+        "/v2/digitalobjects/{uuid}/item",
+        "/latest/digitalobjects/{uuid}/item"
+      },
       produces = "application/json")
   public Item findItemOfDigitalObject(@PathVariable UUID uuid) {
     return digitalObjectService.getItem(uuid);
@@ -153,7 +178,11 @@ public class DigitalObjectController {
 
   @Operation(summary = "Find limited amount of random digital objects")
   @GetMapping(
-      value = {"/latest/digitalobjects/random", "/v2/digitalobjects/random"},
+      value = {
+        "/v5/digitalobjects/random",
+        "/v2/digitalobjects/random",
+        "/latest/digitalobjects/random"
+      },
       produces = "application/json")
   public List<DigitalObject> findRandomDigitalObjects(
       @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
@@ -162,7 +191,10 @@ public class DigitalObjectController {
 
   @Operation(summary = "Get (active) paged collections of a digital objects")
   @GetMapping(
-      value = {"/latest/digitalobjects/{uuid}/collections"},
+      value = {
+        "/v5/digitalobjects/{uuid}/collections",
+        "/latest/digitalobjects/{uuid}/collections"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Collection> getCollections(
       @Parameter(example = "", description = "UUID of the digital object") @PathVariable("uuid")
@@ -183,8 +215,9 @@ public class DigitalObjectController {
   @Operation(summary = "Get file resources of a digital object")
   @GetMapping(
       value = {
-        "/latest/digitalobjects/{uuid}/fileresources",
-        "/v2/digitalobjects/{uuid}/fileresources"
+        "/v5/digitalobjects/{uuid}/fileresources",
+        "/v2/digitalobjects/{uuid}/fileresources",
+        "/latest/digitalobjects/{uuid}/fileresources"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<FileResource> getFileResources(@PathVariable UUID uuid) {
@@ -194,8 +227,9 @@ public class DigitalObjectController {
   @Operation(summary = "Get image file resources of a digital object")
   @GetMapping(
       value = {
-        "/latest/digitalobjects/{uuid}/fileresources/images",
-        "/v2/digitalobjects/{uuid}/fileresources/images"
+        "/v5/digitalobjects/{uuid}/fileresources/images",
+        "/v2/digitalobjects/{uuid}/fileresources/images",
+        "/latest/digitalobjects/{uuid}/fileresources/images"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<ImageFileResource> getImageFileResources(@PathVariable UUID uuid) {
@@ -220,7 +254,11 @@ public class DigitalObjectController {
 
   @Operation(summary = "Get paged projects of a digital objects")
   @GetMapping(
-      value = {"/latest/digitalobjects/{uuid}/projects", "/v3/digitalobjects/{uuid}/projects"},
+      value = {
+        "/v5/digitalobjects/{uuid}/projects",
+        "/v3/digitalobjects/{uuid}/projects",
+        "/latest/digitalobjects/{uuid}/projects"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Project> getProjects(
       @Parameter(example = "", description = "UUID of the digital object") @PathVariable("uuid")
@@ -236,7 +274,7 @@ public class DigitalObjectController {
 
   @Operation(summary = "Save a newly created digital object")
   @PostMapping(
-      value = {"/latest/digitalobjects", "/v2/digitalobjects"},
+      value = {"/v5/digitalobjects", "/v2/digitalobjects", "/latest/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public DigitalObject save(@RequestBody DigitalObject digitalObject, BindingResult errors)
       throws IdentifiableServiceException {
@@ -246,8 +284,9 @@ public class DigitalObjectController {
   @Operation(summary = "Save list of fileresources for a given digital object")
   @PostMapping(
       value = {
-        "/latest/digitalobjects/{uuid}/fileresources",
-        "/v3/digitalobjects/{uuid}/fileresources"
+        "/v5/digitalobjects/{uuid}/fileresources",
+        "/v3/digitalobjects/{uuid}/fileresources",
+        "/latest/digitalobjects/{uuid}/fileresources"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<FileResource> saveFileResources(
@@ -259,7 +298,11 @@ public class DigitalObjectController {
 
   @Operation(summary = "Update a digital object")
   @PutMapping(
-      value = {"/latest/digitalobjects/{uuid}", "/v2/digitalobjects/{uuid}"},
+      value = {
+        "/v5/digitalobjects/{uuid}",
+        "/v2/digitalobjects/{uuid}",
+        "/latest/digitalobjects/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public DigitalObject update(
       @Parameter(example = "", description = "UUID of the digital object") @PathVariable("uuid")
@@ -273,7 +316,11 @@ public class DigitalObjectController {
 
   @Operation(summary = "Get languages of all digital objects")
   @GetMapping(
-      value = {"/latest/digitalobjects/languages", "/v3/digitalobjects/languages"},
+      value = {
+        "/v5/digitalobjects/languages",
+        "/v3/digitalobjects/languages",
+        "/latest/digitalobjects/languages"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
     return digitalObjectService.getLanguages();

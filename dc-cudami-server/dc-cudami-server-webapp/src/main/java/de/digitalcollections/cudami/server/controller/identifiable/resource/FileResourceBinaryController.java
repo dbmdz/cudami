@@ -36,7 +36,7 @@ public class FileResourceBinaryController {
     this.metadataService = metadataService;
   }
 
-  @PostMapping(value = {"/latest/files", "/v2/files"})
+  @PostMapping(value = {"/v5/files", "/v2/files", "/latest/files"})
   public FileResource upload(HttpServletRequest request) throws IOException {
     FileResource fileResource = null;
 

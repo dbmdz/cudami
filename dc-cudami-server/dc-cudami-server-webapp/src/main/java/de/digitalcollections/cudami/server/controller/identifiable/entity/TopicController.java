@@ -49,8 +49,9 @@ public class TopicController {
   @Operation(summary = "Add an existing topic to an existing parent topic")
   @PostMapping(
       value = {
-        "/latest/topics/{parentTopicUuid}/subtopic/{subtopicUuid}",
-        "/v3/topics/{parentTopicUuid}/subtopic/{subtopicUuid}"
+        "/v5/topics/{parentTopicUuid}/subtopic/{subtopicUuid}",
+        "/v3/topics/{parentTopicUuid}/subtopic/{subtopicUuid}",
+        "/latest/topics/{parentTopicUuid}/subtopic/{subtopicUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Boolean> addChild(
@@ -70,7 +71,7 @@ public class TopicController {
 
   @Operation(summary = "Get count of topics")
   @GetMapping(
-      value = {"/latest/topics/count", "/v2/topics/count"},
+      value = {"/v5/topics/count", "/v2/topics/count", "/latest/topics/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return topicService.count();
@@ -78,7 +79,7 @@ public class TopicController {
 
   @Operation(summary = "Get all topics")
   @GetMapping(
-      value = {"/latest/topics", "/v2/topics"},
+      value = {"/v5/topics", "/v2/topics", "/latest/topics"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Topic> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -95,7 +96,7 @@ public class TopicController {
 
   @Operation(summary = "Get all top topics")
   @GetMapping(
-      value = {"/latest/topics/top", "/v3/topics/top"},
+      value = {"/v5/topics/top", "/v3/topics/top", "/latest/topics/top"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Topic> findAllTop(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -113,8 +114,9 @@ public class TopicController {
   @Operation(summary = "Get topic by uuid (and optional locale)")
   @GetMapping(
       value = {
-        "/latest/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v2/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+        "/v5/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v2/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/latest/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Topic> findById(
@@ -140,9 +142,15 @@ public class TopicController {
   }
 
   @Operation(summary = "Get topic by refId")
-  @GetMapping(value = {"/latest/topics/{refId:[0-9]+}", "/v3/topics/{refId:[0-9]+}"})
+  @GetMapping(
+      value = {
+        "/v5/topics/{refId:[0-9]+}",
+        "/v3/topics/{refId:[0-9]+}",
+        "/latest/topics/{refId:[0-9]+}"
+      })
   public ResponseEntity<Topic> findByRefId(
-      @Parameter(example = "", description = "refId of the topic, e.g. <tt>42</tt>") @PathVariable
+      @Parameter(name = "refId", example = "", description = "refId of the topic, e.g. <tt>42</tt>")
+          @PathVariable
           long refId)
       throws IdentifiableServiceException {
     Topic topic = topicService.getByRefId(refId);
@@ -172,7 +180,11 @@ public class TopicController {
 
   @Operation(summary = "Get the breadcrumb for a topic")
   @GetMapping(
-      value = {"/latest/topics/{uuid}/breadcrumb", "/v3/topics/{uuid}/breadcrumb"},
+      value = {
+        "/v5/topics/{uuid}/breadcrumb",
+        "/v3/topics/{uuid}/breadcrumb",
+        "/latest/topics/{uuid}/breadcrumb"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<BreadcrumbNavigation> getBreadcrumb(
       @Parameter(
@@ -205,7 +217,11 @@ public class TopicController {
 
   @Operation(summary = "Get subtopics of topic")
   @GetMapping(
-      value = {"/latest/topics/{uuid}/children", "/v3/topics/{uuid}/children"},
+      value = {
+        "/v5/topics/{uuid}/children",
+        "/v3/topics/{uuid}/children",
+        "/latest/topics/{uuid}/children"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   List<Topic> getChildren(@PathVariable UUID uuid) {
     return topicService.getChildren(uuid);
@@ -213,7 +229,11 @@ public class TopicController {
 
   @Operation(summary = "Get all entities of topic")
   @GetMapping(
-      value = {"/latest/topics/{uuid}/entities/all", "/v3/topics/{uuid}/entities/all"},
+      value = {
+        "/v5/topics/{uuid}/entities/all",
+        "/v3/topics/{uuid}/entities/all",
+        "/latest/topics/{uuid}/entities/all"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Entity> getEntities(
       @Parameter(name = "uuid", description = "The uuid of the topic") @PathVariable UUID uuid) {
@@ -222,7 +242,11 @@ public class TopicController {
 
   @Operation(summary = "Get paged entities of a topic")
   @GetMapping(
-      value = {"/latest/topics/{uuid}/entities", "/v3/topics/{uuid}/entities"},
+      value = {
+        "/v5/topics/{uuid}/entities",
+        "/v3/topics/{uuid}/entities",
+        "/latest/topics/{uuid}/entities"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Entity> getEntities(
       @Parameter(example = "", description = "UUID of the topic") @PathVariable("uuid")
@@ -240,7 +264,11 @@ public class TopicController {
 
   @Operation(summary = "Get file resources of topic")
   @GetMapping(
-      value = {"/latest/topics/{uuid}/fileresources", "/v3/topics/{uuid}/fileresources"},
+      value = {
+        "/v5/topics/{uuid}/fileresources",
+        "/v3/topics/{uuid}/fileresources",
+        "/latest/topics/{uuid}/fileresources"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<FileResource> getFileResources(
       @PathVariable UUID uuid,
@@ -267,7 +295,11 @@ public class TopicController {
 
   @Operation(summary = "Get parent topic of topic")
   @GetMapping(
-      value = {"/latest/topics/{uuid}/parent", "/v3/topics/{uuid}/parent"},
+      value = {
+        "/v5/topics/{uuid}/parent",
+        "/v3/topics/{uuid}/parent",
+        "/latest/topics/{uuid}/parent"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   Topic getParent(@PathVariable UUID uuid) {
     return topicService.getParent(uuid);
@@ -275,7 +307,7 @@ public class TopicController {
 
   @Operation(summary = "Get subtopics of topic")
   @GetMapping(
-      value = {"/v2/topics/{uuid}/subtopics"},
+      value = {"/v5/topics/{uuid}/subtopics", "/v2/topics/{uuid}/subtopics"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   ResponseEntity<String> getSubtopics(@PathVariable UUID uuid) {
     return new ResponseEntity<>(
@@ -285,7 +317,11 @@ public class TopicController {
 
   @Operation(summary = "Get topics an entity is linked to")
   @GetMapping(
-      value = {"/latest/topics/entity/{uuid}", "/v3/topics/entity/{uuid}"},
+      value = {
+        "/v5/topics/entity/{uuid}",
+        "/v3/topics/entity/{uuid}",
+        "/latest/topics/entity/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   List<Topic> getTopicsOfEntity(@PathVariable UUID uuid) {
     return topicService.getTopicsOfEntity(uuid);
@@ -293,7 +329,11 @@ public class TopicController {
 
   @Operation(summary = "Get topics a fileresource is linked to")
   @GetMapping(
-      value = {"/latest/topics/fileresource/{uuid}", "/v3/topics/fileresource/{uuid}"},
+      value = {
+        "/v5/topics/fileresource/{uuid}",
+        "/v3/topics/fileresource/{uuid}",
+        "/latest/topics/fileresource/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   List<Topic> getTopicsOfFileResource(@PathVariable UUID uuid) {
     return topicService.getTopicsOfFileResource(uuid);
@@ -301,7 +341,11 @@ public class TopicController {
 
   @Operation(summary = "Get languages of all top topics")
   @GetMapping(
-      value = {"/latest/topics/top/languages", "/v3/topics/top/languages"},
+      value = {
+        "/v5/topics/top/languages",
+        "/v3/topics/top/languages",
+        "/latest/topics/top/languages"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getTopTopicsLanguages() {
     return topicService.getRootNodesLanguages();
@@ -310,8 +354,9 @@ public class TopicController {
   @Operation(summary = "Remove child-relation of the given subtopic to the given parent topic")
   @DeleteMapping(
       value = {
-        "/latest/topics/{parentTopicUuid}/children/{subtopicUuid}",
-        "/v3/topics/{parentTopicUuid}/children/{subtopicUuid}"
+        "/v5/topics/{parentTopicUuid}/children/{subtopicUuid}",
+        "/v3/topics/{parentTopicUuid}/children/{subtopicUuid}",
+        "/latest/topics/{parentTopicUuid}/children/{subtopicUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   ResponseEntity<Boolean> removeChild(
@@ -329,7 +374,7 @@ public class TopicController {
 
   @Operation(summary = "Save a newly created topic")
   @PostMapping(
-      value = {"/latest/topics", "/v2/topics"},
+      value = {"/v5/topics", "/v2/topics", "/latest/topics"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Topic save(@RequestBody Topic topic, BindingResult errors)
       throws IdentifiableServiceException {
@@ -338,7 +383,11 @@ public class TopicController {
 
   @Operation(summary = "Save entities of topic")
   @PostMapping(
-      value = {"/latest/topics/{uuid}/entities", "/v3/topics/{uuid}/entities"},
+      value = {
+        "/v5/topics/{uuid}/entities",
+        "/v3/topics/{uuid}/entities",
+        "/latest/topics/{uuid}/entities"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Entity> saveEntities(@PathVariable UUID uuid, @RequestBody List<Entity> entities) {
     return topicService.saveEntities(uuid, entities);
@@ -346,7 +395,11 @@ public class TopicController {
 
   @Operation(summary = "Save fileresources of topic")
   @PostMapping(
-      value = {"/latest/topics/{uuid}/fileresources", "/v3/topics/{uuid}/fileresources"},
+      value = {
+        "/v5/topics/{uuid}/fileresources",
+        "/v3/topics/{uuid}/fileresources",
+        "/latest/topics/{uuid}/fileresources"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<FileResource> saveFileresources(
       @PathVariable UUID uuid, @RequestBody List<FileResource> fileResources) {
@@ -356,8 +409,9 @@ public class TopicController {
   @Operation(summary = "Save a newly created topic and add it to parent")
   @PostMapping(
       value = {
-        "/latest/topics/{parentTopicUuid}/subtopic",
-        "/v3/topics/{parentTopicUuid}/subtopic"
+        "/v5/topics/{parentTopicUuid}/subtopic",
+        "/v3/topics/{parentTopicUuid}/subtopic",
+        "/latest/topics/{parentTopicUuid}/subtopic"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Topic saveWithParentTopic(
@@ -372,7 +426,7 @@ public class TopicController {
 
   @Operation(summary = "Update a topic")
   @PutMapping(
-      value = {"/latest/topics/{uuid}", "/v2/topics/{uuid}"},
+      value = {"/v5/topics/{uuid}", "/v2/topics/{uuid}", "/latest/topics/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Topic update(@PathVariable UUID uuid, @RequestBody Topic topic, BindingResult errors)
       throws IdentifiableServiceException {
