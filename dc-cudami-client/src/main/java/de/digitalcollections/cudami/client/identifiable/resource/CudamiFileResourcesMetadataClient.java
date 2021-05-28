@@ -23,7 +23,7 @@ public class CudamiFileResourcesMetadataClient extends CudamiBaseClient<FileReso
   }
 
   public long count() throws HttpException {
-    return Long.parseLong(doGetRequestForString("/latest/fileresources/count"));
+    return Long.parseLong(doGetRequestForString("/v5/fileresources/count"));
   }
 
   public FileResource create() {
@@ -33,12 +33,12 @@ public class CudamiFileResourcesMetadataClient extends CudamiBaseClient<FileReso
   @Deprecated(since = "5.0", forRemoval = true)
   /** @deprecated Please use {@link #find(SearchPageRequest)} instead */
   public PageResponse<FileResource> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/fileresources", pageRequest);
+    return doGetRequestForPagedObjectList("/v5/fileresources", pageRequest);
   }
 
   public SearchPageResponse<FileResource> find(SearchPageRequest searchPageRequest)
       throws HttpException {
-    return doGetSearchRequestForPagedObjectList("/latest/fileresources", searchPageRequest);
+    return doGetSearchRequestForPagedObjectList("/v5/fileresources", searchPageRequest);
   }
 
   public List<FileResource> find(String searchTerm, int maxResults) throws HttpException {
@@ -50,27 +50,27 @@ public class CudamiFileResourcesMetadataClient extends CudamiBaseClient<FileReso
   public SearchPageResponse<FileResource> findFileResourcesByType(
       SearchPageRequest searchPageRequest, String type) throws HttpException {
     return doGetSearchRequestForPagedObjectList(
-        String.format("/latest/fileresources/type/%s", type), searchPageRequest);
+        String.format("/v5/fileresources/type/%s", type), searchPageRequest);
   }
 
   public FileResource findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/fileresources/%s", uuid));
+    return doGetRequestForObject(String.format("/v5/fileresources/%s", uuid));
   }
 
   public FileResource findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-        String.format("/latest/fileresources/identifier/%s:%s.json", namespace, id));
+        String.format("/v5/fileresources/identifier/%s:%s.json", namespace, id));
   }
 
   public List<Locale> getLanguages() throws HttpException {
-    return doGetRequestForObjectList("/latest/fileresources/languages", Locale.class);
+    return doGetRequestForObjectList("/v5/fileresources/languages", Locale.class);
   }
 
   public FileResource save(FileResource fileResource) throws HttpException {
-    return doPostRequestForObject("/latest/fileresources", fileResource);
+    return doPostRequestForObject("/v5/fileresources", fileResource);
   }
 
   public FileResource update(UUID uuid, FileResource fileResource) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/fileresources/%s", uuid), fileResource);
+    return doPutRequestForObject(String.format("/v5/fileresources/%s", uuid), fileResource);
   }
 }

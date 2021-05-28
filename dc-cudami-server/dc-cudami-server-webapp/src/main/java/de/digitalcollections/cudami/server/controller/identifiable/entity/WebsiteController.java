@@ -57,7 +57,7 @@ public class WebsiteController {
                     examples = {@ExampleObject(name = "example", value = "42")}))
       })
   @GetMapping(
-      value = {"/latest/websites/count", "/v2/websites/count"},
+      value = {"/v5/websites/count", "/v2/websites/count", "/latest/websites/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return websiteService.count();
@@ -76,7 +76,7 @@ public class WebsiteController {
                     schema = @Schema(implementation = PageResponseWebsite.class)))
       })
   @GetMapping(
-      value = {"/latest/websites"},
+      value = {"/v5/websites", "/latest/websites"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public SearchPageResponse<Website> findAll(
       @Parameter(
@@ -154,7 +154,7 @@ public class WebsiteController {
       description = "Get languages of all websites",
       responses = {@ApiResponse(responseCode = "200", description = "List&lt;Locale&gt;")})
   @GetMapping(
-      value = {"/latest/websites/languages", "/v2/websites/languages"},
+      value = {"/v5/websites/languages", "/v2/websites/languages", "/latest/websites/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
     return websiteService.getLanguages();
@@ -173,7 +173,7 @@ public class WebsiteController {
                     schema = @Schema(implementation = SearchPageResponseWebpage.class)))
       })
   @GetMapping(
-      value = {"/latest/websites/{uuid}/rootpages"},
+      value = {"/v5/websites/{uuid}/rootpages", "/latest/websites/{uuid}/rootpages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public SearchPageResponse<Webpage> getRootPages(
       @Parameter(
@@ -233,7 +233,7 @@ public class WebsiteController {
                     schema = @Schema(implementation = Website.class)))
       })
   @PostMapping(
-      value = {"/latest/websites", "/v2/websites"},
+      value = {"/v5/websites", "/v2/websites", "/latest/websites"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Website save(@RequestBody Website website, BindingResult errors)
       throws IdentifiableServiceException {
@@ -253,7 +253,7 @@ public class WebsiteController {
                     schema = @Schema(implementation = Website.class)))
       })
   @PutMapping(
-      value = {"/latest/websites/{uuid}", "/v2/websites/{uuid}"},
+      value = {"/v5/websites/{uuid}", "/v2/websites/{uuid}", "/latest/websites/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Website update(
       @Parameter(
@@ -286,7 +286,11 @@ public class WebsiteController {
             description = "update failed because the website did not exist")
       })
   @PutMapping(
-      value = {"/latest/websites/{uuid}/rootpages", "/v3/websites/{uuid}/rootpages"},
+      value = {
+        "/v5/websites/{uuid}/rootpages",
+        "/v3/websites/{uuid}/rootpages",
+        "/latest/websites/{uuid}/rootpages"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity updateRootPagesOrder(
       @Parameter(

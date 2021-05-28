@@ -25,7 +25,7 @@ public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObject> 
   }
 
   public long count() throws HttpException {
-    return Long.parseLong(doGetRequestForString("/latest/digitalobjects/count"));
+    return Long.parseLong(doGetRequestForString("/v5/digitalobjects/count"));
   }
 
   public DigitalObject create() {
@@ -34,16 +34,16 @@ public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObject> 
 
   public boolean delete(UUID uuid) throws HttpException {
     return Boolean.parseBoolean(
-        doDeleteRequestForString(String.format("/latest/digitalobjects/%s", uuid)));
+        doDeleteRequestForString(String.format("/v5/digitalobjects/%s", uuid)));
   }
 
   public PageResponse<DigitalObject> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/digitalobjects", pageRequest);
+    return doGetRequestForPagedObjectList("/v5/digitalobjects", pageRequest);
   }
 
   public SearchPageResponse<DigitalObject> find(SearchPageRequest searchPageRequest)
       throws HttpException {
-    return doGetSearchRequestForPagedObjectList("/latest/digitalobjects/search", searchPageRequest);
+    return doGetSearchRequestForPagedObjectList("/v5/digitalobjects/search", searchPageRequest);
   }
 
   public List<DigitalObject> find(String searchTerm, int maxResults) throws HttpException {
@@ -53,27 +53,27 @@ public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObject> 
   }
 
   public List<DigitalObject> findAllReduced() throws HttpException {
-    return doGetRequestForObjectList("/latest/digitalobjects/reduced", DigitalObject.class);
+    return doGetRequestForObjectList("/v5/digitalobjects/reduced", DigitalObject.class);
   }
 
   public DigitalObject findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/digitalobjects/%s", uuid));
+    return doGetRequestForObject(String.format("/v5/digitalobjects/%s", uuid));
   }
 
   public DigitalObject findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-        String.format("/latest/digitalobjects/identifier/%s:%s.json", namespace, id));
+        String.format("/v5/digitalobjects/identifier/%s:%s.json", namespace, id));
   }
 
   public PageResponse<DigitalObject> findRandomDigitalObjects(int count) throws HttpException {
     PageRequest pageRequest = new PageRequest(0, count, null);
-    return doGetRequestForPagedObjectList("/latest/digitalobjects/random", pageRequest);
+    return doGetRequestForPagedObjectList("/v5/digitalobjects/random", pageRequest);
   }
 
   public PageResponse<Collection> getActiveCollections(UUID uuid, PageRequest pageRequest)
       throws HttpException {
     return doGetRequestForPagedObjectList(
-        String.format("/latest/digitalobjects/%s/collections?active=true", uuid),
+        String.format("/v5/digitalobjects/%s/collections?active=true", uuid),
         pageRequest,
         Collection.class);
   }
@@ -81,25 +81,22 @@ public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObject> 
   public PageResponse<Collection> getCollections(UUID uuid, PageRequest pageRequest)
       throws HttpException {
     return doGetRequestForPagedObjectList(
-        String.format("/latest/digitalobjects/%s/collections", uuid),
-        pageRequest,
-        Collection.class);
+        String.format("/v5/digitalobjects/%s/collections", uuid), pageRequest, Collection.class);
   }
 
   public List<FileResource> getFileResources(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
-        String.format("/latest/digitalobjects/%s/fileresources", uuid), FileResource.class);
+        String.format("/v5/digitalobjects/%s/fileresources", uuid), FileResource.class);
   }
 
   public List<ImageFileResource> getImageFileResources(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
-        String.format("/latest/digitalobjects/%s/fileresources/images", uuid),
-        ImageFileResource.class);
+        String.format("/v5/digitalobjects/%s/fileresources/images", uuid), ImageFileResource.class);
   }
 
   public Item getItem(UUID uuid) throws HttpException {
     return (Item)
-        doGetRequestForObject(String.format("/latest/digitalobjects/%s/item", uuid), Item.class);
+        doGetRequestForObject(String.format("/v5/digitalobjects/%s/item", uuid), Item.class);
   }
 
   public List<Locale> getLanguagesOfCollections(UUID uuid) throws HttpException {
@@ -115,25 +112,25 @@ public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObject> 
   public PageResponse<Project> getProjects(UUID uuid, PageRequest pageRequest)
       throws HttpException {
     return doGetRequestForPagedObjectList(
-        String.format("/latest/digitalobjects/%s/projects", uuid), pageRequest, Project.class);
+        String.format("/v5/digitalobjects/%s/projects", uuid), pageRequest, Project.class);
   }
 
   public DigitalObject save(DigitalObject digitalObject) throws HttpException {
-    return doPostRequestForObject("/latest/digitalobjects", digitalObject);
+    return doPostRequestForObject("/v5/digitalobjects", digitalObject);
   }
 
   public List<FileResource> saveFileResources(UUID uuid, List fileResources) throws HttpException {
     return doPostRequestForObjectList(
-        String.format("/latest/digitalobjects/%s/fileresources", uuid),
+        String.format("/v5/digitalobjects/%s/fileresources", uuid),
         fileResources,
         FileResource.class);
   }
 
   public DigitalObject update(UUID uuid, DigitalObject digitalObject) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/digitalobjects/%s", uuid), digitalObject);
+    return doPutRequestForObject(String.format("/v5/digitalobjects/%s", uuid), digitalObject);
   }
 
   public List<Locale> getLanguages() throws HttpException {
-    return doGetRequestForObjectList("/latest/digitalobjects/languages", Locale.class);
+    return doGetRequestForObjectList("/v5/digitalobjects/languages", Locale.class);
   }
 }

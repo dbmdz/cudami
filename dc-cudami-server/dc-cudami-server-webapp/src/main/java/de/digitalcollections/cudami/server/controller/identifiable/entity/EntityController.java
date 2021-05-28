@@ -41,7 +41,7 @@ public class EntityController<E extends Entity> {
 
   @Operation(summary = "Get count of entities")
   @GetMapping(
-      value = {"/latest/entities/count", "/v3/entities/count"},
+      value = {"/v5/entities/count", "/v3/entities/count", "/latest/entities/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return entityService.count();
@@ -49,7 +49,7 @@ public class EntityController<E extends Entity> {
 
   @Operation(summary = "Get all entities")
   @GetMapping(
-      value = {"/latest/entities", "/v3/entities"},
+      value = {"/v5/entities", "/v3/entities", "/latest/entities"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Entity> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -73,7 +73,7 @@ public class EntityController<E extends Entity> {
   @Operation(
       summary = "Find limited amount of entities containing searchTerm in label or description")
   @GetMapping(
-      value = {"/latest/entities/search", "/v2/entities/search"},
+      value = {"/v5/entities/search", "/v2/entities/search", "/latest/entities/search"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public SearchPageResponse<Entity> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -98,8 +98,9 @@ public class EntityController<E extends Entity> {
   @Operation(summary = "Get entity by uuid")
   @GetMapping(
       value = {
-        "/latest/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v2/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+        "/v5/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v2/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/latest/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Entity findById(@PathVariable UUID uuid) {
@@ -108,7 +109,10 @@ public class EntityController<E extends Entity> {
 
   @Operation(summary = "Get entity by namespace and id")
   @GetMapping(
-      value = {"/latest/entities/identifier/{namespace}:{id}"},
+      value = {
+        "/v5/entities/identifier/{namespace}:{id}",
+        "/latest/entities/identifier/{namespace}:{id}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Entity findByIdentifier(@PathVariable String namespace, @PathVariable String id)
       throws IdentifiableServiceException {
@@ -118,7 +122,7 @@ public class EntityController<E extends Entity> {
 
   @Operation(summary = "Get entity by reference id")
   @GetMapping(
-      value = {"/latest/entities/{refId:[0-9]+}"},
+      value = {"/v5/entities/{refId:[0-9]+}", "/latest/entities/{refId:[0-9]+}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Entity findByRefId(@PathVariable long refId) {
     Entity entity = entityService.getByRefId(refId);
@@ -137,7 +141,7 @@ public class EntityController<E extends Entity> {
 
   @Operation(summary = "Find limited amount of random entites")
   @GetMapping(
-      value = {"/latest/entities/random", "/v2/entities/random"},
+      value = {"/v5/entities/random", "/v2/entities/random", "/latest/entities/random"},
       produces = "application/json")
   public List<Entity> findRandomEntities(
       @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
@@ -147,8 +151,9 @@ public class EntityController<E extends Entity> {
   @Operation(summary = "Get related file resources of entity")
   @GetMapping(
       value = {
-        "/latest/entities/{uuid}/related/fileresources",
-        "/v2/entities/{uuid}/related/fileresources"
+        "/v5/entities/{uuid}/related/fileresources",
+        "/v2/entities/{uuid}/related/fileresources",
+        "/latest/entities/{uuid}/related/fileresources"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
@@ -157,7 +162,11 @@ public class EntityController<E extends Entity> {
 
   @Operation(summary = "Get relations for an entity (being the subject)")
   @GetMapping(
-      value = {"/latest/entities/relations/{uuid}", "/v2/entities/relations/{uuid}"},
+      value = {
+        "/v5/entities/relations/{uuid}",
+        "/v2/entities/relations/{uuid}",
+        "/latest/entities/relations/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   List<EntityRelation> getRelations(@PathVariable UUID uuid) {
     return entityRelationService.getBySubject(uuid);

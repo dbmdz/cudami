@@ -48,7 +48,7 @@ public class FileResourceMetadataController {
 
   @Operation(summary = "Get all fileresources")
   @GetMapping(
-      value = {"/latest/fileresources", "/v2/fileresources"},
+      value = {"/v5/fileresources", "/v2/fileresources", "/latest/fileresources"},
       produces = "application/json")
   public PageResponse<FileResource> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -67,7 +67,11 @@ public class FileResourceMetadataController {
       summary =
           "Find limited amount of fileresources of given type containing searchTerm in label or description")
   @GetMapping(
-      value = {"/latest/fileresources/type/{type}", "/v2/fileresources/type/{type}"},
+      value = {
+        "/v5/fileresources/type/{type}",
+        "/v2/fileresources/type/{type}",
+        "/latest/fileresources/type/{type}"
+      },
       produces = "application/json")
   public SearchPageResponse<FileResource> findFileResourcesByType(
       @Parameter(example = "", description = "Type of the fileresource, e.g. <tt>image</tt>")
@@ -119,7 +123,11 @@ public class FileResourceMetadataController {
       summary =
           "Get a fileresource as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
-      value = {"/latest/fileresources/{uuid}", "/v2/fileresources/{uuid}"},
+      value = {
+        "/v5/fileresources/{uuid}",
+        "/v2/fileresources/{uuid}",
+        "/latest/fileresources/{uuid}"
+      },
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<FileResource> get(
       @Parameter(
@@ -149,8 +157,9 @@ public class FileResourceMetadataController {
           "Get a fileresource as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {
-        "/latest/fileresources/identifier/{namespace}:{id}",
-        "/v2/fileresources/identifier/{namespace}:{id}"
+        "/v5/fileresources/identifier/{namespace}:{id}",
+        "/v2/fileresources/identifier/{namespace}:{id}",
+        "/latest/fileresources/identifier/{namespace}:{id}"
       },
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<FileResource> getByIdentifier(
@@ -162,7 +171,11 @@ public class FileResourceMetadataController {
 
   @Operation(summary = "Get languages of all websites")
   @GetMapping(
-      value = {"/latest/fileresources/languages", "/v2/fileresources/languages"},
+      value = {
+        "/v5/fileresources/languages",
+        "/v2/fileresources/languages",
+        "/latest/fileresources/languages"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
     return metadataService.getLanguages();
@@ -170,7 +183,7 @@ public class FileResourceMetadataController {
 
   @Operation(summary = "Save a newly created fileresource")
   @PostMapping(
-      value = {"/latest/fileresources", "/v2/fileresources"},
+      value = {"/v5/fileresources", "/v2/fileresources", "/latest/fileresources"},
       produces = "application/json")
   public FileResource save(@RequestBody FileResource fileResource)
       throws IdentifiableServiceException {
@@ -179,7 +192,11 @@ public class FileResourceMetadataController {
 
   @Operation(summary = "Update a fileresource")
   @PutMapping(
-      value = {"/latest/fileresources/{uuid}", "/v2/fileresources/{uuid}"},
+      value = {
+        "/v5/fileresources/{uuid}",
+        "/v2/fileresources/{uuid}",
+        "/latest/fileresources/{uuid}"
+      },
       produces = "application/json")
   public FileResource update(
       @PathVariable UUID uuid, @RequestBody FileResource fileResource, BindingResult errors)
