@@ -165,7 +165,7 @@ public class CollectionController {
 
   @Operation(summary = "Get all collections")
   @GetMapping(
-      value = {"/latest/collections"},
+      value = {"/v5/collections", "/latest/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Collection> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
