@@ -19,25 +19,32 @@ public class LocaleController {
   }
 
   @Operation(summary = "Get default language")
-  @GetMapping(value = {"/latest/languages/default", "/v2/languages/default"})
+  @GetMapping(
+      value = {"/v5/languages/default", "/v2/languages/default", "/latest/languages/default"})
   public Locale getDefaultLanguage() {
     return new Locale(localeService.getDefaultLanguage());
   }
 
   @Operation(summary = "Get default locale")
-  @GetMapping(value = {"/latest/locales/default", "/v2/locales/default", "/v1/locales/default"})
+  @GetMapping(
+      value = {
+        "/v5/locales/default",
+        "/v2/locales/default",
+        "/v1/locales/default",
+        "/latest/locales/default"
+      })
   public Locale getDefaultLocale() {
     return localeService.getDefaultLocale();
   }
 
   @Operation(summary = "Get all supported languages")
-  @GetMapping(value = {"/latest/languages", "/v2/languages"})
+  @GetMapping(value = {"/v5/languages", "/v2/languages", "/latest/languages"})
   public List<String> getSupportedLanguages() {
     return localeService.getSupportedLanguages();
   }
 
   @Operation(summary = "Get all supported locales")
-  @GetMapping(value = {"/latest/locales", "/v2/locales", "/v1/locales"})
+  @GetMapping(value = {"/v5/locales", "/v2/locales", "/v1/locales", "/latest/locales"})
   public List<Locale> getSupportedLocales() {
     return localeService.getSupportedLocales();
   }

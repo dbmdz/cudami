@@ -19,18 +19,18 @@ public class CudamiRenderingTemplatesClient extends CudamiBaseClient<RenderingTe
   }
 
   public PageResponse<RenderingTemplate> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/renderingtemplates", pageRequest);
+    return doGetRequestForPagedObjectList("/v5/renderingtemplates", pageRequest);
   }
 
   public RenderingTemplate findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/renderingtemplates/%s", uuid));
+    return doGetRequestForObject(String.format("/v5/renderingtemplates/%s", uuid));
   }
 
   public RenderingTemplate save(RenderingTemplate template) throws HttpException {
-    return doPostRequestForObject("/latest/renderingtemplates", template);
+    return doPostRequestForObject("/v5/renderingtemplates", template);
   }
 
   public RenderingTemplate update(UUID uuid, RenderingTemplate template) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/renderingtemplates/%s", uuid), template);
+    return doPutRequestForObject(String.format("/v5/renderingtemplates/%s", uuid), template);
   }
 }

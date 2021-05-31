@@ -33,7 +33,7 @@ public class IdentifierTypeController {
 
   @Operation(summary = "Get all identifier types")
   @GetMapping(
-      value = {"/latest/identifiertypes"},
+      value = {"/v5/identifiertypes"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<IdentifierType> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -49,7 +49,11 @@ public class IdentifierTypeController {
 
   @Operation(summary = "get identifier type by uuid")
   @GetMapping(
-      value = {"/latest/identifiertypes/{uuid}", "/v2/identifiertypes/{uuid}"},
+      value = {
+        "/v5/identifiertypes/{uuid}",
+        "/v2/identifiertypes/{uuid}",
+        "/latest/identifiertypes/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public IdentifierType findById(@PathVariable UUID uuid) {
     return identifierTypeService.get(uuid);
@@ -57,7 +61,7 @@ public class IdentifierTypeController {
 
   @Operation(summary = "save a newly created identifier type")
   @PostMapping(
-      value = {"/latest/identifiertypes", "/v2/identifiertypes"},
+      value = {"/v5/identifiertypes", "/v2/identifiertypes", "/latest/identifiertypes"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public IdentifierType save(@RequestBody IdentifierType identifierType, BindingResult errors) {
     return identifierTypeService.save(identifierType);
@@ -65,7 +69,11 @@ public class IdentifierTypeController {
 
   @Operation(summary = "update an identifier type")
   @PutMapping(
-      value = {"/latest/identifiertypes/{uuid}", "/v2/identifiertypes/{uuid}"},
+      value = {
+        "/v5/identifiertypes/{uuid}",
+        "/v2/identifiertypes/{uuid}",
+        "/latest/identifiertypes/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public IdentifierType update(
       @PathVariable UUID uuid, @RequestBody IdentifierType identifierType, BindingResult errors) {

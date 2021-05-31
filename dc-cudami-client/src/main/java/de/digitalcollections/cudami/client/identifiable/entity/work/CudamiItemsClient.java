@@ -58,7 +58,7 @@ public class CudamiItemsClient extends CudamiBaseClient<Item> {
       String initial)
       throws HttpException {
     return findByLanguageAndInitial(
-        "/latest/items",
+        "/v5/items",
         pageNumber,
         pageSize,
         sortField,

@@ -61,7 +61,7 @@ public class V3RenderingTemplateController {
                     }))
       })
   @GetMapping(
-      value = {"/v3/renderingtemplates"},
+      value = {"/v3/renderingtemplates", "/latest/renderingtemplates"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> findAll(
       @Parameter(

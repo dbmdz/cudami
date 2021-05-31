@@ -20,7 +20,7 @@ public class CudamiIdentifiablesClient extends CudamiBaseClient<Identifiable> {
   }
 
   public long count() throws HttpException {
-    return Long.parseLong(doGetRequestForString("/latest/identifiables/count"));
+    return Long.parseLong(doGetRequestForString("/v5/identifiables/count"));
   }
 
   public Identifiable create() {
@@ -28,12 +28,12 @@ public class CudamiIdentifiablesClient extends CudamiBaseClient<Identifiable> {
   }
 
   public PageResponse<Identifiable> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/latest/identifiables", pageRequest);
+    return doGetRequestForPagedObjectList("/v5/identifiables", pageRequest);
   }
 
   public SearchPageResponse<Identifiable> find(SearchPageRequest searchPageRequest)
       throws HttpException {
-    return doGetSearchRequestForPagedObjectList("/latest/identifiables/search", searchPageRequest);
+    return doGetSearchRequestForPagedObjectList("/v5/identifiables/search", searchPageRequest);
   }
 
   public List<Identifiable> find(String searchTerm, int maxResults) throws HttpException {
@@ -43,7 +43,7 @@ public class CudamiIdentifiablesClient extends CudamiBaseClient<Identifiable> {
   }
 
   public Identifiable findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/identifiables/%s", uuid));
+    return doGetRequestForObject(String.format("/v5/identifiables/%s", uuid));
   }
 
   public Identifiable findOne(UUID uuid, Locale locale) throws HttpException {
@@ -51,19 +51,19 @@ public class CudamiIdentifiablesClient extends CudamiBaseClient<Identifiable> {
   }
 
   public Identifiable findOne(UUID uuid, String locale) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/identifiables/%s?locale=%s", uuid, locale));
+    return doGetRequestForObject(String.format("/v5/identifiables/%s?locale=%s", uuid, locale));
   }
 
   public Identifiable findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-        String.format("/latest/identifiables/identifier/%s:%s.json", namespace, id));
+        String.format("/v5/identifiables/identifier/%s:%s.json", namespace, id));
   }
 
   public Identifiable save(Identifiable identifiable) throws HttpException {
-    return doPostRequestForObject("/latest/identifiables", identifiable);
+    return doPostRequestForObject("/v5/identifiables", identifiable);
   }
 
   public Identifiable update(UUID uuid, Identifiable identifiable) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/identifiables/%s", uuid), identifiable);
+    return doPutRequestForObject(String.format("/v5/identifiables/%s", uuid), identifiable);
   }
 }

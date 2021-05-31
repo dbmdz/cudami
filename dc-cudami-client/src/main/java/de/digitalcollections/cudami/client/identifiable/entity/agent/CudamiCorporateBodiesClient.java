@@ -35,7 +35,7 @@ public class CudamiCorporateBodiesClient extends CudamiBaseClient<CorporateBody>
   @Deprecated(since = "5.0", forRemoval = true)
   /** @deprecated Please use {@link #find(SearchPageRequest)} instead */
   public PageResponse<CorporateBody> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/v2/corporatebodies", pageRequest);
+    return doGetRequestForPagedObjectList("/v5/corporatebodies", pageRequest);
   }
 
   public SearchPageResponse<CorporateBody> find(SearchPageRequest searchPageRequest)
@@ -44,28 +44,27 @@ public class CudamiCorporateBodiesClient extends CudamiBaseClient<CorporateBody>
   }
 
   public CorporateBody findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/latest/corporatebodies/%s", uuid));
+    return doGetRequestForObject(String.format("/v5/corporatebodies/%s", uuid));
   }
 
   public CorporateBody findOne(UUID uuid, String locale) throws HttpException {
-    return doGetRequestForObject(
-        String.format("/latest/corporatebodies/%s?pLocale=%s", uuid, locale));
+    return doGetRequestForObject(String.format("/v5/corporatebodies/%s?pLocale=%s", uuid, locale));
   }
 
   public CorporateBody findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-        String.format("/latest/corporatebodies/identifier/%s:%s.json", namespace, id));
+        String.format("/v5/corporatebodies/identifier/%s:%s.json", namespace, id));
   }
 
   public List<Locale> getLanguages() throws HttpException {
-    return doGetRequestForObjectList("/latest/corporatebodies/languages", Locale.class);
+    return doGetRequestForObjectList("/v5/corporatebodies/languages", Locale.class);
   }
 
   public CorporateBody save(CorporateBody corporateBody) throws HttpException {
-    return doPostRequestForObject("/latest/corporatebodies", corporateBody);
+    return doPostRequestForObject("/v5/corporatebodies", corporateBody);
   }
 
   public CorporateBody update(UUID uuid, CorporateBody corporateBody) throws HttpException {
-    return doPutRequestForObject(String.format("/latest/corporatebodies/%s", uuid), corporateBody);
+    return doPutRequestForObject(String.format("/v5/corporatebodies/%s", uuid), corporateBody);
   }
 }
