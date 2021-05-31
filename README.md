@@ -14,17 +14,17 @@ Technologies used:
 * Overall: Java, Spring Boot, Spring Security
 * Frontend: Spring MVC, Thymeleaf, React
 * Business: Java
-* Backend: JDBI/PostgreSql, Flyway
+* Backend: JDBI/PostgreSQL, Flyway
 
 Architecture:
 
-* Cudami repository server with REST-interface
-* Cudami webapp GUI connected over REST-Interface with cudami repository server as backend.
+* cudami repository server with REST-interface
+* cudami admin webapp connected over REST-Interface with cudami repository server as backend.
 
 Model:
 
-* cudami Model is in sub-module dc-cudami-model
-* Modelling is done with easyUML-Netbeans-Plugin (see <http://plugins.netbeans.org/plugin/55435/easyuml>) and stored in "dc-cudami/dc-cudami-model-parent/UMLDiagrams".
+* cudami model can be found [here](https://github.com/dbmdz/digitalcollections-model)
+* Modelling is done with the yEd Graph Editor (see <https://www.yworks.com/products/yed>)
 
 Features:
 
@@ -36,101 +36,118 @@ Features:
 * Layer modularization (Frontend, Business, Backend; each API and IMPL)
 * Completely REST-based repository
 
+## Requirements
+
+The minimum version of PostgreSQL is `12`, as cudami uses features that are not available in older versions.
+
 ## Installation
 
-1.  Install PostgreSql:
+1.  Install PostgreSQL:
 
     on Ubuntu:
 
-        $ apt-cache search postgresql
-        ...
-        postgresql - object-relational SQL database (supported version)
-        postgresql-9.4 - object-relational SQL database, version 9.4 server
-        ...
-        $ sudo apt-get install postgresql
+    ```
+    $ apt-cache search postgresql
+    ...
+    postgresql - object-relational SQL database (supported version)
+    postgresql-12 - object-relational SQL database, version 12 server
+    ...
+    $ sudo apt-get install postgresql
+    ```
 
+2.  Create a database on your PostgreSQL instance:
 
-2.  Create a database on your PostgreSql instance:
+    ```
+    $ sudo su - postgres
+    ($ dropdb 'cudami')
+    $ psql -c "CREATE USER cudami PASSWORD 'somepassword';"
+    CREATE ROLE
+    $ createdb cudami -O cudami
+    ```
 
-        $ sudo su - postgres
+    **Check:**
 
-        ($ dropdb 'cudami')
+    - list databases:
 
-        $ psql -c "CREATE USER cudami PASSWORD 'somepassword';"
+    ```
+    $ psql -l
+                                      List of databases
+       Name    |  Owner   | Encoding |   Collate   |    Ctype    |   Access privileges
+    -----------+----------+----------+-------------+-------------+-----------------------
+     postgres  | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 |
+     template0 | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =c/postgres          +
+               |          |          |             |             | postgres=CTc/postgres
+     template1 | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =c/postgres          +
+               |          |          |             |             | postgres=CTc/postgres
+     cudami    | cudami   | UTF8     | en_US.UTF-8 | en_US.UTF-8 |
+     (4 rows)
+     ```
 
-        CREATE ROLE
+    - list tables of database cudami:
 
-        $ createdb cudami -O cudami
+    ```
+    $ psql -d cudami
+    psql (12.x (Debian 12.x))
+    Type "help" for help.
 
-    Check:
-
-    List databases:
-
-        $ psql -l
-                                          List of databases
-           Name    |  Owner   | Encoding |   Collate   |    Ctype    |   Access privileges   
-        -----------+----------+----------+-------------+-------------+-----------------------
-         postgres  | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 |
-         template0 | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =c/postgres          +
-                   |          |          |             |             | postgres=CTc/postgres
-         template1 | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =c/postgres          +
-                   |          |          |             |             | postgres=CTc/postgres
-         cudami    | cudami   | UTF8     | en_US.UTF-8 | en_US.UTF-8 |
-         (4 rows)
-
-    List tables of database cudami:
-
-        $ psql -d cudami
-        psql (9.5.7, server 9.4.8)
-        Type "help" for help.
-
-        cudami=# \d
-        No relations found.
-        cudami=# \q
+    cudami=# \d
+    No relations found.
+    cudami=# \q
+    ```
 
 3. Put your database properties into configuration file(s):
 
-        $ cd <cudami source directory>
-        $ vi dc-cudami-server/dc-cudami-server-backend-jdbi/src/main/resources/de/digitalcollections/cudami/config/SpringConfigBackend-<profile>.properties
+    ```
+    $ cd <cudami source directory>
+    $ vi /dc-cudami-server-webapp/src/main/resources/application.yml
 
-        database.name=cudami
-        database.hostname=localhost
-        database.password=somepassword
-        database.port=5432
-        database.username=cudami
+    spring:
+      ...
+      datasource:
+        ...
+        url: "jdbc:postgresql://localhost:5432/cudami"
+        username: cudami
+        password: somepassword
+        ...
+    ```
 
 ## Build
 
-Build cudami:
+### Development
 
-    $ cd <cudami source directory>
-    $ mvn clean install
+```
+$ cd <cudami source directory>
+$ mvn clean install
+```
+
+### Production
+
+```
+$ cd <cudami source directory>
+$ mvn clean install -Pproduction
+```
 
 ## Usage
 
 ### Run cudami (with "local" profile = configuration for local test)
 
-Start repository and then cudami GUI webapp:
-
 ```sh
-$ java -jar dc-cudami-server-webapp-<VERSION>-exec.jar --spring.profiles.active=local &
-$ java -jar dc-cudami-admin-webapp-<VERSION>-exec.jar --spring.profiles.active=local &
+$ java -jar dc-cudami-server/dc-cudami-server-webapp/target/dc-cudami-server-webapp-<VERSION>.jar &
+$ java -jar dc-cudami-admin-webapp/target/dc-cudami-admin-webapp-<VERSION>.jar &
 ```
 
 ### Run cudami (with "PROD" profile = configuration for production)
 
-Start repository and then cudami GUI webapp:
-
 ```sh
-$ java -jar dc-cudami-server-webapp-<VERSION>-exec.jar --spring.profiles.active=PROD &
-$ java -jar dc-cudami-client-webapp-<VERSION>-exec.jar --spring.profiles.active=PROD &
+$ java -jar dc-cudami-server/dc-cudami-server-webapp/target/dc-cudami-server-webapp-<VERSION>.jar --spring.profiles.active=PROD &
+$ java -jar dc-cudami-admin-webapp/target/dc-cudami-admin-webapp-<VERSION>.jar --spring.profiles.active=PROD &
 ```
 
 ### GUI
 
 Local running cudami: http://localhost:9898
 
-cudami GUI webapp connects to cudami repository server and if no admin user exists, the admin user creation assistant is launched.
+The cudami admin webapp connects to cudami repository server and if no admin user exists, the admin user creation assistant is launched.
 Create an admin user and log in.
 
 Enjoy!
@@ -180,13 +197,12 @@ $ docker-compose build
 $ docker-compose up -d
 ```
 
-Then PostgreSql is running in a container and everything is ready for running a local instance of cudami (see below).
+Then PostgreSQL is running in a container and everything is ready for running a local instance of cudami (see below).
 
 To start cudami server webapp, you have to run:
 
 ```shell
-$ cd dc-cudami-server/dc-cudami-server-webapp/target
-$ java -jar dc-cudami-server-webapp-<VERSION>.jar
+$ java -jar dc-cudami-server/dc-cudami-server-webapp/target/dc-cudami-server-webapp-<VERSION>.jar &
 ```
 
 The cudami server webapp is now running under <http://localhost:9000/>.
@@ -194,11 +210,18 @@ The cudami server webapp is now running under <http://localhost:9000/>.
 To start cudami admin webapp, you have to run:
 
 ```shell
-$ cd dc-cudami-admin/dc-cudami-admin-webapp/target
-$ java -jar dc-cudami-admin-webapp-<VERSION>.jar
+$ java -jar dc-cudami-admin-webapp/target/dc-cudami-admin-webapp-<VERSION>.jar &
 ```
 
 The cudami admin webapp is now running under <http://localhost:9898/>.
+
+To start the react components, you have to run:
+
+```
+$ cd dc-cudami-editor/
+$ npm install
+$ npm start
+```
 
 To stop the container run
 
