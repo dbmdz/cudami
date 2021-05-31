@@ -35,7 +35,11 @@ public class IdentifiableController {
       summary =
           "Find limited amount of identifiables containing searchTerm in label or description")
   @GetMapping(
-      value = {"/latest/identifiables/search", "/v2/identifiables/search"},
+      value = {
+        "/v5/identifiables/search",
+        "/v2/identifiables/search",
+        "/latest/identifiables/search"
+      },
       produces = "application/json")
   public SearchPageResponse<Identifiable> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -52,7 +56,7 @@ public class IdentifiableController {
 
   @Operation(summary = "Find limited amount of identifiables containing searchTerm in label")
   @GetMapping(
-      value = {"/latest/identifiables", "/v2/identifiables"},
+      value = {"/v5/identifiables", "/v2/identifiables", "/latest/identifiables"},
       produces = "application/json")
   public List<Identifiable> find(
       @RequestParam(name = "searchTerm") String searchTerm,
@@ -63,7 +67,11 @@ public class IdentifiableController {
 
   @Operation(summary = "Get identifiable by uuid")
   @GetMapping(
-      value = {"/latest/identifiables/{uuid}", "/v2/identifiables/{uuid}"},
+      value = {
+        "/v5/identifiables/{uuid}",
+        "/v2/identifiables/{uuid}",
+        "/latest/identifiables/{uuid}"
+      },
       produces = "application/json")
   public Identifiable findById(@PathVariable UUID uuid) {
     return identifiableService.get(uuid);
@@ -74,8 +82,9 @@ public class IdentifiableController {
           "get an identifiable as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {
-        "/latest/identifiables/identifier/{namespace}:{id}",
-        "/v2/identifiables/identifier/{namespace}:{id}"
+        "/v5/identifiables/identifier/{namespace}:{id}",
+        "/v2/identifiables/identifier/{namespace}:{id}",
+        "/latest/identifiables/identifier/{namespace}:{id}"
       },
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<Identifiable> getByIdentifier(

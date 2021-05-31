@@ -59,7 +59,7 @@ public class V2IdentifierTypeController {
                     }))
       })
   @GetMapping(
-      value = {"/v2/identifiertypes"},
+      value = {"/v2/identifiertypes", "/latest/identifiertypes"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> findAll(
       @Parameter(
