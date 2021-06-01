@@ -61,7 +61,7 @@ public class V2DigitalObjectController {
                     }))
       })
   @GetMapping(
-      value = {"/v2/digitalobjects"},
+      value = {"/v2/digitalobjects", "/latest/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> findAll(
       @Parameter(

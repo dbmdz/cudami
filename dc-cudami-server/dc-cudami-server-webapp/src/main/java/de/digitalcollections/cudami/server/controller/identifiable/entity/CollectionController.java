@@ -165,7 +165,7 @@ public class CollectionController {
 
   @Operation(summary = "Get all collections")
   @GetMapping(
-      value = {"/v5/collections", "/latest/collections"},
+      value = {"/v5/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Collection> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -333,10 +333,7 @@ public class CollectionController {
 
   @Operation(summary = "Get paged digital objects of a collection")
   @GetMapping(
-      value = {
-        "/v5/collections/{uuid}/digitalobjects",
-        "/latest/collections/{uuid}/digitalobjects"
-      },
+      value = {"/v5/collections/{uuid}/digitalobjects"},
       produces = "application/json")
   public SearchPageResponse<DigitalObject> getDigitalObjects(
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
@@ -397,10 +394,7 @@ public class CollectionController {
 
   @Operation(summary = "Get (active or all) paged subcollections of a collection")
   @GetMapping(
-      value = {
-        "/v5/collections/{uuid}/subcollections",
-        "/latest/collections/{uuid}/subcollections"
-      },
+      value = {"/v5/collections/{uuid}/subcollections"},
       produces = "application/json")
   public PageResponse<Collection> getSubcollections(
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")

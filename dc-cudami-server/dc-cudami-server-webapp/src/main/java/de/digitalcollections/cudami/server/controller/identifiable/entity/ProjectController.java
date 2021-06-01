@@ -107,7 +107,7 @@ public class ProjectController {
 
   @Operation(summary = "Get all projects in reduced form (no identifiers)")
   @GetMapping(
-      value = {"/v5/projects", "/latest/projects"},
+      value = {"/v5/projects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Project> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -177,7 +177,7 @@ public class ProjectController {
 
   @Operation(summary = "Get paged digital objects of a project")
   @GetMapping(
-      value = {"/v5/projects/{uuid}/digitalobjects", "/latest/projects/{uuid}/digitalobjects"},
+      value = {"/v5/projects/{uuid}/digitalobjects"},
       produces = "application/json")
   public PageResponse<DigitalObject> getDigitalObjects(
       @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")

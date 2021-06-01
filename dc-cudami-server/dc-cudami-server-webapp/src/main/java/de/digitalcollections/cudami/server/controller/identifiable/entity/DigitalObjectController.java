@@ -77,7 +77,7 @@ public class DigitalObjectController {
 
   @Operation(summary = "Get all digital objects")
   @GetMapping(
-      value = {"/v5/digitalobjects", "/latest/digitalobjects"},
+      value = {"/v5/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<DigitalObject> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -191,10 +191,7 @@ public class DigitalObjectController {
 
   @Operation(summary = "Get (active) paged collections of a digital objects")
   @GetMapping(
-      value = {
-        "/v5/digitalobjects/{uuid}/collections",
-        "/latest/digitalobjects/{uuid}/collections"
-      },
+      value = {"/v5/digitalobjects/{uuid}/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Collection> getCollections(
       @Parameter(example = "", description = "UUID of the digital object") @PathVariable("uuid")

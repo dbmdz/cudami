@@ -59,7 +59,7 @@ public class V3ProjectController {
                     }))
       })
   @GetMapping(
-      value = {"/v3/projects/{uuid}/digitalobjects"},
+      value = {"/v3/projects/{uuid}/digitalobjects", "/latest/projects/{uuid}/digitalobjects"},
       produces = "application/json")
   public ResponseEntity<String> getDigitalObjects(
       @Parameter(

@@ -62,7 +62,10 @@ public class V3DigitalObjectController {
                     }))
       })
   @GetMapping(
-      value = {"/v3/digitalobjects/{uuid}/collections"},
+      value = {
+        "/v3/digitalobjects/{uuid}/collections",
+        "/latest/digitalobjects/{uuid}/collections"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> getCollections(
       @Parameter(
