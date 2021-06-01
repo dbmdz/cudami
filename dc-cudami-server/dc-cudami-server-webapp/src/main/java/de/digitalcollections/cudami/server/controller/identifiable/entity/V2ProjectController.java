@@ -58,7 +58,7 @@ public class V2ProjectController {
                     }))
       })
   @GetMapping(
-      value = {"/v2/projects"},
+      value = {"/v2/projects", "/latest/projects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> findAll(
       @Parameter(

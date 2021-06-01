@@ -68,7 +68,10 @@ public class V3CollectionController {
                     }))
       })
   @GetMapping(
-      value = {"/v3/collections/{uuid}/digitalobjects"},
+      value = {
+        "/v3/collections/{uuid}/digitalobjects",
+        "/latest/collections/{uuid}/digitalobjects"
+      },
       produces = "application/json")
   public ResponseEntity<String> getDigitalObjects(
       @Parameter(
@@ -137,7 +140,10 @@ public class V3CollectionController {
                     }))
       })
   @GetMapping(
-      value = {"/v3/collections/{uuid}/subcollections"},
+      value = {
+        "/v3/collections/{uuid}/subcollections",
+        "/latest/collections/{uuid}/subcollections"
+      },
       produces = "application/json")
   public ResponseEntity<String> getSubcollections(
       @Parameter(
@@ -203,7 +209,7 @@ public class V3CollectionController {
                     }))
       })
   @GetMapping(
-      value = {"/v3/collections"},
+      value = {"/v3/collections", "/latest/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> findAll(
       @Parameter(

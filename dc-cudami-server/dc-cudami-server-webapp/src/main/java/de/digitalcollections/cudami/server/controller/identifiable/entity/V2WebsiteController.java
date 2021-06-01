@@ -64,7 +64,7 @@ public class V2WebsiteController {
                     }))
       })
   @GetMapping(
-      value = {"/v2/websites"},
+      value = {"/v2/websites", "/latest/websites"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> findAll(
       @Parameter(

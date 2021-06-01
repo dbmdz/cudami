@@ -76,7 +76,7 @@ public class WebsiteController {
                     schema = @Schema(implementation = PageResponseWebsite.class)))
       })
   @GetMapping(
-      value = {"/v5/websites", "/latest/websites"},
+      value = {"/v5/websites"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public SearchPageResponse<Website> findAll(
       @Parameter(
