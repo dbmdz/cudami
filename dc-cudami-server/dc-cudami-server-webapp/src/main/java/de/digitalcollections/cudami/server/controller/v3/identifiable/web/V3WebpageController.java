@@ -202,7 +202,7 @@ public class V3WebpageController {
                     }))
       })
   @GetMapping(
-      value = {"/v3/webpages/{uuid}/children"},
+      value = {"/v3/webpages/{uuid}/children", "/latest/webpages/{uuid}/children"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> getWebpageChildren(
       @Parameter(

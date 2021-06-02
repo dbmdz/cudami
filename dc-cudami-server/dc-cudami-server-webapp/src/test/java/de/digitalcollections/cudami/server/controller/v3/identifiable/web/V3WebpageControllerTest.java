@@ -136,6 +136,7 @@ class V3WebpageControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(
       strings = {
+        "/latest/webpages/157f5428-5a5a-4d47-971e-f092f1836246/children",
         "/v3/webpages/157f5428-5a5a-4d47-971e-f092f1836246/children",
         "/v3/webpages/157f5428-5a5a-4d47-971e-f092f1836246/children?active=true"
       })
@@ -188,7 +189,7 @@ class V3WebpageControllerTest extends BaseControllerTest {
     when(webpageService.getChildren(any(UUID.class), any(PageRequest.class))).thenReturn(expected);
     when(webpageService.getActiveChildren(any(UUID.class), any(PageRequest.class)))
         .thenReturn(expected);
-    testJson(path);
+    testJson(path.replaceAll("latest", "v3")); // v3 equals latest
   }
 
   @DisplayName("returns a webpage with a tree of its children")

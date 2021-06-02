@@ -50,8 +50,9 @@ public class WebpageController {
   @Operation(summary = "Add file resource related to webpage")
   @PostMapping(
       value = {
-        "/latest/webpages/{uuid}/related/fileresources/{fileResourceUuid}",
-        "/v2/webpages/{uuid}/related/fileresources/{fileResourceUuid}"
+        "/v5/webpages/{uuid}/related/fileresources/{fileResourceUuid}",
+        "/v2/webpages/{uuid}/related/fileresources/{fileResourceUuid}",
+        "/latest/webpages/{uuid}/related/fileresources/{fileResourceUuid}"
       })
   @ResponseStatus(value = HttpStatus.OK)
   public void addRelatedFileResource(@PathVariable UUID uuid, @PathVariable UUID fileResourceUuid) {
@@ -60,7 +61,7 @@ public class WebpageController {
 
   @Operation(summary = "Get all webpages")
   @GetMapping(
-      value = {"/latest/webpages", "/v2/webpages"},
+      value = {"/v5/webpages", "/v2/webpages", "/latest/webpages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Webpage> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -86,7 +87,11 @@ public class WebpageController {
 
   @Operation(summary = "Get the breadcrumb for a webpage")
   @GetMapping(
-      value = {"/latest/webpages/{uuid}/breadcrumb", "/v3/webpages/{uuid}/breadcrumb"},
+      value = {
+        "/v5/webpages/{uuid}/breadcrumb",
+        "/v3/webpages/{uuid}/breadcrumb",
+        "/latest/webpages/{uuid}/breadcrumb"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<BreadcrumbNavigation> getBreadcrumb(
       @Parameter(
@@ -121,8 +126,9 @@ public class WebpageController {
   @Operation(summary = "Get file resources related to webpage")
   @GetMapping(
       value = {
-        "/latest/webpages/{uuid}/related/fileresources",
-        "/v2/webpages/{uuid}/related/fileresources"
+        "/v5/webpages/{uuid}/related/fileresources",
+        "/v2/webpages/{uuid}/related/fileresources",
+        "/latest/webpages/{uuid}/related/fileresources"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
@@ -134,7 +140,7 @@ public class WebpageController {
       summary =
           "Get a webpage as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
-      value = {"/latest/webpages/{uuid}"},
+      value = {"/v5/webpages/{uuid}", "/latest/webpages/{uuid}"},
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<Webpage> getWebpage(
       @Parameter(
@@ -172,7 +178,7 @@ public class WebpageController {
 
   @Operation(summary = "Get (active or all) paged children of a webpage as JSON")
   @GetMapping(
-      value = {"/latest/webpages/{uuid}/children"},
+      value = {"/v5/webpages/{uuid}/children"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Webpage> getSubpages(
       @Parameter(
@@ -200,7 +206,7 @@ public class WebpageController {
 
   @Operation(summary = "Get (active or all) children of a webpage recursivly as JSON")
   @GetMapping(
-      value = {"/latest/webpages/{uuid}/childrentree"},
+      value = {"/v5/webpages/{uuid}/childrentree", "/latest/webpages/{uuid}/childrentree"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Webpage> getWebpageChildrenTree(
       @Parameter(
@@ -220,7 +226,11 @@ public class WebpageController {
 
   @Operation(summary = "Get parent of a webpage as JSON")
   @GetMapping(
-      value = {"/latest/webpages/{uuid}/parent", "/v3/webpages/{uuid}/parent"},
+      value = {
+        "/v5/webpages/{uuid}/parent",
+        "/v3/webpages/{uuid}/parent",
+        "/latest/webpages/{uuid}/parent"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Webpage getWebpageParent(
       @Parameter(
@@ -235,7 +245,11 @@ public class WebpageController {
 
   @Operation(summary = "Get website of a webpage as JSON")
   @GetMapping(
-      value = {"/latest/webpages/{uuid}/website", "/v3/webpages/{uuid}/website"},
+      value = {
+        "/v5/webpages/{uuid}/website",
+        "/v3/webpages/{uuid}/website",
+        "/latest/webpages/{uuid}/website"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Website getWebsite(
       @Parameter(
@@ -251,8 +265,9 @@ public class WebpageController {
   @Operation(summary = "Save a newly created webpage")
   @PostMapping(
       value = {
-        "/latest/webpages/{parentWebpageUuid}/webpage",
-        "/v2/webpages/{parentWebpageUuid}/webpage"
+        "/v5/webpages/{parentWebpageUuid}/webpage",
+        "/v2/webpages/{parentWebpageUuid}/webpage",
+        "/latest/webpages/{parentWebpageUuid}/webpage"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Webpage saveWithParentWebpage(
@@ -264,8 +279,9 @@ public class WebpageController {
   @Operation(summary = "Save a newly created top-level webpage")
   @PostMapping(
       value = {
+        "/v5/websites/{parentWebsiteUuid}/webpage",
+        "/v2/websites/{parentWebsiteUuid}/webpage",
         "/latest/websites/{parentWebsiteUuid}/webpage",
-        "/v2/websites/{parentWebsiteUuid}/webpage"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Webpage saveWithParentWebsite(
@@ -276,7 +292,7 @@ public class WebpageController {
 
   @Operation(summary = "Update a webpage")
   @PutMapping(
-      value = {"/latest/webpages/{uuid}", "/v2/webpages/{uuid}"},
+      value = {"/v5/webpages/{uuid}", "/v2/webpages/{uuid}", "/latest/webpages/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Webpage update(@PathVariable UUID uuid, @RequestBody Webpage webpage, BindingResult errors)
       throws IdentifiableServiceException {
@@ -286,7 +302,11 @@ public class WebpageController {
 
   @Operation(summary = "Update the order of a webpage's children")
   @PutMapping(
-      value = {"/latest/webpages/{uuid}/children", "/v3/webpages/{uuid}/children"},
+      value = {
+        "/v5/webpages/{uuid}/children",
+        "/v3/webpages/{uuid}/children",
+        "/latest/webpages/{uuid}/children"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity updateChildrenOrder(
       @Parameter(example = "", description = "UUID of the webpage") @PathVariable("uuid") UUID uuid,
