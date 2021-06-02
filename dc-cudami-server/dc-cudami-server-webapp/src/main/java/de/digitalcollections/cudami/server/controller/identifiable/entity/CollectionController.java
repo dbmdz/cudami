@@ -273,7 +273,7 @@ public class CollectionController {
       summary =
           "Find limited amount of (active or all) collections containing searchTerm in label or description")
   @GetMapping(
-      value = {"/v5/collections/search", "/v3/collections/search", "/latest/collections/search"},
+      value = {"/v5/collections/search"},
       produces = "application/json")
   public SearchPageResponse<Collection> findCollections(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,

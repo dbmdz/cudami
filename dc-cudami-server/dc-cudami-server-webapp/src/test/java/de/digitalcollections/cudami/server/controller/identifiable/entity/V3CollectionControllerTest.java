@@ -157,4 +157,44 @@ public class V3CollectionControllerTest extends BaseControllerTest {
 
     testJson(path, "/v3/collections/active.json");
   }
+
+  @DisplayName("shall search over collections")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {"/v3/collections/search?pageSize=1", "/latest/collections/search?pageSize=1"})
+  public void searchCollections(String path) throws Exception {
+    SearchPageResponse<Collection> expected =
+        (SearchPageResponse)
+            new SearchPageResponseBuilder()
+                .forRequestPage(0)
+                .forPageSize(1)
+                .forAscendingOrderedField("label", "de")
+                .forAscendingOrderedField("label")
+                .withTotalElements(145)
+                .withContent(
+                    new CollectionBuilder()
+                        .createdAt("2020-03-03T16:12:08.686626")
+                        .withLabel(Locale.GERMAN, "Test")
+                        .withLabel(Locale.ENGLISH, "test")
+                        .lastModifiedAt("2020-10-19T17:04:07.889254")
+                        .withPreviewImage(
+                            "Test_Logo.jpg",
+                            "cc3893e8-9530-4602-b640-118a3218e826",
+                            "file:///cudami/image/jpg/cc38/93e8/9530/4602/b640/118a/3218/e826/resource.jpg",
+                            MimeType.MIME_IMAGE_JPEG,
+                            "https://api.digitale-sammlungen.de/iiif/image/v2/cc3893e8-9530-4602-b640-118a3218e826")
+                        .withAltText(Locale.GERMAN, "Test")
+                        .withAltText(Locale.ENGLISH, "test")
+                        .withTitle(Locale.GERMAN, "Test")
+                        .withTitle(Locale.ENGLISH, "test")
+                        .withOpenPreviewImageInNewWindow()
+                        .withUuid("0b0b89e1-3f8a-4928-b8f3-67a8c4b3ff57")
+                        .withRefId(14)
+                        .withPublicationStart("2020-10-01")
+                        .build())
+                .build();
+    when(collectionService.find(any(SearchPageRequest.class))).thenReturn(expected);
+
+    testJson(path, "/v3/collections/search.json");
+  }
 }

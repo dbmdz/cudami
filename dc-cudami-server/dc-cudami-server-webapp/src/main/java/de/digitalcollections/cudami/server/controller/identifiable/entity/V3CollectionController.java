@@ -259,6 +259,67 @@ public class V3CollectionController {
     return new ResponseEntity<>(result.toString(), HttpStatus.OK);
   }
 
+  @Operation(
+      summary =
+          "Find limited amount of (active or all) collections containing searchTerm in label or description")
+  @GetMapping(
+      value = {"/v3/collections/search", "/latest/collections/search"},
+      produces = "application/json")
+  public ResponseEntity<String> findCollections(
+      @Parameter(
+              name = "pageNumber",
+              description = "the page number (starting with 0); if unset, defaults to 0.",
+              example = "0",
+              schema = @Schema(type = "integer"))
+          @RequestParam(name = "pageNumber", required = false, defaultValue = "0")
+          int pageNumber,
+      @Parameter(
+              name = "pageSize",
+              description = "the page size; if unset, defaults to 25",
+              example = "25",
+              schema = @Schema(type = "integer"))
+          @RequestParam(name = "pageSize", required = false, defaultValue = "5")
+          int pageSize,
+      @Parameter(
+              name = "sortBy",
+              description =
+                  "the sorting specification; if unset, default to alphabetically ascending sorting of the field 'label')",
+              example = "label_de.desc.nullsfirst",
+              schema = @Schema(type = "string"))
+          @RequestParam(name = "sortBy", required = false)
+          List<Order> sortBy,
+      @Parameter(
+              name = "searchTerm",
+              description = "the search term, of which the result is filtered (substring match)",
+              example = "Test",
+              schema = @Schema(type = "string"))
+          @RequestParam(name = "searchTerm", required = false)
+          String searchTerm,
+      @Parameter(
+              name = "active",
+              description = "the set to true, only active subcollections are returned.",
+              example = "true",
+              schema = @Schema(type = "boolean"))
+          @RequestParam(name = "active", required = false)
+          String active)
+      throws JsonProcessingException {
+    SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      pageRequest.setSorting(sorting);
+    }
+    SearchPageResponse<Collection> response;
+    if (Boolean.parseBoolean(active)) {
+      response = collectionService.findActive(pageRequest);
+    } else {
+      response = collectionService.find(pageRequest);
+    }
+
+    // Fix the attributes, which are missing or different in new model
+    JSONObject result = fixPageResponse(response);
+    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+  }
+
   private JSONObject fixPageResponse(
       PageResponse<? extends Entity> response, String expectedClassName)
       throws JsonProcessingException {
