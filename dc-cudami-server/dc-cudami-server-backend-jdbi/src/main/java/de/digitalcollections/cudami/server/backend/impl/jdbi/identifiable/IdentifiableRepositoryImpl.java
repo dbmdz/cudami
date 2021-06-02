@@ -306,6 +306,33 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     return true;
   }
 
+  /**
+   * Escape characters that must not appear in jsonpath inner strings.
+   *
+   * <p>This method should always be used to clean up strings, e.g. search terms, that are intended
+   * to appear in an jsonpath inner string, i.e. between double quotes. If the inserted term
+   * contains double quotes then the jsonpath breaks. Hence we remove double quotes at start and end
+   * of the provided string (they do not have any meaning for the search at all) and escape the
+   * remaining ones with a backslash.
+   *
+   * @param term, can be null
+   * @return term with forbidden characters removed or escaped
+   */
+  protected String escapeTermForJsonpath(String term) {
+    if (term == null) {
+      return null;
+    }
+    if (term.startsWith("\"") && term.endsWith("\"")) {
+      // 1st step: remove useless surrounding quotes
+      term = term.replaceAll("^\"(.+)\"$", "$1");
+    }
+    if (term.contains("\"")) {
+      // 2nd step: escape remaining double quotes; yes, looks ugly...
+      term = term.replaceAll("\"", "\\\\\"");
+    }
+    return term;
+  }
+
   @Override
   public PageResponse<I> find(PageRequest pageRequest) {
     return find(pageRequest, null, null);
@@ -359,7 +386,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             + "jsonb_path_exists("
             + tableAlias
             + ".description, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath))";
-    return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
+    return find(
+        searchPageRequest, commonSql, Map.of("searchTerm", this.escapeTermForJsonpath(searchTerm)));
   }
 
   protected SearchPageResponse<I> find(
