@@ -25,8 +25,7 @@ public class CudamiFamilyNamesClient extends CudamiBaseClient<FamilyName> {
 
   public SearchPageResponse<FamilyName> find(SearchPageRequest searchPageRequest)
       throws HttpException {
-    return (SearchPageResponse<FamilyName>)
-        doGetRequestForPagedObjectList("/v5/familynames", searchPageRequest);
+    return doGetSearchRequestForPagedObjectList("/v5/familynames", searchPageRequest);
   }
 
   public SearchPageResponse findByLanguageAndInitial(
