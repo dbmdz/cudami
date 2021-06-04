@@ -133,7 +133,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
     String searchTerm = searchPageRequest.getQuery();
     if (StringUtils.hasText(searchTerm)) {
       commonSql += " AND " + getCommonSearchSql(tableAlias);
-      argumentMappings.put("searchTerm", searchTerm);
+      argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
     }
 
     StringBuilder innerQuery = new StringBuilder("SELECT cc.sortindex AS idx, *" + commonSql);
@@ -486,7 +486,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
     }
 
     commonSql += " AND " + getCommonSearchSql(tableAlias);
-    return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
+    return find(
+        searchPageRequest, commonSql, Map.of("searchTerm", this.escapeTermForJsonpath(searchTerm)));
   }
 
   @Override

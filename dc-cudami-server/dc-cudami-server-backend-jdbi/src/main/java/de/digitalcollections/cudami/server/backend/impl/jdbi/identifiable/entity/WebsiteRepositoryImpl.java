@@ -125,7 +125,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     String searchTerm = searchPageRequest.getQuery();
     if (StringUtils.hasText(searchTerm)) {
       commonSql += " AND " + getCommonSearchSql(wpTableAlias);
-      argumentMappings.put("searchTerm", searchTerm);
+      argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
     }
 
     StringBuilder innerQuery = new StringBuilder("SELECT ww.sortindex AS idx, *" + commonSql);

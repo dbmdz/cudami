@@ -124,7 +124,8 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
     if (!StringUtils.hasText(searchTerm)) {
       return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
     }
-    return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
+    return find(
+        searchPageRequest, commonSql, Map.of("searchTerm", this.escapeTermForJsonpath(searchTerm)));
   }
 
   @Override
