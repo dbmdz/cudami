@@ -114,6 +114,22 @@ public class PageResponseBuilder<T, B extends PageResponse<T>, C extends PageRes
     return (C) this;
   }
 
+  public C forDescendingOrderedField(String fieldName, String subfield) {
+    Order order =
+        new OrderBuilder()
+            .direction(Direction.DESC)
+            .ignoreCase(false)
+            .nullHandling(NullHandling.NATIVE)
+            .property(fieldName)
+            .subProperty(subfield)
+            .build();
+    if (orders == null) {
+      orders = new ArrayList<>();
+    }
+    orders.add(order);
+    return (C) this;
+  }
+
   public C forEqualPredicate(String fieldName, String predicate) {
     if (filterCriteria == null) {
       filterCriteria = new ArrayList<>();
@@ -124,6 +140,10 @@ public class PageResponseBuilder<T, B extends PageResponse<T>, C extends PageRes
 
   public C forAscendingOrderedField(String fieldName) {
     return forAscendingOrderedField(fieldName, "");
+  }
+
+  public C forDescendingOrderedField(String fieldName) {
+    return forDescendingOrderedField(fieldName, "");
   }
 
   public C withTotalElements(long totalElements) {

@@ -192,6 +192,67 @@ class V3WebpageControllerTest extends BaseControllerTest {
     testJson(path.replaceAll("latest", "v3")); // v3 equals latest
   }
 
+  @DisplayName("keeps the sorting order of the children of a webpage")
+  @ParameterizedTest
+  @Disabled("Fails currently")
+  @ValueSource(
+      strings = {
+        "/latest/webpages/5765b8bf-698c-4678-9ffa-bda77c5f44b5/children?sortBy=publicationStart.desc&pageSize=5",
+        "/v3/webpages/5765b8bf-698c-4678-9ffa-bda77c5f44b5/children?sortBy=publicationStart.desc&pageSize=5"
+      })
+  public void returnSortOrderOfChildrenOfAWebpage(String path) throws Exception {
+    PageResponse<Webpage> expected =
+        (PageResponse)
+            new PageResponseBuilder<>()
+                .forRequestPage(0)
+                .forPageSize(5)
+                .forDescendingOrderedField("publicationStart")
+                .withTotalElements(81)
+                .withContent(
+                    List.of(
+                        new WebpageBuilder()
+                            .createdAt("2021-04-19T09:36:44.248372")
+                            .withLabel(Locale.GERMAN, "1")
+                            .lastModifiedAt("2021-04-19T09:37:21.839009")
+                            .withUuid("07417d4c-3cdb-4509-9ee0-5a4ff8ef0153")
+                            .withPublicationStartAt("2021-04-19")
+                            .build(),
+                        new WebpageBuilder()
+                            .createdAt("2020-05-15T11:14:44.52781")
+                            .withLabel(Locale.GERMAN, "2")
+                            .lastModifiedAt("2020-07-01T17:31:36.627785")
+                            .withUuid("97113300-3b04-4b6f-9082-294d10fd778b")
+                            .withPublicationStartAt("2020-06-30")
+                            .build(),
+                        new WebpageBuilder()
+                            .createdAt("2020-05-15T11:14:42.588253")
+                            .withLabel(Locale.GERMAN, "3")
+                            .lastModifiedAt("2021-02-04T08:29:18.210378")
+                            .withUuid("5c2cd93c-73f5-4abd-b200-9141c5473df1")
+                            .withPublicationStartAt("2020-05-29")
+                            .build(),
+                        new WebpageBuilder()
+                            .createdAt("2020-05-15T11:14:43.640695")
+                            .withLabel(Locale.GERMAN, "4")
+                            .lastModifiedAt("2020-11-05T16:52:42.353087")
+                            .withUuid("38e4b7b0-b75a-4ded-a109-4213352130fa")
+                            .withPublicationStartAt("2020-05-29")
+                            .build(),
+                        new WebpageBuilder()
+                            .createdAt("2020-05-15T11:14:45.997827")
+                            .withLabel(Locale.GERMAN, "5")
+                            .lastModifiedAt("2020-05-29T16:31:23.556613")
+                            .withUuid("da9cbead-d855-434c-9c78-69a5d077f9a2")
+                            .withPublicationStartAt("2020-05-29")
+                            .build()))
+                .build();
+
+    when(webpageService.getChildren(any(UUID.class), any(PageRequest.class))).thenReturn(expected);
+    when(webpageService.getActiveChildren(any(UUID.class), any(PageRequest.class)))
+        .thenReturn(expected);
+    testJson(path, "/v3/webpages/news.json");
+  }
+
   @DisplayName("returns a webpage with a tree of its children")
   @ParameterizedTest
   @ValueSource(
