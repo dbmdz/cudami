@@ -52,7 +52,7 @@ public class SpringConfigSecurityWebapp extends WebSecurityConfigurerAdapter {
 
     http.authorizeRequests()
         .antMatchers("/users/updatePassword")
-        .permitAll()
+        .hasAnyAuthority(Role.ADMIN.getAuthority(), Role.CONTENT_MANAGER.getAuthority())
         .antMatchers("/users/**")
         .hasAnyAuthority(Role.ADMIN.getAuthority())
         .anyRequest()
