@@ -5,7 +5,7 @@
 
   <th:block th:fragment="renderWebpage(webpage, locale)">
     <div class="webpage">
-      <th:block th:if="${renderLabel}">
+      <th:block th:if="${#objects.nullSafe(renderLabel, true)}">
         <!-- label of webpage: -->
         <div class="webpage-label">
           <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${webpage.label}, ${locale})"></th:block>
@@ -28,5 +28,5 @@
     </div>
   </th:block>
 
-</body>
+  </body>
 </html>
