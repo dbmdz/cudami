@@ -194,7 +194,6 @@ class V3WebpageControllerTest extends BaseControllerTest {
 
   @DisplayName("keeps the sorting order of the children of a webpage")
   @ParameterizedTest
-  @Disabled("Fails currently")
   @ValueSource(
       strings = {
         "/latest/webpages/5765b8bf-698c-4678-9ffa-bda77c5f44b5/children?sortBy=publicationStart.desc&pageSize=5",
@@ -214,7 +213,7 @@ class V3WebpageControllerTest extends BaseControllerTest {
                             .createdAt("2021-04-19T09:36:44.248372")
                             .withLabel(Locale.GERMAN, "1")
                             .lastModifiedAt("2021-04-19T09:37:21.839009")
-                            .withUuid("07417d4c-3cdb-4509-9ee0-5a4ff8ef0153")
+                            .withUuid("ed86dcc0-a1aa-4e82-872a-8d82d2536846")
                             .withPublicationStartAt("2021-04-19")
                             .build(),
                         new WebpageBuilder()
