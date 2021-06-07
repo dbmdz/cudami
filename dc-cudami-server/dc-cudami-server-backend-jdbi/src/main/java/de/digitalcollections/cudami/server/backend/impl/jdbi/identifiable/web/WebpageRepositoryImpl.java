@@ -275,13 +275,16 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
 
     StringBuilder innerQuery = new StringBuilder("SELECT ww.sortindex AS idx, *" + commonSql);
     addFiltering(pageRequest, innerQuery);
+
+    String orderBy = null;
     if (pageRequest.getSorting() == null) {
-      innerQuery.append(" ORDER BY idx ASC");
+      orderBy = "ORDER BY idx ASC";
+      innerQuery.append(" ").append(orderBy);
     }
     addPageRequestParams(pageRequest, innerQuery);
 
     List<Webpage> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), "ORDER BY idx ASC");
+        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), orderBy);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, countQuery);
