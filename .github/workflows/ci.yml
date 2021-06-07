@@ -57,7 +57,7 @@ jobs:
       - name: Set project version
         run: echo "PROJECT_VERSION=$(xmllint --xpath '/*[local-name()="project"]/*[local-name()="version"]/text()' pom.xml)" >> $GITHUB_ENV
       - name: Publish to the Maven Central Repository
-        run: if [[ "$PROJECT_VERSION" =~ .*SNAPSHOT ]]; then mvn -B deploy -DskipTests; fi
+        run: if [[ "$PROJECT_VERSION" =~ .*SNAPSHOT ]]; then mvn -B deploy -DskipTests -Pproduction; fi
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
