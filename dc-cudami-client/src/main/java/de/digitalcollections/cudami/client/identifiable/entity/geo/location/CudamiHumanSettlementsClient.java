@@ -16,7 +16,7 @@ public class CudamiHumanSettlementsClient extends CudamiBaseClient<HumanSettleme
   }
 
   public long count() throws HttpException {
-    return Long.parseLong(doGetRequestForString("/v5/human_settlements/count"));
+    return Long.parseLong(doGetRequestForString("/v5/humansettlements/count"));
   }
 
   public HumanSettlement create() {
@@ -24,12 +24,12 @@ public class CudamiHumanSettlementsClient extends CudamiBaseClient<HumanSettleme
   }
 
   public PageResponse<HumanSettlement> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/v5/human_settlements", pageRequest);
+    return doGetRequestForPagedObjectList("/v5/humansettlements", pageRequest);
   }
 
   public PageResponse findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial) throws HttpException {
-    return findByLanguageAndInitial("/v5/human_settlements", pageRequest, language, initial);
+    return findByLanguageAndInitial("/v5/humansettlements", pageRequest, language, initial);
   }
 
   public PageResponse<HumanSettlement> findByLanguageAndInitial(
@@ -42,7 +42,7 @@ public class CudamiHumanSettlementsClient extends CudamiBaseClient<HumanSettleme
       String initial)
       throws HttpException {
     return findByLanguageAndInitial(
-        "/v5/human_settlements",
+        "/v5/humansettlements",
         pageNumber,
         pageSize,
         sortField,
@@ -53,19 +53,19 @@ public class CudamiHumanSettlementsClient extends CudamiBaseClient<HumanSettleme
   }
 
   public HumanSettlement findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/v5/human_settlements/%s", uuid));
+    return doGetRequestForObject(String.format("/v5/humansettlements/%s", uuid));
   }
 
   public HumanSettlement findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-        String.format("/v5/human_settlements/identifier?namespace=%s&id=%s", namespace, id));
+        String.format("/v5/humansettlements/identifier?namespace=%s&id=%s", namespace, id));
   }
 
   public HumanSettlement save(HumanSettlement humanSettlement) throws HttpException {
-    return doPostRequestForObject("/v5/human_settlements", humanSettlement);
+    return doPostRequestForObject("/v5/humansettlements", humanSettlement);
   }
 
   public HumanSettlement update(UUID uuid, HumanSettlement humanSettlement) throws HttpException {
-    return doPutRequestForObject(String.format("/v5/human_settlements/%s", uuid), humanSettlement);
+    return doPutRequestForObject(String.format("/v5/humansettlements/%s", uuid), humanSettlement);
   }
 }

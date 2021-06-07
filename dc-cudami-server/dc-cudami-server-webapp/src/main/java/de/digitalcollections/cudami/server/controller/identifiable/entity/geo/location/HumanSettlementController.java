@@ -42,7 +42,7 @@ public class HumanSettlementController {
 
   @Operation(summary = "get all human settlements")
   @GetMapping(
-      value = {"/v5/human_settlements", "/v2/human_settlements", "/latest/human_settlements"},
+      value = {"/v5/humansettlements", "/v2/humansettlements", "/latest/humansettlements"},
       produces = "application/json")
   public PageResponse<HumanSettlement> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -66,9 +66,9 @@ public class HumanSettlementController {
           "get a human settlement as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {
-        "/v5/human_settlements/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v2/human_settlements/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/latest/human_settlements/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+        "/v5/humansettlements/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v2/humansettlements/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/latest/humansettlements/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<HumanSettlement> get(
@@ -100,9 +100,9 @@ public class HumanSettlementController {
           "get a human settlement as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
   @GetMapping(
       value = {
-        "/v5/human_settlements/identifier",
-        "/v2/human_settlements/identifier",
-        "/latest/human_settlements/identifier"
+        "/v5/humansettlements/identifier",
+        "/v2/humansettlements/identifier",
+        "/latest/humansettlements/identifier"
       },
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<HumanSettlement> getByIdentifier(
@@ -115,7 +115,7 @@ public class HumanSettlementController {
 
   @Operation(summary = "save a newly created human settlement")
   @PostMapping(
-      value = {"/v5/human_settlements", "/v2/human_settlements", "/latest/human_settlements"},
+      value = {"/v5/humansettlements", "/v2/humansettlements", "/latest/humansettlements"},
       produces = "application/json")
   public HumanSettlement save(@RequestBody HumanSettlement humanSettlement, BindingResult errors)
       throws IdentifiableServiceException {
@@ -125,9 +125,9 @@ public class HumanSettlementController {
   @Operation(summary = "update a human settlement")
   @PutMapping(
       value = {
-        "/v5/human_settlements/{uuid}",
-        "/v2/human_settlements/{uuid}",
-        "/latest/human_settlements/{uuid}"
+        "/v5/humansettlements/{uuid}",
+        "/v2/humansettlements/{uuid}",
+        "/latest/humansettlements/{uuid}"
       },
       produces = "application/json")
   public HumanSettlement update(
