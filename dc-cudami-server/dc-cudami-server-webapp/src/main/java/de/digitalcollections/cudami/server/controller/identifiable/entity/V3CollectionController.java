@@ -309,7 +309,7 @@ public class V3CollectionController {
       pageRequest.setSorting(sorting);
     }
     SearchPageResponse<Collection> response;
-    if (Boolean.parseBoolean(active)) {
+    if (active != null) {
       response = collectionService.findActive(pageRequest);
     } else {
       response = collectionService.find(pageRequest);
