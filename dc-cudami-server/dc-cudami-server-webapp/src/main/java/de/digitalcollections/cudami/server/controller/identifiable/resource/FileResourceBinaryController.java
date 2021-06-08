@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.res
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,6 +37,7 @@ public class FileResourceBinaryController {
     this.metadataService = metadataService;
   }
 
+  @Operation(summary = "Save a file to the disk")
   @PostMapping(value = {"/v5/files", "/v2/files", "/latest/files"})
   public FileResource upload(HttpServletRequest request) throws IOException {
     FileResource fileResource = null;
