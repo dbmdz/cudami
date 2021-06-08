@@ -307,7 +307,7 @@ public class TopicController {
 
   @Operation(summary = "Get subtopics of topic")
   @GetMapping(
-      value = {"/v5/topics/{uuid}/subtopics", "/v2/topics/{uuid}/subtopics"},
+      value = {"/v2/topics/{uuid}/subtopics"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   ResponseEntity<String> getSubtopics(@PathVariable UUID uuid) {
     return new ResponseEntity<>(
