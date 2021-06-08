@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.server.controller.v2.identifiable.web;
+package de.digitalcollections.cudami.server.controller.identifiable.web;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,8 +14,10 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import org.jdom2.Element;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,41 +27,59 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(name = "V2WebpageController", description = "The WebpageController in legacy version V2")
-public class V2WebpageController {
+@Tag(name = "V1WebpageController", description = "The WebpageController in legacy version V1")
+public class V1WebpageController {
 
   private final ObjectMapper objectMapper;
   private final WebpageService webpageService;
 
-  public V2WebpageController(WebpageService webpageService, ObjectMapper objectMapper) {
+  public V1WebpageController(WebpageService webpageService, ObjectMapper objectMapper) {
     this.webpageService = webpageService;
     this.objectMapper = objectMapper;
   }
 
   private JSONObject convertLocalizedStructuredContentJson(JSONObject json) {
     JSONObject localizedStructuredContent = new JSONObject();
-    localizedStructuredContent.put("localizedStructuredContent", json);
+    JSONObject documents = new JSONObject();
+    for (String locale : json.keySet()) {
+      if (locale.equals("de")) {
+        documents.put("de_DE", json.get(locale));
+      } else {
+        documents.put(locale, json.get(locale));
+      }
+    }
+    localizedStructuredContent.put("documents", documents);
     return localizedStructuredContent;
   }
 
   private JSONObject convertLocalizedTextJson(JSONObject json) {
     JSONObject result = new JSONObject();
     JSONArray translations = new JSONArray();
-    json.keySet()
-        .forEach(
-            (locale) -> {
-              JSONObject translation = new JSONObject();
-              translation.put("locale", locale);
-              translation.put("text", json.get(locale));
-              translations.put(translation);
-            });
+    for (String locale : json.keySet()) {
+      JSONObject translation = new JSONObject();
+      if (locale.equals("de")) {
+        translation.put("locale", "de_DE");
+      } else {
+        translation.put("locale", locale);
+      }
+      translation.put("text", json.get(locale));
+      translations.put(translation);
+    }
     result.put("translations", translations);
     return result;
   }
 
+  private Element createDocumentsElement(List<Element> contents) {
+    Element documents = new Element("documents");
+    for (Element entry : contents) {
+      documents.addContent(entry.clone());
+    }
+    return documents;
+  }
+
   @Operation(
       summary = "Get a webpage in JSON format",
-      description = "Get a webpage in JSON format (version 2)",
+      description = "Get a webpage in JSON format (version 1)",
       responses = {
         @ApiResponse(
             responseCode = "200",
@@ -73,19 +93,19 @@ public class V2WebpageController {
                       @ExampleObject(
                           name = "example list",
                           externalValue =
-                              "https://github.com/dbmdz/cudami/raw/main/dc-cudami-server/dc-cudami-server-webapp/src/test/resources/json/v2/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa.json")
+                              "https://github.com/dbmdz/cudami/raw/main/dc-cudami-server/dc-cudami-server-webapp/src/test/resources/json/v1/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa.json")
                     }))
       })
   @GetMapping(
-      value = {"/v2/webpages/{uuid}.json", "/v2/webpages/{uuid}"},
+      value = {"/v1/webpages/{uuid}.json", "/v1/webpages/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> getWebpageV2Json(
+  public ResponseEntity<String> getWebpageV1Json(
       @Parameter(
               name = "uuid",
               description = "the UUID of the webpage",
               example = "599a120c-2dd5-11e8-b467-0ed5f89f718b",
               schema = @Schema(implementation = UUID.class))
-          @PathVariable("uuid")
+          @PathVariable(name = "uuid")
           UUID uuid,
       @Parameter(
               name = "pLocale",

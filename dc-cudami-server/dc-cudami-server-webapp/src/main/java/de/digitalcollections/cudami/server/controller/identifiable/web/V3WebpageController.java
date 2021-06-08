@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.server.controller.v3.identifiable.web;
+package de.digitalcollections.cudami.server.controller.identifiable.web;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
