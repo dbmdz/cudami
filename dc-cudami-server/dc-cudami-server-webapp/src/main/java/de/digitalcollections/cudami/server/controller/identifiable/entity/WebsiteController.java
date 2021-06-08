@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(name = "WebsiteController", description = "The controller for Websites")
+@Tag(name = "Website controller")
 public class WebsiteController {
 
   private final WebsiteService websiteService;

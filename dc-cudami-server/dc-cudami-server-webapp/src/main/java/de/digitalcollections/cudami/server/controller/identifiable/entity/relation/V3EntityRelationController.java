@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(name = "Entity relations controller")
+@Tag(name = "Entity relation controller")
 public class V3EntityRelationController {
 
   private final EntityRelationService entityRelationService;
