@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
  * latest endpoint
  */
 @RestController
-@Tag(name = "V3WebsiteController", description = "The WebsiteController in legacy version V3")
+@Tag(name = "Website controller")
 public class V3WebsiteController {
 
   private final ObjectMapper objectMapper;

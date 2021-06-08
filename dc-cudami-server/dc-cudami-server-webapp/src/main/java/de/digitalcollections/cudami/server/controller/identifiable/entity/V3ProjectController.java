@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(name = "V3ProjectController", description = "The ProjectController in legacy version V3")
+@Tag(name = "Project controller")
 public class V3ProjectController {
 
   private final ObjectMapper objectMapper;

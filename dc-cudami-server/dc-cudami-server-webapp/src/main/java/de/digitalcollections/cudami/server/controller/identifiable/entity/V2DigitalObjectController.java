@@ -27,9 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(
-    name = "V2DigitalObjectController",
-    description = "The DigitalObjectController in legacy version V2")
+@Tag(name = "Digital object controller")
 public class V2DigitalObjectController {
 
   private final ObjectMapper objectMapper;

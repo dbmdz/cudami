@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  * latest endpoint
  */
 @RestController
-@Tag(name = "V2WebsiteController", description = "The WebsiteController in legacy version V2")
+@Tag(name = "Website controller")
 public class V2WebsiteController {
 
   private final ObjectMapper objectMapper;

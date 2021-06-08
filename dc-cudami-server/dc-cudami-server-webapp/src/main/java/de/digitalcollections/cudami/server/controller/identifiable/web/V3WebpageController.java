@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(name = "V3WebpageController", description = "The WebpageController in legacy version V3")
+@Tag(name = "Webpage controller")
 public class V3WebpageController {
 
   private final LocaleService localeService;
