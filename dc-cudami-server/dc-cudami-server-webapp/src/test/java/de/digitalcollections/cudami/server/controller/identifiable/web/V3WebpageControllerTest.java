@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.server.controller.v3.identifiable.web;
+package de.digitalcollections.cudami.server.controller.identifiable.web;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
