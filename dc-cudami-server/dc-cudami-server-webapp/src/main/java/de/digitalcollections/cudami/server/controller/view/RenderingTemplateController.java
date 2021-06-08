@@ -6,6 +6,8 @@ import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.Sorting;
 import de.digitalcollections.model.view.RenderingTemplate;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Tag(name = "Rendering template controller")
 public class RenderingTemplateController {
 
   private final RenderingTemplateService renderingTemplateService;
@@ -28,6 +31,7 @@ public class RenderingTemplateController {
     this.renderingTemplateService = renderingTemplateService;
   }
 
+  @Operation(summary = "Get all rendering templates")
   @GetMapping(
       value = {"/v5/renderingtemplates"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -43,6 +47,7 @@ public class RenderingTemplateController {
     return renderingTemplateService.find(pageRequest);
   }
 
+  @Operation(summary = "Get rendering template by uuid")
   @GetMapping(
       value = {
         "/v5/renderingtemplates/{uuid}",
@@ -54,6 +59,7 @@ public class RenderingTemplateController {
     return renderingTemplateService.findOne(uuid);
   }
 
+  @Operation(summary = "Save a newly created rendering template")
   @PostMapping(
       value = {"/v5/renderingtemplates", "/v3/renderingtemplates", "/latest/renderingtemplates"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -61,6 +67,7 @@ public class RenderingTemplateController {
     return renderingTemplateService.save(template);
   }
 
+  @Operation(summary = "Update a rendering template")
   @PutMapping(
       value = {
         "/v5/renderingtemplates/{uuid}",
