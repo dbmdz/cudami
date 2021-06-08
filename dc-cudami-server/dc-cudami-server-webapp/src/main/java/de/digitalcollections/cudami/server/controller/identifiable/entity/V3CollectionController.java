@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(name = "V3CollectionController", description = "The CollectionController in legacy version V3")
+@Tag(name = "Collection controller")
 public class V3CollectionController {
 
   private final ObjectMapper objectMapper;

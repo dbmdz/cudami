@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(name = "V2CollectionController", description = "The CollectionController in legacy version V2")
+@Tag(name = "Collection controller")
 public class V2CollectionController {
 
   private final ObjectMapper objectMapper;

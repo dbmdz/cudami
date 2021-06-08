@@ -27,9 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(
-    name = "V2IdentifierTypeController",
-    description = "The IdentifierTypeController in legacy version V2")
+@Tag(name = "Identifier type controller")
 public class V2IdentifierTypeController {
 
   private final DigitalCollectionsObjectMapper objectMapper = new DigitalCollectionsObjectMapper();

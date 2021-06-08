@@ -27,9 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(
-    name = "V3RenderingTemplateController",
-    description = "The RenderingTemplateController in legacy version V3")
+@Tag(name = "Rendering template controller")
 public class V3RenderingTemplateController {
 
   private final ObjectMapper objectMapper;

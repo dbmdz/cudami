@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(name = "V1WebpageController", description = "The WebpageController in legacy version V1")
+@Tag(name = "Webpage controller")
 public class V1WebpageController {
 
   private final ObjectMapper objectMapper;
