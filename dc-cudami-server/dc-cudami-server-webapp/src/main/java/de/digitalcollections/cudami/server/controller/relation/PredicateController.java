@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(name = "Predicates controller")
+@Tag(name = "Predicate controller")
 public class PredicateController {
 
   private final PredicateService predicateService;

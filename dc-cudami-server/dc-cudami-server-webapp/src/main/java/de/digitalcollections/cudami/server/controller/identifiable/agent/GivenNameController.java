@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(name = "GivenName controller")
+@Tag(name = "Given name controller")
 public class GivenNameController {
 
   private final GivenNameService givenNameService;

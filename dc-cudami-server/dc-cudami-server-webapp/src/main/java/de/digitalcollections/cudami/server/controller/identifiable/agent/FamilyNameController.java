@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Tag(name = "FamilyName controller")
+@Tag(name = "Family name controller")
 public class FamilyNameController {
 
   private final FamilyNameService familyNameService;
