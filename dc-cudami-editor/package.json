@@ -24,9 +24,6 @@
     ]
   },
   "prettier": "@fisker/prettier-config",
-  "eslintConfig": {
-    "extends": "react-app"
-  },
   "dependencies": {
     "@aeaton/prosemirror-footnotes": "^0.1.0",
     "@aeaton/react-prosemirror": "^0.22.1",
