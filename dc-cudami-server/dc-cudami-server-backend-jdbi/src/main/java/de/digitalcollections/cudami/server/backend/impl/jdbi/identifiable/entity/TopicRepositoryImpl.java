@@ -139,8 +139,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
     StringBuilder innerQuery = new StringBuilder("SELECT cc.sortindex AS idx, *" + commonSql);
     addFiltering(searchPageRequest, innerQuery);
 
-    String orderBy = null;
-    if (searchPageRequest.getSorting() == null) {
+    String orderBy = getOrderBy(searchPageRequest.getSorting());
+    if (!StringUtils.hasText(orderBy)) {
       orderBy = "ORDER BY idx ASC";
       innerQuery.append(" ").append(orderBy);
     }
