@@ -203,20 +203,8 @@ public class WebsiteController {
               example = "Test",
               schema = @Schema(type = "string"))
           @RequestParam(name = "searchTerm", required = false)
-          String searchTerm,
-      @Parameter(
-              name = "sortBy",
-              description =
-                  "the sorting specification; if unset, default to alphabetically ascending sorting of the field 'label')",
-              example = "label_de.desc.nullsfirst",
-              schema = @Schema(type = "string"))
-          @RequestParam(name = "sortBy", required = false)
-          List<Order> sortBy) {
+          String searchTerm) {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
     return websiteService.findRootPages(uuid, searchPageRequest);
   }
 
