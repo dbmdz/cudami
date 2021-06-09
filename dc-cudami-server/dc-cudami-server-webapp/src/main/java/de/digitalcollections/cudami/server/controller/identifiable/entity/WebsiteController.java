@@ -173,7 +173,7 @@ public class WebsiteController {
                     schema = @Schema(implementation = SearchPageResponseWebpage.class)))
       })
   @GetMapping(
-      value = {"/v5/websites/{uuid}/rootpages", "/latest/websites/{uuid}/rootpages"},
+      value = {"/v5/websites/{uuid}/rootpages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public SearchPageResponse<Webpage> getRootPages(
       @Parameter(
