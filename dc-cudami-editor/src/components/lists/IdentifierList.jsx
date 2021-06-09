@@ -1,5 +1,3 @@
-import React from 'react'
-
 const IdentifierList = ({identifiers, identifierTypes}) => (
   <ul className="list-inline mb-0">
     {identifiers.map(({id, namespace}) => (

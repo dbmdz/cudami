@@ -1,6 +1,5 @@
 import './FileUploadForm.css'
 
-import React from 'react'
 import {FileDrop} from 'react-file-drop'
 import {useTranslation} from 'react-i18next'
 import {FaCopy, FaUpload} from 'react-icons/fa'

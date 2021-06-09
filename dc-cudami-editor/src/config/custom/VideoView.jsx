@@ -1,5 +1,4 @@
 import {publish, subscribe, unsubscribe} from 'pubsub-js'
-import React from 'react'
 import {render} from 'react-dom'
 
 import EditButton from '../../components/editor/EditButton'

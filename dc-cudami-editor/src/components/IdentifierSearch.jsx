@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import {Component} from 'react'
 import {FaSearch} from 'react-icons/fa'
 import {
   Button,

@@ -1,4 +1,3 @@
-import React from 'react'
 import {FaQuestionCircle} from 'react-icons/fa'
 import {Button, PopoverBody, UncontrolledPopover} from 'reactstrap'
 

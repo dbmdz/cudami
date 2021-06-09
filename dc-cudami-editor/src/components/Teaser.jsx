@@ -1,4 +1,3 @@
-import React from 'react'
 import {Card, CardBody, Col, Row} from 'reactstrap'
 
 import EditorWithLabel from './editor/EditorWithLabel'

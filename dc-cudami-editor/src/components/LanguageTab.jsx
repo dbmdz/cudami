@@ -1,5 +1,4 @@
 import {publish} from 'pubsub-js'
-import React from 'react'
 import {useTranslation} from 'react-i18next'
 import {FaTrashAlt} from 'react-icons/fa'
 import {Button, NavItem, NavLink} from 'reactstrap'

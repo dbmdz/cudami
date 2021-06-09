@@ -1,4 +1,4 @@
-import React, {forwardRef, useContext, useState} from 'react'
+import {forwardRef, useContext, useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {
   FaArrowsAltV,

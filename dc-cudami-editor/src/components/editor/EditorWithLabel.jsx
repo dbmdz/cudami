@@ -1,7 +1,7 @@
 import './EditorWithLabel.css'
 
 import {Editor} from '@aeaton/react-prosemirror'
-import React, {Component} from 'react'
+import {Component} from 'react'
 import {withTranslation} from 'react-i18next'
 import {Label} from 'reactstrap'
 

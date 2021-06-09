@@ -1,4 +1,3 @@
-import React from 'react'
 import ReactDOM from 'react-dom'
 
 import RenderingTemplateForm from '../components/forms/RenderingTemplateForm'

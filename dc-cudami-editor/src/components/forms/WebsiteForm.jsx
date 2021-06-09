@@ -1,4 +1,3 @@
-import React from 'react'
 import {useTranslation} from 'react-i18next'
 import {Col, Form, Nav, Row, TabContent, TabPane} from 'reactstrap'
 

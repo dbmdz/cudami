@@ -1,5 +1,4 @@
 import startCase from 'lodash/startCase'
-import React from 'react'
 import {useTranslation} from 'react-i18next'
 import {Button, Modal, ModalBody, ModalFooter, ModalHeader} from 'reactstrap'
 

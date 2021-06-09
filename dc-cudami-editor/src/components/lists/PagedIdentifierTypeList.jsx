@@ -1,4 +1,3 @@
-import React from 'react'
 import {useTranslation} from 'react-i18next'
 import {FaHashtag} from 'react-icons/fa'
 import {Button, Card, CardBody, Col, Row, Table} from 'reactstrap'

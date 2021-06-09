@@ -1,5 +1,5 @@
 import {subscribe, unsubscribe} from 'pubsub-js'
-import React, {useEffect, useState} from 'react'
+import {useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {Button, Modal, ModalBody, ModalFooter, ModalHeader} from 'reactstrap'
 

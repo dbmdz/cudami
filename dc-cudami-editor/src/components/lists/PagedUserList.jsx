@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import React, {useState} from 'react'
+import {useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {FaHashtag, FaPowerOff, FaToggleOff, FaToggleOn} from 'react-icons/fa'
 import {Button, Card, CardBody, Col, Row, Table} from 'reactstrap'

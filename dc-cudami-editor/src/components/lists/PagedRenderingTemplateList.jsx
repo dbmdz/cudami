@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import {useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {FaHashtag} from 'react-icons/fa'
 import {Button, Card, CardBody, Col, Nav, Row, Table} from 'reactstrap'

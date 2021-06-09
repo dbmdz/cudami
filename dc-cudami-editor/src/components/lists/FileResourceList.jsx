@@ -1,5 +1,5 @@
 import filesize from 'filesize'
-import React, {useContext} from 'react'
+import {useContext} from 'react'
 import {useTranslation} from 'react-i18next'
 import {FaHashtag, FaImage} from 'react-icons/fa'
 import {Table} from 'reactstrap'
