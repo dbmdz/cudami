@@ -145,6 +145,7 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
 
   @Override
   public SearchPageResponse<Collection> findRootNodes(SearchPageRequest searchPageRequest) {
+    setDefaultSorting(searchPageRequest);
     return ((NodeRepository<Collection>) repository).findRootNodes(searchPageRequest);
   }
 
