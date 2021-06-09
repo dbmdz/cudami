@@ -1,7 +1,7 @@
 import '../../polyfills'
 
 import uniqBy from 'lodash/uniqBy'
-import React, {Component} from 'react'
+import {Component} from 'react'
 import {withTranslation} from 'react-i18next'
 import {Button, Card, CardBody, Col, Nav, Row} from 'reactstrap'
 

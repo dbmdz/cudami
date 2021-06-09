@@ -1,4 +1,3 @@
-import React from 'react'
 import {useTranslation} from 'react-i18next'
 import {FaPlus} from 'react-icons/fa'
 import {NavItem, NavLink} from 'reactstrap'

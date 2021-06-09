@@ -1,6 +1,6 @@
 import './Autocomplete.css'
 
-import React, {Component} from 'react'
+import {Component} from 'react'
 import Autosuggest from 'react-autosuggest'
 import {withTranslation} from 'react-i18next'
 import {Col, FormGroup, Row} from 'reactstrap'

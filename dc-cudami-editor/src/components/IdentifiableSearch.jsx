@@ -1,7 +1,6 @@
 import './IdentifiableSearch.css'
 
 import classNames from 'classnames'
-import React from 'react'
 import {useTranslation} from 'react-i18next'
 import {FaSearch, FaTimes} from 'react-icons/fa'
 import {Button, Form, Input, InputGroup, InputGroupAddon} from 'reactstrap'

@@ -1,6 +1,6 @@
 import mapValues from 'lodash/mapValues'
 import {publish, subscribe} from 'pubsub-js'
-import React, {Component} from 'react'
+import {Component} from 'react'
 import {withTranslation} from 'react-i18next'
 import {
   Button,

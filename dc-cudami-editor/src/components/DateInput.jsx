@@ -1,4 +1,4 @@
-import React, {useContext} from 'react'
+import {useContext} from 'react'
 import DatePicker from 'react-date-picker'
 import {useTranslation} from 'react-i18next'
 import {FormGroup, Label} from 'reactstrap'

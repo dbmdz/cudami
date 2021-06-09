@@ -1,5 +1,5 @@
 import startCase from 'lodash/startCase'
-import React, {Component} from 'react'
+import {Component} from 'react'
 import {withTranslation} from 'react-i18next'
 import {FaTrash} from 'react-icons/fa'
 import {

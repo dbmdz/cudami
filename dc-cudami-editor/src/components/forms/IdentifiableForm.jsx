@@ -3,7 +3,7 @@ import '../../polyfills'
 import kebabCase from 'lodash/kebabCase'
 import omit from 'lodash/omit'
 import sortBy from 'lodash/sortBy'
-import React, {Component} from 'react'
+import {Component} from 'react'
 import {withTranslation} from 'react-i18next'
 
 import {

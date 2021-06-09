@@ -1,7 +1,6 @@
 import './EditorMenu.css'
 
 import classNames from 'classnames'
-import React from 'react'
 import {DropdownItem, DropdownMenu, UncontrolledDropdown} from 'reactstrap'
 
 const Button = ({dispatch, fullWidth, item, state}) => {

@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import {Component} from 'react'
 import {withTranslation} from 'react-i18next'
 import {Button, ButtonGroup, Card, Col, Form, Input, Row} from 'reactstrap'
 
