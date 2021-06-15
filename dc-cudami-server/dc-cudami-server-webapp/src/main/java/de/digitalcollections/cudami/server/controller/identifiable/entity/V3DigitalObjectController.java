@@ -43,7 +43,7 @@ public class V3DigitalObjectController {
 
   @Operation(
       summary = "Get collections for a digital object",
-      description = "Get (active) paged collections of a digital objects\"",
+      description = "Get (active) paged collections of a digital objects",
       responses = {
         @ApiResponse(
             responseCode = "200",
@@ -69,7 +69,7 @@ public class V3DigitalObjectController {
   public ResponseEntity<String> getCollections(
       @Parameter(
               name = "uuid",
-              description = "the UUID of the collection",
+              description = "the UUID of the digital object",
               example = "a014a33b-6803-4b17-a876-a8f68758f2a7",
               schema = @Schema(implementation = UUID.class))
           @PathVariable("uuid")
@@ -90,7 +90,7 @@ public class V3DigitalObjectController {
           int pageSize,
       @Parameter(
               name = "active",
-              description = "the set to true, only active subcollections are returned.",
+              description = "the set to true, only active collections are returned.",
               example = "true",
               schema = @Schema(type = "boolean"))
           @RequestParam(name = "active", required = false)
