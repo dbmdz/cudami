@@ -90,7 +90,7 @@ public class V3DigitalObjectController {
           int pageSize,
       @Parameter(
               name = "active",
-              description = "the set to true, only active collections are returned.",
+              description = "if set to true, only active collections are returned.",
               example = "true",
               schema = @Schema(type = "boolean"))
           @RequestParam(name = "active", required = false)
