@@ -251,11 +251,7 @@ public class DigitalObjectController {
 
   @Operation(summary = "Get paged projects of a digital objects")
   @GetMapping(
-      value = {
-        "/v5/digitalobjects/{uuid}/projects",
-        "/v3/digitalobjects/{uuid}/projects",
-        "/latest/digitalobjects/{uuid}/projects"
-      },
+      value = {"/v5/digitalobjects/{uuid}/projects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Project> getProjects(
       @Parameter(example = "", description = "UUID of the digital object") @PathVariable("uuid")
