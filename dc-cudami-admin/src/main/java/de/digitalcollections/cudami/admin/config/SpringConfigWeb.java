@@ -8,6 +8,7 @@ import de.digitalcollections.commons.springmvc.controller.ErrorController;
 import de.digitalcollections.commons.springmvc.thymeleaf.SpacesDialect;
 import de.digitalcollections.cudami.admin.converter.GrantedAuthorityJsonFilter;
 import de.digitalcollections.cudami.admin.interceptors.CreateAdminUserInterceptor;
+import de.digitalcollections.cudami.admin.interceptors.RequestIdLoggingInterceptor;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import java.util.List;
@@ -99,6 +100,7 @@ public class SpringConfigWeb implements WebMvcConfigurer {
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
     registry.addInterceptor(localeChangeInterceptor());
+    registry.addInterceptor(new RequestIdLoggingInterceptor());
 
     InterceptorRegistration createAdminUserInterceptorRegistration =
         registry.addInterceptor(createAdminUserInterceptor());
