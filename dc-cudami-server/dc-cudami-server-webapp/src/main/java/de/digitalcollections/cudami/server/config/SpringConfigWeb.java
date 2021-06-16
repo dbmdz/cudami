@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.commons.springmvc.thymeleaf.SpacesDialect;
+import de.digitalcollections.cudami.server.interceptors.RequestIdLoggingInterceptor;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import java.time.format.DateTimeFormatter;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +13,7 @@ import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.dialect.AbstractProcessorDialect;
@@ -69,5 +71,10 @@ public class SpringConfigWeb implements WebMvcConfigurer {
   @Bean
   public AbstractProcessorDialect whiteSpaceNormalizedDialect() {
     return new SpacesDialect();
+  }
+
+  @Override
+  public void addInterceptors(InterceptorRegistry registry) {
+    registry.addInterceptor(new RequestIdLoggingInterceptor());
   }
 }

@@ -40,6 +40,10 @@
       <artifactId>thymeleaf-extras-data-attribute</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.github.spotbugs</groupId>
+      <artifactId>spotbugs-annotations</artifactId>
+    </dependency>
+    <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-server</artifactId>
       <version>${version.dc-commons-server}</version>
