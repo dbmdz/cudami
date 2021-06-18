@@ -10,7 +10,7 @@ import javax.sql.DataSource;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.jdbi.v3.postgres.PostgresPlugin;
-import org.jdbi.v3.spring4.JdbiFactoryBean;
+import org.jdbi.v3.spring5.JdbiFactoryBean;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
