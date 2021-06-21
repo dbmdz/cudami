@@ -26,6 +26,7 @@ import de.digitalcollections.cudami.client.relation.CudamiPredicatesClient;
 import de.digitalcollections.cudami.client.security.CudamiUsersClient;
 import de.digitalcollections.cudami.client.view.CudamiRenderingTemplatesClient;
 import java.net.http.HttpClient;
+import java.net.http.HttpClient.Version;
 import java.time.Duration;
 
 public class CudamiClient {
@@ -62,6 +63,7 @@ public class CudamiClient {
         HttpClient.newBuilder()
             .followRedirects(HttpClient.Redirect.ALWAYS)
             .connectTimeout(Duration.ofSeconds(10))
+            .version(Version.HTTP_1_1)
             .build(),
         cudamiServerUrl,
         mapper);
