@@ -73,7 +73,6 @@ public class CorporateBodyController {
     return corporateBodyService.find(searchPageRequest);
   }
 
-  // Test-URL: http://localhost:9000/latest/corporatebodies/599a120c-2dd5-11e8-b467-0ed5f89f718b
   @Operation(
       summary =
           "Get an corporate body as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")

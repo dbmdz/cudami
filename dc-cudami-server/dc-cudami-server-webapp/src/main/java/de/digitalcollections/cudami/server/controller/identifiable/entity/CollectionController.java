@@ -224,7 +224,6 @@ public class CollectionController {
     return findByUuid(collection.getUuid(), null, null);
   }
 
-  // Test-URL: http://localhost:9000/latest/collections/599a120c-2dd5-11e8-b467-0ed5f89f718b
   @Operation(
       summary =
           "Get an collection as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")

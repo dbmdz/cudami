@@ -144,7 +144,6 @@ public class ProjectController {
     return projectService.getByIdentifier(namespace, id);
   }
 
-  // Test-URL: http://localhost:9000/latest/projects/599a120c-2dd5-11e8-b467-0ed5f89f718b
   @Operation(
       summary =
           "Get an project as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")

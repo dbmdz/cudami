@@ -135,7 +135,6 @@ public class WebpageController {
     return webpageService.getRelatedFileResources(uuid);
   }
 
-  // Test-URL: http://localhost:9000/latest/webpages/599a120c-2dd5-11e8-b467-0ed5f89f718b
   @Operation(
       summary =
           "Get a webpage as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")

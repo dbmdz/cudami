@@ -195,7 +195,6 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
 
   @Override
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) {
-
     List<BreadcrumbNode> result =
         dbi.withHandle(
             h ->
