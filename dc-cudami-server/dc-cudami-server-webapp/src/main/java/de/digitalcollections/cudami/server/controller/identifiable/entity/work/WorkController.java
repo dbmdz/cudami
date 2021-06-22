@@ -70,16 +70,14 @@ public class WorkController {
     return workService.findByLanguageAndInitial(pageRequest, language, initial);
   }
 
-  @Operation(
-      summary =
-          "get a work as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @Operation(summary = "Get a work by uuid")
   @GetMapping(
       value = {
         "/v5/works/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v2/works/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/latest/works/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Work> get(
       @Parameter(
               example = "",
@@ -103,16 +101,14 @@ public class WorkController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @Operation(
-      summary =
-          "get a work as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @Operation(summary = "Get a work by namespace and id")
   @GetMapping(
       value = {
         "/v5/works/identifier",
         "/v2/works/identifier",
         "/latest/works/identifier",
       },
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Work> getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)

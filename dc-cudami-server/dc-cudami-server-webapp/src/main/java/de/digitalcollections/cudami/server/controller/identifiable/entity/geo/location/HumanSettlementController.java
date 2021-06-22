@@ -61,16 +61,14 @@ public class HumanSettlementController {
     return humanSettlementService.findByLanguageAndInitial(pageRequest, language, initial);
   }
 
-  @Operation(
-      summary =
-          "get a human settlement as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @Operation(summary = "Get a human settlement by uuid")
   @GetMapping(
       value = {
         "/v5/humansettlements/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v2/humansettlements/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/latest/humansettlements/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<HumanSettlement> get(
       @Parameter(
               example = "",
@@ -95,16 +93,14 @@ public class HumanSettlementController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @Operation(
-      summary =
-          "get a human settlement as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @Operation(summary = "Get a human settlement by namespace and id")
   @GetMapping(
       value = {
         "/v5/humansettlements/identifier",
         "/v2/humansettlements/identifier",
         "/latest/humansettlements/identifier"
       },
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<HumanSettlement> getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)

@@ -77,16 +77,14 @@ public class IdentifiableController {
     return identifiableService.get(uuid);
   }
 
-  @Operation(
-      summary =
-          "get an identifiable as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @Operation(summary = "Get an identifiable by namespace and id")
   @GetMapping(
       value = {
         "/v5/identifiables/identifier/{namespace}:{id}",
         "/v2/identifiables/identifier/{namespace}:{id}",
         "/latest/identifiables/identifier/{namespace}:{id}"
       },
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Identifiable> getByIdentifier(
       @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
 

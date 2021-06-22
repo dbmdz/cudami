@@ -135,16 +135,14 @@ public class PersonController {
     return personService.findByLocationOfDeath(pageRequest, uuid);
   }
 
-  @Operation(
-      summary =
-          "get a person as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @Operation(summary = "Get a person by uuid")
   @GetMapping(
       value = {
         "/v5/persons/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v2/persons/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/latest/persons/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Person> get(
       @Parameter(
               example = "",
@@ -169,12 +167,10 @@ public class PersonController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @Operation(
-      summary =
-          "get a person as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @Operation(summary = "Get a person by namespace and id")
   @GetMapping(
       value = {"/v5/persons/identifier", "/v2/persons/identifier", "/latest/persons/identifier"},
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Person> getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)
@@ -183,9 +179,7 @@ public class PersonController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @Operation(
-      summary =
-          "get a person's digital objects as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @Operation(summary = "Get a person's digital objects")
   @GetMapping(
       value = {
         "/v5/persons/{uuid}/digitalobjects",
@@ -206,9 +200,7 @@ public class PersonController {
     return personService.getLanguages();
   }
 
-  @Operation(
-      summary =
-          "get a person's works as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @Operation(summary = "Get a person's works")
   @GetMapping(
       value = {
         "/v5/persons/{uuid}/works",

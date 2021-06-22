@@ -71,12 +71,10 @@ public class ItemController {
     return itemService.findByLanguageAndInitial(pageRequest, language, initial);
   }
 
-  @Operation(
-      summary =
-          "get an item as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @Operation(summary = "Get an item by uuid")
   @GetMapping(
       value = {"/v5/items/{uuid}", "/v2/items/{uuid}", "/latest/items/{uuid}"},
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Item> get(
       @Parameter(
               name = "uuid",
@@ -100,12 +98,10 @@ public class ItemController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @Operation(
-      summary =
-          "get an item as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @Operation(summary = "Get an item by namespace and id")
   @GetMapping(
       value = {"/v5/items/identifier", "/v2/items/identifier", "/latest/items/identifier"},
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Item> getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)
