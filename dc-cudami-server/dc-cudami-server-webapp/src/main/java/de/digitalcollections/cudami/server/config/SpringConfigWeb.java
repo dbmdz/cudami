@@ -5,6 +5,7 @@ import de.digitalcollections.commons.springmvc.thymeleaf.SpacesDialect;
 import de.digitalcollections.cudami.server.interceptors.RequestIdLoggingInterceptor;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -53,14 +54,19 @@ public class SpringConfigWeb implements WebMvcConfigurer {
     configurer
         .favorParameter(true)
         .favorPathExtension(true)
-        //            .ignoreAcceptHeader(false)
+        // .ignoreAcceptHeader(false)
         .ignoreUnknownPathExtensions(true)
         .useRegisteredExtensionsOnly(false)
-        .defaultContentType(
-            MediaType.APPLICATION_JSON); // we are are REST-Server (no HTML/Webapp!) !
-    configurer.mediaType("html", MediaType.TEXT_HTML);
-    configurer.mediaType("json", MediaType.APPLICATION_JSON);
-    configurer.mediaType("xml", MediaType.APPLICATION_XML);
+        // we are a REST-Server (no HTML/Webapp)!
+        .defaultContentType(MediaType.APPLICATION_JSON)
+        .mediaTypes(
+            Map.of(
+                "html",
+                MediaType.TEXT_HTML,
+                "json",
+                MediaType.APPLICATION_JSON,
+                "xml",
+                MediaType.APPLICATION_XML));
   }
 
   /**
