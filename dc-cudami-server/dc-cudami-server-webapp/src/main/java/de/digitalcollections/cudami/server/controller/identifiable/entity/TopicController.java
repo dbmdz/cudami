@@ -147,7 +147,8 @@ public class TopicController {
         "/v5/topics/{refId:[0-9]+}",
         "/v3/topics/{refId:[0-9]+}",
         "/latest/topics/{refId:[0-9]+}"
-      })
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Topic> findByRefId(
       @Parameter(name = "refId", example = "", description = "refId of the topic, e.g. <tt>42</tt>")
           @PathVariable

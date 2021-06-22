@@ -18,6 +18,7 @@ import org.apache.tomcat.util.http.fileupload.FileItemStream;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,7 +39,9 @@ public class FileResourceBinaryController {
   }
 
   @Operation(summary = "Save a file to the disk")
-  @PostMapping(value = {"/v5/files", "/v2/files", "/latest/files"})
+  @PostMapping(
+      value = {"/v5/files", "/v2/files", "/latest/files"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public FileResource upload(HttpServletRequest request) throws IOException {
     FileResource fileResource = null;
 
