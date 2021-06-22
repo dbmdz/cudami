@@ -138,7 +138,7 @@ public class ProjectController {
         "/v3/projects/identifier/{namespace}:{id}",
         "/latest/projects/identifier/{namespace}:{id}"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public Project findByIdentifier(@PathVariable String namespace, @PathVariable String id)
       throws IdentifiableServiceException {
     return projectService.getByIdentifier(namespace, id);
@@ -175,7 +175,7 @@ public class ProjectController {
   @Operation(summary = "Get paged digital objects of a project")
   @GetMapping(
       value = {"/v5/projects/{uuid}/digitalobjects"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<DigitalObject> getDigitalObjects(
       @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
           UUID projectUuid,

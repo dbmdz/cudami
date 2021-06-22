@@ -6,6 +6,7 @@ import de.digitalcollections.model.relation.Predicate;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +33,7 @@ public class PredicateController {
   @Operation(summary = "create or update a predicate, identified by its value")
   @PutMapping(
       value = {"/v5/predicates/{value}", "/v3/predicates/{value}", "/latest/predicates/{value}"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public Predicate update(
       @PathVariable("value") String value, @RequestBody Predicate predicate, BindingResult errors)
       throws PredicatesServiceException {

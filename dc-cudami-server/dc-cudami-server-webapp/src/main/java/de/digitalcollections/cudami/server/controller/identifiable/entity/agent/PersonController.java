@@ -48,7 +48,7 @@ public class PersonController {
   @Operation(summary = "count all persons")
   @GetMapping(
       value = {"/v5/persons/count", "/v2/persons/count", "/latest/persons/count"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return personService.count();
   }
@@ -56,7 +56,7 @@ public class PersonController {
   @Operation(summary = "get all persons")
   @GetMapping(
       value = {"/v5/persons", "/v2/persons", "/latest/persons"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Person> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
@@ -90,7 +90,7 @@ public class PersonController {
         "/v2/persons/placeofbirth/{uuid}",
         "/latest/persons/placeofbirth/{uuid}"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Person> getByPlaceOfBirth(
       @Parameter(
               example = "",
@@ -116,7 +116,7 @@ public class PersonController {
         "/v2/persons/placeofdeath/{uuid}",
         "/latest/persons/placeofdeath/{uuid}"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Person> getByPlaceOfDeath(
       @Parameter(
               example = "",
@@ -186,7 +186,7 @@ public class PersonController {
         "/v2/persons/{uuid}/digitalobjects",
         "/latest/persons/{uuid}/digitalobjects"
       },
-      produces = {MediaType.APPLICATION_JSON_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public Set<DigitalObject> getDigitalObjects(@PathVariable("uuid") UUID uuid)
       throws IdentifiableServiceException {
     return personService.getDigitalObjects(uuid);
@@ -207,7 +207,7 @@ public class PersonController {
         "/v2/persons/{uuid}/works",
         "/latest/persons/{uuid}/works"
       },
-      produces = {MediaType.APPLICATION_JSON_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public Set<Work> getWorks(@PathVariable("uuid") UUID uuid) throws IdentifiableServiceException {
     return personService.getWorks(uuid);
   }
@@ -215,7 +215,7 @@ public class PersonController {
   @Operation(summary = "save a newly created person")
   @PostMapping(
       value = {"/v5/persons", "/v2/persons", "/latest/persons"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public Person save(@RequestBody Person person, BindingResult errors)
       throws IdentifiableServiceException {
     return personService.save(person);
@@ -224,7 +224,7 @@ public class PersonController {
   @Operation(summary = "update a person")
   @PutMapping(
       value = {"/v5/persons/{uuid}", "/v2/persons/{uuid}", "/latest/persons/{uuid}"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public Person update(
       @PathVariable("uuid") UUID uuid, @RequestBody Person person, BindingResult errors)
       throws IdentifiableServiceException {

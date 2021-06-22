@@ -207,7 +207,7 @@ public class CollectionController {
         "/v2/collections/identifier/{namespace}:{id}",
         "/latest/collections/identifier/{namespace}:{id}"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public Collection findByIdentifier(@PathVariable String namespace, @PathVariable String id)
       throws IdentifiableServiceException {
     return collectionService.getByIdentifier(namespace, id);
@@ -271,7 +271,7 @@ public class CollectionController {
           "Find limited amount of (active or all) collections containing searchTerm in label or description")
   @GetMapping(
       value = {"/v5/collections/search"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public SearchPageResponse<Collection> findCollections(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
@@ -331,7 +331,7 @@ public class CollectionController {
   @Operation(summary = "Get paged digital objects of a collection")
   @GetMapping(
       value = {"/v5/collections/{uuid}/digitalobjects"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public SearchPageResponse<DigitalObject> getDigitalObjects(
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid,
@@ -365,7 +365,7 @@ public class CollectionController {
         "/v3/collections/{uuid}/parents",
         "/latest/collections/{uuid}/parents"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Collection> getParents(
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid) {
@@ -380,7 +380,7 @@ public class CollectionController {
         "/v3/collections/{uuid}/related/corporatebodies",
         "/latest/collections/{uuid}/related/corporatebodies"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public List<CorporateBody> getRelatedCorporateBodies(
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID uuid,
@@ -392,7 +392,7 @@ public class CollectionController {
   @Operation(summary = "Get (active or all) paged subcollections of a collection")
   @GetMapping(
       value = {"/v5/collections/{uuid}/subcollections"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Collection> getSubcollections(
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid,

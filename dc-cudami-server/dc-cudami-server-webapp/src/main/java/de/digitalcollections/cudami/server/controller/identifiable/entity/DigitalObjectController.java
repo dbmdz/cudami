@@ -171,7 +171,7 @@ public class DigitalObjectController {
         "/v2/digitalobjects/{uuid}/item",
         "/latest/digitalobjects/{uuid}/item"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public Item findItemOfDigitalObject(@PathVariable UUID uuid) {
     return digitalObjectService.getItem(uuid);
   }
@@ -183,7 +183,7 @@ public class DigitalObjectController {
         "/v2/digitalobjects/random",
         "/latest/digitalobjects/random"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public List<DigitalObject> findRandomDigitalObjects(
       @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
     return digitalObjectService.getRandom(count);

@@ -69,7 +69,7 @@ public class V3WebpageController {
       })
   @GetMapping(
       value = {"/v3/webpages/{uuid}"},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> getWebpageJson(
       @Parameter(
               name = "uuid",
@@ -141,7 +141,7 @@ public class V3WebpageController {
       })
   @GetMapping(
       value = {"/v3/webpages/{uuid}"},
-      produces = {MediaType.APPLICATION_XML_VALUE})
+      produces = MediaType.APPLICATION_XML_VALUE)
   public ResponseEntity<String> getWebpageXml(
       @Parameter(
               name = "uuid",

@@ -44,7 +44,7 @@ public class WorkController {
   @Operation(summary = "count all works")
   @GetMapping(
       value = {"/v5/works/count", "/v2/works/count", "/latest/works/count"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return workService.count();
   }
@@ -52,7 +52,7 @@ public class WorkController {
   @Operation(summary = "get all works")
   @GetMapping(
       value = {"/v5/works", "/v2/works", "/latest/works"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Work> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
@@ -120,7 +120,7 @@ public class WorkController {
   @Operation(summary = "save a newly created work")
   @PostMapping(
       value = {"/v5/works", "/v2/works", "/latest/works"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public Work save(@RequestBody Work work, BindingResult errors)
       throws IdentifiableServiceException {
     return workService.save(work);
@@ -129,7 +129,7 @@ public class WorkController {
   @Operation(summary = "update a work")
   @PutMapping(
       value = {"/v5/works/{uuid}", "/v2/works/{uuid}", "/latest/works/{uuid}"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public Work update(@PathVariable("uuid") UUID uuid, @RequestBody Work work, BindingResult errors)
       throws IdentifiableServiceException {
     if (uuid == null || work == null || !uuid.equals(work.getUuid())) {
@@ -146,7 +146,7 @@ public class WorkController {
         "/v2/works/{uuid}/creators",
         "/latest/works/{uuid}/creators"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Agent> getCreators(@PathVariable UUID uuid) {
     return workService.getCreators(uuid);
   }
@@ -154,7 +154,7 @@ public class WorkController {
   @Operation(summary = "Get items of a work")
   @GetMapping(
       value = {"/v5/works/{uuid}/items", "/v2/works/{uuid}/items", "/latest/works/{uuid}/items"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Item> getItems(@PathVariable UUID uuid) {
     return workService.getItems(uuid);
   }

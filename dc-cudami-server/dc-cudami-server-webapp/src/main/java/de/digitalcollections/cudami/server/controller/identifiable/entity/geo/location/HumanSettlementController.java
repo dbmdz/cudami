@@ -43,7 +43,7 @@ public class HumanSettlementController {
   @Operation(summary = "get all human settlements")
   @GetMapping(
       value = {"/v5/humansettlements", "/v2/humansettlements", "/latest/humansettlements"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<HumanSettlement> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
@@ -112,7 +112,7 @@ public class HumanSettlementController {
   @Operation(summary = "save a newly created human settlement")
   @PostMapping(
       value = {"/v5/humansettlements", "/v2/humansettlements", "/latest/humansettlements"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public HumanSettlement save(@RequestBody HumanSettlement humanSettlement, BindingResult errors)
       throws IdentifiableServiceException {
     return humanSettlementService.save(humanSettlement);
@@ -125,7 +125,7 @@ public class HumanSettlementController {
         "/v2/humansettlements/{uuid}",
         "/latest/humansettlements/{uuid}"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public HumanSettlement update(
       @PathVariable("uuid") UUID uuid,
       @RequestBody HumanSettlement humanSettlement,
