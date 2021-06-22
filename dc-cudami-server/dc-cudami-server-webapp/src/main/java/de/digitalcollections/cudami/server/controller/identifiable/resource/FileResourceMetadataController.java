@@ -49,7 +49,7 @@ public class FileResourceMetadataController {
   @Operation(summary = "Get all fileresources")
   @GetMapping(
       value = {"/v5/fileresources", "/v2/fileresources", "/latest/fileresources"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<FileResource> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
@@ -72,7 +72,7 @@ public class FileResourceMetadataController {
         "/v2/fileresources/type/{type}",
         "/latest/fileresources/type/{type}"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public SearchPageResponse<FileResource> findFileResourcesByType(
       @Parameter(example = "", description = "Type of the fileresource, e.g. <tt>image</tt>")
           @PathVariable("type")
@@ -180,7 +180,7 @@ public class FileResourceMetadataController {
   @Operation(summary = "Save a newly created fileresource")
   @PostMapping(
       value = {"/v5/fileresources", "/v2/fileresources", "/latest/fileresources"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public FileResource save(@RequestBody FileResource fileResource)
       throws IdentifiableServiceException {
     return metadataService.save(fileResource);
@@ -193,7 +193,7 @@ public class FileResourceMetadataController {
         "/v2/fileresources/{uuid}",
         "/latest/fileresources/{uuid}"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public FileResource update(
       @PathVariable UUID uuid, @RequestBody FileResource fileResource, BindingResult errors)
       throws IdentifiableServiceException {

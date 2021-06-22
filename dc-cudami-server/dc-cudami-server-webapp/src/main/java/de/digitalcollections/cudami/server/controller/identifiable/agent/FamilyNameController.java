@@ -100,7 +100,7 @@ public class FamilyNameController {
   @Operation(summary = "save a newly created family")
   @PostMapping(
       value = {"/v5/familynames"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public FamilyName save(@RequestBody FamilyName familyName, BindingResult errors)
       throws IdentifiableServiceException {
     return familyNameService.save(familyName);
@@ -109,7 +109,7 @@ public class FamilyNameController {
   @Operation(summary = "update a familyname")
   @PutMapping(
       value = {"/v5/familynames/{uuid}"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public FamilyName update(
       @PathVariable("uuid") UUID uuid, @RequestBody FamilyName familyName, BindingResult errors)
       throws IdentifiableServiceException {

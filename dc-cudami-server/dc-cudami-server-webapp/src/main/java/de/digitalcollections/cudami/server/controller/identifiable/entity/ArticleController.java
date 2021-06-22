@@ -92,7 +92,7 @@ public class ArticleController {
   @Operation(summary = "Get languages of all articles")
   @GetMapping(
       value = {"/v5/articles/languages", "/v2/articles/languages", "/latest/articles/languages"},
-      produces = {MediaType.APPLICATION_JSON_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
     return this.articleService.getLanguages();
   }

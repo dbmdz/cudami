@@ -45,7 +45,7 @@ public class ItemController {
   @Operation(summary = "count all items")
   @GetMapping(
       value = {"/v5/items/count", "/v2/items/count", "/latest/items/count"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return itemService.count();
   }
@@ -53,7 +53,7 @@ public class ItemController {
   @Operation(summary = "get all items")
   @GetMapping(
       value = {"/v5/items", "/v2/items", "/latest/items"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Item> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
@@ -113,7 +113,7 @@ public class ItemController {
   @Operation(summary = "save a newly created item")
   @PostMapping(
       value = {"/v5/items", "/v2/items", "/latest/items"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public Item save(@RequestBody Item item, BindingResult errors)
       throws IdentifiableServiceException {
     return itemService.save(item);
@@ -122,7 +122,7 @@ public class ItemController {
   @Operation(summary = "update an item")
   @PutMapping(
       value = {"/v5/items/{uuid}", "/v2/items/{uuid}", "/latest/items/{uuid}"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public Item update(@PathVariable("uuid") UUID uuid, @RequestBody Item item, BindingResult errors)
       throws IdentifiableServiceException {
     if (uuid == null || item == null || !uuid.equals(item.getUuid())) {
@@ -135,7 +135,7 @@ public class ItemController {
   @Operation(summary = "Get digital objects of this item")
   @GetMapping(
       value = {"/latest/items/{uuid}/digitalobjects", "/v2/items/{uuid}/digitalobjects"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public Set<DigitalObject> getDigitalObjects(
       @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid) {
     return itemService.getDigitalObjects(uuid);
@@ -144,7 +144,7 @@ public class ItemController {
   @Operation(summary = "Get works embodied in an item")
   @GetMapping(
       value = {"/latest/items/{uuid}/works", "/v2/items/{uuid}/works"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public Set<Work> getWorks(
       @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid) {
     return itemService.getWorks(uuid);
@@ -153,7 +153,7 @@ public class ItemController {
   @Operation(summary = "Add work to an item")
   @PostMapping(
       value = {"/latest/items/{uuid}/works/{workUuid}", "/v2/items/{uuid}/works/{workUuid}"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public boolean addWork(
       @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid,
       @Parameter(name = "workUuid", description = "UUID of the work") @PathVariable UUID workUuid) {
@@ -166,7 +166,7 @@ public class ItemController {
         "/latest/items/{uuid}/digitalobjects/{digitalObjectUuid}",
         "/v2/items/{uuid}/digitalobjects/{digitalObjectUuid}"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public boolean addDigitalObject(
       @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid,
       @Parameter(name = "digitalObjectUuid", description = "UUID of the digital object")

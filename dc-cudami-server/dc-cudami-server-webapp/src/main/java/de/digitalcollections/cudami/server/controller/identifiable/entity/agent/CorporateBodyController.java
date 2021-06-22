@@ -112,7 +112,7 @@ public class CorporateBodyController {
         "/v3/corporatebodies/identifier/{namespace}:{id}",
         "/latest/corporatebodies/identifier/{namespace}:{id}"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public CorporateBody getByIdentifier(
       @Parameter(example = "", description = "namespace of identifier") @PathVariable("namespace")
           String namespace,
@@ -128,7 +128,7 @@ public class CorporateBodyController {
         "/v3/corporatebodies/{refId:[0-9]+}",
         "/latest/corporatebodies/{refId:[0-9]+}"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public CorporateBody getByRefId(
       @Parameter(example = "", description = "reference id") @PathVariable("refId") long refId)
       throws IdentifiableServiceException {

@@ -43,7 +43,7 @@ public class GeoLocationController {
   @Operation(summary = "count all geolocations")
   @GetMapping(
       value = {"/v5/geolocations/count", "/v2/geolocations/count", "/latest/geolocations/count"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return geoLocationService.count();
   }
@@ -51,7 +51,7 @@ public class GeoLocationController {
   @Operation(summary = "get all geo locations")
   @GetMapping(
       value = {"/v5/geolocations", "/v2/geolocations", "/latest/geolocations"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<GeoLocation> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
@@ -129,7 +129,7 @@ public class GeoLocationController {
   @Operation(summary = "save a newly created geolocation")
   @PostMapping(
       value = {"/v5/geolocations", "/v2/geolocations", "/latest/geolocations"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public GeoLocation save(@RequestBody GeoLocation geoLocation, BindingResult errors)
       throws IdentifiableServiceException {
     return geoLocationService.save(geoLocation);
@@ -138,7 +138,7 @@ public class GeoLocationController {
   @Operation(summary = "update a geolocation")
   @PutMapping(
       value = {"/v5/geolocations/{uuid}", "/v2/geolocations/{uuid}", "/latest/geolocations/{uuid}"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public GeoLocation update(
       @PathVariable("uuid") UUID uuid, @RequestBody GeoLocation geoLocation, BindingResult errors)
       throws IdentifiableServiceException {

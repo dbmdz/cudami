@@ -72,7 +72,7 @@ public class V3CollectionController {
         "/v3/collections/{uuid}/digitalobjects",
         "/latest/collections/{uuid}/digitalobjects"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> getDigitalObjects(
       @Parameter(
               name = "uuid",
@@ -144,7 +144,7 @@ public class V3CollectionController {
         "/v3/collections/{uuid}/subcollections",
         "/latest/collections/{uuid}/subcollections"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> getSubcollections(
       @Parameter(
               name = "uuid",
@@ -264,7 +264,7 @@ public class V3CollectionController {
           "Find limited amount of (active or all) collections containing searchTerm in label or description")
   @GetMapping(
       value = {"/v3/collections/search", "/latest/collections/search"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> findCollections(
       @Parameter(
               name = "pageNumber",

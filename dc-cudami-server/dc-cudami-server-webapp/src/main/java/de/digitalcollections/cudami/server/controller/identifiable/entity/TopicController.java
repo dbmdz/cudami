@@ -162,7 +162,7 @@ public class TopicController {
       value = {
         "/v5/topics/{uuid}/subtopics",
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Topic> getSubtopics(
       @Parameter(example = "", description = "UUID of the topic") @PathVariable("uuid")
           UUID topicUuid,

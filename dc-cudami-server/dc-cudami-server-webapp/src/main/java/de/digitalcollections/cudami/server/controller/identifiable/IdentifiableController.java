@@ -40,7 +40,7 @@ public class IdentifiableController {
         "/v2/identifiables/search",
         "/latest/identifiables/search"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public SearchPageResponse<Identifiable> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
@@ -57,7 +57,7 @@ public class IdentifiableController {
   @Operation(summary = "Find limited amount of identifiables containing searchTerm in label")
   @GetMapping(
       value = {"/v5/identifiables", "/v2/identifiables", "/latest/identifiables"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Identifiable> find(
       @RequestParam(name = "searchTerm") String searchTerm,
       @RequestParam(name = "maxResults", required = false, defaultValue = "25") int maxResults) {
@@ -72,7 +72,7 @@ public class IdentifiableController {
         "/v2/identifiables/{uuid}",
         "/latest/identifiables/{uuid}"
       },
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public Identifiable findById(@PathVariable UUID uuid) {
     return identifiableService.get(uuid);
   }

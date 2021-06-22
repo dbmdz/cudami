@@ -100,7 +100,7 @@ public class GivenNameController {
   @Operation(summary = "save a newly created givenname")
   @PostMapping(
       value = {"/v5/givennames"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public GivenName save(@RequestBody GivenName givenName, BindingResult errors)
       throws IdentifiableServiceException {
     return givenNameService.save(givenName);
@@ -109,7 +109,7 @@ public class GivenNameController {
   @Operation(summary = "update a givenname")
   @PutMapping(
       value = {"/v5/givennames/{uuid}"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public GivenName update(
       @PathVariable("uuid") UUID uuid, @RequestBody GivenName givenName, BindingResult errors)
       throws IdentifiableServiceException {

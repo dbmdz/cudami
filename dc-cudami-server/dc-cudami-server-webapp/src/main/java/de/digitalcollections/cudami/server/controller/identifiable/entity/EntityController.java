@@ -142,7 +142,7 @@ public class EntityController<E extends Entity> {
   @Operation(summary = "Find limited amount of random entites")
   @GetMapping(
       value = {"/v5/entities/random", "/v2/entities/random", "/latest/entities/random"},
-      produces = "application/json")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Entity> findRandomEntities(
       @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
     return entityService.getRandom(count);
