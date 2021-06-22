@@ -61,12 +61,10 @@ public class ArticleController {
     return articleService.find(pageRequest);
   }
 
-  @Operation(
-      summary =
-          "Get an article as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @Operation(summary = "Get an article")
   @GetMapping(
       value = {"/v5/articles/{uuid}", "/v2/articles/{uuid}", "/latest/articles/{uuid}"},
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Article> getArticle(
       @Parameter(
               example = "",

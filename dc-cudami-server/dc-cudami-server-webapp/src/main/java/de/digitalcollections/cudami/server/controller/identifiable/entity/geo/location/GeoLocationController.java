@@ -70,12 +70,10 @@ public class GeoLocationController {
     return geoLocationService.findByLanguageAndInitial(searchPageRequest, language, initial);
   }
 
-  @Operation(
-      summary =
-          "get a geolocation as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @Operation(summary = "Get a geolocation by uuid")
   @GetMapping(
       value = {"/v5/geolocations/{uuid}", "/v2/geolocations/{uuid}", "/latest/geolocations/{uuid}"},
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<GeoLocation> get(
       @Parameter(
               example = "",
@@ -100,16 +98,14 @@ public class GeoLocationController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @Operation(
-      summary =
-          "get a geolocation as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @Operation(summary = "Get a geolocation by namespace and id")
   @GetMapping(
       value = {
         "/v5/geolocations/{uuid}",
         "/v2/geolocations/identifier",
         "/latest/geolocations/{uuid}"
       },
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<GeoLocation> getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)

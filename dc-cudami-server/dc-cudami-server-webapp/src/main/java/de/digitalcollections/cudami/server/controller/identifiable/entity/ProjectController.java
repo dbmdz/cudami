@@ -144,12 +144,10 @@ public class ProjectController {
     return projectService.getByIdentifier(namespace, id);
   }
 
-  @Operation(
-      summary =
-          "Get an project as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @Operation(summary = "Get a project by uuid")
   @GetMapping(
       value = {"/v5/projects/{uuid}", "/v2/projects/{uuid}", "/latest/projects/{uuid}"},
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Project> findByUuid(
       @Parameter(
               example = "",

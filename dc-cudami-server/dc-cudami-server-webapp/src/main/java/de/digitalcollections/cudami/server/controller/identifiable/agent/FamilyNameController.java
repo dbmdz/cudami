@@ -57,12 +57,10 @@ public class FamilyNameController {
     return familyNameService.findByLanguageAndInitial(pageRequest, language, initial);
   }
 
-  @Operation(
-      summary =
-          "get a familyname as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @Operation(summary = "Get a familyname by uuid")
   @GetMapping(
       value = {"/v5/familynames/{uuid}"},
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<FamilyName> get(
       @Parameter(
               example = "",
@@ -87,12 +85,10 @@ public class FamilyNameController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @Operation(
-      summary =
-          "get a familyname as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @Operation(summary = "Get a familyname by namespace and id")
   @GetMapping(
       value = {"/v5/familynames/identifier"},
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<FamilyName> getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)

@@ -135,12 +135,10 @@ public class WebpageController {
     return webpageService.getRelatedFileResources(uuid);
   }
 
-  @Operation(
-      summary =
-          "Get a webpage as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @Operation(summary = "Get a webpage by uuid")
   @GetMapping(
       value = {"/v5/webpages/{uuid}", "/latest/webpages/{uuid}"},
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Webpage> getWebpage(
       @Parameter(
               example = "",

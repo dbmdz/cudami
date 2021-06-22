@@ -57,12 +57,10 @@ public class GivenNameController {
     return givenNameService.findByLanguageAndInitial(pageRequest, language, initial);
   }
 
-  @Operation(
-      summary =
-          "get a givenname as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @Operation(summary = "Get a givenname by uuid")
   @GetMapping(
       value = {"/v5/givennames/{uuid}"},
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<GivenName> get(
       @Parameter(
               example = "",
@@ -87,12 +85,10 @@ public class GivenNameController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @Operation(
-      summary =
-          "get a givenname as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @Operation(summary = "Get a givenname by namespace and id")
   @GetMapping(
       value = {"/v5/givennames/identifier"},
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<GivenName> getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id)

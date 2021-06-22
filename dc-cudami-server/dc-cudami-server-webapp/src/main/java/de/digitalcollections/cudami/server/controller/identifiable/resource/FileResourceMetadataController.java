@@ -119,16 +119,14 @@ public class FileResourceMetadataController {
     return metadataService.find(pageRequest);
   }
 
-  @Operation(
-      summary =
-          "Get a fileresource as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @Operation(summary = "Get a fileresource by uuid")
   @GetMapping(
       value = {
         "/v5/fileresources/{uuid}",
         "/v2/fileresources/{uuid}",
         "/latest/fileresources/{uuid}"
       },
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<FileResource> get(
       @Parameter(
               example = "",
@@ -152,16 +150,14 @@ public class FileResourceMetadataController {
     return new ResponseEntity<>(fileResource, HttpStatus.OK);
   }
 
-  @Operation(
-      summary =
-          "Get a fileresource as JSON or XML, depending on extension or <tt>format</tt> request parameter or accept header")
+  @Operation(summary = "Get a fileresource by namespace and id")
   @GetMapping(
       value = {
         "/v5/fileresources/identifier/{namespace}:{id}",
         "/v2/fileresources/identifier/{namespace}:{id}",
         "/latest/fileresources/identifier/{namespace}:{id}"
       },
-      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<FileResource> getByIdentifier(
       @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
 
