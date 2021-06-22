@@ -213,8 +213,10 @@ public class CollectionController {
     return collectionService.getByIdentifier(namespace, id);
   }
 
-  @Operation(summary = "Get collection by refId")
-  @GetMapping(value = {"/v5/collections/{refId:[0-9]+}", "/latest/collections/{refId:[0-9]+}"})
+  @Operation(summary = "Get a collection by refId")
+  @GetMapping(
+      value = {"/v5/collections/{refId:[0-9]+}", "/latest/collections/{refId:[0-9]+}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Collection> findByRefId(
       @Parameter(example = "", description = "refId of the collection, e.g. <tt>42</tt>")
           @PathVariable
