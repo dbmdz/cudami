@@ -200,7 +200,7 @@ public class CollectionController {
     return collectionService.findRootNodes(searchPageRequest);
   }
 
-  @Operation(summary = "Get collection by namespace and id")
+  @Operation(summary = "Get a collection by namespace and id")
   @GetMapping(
       value = {
         "/v5/collections/identifier/{namespace}:{id}",
@@ -532,7 +532,7 @@ public class CollectionController {
     return collectionService.saveWithParent(collection, parentUuid);
   }
 
-  @Operation(summary = "Update an collection")
+  @Operation(summary = "Update a collection")
   @PutMapping(
       value = {"/v5/collections/{uuid}", "/v2/collections/{uuid}", "/latest/collections/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
