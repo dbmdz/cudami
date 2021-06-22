@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
-import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.paging.Order;
@@ -33,12 +32,9 @@ public class V2CollectionController {
 
   private final ObjectMapper objectMapper;
   private final CollectionService collectionService;
-  private final LocaleService localeService;
 
-  public V2CollectionController(
-      CollectionService collectionService, LocaleService localeService, ObjectMapper objectMapper) {
+  public V2CollectionController(CollectionService collectionService, ObjectMapper objectMapper) {
     this.collectionService = collectionService;
-    this.localeService = localeService;
     this.objectMapper = objectMapper;
   }
 
