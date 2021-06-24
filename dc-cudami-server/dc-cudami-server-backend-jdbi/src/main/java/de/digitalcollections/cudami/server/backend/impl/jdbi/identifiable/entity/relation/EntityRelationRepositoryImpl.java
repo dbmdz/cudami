@@ -37,16 +37,7 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
 
   @Override
   public void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid) {
-    dbi.withHandle(
-        h ->
-            h.createUpdate(
-                    "INSERT INTO "
-                        + tableName
-                        + "(subject_uuid, predicate, object_uuid) VALUES (:subject_uuid, :predicate, :object_uuid)")
-                .bind("subject_uuid", subjectEntityUuid)
-                .bind("predicate", predicate)
-                .bind("object_uuid", objectEntityUuid)
-                .execute());
+    save(subjectEntityUuid, predicate, objectEntityUuid);
   }
 
   @Override
@@ -152,16 +143,13 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
 
   @Override
   public void save(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid) {
-    dbi.withHandle(
-        h ->
-            h.createUpdate(
-                    "INSERT INTO "
-                        + tableName
-                        + "(subject_uuid, predicate, object_uuid) VALUES (:subject_uuid, :predicate, :object_uuid)")
-                .bind("subject_uuid", subjectEntityUuid)
-                .bind("predicate", predicate)
-                .bind("object_uuid", objectEntityUuid)
-                .execute());
+    Entity subject = new Entity();
+    subject.setUuid(subjectEntityUuid);
+
+    Entity object = new Entity();
+    object.setUuid(objectEntityUuid);
+
+    save(List.of(new EntityRelation(subject, predicate, object)));
   }
 
   @Override
