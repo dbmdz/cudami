@@ -7,20 +7,17 @@ import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import javax.sql.DataSource;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
-// TODO: added Spring JDBC-Template framework, because I couldn't get JDBI get to work with double
-// join on entities... sorry. Solutions welcome
 public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
     implements EntityRelationRepository {
 
@@ -29,16 +26,13 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
   public static final String TABLE_NAME = "rel_entity_entities";
 
   private final EntityRepositoryImpl<Entity> entityRepositoryImpl;
-  private final JdbcTemplate jdbcTemplate;
 
   @Autowired
   public EntityRelationRepositoryImpl(
-      DataSource dataSource,
       Jdbi dbi,
       @Qualifier("entityRepositoryImpl") EntityRepositoryImpl<Entity> entityRepositoryImpl) {
     super(dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX);
     this.entityRepositoryImpl = entityRepositoryImpl;
-    this.jdbcTemplate = new JdbcTemplate(dataSource);
   }
 
   @Override
@@ -66,39 +60,39 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
 
   @Override
   public PageResponse<EntityRelation> find(PageRequest pageRequest) {
+    String commonSql = " FROM " + tableName + " AS " + tableAlias;
     StringBuilder query =
         new StringBuilder(
             "SELECT rel.subject_uuid rel_subject, rel.predicate rel_predicate, rel.object_uuid rel_object"
-                + " FROM "
-                + tableName
-                + " AS "
-                + tableAlias);
+                + commonSql);
     // handle optional filtering params
-    String filterClauses = getFilterClauses(pageRequest.getFiltering());
-    if (!filterClauses.isEmpty()) {
-      query.append(" WHERE ").append(filterClauses);
-    }
+    addFiltering(pageRequest, query);
     addPageRequestParams(pageRequest, query);
 
     List<EntityRelation> result =
-        jdbcTemplate.query(
-            query.toString(),
-            (rs, rowNum) -> {
-              String subjectUuid = rs.getString("rel_subject");
-              String predicate = rs.getString("rel_predicate");
-              String objectUuid = rs.getString("rel_object");
+        dbi.withHandle(
+            h ->
+                h.createQuery(query.toString())
+                    .reduceResultSet(
+                        new ArrayList<EntityRelation>(),
+                        (acc, rs, ctx) -> {
+                          String subjectUuid = rs.getString("rel_subject");
+                          String predicate = rs.getString("rel_predicate");
+                          String objectUuid = rs.getString("rel_object");
 
-              Entity subject = entityRepositoryImpl.findOne(UUID.fromString(subjectUuid));
-              Entity object = entityRepositoryImpl.findOne(UUID.fromString(objectUuid));
+                          Entity subject =
+                              entityRepositoryImpl.findOne(UUID.fromString(subjectUuid));
+                          Entity object = entityRepositoryImpl.findOne(UUID.fromString(objectUuid));
 
-              return new EntityRelation(subject, predicate, object);
-            });
-    String countQuery = "SELECT count(*) FROM " + tableName + " AS " + tableAlias;
-    if (!filterClauses.isEmpty()) {
-      countQuery += " WHERE " + filterClauses;
-    }
-    final String sqlCount = countQuery;
-    long count = dbi.withHandle(h -> h.createQuery(sqlCount).mapTo(Long.class).findOne().get());
+                          acc.add(new EntityRelation(subject, predicate, object));
+
+                          return acc;
+                        }));
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    addFiltering(pageRequest, countQuery);
+    long count =
+        dbi.withHandle(h -> h.createQuery(countQuery.toString()).mapTo(Long.class).findOne().get());
     PageResponse<EntityRelation> pageResponse = new PageResponse<>(result, pageRequest, count);
     return pageResponse;
   }
