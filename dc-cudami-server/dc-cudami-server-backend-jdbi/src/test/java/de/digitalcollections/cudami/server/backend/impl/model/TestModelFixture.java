@@ -1,12 +1,15 @@
 package de.digitalcollections.cudami.server.backend.impl.model;
 
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.StructuredContent;
 import de.digitalcollections.model.text.contentblock.Paragraph;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 public class TestModelFixture {
 
@@ -29,5 +32,14 @@ public class TestModelFixture {
     digitalObject.setDescription(descriptionContent);
 
     return digitalObject;
+  }
+
+  public static EntityRelation createEntityRelation(
+      Map<Locale, String> subjectLabels, Map<Locale, String> objectLabels, String predicate) {
+    Entity subject = createDigitalObject(subjectLabels, Map.of());
+    subject.setUuid(UUID.randomUUID());
+    Entity object = createDigitalObject(objectLabels, Map.of());
+    object.setUuid(UUID.randomUUID());
+    return new EntityRelation(subject, predicate, object);
   }
 }
