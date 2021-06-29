@@ -20,6 +20,7 @@ import {
   typeToEndpointMapping,
   updateIdentifiable,
 } from '../../api'
+import FeedbackMessage from '../FeedbackMessage'
 import InputWithLabel from '../InputWithLabel'
 import LanguageTab from '../LanguageTab'
 import ActionButtons from './ActionButtons'
@@ -34,12 +35,10 @@ const loadData = async (context, type, uuid) => {
 }
 
 const submitData = async (context, data, type, uuid) => {
-  if (uuid) {
-    await updateIdentifiable(context, data, type, false)
-  } else {
-    await saveIdentifiable(context, data, null, null, type, false)
-  }
-  window.location.href = `${context}${typeToEndpointMapping[type]}`
+  const {error = false} = await (uuid
+    ? updateIdentifiable(context, data, type)
+    : saveIdentifiable(context, data, type))
+  return error
 }
 
 const RenderingTemplateForm = ({apiContextPath = '/', uuid}) => {
@@ -51,6 +50,7 @@ const RenderingTemplateForm = ({apiContextPath = '/', uuid}) => {
     })
   }, [])
   const [defaultLanguage, setDefaultLanguage] = useState('')
+  const [feedbackMessage, setFeedbackMessage] = useState()
   const [template, setTemplate] = useState(null)
   const {t} = useTranslation()
   if (!template) {
@@ -59,90 +59,106 @@ const RenderingTemplateForm = ({apiContextPath = '/', uuid}) => {
   const {description, label, name} = template
   const formId = 'rendering-template-form'
   return (
-    <Form
-      id={formId}
-      onSubmit={(evt) => {
-        evt.preventDefault()
-        submitData(apiContextPath, template, type, uuid)
-      }}
-    >
-      <Row>
-        <Col xs="6" sm="9">
-          <h1>
-            {uuid
-              ? t('editRenderingTemplate', {name})
-              : t('createRenderingTemplate')}
-          </h1>
-        </Col>
-        <Col xs="6" sm="3">
-          <ActionButtons formId={formId} />
-        </Col>
-      </Row>
-      <Row>
-        <Col sm="12">
-          <hr />
-        </Col>
-      </Row>
-      <Row>
-        <Col sm="12">
-          {uuid && (
-            <InputWithLabel id="uuid" label="ID" readOnly value={uuid} />
-          )}
-          <InputWithLabel
-            id="name"
-            labelKey="name"
-            onChange={(name) => setTemplate({...template, name})}
-            required
-            value={name ?? ''}
-          />
-          <Nav tabs>
-            <LanguageTab
-              activeLanguage={defaultLanguage}
-              language={defaultLanguage}
-              toggle={() => {}}
+    <>
+      {feedbackMessage && (
+        <FeedbackMessage
+          className="mb-2"
+          message={feedbackMessage}
+          onClose={() => setFeedbackMessage(undefined)}
+        />
+      )}
+      <Form
+        id={formId}
+        onSubmit={async (evt) => {
+          evt.preventDefault()
+          const error = await submitData(apiContextPath, template, type, uuid)
+          if (error) {
+            return setFeedbackMessage({
+              color: 'danger',
+              key: 'submitOfFormFailed',
+            })
+          }
+          window.location.href = `${apiContextPath}${typeToEndpointMapping[type]}`
+        }}
+      >
+        <Row>
+          <Col xs="6" sm="9">
+            <h1>
+              {uuid
+                ? t('editRenderingTemplate', {name})
+                : t('createRenderingTemplate')}
+            </h1>
+          </Col>
+          <Col xs="6" sm="3">
+            <ActionButtons formId={formId} />
+          </Col>
+        </Row>
+        <Row>
+          <Col sm="12">
+            <hr />
+          </Col>
+        </Row>
+        <Row>
+          <Col sm="12">
+            {uuid && (
+              <InputWithLabel id="uuid" label="ID" readOnly value={uuid} />
+            )}
+            <InputWithLabel
+              id="name"
+              labelKey="name"
+              onChange={(name) => setTemplate({...template, name})}
+              required
+              value={name ?? ''}
             />
-          </Nav>
-          <TabContent activeTab={defaultLanguage}>
-            <TabPane tabId={defaultLanguage}>
-              <Card className="bg-light">
-                <CardBody>
-                  <InputWithLabel
-                    id="label"
-                    labelKey="label"
-                    onChange={(label) =>
-                      setTemplate({
-                        ...template,
-                        label: label
-                          ? {
-                              [defaultLanguage]: label,
-                            }
-                          : undefined,
-                      })
-                    }
-                    value={label?.[defaultLanguage] ?? ''}
-                  />
-                  <InputWithLabel
-                    id="description"
-                    labelKey="description"
-                    onChange={(description) =>
-                      setTemplate({
-                        ...template,
-                        description: description
-                          ? {
-                              [defaultLanguage]: description,
-                            }
-                          : undefined,
-                      })
-                    }
-                    value={description?.[defaultLanguage] ?? ''}
-                  />
-                </CardBody>
-              </Card>
-            </TabPane>
-          </TabContent>
-        </Col>
-      </Row>
-    </Form>
+            <Nav tabs>
+              <LanguageTab
+                activeLanguage={defaultLanguage}
+                language={defaultLanguage}
+                toggle={() => {}}
+              />
+            </Nav>
+            <TabContent activeTab={defaultLanguage}>
+              <TabPane tabId={defaultLanguage}>
+                <Card className="bg-light">
+                  <CardBody>
+                    <InputWithLabel
+                      id="label"
+                      labelKey="label"
+                      onChange={(label) =>
+                        setTemplate({
+                          ...template,
+                          label: label
+                            ? {
+                                [defaultLanguage]: label,
+                              }
+                            : undefined,
+                        })
+                      }
+                      value={label?.[defaultLanguage] ?? ''}
+                    />
+                    <InputWithLabel
+                      id="description"
+                      labelKey="description"
+                      onChange={(description) =>
+                        setTemplate({
+                          ...template,
+                          description: description
+                            ? {
+                                [defaultLanguage]: description,
+                              }
+                            : undefined,
+                        })
+                      }
+                      value={description?.[defaultLanguage] ?? ''}
+                    />
+                  </CardBody>
+                </Card>
+              </TabPane>
+            </TabContent>
+          </Col>
+        </Row>
+      </Form>
+    </>
   )
 }
 
