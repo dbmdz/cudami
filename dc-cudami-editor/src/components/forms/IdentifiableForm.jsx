@@ -11,6 +11,7 @@ import {
   loadDefaultLanguage,
   loadIdentifiable,
   saveIdentifiable,
+  typeToEndpointMapping,
   updateIdentifiable,
 } from '../../api'
 import AppContext from '../AppContext'
@@ -22,6 +23,7 @@ import AddPreviewImageDialog from '../dialogs/AddPreviewImageDialog'
 import AddTableDialog from '../dialogs/AddTableDialog'
 import AddVideoDialog from '../dialogs/AddVideoDialog'
 import RemoveLanguageDialog from '../dialogs/RemoveLanguageDialog'
+import FeedbackMessage from '../FeedbackMessage'
 import FormErrors from '../FormErrors'
 import ArticleForm from './ArticleForm'
 import CollectionForm from './CollectionForm'
@@ -229,7 +231,7 @@ class IdentifiableForm extends Component {
     this.setState(newState)
   }
 
-  submitIdentifiable = () => {
+  submitIdentifiable = async () => {
     if (this.isFormValid()) {
       const {apiContextPath, parentType, parentUuid, type} = this.props
       const identifiable = {
@@ -239,17 +241,21 @@ class IdentifiableForm extends Component {
       if (identifiable.text) {
         identifiable.text = this.cleanUpJson(this.state.identifiable.text)
       }
-      if (identifiable.uuid) {
-        updateIdentifiable(apiContextPath, identifiable, type)
-      } else {
-        saveIdentifiable(
-          apiContextPath,
-          identifiable,
-          parentType,
-          parentUuid,
-          type
-        )
+      const {error = false, uuid} = await (identifiable.uuid
+        ? updateIdentifiable(apiContextPath, identifiable, type)
+        : saveIdentifiable(apiContextPath, identifiable, type, {
+            parentType,
+            parentUuid,
+          }))
+      if (error) {
+        return this.setState({
+          feedbackMessage: {
+            color: 'danger',
+            key: 'submitOfFormFailed',
+          },
+        })
       }
+      window.location.href = `${apiContextPath}${typeToEndpointMapping[type]}/${uuid}`
     }
   }
 
@@ -284,6 +290,7 @@ class IdentifiableForm extends Component {
       availableLanguages,
       defaultLanguage,
       dialogsOpen,
+      feedbackMessage,
       identifiable,
       invalidLanguages,
     } = this.state
@@ -301,6 +308,13 @@ class IdentifiableForm extends Component {
         <div className="identifiable-editor">
           {invalidLanguages.length > 0 && (
             <FormErrors invalidLanguages={invalidLanguages} />
+          )}
+          {feedbackMessage && (
+            <FeedbackMessage
+              className="mb-2"
+              message={feedbackMessage}
+              onClose={() => this.setState({feedbackMessage: undefined})}
+            />
           )}
           {this.getFormComponent()}
           <AddIframeDialog

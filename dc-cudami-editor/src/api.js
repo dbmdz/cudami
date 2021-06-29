@@ -213,10 +213,7 @@ export async function saveFileResource(contextPath, fileResource) {
   const savedFileResource = await saveIdentifiable(
     contextPath,
     fileResource,
-    null,
-    null,
-    'fileResource',
-    false
+    'fileResource'
   )
   return savedFileResource
 }
@@ -224,10 +221,8 @@ export async function saveFileResource(contextPath, fileResource) {
 export async function saveIdentifiable(
   contextPath,
   identifiable,
-  parentType,
-  parentUuid,
   type,
-  redirect = true
+  {parentType, parentUuid} = {}
 ) {
   let url = `${contextPath}api/${typeToEndpointMapping[type]}`
   if (parentType && parentUuid) {
@@ -241,15 +236,12 @@ export async function saveIdentifiable(
       },
       method: 'POST',
     })
-    const json = await response.json()
-    if (redirect) {
-      const viewUrl = `${contextPath}${typeToEndpointMapping[type]}/${json.uuid}`
-      window.location.href = viewUrl
-    } else {
-      return json
+    if (!response.ok) {
+      throw Error(response.statusText)
     }
+    return await response.json()
   } catch (err) {
-    console.log('An error occured while saving the identifiable')
+    return {error: true}
   }
 }
 
@@ -325,18 +317,12 @@ export async function updateFileResource(contextPath, fileResource) {
   const updatedFileResource = await updateIdentifiable(
     contextPath,
     fileResource,
-    'fileResource',
-    false
+    'fileResource'
   )
   return updatedFileResource
 }
 
-export async function updateIdentifiable(
-  contextPath,
-  identifiable,
-  type,
-  redirect = true
-) {
+export async function updateIdentifiable(contextPath, identifiable, type) {
   const url = `${contextPath}api/${typeToEndpointMapping[type]}/${identifiable.uuid}`
   try {
     const response = await fetch(url, {
@@ -346,15 +332,12 @@ export async function updateIdentifiable(
       },
       method: 'PUT',
     })
-    const json = await response.json()
-    if (redirect) {
-      const viewUrl = `${contextPath}${typeToEndpointMapping[type]}/${json.uuid}`
-      window.location.href = viewUrl
-    } else {
-      return json
+    if (!response.ok) {
+      throw Error(response.statusText)
     }
+    return await response.json()
   } catch (err) {
-    console.log('An error occured while updating the identifiable')
+    return {error: err}
   }
 }
 

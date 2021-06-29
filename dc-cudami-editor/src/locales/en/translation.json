@@ -23,6 +23,7 @@
     "subcollectionMovedSuccessfully": "{{ name }} has been moved successfully to <0>{{ targetName }}</0>.",
     "subcollectionNotFound": "Collection was not found.",
     "subcollectionRemovedSuccessfully": "{{ name }} has been removed successfully.",
+    "submitOfFormFailed": "An error occurred while saving",
     "uploadFailed": "An error occurred while uploading.",
     "uploadSuccessful": "$t({{ mediaType }}, capitalize) uploaded successfully.",
     "userActivatedSuccessfully": "User \"{{ email }}\" was successfully activated.",
