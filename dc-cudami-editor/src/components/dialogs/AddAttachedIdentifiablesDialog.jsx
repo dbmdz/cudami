@@ -56,8 +56,16 @@ class AddAttachedIdentifiablesDialog extends Component {
   }
 
   render() {
-    const {action, identifierTypes, isOpen, maxElements, onSubmit, t, type} =
-      this.props
+    const {
+      action,
+      activeLanguage,
+      identifierTypes,
+      isOpen,
+      maxElements,
+      onSubmit,
+      t,
+      type,
+    } = this.props
     const {feedbackMessage, identifiables, selectedOption} = this.state
     const showAutocomplete = selectedOption < this.fixedOptions.length
     const showInputFields =
@@ -111,6 +119,7 @@ class AddAttachedIdentifiablesDialog extends Component {
                 <FormGroup className="d-inline-block pl-1 w-75">
                   {showAutocomplete ? (
                     <Autocomplete
+                      activeLanguage={activeLanguage}
                       onSelect={this.addIdentifiableToList}
                       search={(contextPath, searchTerm, pageNumber, pageSize) =>
                         searchIdentifiables(
@@ -124,6 +133,7 @@ class AddAttachedIdentifiablesDialog extends Component {
                     />
                   ) : (
                     <IdentifierSearch
+                      activeLanguage={activeLanguage}
                       namespace={
                         identifierTypes[
                           selectedOption - this.fixedOptions.length
