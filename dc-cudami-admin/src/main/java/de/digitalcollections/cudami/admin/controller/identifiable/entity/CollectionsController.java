@@ -172,7 +172,7 @@ public class CollectionsController extends AbstractController {
     return service.findSubcollections(uuid, searchPageRequest);
   }
 
-  @GetMapping("/api/collections/{uuid}")
+  @GetMapping({"/api/collections/{uuid}", "/api/subcollections/{uuid}"})
   @ResponseBody
   public Collection get(@PathVariable UUID uuid) throws HttpException {
     return service.findOne(uuid);
