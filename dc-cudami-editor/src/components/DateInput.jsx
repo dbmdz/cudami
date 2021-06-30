@@ -1,3 +1,5 @@
+import './DateInput.css'
+
 import {useContext} from 'react'
 import DatePicker from 'react-date-picker'
 import {useTranslation} from 'react-i18next'
@@ -27,6 +29,8 @@ const DateInput = ({id, label, onChange, value}) => {
       </Label>
       <DatePicker
         calendarAriaLabel={t('datePicker:toggleCalendar')}
+        calendarClassName="rounded"
+        className="form-control"
         clearAriaLabel={t('datePicker:clearDate')}
         dayAriaLabel={t('datePicker:day')}
         id={id}
