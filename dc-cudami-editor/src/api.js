@@ -81,8 +81,7 @@ export async function findByIdentifier(contextPath, id, namespace, type) {
     if (!response.ok) {
       return {}
     }
-    const json = await response.json()
-    return json
+    return await response.json()
   } catch (err) {
     return {}
   }
@@ -153,8 +152,11 @@ export async function loadDefaultLanguage(contextPath) {
 export async function loadIdentifiable(contextPath, type, uuid = 'new') {
   const url = `${contextPath}api/${typeToEndpointMapping[type]}/${uuid}`
   try {
-    const result = await fetch(url)
-    return result.json()
+    const response = await fetch(url)
+    if (!response.ok) {
+      return {}
+    }
+    return await response.json()
   } catch (err) {
     return {}
   }
