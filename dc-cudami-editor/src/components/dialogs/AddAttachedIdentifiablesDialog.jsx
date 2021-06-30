@@ -24,6 +24,12 @@ import IdentifierSearch from '../IdentifierSearch'
 import PreviewImage from '../PreviewImage'
 
 class AddAttachedIdentifiablesDialog extends Component {
+  fixedIdentifiers = [
+    {
+      label: 'UUID',
+      namespace: 'uuid',
+    },
+  ]
   fixedOptions = ['label']
 
   constructor(props) {
@@ -114,6 +120,18 @@ class AddAttachedIdentifiablesDialog extends Component {
                         {identifierType.label}
                       </option>
                     ))}
+                    {this.fixedIdentifiers.map((identifier, index) => (
+                      <option
+                        key={identifier.namespace}
+                        value={
+                          index +
+                          this.fixedOptions.length +
+                          identifierTypes.length
+                        }
+                      >
+                        {identifier.label}
+                      </option>
+                    ))}
                   </Input>
                 </FormGroup>
                 <FormGroup className="d-inline-block pl-1 w-75">
@@ -137,6 +155,11 @@ class AddAttachedIdentifiablesDialog extends Component {
                       namespace={
                         identifierTypes[
                           selectedOption - this.fixedOptions.length
+                        ]?.namespace ??
+                        this.fixedIdentifiers[
+                          selectedOption -
+                            this.fixedOptions.length -
+                            identifierTypes.length
                         ].namespace
                       }
                       onSelect={this.addIdentifiableToList}
