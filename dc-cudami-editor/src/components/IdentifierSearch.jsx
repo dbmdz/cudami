@@ -9,7 +9,7 @@ import {
   Row,
 } from 'reactstrap'
 
-import {findByIdentifier} from '../api'
+import {findByIdentifier, loadIdentifiable} from '../api'
 import AppContext from './AppContext'
 import InputWithSpinner from './InputWithSpinner'
 import PreviewImage from './PreviewImage'
@@ -32,12 +32,14 @@ class IdentifierSearch extends Component {
   search = async () => {
     this.setState({loading: true})
     const {namespace, setFeedbackMessage, type} = this.props
-    const result = await findByIdentifier(
-      this.context.apiContextPath,
-      this.state.id,
-      namespace,
-      type
-    )
+    const result = await (namespace === 'uuid'
+      ? loadIdentifiable(this.context.apiContextPath, type, this.state.id)
+      : findByIdentifier(
+          this.context.apiContextPath,
+          this.state.id,
+          namespace,
+          type
+        ))
     const isEmptyResult = Object.keys(result).length === 0
     if (isEmptyResult) {
       setFeedbackMessage({
