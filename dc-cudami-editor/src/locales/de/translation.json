@@ -21,6 +21,7 @@
     "subcollectionAddedSuccessfully": "Die gewählte Sammlung wurde erfolgreich als Untersammlung hinzugefügt.",
     "subcollectionAddedSuccessfully_plural": "Die gewählten Sammlungen wurden erfolgreich als Untersammlungen hinzugefügt.",
     "subcollectionMovedSuccessfully": "{{ name }} wurde erfolgreich nach <0>{{ targetName }}</0> verschoben.",
+    "subcollectionNotFound": "Sammlung wurde nicht gefunden.",
     "subcollectionRemovedSuccessfully": "{{ name }} wurde erfolgreich entfernt.",
     "uploadFailed": "Beim Hochladen ist ein Fehler aufgetreten.",
     "uploadSuccessful": "$t({{ mediaType }}) erfolgreich hochgeladen.",
