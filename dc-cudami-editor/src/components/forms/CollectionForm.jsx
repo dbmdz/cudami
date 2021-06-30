@@ -66,7 +66,7 @@ const CollectionForm = ({
         </Row>
       )}
       <Row>
-        <Col sm="3">
+        <Col md="3" sm="6">
           <DateInput
             id="publication-start-date"
             label={t('publicationStatus:startDate')}
@@ -74,7 +74,7 @@ const CollectionForm = ({
             value={identifiable.publicationStart}
           />
         </Col>
-        <Col sm="3">
+        <Col md="3" sm="6">
           <DateInput
             id="publication-end-date"
             label={t('publicationStatus:endDate')}
