@@ -23,6 +23,7 @@ import FeedbackMessage from '../FeedbackMessage'
 import IdentifiableSearch from '../IdentifiableSearch'
 import LanguageTab from '../LanguageTab'
 import Pagination from '../Pagination'
+import {getLabelValue} from '../utils'
 import ArticleList from './ArticleList'
 import CollectionList from './CollectionList'
 import CorporateBodyList from './CorporateBodyList'
@@ -127,14 +128,6 @@ class PagedIdentifiableList extends Component {
     })
   }
 
-  getLabelValue = (label) => {
-    return (
-      label[this.state.activeLanguage] ??
-      label[this.state.defaultLanguage] ??
-      Object.values(label)[0]
-    )
-  }
-
   getListComponent = () => {
     const LIST_COMPONENT_MAPPING = {
       article: ArticleList,
@@ -209,7 +202,13 @@ class PagedIdentifiableList extends Component {
 
   handleMove = async ({label: targetLabel, uuid: targetUuid}) => {
     const {apiContextPath, parentUuid, type} = this.props
-    const {identifiables, moveIndex, pageNumber} = this.state
+    const {
+      activeLanguage,
+      defaultLanguage,
+      identifiables,
+      moveIndex,
+      pageNumber,
+    } = this.state
     const {label, uuid} = identifiables[moveIndex]
     if (uuid === targetUuid) {
       return console.error('an identifiable cannot be moved to itself')
@@ -229,8 +228,12 @@ class PagedIdentifiableList extends Component {
               `${apiContextPath}${typeToEndpointMapping[type]}/${targetUuid}`,
             ],
             values: {
-              name: this.getLabelValue(label),
-              targetName: this.getLabelValue(targetLabel),
+              name: getLabelValue(label, activeLanguage, defaultLanguage),
+              targetName: getLabelValue(
+                targetLabel,
+                activeLanguage,
+                defaultLanguage
+              ),
             },
           },
         })
@@ -243,7 +246,13 @@ class PagedIdentifiableList extends Component {
   }
 
   handleRemove = async () => {
-    const {identifiables, pageNumber, removeIndex} = this.state
+    const {
+      activeLanguage,
+      defaultLanguage,
+      identifiables,
+      pageNumber,
+      removeIndex,
+    } = this.state
     const {label, uuid} = identifiables[removeIndex]
     const successful = await this.removeIdentifiable(
       this.props.parentUuid,
@@ -257,7 +266,7 @@ class PagedIdentifiableList extends Component {
         color: 'success',
         key: `${this.props.type}RemovedSuccessfully`,
         values: {
-          name: this.getLabelValue(label),
+          name: getLabelValue(label, activeLanguage, defaultLanguage),
         },
       },
     })
@@ -483,6 +492,7 @@ class PagedIdentifiableList extends Component {
         {enableAdd && (
           <AddAttachedIdentifiablesDialog
             action="add"
+            activeLanguage={activeLanguage}
             identifierTypes={identifierTypes}
             isOpen={dialogsOpen.addAttachedIdentifiables}
             onSubmit={this.handleAdd}

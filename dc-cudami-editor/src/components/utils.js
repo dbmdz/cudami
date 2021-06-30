@@ -30,6 +30,12 @@ export function getImageUrl(image, width = 'full') {
   }`
 }
 
+export function getLabelValue(label, activeLanguage, defaultLanguage) {
+  return (
+    label[activeLanguage] ?? label[defaultLanguage] ?? Object.values(label)[0]
+  )
+}
+
 export function getVideoUrl(video) {
   if (!video.httpBaseUrl || !video.mimeType) {
     return video.uri

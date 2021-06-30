@@ -13,6 +13,7 @@ import {findByIdentifier} from '../api'
 import AppContext from './AppContext'
 import InputWithSpinner from './InputWithSpinner'
 import PreviewImage from './PreviewImage'
+import {getLabelValue} from './utils'
 
 class IdentifierSearch extends Component {
   constructor(props) {
@@ -83,8 +84,11 @@ class IdentifierSearch extends Component {
                   />
                 </Col>
                 <Col md="11">
-                  {result.label[this.context.defaultLanguage] ??
-                    Object.values(result.label)[0]}
+                  {getLabelValue(
+                    result.label,
+                    this.props.activeLanguage,
+                    this.context.defaultLanguage
+                  )}
                 </Col>
               </Row>
             </ListGroupItem>

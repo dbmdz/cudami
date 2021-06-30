@@ -9,6 +9,7 @@ import AppContext from './AppContext'
 import FeedbackMessage from './FeedbackMessage'
 import InputWithSpinner from './InputWithSpinner'
 import PreviewImage from './PreviewImage'
+import {getLabelValue} from './utils'
 
 class Autocomplete extends Component {
   /* defines the number of suggestions to be fetched */
@@ -24,16 +25,12 @@ class Autocomplete extends Component {
     }
   }
 
-  getLabelValue = (label) => {
-    return (
-      label[this.props.activeLanguage] ??
-      label[this.context.defaultLanguage] ??
-      Object.values(label)[0]
-    )
-  }
-
-  getSuggestionAsString = (suggestion) =>
-    `${this.getLabelValue(suggestion.label)}`
+  getSuggestionAsString = ({label}) =>
+    `${getLabelValue(
+      label,
+      this.props.activeLanguage,
+      this.context.defaultLanguage
+    )}`
 
   onChange = (_, {newValue: searchTerm}) => {
     this.setState({
@@ -95,7 +92,11 @@ class Autocomplete extends Component {
           />
         </Col>
         <Col className="text-left" md="11">
-          {this.getLabelValue(label)}
+          {getLabelValue(
+            label,
+            this.props.activeLanguage,
+            this.context.defaultLanguage
+          )}
         </Col>
       </Row>
     )
