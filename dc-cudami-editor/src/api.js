@@ -210,12 +210,7 @@ export async function removeAttachedIdentifiable(
 }
 
 export async function saveFileResource(contextPath, fileResource) {
-  const savedFileResource = await saveIdentifiable(
-    contextPath,
-    fileResource,
-    'fileResource'
-  )
-  return savedFileResource
+  return await saveIdentifiable(contextPath, fileResource, 'fileResource')
 }
 
 export async function saveIdentifiable(
@@ -314,12 +309,7 @@ export async function updateAttachedIdentifiablesOrder(
 }
 
 export async function updateFileResource(contextPath, fileResource) {
-  const updatedFileResource = await updateIdentifiable(
-    contextPath,
-    fileResource,
-    'fileResource'
-  )
-  return updatedFileResource
+  return await updateIdentifiable(contextPath, fileResource, 'fileResource')
 }
 
 export async function updateIdentifiable(contextPath, identifiable, type) {
