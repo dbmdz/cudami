@@ -2,6 +2,11 @@ import {Trans} from 'react-i18next'
 import {FaTimes} from 'react-icons/fa'
 import {Alert, Button} from 'reactstrap'
 
+/**
+@field className defaults to "mb-0"
+@field message `{color: defaults to "info", key: used in t for `feedback:${key}`, links: for <a> tag, values: object used in interpolated message strings}`
+@field onClose
+*/
 const FeedbackMessage = ({className = 'mb-0', message, onClose}) => {
   let {color = 'info', key, links = [], values} = message
   links = links.map((link) => (
@@ -13,7 +18,6 @@ const FeedbackMessage = ({className = 'mb-0', message, onClose}) => {
   ))
   return (
     <Alert className={className} color={color}>
-      <Trans components={links} i18nKey={`feedback:${key}`} values={values} />
       {onClose && (
         <Button
           className="close"
@@ -24,6 +28,7 @@ const FeedbackMessage = ({className = 'mb-0', message, onClose}) => {
           <FaTimes size={16} />
         </Button>
       )}
+      <Trans components={links} i18nKey={`feedback:${key}`} values={values} />
     </Alert>
   )
 }
