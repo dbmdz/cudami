@@ -356,16 +356,17 @@ export async function uploadFile(contextPath, file, updateProgress) {
 }
 
 // Users are special so lets treat them special
+
 /**
-Update an existing user
+Update an existing user or add a new one.
 
 @param contextPath
 @param user User object as retrieved from server
 @param passwords `{pwd1:..., pwd2:...}` that will be added as request params
-@returns `{status: status code of request, returnObject: on error an error object, the new user object otherwise}`
+@returns `{status: status code of request, returnObject: on error an error object, the new/updated user object otherwise}`
 */
-export async function updateUser(contextPath, user, passwords) {
-  let url = `${contextPath}api/${typeToEndpointMapping["user"]}/${user.uuid}`
+export async function addOrUpdateUser(contextPath, user, passwords) {
+  let url = `${contextPath}api/${typeToEndpointMapping["user"]}${user.uuid ? "/" + user.uuid : ""}`
   if (passwords) {
     const paramList = Object.entries(passwords).map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
     url += `?${paramList.join("&")}`
@@ -377,7 +378,7 @@ export async function updateUser(contextPath, user, passwords) {
       headers: {
         'Content-Type': 'application/json',
       },
-      method: 'PUT'
+      method: user.uuid ? 'PUT' : 'POST'
     }).then(async (response) => ({status: response.status, returnObject: await response.json()}))
   } catch (err) {
     result = {status: 500, returnObject: null}

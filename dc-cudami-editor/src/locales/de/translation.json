@@ -14,7 +14,6 @@
     "digitalObjectNotFound": "Digitalisat wurde nicht gefunden.",
     "digitalObjectRemovedSuccessfully": "{{ name }} wurde erfolgreich entfernt.",
     "duplicateInformation": "Werden Einträge mehrfach ausgewählt, so werden die Duplikate beim Klick auf \"$t(add)\" automatisch entfernt.",
-    "error": "Beim Speichern ist ein Fehler aufgetreten.",
     "moreElementsFound": "{{ maxElements }} von {{ totalElements }} Treffern, bitte verfeinern Sie Ihre Suche.",
     "orderChangedSuccessfully": "Reihenfolge wurde erfolgreich geändert.",
     "orderNotChangedSuccessfully": "Reihenfolge konnte nicht geändert werden.",

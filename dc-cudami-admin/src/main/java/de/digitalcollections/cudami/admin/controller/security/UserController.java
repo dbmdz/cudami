@@ -65,33 +65,25 @@ public class UserController extends AbstractController {
 
   @GetMapping("/users/new")
   public String create(Model model) {
-    model.addAttribute("user", service.create());
     return "users/create";
   }
 
-  @PostMapping("/users/new")
-  public String create(
+  @PostMapping("/api/users")
+  public ResponseEntity create(
       @RequestParam("pwd1") String password1,
       @RequestParam("pwd2") String password2,
-      @ModelAttribute(name = "user") @Valid User user,
-      BindingResult results,
-      Model model,
-      SessionStatus status,
-      RedirectAttributes redirectAttributes)
+      @RequestBody @Valid User user,
+      BindingResult results)
       throws ServiceException {
-    verifyBinding(results);
+    this.verifyBinding(results);
     if (results.hasErrors()) {
-      return "users/create";
+      return new ResponseEntity<>(results.getGlobalError(), HttpStatus.BAD_REQUEST);
     }
     User userDb = service.create(user, password1, password2, results);
     if (results.hasErrors()) {
-      return "users/create";
+      return new ResponseEntity<>(results.getGlobalError(), HttpStatus.BAD_REQUEST);
     }
-    status.setComplete();
-    String message =
-        messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
-    redirectAttributes.addFlashAttribute("success_message", message);
-    return "redirect:/users/" + userDb.getUuid().toString();
+    return ResponseEntity.ok(userDb);
   }
 
   @GetMapping("/users/{uuid}/edit")
