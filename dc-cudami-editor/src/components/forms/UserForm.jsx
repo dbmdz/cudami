@@ -5,11 +5,8 @@ import {useTranslation} from 'react-i18next'
 import {Alert, Col, Form, FormGroup, Label, Row} from 'reactstrap'
 
 import {
+    addOrUpdateUser,
   loadIdentifiable,
-  saveIdentifiable,
-  typeToEndpointMapping,
-  updateIdentifiable,
-  updateUser,
 } from '../../api'
 import Checkbox from '../Checkbox'
 import FeedbackMessage from '../FeedbackMessage'
@@ -21,10 +18,11 @@ const type = 'user'
 
 
 export default function UserForm({allRoles, apiContextPath = '/', uuid}) {
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState({email: undefined, firstname: undefined, lastname: undefined, roles: [], uuid: undefined, enabled: false})
   const [passwords, setPasswords] = useState({pwd1: null, pwd2: null})
   const [feedback, setFeedback] = useState()
   useEffect(() => {
+    if (!uuid) return
     loadIdentifiable(apiContextPath, type, uuid).then(userObj => {
       setUser(userObj)
     })
@@ -42,18 +40,13 @@ export default function UserForm({allRoles, apiContextPath = '/', uuid}) {
   }
 
   const submitData = async function(apiContext, user, passwords) {
-    let response
-    if (user.uuid) {
-      response = await updateUser(apiContext, user, Object.values(passwords).some(pwd => pwd) ? passwords : null)
-    } else {
-      response = await saveIdentifiable(context, data, null, null, type, false)
-    }
+    const response = await addOrUpdateUser(apiContext, user, Object.values(passwords).some(pwd => pwd) ? passwords : null)
     if ([200, 201].includes(response.status)) {
       window.location.href = `${apiContext}users/${response.returnObject.uuid}`
     } else if (response.status == 400) {
       // we got an error in the `returnObject`
       const {code, arguments: args} = response.returnObject
-      let message = {color: "danger", key: "error"}
+      let message = {color: "danger", key: "submitOfFormFailed"}
       if (code) {
         let errorKey = code.replace(/^error\./, "")
         message.key = errorKey
