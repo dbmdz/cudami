@@ -19,7 +19,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -27,6 +26,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -40,7 +40,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class UserController extends AbstractController {
 
   private final MessageSource messageSource;
-  private final UserService service;
+  private final UserService<User> service;
 
   public UserController(MessageSource messageSource, UserService service) {
     this.messageSource = messageSource;
@@ -83,7 +83,7 @@ public class UserController extends AbstractController {
     if (results.hasErrors()) {
       return "users/create";
     }
-    User userDb = service.create(user, password1, password2, (Errors) results);
+    User userDb = service.create(user, password1, password2, results);
     if (results.hasErrors()) {
       return "users/create";
     }
@@ -96,35 +96,8 @@ public class UserController extends AbstractController {
 
   @GetMapping("/users/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) throws ServiceException {
-    model.addAttribute("user", service.findOne(uuid));
+    model.addAttribute("uuid", uuid);
     return "users/edit";
-  }
-
-  @PostMapping("/users/{uuid}/edit")
-  public String edit(
-      @PathVariable UUID uuid,
-      @RequestParam(name = "pwd1", required = false) String password1,
-      @RequestParam(name = "pwd2", required = false) String password2,
-      @ModelAttribute(name = "user") @Valid User user,
-      BindingResult results,
-      Model model,
-      SessionStatus status,
-      RedirectAttributes redirectAttributes)
-      throws ServiceException {
-    verifyBinding(results);
-    if (results.hasErrors()) {
-      return "users/edit";
-    }
-    service.update(user, password1, password2, (Errors) results);
-    if (results.hasErrors()) {
-      return "users/edit";
-    }
-    status.setComplete();
-    String message =
-        messageSource.getMessage(
-            "msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
-    redirectAttributes.addFlashAttribute("success_message", message);
-    return "redirect:/users/" + uuid;
   }
 
   @GetMapping("/api/users")
@@ -135,6 +108,12 @@ public class UserController extends AbstractController {
       throws ServiceException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     return service.find(pageRequest);
+  }
+
+  @GetMapping("/api/users/{uuid}")
+  @ResponseBody
+  public User getUser(@PathVariable UUID uuid) throws ServiceException {
+    return this.service.findOne(uuid);
   }
 
   @GetMapping("/users")
@@ -178,7 +157,7 @@ public class UserController extends AbstractController {
       model.addAttribute("error_message", errorMessage);
       return "users/edit-password";
     }
-    service.update(user, password1, password2, (Errors) results);
+    service.update(user, password1, password2, results);
     if (results.hasErrors()) {
       model.addAttribute("error_message", errorMessage);
       return "users/edit-password";
@@ -189,6 +168,25 @@ public class UserController extends AbstractController {
             "msg.changed_password_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
     return "redirect:/";
+  }
+
+  @PutMapping("/api/users/{uuid}")
+  public ResponseEntity updateUser(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "pwd1", required = false) String password1,
+      @RequestParam(name = "pwd2", required = false) String password2,
+      @RequestBody User user,
+      BindingResult results)
+      throws ServiceException {
+    this.verifyBinding(results);
+    if (results.hasErrors()) {
+      return new ResponseEntity<>(results.getGlobalError(), HttpStatus.BAD_REQUEST);
+    }
+    User updatedUser = this.service.update(user, password1, password2, results);
+    if (results.hasErrors()) {
+      return new ResponseEntity<>(results.getGlobalError(), HttpStatus.BAD_REQUEST);
+    }
+    return ResponseEntity.ok(updatedUser);
   }
 
   @GetMapping("/users/{uuid}")
