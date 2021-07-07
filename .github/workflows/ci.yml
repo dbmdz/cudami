@@ -24,8 +24,10 @@ jobs:
         env:
           cache-name: cache-maven-artifacts
         with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          key: cudami-cache-java-${{ matrix.java }}-${{ github.run_id }}
+          path: |
+            ~/.m2/repository
+            **/target
       - name: Check Java codestyle
         run: mvn com.coveo:fmt-maven-plugin:check
       - name: Set up Node.js
@@ -37,7 +39,7 @@ jobs:
         run: npm install && npm run format-check
         working-directory: dc-cudami-editor
       - name: Build with Maven
-        run: mvn -B -U verify -Pproduction
+        run: mvn -B -U clean verify -Pproduction
     strategy:
       matrix:
         java: [11, 14]
@@ -55,8 +57,10 @@ jobs:
         env:
           cache-name: cache-maven-artifacts
         with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          key: cudami-cache-java-11-${{ github.run_id }}
+          path: |
+            ~/.m2/repository
+            **/target
       - name: Install XML utils
         run: sudo apt install libxml2-utils
       - name: Extract project version
@@ -77,7 +81,7 @@ jobs:
           server-username: MAVEN_USERNAME
       - name: Publish snapshot to the Maven Central Repository
         if: github.event_name == 'push' && endswith(env.PROJECT_VERSION, 'SNAPSHOT')
-        run: mvn -B deploy -DskipTests -Pproduction
+        run: mvn -B deploy -DskipTests
         env:
           MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
@@ -96,7 +100,7 @@ jobs:
           server-username: MAVEN_USERNAME
       - name: Publish release to the Maven Central Repository
         if: github.event_name == 'release' && !endswith(env.PROJECT_VERSION, 'SNAPSHOT')
-        run: mvn -B deploy -DskipTests -Pdeploy -Pproduction
+        run: mvn -B deploy -DskipTests -Pdeploy
         env:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
