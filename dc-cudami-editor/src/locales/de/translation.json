@@ -171,7 +171,7 @@
       }
     },
     "insertLink": "Verlinkung einfügen",
-    "invalidLabels": "Bitte füllen Sie in den folgenden Sprachen das Feld \"$t(label)\" noch aus):",
+    "invalidLabels": "Bitte füllen Sie in den folgenden Sprachen das Feld \"$t(label)\" noch aus:",
     "label": "Titel",
     "lastModified": "letzte Änderung",
     "lastname": "Nachname",
