@@ -70,8 +70,8 @@ public class UserController extends AbstractController {
 
   @PostMapping("/api/users")
   public ResponseEntity create(
-      @RequestParam("pwd1") String password1,
-      @RequestParam("pwd2") String password2,
+      @RequestParam(value = "pwd1", required = false) String password1,
+      @RequestParam(value = "pwd2", required = false) String password2,
       @RequestBody @Valid User user,
       BindingResult results)
       throws ServiceException {
@@ -111,35 +111,6 @@ public class UserController extends AbstractController {
   @GetMapping("/users")
   public String list() {
     return "users/list";
-  }
-
-  @GetMapping("/users/{uuid}/activate")
-  public String activate(
-      @PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes)
-      throws ServiceException {
-    User user = new User();
-    user.setEnabled(true);
-    this.setStatus(uuid, user);
-    String message =
-        messageSource.getMessage("msg.user_activated", null, LocaleContextHolder.getLocale());
-    redirectAttributes.addFlashAttribute("success_message", message);
-    return "redirect:/users";
-  }
-
-  @GetMapping("/users/{uuid}/deactivate")
-  public String deactivate(
-      @PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes)
-      throws ServiceException {
-    User user = new User();
-    user.setEnabled(false);
-    this.setStatus(uuid, user);
-    String message =
-        messageSource.getMessage(
-            "msg.user_deactivated",
-            new Object[] {user.getEmail()},
-            LocaleContextHolder.getLocale());
-    redirectAttributes.addFlashAttribute("warning_message", message);
-    return "redirect:/users";
   }
 
   @PatchMapping("/api/users/{uuid}")

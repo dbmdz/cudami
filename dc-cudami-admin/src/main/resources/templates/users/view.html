@@ -26,24 +26,22 @@
                  th:text="#{edit}">
                 edit
               </a>
-              <a class="btn btn-danger"
-                 th:if="*{enabled}" href="#"
+              <input class="btn btn-danger user-status-toggle"
+                 th:if="*{enabled}"
                  th:title="#{tooltip_deactivate_user}"
-                 th:text="#{btn_deactivate_user}"
-                 data:href="@{*{uuid} + '/deactivate'}"
+                 th:value="#{btn_deactivate_user}"
+                 type="button"
+                 data:enable="false"
                  data:message="#{msg.confirm_user_deactivation(*{email})}"
                  data:title="#{title_warning}"
                  data-target="#confirmYesNoDialog"
                  data-toggle="modal">
-                deactivate user
-              </a>
-              <a class="btn btn-success"
+              <input class="btn btn-success user-status-toggle"
                  th:unless="*{enabled}"
-                 th:href="@{*{uuid} + '/activate'}"
                  th:title="#{tooltip_activate_user}"
-                 th:text="#{btn_activate_user}">
-                activate user
-              </a>
+                 th:value="#{btn_activate_user}"
+                 type="button"
+                 data:enable="true">
             </div>
           </div>
         </div>
@@ -85,6 +83,9 @@
   </th:block>
   <th:block layout:fragment="beforeBodyEnds">
     <div th:replace="fragments/modals-confirmation :: confirmYesNoDialog-bootstrap4"></div>
+    <script th:inline="javascript">
+      $(addUserStatusChangeHandler(/*[[@{/api/users/{uuid}(uuid=${user.uuid})}]]*/))
+    </script>
   </th:block>
 </body>
 </html>
