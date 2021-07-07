@@ -83,5 +83,8 @@
       </div>
     </div>
   </th:block>
+  <th:block layout:fragment="beforeBodyEnds">
+    <div th:replace="fragments/modals-confirmation :: confirmYesNoDialog-bootstrap4"></div>
+  </th:block>
 </body>
 </html>
