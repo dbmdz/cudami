@@ -382,7 +382,12 @@
         </executions>
         <configuration>
           <excludes>
+            <exclude>**/*Advice.*</exclude>
             <exclude>**/Application.*</exclude>
+            <exclude>**/*Exception.*</exclude>
+            <exclude>**/*Filter.*</exclude>
+            <exclude>**/*Interceptor.*</exclude>
+            <exclude>**/*Properties.*</exclude>
             <exclude>**/SpringConfig*</exclude>
           </excludes>
         </configuration>
