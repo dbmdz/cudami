@@ -113,6 +113,35 @@ public class UserController extends AbstractController {
     return "users/list";
   }
 
+  @GetMapping("/users/{uuid}/activate")
+  public String activate(
+      @PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes)
+      throws ServiceException {
+    User user = new User();
+    user.setEnabled(true);
+    this.setStatus(uuid, user);
+    String message =
+        messageSource.getMessage("msg.user_activated", null, LocaleContextHolder.getLocale());
+    redirectAttributes.addFlashAttribute("success_message", message);
+    return "redirect:/users";
+  }
+
+  @GetMapping("/users/{uuid}/deactivate")
+  public String deactivate(
+      @PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes)
+      throws ServiceException {
+    User user = new User();
+    user.setEnabled(false);
+    this.setStatus(uuid, user);
+    String message =
+        messageSource.getMessage(
+            "msg.user_deactivated",
+            new Object[] {user.getEmail()},
+            LocaleContextHolder.getLocale());
+    redirectAttributes.addFlashAttribute("warning_message", message);
+    return "redirect:/users";
+  }
+
   @PatchMapping("/api/users/{uuid}")
   public ResponseEntity setStatus(@PathVariable("uuid") UUID uuid, @RequestBody User user) {
     boolean successful = service.setStatus(uuid, user.isEnabled());
