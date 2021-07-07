@@ -366,10 +366,14 @@ Update an existing user or add a new one.
 @returns `{status: status code of request, returnObject: on error an error object, the new/updated user object otherwise}`
 */
 export async function addOrUpdateUser(contextPath, user, passwords) {
-  let url = `${contextPath}api/${typeToEndpointMapping["user"]}${user.uuid ? "/" + user.uuid : ""}`
+  let url = `${contextPath}api/${typeToEndpointMapping['user']}${
+    user.uuid ? '/' + user.uuid : ''
+  }`
   if (passwords) {
-    const paramList = Object.entries(passwords).map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
-    url += `?${paramList.join("&")}`
+    const paramList = Object.entries(passwords).map(
+      ([k, v]) => `${k}=${encodeURIComponent(v)}`
+    )
+    url += `?${paramList.join('&')}`
   }
   let result
   try {
@@ -378,8 +382,11 @@ export async function addOrUpdateUser(contextPath, user, passwords) {
       headers: {
         'Content-Type': 'application/json',
       },
-      method: user.uuid ? 'PUT' : 'POST'
-    }).then(async (response) => ({status: response.status, returnObject: await response.json()}))
+      method: user.uuid ? 'PUT' : 'POST',
+    }).then(async (response) => ({
+      status: response.status,
+      returnObject: await response.json(),
+    }))
   } catch (err) {
     result = {status: 500, returnObject: null}
   }

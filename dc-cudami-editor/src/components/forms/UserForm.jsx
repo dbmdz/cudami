@@ -4,51 +4,56 @@ import {useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {Alert, Col, Form, FormGroup, Label, Row} from 'reactstrap'
 
-import {
-    addOrUpdateUser,
-  loadIdentifiable,
-} from '../../api'
+import {addOrUpdateUser, loadIdentifiable} from '../../api'
 import Checkbox from '../Checkbox'
 import FeedbackMessage from '../FeedbackMessage'
 import InputWithLabel from '../InputWithLabel'
 import ActionButtons from './ActionButtons'
 
-
 const type = 'user'
 
-
 export default function UserForm({allRoles, apiContextPath = '/', uuid}) {
-  const [user, setUser] = useState({email: undefined, firstname: undefined, lastname: undefined, roles: [], uuid: undefined, enabled: false})
+  const [user, setUser] = useState({
+    email: undefined,
+    firstname: undefined,
+    lastname: undefined,
+    roles: [],
+    uuid: undefined,
+    enabled: false,
+  })
   const [passwords, setPasswords] = useState({pwd1: null, pwd2: null})
   const [feedback, setFeedback] = useState()
   useEffect(() => {
     if (!uuid) return
-    loadIdentifiable(apiContextPath, type, uuid).then(userObj => {
+    loadIdentifiable(apiContextPath, type, uuid).then((userObj) => {
       setUser(userObj)
     })
   }, [])
 
-  const setUserRole = function(role, selected) {
+  const setUserRole = function (role, selected) {
     let {roles: currentRoles = []} = user
     if (selected && !currentRoles.includes(role)) {
       currentRoles.push(role)
-    }
-    else if (!selected && currentRoles.includes(role)) {
+    } else if (!selected && currentRoles.includes(role)) {
       currentRoles.splice(currentRoles.indexOf(role), 1)
     }
     setUser({...user, roles: currentRoles})
   }
 
-  const submitData = async function(apiContext, user, passwords) {
-    const response = await addOrUpdateUser(apiContext, user, Object.values(passwords).some(pwd => pwd) ? passwords : null)
+  const submitData = async function (apiContext, user, passwords) {
+    const response = await addOrUpdateUser(
+      apiContext,
+      user,
+      Object.values(passwords).some((pwd) => pwd) ? passwords : null
+    )
     if ([200, 201].includes(response.status)) {
       window.location.href = `${apiContext}users/${response.returnObject.uuid}`
     } else if (response.status == 400) {
       // we got an error in the `returnObject`
       const {code, arguments: args} = response.returnObject
-      let message = {color: "danger", key: "submitOfFormFailed"}
+      let message = {color: 'danger', key: 'submitOfFormFailed'}
       if (code) {
-        let errorKey = code.replace(/^error\./, "")
+        let errorKey = code.replace(/^error\./, '')
         message.key = errorKey
         message.values = args && {count: args[0]}
       }
@@ -63,87 +68,111 @@ export default function UserForm({allRoles, apiContextPath = '/', uuid}) {
   const formId = 'user-form'
   return (
     <>
-    {feedback && <FeedbackMessage className="mb-2" message={feedback} onClose={() => setFeedback(undefined)}/>}
-    <Form
-      id={formId}
-      onSubmit={(evt) => {
-        evt.preventDefault()
-        submitData(apiContextPath, user, passwords)
-      }}
-    >
-      <Row form>
-        <Col xs="6" sm="9">
-          <h1>
-            {uuid
-              ? t('editUser', { email: user.email })
-              : t('createUser')}
-          </h1>
-        </Col>
-        <Col xs="6" sm="3">
-          <ActionButtons formId={formId} />
-        </Col>
-      </Row>
-      <Row form>
-        <Col sm="12">
-          <hr />
-        </Col>
-      </Row>
-      <Row form>
-        <Col sm="12">
-          {uuid && (
-            <InputWithLabel id="uuid" label="ID" readOnly value={uuid} />
-          )}
-          <InputWithLabel
-            id="email"
-            label={`${t("username")} / ${t("email")}`}
-            onChange={email => setUser({...user, email})}
-            required
-            value={user.email ?? ''}
+      {feedback && (
+        <FeedbackMessage
+          className="mb-2"
+          message={feedback}
+          onClose={() => setFeedback(undefined)}
+        />
+      )}
+      <Form
+        id={formId}
+        onSubmit={(evt) => {
+          evt.preventDefault()
+          submitData(apiContextPath, user, passwords)
+        }}
+      >
+        <Row form>
+          <Col xs="6" sm="9">
+            <h1>
+              {uuid ? t('editUser', {email: user.email}) : t('createUser')}
+            </h1>
+          </Col>
+          <Col xs="6" sm="3">
+            <ActionButtons formId={formId} />
+          </Col>
+        </Row>
+        <Row form>
+          <Col sm="12">
+            <hr />
+          </Col>
+        </Row>
+        <Row form>
+          <Col sm="12">
+            {uuid && (
+              <InputWithLabel id="uuid" label="ID" readOnly value={uuid} />
+            )}
+            <InputWithLabel
+              id="email"
+              label={`${t('username')} / ${t('email')}`}
+              onChange={(email) => setUser({...user, email})}
+              required
+              value={user.email ?? ''}
+            />
+          </Col>
+        </Row>
+        <Row form>
+          <Col>
+            <InputWithLabel
+              id="lastname"
+              labelKey="lastname"
+              onChange={(lastname) => setUser({...user, lastname})}
+              required
+              value={user.lastname ?? ''}
+            />
+          </Col>
+          <Col>
+            <InputWithLabel
+              id="firstname"
+              labelKey="firstname"
+              onChange={(firstname) => setUser({...user, firstname})}
+              required
+              value={user.firstname ?? ''}
+            />
+          </Col>
+        </Row>
+        <FormGroup>
+          <Label className="font-weight-bold">{t('roles')}</Label>
+          {allRoles.map((role) => (
+            <Checkbox
+              id={`chkbx_${role}`}
+              label={role}
+              checked={user.roles.includes(role)}
+              onChange={(isChecked) => setUserRole(role, isChecked)}
+            />
+          ))}
+        </FormGroup>
+        <FormGroup>
+          <Label className="font-weight-bold">{t('status')}</Label>
+          <Checkbox
+            id="chkbx_active"
+            label={t('activated')}
+            checked={user.enabled}
+            onChange={(isChecked) => setUser({...user, enabled: isChecked})}
           />
-        </Col>
-      </Row>
-      <Row form>
-        <Col>
-          <InputWithLabel
-            id="lastname"
-            labelKey="lastname"
-            onChange={lastname => setUser({...user, lastname})}
-            required
-            value={user.lastname ?? ''}
-          />
-        </Col>
-        <Col>
-          <InputWithLabel
-            id="firstname"
-            labelKey="firstname"
-            onChange={(firstname) =>
-              setUser({...user, firstname})
-            }
-            required
-            value={user.firstname ?? ''}
-          />
-        </Col>
-      </Row>
-      <FormGroup>
-        <Label className="font-weight-bold">{t("roles")}</Label>
-        {allRoles.map(role =>
-          <Checkbox id={`chkbx_${role}`} label={role} checked={user.roles.includes(role)} onChange={isChecked => setUserRole(role, isChecked)} />
-        )}
-      </FormGroup>
-      <FormGroup>
-        <Label className="font-weight-bold">{t("status")}</Label>
-        <Checkbox id="chkbx_active" label={t("activated")} checked={user.enabled} onChange={isChecked => setUser({...user, enabled: isChecked})} />
-      </FormGroup>
-      <Alert color="info">{t("passwordChangeInfo")}</Alert>
-      <Row form>
-        <Col>
-          <InputWithLabel id="pwd1" type="password" labelKey="newPassword" value={passwords.pwd1} onChange={v => setPasswords({...passwords, pwd1: v})} />
-        </Col>
-        <Col>
-          <InputWithLabel id="pwd2" type="password" labelKey="confirmPassword" value={passwords.pwd2} onChange={v => setPasswords({...passwords, pwd2: v})} />
-        </Col>
-      </Row>
-    </Form>
+        </FormGroup>
+        <Alert color="info">{t('passwordChangeInfo')}</Alert>
+        <Row form>
+          <Col>
+            <InputWithLabel
+              id="pwd1"
+              type="password"
+              labelKey="newPassword"
+              value={passwords.pwd1}
+              onChange={(v) => setPasswords({...passwords, pwd1: v})}
+            />
+          </Col>
+          <Col>
+            <InputWithLabel
+              id="pwd2"
+              type="password"
+              labelKey="confirmPassword"
+              value={passwords.pwd2}
+              onChange={(v) => setPasswords({...passwords, pwd2: v})}
+            />
+          </Col>
+        </Row>
+      </Form>
     </>
   )
 }
