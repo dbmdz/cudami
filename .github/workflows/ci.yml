@@ -43,6 +43,22 @@ jobs:
     strategy:
       matrix:
         java: [11, 14]
+  debug:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Set up cache
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-maven-artifacts
+        with:
+          key: cudami-cache-java-11-${{ github.run_id }}
+          path: |
+            ~/.m2/repository
+            **/target
+      - run: tree
   publish:
     if: (github.event_name == 'push' && contains(github.ref, 'main')) || github.event_name == 'release'
     needs: build
