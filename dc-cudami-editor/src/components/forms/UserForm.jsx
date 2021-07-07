@@ -21,7 +21,7 @@ export default function UserForm({allRoles, apiContextPath = '/', uuid}) {
     uuid: undefined,
     enabled: false,
   })
-  const [passwords, setPasswords] = useState({pwd1: null, pwd2: null})
+  const [passwords, setPasswords] = useState({pwd1: '', pwd2: ''})
   const [feedback, setFeedback] = useState()
   useEffect(() => {
     if (!uuid) return
