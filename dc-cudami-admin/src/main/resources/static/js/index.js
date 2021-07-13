@@ -76,27 +76,30 @@ function moveEditButtonToNavbar() {
 
 function addUserStatusChangeHandler(url) {
   const listener = function (enabled) {
-    return async function (evt) {
-      await fetch(url, {
-        body: JSON.stringify({enabled}),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        method: 'PATCH',
-      }).then(resp => {
-        if (resp.ok) {
-          window.location.reload()
-        } else {
-          throw new Error("Error during change of user status")
+    return async function (_evt) {
+      try {
+        const response = await fetch(url, {
+          body: JSON.stringify({enabled}),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          method: 'PATCH',
+        })
+        if (!response.ok) {
+          throw new Error('Error during change of user status')
         }
-      })
+        window.location.reload()
+      } catch (err) {
+        console.error(err)
+      }
     }
   }
-  const btn = document.querySelector("input.user-status-toggle")
-  const enable = btn?.dataset?.enable === "true"
+  const btn = document.querySelector('input.user-status-toggle')
+  const confirm = document.querySelector('a#confirm')
+  const enable = btn.dataset.enable === 'true'
   if (enable) {
-    btn.addEventListener("click", listener(enable))
+    btn.addEventListener('click', listener(enable))
   } else {
-    $("#confirm")?.click(listener(enable))
+    confirm.addEventListener('click', listener(enable))
   }
 }

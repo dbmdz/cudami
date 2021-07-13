@@ -4,89 +4,83 @@ import {useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {Alert, Col, Form, FormGroup, Label, Row} from 'reactstrap'
 
-import {addOrUpdateUser, loadIdentifiable} from '../../api'
-import Checkbox from '../Checkbox'
+import {
+  loadIdentifiable,
+  saveOrUpdateUser,
+  typeToEndpointMapping,
+} from '../../api'
+import CheckboxWithLabel from '../CheckboxWithLabel'
 import FeedbackMessage from '../FeedbackMessage'
 import InputWithLabel from '../InputWithLabel'
 import ActionButtons from './ActionButtons'
 
-const type = 'user'
+const submitData = async (context, user, passwords) => {
+  const {error, json} = await saveOrUpdateUser(
+    context,
+    user,
+    Object.values(passwords).every((pwd) => pwd) ? passwords : null
+  )
+  if (!error) {
+    return {uuid: json.uuid}
+  }
+  // we got an error in the response json
+  return {
+    message: {
+      color: 'danger',
+      key: 'submitOfFormFailed',
+      text: json.defaultMessage,
+    },
+  }
+}
 
-export default function UserForm({allRoles, apiContextPath = '/', uuid}) {
-  const [user, setUser] = useState({
-    email: undefined,
-    firstname: undefined,
-    lastname: undefined,
-    roles: [],
-    uuid: undefined,
-    enabled: false,
-  })
-  const [passwords, setPasswords] = useState({pwd1: '', pwd2: ''})
-  const [feedback, setFeedback] = useState()
+const UserForm = ({allRoles, apiContextPath = '/', uuid}) => {
+  const type = 'user'
   useEffect(() => {
-    if (!uuid) return
-    loadIdentifiable(apiContextPath, type, uuid).then((userObj) => {
-      setUser(userObj)
+    loadIdentifiable(apiContextPath, type, uuid).then((user) => {
+      setUser(user)
     })
   }, [])
-
-  const setUserRole = function (role, selected) {
-    let {roles: currentRoles = []} = user
-    if (selected && !currentRoles.includes(role)) {
-      currentRoles.push(role)
-    } else if (!selected && currentRoles.includes(role)) {
-      currentRoles.splice(currentRoles.indexOf(role), 1)
-    }
-    setUser({...user, roles: currentRoles})
-  }
-
-  const submitData = async function (apiContext, user, passwords) {
-    const response = await addOrUpdateUser(
-      apiContext,
-      user,
-      Object.values(passwords).some((pwd) => pwd) ? passwords : null
-    )
-    if ([200, 201].includes(response.status)) {
-      window.location.href = `${apiContext}users/${response.returnObject.uuid}`
-    } else if (response.status == 400) {
-      // we got an error in the `returnObject`
-      const {code, arguments: args} = response.returnObject
-      let message = {color: 'danger', key: 'submitOfFormFailed'}
-      if (code) {
-        let errorKey = code.replace(/^error\./, '')
-        message.key = errorKey
-        message.values = args && {count: args[0]}
-      }
-      setFeedback(message)
-    }
-  }
-
+  const [feedbackMessage, setFeedbackMessage] = useState()
+  const [passwords, setPasswords] = useState({})
+  const [user, setUser] = useState()
   const {t} = useTranslation()
   if (!user) {
     return null
   }
+  const updateRoles = (role, selected) => {
+    return allRoles.filter((r) => {
+      return r === role ? selected : roles.includes(r)
+    })
+  }
+  const {email, enabled, firstname, lastname, roles} = user
   const formId = 'user-form'
   return (
     <>
-      {feedback && (
+      {feedbackMessage && (
         <FeedbackMessage
           className="mb-2"
-          message={feedback}
-          onClose={() => setFeedback(undefined)}
+          message={feedbackMessage}
+          onClose={() => setFeedbackMessage(undefined)}
         />
       )}
       <Form
         id={formId}
-        onSubmit={(evt) => {
+        onSubmit={async (evt) => {
           evt.preventDefault()
-          submitData(apiContextPath, user, passwords)
+          const {message, uuid} = await submitData(
+            apiContextPath,
+            user,
+            passwords
+          )
+          if (message) {
+            return setFeedbackMessage(message)
+          }
+          window.location.href = `${apiContextPath}${typeToEndpointMapping[type]}/${uuid}`
         }}
       >
         <Row form>
           <Col xs="6" sm="9">
-            <h1>
-              {uuid ? t('editUser', {email: user.email}) : t('createUser')}
-            </h1>
+            <h1>{uuid ? t('editUser', {email}) : t('createUser')}</h1>
           </Col>
           <Col xs="6" sm="3">
             <ActionButtons formId={formId} />
@@ -107,7 +101,7 @@ export default function UserForm({allRoles, apiContextPath = '/', uuid}) {
               label={`${t('username')} / ${t('email')}`}
               onChange={(email) => setUser({...user, email})}
               required
-              value={user.email ?? ''}
+              value={email ?? ''}
             />
           </Col>
         </Row>
@@ -118,7 +112,7 @@ export default function UserForm({allRoles, apiContextPath = '/', uuid}) {
               labelKey="lastname"
               onChange={(lastname) => setUser({...user, lastname})}
               required
-              value={user.lastname ?? ''}
+              value={lastname ?? ''}
             />
           </Col>
           <Col>
@@ -127,48 +121,54 @@ export default function UserForm({allRoles, apiContextPath = '/', uuid}) {
               labelKey="firstname"
               onChange={(firstname) => setUser({...user, firstname})}
               required
-              value={user.firstname ?? ''}
+              value={firstname ?? ''}
             />
           </Col>
         </Row>
         <FormGroup>
           <Label className="font-weight-bold">{t('roles')}</Label>
           {allRoles.map((role) => (
-            <Checkbox
-              id={`chkbx_${role}`}
+            <CheckboxWithLabel
+              checked={roles.includes(role)}
+              key={role}
               label={role}
-              checked={user.roles.includes(role)}
-              onChange={(isChecked) => setUserRole(role, isChecked)}
+              onChange={(isChecked) =>
+                setUser({
+                  ...user,
+                  roles: updateRoles(role, isChecked),
+                })
+              }
             />
           ))}
         </FormGroup>
         <FormGroup>
           <Label className="font-weight-bold">{t('status')}</Label>
-          <Checkbox
-            id="chkbx_active"
+          <CheckboxWithLabel
+            checked={enabled}
             label={t('activated')}
-            checked={user.enabled}
             onChange={(isChecked) => setUser({...user, enabled: isChecked})}
           />
         </FormGroup>
-        <Alert color="info">{t('passwordChangeInfo')}</Alert>
+        {uuid && <Alert color="info">{t('passwordChangeInfo')}</Alert>}
         <Row form>
           <Col>
             <InputWithLabel
               id="pwd1"
-              type="password"
-              labelKey="newPassword"
-              value={passwords.pwd1}
+              labelKey="password"
               onChange={(v) => setPasswords({...passwords, pwd1: v})}
+              required={!uuid}
+              type="password"
+              value={passwords?.pwd1 ?? ''}
             />
           </Col>
           <Col>
             <InputWithLabel
               id="pwd2"
-              type="password"
               labelKey="confirmPassword"
-              value={passwords.pwd2}
               onChange={(v) => setPasswords({...passwords, pwd2: v})}
+              required={!uuid}
+              type="password"
+              value={passwords?.pwd2 ?? ''}
             />
           </Col>
         </Row>
@@ -176,3 +176,5 @@ export default function UserForm({allRoles, apiContextPath = '/', uuid}) {
     </>
   )
 }
+
+export default UserForm

@@ -8,7 +8,7 @@ import {Alert, Button} from 'reactstrap'
 @field onClose
 */
 const FeedbackMessage = ({className = 'mb-0', message, onClose}) => {
-  let {color = 'info', key, links = [], values} = message
+  let {color = 'info', key, links = [], text, values} = message
   links = links.map((link) => (
     <a
       href={link}
@@ -28,7 +28,11 @@ const FeedbackMessage = ({className = 'mb-0', message, onClose}) => {
           <FaTimes size={16} />
         </Button>
       )}
-      <Trans components={links} i18nKey={`feedback:${key}`} values={values} />
+      {text ? (
+        <span dangerouslySetInnerHTML={{__html: text}} />
+      ) : (
+        <Trans components={links} i18nKey={`feedback:${key}`} values={values} />
+      )}
     </Alert>
   )
 }
