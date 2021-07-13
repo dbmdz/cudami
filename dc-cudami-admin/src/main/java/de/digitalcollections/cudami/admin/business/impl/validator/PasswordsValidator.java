@@ -9,6 +9,8 @@ import org.passay.LengthRule;
 import org.passay.PasswordData;
 import org.passay.PasswordValidator;
 import org.passay.RuleResult;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -22,6 +24,12 @@ public class PasswordsValidator implements Validator {
   private static final Pattern PATTERN_SPECIAL_CHAR = Pattern.compile(".*[^a-zA-Z0-9]+.*");
   private static final int PASSWORD_MIN_LENGTH = 12;
   private static final int PASSWORD_MAX_LENGTH = 30;
+
+  private final MessageSource messageSource;
+
+  public PasswordsValidator(MessageSource messageSource) {
+    this.messageSource = messageSource;
+  }
 
   protected boolean containsSpecialChar(String password) {
     Matcher m = PATTERN_SPECIAL_CHAR.matcher(password);
@@ -41,29 +49,31 @@ public class PasswordsValidator implements Validator {
     String password2 = passwords.getPassword2();
 
     if (!ObjectUtils.nullSafeEquals(password1, password2)) {
-      errors.reject("error.passwords_must_be_equals");
+      String code = "error.passwords_must_be_equals";
+      errors.reject(code, messageSource.getMessage(code, null, LocaleContextHolder.getLocale()));
       return;
     }
 
     String passwordHash = passwords.getPasswordHash();
     if (!StringUtils.hasText(passwordHash) && !StringUtils.hasText(password1)) {
-      errors.reject("error.passwords_must_be_filled");
+      String code = "error.passwords_must_be_filled";
+      errors.reject(code, messageSource.getMessage(code, null, LocaleContextHolder.getLocale()));
       return;
     }
 
     if (StringUtils.hasText(password1) && password1.length() < PASSWORD_MIN_LENGTH) {
+      String code = "error.password_min_length";
+      Object[] args = new Object[] {PASSWORD_MIN_LENGTH};
       errors.reject(
-          "error.password_min_length",
-          new Object[] {PASSWORD_MIN_LENGTH},
-          String.format("Password's minimum length is %d.", PASSWORD_MIN_LENGTH));
+          code, args, messageSource.getMessage(code, args, LocaleContextHolder.getLocale()));
       return;
     }
 
     if (StringUtils.hasText(password1) && password1.length() > PASSWORD_MAX_LENGTH) {
+      String code = "error.password_max_length";
+      Object[] args = new Object[] {PASSWORD_MAX_LENGTH};
       errors.reject(
-          "error.password_max_length",
-          new Object[] {PASSWORD_MAX_LENGTH},
-          String.format("Password's maximum length is %d.", PASSWORD_MAX_LENGTH));
+          code, args, messageSource.getMessage(code, args, LocaleContextHolder.getLocale()));
       return;
     }
 
@@ -90,13 +100,15 @@ public class PasswordsValidator implements Validator {
     //            new WhitespaceRule()));
     final RuleResult result = validator.validate(new PasswordData(password1));
     if (!result.isValid()) {
-      errors.reject("error.password_too_weak");
+      String code = "error.password_too_weak";
+      errors.reject(code, messageSource.getMessage(code, null, LocaleContextHolder.getLocale()));
       return;
     }
 
     // at least one special character
     if (!containsSpecialChar(password1)) {
-      errors.reject("error.password_too_weak");
+      String code = "error.password_too_weak";
+      errors.reject(code, messageSource.getMessage(code, null, LocaleContextHolder.getLocale()));
       return;
     }
   }

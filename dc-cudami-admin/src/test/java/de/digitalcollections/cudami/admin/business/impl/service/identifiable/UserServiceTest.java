@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.VerificationModeFactory;
+import org.springframework.context.MessageSource;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +23,7 @@ public class UserServiceTest {
 
   CudamiClient cudamiClient = Mockito.mock(CudamiClient.class);
   CudamiUsersClient userRepository = Mockito.mock(CudamiUsersClient.class);
+  MessageSource messageSource = Mockito.mock(MessageSource.class);
 
   UserService service;
 
@@ -31,8 +33,10 @@ public class UserServiceTest {
     user.setEmail("foo@spar.org");
     user.setPasswordHash(new BCryptPasswordEncoder().encode("foobar"));
     Mockito.when(cudamiClient.forUsers()).thenReturn(userRepository);
+    Mockito.when(messageSource.getMessage(Mockito.any(), Mockito.any(), Mockito.any()))
+        .thenReturn("foobar");
     Mockito.when(userRepository.findOneByEmail("foo@spar.org")).thenReturn(user);
-    service = new UserServiceImpl(null, cudamiClient);
+    service = new UserServiceImpl(null, cudamiClient, messageSource);
   }
 
   @AfterEach
