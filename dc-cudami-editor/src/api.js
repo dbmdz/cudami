@@ -240,6 +240,46 @@ export async function saveIdentifiable(
   }
 }
 
+/**
+ * Update an existing user or save a new one.
+ *
+ * @param contextPath
+ * @param user User object as retrieved from server
+ * @param passwords `{pwd1:..., pwd2:...}` that will be added as request params
+ * @returns `{error: flag if there was an error, json: on error an error object, the new/updated user object otherwise}`
+ */
+export async function saveOrUpdateUser(contextPath, user, passwords) {
+  let url = `${contextPath}api/${typeToEndpointMapping['user']}`
+  if (user.uuid) {
+    url += `/${user.uuid}`
+  }
+  if (passwords) {
+    const paramList = Object.entries(passwords).map(
+      ([k, v]) => `${k}=${encodeURIComponent(v)}`
+    )
+    url += `?${paramList.join('&')}`
+  }
+  try {
+    const response = await fetch(url, {
+      body: JSON.stringify(user),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: user.uuid ? 'PUT' : 'POST',
+    })
+    const json = await response.json()
+    return {
+      error: !response.ok,
+      json,
+    }
+  } catch (err) {
+    return {
+      error: true,
+      json: {},
+    }
+  }
+}
+
 export async function searchIdentifiables(
   contextPath,
   searchTerm,
@@ -353,42 +393,4 @@ export async function uploadFile(contextPath, file, updateProgress) {
     formData.append('userfile', file, file.name)
     request.send(formData)
   })
-}
-
-// Users are special so lets treat them special
-
-/**
-Update an existing user or add a new one.
-
-@param contextPath
-@param user User object as retrieved from server
-@param passwords `{pwd1:..., pwd2:...}` that will be added as request params
-@returns `{status: status code of request, returnObject: on error an error object, the new/updated user object otherwise}`
-*/
-export async function addOrUpdateUser(contextPath, user, passwords) {
-  let url = `${contextPath}api/${typeToEndpointMapping['user']}${
-    user.uuid ? '/' + user.uuid : ''
-  }`
-  if (passwords) {
-    const paramList = Object.entries(passwords).map(
-      ([k, v]) => `${k}=${encodeURIComponent(v)}`
-    )
-    url += `?${paramList.join('&')}`
-  }
-  let result
-  try {
-    result = await fetch(url, {
-      body: JSON.stringify(user),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      method: user.uuid ? 'PUT' : 'POST',
-    }).then(async (response) => ({
-      status: response.status,
-      returnObject: await response.json(),
-    }))
-  } catch (err) {
-    result = {status: 500, returnObject: null}
-  }
-  return result
 }

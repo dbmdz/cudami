@@ -2,16 +2,27 @@ package de.digitalcollections.cudami.admin.business.impl.validator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.context.MessageSource;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 
 public class PasswordsValidatorTest {
 
+  MessageSource messageSource = Mockito.mock(MessageSource.class);
+
+  @BeforeEach
+  public void setup() throws Exception {
+    Mockito.when(messageSource.getMessage(Mockito.any(), Mockito.any(), Mockito.any()))
+        .thenReturn("foobar");
+  }
+
   @Test
   public void testContainsSpecialCharFalse() {
     String password = "abcdef12345ABC";
-    PasswordsValidator instance = new PasswordsValidator();
+    PasswordsValidator instance = new PasswordsValidator(messageSource);
     boolean expResult = false;
     boolean result = instance.containsSpecialChar(password);
     assertThat(result).isEqualTo(expResult);
@@ -20,7 +31,7 @@ public class PasswordsValidatorTest {
   @Test
   public void testContainsSpecialCharTrue() {
     String password = "aB923$";
-    PasswordsValidator instance = new PasswordsValidator();
+    PasswordsValidator instance = new PasswordsValidator(messageSource);
     boolean expResult = true;
     boolean result = instance.containsSpecialChar(password);
     assertThat(result).isEqualTo(expResult);
@@ -30,7 +41,7 @@ public class PasswordsValidatorTest {
   public void testValidateMinimumPasswordLengthFalse() {
     String password = "Hopfen";
     PasswordsValidatorParams params = new PasswordsValidatorParams(password, password, "hash");
-    PasswordsValidator instance = new PasswordsValidator();
+    PasswordsValidator instance = new PasswordsValidator(messageSource);
     Errors errors = new BeanPropertyBindingResult(params, "params");
 
     instance.validate(params, errors);
@@ -47,7 +58,7 @@ public class PasswordsValidatorTest {
   public void testValidateMaximumPasswordLengthFalse() {
     String password = "Hopfenzeitung089Hopfenzeitung089";
     PasswordsValidatorParams params = new PasswordsValidatorParams(password, password, "hash");
-    PasswordsValidator instance = new PasswordsValidator();
+    PasswordsValidator instance = new PasswordsValidator(messageSource);
     Errors errors = new BeanPropertyBindingResult(params, "params");
 
     instance.validate(params, errors);
@@ -64,7 +75,7 @@ public class PasswordsValidatorTest {
   public void testValidateTrue() {
     String password = "Hopfenzeitung089!";
     PasswordsValidatorParams params = new PasswordsValidatorParams(password, password, "hash");
-    PasswordsValidator instance = new PasswordsValidator();
+    PasswordsValidator instance = new PasswordsValidator(messageSource);
     Errors errors = new BeanPropertyBindingResult(params, "params");
 
     instance.validate(params, errors);
