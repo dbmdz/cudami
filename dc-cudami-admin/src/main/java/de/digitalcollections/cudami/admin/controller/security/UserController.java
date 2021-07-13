@@ -64,12 +64,45 @@ public class UserController extends AbstractController {
   }
 
   @GetMapping("/users/new")
-  public String create(Model model) {
+  public String create() {
     return "users/create";
   }
 
+  @GetMapping("/api/users/new")
+  @ResponseBody
+  public User createModel() {
+    return service.create();
+  }
+
+  @GetMapping("/users/{uuid}/edit")
+  public String edit(@PathVariable UUID uuid, Model model) throws ServiceException {
+    model.addAttribute("user", service.findOne(uuid));
+    return "users/edit";
+  }
+
+  @GetMapping("/api/users")
+  @ResponseBody
+  public PageResponse<User> findAll(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      throws ServiceException {
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+    return service.find(pageRequest);
+  }
+
+  @GetMapping("/api/users/{uuid}")
+  @ResponseBody
+  public User get(@PathVariable UUID uuid) throws ServiceException {
+    return this.service.findOne(uuid);
+  }
+
+  @GetMapping("/users")
+  public String list() {
+    return "users/list";
+  }
+
   @PostMapping("/api/users")
-  public ResponseEntity create(
+  public ResponseEntity save(
       @RequestParam(value = "pwd1", required = false) String password1,
       @RequestParam(value = "pwd2", required = false) String password2,
       @RequestBody @Valid User user,
@@ -86,33 +119,6 @@ public class UserController extends AbstractController {
     return ResponseEntity.ok(userDb);
   }
 
-  @GetMapping("/users/{uuid}/edit")
-  public String edit(@PathVariable UUID uuid, Model model) throws ServiceException {
-    model.addAttribute("uuid", uuid);
-    return "users/edit";
-  }
-
-  @GetMapping("/api/users")
-  @ResponseBody
-  public PageResponse<User> findAll(
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
-      throws ServiceException {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-    return service.find(pageRequest);
-  }
-
-  @GetMapping("/api/users/{uuid}")
-  @ResponseBody
-  public User getUser(@PathVariable UUID uuid) throws ServiceException {
-    return this.service.findOne(uuid);
-  }
-
-  @GetMapping("/users")
-  public String list() {
-    return "users/list";
-  }
-
   @PatchMapping("/api/users/{uuid}")
   public ResponseEntity setStatus(@PathVariable("uuid") UUID uuid, @RequestBody User user) {
     boolean successful = service.setStatus(uuid, user.isEnabled());
@@ -120,6 +126,25 @@ public class UserController extends AbstractController {
       return new ResponseEntity<>(successful, HttpStatus.OK);
     }
     return new ResponseEntity<>(successful, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
+  @PutMapping("/api/users/{uuid}")
+  public ResponseEntity update(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "pwd1", required = false) String password1,
+      @RequestParam(name = "pwd2", required = false) String password2,
+      @RequestBody User user,
+      BindingResult results)
+      throws ServiceException {
+    this.verifyBinding(results);
+    if (results.hasErrors()) {
+      return new ResponseEntity<>(results.getGlobalError(), HttpStatus.BAD_REQUEST);
+    }
+    User updatedUser = this.service.update(user, password1, password2, results);
+    if (results.hasErrors()) {
+      return new ResponseEntity<>(results.getGlobalError(), HttpStatus.BAD_REQUEST);
+    }
+    return ResponseEntity.ok(updatedUser);
   }
 
   @GetMapping("/users/updatePassword")
@@ -160,25 +185,6 @@ public class UserController extends AbstractController {
             "msg.changed_password_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
     return "redirect:/";
-  }
-
-  @PutMapping("/api/users/{uuid}")
-  public ResponseEntity updateUser(
-      @PathVariable UUID uuid,
-      @RequestParam(name = "pwd1", required = false) String password1,
-      @RequestParam(name = "pwd2", required = false) String password2,
-      @RequestBody User user,
-      BindingResult results)
-      throws ServiceException {
-    this.verifyBinding(results);
-    if (results.hasErrors()) {
-      return new ResponseEntity<>(results.getGlobalError(), HttpStatus.BAD_REQUEST);
-    }
-    User updatedUser = this.service.update(user, password1, password2, results);
-    if (results.hasErrors()) {
-      return new ResponseEntity<>(results.getGlobalError(), HttpStatus.BAD_REQUEST);
-    }
-    return ResponseEntity.ok(updatedUser);
   }
 
   @GetMapping("/users/{uuid}")

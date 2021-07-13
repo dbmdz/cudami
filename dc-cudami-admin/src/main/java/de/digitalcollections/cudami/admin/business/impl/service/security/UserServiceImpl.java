@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.MessageSource;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -35,18 +36,22 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
   private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
   private final CudamiUsersClient client;
+  private final MessageSource messageSource;
   private final Validator passwordsValidator;
   private Validator uniqueUsernameValidator;
 
   public UserServiceImpl(
-      @Qualifier("passwordsValidator") Validator passwordsValidator, CudamiClient client) {
+      @Qualifier("passwordsValidator") Validator passwordsValidator,
+      CudamiClient client,
+      MessageSource messageSource) {
     this.passwordsValidator = passwordsValidator;
     this.client = client.forUsers();
+    this.messageSource = messageSource;
   }
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    this.uniqueUsernameValidator = new UniqueUsernameValidator(this);
+    this.uniqueUsernameValidator = new UniqueUsernameValidator(messageSource, this);
   }
 
   private org.springframework.security.core.userdetails.User buildUserForAuthentication(
