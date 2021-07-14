@@ -21,7 +21,16 @@ class IdentifierSearch extends Component {
     this.state = {
       id: '',
       loading: false,
-      result: null,
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.namespace !== this.props.namespace) {
+      this.setState({
+        id: '',
+        loading: false,
+        result: undefined,
+      })
     }
   }
 
