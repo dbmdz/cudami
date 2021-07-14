@@ -105,15 +105,23 @@ public class DigitalObjectController {
     return digitalObjectService.findAllReduced();
   }
 
-  @Operation(summary = "Get digital object by uuid")
+  @Operation(summary = "Get a digital object by refId")
+  @GetMapping(
+      value = {"/v5/digitalobjects/{refId:[0-9]+}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public DigitalObject findByRefId(@PathVariable long refId) {
+    return digitalObjectService.getByRefId(refId);
+  }
+
+  @Operation(summary = "Get a digital object by uuid")
   @GetMapping(
       value = {
-        "/v5/digitalobjects/{uuid}",
-        "/v2/digitalobjects/{uuid}",
-        "/latest/digitalobjects/{uuid}"
+        "/v5/digitalobjects/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v2/digitalobjects/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/latest/digitalobjects/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public DigitalObject findById(@PathVariable UUID uuid) {
+  public DigitalObject findByUuid(@PathVariable UUID uuid) {
     return digitalObjectService.get(uuid);
   }
 
