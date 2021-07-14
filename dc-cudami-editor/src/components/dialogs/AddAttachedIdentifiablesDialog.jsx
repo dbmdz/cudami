@@ -29,6 +29,9 @@ class AddAttachedIdentifiablesDialog extends Component {
       label: 'UUID',
       namespace: 'uuid',
     },
+    {
+      namespace: 'refId',
+    },
   ]
   fixedOptions = ['label']
 
@@ -120,16 +123,16 @@ class AddAttachedIdentifiablesDialog extends Component {
                         {identifierType.label}
                       </option>
                     ))}
-                    {this.fixedIdentifiers.map((identifier, index) => (
+                    {this.fixedIdentifiers.map(({label, namespace}, index) => (
                       <option
-                        key={identifier.namespace}
+                        key={namespace}
                         value={
                           index +
                           this.fixedOptions.length +
                           identifierTypes.length
                         }
                       >
-                        {identifier.label}
+                        {label ?? t(namespace)}
                       </option>
                     ))}
                   </Input>
@@ -152,6 +155,7 @@ class AddAttachedIdentifiablesDialog extends Component {
                   ) : (
                     <IdentifierSearch
                       activeLanguage={activeLanguage}
+                      fixedIdentifiers={this.fixedIdentifiers}
                       namespace={
                         identifierTypes[
                           selectedOption - this.fixedOptions.length
