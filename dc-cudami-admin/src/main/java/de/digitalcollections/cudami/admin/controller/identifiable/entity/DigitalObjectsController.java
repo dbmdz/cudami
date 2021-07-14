@@ -46,6 +46,17 @@ public class DigitalObjectsController extends AbstractController {
     return "digitalobjects";
   }
 
+  @GetMapping("/api/digitalobjects")
+  @ResponseBody
+  public PageResponse<DigitalObject> findAll(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      throws HttpException {
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    return service.find(searchPageRequest);
+  }
+
   @GetMapping("/api/digitalobjects/identifier/{namespace}:{id}")
   @ResponseBody
   public DigitalObject findOneByIdentifier(@PathVariable String namespace, @PathVariable String id)
@@ -84,17 +95,6 @@ public class DigitalObjectsController extends AbstractController {
         "existingLanguages",
         languageSortingHelper.sortLanguages(displayLocale, service.getLanguages()));
     return "digitalobjects/list";
-  }
-
-  @GetMapping("/api/digitalobjects")
-  @ResponseBody
-  public PageResponse<DigitalObject> findAll(
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws HttpException {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    return service.find(searchPageRequest);
   }
 
   @GetMapping("/api/digitalobjects/search")
