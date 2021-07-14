@@ -65,6 +65,19 @@ public class DigitalObjectsController extends AbstractController {
   }
 
   @GetMapping(
+      "/api/digitalobjects/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}")
+  @ResponseBody
+  public DigitalObject get(@PathVariable UUID uuid) throws HttpException {
+    return service.findOne(uuid);
+  }
+
+  @GetMapping("/api/digitalobjects/{refId:[0-9]+}")
+  @ResponseBody
+  public DigitalObject getByRefId(@PathVariable long refId) throws HttpException {
+    return service.findOneByRefId(refId);
+  }
+
+  @GetMapping(
       value = "/api/digitalobjects/{uuid}/collections",
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseBody

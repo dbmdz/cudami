@@ -172,10 +172,19 @@ public class CollectionsController extends AbstractController {
     return service.findSubcollections(uuid, searchPageRequest);
   }
 
-  @GetMapping({"/api/collections/{uuid}", "/api/subcollections/{uuid}"})
+  @GetMapping({
+    "/api/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+    "/api/subcollections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+  })
   @ResponseBody
   public Collection get(@PathVariable UUID uuid) throws HttpException {
     return service.findOne(uuid);
+  }
+
+  @GetMapping({"/api/collections/{refId:[0-9]+}", "/api/subcollections/{refId:[0-9]+}"})
+  @ResponseBody
+  public Collection getByRefId(@PathVariable long refId) throws HttpException {
+    return service.findOneByRefId(refId);
   }
 
   @GetMapping("/collections")
