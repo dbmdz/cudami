@@ -158,7 +158,7 @@ public class TopicController {
     return findById(topic.getUuid(), null);
   }
 
-  @Operation(summary = "Get (active or all) paged subtopics of a topic")
+  @Operation(summary = "Get paged subtopics of a topic")
   @GetMapping(
       value = {
         "/v5/topics/{uuid}/subtopics",

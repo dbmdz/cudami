@@ -189,7 +189,7 @@ public class DigitalObjectController {
     return digitalObjectService.getRandom(count);
   }
 
-  @Operation(summary = "Get (active) paged collections of a digital objects")
+  @Operation(summary = "Get (active or all) paged collections of a digital objects")
   @GetMapping(
       value = {"/v5/digitalobjects/{uuid}/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
