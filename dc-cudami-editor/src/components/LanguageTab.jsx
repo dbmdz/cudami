@@ -16,7 +16,7 @@ const LanguageTab = ({activeLanguage, enableRemove, language, toggle}) => {
           }
         }}
       >
-        {t(`languageNames:${language}`)}
+        {language ? t(`languageNames:${language}`) : `(${t('notSpecified')})`}
         {enableRemove && (
           <Button
             className="ml-2 p-0"
