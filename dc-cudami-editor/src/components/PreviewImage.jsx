@@ -1,4 +1,5 @@
 import {useContext} from 'react'
+import {useTranslation} from 'react-i18next'
 
 import AppContext from './AppContext'
 import {getImageUrl} from './utils'
@@ -11,6 +12,7 @@ const PreviewImage = ({
   showCaption = false,
   width,
 }) => {
+  const {t} = useTranslation()
   const {apiContextPath, defaultLanguage} = useContext(AppContext)
   if (!language) {
     language = defaultLanguage
@@ -19,7 +21,9 @@ const PreviewImage = ({
   return (
     <figure className={className} style={{maxWidth: `${width}px`}}>
       <img
-        alt={altText?.[language] ?? ''}
+        alt={
+          image ? altText?.[language] ?? image.filename : t('noPreviewImage')
+        }
         className="img-fluid mw-100"
         src={
           image
