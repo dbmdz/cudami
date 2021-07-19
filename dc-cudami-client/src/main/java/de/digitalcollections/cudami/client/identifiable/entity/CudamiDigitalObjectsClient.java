@@ -74,18 +74,20 @@ public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObject> 
     return doGetRequestForPagedObjectList("/v5/digitalobjects/random", pageRequest);
   }
 
-  public PageResponse<Collection> getActiveCollections(UUID uuid, PageRequest pageRequest)
-      throws HttpException {
-    return doGetRequestForPagedObjectList(
+  public SearchPageResponse<Collection> getActiveCollections(
+      UUID uuid, SearchPageRequest searchPageRequest) throws HttpException {
+    return doGetSearchRequestForPagedObjectList(
         String.format("/v5/digitalobjects/%s/collections?active=true", uuid),
-        pageRequest,
+        searchPageRequest,
         Collection.class);
   }
 
-  public PageResponse<Collection> getCollections(UUID uuid, PageRequest pageRequest)
-      throws HttpException {
-    return doGetRequestForPagedObjectList(
-        String.format("/v5/digitalobjects/%s/collections", uuid), pageRequest, Collection.class);
+  public SearchPageResponse<Collection> getCollections(
+      UUID uuid, SearchPageRequest searchPageRequest) throws HttpException {
+    return doGetSearchRequestForPagedObjectList(
+        String.format("/v5/digitalobjects/%s/collections", uuid),
+        searchPageRequest,
+        Collection.class);
   }
 
   public List<FileResource> getFileResources(UUID uuid) throws HttpException {
@@ -113,10 +115,10 @@ public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObject> 
         String.format("/v5/digitalobjects/%s/projects/languages", uuid), Locale.class);
   }
 
-  public PageResponse<Project> getProjects(UUID uuid, PageRequest pageRequest)
+  public SearchPageResponse<Project> getProjects(UUID uuid, SearchPageRequest searchPageRequest)
       throws HttpException {
-    return doGetRequestForPagedObjectList(
-        String.format("/v5/digitalobjects/%s/projects", uuid), pageRequest, Project.class);
+    return doGetSearchRequestForPagedObjectList(
+        String.format("/v5/digitalobjects/%s/projects", uuid), searchPageRequest, Project.class);
   }
 
   public DigitalObject save(DigitalObject digitalObject) throws HttpException {

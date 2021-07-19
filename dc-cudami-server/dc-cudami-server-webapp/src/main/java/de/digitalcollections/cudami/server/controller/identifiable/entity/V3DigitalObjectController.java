@@ -8,8 +8,8 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -96,17 +96,16 @@ public class V3DigitalObjectController {
           @RequestParam(name = "active", required = false)
           String active)
       throws JsonProcessingException {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, new Sorting());
+    SearchPageRequest searchPageRequest =
+        new SearchPageRequest(null, pageNumber, pageSize, new Sorting());
 
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);
-
     PageResponse<Collection> response;
-
     if (active != null) {
-      response = digitalObjectService.getActiveCollections(digitalObject, pageRequest);
+      response = digitalObjectService.getActiveCollections(digitalObject, searchPageRequest);
     } else {
-      response = digitalObjectService.getCollections(digitalObject, pageRequest);
+      response = digitalObjectService.getCollections(digitalObject, searchPageRequest);
     }
 
     // Fix the attributes, which are missing or different in new model
@@ -166,12 +165,13 @@ public class V3DigitalObjectController {
           @RequestParam(name = "pageSize", required = false, defaultValue = "25")
           int pageSize)
       throws JsonProcessingException {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, new Sorting());
+    SearchPageRequest searchPageRequest =
+        new SearchPageRequest(null, pageNumber, pageSize, new Sorting());
 
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);
-
-    PageResponse<Project> response = digitalObjectService.getProjects(digitalObject, pageRequest);
+    PageResponse<Project> response =
+        digitalObjectService.getProjects(digitalObject, searchPageRequest);
 
     // Fix the attributes, which are missing or different in new model
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(response));

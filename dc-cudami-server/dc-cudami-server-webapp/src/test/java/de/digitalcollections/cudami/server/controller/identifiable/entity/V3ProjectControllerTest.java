@@ -6,12 +6,12 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.cudami.server.model.DigitalObjectBuilder;
-import de.digitalcollections.cudami.server.model.PageResponseBuilder;
+import de.digitalcollections.cudami.server.model.SearchPageResponseBuilder;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -31,9 +31,9 @@ public class V3ProjectControllerTest extends BaseControllerTest {
         "/v3/projects/d0e3ce0f-f030-4c7f-8f78-5606173f1a11/digitalobjects?pageNumber=0&pageSize=1"
       })
   public void getDigitalObjectsForProject(String path) throws Exception {
-    PageResponse<DigitalObject> expected =
-        (PageResponse)
-            new PageResponseBuilder()
+    SearchPageResponse<DigitalObject> expected =
+        (SearchPageResponse)
+            new SearchPageResponseBuilder()
                 .forPageSize(1)
                 .forRequestPage(0)
                 .withTotalElements(45)
@@ -56,7 +56,7 @@ public class V3ProjectControllerTest extends BaseControllerTest {
                         .build())
                 .build();
 
-    when(projectService.getDigitalObjects(any(Project.class), any(PageRequest.class)))
+    when(projectService.getDigitalObjects(any(Project.class), any(SearchPageRequest.class)))
         .thenReturn(expected);
 
     testJson(path);

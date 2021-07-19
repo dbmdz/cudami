@@ -8,7 +8,6 @@ import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiProjectsClient;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import java.util.List;
@@ -110,12 +109,11 @@ public class ProjectsController extends AbstractController {
   public PageResponse<DigitalObject> getDigitalObjects(
       @PathVariable UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws HttpException {
-    PageRequest pageRequest = new PageRequest();
-    pageRequest.setPageNumber(pageNumber);
-    pageRequest.setPageSize(pageSize);
-    return service.getDigitalObjects(uuid, pageRequest);
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    return service.getDigitalObjects(uuid, searchPageRequest);
   }
 
   @GetMapping("/projects")

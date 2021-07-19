@@ -206,15 +206,16 @@ public class DigitalObjectController {
           UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "active", required = false) String active) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, new Sorting());
+      @RequestParam(name = "active", required = false) String active,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
 
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);
     if (active != null) {
-      return digitalObjectService.getActiveCollections(digitalObject, pageRequest);
+      return digitalObjectService.getActiveCollections(digitalObject, searchPageRequest);
     }
-    return digitalObjectService.getCollections(digitalObject, pageRequest);
+    return digitalObjectService.getCollections(digitalObject, searchPageRequest);
   }
 
   @Operation(summary = "Get file resources of a digital object")
@@ -261,16 +262,17 @@ public class DigitalObjectController {
   @GetMapping(
       value = {"/v5/digitalobjects/{uuid}/projects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Project> getProjects(
+  public SearchPageResponse<Project> getProjects(
       @Parameter(example = "", description = "UUID of the digital object") @PathVariable("uuid")
           UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, new Sorting());
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
 
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);
-    return digitalObjectService.getProjects(digitalObject, pageRequest);
+    return digitalObjectService.getProjects(digitalObject, searchPageRequest);
   }
 
   @Operation(summary = "Save a newly created digital object")

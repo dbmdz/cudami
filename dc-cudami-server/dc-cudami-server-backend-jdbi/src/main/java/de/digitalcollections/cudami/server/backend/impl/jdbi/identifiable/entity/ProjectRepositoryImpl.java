@@ -4,8 +4,9 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ProjectRepository;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 @Repository
 public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
@@ -111,7 +113,8 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   }
 
   @Override
-  public PageResponse<DigitalObject> getDigitalObjects(UUID projectUuid, PageRequest pageRequest) {
+  public SearchPageResponse<DigitalObject> getDigitalObjects(
+      UUID projectUuid, SearchPageRequest searchPageRequest) {
     final String doTableAlias = digitalObjectRepositoryImpl.getTableAlias();
     final String doTableName = digitalObjectRepositoryImpl.getTableName();
 
@@ -124,25 +127,37 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
             + doTableAlias
             + ".uuid = pd.digitalobject_uuid"
             + " WHERE pd.project_uuid = :uuid";
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", projectUuid);
+
+    String searchTerm = searchPageRequest.getQuery();
+    if (StringUtils.hasText(searchTerm)) {
+      commonSql += " AND " + getCommonSearchSql(doTableAlias);
+      argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
+    }
 
     StringBuilder innerQuery = new StringBuilder("SELECT pd.sortindex AS idx, *" + commonSql);
-    addFiltering(pageRequest, innerQuery);
-    pageRequest.setSorting(null);
-    innerQuery.append(" ORDER BY idx ASC");
-    addPageRequestParams(pageRequest, innerQuery);
+    addFiltering(searchPageRequest, innerQuery);
+
+    String orderBy = null;
+    if (searchPageRequest.getSorting() == null) {
+      orderBy = "ORDER BY idx ASC";
+      innerQuery.append(" ").append(orderBy);
+    }
+    addPageRequestParams(searchPageRequest, innerQuery);
 
     List<DigitalObject> result =
         digitalObjectRepositoryImpl.retrieveList(
             digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
-            Map.of("uuid", projectUuid),
-            "ORDER BY idx ASC");
+            argumentMappings,
+            orderBy);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(pageRequest, countQuery);
-    long total = retrieveCount(countQuery, Map.of("uuid", projectUuid));
+    addFiltering(searchPageRequest, countQuery);
+    long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total);
+    return new SearchPageResponse<>(result, searchPageRequest, total);
   }
 
   @Override
