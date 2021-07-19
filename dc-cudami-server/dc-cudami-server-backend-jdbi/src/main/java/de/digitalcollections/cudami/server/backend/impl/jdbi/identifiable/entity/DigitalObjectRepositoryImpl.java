@@ -14,8 +14,9 @@ import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 @Repository
 public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObject>
@@ -101,7 +103,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public PageResponse<Collection> getCollections(UUID digitalObjectUuid, PageRequest pageRequest) {
+  public SearchPageResponse<Collection> getCollections(
+      UUID digitalObjectUuid, SearchPageRequest searchPageRequest) {
     final String tableAliasCollection = collectionRepositoryImpl.getTableAlias();
     final String tableNameCollection = collectionRepositoryImpl.getTableName();
 
@@ -114,12 +117,20 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             + tableAliasCollection
             + ".uuid = cd.collection_uuid"
             + " WHERE cd.digitalobject_uuid = :uuid";
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", digitalObjectUuid);
 
-    StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
+    String searchTerm = searchPageRequest.getQuery();
+    if (StringUtils.hasText(searchTerm)) {
+      commonSql += " AND " + getCommonSearchSql(tableAliasCollection);
+      argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
+    }
+
+    StringBuilder innerQuery = new StringBuilder("SELECT cd.sortindex AS idx, *" + commonSql);
 
     // as filtering has other target object type (collection) than this repository (digitalobject)
     // we have to rename filter field names to target table alias and column names:
-    Filtering filtering = pageRequest.getFiltering();
+    Filtering filtering = searchPageRequest.getFiltering();
     if (filtering != null) {
       List<FilterCriterion> filterCriteria =
           filtering.getFilterCriteria().stream()
@@ -131,23 +142,27 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
               .collect(Collectors.toList());
       filtering.setFilterCriteria(filterCriteria);
     }
-    addFiltering(pageRequest, innerQuery);
-    pageRequest.setSorting(null);
-    innerQuery.append(" ORDER BY ").append(tableAliasCollection).append(".label ASC");
-    addPageRequestParams(pageRequest, innerQuery);
+    addFiltering(searchPageRequest, innerQuery);
+
+    String orderBy = null;
+    if (searchPageRequest.getSorting() == null) {
+      orderBy = "ORDER BY idx ASC";
+      innerQuery.append(" ").append(orderBy);
+    }
+    addPageRequestParams(searchPageRequest, innerQuery);
 
     List<Collection> result =
         collectionRepositoryImpl.retrieveList(
             collectionRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
-            Map.of("uuid", digitalObjectUuid),
-            null);
+            argumentMappings,
+            orderBy);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(pageRequest, countQuery);
-    long total = retrieveCount(countQuery, Map.of("uuid", digitalObjectUuid));
+    addFiltering(searchPageRequest, countQuery);
+    long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total);
+    return new SearchPageResponse<>(result, searchPageRequest, total);
   }
 
   @Override
@@ -264,7 +279,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public PageResponse<Project> getProjects(UUID digitalObjectUuid, PageRequest pageRequest) {
+  public SearchPageResponse<Project> getProjects(
+      UUID digitalObjectUuid, SearchPageRequest searchPageRequest) {
     final String prTableAlias = projectRepositoryImpl.getTableAlias();
     final String prTableName = projectRepositoryImpl.getTableName();
 
@@ -277,26 +293,37 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             + prTableAlias
             + ".uuid = pd.project_uuid"
             + " WHERE pd.digitalobject_uuid = :uuid";
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", digitalObjectUuid);
 
-    StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
-    addFiltering(pageRequest, innerQuery);
-    pageRequest.setSorting(null);
-    innerQuery.append(" ORDER BY ").append(prTableAlias).append(".label ASC");
-    addPageRequestParams(pageRequest, innerQuery);
+    String searchTerm = searchPageRequest.getQuery();
+    if (StringUtils.hasText(searchTerm)) {
+      commonSql += " AND " + getCommonSearchSql(prTableAlias);
+      argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
+    }
+
+    StringBuilder innerQuery = new StringBuilder("SELECT pd.sortindex AS idx, *" + commonSql);
+    addFiltering(searchPageRequest, innerQuery);
+
+    String orderBy = null;
+    if (searchPageRequest.getSorting() == null) {
+      orderBy = "ORDER BY idx ASC";
+      innerQuery.append(" ").append(orderBy);
+    }
+    addPageRequestParams(searchPageRequest, innerQuery);
 
     List<Project> result =
         projectRepositoryImpl.retrieveList(
             projectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
-            Map.of("uuid", digitalObjectUuid),
-            null);
-    // TODO check if order by statement from above must be added to preceeding line (instead null)?
+            argumentMappings,
+            orderBy);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(pageRequest, countQuery);
-    long total = retrieveCount(countQuery, Map.of("uuid", digitalObjectUuid));
+    addFiltering(searchPageRequest, countQuery);
+    long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total);
+    return new SearchPageResponse<>(result, searchPageRequest, total);
   }
 
   @Override

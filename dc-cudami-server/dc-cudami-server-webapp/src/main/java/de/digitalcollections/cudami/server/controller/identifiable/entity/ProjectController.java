@@ -5,9 +5,9 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -176,16 +176,17 @@ public class ProjectController {
   @GetMapping(
       value = {"/v5/projects/{uuid}/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<DigitalObject> getDigitalObjects(
+  public SearchPageResponse<DigitalObject> getDigitalObjects(
       @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
           UUID projectUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, new Sorting());
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
 
     Project project = new Project();
     project.setUuid(projectUuid);
-    return projectService.getDigitalObjects(project, pageRequest);
+    return projectService.getDigitalObjects(project, searchPageRequest);
   }
 
   @Operation(summary = "Remove an existing digital object from an existing project")

@@ -11,8 +11,8 @@ import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -73,16 +73,18 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
-  public PageResponse<Collection> getActiveCollections(
-      DigitalObject digitalObject, PageRequest pageRequest) {
+  public SearchPageResponse<Collection> getActiveCollections(
+      DigitalObject digitalObject, SearchPageRequest searchPageRequest) {
     Filtering filtering = filteringForActive();
-    pageRequest.add(filtering);
-    return ((DigitalObjectRepository) repository).getCollections(digitalObject, pageRequest);
+    searchPageRequest.add(filtering);
+    return ((DigitalObjectRepository) repository).getCollections(digitalObject, searchPageRequest);
   }
 
   @Override
-  public PageResponse<Collection> getCollections(UUID digitalObjectUuid, PageRequest pageRequest) {
-    return ((DigitalObjectRepository) repository).getCollections(digitalObjectUuid, pageRequest);
+  public SearchPageResponse<Collection> getCollections(
+      UUID digitalObjectUuid, SearchPageRequest searchPageRequest) {
+    return ((DigitalObjectRepository) repository)
+        .getCollections(digitalObjectUuid, searchPageRequest);
   }
 
   @Override
@@ -111,8 +113,9 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
-  public PageResponse<Project> getProjects(UUID digitalObjectUuid, PageRequest pageRequest) {
-    return ((DigitalObjectRepository) repository).getProjects(digitalObjectUuid, pageRequest);
+  public SearchPageResponse<Project> getProjects(
+      UUID digitalObjectUuid, SearchPageRequest searchPageRequest) {
+    return ((DigitalObjectRepository) repository).getProjects(digitalObjectUuid, searchPageRequest);
   }
 
   @Override
