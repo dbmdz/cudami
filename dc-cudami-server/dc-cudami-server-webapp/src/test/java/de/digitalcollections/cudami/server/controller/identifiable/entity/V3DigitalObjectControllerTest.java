@@ -8,14 +8,14 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.cudami.server.model.CollectionBuilder;
 import de.digitalcollections.cudami.server.model.DigitalObjectBuilder;
-import de.digitalcollections.cudami.server.model.PageResponseBuilder;
 import de.digitalcollections.cudami.server.model.ProjectBuilder;
+import de.digitalcollections.cudami.server.model.SearchPageResponseBuilder;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -37,17 +37,18 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
       })
   public void emptyCollectionsForDigitalObject(String path) throws Exception {
 
-    PageResponse<Collection> expected =
-        new PageResponseBuilder(Collection.class)
-            .withoutContent()
-            .forRequestPage(0)
-            .forPageSize(1000)
-            .forStartDate("c.publication_start", "2021-03-31")
-            .forEndDate("c.publication_end", "2021-03-31")
-            .build();
+    SearchPageResponse<Collection> expected =
+        (SearchPageResponse)
+            new SearchPageResponseBuilder()
+                .withoutContent()
+                .forRequestPage(0)
+                .forPageSize(1000)
+                .forStartDate("c.publication_start", "2021-03-31")
+                .forEndDate("c.publication_end", "2021-03-31")
+                .build();
 
     DigitalObject digitalObject = new DigitalObjectBuilder().atPath(path).build();
-    when(digitalObjectService.getActiveCollections(eq(digitalObject), any(PageRequest.class)))
+    when(digitalObjectService.getActiveCollections(eq(digitalObject), any(SearchPageRequest.class)))
         .thenReturn(expected);
 
     testJson(path);
@@ -60,9 +61,9 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
         "/v3/digitalobjects/6bfbe6dc-2c14-4e61-b88b-ce56cea712c7/collections?active=true&pageNumber=0&pageSize=1"
       })
   public void collectionsForDigitalObject(String path) throws Exception {
-    PageResponse<Collection> expected =
-        (PageResponse)
-            new PageResponseBuilder<>()
+    SearchPageResponse<Collection> expected =
+        (SearchPageResponse)
+            new SearchPageResponseBuilder<>()
                 .forRequestPage(0)
                 .forPageSize(1)
                 .forStartDate("c.publication_start", "2021-04-12")
@@ -88,7 +89,7 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
                 .build();
 
     when(digitalObjectService.getActiveCollections(
-            any(DigitalObject.class), any(PageRequest.class)))
+            any(DigitalObject.class), any(SearchPageRequest.class)))
         .thenReturn(expected);
 
     testJson(path);
@@ -101,9 +102,9 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
         "/v3/digitalobjects/6bfbe6dc-2c14-4e61-b88b-ce56cea712c7/projects?pageNumber=0&pageSize=1"
       })
   public void projectsForDigitalObject(String path) throws Exception {
-    PageResponse<Project> expected =
-        (PageResponse)
-            new PageResponseBuilder<>()
+    SearchPageResponse<Project> expected =
+        (SearchPageResponse)
+            new SearchPageResponseBuilder<>()
                 .forRequestPage(0)
                 .forPageSize(1)
                 .withTotalElements(1)
@@ -125,7 +126,7 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
                         .build())
                 .build();
 
-    when(digitalObjectService.getProjects(any(DigitalObject.class), any(PageRequest.class)))
+    when(digitalObjectService.getProjects(any(DigitalObject.class), any(SearchPageRequest.class)))
         .thenReturn(expected);
 
     testJson(path);
