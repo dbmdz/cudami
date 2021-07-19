@@ -10,6 +10,7 @@ module.exports = {
     RenderingTemplateEditor: './src/lib/RenderingTemplateEditor.jsx',
     RenderingTemplateList: './src/lib/RenderingTemplateList.jsx',
     UserList: './src/lib/UserList.jsx',
+    UserEditor: './src/lib/UserEditor.jsx'
   },
   module: {
     rules: [
