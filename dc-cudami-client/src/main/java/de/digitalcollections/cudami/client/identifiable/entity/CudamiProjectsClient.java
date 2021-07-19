@@ -73,11 +73,11 @@ public class CudamiProjectsClient extends CudamiBaseClient<Project> {
     return doGetRequestForObjectList(String.format("/v5/projectlist", Project.class));
   }
 
-  public PageResponse<DigitalObject> getDigitalObjects(UUID projectUuid, PageRequest pageRequest)
-      throws HttpException {
-    return doGetRequestForPagedObjectList(
+  public SearchPageResponse<DigitalObject> getDigitalObjects(
+      UUID projectUuid, SearchPageRequest searchPageRequest) throws HttpException {
+    return doGetSearchRequestForPagedObjectList(
         String.format("/v5/projects/%s/digitalobjects", projectUuid),
-        pageRequest,
+        searchPageRequest,
         DigitalObject.class);
   }
 

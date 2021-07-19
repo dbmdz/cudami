@@ -88,6 +88,7 @@
     <script th:inline="javascript">
       IdentifiableList({
         apiContextPath: /*[[@{/}]]*/ '',
+        enableSearch: true,
         existingLanguages: /*[[${existingCollectionLanguages}]]*/ [],
         id: "collections-list",
         parentType: "digitalObject",
@@ -98,6 +99,7 @@
 
       IdentifiableList({
         apiContextPath: /*[[@{/}]]*/ '',
+        enableSearch: true,
         existingLanguages: /*[[${existingProjectLanguages}]]*/ [],
         id: "projects-list",
         parentType: "digitalObject",

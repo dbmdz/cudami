@@ -6,8 +6,8 @@ import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -17,15 +17,16 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
 
   void deleteFileResources(UUID digitalObjectUuid);
 
-  PageResponse<Collection> getActiveCollections(
-      DigitalObject digitalObject, PageRequest pageRequest);
+  SearchPageResponse<Collection> getActiveCollections(
+      DigitalObject digitalObject, SearchPageRequest pageRequest);
 
-  default PageResponse<Collection> getCollections(
-      DigitalObject digitalObject, PageRequest pageRequest) {
-    return getCollections(digitalObject.getUuid(), pageRequest);
+  default SearchPageResponse<Collection> getCollections(
+      DigitalObject digitalObject, SearchPageRequest searchPageRequest) {
+    return getCollections(digitalObject.getUuid(), searchPageRequest);
   }
 
-  PageResponse<Collection> getCollections(UUID digitalObjectUuid, PageRequest pageRequest);
+  SearchPageResponse<Collection> getCollections(
+      UUID digitalObjectUuid, SearchPageRequest pageRequest);
 
   default List<FileResource> getFileResources(DigitalObject digitalObject) {
     return getFileResources(digitalObject.getUuid());
@@ -52,11 +53,13 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
 
   List<Locale> getLanguagesOfProjects(UUID uuid);
 
-  default PageResponse<Project> getProjects(DigitalObject digitalObject, PageRequest pageRequest) {
-    return getProjects(digitalObject.getUuid(), pageRequest);
+  default SearchPageResponse<Project> getProjects(
+      DigitalObject digitalObject, SearchPageRequest searchPageRequest) {
+    return getProjects(digitalObject.getUuid(), searchPageRequest);
   }
 
-  PageResponse<Project> getProjects(UUID digitalObjectUuid, PageRequest pageRequest);
+  SearchPageResponse<Project> getProjects(
+      UUID digitalObjectUuid, SearchPageRequest searchPageRequest);
 
   default List<FileResource> saveFileResources(
       DigitalObject digitalObject, List<FileResource> fileResources) {

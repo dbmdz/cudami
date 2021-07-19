@@ -10,7 +10,6 @@ import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
@@ -84,9 +83,11 @@ public class DigitalObjectsController extends AbstractController {
   public PageResponse<Collection> getAssociatedCollections(
       @PathVariable UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws HttpException {
-    return this.service.getCollections(uuid, new PageRequest(pageNumber, pageSize));
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    return this.service.getCollections(uuid, searchPageRequest);
   }
 
   @GetMapping(
@@ -96,9 +97,11 @@ public class DigitalObjectsController extends AbstractController {
   public PageResponse<Project> getAssociatedProjects(
       @PathVariable UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws HttpException {
-    return this.service.getProjects(uuid, new PageRequest(pageNumber, pageSize));
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    return this.service.getProjects(uuid, searchPageRequest);
   }
 
   @GetMapping("/digitalobjects")
