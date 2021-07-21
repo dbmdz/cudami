@@ -65,6 +65,10 @@ public class CudamiDigitalObjectsClient extends CudamiBaseClient<DigitalObject> 
         String.format("/v5/digitalobjects/identifier/%s:%s.json", namespace, id));
   }
 
+  public DigitalObject findOneByRefId(long refId) throws HttpException {
+    return doGetRequestForObject(String.format("/v5/digitalobjects/%s", refId));
+  }
+
   public PageResponse<DigitalObject> findRandomDigitalObjects(int count) throws HttpException {
     PageRequest pageRequest = new PageRequest(0, count, null);
     return doGetRequestForPagedObjectList("/v5/digitalobjects/random", pageRequest);
