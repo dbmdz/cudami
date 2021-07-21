@@ -87,7 +87,7 @@
     <version.openjson>1.0.12</version.openjson>
     <version.passay>1.6.0</version.passay>
     <version.postgresql>42.2.23</version.postgresql>
-    <version.slf4j>1.7.31</version.slf4j>
+    <version.slf4j>1.7.32</version.slf4j>
     <version.spotbugs>4.2.3</version.spotbugs>
     <version.unbescape>1.1.6.RELEASE</version.unbescape>
 
