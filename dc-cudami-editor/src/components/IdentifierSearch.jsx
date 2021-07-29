@@ -21,7 +21,16 @@ class IdentifierSearch extends Component {
     this.state = {
       id: '',
       loading: false,
-      result: null,
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.namespace !== this.props.namespace) {
+      this.setState({
+        id: '',
+        loading: false,
+        result: undefined,
+      })
     }
   }
 
@@ -31,8 +40,11 @@ class IdentifierSearch extends Component {
 
   search = async () => {
     this.setState({loading: true})
-    const {namespace, setFeedbackMessage, type} = this.props
-    const result = await (namespace === 'uuid'
+    const {fixedIdentifiers, namespace, setFeedbackMessage, type} = this.props
+    const isFixedIdentifier = fixedIdentifiers.some(
+      (i) => i.namespace === namespace
+    )
+    const result = await (isFixedIdentifier
       ? loadIdentifiable(this.context.apiContextPath, type, this.state.id)
       : findByIdentifier(
           this.context.apiContextPath,

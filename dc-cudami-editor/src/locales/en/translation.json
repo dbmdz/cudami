@@ -204,6 +204,7 @@
     "openLinkNewTab": "open in a new tab",
     "openLinkSameTab": "open in the same tab",
     "pattern": "Pattern",
+    "refId": "Reference id",
     "removeFrom": {
       "collection": "remove from collection"
     },
