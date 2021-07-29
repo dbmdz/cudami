@@ -21,7 +21,7 @@
   <licenses>
     <license>
       <name>MIT License</name>
-      <url>https://github.com/dbmdz/cudami/blob/master/LICENSE</url>
+      <url>https://github.com/dbmdz/cudami/blob/main/LICENSE</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
@@ -42,14 +42,14 @@
       <id>clorenz</id>
     </developer>
     <developer>
-      <name>Thomas Zirngibl</name>
-      <email>thomas.zirngibl@bsb-muenchen.de</email>
-      <id>tomzirn</id>
+      <name>David Förster</name>
+      <email>david.foerster@bsb-muenchen.de</email>
+      <id>daforster</id>
     </developer>
   </developers>
   <ciManagement>
-    <system>Travis CI</system>
-    <url>https://travis-ci.org/dbmdz/cudami</url>
+    <system>GitHub Actions</system>
+    <url>https://github.com/dbmdz/cudami/actions</url>
   </ciManagement>
   <issueManagement>
     <system>GitHub Issues</system>
