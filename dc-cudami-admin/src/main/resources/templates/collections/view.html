@@ -59,6 +59,10 @@
                 <div class="col-md-9"><span th:text="*{uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
               </div>
               <div class="row">
+                <div class="col-md-3"><label class="font-weight-bold" th:text="#{ref_id}">Reference id</label></div>
+                <div class="col-md-9"><span th:text="*{refId}">42</span></div>
+              </div>
+              <div class="row">
                 <div class="col-md-3">
                   <label class="font-weight-bold" th:text="#{publicationStatus}">Publication status</label>
                   <button class="btn btn-link" data-html="true" data-placement="bottom" data-toggle="popover" data-trigger="focus" th:attr="data-content=#{tooltip_publication_status}" id="publication_status_tooltip" type="button">
