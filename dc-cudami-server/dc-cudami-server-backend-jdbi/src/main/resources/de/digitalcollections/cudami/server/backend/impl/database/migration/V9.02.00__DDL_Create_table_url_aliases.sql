@@ -10,6 +10,5 @@ CREATE TABLE IF NOT EXISTS url_aliases (
   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   
   CONSTRAINT fk_domain FOREIGN KEY (website_uuid) REFERENCES websites(uuid),
-  CONSTRAINT fk_identifiable FOREIGN KEY (target_uuid) REFERENCES identifiables(uuid),
   UNIQUE (website_uuid, slug)
 );
