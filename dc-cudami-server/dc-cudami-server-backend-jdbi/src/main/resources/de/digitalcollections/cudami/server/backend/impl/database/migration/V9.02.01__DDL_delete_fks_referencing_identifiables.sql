@@ -21,3 +21,7 @@ That's of course the reason why we always get a foreign key violation.
 
 ALTER TABLE rel_identifiable_entities DROP CONSTRAINT IF EXISTS rel_identifiable_entities_identifiable_uuid_fkey;
 ALTER TABLE rel_identifiable_fileresources DROP CONSTRAINT IF EXISTS rel_identifiable_fileresources_identifiable_uuid_fkey;
+
+ALTER TABLE rel_entity_fileresources DROP CONSTRAINT IF EXISTS rel_entity_fileresources_fileresource_uuid_fkey;
+ALTER TABLE rel_identifiable_fileresources DROP CONSTRAINT IF EXISTS rel_identifiable_fileresources_fileresource_uuid_fkey;
+ALTER TABLE topic_fileresources DROP CONSTRAINT IF EXISTS topic_fileresources_fileresource_uuid_fkey;
