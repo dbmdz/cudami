@@ -64,7 +64,7 @@
     "import-sort-style-module": "^6.0.0",
     "prettier": "^2.3.2",
     "prettier-plugin-import-sort": "^0.0.7",
-    "webpack-cli": "^4.7.2",
+    "webpack-cli": "^4.8.0",
     "webpack-merge": "^5.8.0"
   },
   "importSort": {
