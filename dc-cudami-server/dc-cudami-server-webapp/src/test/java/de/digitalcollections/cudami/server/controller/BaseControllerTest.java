@@ -1,6 +1,8 @@
 package de.digitalcollections.cudami.server.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -20,6 +22,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 public abstract class BaseControllerTest {
@@ -107,6 +110,15 @@ public abstract class BaseControllerTest {
         .andExpect(content().json(getJsonFromFileResource(expectedJsonPath)));
   }
 
+  protected void testPostJson(String path, String jsonBody, String expectedJsonPath)
+      throws Exception {
+    mockMvc
+        .perform(post(path).contentType(MediaType.APPLICATION_JSON).content(jsonBody))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(ContentType.APPLICATION_JSON.getMimeType()))
+        .andExpect(content().json(getJsonFromFileResource(expectedJsonPath)));
+  }
+
   protected void testHtml(String path) throws Exception {
     mockMvc
         .perform(get(path))
@@ -127,5 +139,13 @@ public abstract class BaseControllerTest {
 
   protected void testNotFound(String path) throws Exception {
     mockMvc.perform(get(path)).andExpect(status().isNotFound());
+  }
+
+  protected void testDeleteNotFound(String path) throws Exception {
+    mockMvc.perform(delete(path)).andExpect(status().isNotFound());
+  }
+
+  protected void testDeleteSuccessful(String path) throws Exception {
+    mockMvc.perform(delete(path)).andExpect(status().is(204));
   }
 }
