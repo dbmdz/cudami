@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -84,15 +85,49 @@ public class UrlAliasController {
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
-  @Operation(summary = "Save a newly created UrlAlias")
+  @Operation(summary = "Create and persist an UrlAlias")
   @PostMapping(
       value = {"/v5/urlaliases"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<UrlAlias> save(@RequestBody UrlAlias urlAlias) throws ControllerException {
+  public ResponseEntity<UrlAlias> create(@RequestBody UrlAlias urlAlias)
+      throws ControllerException {
+
+    if (urlAlias == null || urlAlias.getUuid() != null) {
+      return new ResponseEntity("UUID must not be set", HttpStatus.UNPROCESSABLE_ENTITY);
+    }
 
     UrlAlias result;
     try {
-      result = urlAliasService.save(urlAlias);
+      result = urlAliasService.create(urlAlias);
+    } catch (CudamiServiceException e) {
+      throw new ControllerException(e);
+    }
+
+    return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
+  @Operation(summary = "update an UrlAlias")
+  @PutMapping(
+      value = {"/v5/urlaliases/{uuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<UrlAlias> update(
+      @Parameter(
+              description =
+                  "UUID of the urlalias, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @RequestBody UrlAlias urlAlias)
+      throws ControllerException {
+
+    if (uuid == null || urlAlias == null || !uuid.equals(urlAlias.getUuid())) {
+      return new ResponseEntity(
+          "UUID=" + uuid + " not set or does not match UUID of provided resource",
+          HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    UrlAlias result;
+    try {
+      result = urlAliasService.update(urlAlias);
     } catch (CudamiServiceException e) {
       throw new ControllerException(e);
     }

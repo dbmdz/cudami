@@ -6,6 +6,10 @@ public class ControllerException extends Exception {
     super(cause);
   }
 
+  public ControllerException(String message) {
+    super(message);
+  }
+
   public ControllerException(String message, Throwable cause) {
     super(message, cause);
   }

@@ -43,11 +43,25 @@ public class UrlAliasServiceImpl implements UrlAliasService {
 
   @Override
   public boolean delete(List<UUID> uuids) throws CudamiServiceException {
-    return false;
+    boolean anyDeleted = false;
+
+    for (UUID uuid : uuids) {
+      UrlAlias urlAlias = findOne(uuid);
+      if (urlAlias != null) {
+        repository.delete(urlAlias);
+        anyDeleted = true;
+      }
+    }
+
+    return anyDeleted;
   }
 
   @Override
-  public UrlAlias save(UrlAlias urlAlias) throws CudamiServiceException {
+  public UrlAlias create(UrlAlias urlAlias) throws CudamiServiceException {
+    if (urlAlias == null) {
+      throw new CudamiServiceException("Cannot create an empty UrlAlias");
+    }
+
     if (urlAlias.getUuid() != null) {
       throw new CudamiServiceException("Cannot create an UrlAlias, when its UUID is already set!");
     }
@@ -56,6 +70,23 @@ public class UrlAliasServiceImpl implements UrlAliasService {
       return repository.save(urlAlias);
     } catch (Exception e) {
       throw new CudamiServiceException("Cannot save urlAlias: " + e, e);
+    }
+  }
+
+  @Override
+  public UrlAlias update(UrlAlias urlAlias) throws CudamiServiceException {
+    if (urlAlias == null) {
+      throw new CudamiServiceException("Cannot update an empty UrlAlias");
+    }
+
+    if (urlAlias.getUuid() == null) {
+      throw new CudamiServiceException("Cannot update an UrlAlias with empty UUID");
+    }
+
+    try {
+      return repository.update(urlAlias);
+    } catch (Exception e) {
+      throw new CudamiServiceException("Cannot update urlAlias: " + e, e);
     }
   }
 

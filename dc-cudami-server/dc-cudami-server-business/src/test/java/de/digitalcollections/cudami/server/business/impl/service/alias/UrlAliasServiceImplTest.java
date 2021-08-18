@@ -12,6 +12,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Cudam
 import de.digitalcollections.model.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.EntityType;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,17 +70,27 @@ class UrlAliasServiceImplTest {
     assertThat(service.findOne(UUID.randomUUID())).isEqualTo(expected);
   }
 
-  @DisplayName("raises a ServiceException when trying to save an UrlAlias with existing UUID")
+  @DisplayName("raises a ServiceException when trying to create an empty UrlAlias")
+  @Test
+  public void raiseExceptionWhenSaveWithNullUrlAlias() throws CudamiServiceException {
+    assertThrows(
+        CudamiServiceException.class,
+        () -> {
+          service.create(null);
+        });
+  }
+
+  @DisplayName("raises a ServiceException when trying to create an UrlAlias with existing UUID")
   @Test
   public void raiseExceptionWhenSaveWithUuid() throws CudamiServiceException {
     assertThrows(
         CudamiServiceException.class,
         () -> {
-          service.save(createUrlAlias("hützligrütz", true));
+          service.create(createUrlAlias("hützligrütz", true));
         });
   }
 
-  @DisplayName("raises a ServiceException when saving leads to an exception in the repository")
+  @DisplayName("raises a ServiceException when creating leads to an exception in the repository")
   @Test
   public void raiseExceptionWhenSaveLeadsToAnException() throws CudamiServiceException {
     when(repo.save(any(UrlAlias.class))).thenThrow(new NullPointerException("foo"));
@@ -87,11 +98,11 @@ class UrlAliasServiceImplTest {
     assertThrows(
         CudamiServiceException.class,
         () -> {
-          service.save(createUrlAlias("hützligrütz", false));
+          service.create(createUrlAlias("hützligrütz", false));
         });
   }
 
-  @DisplayName("saves an UrlAlias and returns it with set UUID")
+  @DisplayName("creates and saves an UrlAlias and returns it with set UUID")
   @Test
   public void saveUrlAlias() throws CudamiServiceException {
     UrlAlias urlAlias = createUrlAlias("hützligrütz", false);
@@ -100,7 +111,86 @@ class UrlAliasServiceImplTest {
 
     when(repo.save(eq(urlAlias))).thenReturn(expected);
 
-    assertThat(service.save(urlAlias)).isEqualTo(expected);
+    assertThat(service.create(urlAlias)).isEqualTo(expected);
+  }
+
+  @DisplayName("raises a ServiceException when trying to update an empty UrlAlias")
+  @Test
+  public void raiseExceptionWhenUpdateWithNullUrlAlias() throws CudamiServiceException {
+    assertThrows(
+        CudamiServiceException.class,
+        () -> {
+          service.update(null);
+        });
+  }
+
+  @DisplayName("raises a ServiceException when trying to update an UrlAlias with missing UUID")
+  @Test
+  public void raiseExceptionWhenUpdateWithMissingUuid() throws CudamiServiceException {
+    assertThrows(
+        CudamiServiceException.class,
+        () -> {
+          service.update(createUrlAlias("hützligrütz", false));
+        });
+  }
+
+  @DisplayName("raises a ServiceException when updating leads to an exception in the repository")
+  @Test
+  public void raiseExceptionWhenUpdateLeadsToAnException() throws CudamiServiceException {
+    when(repo.update(any(UrlAlias.class))).thenThrow(new NullPointerException("foo"));
+
+    assertThrows(
+        CudamiServiceException.class,
+        () -> {
+          service.update(createUrlAlias("hützligrütz", true));
+        });
+  }
+
+  @DisplayName("updates and returns an UrlAlias")
+  @Test
+  public void updateUrlAlias() throws CudamiServiceException {
+    UrlAlias expected = createUrlAlias("hützligrütz", true);
+
+    when(repo.update(eq(expected))).thenReturn(expected);
+
+    assertThat(service.update(expected)).isEqualTo(expected);
+  }
+
+  @DisplayName("returns false when trying to delete a nonexistant UrlAlias by its uuid")
+  @Test
+  public void deleteNonexistantSingleUrlAlias() throws CudamiServiceException {
+    when(repo.findOne(any(UUID.class))).thenReturn(null);
+
+    assertThat(service.delete(UUID.randomUUID())).isFalse();
+  }
+
+  @DisplayName("returns true when an existant UrlAlias could be deleted")
+  @Test
+  public void deleteSingleUrlAlias() throws CudamiServiceException {
+    UrlAlias existingUrlAlias = createUrlAlias("hützligrütz", true);
+    when(repo.findOne(any(UUID.class))).thenReturn(existingUrlAlias);
+
+    assertThat(service.delete(UUID.randomUUID())).isTrue();
+  }
+
+  @DisplayName("returns false, when no single UrlAlias of a list could be deleted")
+  @Test
+  public void deleteNoUrlAliasesAtAll() throws CudamiServiceException {
+    when(repo.findOne(any(UUID.class))).thenReturn(null);
+
+    assertThat(service.delete(List.of(UUID.randomUUID(), UUID.randomUUID()))).isFalse();
+  }
+
+  @DisplayName("returns true, when at least one UrlAlias of a list could be deleted")
+  @Test
+  public void deleteSomeUrlAliases() throws CudamiServiceException {
+    UUID uuid1 = UUID.randomUUID();
+    UUID uuid2 = UUID.randomUUID();
+
+    when(repo.findOne(eq(uuid1))).thenReturn(null);
+    when(repo.findOne(eq(uuid2))).thenReturn(createUrlAlias("hützligrütz", true));
+
+    assertThat(service.delete(List.of(uuid1, uuid2))).isTrue();
   }
 
   // -------------------------------------------------------------------------
