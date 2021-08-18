@@ -1,6 +1,9 @@
 import classNames from 'classnames'
+import {useContext} from 'react'
 import {useTranslation} from 'react-i18next'
 import ReactPaginate from 'react-paginate'
+
+import AppContext from './AppContext'
 
 const Pagination = ({
   changePage,
@@ -11,6 +14,7 @@ const Pagination = ({
   totalElements = 0,
   type,
 }) => {
+  const {uiLocale} = useContext(AppContext)
   const {t} = useTranslation()
   if (totalElements === 0) {
     return <div />
@@ -44,7 +48,10 @@ const Pagination = ({
       />
       {showTotalElements && (
         <span className="ml-2">
-          {t(`pagination:totalElements.${type}`, {count: totalElements})}
+          {t(`pagination:totalElements.${type}`, {
+            count: totalElements,
+            formattedCount: totalElements.toLocaleString(uiLocale),
+          })}
         </span>
       )}
     </div>
