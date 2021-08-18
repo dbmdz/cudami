@@ -38,7 +38,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
 
   @Override
   public boolean delete(UUID uuid) throws CudamiServiceException {
-    return UrlAliasService.super.delete(uuid);
+    return delete(List.of(uuid));
   }
 
   @Override
@@ -48,7 +48,15 @@ public class UrlAliasServiceImpl implements UrlAliasService {
 
   @Override
   public UrlAlias save(UrlAlias urlAlias) throws CudamiServiceException {
-    return null;
+    if (urlAlias.getUuid() != null) {
+      throw new CudamiServiceException("Cannot create an UrlAlias, when its UUID is already set!");
+    }
+
+    try {
+      return repository.save(urlAlias);
+    } catch (Exception e) {
+      throw new CudamiServiceException("Cannot save urlAlias: " + e, e);
+    }
   }
 
   @Override

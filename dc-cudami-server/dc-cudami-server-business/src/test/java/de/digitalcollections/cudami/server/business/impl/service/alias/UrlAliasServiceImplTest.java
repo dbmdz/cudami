@@ -62,17 +62,53 @@ class UrlAliasServiceImplTest {
   @DisplayName("returns an UrlAlias")
   @Test
   public void readExisting() throws CudamiServiceException {
-    UrlAlias expected = createUrlAlias("hurz");
+    UrlAlias expected = createUrlAlias("hützligrütz", false);
 
     when(repo.findOne(any(UUID.class))).thenReturn(expected);
 
     assertThat(service.findOne(UUID.randomUUID())).isEqualTo(expected);
   }
 
+  @DisplayName("raises a ServiceException when trying to save an UrlAlias with existing UUID")
+  @Test
+  public void raiseExceptionWhenSaveWithUuid() throws CudamiServiceException {
+    assertThrows(
+        CudamiServiceException.class,
+        () -> {
+          service.save(createUrlAlias("hützligrütz", true));
+        });
+  }
+
+  @DisplayName("raises a ServiceException when saving leads to an exception in the repository")
+  @Test
+  public void raiseExceptionWhenSaveLeadsToAnException() throws CudamiServiceException {
+    when(repo.save(any(UrlAlias.class))).thenThrow(new NullPointerException("foo"));
+
+    assertThrows(
+        CudamiServiceException.class,
+        () -> {
+          service.save(createUrlAlias("hützligrütz", false));
+        });
+  }
+
+  @DisplayName("saves an UrlAlias and returns it with set UUID")
+  @Test
+  public void saveUrlAlias() throws CudamiServiceException {
+    UrlAlias urlAlias = createUrlAlias("hützligrütz", false);
+    UrlAlias expected = deepCopy(urlAlias);
+    expected.setUuid(UUID.randomUUID());
+
+    when(repo.save(eq(urlAlias))).thenReturn(expected);
+
+    assertThat(service.save(urlAlias)).isEqualTo(expected);
+  }
+
   // -------------------------------------------------------------------------
-  private UrlAlias createUrlAlias(String slug) {
+  private UrlAlias createUrlAlias(String slug, boolean setUuid) {
     UrlAlias urlAlias = new UrlAlias();
-    urlAlias.setUuid(UUID.randomUUID());
+    if (setUuid) {
+      urlAlias.setUuid(UUID.randomUUID());
+    }
     urlAlias.setMainAlias(false);
     urlAlias.setTargetUuid(UUID.randomUUID());
     urlAlias.setSlug(slug);
@@ -82,5 +118,18 @@ class UrlAliasServiceImplTest {
     urlAlias.setTargetLanguage(Locale.forLanguageTag("de"));
     urlAlias.setWebsiteUuid(UUID.randomUUID());
     return urlAlias;
+  }
+
+  private UrlAlias deepCopy(UrlAlias urlAlias) {
+    UrlAlias copy = new UrlAlias();
+    copy.setMainAlias(urlAlias.isMainAlias());
+    copy.setTargetLanguage(urlAlias.getTargetLanguage());
+    copy.setUuid(urlAlias.getUuid());
+    copy.setCreated(urlAlias.getCreated());
+    copy.setWebsiteUuid(urlAlias.getWebsiteUuid());
+    copy.setLastPublished(urlAlias.getLastPublished());
+    copy.setSlug(urlAlias.getSlug());
+    copy.setTargetType(urlAlias.getTargetType());
+    return copy;
   }
 }
