@@ -27,7 +27,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     PROPERTY_COLUMN_MAPPING = new LinkedHashMap<>(9);
     PROPERTY_COLUMN_MAPPING.put("created", "created");
     PROPERTY_COLUMN_MAPPING.put("lastPublished", "last_published");
-    PROPERTY_COLUMN_MAPPING.put("mainAlias", "is_main_alias");
+    PROPERTY_COLUMN_MAPPING.put("mainAlias", "main_alias");
     PROPERTY_COLUMN_MAPPING.put("slug", "slug");
     PROPERTY_COLUMN_MAPPING.put("targetLanguage", "target_language");
     PROPERTY_COLUMN_MAPPING.put("targetType", "target_type");
@@ -84,16 +84,34 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
       return new LocalizedUrlAliases();
     }
     String sql =
-        "SELECT * FROM " + TABLE_NAME + " WHERE target_uuid = ? ORDER BY is_main_alias, slug;";
-    List<UrlAlias> resultset =
-        this.dbi.withHandle(h -> h.createQuery(sql).bind(0, uuid).mapTo(UrlAlias.class).list());
-    return new LocalizedUrlAliases((UrlAlias[]) resultset.toArray());
+        "SELECT * FROM " + TABLE_NAME + " WHERE target_uuid = ? ORDER BY main_alias, slug;";
+    UrlAlias[] resultset =
+        this.dbi.withHandle(
+            h ->
+                h.createQuery(sql).bind(0, uuid).mapToBean(UrlAlias.class).stream()
+                    .toArray(UrlAlias[]::new));
+    return new LocalizedUrlAliases(resultset);
   }
 
   @Override
   public UrlAlias findMainLink(UUID uuid) {
-    // TODO Auto-generated method stub
-    return null;
+    if (uuid == null) {
+      return null;
+    }
+    String sql =
+        "SELECT * FROM " + TABLE_NAME + " WHERE target_uuid = :uuid AND main_alias = true;";
+    try {
+      return this.dbi.withHandle(
+          h ->
+              h.createQuery(sql)
+                  .bind("uuid", uuid)
+                  .mapToBean(UrlAlias.class)
+                  .findOne()
+                  .orElse(null));
+    } catch (IllegalStateException e) {
+      // TODO
+      throw e;
+    }
   }
 
   @Override
