@@ -40,6 +40,7 @@ const Pagination = ({
         onPageChange={changePage}
         pageClassName="page-item"
         pageCount={numberOfPages}
+        pageLabelBuilder={(page) => page.toLocaleString(uiLocale)}
         pageLinkClassName="page-link"
         pageRangeDisplayed={5}
         previousClassName="page-item"
