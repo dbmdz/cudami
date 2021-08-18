@@ -5,8 +5,10 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
+import de.digitalcollections.cudami.server.model.LocalizedUrlAliasBuilder;
 import de.digitalcollections.cudami.server.model.SearchPageResponseBuilder;
 import de.digitalcollections.cudami.server.model.UrlAliasBuilder;
+import de.digitalcollections.model.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.paging.SearchPageRequest;
@@ -110,8 +112,8 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(strings = {"/v5/urlaliases"})
   public void findWithEmptyResult(String path) throws Exception {
-    SearchPageResponse<UrlAlias> expected =
-        (SearchPageResponse<UrlAlias>)
+    SearchPageResponse<LocalizedUrlAliases> expected =
+        (SearchPageResponse<LocalizedUrlAliases>)
             new SearchPageResponseBuilder().forPageSize(1).withTotalElements(0).build();
 
     when(urlAliasService.find(any(SearchPageRequest.class))).thenReturn(expected);
@@ -123,23 +125,26 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(strings = {"/v5/urlaliases?pageNumber=0&pageSize=1"})
   public void findWithFilledResult(String path) throws Exception {
-    SearchPageResponse<UrlAlias> expected =
-        (SearchPageResponse<UrlAlias>)
+    SearchPageResponse<LocalizedUrlAliases> expected =
+        (SearchPageResponse<LocalizedUrlAliases>)
             new SearchPageResponseBuilder()
                 .forPageSize(1)
                 .withTotalElements(319)
                 .withContent(
                     List.of(
-                        new UrlAliasBuilder()
-                            .createdAt("2021-08-17T15:18:01.000001")
-                            .lastPublishedAt("2021-08-17T15:18:01.000001")
-                            .isMainAlias()
-                            .withSlug("hurz")
-                            .withTargetLanguage("de")
-                            .withTargetType(EntityType.COLLECTION)
-                            .withTargetUuid("23456789-2345-2345-2345-234567890123")
-                            .withUuid("12345678-1234-1234-1234-123456789012")
-                            .withWebsiteUuid("87654321-4321-4321-4321-876543210987")
+                        new LocalizedUrlAliasBuilder()
+                            .addUrlAlias(
+                                new UrlAliasBuilder()
+                                    .createdAt("2021-08-17T15:18:01.000001")
+                                    .lastPublishedAt("2021-08-17T15:18:01.000001")
+                                    .isMainAlias()
+                                    .withSlug("hurz")
+                                    .withTargetLanguage("de")
+                                    .withTargetType(EntityType.COLLECTION)
+                                    .withTargetUuid("23456789-2345-2345-2345-234567890123")
+                                    .withUuid("12345678-1234-1234-1234-123456789012")
+                                    .withWebsiteUuid("87654321-4321-4321-4321-876543210987")
+                                    .build())
                             .build()))
                 .build();
 
