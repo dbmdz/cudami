@@ -49,7 +49,16 @@ public interface UrlAliasService {
    * @return the persisted UrlAlias with its generated UUID
    * @throws CudamiServiceException
    */
-  UrlAlias save(UrlAlias urlAlias) throws CudamiServiceException;
+  UrlAlias create(UrlAlias urlAlias) throws CudamiServiceException;
+
+  /**
+   * Updates an UrlAlias in the database
+   *
+   * @param urlAlias the UrlAlias (with set UUID)
+   * @return the updated UrlAlias
+   * @throws CudamiServiceException
+   */
+  UrlAlias update(UrlAlias urlAlias) throws CudamiServiceException;
 
   /**
    * Find UrlAliases

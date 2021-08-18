@@ -16,6 +16,7 @@ import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -75,6 +76,25 @@ class UrlAliasControllerTest extends BaseControllerTest {
     testDeleteSuccessful(path);
   }
 
+  @DisplayName("returns an error state when creating an UrlAlias with already set uuid")
+  @Test
+  public void createWithSetUuidLeadsToError() throws Exception {
+    String body =
+        "{\n"
+            + "  \"created\": \"2021-08-17T15:18:01.000001\",\n"
+            + "  \"lastPublished\": \"2021-08-17T15:18:01.000001\",\n"
+            + "  \"mainAlias\": true,\n"
+            + "  \"slug\": \"hurz\",\n"
+            + "  \"targetLanguage\": \"de\",\n"
+            + "  \"targetType\": \"COLLECTION\",\n"
+            + "  \"uuid\": \"12345678-1234-1234-1234-123456789012\",\n"
+            + "  \"targetUuid\": \"23456789-2345-2345-2345-234567890123\",\n"
+            + "  \"websiteUuid\": \"87654321-4321-4321-4321-876543210987\"\n"
+            + "}";
+
+    testPostJsonWithState("/v5/urlaliases", body, 422);
+  }
+
   @DisplayName("successfully creates an UrlAlias")
   @ParameterizedTest
   @ValueSource(strings = {"/v5/urlaliases"})
@@ -91,7 +111,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .withUuid("12345678-1234-1234-1234-123456789012")
             .withWebsiteUuid("87654321-4321-4321-4321-876543210987")
             .build();
-    when(urlAliasService.save(any(UrlAlias.class))).thenReturn(expectedUrlAlias);
+    when(urlAliasService.create(any(UrlAlias.class))).thenReturn(expectedUrlAlias);
 
     String body =
         "{\n"
@@ -106,6 +126,58 @@ class UrlAliasControllerTest extends BaseControllerTest {
             + "}";
 
     testPostJson(path, body, "/v5/urlaliases/12345678-1234-1234-1234-123456789012.json");
+  }
+
+  @DisplayName("successfully updates an UrlAlias")
+  @ParameterizedTest
+  @ValueSource(strings = {"/v5/urlaliases/12345678-1234-1234-1234-123456789012"})
+  public void update(String path) throws Exception {
+    UrlAlias expectedUrlAlias =
+        new UrlAliasBuilder()
+            .createdAt("2021-08-17T15:18:01.000001")
+            .lastPublishedAt("2021-08-17T15:18:01.000001")
+            .isMainAlias()
+            .withSlug("hurz")
+            .withTargetLanguage("de")
+            .withTargetType(EntityType.COLLECTION)
+            .withTargetUuid("23456789-2345-2345-2345-234567890123")
+            .withUuid("12345678-1234-1234-1234-123456789012")
+            .withWebsiteUuid("87654321-4321-4321-4321-876543210987")
+            .build();
+    when(urlAliasService.update(any(UrlAlias.class))).thenReturn(expectedUrlAlias);
+
+    String body =
+        "{\n"
+            + "  \"created\": \"2021-08-17T15:18:01.000001\",\n"
+            + "  \"lastPublished\": \"2021-08-17T15:18:01.000001\",\n"
+            + "  \"mainAlias\": true,\n"
+            + "  \"slug\": \"hurz\",\n"
+            + "  \"targetLanguage\": \"de\",\n"
+            + "  \"targetType\": \"COLLECTION\",\n"
+            + "  \"uuid\": \"12345678-1234-1234-1234-123456789012\",\n"
+            + "  \"targetUuid\": \"23456789-2345-2345-2345-234567890123\",\n"
+            + "  \"websiteUuid\": \"87654321-4321-4321-4321-876543210987\"\n"
+            + "}";
+
+    testPutJson(path, body, "/v5/urlaliases/12345678-1234-1234-1234-123456789012.json");
+  }
+
+  @DisplayName("returns an error state when updating an UrlAlias with missing uuid")
+  @Test
+  public void updateWithMissingUuidLeadsToError() throws Exception {
+    String body =
+        "{\n"
+            + "  \"created\": \"2021-08-17T15:18:01.000001\",\n"
+            + "  \"lastPublished\": \"2021-08-17T15:18:01.000001\",\n"
+            + "  \"mainAlias\": true,\n"
+            + "  \"slug\": \"hurz\",\n"
+            + "  \"targetLanguage\": \"de\",\n"
+            + "  \"targetType\": \"COLLECTION\",\n"
+            + "  \"targetUuid\": \"23456789-2345-2345-2345-234567890123\",\n"
+            + "  \"websiteUuid\": \"87654321-4321-4321-4321-876543210987\"\n"
+            + "}";
+
+    testPutJsonWithState("/v5/urlaliases/12345678-1234-1234-1234-123456789012", body, 422);
   }
 
   @DisplayName("can return a find result with empty content")
