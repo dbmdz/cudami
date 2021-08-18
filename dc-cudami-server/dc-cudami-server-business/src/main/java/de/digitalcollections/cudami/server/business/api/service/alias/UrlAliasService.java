@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.api.service.alias;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.model.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.alias.UrlAlias;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
@@ -54,7 +55,7 @@ public interface UrlAliasService {
    * Find UrlAliases
    *
    * @param pageRequest the PageRequest
-   * @return a SearchPageResponse with the found UrlAliases as paged content
+   * @return a SearchPageResponse with the found LocalizedUrlAliases as paged content
    */
-  SearchPageResponse<UrlAlias> find(SearchPageRequest pageRequest) throws CudamiServiceException;
+  SearchPageResponse<LocalizedUrlAliases> find(SearchPageRequest pageRequest) throws CudamiServiceException;
 }

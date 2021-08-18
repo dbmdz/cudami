@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.controller.alias;
 import de.digitalcollections.cudami.server.business.api.service.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.controller.ControllerException;
+import de.digitalcollections.model.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.alias.UrlAlias;
 import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.SearchPageRequest;
@@ -99,11 +100,11 @@ public class UrlAliasController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @Operation(summary = "Find limited amount of UrlAliases")
+  @Operation(summary = "Find limited amounts of LocalizedUrlAliases")
   @GetMapping(
       value = {"/v5/urlaliases"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<SearchPageResponse<UrlAlias>> find(
+  public ResponseEntity<SearchPageResponse<LocalizedUrlAliases>> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
@@ -114,7 +115,7 @@ public class UrlAliasController {
       pageRequest.setSorting(sorting);
     }
 
-    SearchPageResponse<UrlAlias> result;
+    SearchPageResponse<LocalizedUrlAliases> result;
     try {
       result = urlAliasService.find(pageRequest);
     } catch (CudamiServiceException e) {
