@@ -167,8 +167,7 @@ class UrlAliasServiceImplTest {
   @DisplayName("returns true when an existant UrlAlias could be deleted")
   @Test
   public void deleteSingleUrlAlias() throws CudamiServiceException {
-    UrlAlias existingUrlAlias = createUrlAlias("hützligrütz", true);
-    when(repo.findOne(any(UUID.class))).thenReturn(existingUrlAlias);
+    when(repo.delete(any(List.class))).thenReturn(1);
 
     assertThat(service.delete(UUID.randomUUID())).isTrue();
   }
@@ -176,7 +175,7 @@ class UrlAliasServiceImplTest {
   @DisplayName("returns false, when no single UrlAlias of a list could be deleted")
   @Test
   public void deleteNoUrlAliasesAtAll() throws CudamiServiceException {
-    when(repo.findOne(any(UUID.class))).thenReturn(null);
+    when(repo.delete(any(List.class))).thenReturn(0);
 
     assertThat(service.delete(List.of(UUID.randomUUID(), UUID.randomUUID()))).isFalse();
   }
@@ -187,8 +186,7 @@ class UrlAliasServiceImplTest {
     UUID uuid1 = UUID.randomUUID();
     UUID uuid2 = UUID.randomUUID();
 
-    when(repo.findOne(eq(uuid1))).thenReturn(null);
-    when(repo.findOne(eq(uuid2))).thenReturn(createUrlAlias("hützligrütz", true));
+    when(repo.delete(eq(List.of(uuid1, uuid2)))).thenReturn(1);
 
     assertThat(service.delete(List.of(uuid1, uuid2))).isTrue();
   }
