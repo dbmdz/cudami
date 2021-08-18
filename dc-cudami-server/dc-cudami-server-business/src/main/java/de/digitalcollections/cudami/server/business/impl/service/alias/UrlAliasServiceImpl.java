@@ -43,7 +43,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
 
   @Override
   public boolean delete(List<UUID> uuids) throws CudamiServiceException {
-    return repository.delete(uuids.toArray(new UUID[0])) > 0;
+    return repository.delete(uuids) > 0;
   }
 
   @Override
