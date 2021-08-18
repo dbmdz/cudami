@@ -57,5 +57,6 @@ public interface UrlAliasService {
    * @param pageRequest the PageRequest
    * @return a SearchPageResponse with the found LocalizedUrlAliases as paged content
    */
-  SearchPageResponse<LocalizedUrlAliases> find(SearchPageRequest pageRequest) throws CudamiServiceException;
+  SearchPageResponse<LocalizedUrlAliases> find(SearchPageRequest pageRequest)
+      throws CudamiServiceException;
 }
