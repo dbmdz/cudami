@@ -46,6 +46,11 @@ public class CorporateBodiesController extends AbstractController {
     this.service = client.forCorporateBodies();
   }
 
+  @ModelAttribute("menu")
+  protected String module() {
+    return "corporatebodies";
+  }
+
   @GetMapping("/corporatebodies/new")
   public String create(Model model) throws HttpException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
@@ -104,11 +109,6 @@ public class CorporateBodiesController extends AbstractController {
         "existingLanguages",
         languageSortingHelper.sortLanguages(displayLocale, service.getLanguages()));
     return "corporatebodies/list";
-  }
-
-  @ModelAttribute("menu")
-  protected String module() {
-    return "corporatebodies";
   }
 
   @PostMapping("/api/corporatebodies")

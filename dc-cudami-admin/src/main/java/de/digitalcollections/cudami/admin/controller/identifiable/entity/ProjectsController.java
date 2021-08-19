@@ -99,6 +99,17 @@ public class ProjectsController extends AbstractController {
     return "projects/edit";
   }
 
+  @GetMapping("/api/projects")
+  @ResponseBody
+  public PageResponse<Project> findAll(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      throws HttpException {
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    return service.find(searchPageRequest);
+  }
+
   @GetMapping("/api/projects/{uuid}")
   @ResponseBody
   public Project get(@PathVariable UUID uuid) throws HttpException {
@@ -176,16 +187,5 @@ public class ProjectsController extends AbstractController {
     model.addAttribute("project", project);
 
     return "projects/view";
-  }
-
-  @GetMapping("/api/projects")
-  @ResponseBody
-  public PageResponse<Project> findAll(
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws HttpException {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    return service.find(searchPageRequest);
   }
 }

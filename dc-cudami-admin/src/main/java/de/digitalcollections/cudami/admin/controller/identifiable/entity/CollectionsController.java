@@ -54,6 +54,11 @@ public class CollectionsController extends AbstractController {
     this.service = client.forCollections();
   }
 
+  @ModelAttribute("menu")
+  protected String module() {
+    return "collections";
+  }
+
   @PostMapping("/api/collections/{uuid}/digitalobjects")
   public ResponseEntity addDigitalObjects(
       @PathVariable UUID uuid, @RequestBody List<DigitalObject> digitalObjects)
@@ -195,11 +200,6 @@ public class CollectionsController extends AbstractController {
         "existingLanguages",
         languageSortingHelper.sortLanguages(displayLocale, service.getTopCollectionsLanguages()));
     return "collections/list";
-  }
-
-  @ModelAttribute("menu")
-  protected String module() {
-    return "collections";
   }
 
   @DeleteMapping("/api/collections/{collectionUuid}/digitalobjects/{digitalobjectUuid}")
