@@ -169,10 +169,9 @@ public class FileResourcesMetadataController extends AbstractController {
     }
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, resource.getLabel().getLocales());
-
-    model.addAttribute("existingLanguages", existingLanguages);
-    model.addAttribute("fileresource", resource);
-
+    model
+        .addAttribute("existingLanguages", existingLanguages)
+        .addAttribute("fileresource", resource);
     return "fileresources/view";
   }
 }

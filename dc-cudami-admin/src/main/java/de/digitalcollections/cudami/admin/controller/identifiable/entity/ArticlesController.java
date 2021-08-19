@@ -143,12 +143,11 @@ public class ArticlesController extends AbstractController {
     }
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, article.getLabel().getLocales());
-
-    model.addAttribute("article", article);
-    model.addAttribute("existingLanguages", existingLanguages);
-
     List<FileResource> relatedFileResources = service.getRelatedFileResources(article.getUuid());
-    model.addAttribute("relatedFileResources", relatedFileResources);
+    model
+        .addAttribute("article", article)
+        .addAttribute("existingLanguages", existingLanguages)
+        .addAttribute("relatedFileResources", relatedFileResources);
     return "articles/view";
   }
 }

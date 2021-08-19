@@ -182,10 +182,7 @@ public class ProjectsController extends AbstractController {
     }
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, project.getLabel().getLocales());
-
-    model.addAttribute("existingLanguages", existingLanguages);
-    model.addAttribute("project", project);
-
+    model.addAttribute("existingLanguages", existingLanguages).addAttribute("project", project);
     return "projects/view";
   }
 }
