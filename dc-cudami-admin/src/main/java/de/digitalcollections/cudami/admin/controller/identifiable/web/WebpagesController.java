@@ -139,7 +139,7 @@ public class WebpagesController extends AbstractController {
   @PutMapping("/api/webpages/{uuid}")
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Webpage webpage) {
     try {
-      Webpage webpageDb = (Webpage) service.update(uuid, webpage);
+      Webpage webpageDb = service.update(uuid, webpage);
       return ResponseEntity.ok(webpageDb);
     } catch (HttpException e) {
       LOGGER.error("Cannot save webpage with uuid={}", uuid, e);
