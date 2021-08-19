@@ -11,6 +11,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.alias.UrlAlias
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.model.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.alias.UrlAlias;
+import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.entity.EntityType;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -228,7 +229,8 @@ class UrlAliasServiceImplTest {
     urlAlias.setMainAlias(false);
     urlAlias.setTargetUuid(UUID.randomUUID());
     urlAlias.setSlug(slug);
-    urlAlias.setTargetType(EntityType.COLLECTION);
+    urlAlias.setTargetIdentifiableType(IdentifiableType.ENTITY);
+    urlAlias.setTargetEntityType(EntityType.COLLECTION);
     urlAlias.setLastPublished(LocalDateTime.now());
     urlAlias.setCreated(LocalDateTime.now());
     urlAlias.setTargetLanguage(Locale.forLanguageTag("de"));
@@ -245,7 +247,8 @@ class UrlAliasServiceImplTest {
     copy.setWebsiteUuid(urlAlias.getWebsiteUuid());
     copy.setLastPublished(urlAlias.getLastPublished());
     copy.setSlug(urlAlias.getSlug());
-    copy.setTargetType(urlAlias.getTargetType());
+    copy.setTargetIdentifiableType(urlAlias.getTargetIdentifiableType());
+    copy.setTargetEntityType(urlAlias.getTargetEntityType());
     return copy;
   }
 }

@@ -6,7 +6,8 @@
       "mainAlias": true,
       "slug": "hurz",
       "targetLanguage": "de",
-      "targetType": "COLLECTION",
+      "targetIdentifiableType": "ENTITY",
+      "targetEntityType": "COLLECTION",
       "targetUuid": "23456789-2345-2345-2345-234567890123",
       "uuid": "12345678-1234-1234-1234-123456789012",
       "websiteUuid": "87654321-4321-4321-4321-876543210987"
@@ -17,7 +18,8 @@
       "mainAlias": true,
       "slug": "hützligrütz",
       "targetLanguage": "de",
-      "targetType": "DIGITAL_OBJECT",
+      "targetIdentifiableType": "ENTITY",
+      "targetEntityType": "DIGITAL_OBJECT",
       "targetUuid": "23456789-2345-2345-2345-234567890124",
       "uuid": "12345678-1234-1234-1234-123456789012",
       "websiteUuid": "87654321-4321-4321-4321-876543210987"

@@ -11,6 +11,7 @@ import de.digitalcollections.cudami.server.model.UrlAliasBuilder;
 import de.digitalcollections.model.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.entity.EntityType;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -66,7 +67,7 @@ public class IdentifiableControllerTest extends BaseControllerTest {
             .isMainAlias()
             .withSlug("hurz")
             .withTargetLanguage("de")
-            .withTargetType(EntityType.COLLECTION)
+            .withTargetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
             .withTargetUuid("23456789-2345-2345-2345-234567890123")
             .withUuid("12345678-1234-1234-1234-123456789012")
             .withWebsiteUuid("87654321-4321-4321-4321-876543210987")
@@ -78,7 +79,7 @@ public class IdentifiableControllerTest extends BaseControllerTest {
             .isMainAlias()
             .withSlug("hützligrütz")
             .withTargetLanguage("de")
-            .withTargetType(EntityType.DIGITAL_OBJECT)
+            .withTargetType(IdentifiableType.ENTITY, EntityType.DIGITAL_OBJECT)
             .withTargetUuid("23456789-2345-2345-2345-234567890124")
             .withUuid("12345678-1234-1234-1234-123456789012")
             .withWebsiteUuid("87654321-4321-4321-4321-876543210987")

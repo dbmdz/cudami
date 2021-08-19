@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.alias;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.alias.UrlAliasService;
@@ -10,6 +11,7 @@ import de.digitalcollections.cudami.server.model.SearchPageResponseBuilder;
 import de.digitalcollections.cudami.server.model.UrlAliasBuilder;
 import de.digitalcollections.model.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.alias.UrlAlias;
+import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
@@ -48,7 +50,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .isMainAlias()
             .withSlug("hurz")
             .withTargetLanguage("de")
-            .withTargetType(EntityType.COLLECTION)
+            .withTargetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
             .withTargetUuid("23456789-2345-2345-2345-234567890123")
             .withUuid("12345678-1234-1234-1234-123456789012")
             .withWebsiteUuid("87654321-4321-4321-4321-876543210987")
@@ -86,7 +88,8 @@ class UrlAliasControllerTest extends BaseControllerTest {
             + "  \"mainAlias\": true,\n"
             + "  \"slug\": \"hurz\",\n"
             + "  \"targetLanguage\": \"de\",\n"
-            + "  \"targetType\": \"COLLECTION\",\n"
+            + "  \"targetIdentifiableType\": \"ENTITY\",\n"
+            + "  \"targetEntityType\": \"COLLECTION\",\n"
             + "  \"uuid\": \"12345678-1234-1234-1234-123456789012\",\n"
             + "  \"targetUuid\": \"23456789-2345-2345-2345-234567890123\",\n"
             + "  \"websiteUuid\": \"87654321-4321-4321-4321-876543210987\"\n"
@@ -106,7 +109,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .isMainAlias()
             .withSlug("hurz")
             .withTargetLanguage("de")
-            .withTargetType(EntityType.COLLECTION)
+            .withTargetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
             .withTargetUuid("23456789-2345-2345-2345-234567890123")
             .withUuid("12345678-1234-1234-1234-123456789012")
             .withWebsiteUuid("87654321-4321-4321-4321-876543210987")
@@ -120,7 +123,8 @@ class UrlAliasControllerTest extends BaseControllerTest {
             + "  \"mainAlias\": true,\n"
             + "  \"slug\": \"hurz\",\n"
             + "  \"targetLanguage\": \"de\",\n"
-            + "  \"targetType\": \"COLLECTION\",\n"
+            + "  \"targetIdentifiableType\": \"ENTITY\",\n"
+            + "  \"targetEntityType\": \"COLLECTION\",\n"
             + "  \"targetUuid\": \"23456789-2345-2345-2345-234567890123\",\n"
             + "  \"websiteUuid\": \"87654321-4321-4321-4321-876543210987\"\n"
             + "}";
@@ -139,7 +143,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .isMainAlias()
             .withSlug("hurz")
             .withTargetLanguage("de")
-            .withTargetType(EntityType.COLLECTION)
+            .withTargetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
             .withTargetUuid("23456789-2345-2345-2345-234567890123")
             .withUuid("12345678-1234-1234-1234-123456789012")
             .withWebsiteUuid("87654321-4321-4321-4321-876543210987")
@@ -153,7 +157,8 @@ class UrlAliasControllerTest extends BaseControllerTest {
             + "  \"mainAlias\": true,\n"
             + "  \"slug\": \"hurz\",\n"
             + "  \"targetLanguage\": \"de\",\n"
-            + "  \"targetType\": \"COLLECTION\",\n"
+            + "  \"targetIdentifiableType\": \"ENTITY\",\n"
+            + "  \"targetEntityType\": \"COLLECTION\",\n"
             + "  \"uuid\": \"12345678-1234-1234-1234-123456789012\",\n"
             + "  \"targetUuid\": \"23456789-2345-2345-2345-234567890123\",\n"
             + "  \"websiteUuid\": \"87654321-4321-4321-4321-876543210987\"\n"
@@ -172,7 +177,8 @@ class UrlAliasControllerTest extends BaseControllerTest {
             + "  \"mainAlias\": true,\n"
             + "  \"slug\": \"hurz\",\n"
             + "  \"targetLanguage\": \"de\",\n"
-            + "  \"targetType\": \"COLLECTION\",\n"
+            + "  \"targetIdentifiableType\": \"ENTITY\",\n"
+            + "  \"targetEntityType\": \"COLLECTION\",\n"
             + "  \"targetUuid\": \"23456789-2345-2345-2345-234567890123\",\n"
             + "  \"websiteUuid\": \"87654321-4321-4321-4321-876543210987\"\n"
             + "}";
@@ -212,7 +218,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
                                     .isMainAlias()
                                     .withSlug("hurz")
                                     .withTargetLanguage("de")
-                                    .withTargetType(EntityType.COLLECTION)
+                                    .withTargetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
                                     .withTargetUuid("23456789-2345-2345-2345-234567890123")
                                     .withUuid("12345678-1234-1234-1234-123456789012")
                                     .withWebsiteUuid("87654321-4321-4321-4321-876543210987")
@@ -223,5 +229,50 @@ class UrlAliasControllerTest extends BaseControllerTest {
     when(urlAliasService.find(any(SearchPageRequest.class))).thenReturn(expected);
 
     testJson(path, "/v5/urlaliases/find_with_result.json");
+  }
+
+  @DisplayName(
+      "returns a 404, when the parameters for retrieving a main link, are invalid and so don't match the endpoint URLs")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v5/urlaliases/12345678-1234-1234-1234-123456789012/",
+        "/v5/urlaliases//slug",
+        "/v5/urlaliases/foo/slug"
+      })
+  public void invalidParamtersForMainLink(String path) throws Exception {
+    testNotFound(path);
+  }
+
+  @DisplayName(
+      "returns a 404 for a main link, when no main link for a given webpage/slug pair exists")
+  @Test
+  public void nonexistingMainLink() throws Exception {
+    when(urlAliasService.findMainLink(any(UUID.class), eq("notexisting"))).thenReturn(null);
+
+    testNotFound("/v5/urlalises/12345678-1234-1234-1234-123456789012/notexisting");
+  }
+
+  @DisplayName("can return a mainLink for a given webpage/slug pair")
+  @ParameterizedTest
+  @ValueSource(strings = {"/v5/urlaliases/87654321-4321-4321-4321-876543210987/imprint"})
+  public void existingMainLink(String path) throws Exception {
+    LocalizedUrlAliases expected = new LocalizedUrlAliases();
+    expected.add(
+        new UrlAliasBuilder()
+            .createdAt("2021-08-17T15:18:01.000001")
+            .lastPublishedAt("2021-08-17T15:18:01.000001")
+            .isMainAlias()
+            .withSlug("imprint")
+            .withTargetLanguage("en")
+            .withTargetType(IdentifiableType.RESOURCE, null)
+            .withTargetUuid("23456789-2345-2345-2345-234567890123")
+            .withUuid("12345678-1234-1234-1234-123456789012")
+            .withWebsiteUuid("87654321-4321-4321-4321-876543210987")
+            .build());
+
+    when(urlAliasService.findMainLink(any(UUID.class), eq("imprint"))).thenReturn(expected);
+
+    testJson(path);
   }
 }
