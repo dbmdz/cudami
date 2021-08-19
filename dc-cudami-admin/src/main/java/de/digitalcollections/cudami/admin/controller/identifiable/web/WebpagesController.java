@@ -50,6 +50,11 @@ public class WebpagesController extends AbstractController {
     this.service = client.forWebpages();
   }
 
+  @ModelAttribute("menu")
+  protected String module() {
+    return "webpages";
+  }
+
   @GetMapping("/webpages/new")
   public String create(
       Model model,
@@ -106,11 +111,6 @@ public class WebpagesController extends AbstractController {
   @ResponseBody
   public Webpage get(@PathVariable UUID uuid) throws HttpException {
     return service.findOne(uuid);
-  }
-
-  @ModelAttribute("menu")
-  protected String module() {
-    return "webpages";
   }
 
   @PostMapping("/api/webpages")
