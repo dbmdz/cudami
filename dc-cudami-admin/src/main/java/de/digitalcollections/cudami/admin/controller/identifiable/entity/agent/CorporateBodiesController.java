@@ -143,10 +143,9 @@ public class CorporateBodiesController extends AbstractController {
     }
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, corporateBody.getLabel().getLocales());
-
-    model.addAttribute("existingLanguages", existingLanguages);
-    model.addAttribute("corporateBody", corporateBody);
-
+    model
+        .addAttribute("corporateBody", corporateBody)
+        .addAttribute("existingLanguages", existingLanguages);
     return "corporatebodies/view";
   }
 }

@@ -171,13 +171,12 @@ public class WebsitesController extends AbstractController {
         website.getRootPages().stream()
             .flatMap(child -> child.getLabel().getLocales().stream())
             .collect(Collectors.toList());
-
-    model.addAttribute("existingLanguages", existingLanguages);
-    model.addAttribute(
-        "existingWebpageLanguages",
-        languageSortingHelper.sortLanguages(displayLocale, existingWebpageLanguages));
-    model.addAttribute("website", website);
-
+    model
+        .addAttribute("existingLanguages", existingLanguages)
+        .addAttribute(
+            "existingWebpageLanguages",
+            languageSortingHelper.sortLanguages(displayLocale, existingWebpageLanguages))
+        .addAttribute("website", website);
     return "websites/view";
   }
 }
