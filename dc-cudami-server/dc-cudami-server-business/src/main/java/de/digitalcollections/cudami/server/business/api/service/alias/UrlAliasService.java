@@ -77,4 +77,15 @@ public interface UrlAliasService {
    * @throws CudamiServiceException in case of an error
    */
   LocalizedUrlAliases findLocalizedUrlAliases(UUID uuid) throws CudamiServiceException;
+
+  /**
+   * Returns the main Link as LocalizedUrlAliases for a given slug for a given website (identified
+   * by its uuid)
+   *
+   * @param websiteUuid the UUID of the website, the slug belongs to
+   * @param slug the slug (=relative path)
+   * @return LocalizedUrlAliases, if a main link exists; otherwise: null.
+   * @throws CudamiServiceException in case of an error
+   */
+  LocalizedUrlAliases findMainLink(UUID websiteUuid, String slug) throws CudamiServiceException;
 }

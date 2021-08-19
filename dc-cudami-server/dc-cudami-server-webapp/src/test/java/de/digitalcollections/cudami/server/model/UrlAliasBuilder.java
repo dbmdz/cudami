@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.model;
 
 import de.digitalcollections.model.alias.UrlAlias;
+import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.entity.EntityType;
 import java.time.LocalDateTime;
 import java.util.Locale;
@@ -39,8 +40,9 @@ public class UrlAliasBuilder {
     return this;
   }
 
-  public UrlAliasBuilder withTargetType(EntityType entityType) {
-    urlAlias.setTargetType(entityType);
+  public UrlAliasBuilder withTargetType(IdentifiableType identifiableType, EntityType entityType) {
+    urlAlias.setTargetIdentifiableType(identifiableType);
+    urlAlias.setTargetEntityType(entityType);
     return this;
   }
 

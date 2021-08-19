@@ -97,4 +97,10 @@ public class UrlAliasServiceImpl implements UrlAliasService {
           "Cannot find LocalizedUrlAliases for identifiable with uuid=" + uuid + ": " + e, e);
     }
   }
+
+  @Override
+  public LocalizedUrlAliases findMainLink(UUID websiteUuid, String slug)
+      throws CudamiServiceException {
+    return null;
+  }
 }

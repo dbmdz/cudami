@@ -38,7 +38,9 @@ public class UrlAliasController {
 
   @Operation(summary = "Get an UrlAlias by uuid")
   @GetMapping(
-      value = {"/v5/urlaliases/{uuid}"},
+      value = {
+        "/v5/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<UrlAlias> get(
       @Parameter(
@@ -63,7 +65,10 @@ public class UrlAliasController {
   }
 
   @Operation(summary = "Delete an UrlAlias by uuid")
-  @DeleteMapping(value = {"/v5/urlaliases/{uuid}"})
+  @DeleteMapping(
+      value = {
+        "/v5/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+      })
   public ResponseEntity<Void> delete(
       @Parameter(
               description =
@@ -108,7 +113,9 @@ public class UrlAliasController {
 
   @Operation(summary = "update an UrlAlias")
   @PutMapping(
-      value = {"/v5/urlaliases/{uuid}"},
+      value = {
+        "/v5/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<UrlAlias> update(
       @Parameter(
@@ -158,6 +165,35 @@ public class UrlAliasController {
       result = urlAliasService.find(pageRequest);
     } catch (CudamiServiceException e) {
       throw new ControllerException(e);
+    }
+
+    return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
+  @Operation(summary = "Get the main UrlAlias for a given website uuid and slug")
+  @GetMapping(
+      value = {
+        "/v5/urlaliases/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}/{slug}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<LocalizedUrlAliases> getMainUrlAlias(
+      @Parameter(
+              description =
+                  "UUID of the website, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("website_uuid")
+          UUID websiteUuid,
+      @Parameter(description = "the slug of the URL, e.g. <tt>imprint</tt>") @PathVariable("slug")
+          String slug)
+      throws ControllerException {
+    LocalizedUrlAliases result;
+    try {
+      result = urlAliasService.findMainLink(websiteUuid, slug);
+    } catch (CudamiServiceException e) {
+      throw new ControllerException(e);
+    }
+
+    if (result == null) {
+      return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
     return new ResponseEntity<>(result, HttpStatus.OK);
