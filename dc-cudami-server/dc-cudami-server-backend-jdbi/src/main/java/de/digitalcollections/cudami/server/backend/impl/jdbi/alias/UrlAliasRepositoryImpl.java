@@ -1,18 +1,25 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.alias;
 
 import de.digitalcollections.cudami.server.backend.api.repository.alias.UrlAliasRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.alias.UrlAlias;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.JdbiException;
+import org.jdbi.v3.core.statement.StatementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 @Repository
 public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAliasRepository {
@@ -24,13 +31,14 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
   private static final Map<String, String> PROPERTY_COLUMN_MAPPING;
 
   static {
-    PROPERTY_COLUMN_MAPPING = new LinkedHashMap<>(9);
+    PROPERTY_COLUMN_MAPPING = new LinkedHashMap<>(10);
     PROPERTY_COLUMN_MAPPING.put("created", "created");
     PROPERTY_COLUMN_MAPPING.put("lastPublished", "last_published");
     PROPERTY_COLUMN_MAPPING.put("mainAlias", "main_alias");
     PROPERTY_COLUMN_MAPPING.put("slug", "slug");
+    PROPERTY_COLUMN_MAPPING.put("targetIdentifiableType", "target_identifiable_type");
+    PROPERTY_COLUMN_MAPPING.put("targetEntityType", "target_entity_type");
     PROPERTY_COLUMN_MAPPING.put("targetLanguage", "target_language");
-    PROPERTY_COLUMN_MAPPING.put("targetType", "target_type");
     PROPERTY_COLUMN_MAPPING.put("targetUuid", "target_uuid");
     PROPERTY_COLUMN_MAPPING.put("uuid", "uuid");
     PROPERTY_COLUMN_MAPPING.put("websiteUuid", "website_uuid");
@@ -69,63 +77,156 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
   }
 
   @Override
-  public int delete(List<UUID> urlAliasUuids) {
+  public int delete(List<UUID> urlAliasUuids) throws UrlAliasRepositoryException {
     if (urlAliasUuids.isEmpty()) {
       return 0;
     }
     String sql = "DELETE FROM " + TABLE_NAME + " WHERE uuid in (<aliasUuids>);";
-    return this.dbi.withHandle(
-        h -> h.createUpdate(sql).bindList("aliasUuids", urlAliasUuids).execute());
+    try {
+      return this.dbi.withHandle(
+          h -> h.createUpdate(sql).bindList("aliasUuids", urlAliasUuids).execute());
+    } catch (StatementException e) {
+      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+      throw new UrlAliasRepositoryException(
+          String.format("The SQL statement is defective: %s", detailMessage), e);
+    } catch (JdbiException e) {
+      throw new UrlAliasRepositoryException(e);
+    }
   }
 
   @Override
-  public LocalizedUrlAliases findAllForTarget(UUID uuid) {
+  public SearchPageResponse<LocalizedUrlAliases> find(SearchPageRequest searchPageRequest)
+      throws UrlAliasRepositoryException {
+    StringBuilder commonSql = new StringBuilder("FROM " + TABLE_NAME + " AS " + TABLE_ALIAS);
+    Map<String, Object> bindings = new HashMap<>();
+
+    this.addFiltering(searchPageRequest, commonSql);
+    if (StringUtils.hasText(searchPageRequest.getQuery())) {
+      commonSql
+          .append(commonSql.toString().matches("(?i).+\\s+WHERE .*") ? " AND " : " WHERE ")
+          .append(TABLE_ALIAS + ".slug like '%' || :searchTerm || '%' ");
+      bindings.put("searchTerm", searchPageRequest.getQuery());
+    }
+
+    long count;
+    try {
+      count =
+          this.dbi.withHandle(
+              h ->
+                  h.createQuery("SELECT count(*) " + commonSql.toString())
+                      .bindMap(bindings)
+                      .mapTo(Long.class)
+                      .findOne()
+                      .orElse(0L));
+    } catch (StatementException e) {
+      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+      throw new UrlAliasRepositoryException(
+          String.format("The SQL statement is defective: %s", detailMessage), e);
+    } catch (JdbiException e) {
+      throw new UrlAliasRepositoryException(e);
+    }
+
+    this.addOrderBy(searchPageRequest, commonSql);
+    if (!commonSql.toString().matches("(?i).+\\s+ORDER BY .*")) {
+      commonSql.append(" ORDER BY slug ");
+    }
+    this.addLimit(searchPageRequest, commonSql);
+    this.addOffset(searchPageRequest, commonSql);
+
+    try {
+      UrlAlias[] resultset =
+          this.dbi.withHandle(
+              h ->
+                  h
+                      .createQuery("SELECT * " + commonSql.toString())
+                      .bindMap(bindings)
+                      .mapToBean(UrlAlias.class)
+                      .stream()
+                      .toArray(UrlAlias[]::new));
+      return new SearchPageResponse<>(
+          List.of(new LocalizedUrlAliases(resultset)), searchPageRequest, count);
+    } catch (StatementException e) {
+      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+      throw new UrlAliasRepositoryException(
+          String.format("The SQL statement is defective: %s", detailMessage), e);
+    } catch (JdbiException e) {
+      throw new UrlAliasRepositoryException(e);
+    }
+  }
+
+  @Override
+  public LocalizedUrlAliases findAllForTarget(UUID uuid) throws UrlAliasRepositoryException {
     if (uuid == null) {
       return new LocalizedUrlAliases();
     }
     String sql =
         "SELECT * FROM " + TABLE_NAME + " WHERE target_uuid = ? ORDER BY main_alias, slug;";
-    UrlAlias[] resultset =
-        this.dbi.withHandle(
-            h ->
-                h.createQuery(sql).bind(0, uuid).mapToBean(UrlAlias.class).stream()
-                    .toArray(UrlAlias[]::new));
-    return new LocalizedUrlAliases(resultset);
-  }
-
-  @Override
-  public UrlAlias findMainLink(UUID uuid) {
-    if (uuid == null) {
-      return null;
-    }
-    String sql =
-        "SELECT * FROM " + TABLE_NAME + " WHERE target_uuid = :uuid AND main_alias = true;";
     try {
-      return this.dbi.withHandle(
-          h ->
-              h.createQuery(sql)
-                  .bind("uuid", uuid)
-                  .mapToBean(UrlAlias.class)
-                  .findOne()
-                  .orElse(null));
-    } catch (IllegalStateException e) {
-      // TODO
-      throw e;
+      UrlAlias[] resultset =
+          this.dbi.withHandle(
+              h ->
+                  h.createQuery(sql).bind(0, uuid).mapToBean(UrlAlias.class).stream()
+                      .toArray(UrlAlias[]::new));
+      return new LocalizedUrlAliases(resultset);
+    } catch (StatementException e) {
+      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+      throw new UrlAliasRepositoryException(
+          String.format("The SQL statement is defective: %s", detailMessage), e);
+    } catch (JdbiException e) {
+      throw new UrlAliasRepositoryException(e);
     }
   }
 
   @Override
-  public UrlAlias findOne(UUID uuid) {
+  public LocalizedUrlAliases findMainLinks(UUID websiteUuid, String slug)
+      throws UrlAliasRepositoryException {
+    if (websiteUuid == null || !StringUtils.hasText(slug)) {
+      return new LocalizedUrlAliases();
+    }
+    String innerSel =
+        "(SELECT target_uuid FROM " + TABLE_NAME + " WHERE website_uuid = :uuid AND slug = :slug)";
+    String sql =
+        "SELECT * FROM "
+            + TABLE_NAME
+            + " WHERE website_uuid = :uuid AND main_alias = true AND target_uuid = "
+            + innerSel;
+    Map<String, Object> bindings = Map.of("uuid", websiteUuid, "slug", slug);
+    try {
+      UrlAlias[] resultset =
+          this.dbi.withHandle(
+              h ->
+                  h.createQuery(sql).bindMap(bindings).mapToBean(UrlAlias.class).stream()
+                      .toArray(UrlAlias[]::new));
+      return new LocalizedUrlAliases(resultset);
+    } catch (StatementException e) {
+      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+      throw new UrlAliasRepositoryException(
+          String.format("The SQL statement is defective: %s", detailMessage), e);
+    } catch (JdbiException e) {
+      throw new UrlAliasRepositoryException(e);
+    }
+  }
+
+  @Override
+  public UrlAlias findOne(UUID uuid) throws UrlAliasRepositoryException {
     if (uuid == null) {
       return null;
     }
     String sql = "select * from " + TABLE_NAME + " where uuid = ?;";
-    return this.dbi.withHandle(
-        h -> h.createQuery(sql).bind(0, uuid).mapToBean(UrlAlias.class).findFirst().orElse(null));
+    try {
+      return this.dbi.withHandle(
+          h -> h.createQuery(sql).bind(0, uuid).mapToBean(UrlAlias.class).findFirst().orElse(null));
+    } catch (StatementException e) {
+      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+      throw new UrlAliasRepositoryException(
+          String.format("The SQL statement is defective: %s", detailMessage), e);
+    } catch (JdbiException e) {
+      throw new UrlAliasRepositoryException(e);
+    }
   }
 
   @Override
-  public UrlAlias save(UrlAlias urlAlias) {
+  public UrlAlias save(UrlAlias urlAlias) throws UrlAliasRepositoryException {
     if (urlAlias == null) {
       return null;
     }
@@ -141,13 +242,25 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
             + ") VALUES ("
             + this.getPlaceholdersForInsert()
             + ") RETURNING *;";
-    return this.dbi.withHandle(
-        h ->
-            h.createQuery(sql).bindBean(urlAlias).mapToBean(UrlAlias.class).findOne().orElse(null));
+    try {
+      return this.dbi.withHandle(
+          h ->
+              h.createQuery(sql)
+                  .bindBean(urlAlias)
+                  .mapToBean(UrlAlias.class)
+                  .findOne()
+                  .orElse(null));
+    } catch (StatementException e) {
+      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+      throw new UrlAliasRepositoryException(
+          String.format("The SQL statement is defective: %s", detailMessage), e);
+    } catch (JdbiException e) {
+      throw new UrlAliasRepositoryException(e);
+    }
   }
 
   @Override
-  public UrlAlias update(UrlAlias urlAlias) {
+  public UrlAlias update(UrlAlias urlAlias) throws UrlAliasRepositoryException {
     if (urlAlias == null) {
       return null;
     }
@@ -157,7 +270,20 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
             + " SET "
             + this.getAssignmentsForUpdate()
             + " WHERE uuid = :uuid RETURNING *;";
-    return this.dbi.withHandle(
-        h -> h.createQuery(sql).bindBean(urlAlias).mapToBean(UrlAlias.class).findOne().get());
+    try {
+      return this.dbi.withHandle(
+          h ->
+              h.createQuery(sql)
+                  .bindBean(urlAlias)
+                  .mapToBean(UrlAlias.class)
+                  .findOne()
+                  .orElse(null));
+    } catch (StatementException e) {
+      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+      throw new UrlAliasRepositoryException(
+          String.format("The SQL statement is defective: %s", detailMessage), e);
+    } catch (JdbiException e) {
+      throw new UrlAliasRepositoryException(e);
+    }
   }
 }
