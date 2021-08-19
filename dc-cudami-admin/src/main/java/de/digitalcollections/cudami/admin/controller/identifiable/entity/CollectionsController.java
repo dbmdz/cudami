@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiCollectionsClient;
+import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.paging.Direction;
@@ -277,9 +278,13 @@ public class CollectionsController extends AbstractController {
     "/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
     "/subcollections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
   })
-  public String view(@PathVariable UUID uuid, Model model) throws HttpException {
+  public String view(@PathVariable UUID uuid, Model model)
+      throws HttpException, ResourceNotFoundException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Collection collection = service.findOne(uuid);
+    if (collection == null) {
+      throw new ResourceNotFoundException();
+    }
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, collection.getLabel().getLocales());
     List<Locale> existingSubcollectionLanguages =
@@ -304,8 +309,12 @@ public class CollectionsController extends AbstractController {
   }
 
   @GetMapping({"/collections/{refId:[0-9]+}", "/subcollections/{refId:[0-9]+}"})
-  public String viewByRefId(@PathVariable long refId, Model model) throws HttpException {
+  public String viewByRefId(@PathVariable long refId, Model model)
+      throws HttpException, ResourceNotFoundException {
     Collection collection = service.findOneByRefId(refId);
+    if (collection == null) {
+      throw new ResourceNotFoundException();
+    }
     return view(collection.getUuid(), model);
   }
 }

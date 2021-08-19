@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiCorporateBodiesClient;
+import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
@@ -133,9 +134,13 @@ public class CorporateBodiesController extends AbstractController {
   }
 
   @GetMapping("/corporatebodies/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) throws HttpException {
+  public String view(@PathVariable UUID uuid, Model model)
+      throws HttpException, ResourceNotFoundException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     CorporateBody corporateBody = service.findOne(uuid);
+    if (corporateBody == null) {
+      throw new ResourceNotFoundException();
+    }
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, corporateBody.getLabel().getLocales());
 

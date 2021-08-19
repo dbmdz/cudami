@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesMetadataClient;
+import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.Order;
@@ -159,9 +160,13 @@ public class FileResourcesMetadataController extends AbstractController {
   }
 
   @GetMapping(value = "/fileresources/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) throws HttpException {
+  public String view(@PathVariable UUID uuid, Model model)
+      throws HttpException, ResourceNotFoundException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     FileResource resource = service.findOne(uuid);
+    if (resource == null) {
+      throw new ResourceNotFoundException();
+    }
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, resource.getLabel().getLocales());
 

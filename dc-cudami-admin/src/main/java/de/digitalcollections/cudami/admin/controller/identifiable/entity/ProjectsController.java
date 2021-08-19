@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiProjectsClient;
+import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.paging.PageResponse;
@@ -162,9 +163,12 @@ public class ProjectsController extends AbstractController {
   @GetMapping("/projects/{uuid}")
   public String view(
       @PathVariable UUID uuid, @PageableDefault(size = 25) Pageable pageable, Model model)
-      throws HttpException {
+      throws HttpException, ResourceNotFoundException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Project project = service.findOne(uuid);
+    if (project == null) {
+      throw new ResourceNotFoundException();
+    }
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, project.getLabel().getLocales());
 

@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiDigitalObjectsClient;
+import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -133,17 +134,19 @@ public class DigitalObjectsController extends AbstractController {
   }
 
   @GetMapping("/digitalobjects/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) throws HttpException {
+  public String view(@PathVariable UUID uuid, Model model)
+      throws HttpException, ResourceNotFoundException {
     DigitalObject digitalObject = service.findOne(uuid);
-    model.addAttribute("digitalObject", digitalObject);
-
+    if (digitalObject == null) {
+      throw new ResourceNotFoundException();
+    }
     List<Locale> existingCollectionLanguages = this.service.getLanguagesOfCollections(uuid),
         existingProjectLanguages = this.service.getLanguagesOfProjects(uuid);
 
     model
+        .addAttribute("digitalObject", digitalObject)
         .addAttribute("existingCollectionLanguages", existingCollectionLanguages)
         .addAttribute("existingProjectLanguages", existingProjectLanguages);
-
     return "digitalobjects/view";
   }
 }

@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.admin.controller.security;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
+import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.security.Role;
@@ -188,8 +189,13 @@ public class UserController extends AbstractController {
   }
 
   @GetMapping("/users/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) throws ServiceException {
-    model.addAttribute("user", service.findOne(uuid));
+  public String view(@PathVariable UUID uuid, Model model)
+      throws ResourceNotFoundException, ServiceException {
+    User user = service.findOne(uuid);
+    if (user == null) {
+      throw new ResourceNotFoundException();
+    }
+    model.addAttribute("user", user);
     return "users/view";
   }
 }

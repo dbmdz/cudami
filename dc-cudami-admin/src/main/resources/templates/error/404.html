@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{base}">
+  <head>
+    <title>Main</title>
+  </head>
+  <body>
+    <section layout:fragment="content">
+      <div class="d-flex justify-content-center">
+        <div class="flex-column text-center">
+          <img alt="" src="/images/404.png">
+          <h1 th:text="#{error.not_found}">not found</h1>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
