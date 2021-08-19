@@ -135,16 +135,19 @@ public class UrlAliasController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @Operation(summary = "Find limited amounts of LocalizedUrlAliases")
+  @Operation(
+      summary =
+          "Find limited amounts of LocalizedUrlAliases. If the searchTerm is used, the slugs to be returned have to match the searchTerm")
   @GetMapping(
       value = {"/v5/urlaliases"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<SearchPageResponse<LocalizedUrlAliases>> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws ControllerException {
-    SearchPageRequest pageRequest = new SearchPageRequest(null, pageNumber, pageSize);
+    SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
