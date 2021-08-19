@@ -83,6 +83,27 @@ public class UrlAliasServiceImpl implements UrlAliasService {
   @Override
   public SearchPageResponse<LocalizedUrlAliases> find(SearchPageRequest pageRequest)
       throws CudamiServiceException {
+
+    // return repository.find(searchPageRequest);
     return null;
+  }
+
+  @Override
+  public LocalizedUrlAliases findLocalizedUrlAliases(UUID uuid) throws CudamiServiceException {
+    try {
+      if (repository.findOne(uuid) == null) {
+        return null;
+      }
+    } catch (Exception e) {
+      throw new CudamiServiceException(
+          "Cannot check existing of identifiable with uuid=" + uuid + ": " + e, e);
+    }
+
+    try {
+      return repository.findAllForTarget(uuid);
+    } catch (Exception e) {
+      throw new CudamiServiceException(
+          "Cannot find LocalizedUrlAliases for identifiable with uuid=" + uuid + ": " + e, e);
+    }
   }
 }

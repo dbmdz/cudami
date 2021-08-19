@@ -68,4 +68,13 @@ public interface UrlAliasService {
    */
   SearchPageResponse<LocalizedUrlAliases> find(SearchPageRequest pageRequest)
       throws CudamiServiceException;
+
+  /**
+   * Returns the LocalizedUrlAliases for an identifiable, identified by its UUID
+   *
+   * @param uuid the UUID of the identifiable
+   * @return the LocalizedUrlAliases, if found, or null
+   * @throws CudamiServiceException in case of an error
+   */
+  LocalizedUrlAliases findLocalizedUrlAliases(UUID uuid) throws CudamiServiceException;
 }
