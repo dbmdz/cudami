@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiTopicsClient;
+import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -183,8 +184,12 @@ public class TopicsController extends AbstractController {
   }
 
   @GetMapping({"/subtopics/{refId:[0-9]+}", "/topics/{refId:[0-9]+}"})
-  public String viewByRefId(@PathVariable long refId, Model model) throws HttpException {
+  public String viewByRefId(@PathVariable long refId, Model model)
+      throws HttpException, ResourceNotFoundException {
     Topic topic = service.findOneByRefId(refId);
+    if (topic == null) {
+      throw new ResourceNotFoundException();
+    }
     return view(topic.getUuid(), model);
   }
 
@@ -192,9 +197,13 @@ public class TopicsController extends AbstractController {
     "/subtopics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
     "/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
   })
-  public String view(@PathVariable UUID uuid, Model model) throws HttpException {
+  public String view(@PathVariable UUID uuid, Model model)
+      throws HttpException, ResourceNotFoundException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Topic topic = service.findOne(uuid);
+    if (topic == null) {
+      throw new ResourceNotFoundException();
+    }
     List<Locale> existingLanguages =
         this.languageSortingHelper.sortLanguages(displayLocale, topic.getLabel().getLocales());
     List<Locale> existingSubtopicLanguages =

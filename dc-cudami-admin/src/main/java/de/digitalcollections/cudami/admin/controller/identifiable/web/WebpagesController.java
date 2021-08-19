@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.web.CudamiWebpagesClient;
+import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.web.Webpage;
@@ -157,9 +158,13 @@ public class WebpagesController extends AbstractController {
   }
 
   @GetMapping("/webpages/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) throws HttpException {
+  public String view(@PathVariable UUID uuid, Model model)
+      throws HttpException, ResourceNotFoundException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Webpage webpage = service.findOne(uuid);
+    if (webpage == null) {
+      throw new ResourceNotFoundException();
+    }
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, webpage.getLabel().getLocales());
     List<Locale> existingSubpageLanguages =
