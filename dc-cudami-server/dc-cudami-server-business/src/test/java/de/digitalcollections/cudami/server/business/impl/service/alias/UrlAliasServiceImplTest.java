@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.backend.api.repository.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.model.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.EntityType;
 import java.time.LocalDateTime;
@@ -189,6 +190,33 @@ class UrlAliasServiceImplTest {
     when(repo.delete(eq(List.of(uuid1, uuid2)))).thenReturn(1);
 
     assertThat(service.delete(List.of(uuid1, uuid2))).isTrue();
+  }
+
+  @DisplayName(
+      "raises a ServiceException when retriving LocalizedUrlAliases leads to an exception in the repository")
+  @Test
+  public void raiseExceptionWhenRetrievingLocalizedUrlAliasesLeadsToAnException() {
+    when(repo.findAllForTarget(any(UUID.class))).thenThrow(new NullPointerException("foo"));
+
+    assertThrows(
+        CudamiServiceException.class,
+        () -> {
+          service.findLocalizedUrlAliases(UUID.randomUUID());
+        });
+  }
+
+  @DisplayName("returns LocalizedUrlAliases for an UUID of an identifiable")
+  @Test
+  public void returnLocalizedUrlAliases() throws CudamiServiceException {
+    LocalizedUrlAliases expected = new LocalizedUrlAliases();
+    UrlAlias urlAlias = new UrlAlias();
+    urlAlias.setUuid(UUID.randomUUID());
+    urlAlias.setTargetLanguage(Locale.forLanguageTag("de"));
+    expected.add(urlAlias);
+
+    when(repo.findAllForTarget(any(UUID.class))).thenReturn(expected);
+
+    assertThat(service.findLocalizedUrlAliases(UUID.randomUUID())).isEqualTo(expected);
   }
 
   // -------------------------------------------------------------------------
