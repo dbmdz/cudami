@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.impl.service.alias;
 
 import de.digitalcollections.cudami.server.backend.api.repository.alias.UrlAliasRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.cudami.server.business.api.service.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.model.alias.LocalizedUrlAliases;
@@ -43,7 +44,11 @@ public class UrlAliasServiceImpl implements UrlAliasService {
 
   @Override
   public boolean delete(List<UUID> uuids) throws CudamiServiceException {
-    return repository.delete(uuids) > 0;
+    try {
+      return repository.delete(uuids) > 0;
+    } catch (UrlAliasRepositoryException e) {
+      throw new CudamiServiceException("Cannot delete UrlAliases by uuids: " + e, e);
+    }
   }
 
   @Override
@@ -109,7 +114,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
     }
 
     try {
-      return repository.findMainLink(websiteUuid, slug);
+      return repository.findMainLinks(websiteUuid, slug);
     } catch (Exception e) {
       throw new CudamiServiceException(
           "Could not find mainLink for websiteUuid=" + websiteUuid + ", slug=" + slug + ": " + e,
