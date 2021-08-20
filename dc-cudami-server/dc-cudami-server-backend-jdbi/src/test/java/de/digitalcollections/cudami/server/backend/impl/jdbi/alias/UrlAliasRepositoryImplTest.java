@@ -53,24 +53,20 @@ public class UrlAliasRepositoryImplTest {
   UrlAlias secondUrlAlias;
 
   @BeforeAll
-  public void setupTest() {
+  public void setupTest() throws MalformedURLException {
     this.repo = new UrlAliasRepositoryImpl(this.jdbi);
     this.prepareWebsite();
   }
 
-  private void prepareWebsite() {
+  private void prepareWebsite() throws MalformedURLException {
     // to meet the foreign key constraints we must do some preparation
-    try {
-      Website website = new Website(new URL("https://my-first-website.com"));
-      website.setUuid(this.websiteUuid);
-      website.setCreated(LocalDateTime.now());
-      website.setRefId(13);
-      website.setLastModified(LocalDateTime.now());
-      website.setLabel("Test website");
-      this.websiteRepository.save(website);
-    } catch (MalformedURLException e) {
-      e.printStackTrace();
-    }
+    Website website = new Website(new URL("https://my-first-website.com"));
+    website.setUuid(this.websiteUuid);
+    website.setCreated(LocalDateTime.now());
+    website.setRefId(13);
+    website.setLastModified(LocalDateTime.now());
+    website.setLabel("Test website");
+    this.websiteRepository.save(website);
   }
 
   private UrlAlias getNewUrlAliasObject() {
@@ -151,8 +147,10 @@ public class UrlAliasRepositoryImplTest {
     LocalizedUrlAliases allLinks = this.repo.findAllForTarget(this.firstUrlAlias.getTargetUuid()),
         mainLinks = this.repo.findMainLinks(this.websiteUuid, "wir_ueber_uns");
 
-    assert allLinks.values().stream().flatMapToInt(list -> IntStream.of(list.size())).sum() == 3;
-    assert mainLinks.values().stream().flatMapToInt(list -> IntStream.of(list.size())).sum() == 2;
+    assertThat(allLinks.values().stream().flatMapToInt(list -> IntStream.of(list.size())).sum())
+        .isEqualTo(3);
+    assertThat(mainLinks.values().stream().flatMapToInt(list -> IntStream.of(list.size())).sum())
+        .isEqualTo(2);
     assertThat(mainLinks.get(Locale.GERMAN).get(0)).isEqualTo(this.firstUrlAlias);
     assertThat(mainLinks.get(Locale.ENGLISH).get(0)).isEqualTo(anotherMainLink);
   }
@@ -166,10 +164,10 @@ public class UrlAliasRepositoryImplTest {
         new FilteringBuilder().filter("targetLanguage").isEquals(Locale.GERMAN.toString()).build());
 
     var searchPageResponse = this.repo.find(searchPageRequest);
-    assert searchPageResponse.hasContent();
-    assert searchPageResponse.getTotalElements() == 1;
-    assert searchPageResponse.getContent().size() == 1;
-    assert searchPageResponse.getContent().get(0).containsKey(Locale.GERMAN);
+    assertThat(searchPageResponse.hasContent()).isTrue();
+    assertThat(searchPageResponse.getTotalElements()).isEqualTo(1);
+    assertThat(searchPageResponse.getContent().size()).isEqualTo(1);
+    assertThat(searchPageResponse.getContent().get(0).containsKey(Locale.GERMAN)).isTrue();
     assertThat(searchPageResponse.getContent().get(0).get(Locale.GERMAN))
         .isEqualTo(List.of(this.secondUrlAlias));
   }
@@ -179,6 +177,6 @@ public class UrlAliasRepositoryImplTest {
   @Test
   public void delete() throws UrlAliasRepositoryException {
     int count = this.repo.delete(List.of(this.firstUrlAlias.getUuid()));
-    assert count == 1;
+    assertThat(count).isEqualTo(1);
   }
 }

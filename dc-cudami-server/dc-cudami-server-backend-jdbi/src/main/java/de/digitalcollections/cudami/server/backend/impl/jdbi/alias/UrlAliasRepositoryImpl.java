@@ -126,12 +126,10 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
       throw new UrlAliasRepositoryException(e);
     }
 
-    this.addOrderBy(searchPageRequest, commonSql);
-    if (!commonSql.toString().matches("(?i).+\\s+ORDER BY .*")) {
+    if (searchPageRequest.getSorting() == null) {
       commonSql.append(" ORDER BY slug ");
     }
-    this.addLimit(searchPageRequest, commonSql);
-    this.addOffset(searchPageRequest, commonSql);
+    this.addPageRequestParams(searchPageRequest, commonSql);
 
     try {
       UrlAlias[] resultset =
@@ -160,12 +158,12 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
       return new LocalizedUrlAliases();
     }
     String sql =
-        "SELECT * FROM " + TABLE_NAME + " WHERE target_uuid = ? ORDER BY main_alias, slug;";
+        "SELECT * FROM " + TABLE_NAME + " WHERE target_uuid = :uuid ORDER BY main_alias, slug;";
     try {
       UrlAlias[] resultset =
           this.dbi.withHandle(
               h ->
-                  h.createQuery(sql).bind(0, uuid).mapToBean(UrlAlias.class).stream()
+                  h.createQuery(sql).bind("uuid", uuid).mapToBean(UrlAlias.class).stream()
                       .toArray(UrlAlias[]::new));
       return new LocalizedUrlAliases(resultset);
     } catch (StatementException e) {
@@ -212,10 +210,15 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     if (uuid == null) {
       return null;
     }
-    String sql = "select * from " + TABLE_NAME + " where uuid = ?;";
+    String sql = "select * from " + TABLE_NAME + " where uuid = :uuid;";
     try {
       return this.dbi.withHandle(
-          h -> h.createQuery(sql).bind(0, uuid).mapToBean(UrlAlias.class).findFirst().orElse(null));
+          h ->
+              h.createQuery(sql)
+                  .bind("uuid", uuid)
+                  .mapToBean(UrlAlias.class)
+                  .findFirst()
+                  .orElse(null));
     } catch (StatementException e) {
       String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
       throw new UrlAliasRepositoryException(
