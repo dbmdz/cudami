@@ -14,6 +14,8 @@ import de.digitalcollections.model.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.entity.EntityType;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
@@ -161,6 +163,19 @@ class UrlAliasServiceImplTest {
     assertThat(service.update(expected)).isEqualTo(expected);
   }
 
+  @DisplayName("raises a ServiceException when deleting leads to an exception in the repository")
+  @Test
+  public void raiseExceptionWhenDeleteLeadsToAnException()
+      throws CudamiServiceException, UrlAliasRepositoryException {
+    when(repo.delete(any(List.class))).thenThrow(new UrlAliasRepositoryException("foo"));
+
+    assertThrows(
+        CudamiServiceException.class,
+        () -> {
+          service.delete(List.of(UUID.randomUUID()));
+        });
+  }
+
   @DisplayName("returns false when trying to delete a nonexistant UrlAlias by its uuid")
   @Test
   public void deleteNonexistantSingleUrlAlias()
@@ -224,6 +239,85 @@ class UrlAliasServiceImplTest {
     when(repo.findAllForTarget(any(UUID.class))).thenReturn(expected);
 
     assertThat(service.findLocalizedUrlAliases(UUID.randomUUID())).isEqualTo(expected);
+  }
+
+  @DisplayName(
+      "raises a ServiceException when trying to get a mainlink with a missing website uuid")
+  @Test
+  public void raiseExceptionForMainlinkWithMissingUuid() throws CudamiServiceException {
+    assertThrows(
+        CudamiServiceException.class,
+        () -> {
+          service.findMainLink(null, "hützligrütz");
+        });
+  }
+
+  @DisplayName(
+      "raises a ServiceException when trying to get a mainlink with a missing or empty slug")
+  @Test
+  public void raiseExceptionForMainlinkWithMissingOrEmptySlug() throws CudamiServiceException {
+    assertThrows(
+        CudamiServiceException.class,
+        () -> {
+          service.findMainLink(UUID.randomUUID(), null);
+        });
+    assertThrows(
+        CudamiServiceException.class,
+        () -> {
+          service.findMainLink(UUID.randomUUID(), "");
+        });
+  }
+
+  @DisplayName(
+      "raises a ServiceException when retriving a mainLink leads to an exception in the repository")
+  @Test
+  public void raiseExceptionWhenRetrievingMainLinkLeadsToAnException()
+      throws UrlAliasRepositoryException {
+    when(repo.findMainLinks(any(UUID.class), any(String.class)))
+        .thenThrow(new NullPointerException("foo"));
+
+    assertThrows(
+        CudamiServiceException.class,
+        () -> {
+          service.findMainLink(UUID.randomUUID(), "hützligrütz");
+        });
+  }
+
+  @DisplayName("can return a mainLink")
+  @Test
+  public void returnMainLink() throws CudamiServiceException, UrlAliasRepositoryException {
+    LocalizedUrlAliases expected = new LocalizedUrlAliases();
+    expected.add(createUrlAlias("hützligrütz", true));
+    when(repo.findMainLinks(any(UUID.class), any(String.class))).thenReturn(expected);
+
+    assertThat(service.findMainLink(UUID.randomUUID(), "hützligrütz")).isEqualTo(expected);
+  }
+
+  @DisplayName(
+      "raises a ServiceException when finding an UrlAlias leads to an exception in the repository")
+  @Test
+  public void raiseExceptionWhenFindLeadsToAnException() throws UrlAliasRepositoryException {
+    when(repo.find(any(SearchPageRequest.class))).thenThrow(new NullPointerException("foo"));
+
+    assertThrows(
+        CudamiServiceException.class,
+        () -> {
+          service.find(new SearchPageRequest());
+        });
+  }
+
+  @DisplayName("can return a SearchPageResult")
+  @Test
+  public void returnSearchPageResult() throws UrlAliasRepositoryException, CudamiServiceException {
+    SearchPageResponse<LocalizedUrlAliases> expected = new SearchPageResponse();
+    LocalizedUrlAliases localizedUrlAlias = new LocalizedUrlAliases();
+    localizedUrlAlias.add(createUrlAlias("hützligrütz", true));
+    expected.setContent(List.of(localizedUrlAlias));
+
+    when(repo.find(any(SearchPageRequest.class))).thenReturn(expected);
+
+    SearchPageRequest searchPageRequest = new SearchPageRequest();
+    assertThat(service.find(searchPageRequest)).isEqualTo(expected);
   }
 
   // -------------------------------------------------------------------------

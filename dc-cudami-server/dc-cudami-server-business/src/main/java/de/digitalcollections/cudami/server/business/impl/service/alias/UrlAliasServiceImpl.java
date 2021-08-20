@@ -86,11 +86,15 @@ public class UrlAliasServiceImpl implements UrlAliasService {
   }
 
   @Override
-  public SearchPageResponse<LocalizedUrlAliases> find(SearchPageRequest pageRequest)
+  public SearchPageResponse<LocalizedUrlAliases> find(SearchPageRequest searchPageRequest)
       throws CudamiServiceException {
-
-    // return repository.find(searchPageRequest);
-    return null;
+    try {
+      return repository.find(searchPageRequest);
+    } catch (Exception e) {
+      throw new CudamiServiceException(
+          "Cannot find LocalizedUrlAliases with searchPageRequest=" + searchPageRequest + ": " + e,
+          e);
+    }
   }
 
   @Override
