@@ -58,7 +58,7 @@ public class UrlAliasController {
     }
 
     if (result == null) {
-      return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     return new ResponseEntity<>(result, HttpStatus.OK);
@@ -193,7 +193,7 @@ public class UrlAliasController {
     }
 
     if (result == null) {
-      return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     return new ResponseEntity<>(result, HttpStatus.OK);
