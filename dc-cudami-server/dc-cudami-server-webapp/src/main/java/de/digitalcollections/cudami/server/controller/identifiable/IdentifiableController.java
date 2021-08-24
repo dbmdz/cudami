@@ -117,7 +117,7 @@ public class IdentifiableController {
 
     try {
       if (findById(uuid) == null) {
-        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
       }
     } catch (Exception e) {
       throw new ControllerException(e);
