@@ -69,6 +69,12 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
         .collect(Collectors.joining(", "));
   }
 
+  public static String getSelectFields() {
+    return PROPERTY_COLUMN_MAPPING.values().stream()
+        .map(col -> String.format("%1$s.%2$s %3$s_%2$s", TABLE_ALIAS, col, MAPPING_PREFIX))
+        .collect(Collectors.joining(", "));
+  }
+
   private String getAssignmentsForUpdate() {
     return PROPERTY_COLUMN_MAPPING.entrySet().stream()
         .filter(e -> !(e.getKey().equals("created") || e.getKey().equals("uuid")))
