@@ -42,7 +42,7 @@ jobs:
         run: mvn -B -U clean verify -Pproduction
     strategy:
       matrix:
-        java: [11, 14]
+        java: [11, 16]
   coverage:
     needs: build
     runs-on: ubuntu-latest
