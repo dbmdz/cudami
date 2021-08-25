@@ -91,15 +91,19 @@ public interface UrlAliasService {
   LocalizedUrlAliases findMainLink(UUID websiteUuid, String slug) throws CudamiServiceException;
 
   /**
-   * Creates a not yet existing slug for the provided label, language and websiteUuid. If the
+   * Generates a not yet existing slug for the provided label, language and websiteUuid. If the
    * websiteUuid is empty, the configured default website uuid is used.
    *
-   * @param pLocale The locale for which the slug is created
+   * <p>If for the (locale,label,websiteUuid) triple a slug already exists, a new slug is calculated
+   * by appending suffixes to it.
+   *
+   * @param pLocale The locale for which the slug is generated.
    * @param label The label as a string
-   * @param websiteUuid The uuid of the website, for which the slug is created. If not set, the UUID
-   *     of the default website is used
+   * @param websiteUuid The uuid of the website, for which the slug is generated. If not set, the
+   *     UUID of the default website is used
    * @return slug as String, or null, if no website under the provided websiteUuid exists
    * @throws CudamiServiceException
    */
-  UrlAlias getSlug(Locale pLocale, String label, UUID websiteUuid) throws CudamiServiceException;
+  UrlAlias generateSlug(Locale pLocale, String label, UUID websiteUuid)
+      throws CudamiServiceException;
 }

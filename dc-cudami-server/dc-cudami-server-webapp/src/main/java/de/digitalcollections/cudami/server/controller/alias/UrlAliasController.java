@@ -206,7 +206,7 @@ public class UrlAliasController {
         "/v5/urlaliases/slug/{pLocale}/{label}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<UrlAlias> getSlug(
+  public ResponseEntity<UrlAlias> generateSlug(
       @Parameter(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>.")
           @RequestParam(name = "pLocale", required = true)
           Locale pLocale,
@@ -225,7 +225,7 @@ public class UrlAliasController {
 
     UrlAlias result;
     try {
-      result = urlAliasService.getSlug(pLocale, label, websiteUuid);
+      result = urlAliasService.generateSlug(pLocale, label, websiteUuid);
     } catch (CudamiServiceException e) {
       throw new ControllerException(e);
     }
