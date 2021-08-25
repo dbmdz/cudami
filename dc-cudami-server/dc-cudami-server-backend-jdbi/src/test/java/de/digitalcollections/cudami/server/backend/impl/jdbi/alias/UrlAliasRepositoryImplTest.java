@@ -1,6 +1,9 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.alias;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
@@ -18,7 +21,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.stream.IntStream;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -92,7 +94,7 @@ public class UrlAliasRepositoryImplTest {
     assertThat(actual.getUuid()).isNotNull();
     assertThat(actual.getCreated()).isNotNull();
     assertThat(actual.getLastPublished()).isNull();
-    assertThat(actual.isMainAlias()).isEqualTo(false);
+    assertFalse(actual.isMainAlias());
     this.firstUrlAlias = actual;
   }
 
@@ -128,9 +130,8 @@ public class UrlAliasRepositoryImplTest {
     this.secondUrlAlias = this.repo.save(this.secondUrlAlias);
 
     LocalizedUrlAliases actual = this.repo.findAllForTarget(this.firstUrlAlias.getTargetUuid());
-    LocalizedUrlAliases expected = new LocalizedUrlAliases(this.firstUrlAlias, this.secondUrlAlias);
-    assertThat(actual.keySet()).isEqualTo(expected.keySet());
-    assertThat(actual.get(Locale.GERMAN)).containsAll(expected.get(Locale.GERMAN));
+    LocalizedUrlAliases expected = new LocalizedUrlAliases(this.secondUrlAlias, this.firstUrlAlias);
+    assertTrue(actual.equals(expected));
   }
 
   @DisplayName("Retrieve main link for target UUID")
@@ -147,10 +148,8 @@ public class UrlAliasRepositoryImplTest {
     LocalizedUrlAliases allLinks = this.repo.findAllForTarget(this.firstUrlAlias.getTargetUuid()),
         mainLinks = this.repo.findMainLinks(this.websiteUuid, "wir_ueber_uns");
 
-    assertThat(allLinks.values().stream().flatMapToInt(list -> IntStream.of(list.size())).sum())
-        .isEqualTo(3);
-    assertThat(mainLinks.values().stream().flatMapToInt(list -> IntStream.of(list.size())).sum())
-        .isEqualTo(2);
+    assertThat(allLinks.flatten().size()).isEqualTo(3);
+    assertThat(mainLinks.flatten().size()).isEqualTo(2);
     assertThat(mainLinks.get(Locale.GERMAN).get(0)).isEqualTo(this.firstUrlAlias);
     assertThat(mainLinks.get(Locale.ENGLISH).get(0)).isEqualTo(anotherMainLink);
   }
@@ -164,16 +163,26 @@ public class UrlAliasRepositoryImplTest {
         new FilteringBuilder().filter("targetLanguage").isEquals(Locale.GERMAN.toString()).build());
 
     var searchPageResponse = this.repo.find(searchPageRequest);
-    assertThat(searchPageResponse.hasContent()).isTrue();
+    assertTrue(searchPageResponse.hasContent());
     assertThat(searchPageResponse.getTotalElements()).isEqualTo(1);
     assertThat(searchPageResponse.getContent().size()).isEqualTo(1);
-    assertThat(searchPageResponse.getContent().get(0).containsKey(Locale.GERMAN)).isTrue();
+    assertTrue(searchPageResponse.getContent().get(0).containsKey(Locale.GERMAN));
     assertThat(searchPageResponse.getContent().get(0).get(Locale.GERMAN))
         .isEqualTo(List.of(this.secondUrlAlias));
   }
 
-  @DisplayName("Delete an UrlAlias")
+  @DisplayName("Check method hasUrlAlias")
   @Order(7)
+  @Test
+  public void hasUrlAlias() throws UrlAliasRepositoryException {
+    assertThrows(
+        UrlAliasRepositoryException.class, () -> this.repo.hasUrlAlias(this.websiteUuid, ""));
+    assertTrue(this.repo.hasUrlAlias(this.websiteUuid, this.firstUrlAlias.getSlug()));
+    assertFalse(this.repo.hasUrlAlias(this.websiteUuid, "does_not_exist"));
+  }
+
+  @DisplayName("Delete an UrlAlias")
+  @Order(8)
   @Test
   public void delete() throws UrlAliasRepositoryException {
     int count = this.repo.delete(List.of(this.firstUrlAlias.getUuid()));
