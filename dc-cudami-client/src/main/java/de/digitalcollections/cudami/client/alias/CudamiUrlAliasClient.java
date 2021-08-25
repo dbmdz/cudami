@@ -8,7 +8,10 @@ import de.digitalcollections.model.alias.UrlAlias;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.net.http.HttpClient;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class CudamiUrlAliasClient extends CudamiBaseClient<UrlAlias> {
 
@@ -16,8 +19,14 @@ public class CudamiUrlAliasClient extends CudamiBaseClient<UrlAlias> {
     super(http, serverUrl, UrlAlias.class, mapper);
   }
 
-  public LocalizedUrlAliases findOneByWebsiteUuidAndSlug(UUID websiteUuid, String slug)
-      throws HttpException {
+  public LocalizedUrlAliases findMainLinks(UUID websiteUuid, String slug) throws HttpException {
+    return (LocalizedUrlAliases)
+        doGetRequestForObject(
+            String.format("/v5/urlaliases/%s/%s?mainLinks=true", websiteUuid, slug),
+            LocalizedUrlAliases.class);
+  }
+
+  public LocalizedUrlAliases findAllLinks(UUID websiteUuid, String slug) throws HttpException {
     return (LocalizedUrlAliases)
         doGetRequestForObject(
             String.format("/v5/urlaliases/%s/%s", websiteUuid, slug), LocalizedUrlAliases.class);
@@ -45,8 +54,29 @@ public class CudamiUrlAliasClient extends CudamiBaseClient<UrlAlias> {
         "/v5/urlaliases/search", searchPageRequest, LocalizedUrlAliases.class);
   }
 
+  public boolean isMainLink(UUID websiteUuid, String slug) throws HttpException {
+    LocalizedUrlAliases localizedUrlAliases = findMainLinks(websiteUuid, slug);
+    if (localizedUrlAliases == null || localizedUrlAliases.isEmpty()) {
+      return false;
+    }
+
+    for (UrlAlias urlAlias :
+        localizedUrlAliases.values().stream().flatMap(List::stream).collect(Collectors.toList())) {
+      if (urlAlias.getSlug().equals(slug)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  public String generateSlug(Locale locale, String label, UUID websiteUuid) throws HttpException {
+    return doGetRequestForString(
+        String.format("/v5/urlaliases/slug/%s/%s/%s", locale, label, websiteUuid));
+  }
+
   /* TODO
-  public boolean isMainLink(UrlAlias urlAlias, String slug);
+
   public LocalizedUrlAlias appendUrlAliases(UUID uuid) throws HttpException;
   public LocalizedUrlAlias getLocalizedUrlAliases(UUID uuid) throws HttpException;
    */
