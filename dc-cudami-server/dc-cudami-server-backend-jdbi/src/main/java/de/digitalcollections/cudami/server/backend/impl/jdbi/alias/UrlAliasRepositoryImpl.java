@@ -216,7 +216,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     if (uuid == null) {
       return null;
     }
-    String sql = "select * from " + TABLE_NAME + " where uuid = :uuid;";
+    String sql = "SELECT * FROM " + TABLE_NAME + " WHERE uuid = :uuid;";
     try {
       return this.dbi.withHandle(
           h ->
@@ -225,6 +225,31 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
                   .mapToBean(UrlAlias.class)
                   .findFirst()
                   .orElse(null));
+    } catch (StatementException e) {
+      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+      throw new UrlAliasRepositoryException(
+          String.format("The SQL statement is defective: %s", detailMessage), e);
+    } catch (JdbiException e) {
+      throw new UrlAliasRepositoryException(e);
+    }
+  }
+
+  @Override
+  public boolean hasUrlAlias(UUID websiteUuid, String slug) throws UrlAliasRepositoryException {
+    if (websiteUuid == null || !StringUtils.hasText(slug)) {
+      throw new UrlAliasRepositoryException(
+          "UrlAliasRepository.hasUrlAlias: Parameters must not be null or empty.");
+    }
+    try {
+      return 0
+          < this.dbi.withHandle(
+              h ->
+                  h.createQuery(
+                          "SELECT uuid FROM "
+                              + TABLE_NAME
+                              + " WHERE website_uuid = :websiteUuid AND slug = :slug;")
+                      .bindMap(Map.of("websiteUuid", websiteUuid, "slug", slug))
+                      .reduceRows(0, (count, row) -> ++count));
     } catch (StatementException e) {
       String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
       throw new UrlAliasRepositoryException(

@@ -51,6 +51,9 @@ public interface UrlAliasRepository {
    */
   UrlAlias findOne(UUID uuid) throws UrlAliasRepositoryException;
 
+  /** Check whether an entry exists for the passed website UUID and slug. */
+  boolean hasUrlAlias(UUID websiteUuid, String slug) throws UrlAliasRepositoryException;
+
   /**
    * Save an {@code UrlAlias} object.
    *
