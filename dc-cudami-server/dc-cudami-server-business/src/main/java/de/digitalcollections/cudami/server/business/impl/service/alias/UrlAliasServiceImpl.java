@@ -9,6 +9,7 @@ import de.digitalcollections.model.alias.UrlAlias;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -124,5 +125,11 @@ public class UrlAliasServiceImpl implements UrlAliasService {
           "Could not find mainLink for websiteUuid=" + websiteUuid + ", slug=" + slug + ": " + e,
           e);
     }
+  }
+
+  @Override
+  public UrlAlias generateSlug(Locale pLocale, String label, UUID websiteUuid)
+      throws CudamiServiceException {
+    return null;
   }
 }
