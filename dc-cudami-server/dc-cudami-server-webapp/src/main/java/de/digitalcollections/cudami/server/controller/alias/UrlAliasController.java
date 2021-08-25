@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -188,6 +189,43 @@ public class UrlAliasController {
     LocalizedUrlAliases result;
     try {
       result = urlAliasService.findMainLink(websiteUuid, slug);
+    } catch (CudamiServiceException e) {
+      throw new ControllerException(e);
+    }
+
+    if (result == null) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
+  @Operation(summary = "Get a slug for language and label and, if given, website_uuid")
+  @GetMapping(
+      value = {
+        "/v5/urlaliases/slug/{pLocale}/{label}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<UrlAlias> getSlug(
+      @Parameter(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>.")
+          @RequestParam(name = "pLocale", required = true)
+          Locale pLocale,
+      @Parameter(
+              name = "label",
+              description =
+                  "The label, from which the slug shall be constructed, e.g. <tt>Impressum</tt>")
+          @PathVariable("label")
+          String label,
+      @Parameter(
+              description =
+                  "UUID of the website (or null, if the default website shall be used), e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("website_uuid")
+          UUID websiteUuid)
+      throws ControllerException {
+
+    UrlAlias result;
+    try {
+      result = urlAliasService.getSlug(pLocale, label, websiteUuid);
     } catch (CudamiServiceException e) {
       throw new ControllerException(e);
     }
