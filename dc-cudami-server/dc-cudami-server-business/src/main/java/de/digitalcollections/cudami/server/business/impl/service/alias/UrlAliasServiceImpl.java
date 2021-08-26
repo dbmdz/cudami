@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.alias.UrlAlias
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.cudami.server.business.api.service.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.impl.alias.SlugGenerator;
 import de.digitalcollections.model.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.alias.UrlAlias;
 import de.digitalcollections.model.paging.SearchPageRequest;
@@ -12,17 +13,34 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /** Service implementation for UrlAlias handling. */
 @Service
 public class UrlAliasServiceImpl implements UrlAliasService {
 
+  private final SlugGenerator slugGenerator;
   private final UrlAliasRepository repository;
 
+  @Value("${cudami.defaults.locale}")
+  private Locale defaultLocale;
+
+  @Value("${cudami.urlalias.website.default.uuid}")
+  private UUID defaultWebsiteUuid;
+
   @Autowired
-  public UrlAliasServiceImpl(UrlAliasRepository repository) {
+  public UrlAliasServiceImpl(UrlAliasRepository repository, SlugGenerator slugGenerator) {
     this.repository = repository;
+    this.slugGenerator = slugGenerator;
+  }
+
+  protected void setDefaultLocale(Locale defaultLocale) {
+    this.defaultLocale = defaultLocale;
+  }
+
+  protected void setDefaultWebsiteUuid(UUID defaultWebsiteUuid) {
+    this.defaultWebsiteUuid = defaultWebsiteUuid;
   }
 
   @Override
@@ -128,8 +146,67 @@ public class UrlAliasServiceImpl implements UrlAliasService {
   }
 
   @Override
-  public UrlAlias generateSlug(Locale pLocale, String label, UUID websiteUuid)
+  public String generateSlug(Locale pLocale, String label, UUID websiteUuid)
       throws CudamiServiceException {
-    return null;
+    if (websiteUuid == null) {
+      websiteUuid = defaultWebsiteUuid;
+    }
+
+    String slug = slugGenerator.generateSlug(label);
+
+    try {
+      if (!repository.hasUrlAlias(websiteUuid, slug)) {
+        return slug;
+      }
+    } catch (UrlAliasRepositoryException e) {
+      throw new CudamiServiceException(
+          "Cannot check, if UrlAliase for websiteUuid="
+              + websiteUuid
+              + ", slug="
+              + slug
+              + " already exists: "
+              + e,
+          e);
+    }
+
+    // If the provided locale is not the default locale, we start by adding
+    // locale-bases suffixes, d.h. "-en".
+    if (!pLocale.equals(defaultLocale)) {
+      String languageSuffixedSlug = slug + "-" + pLocale.getLanguage();
+      try {
+        if (!repository.hasUrlAlias(websiteUuid, languageSuffixedSlug)) {
+          return languageSuffixedSlug;
+        }
+      } catch (UrlAliasRepositoryException e) {
+        throw new CudamiServiceException(
+            "Cannot check, if UrlAliase for websiteUuid="
+                + websiteUuid
+                + ", slug="
+                + languageSuffixedSlug
+                + " already exists: "
+                + e,
+            e);
+      }
+    }
+
+    // Our last chance is now to add a numerical suffix
+    int suffixId = 1;
+    while (true) {
+      String numericalSuffixedSlug = slug + "-" + suffixId;
+      try {
+        if (!repository.hasUrlAlias(websiteUuid, numericalSuffixedSlug))
+          return numericalSuffixedSlug;
+      } catch (UrlAliasRepositoryException e) {
+        throw new CudamiServiceException(
+            "Cannot check, if UrlAliase for websiteUuid="
+                + websiteUuid
+                + ", slug="
+                + numericalSuffixedSlug
+                + " already exists: "
+                + e,
+            e);
+      }
+      suffixId++;
+    }
   }
 }

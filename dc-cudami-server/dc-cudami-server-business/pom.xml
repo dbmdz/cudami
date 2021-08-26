@@ -14,10 +14,16 @@
   <packaging>jar</packaging>
 
   <properties>
+    <version.icu4j>63.1</version.icu4j>
     <version.jscience>4.3.1</version.jscience>
   </properties>
-  
+
   <dependencies>
+    <dependency>
+      <groupId>com.ibm.icu</groupId>
+      <artifactId>icu4j</artifactId>
+      <version>${version.icu4j}</version>
+    </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-server-backend-api</artifactId>
