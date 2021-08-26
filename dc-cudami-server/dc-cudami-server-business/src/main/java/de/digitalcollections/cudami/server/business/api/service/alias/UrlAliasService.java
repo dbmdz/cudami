@@ -104,6 +104,5 @@ public interface UrlAliasService {
    * @return slug as String, or null, if no website under the provided websiteUuid exists
    * @throws CudamiServiceException
    */
-  UrlAlias generateSlug(Locale pLocale, String label, UUID websiteUuid)
-      throws CudamiServiceException;
+  String generateSlug(Locale pLocale, String label, UUID websiteUuid) throws CudamiServiceException;
 }
