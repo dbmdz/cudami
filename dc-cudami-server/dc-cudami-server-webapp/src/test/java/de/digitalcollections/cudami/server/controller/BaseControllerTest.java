@@ -161,8 +161,21 @@ public abstract class BaseControllerTest {
         .andExpect(content().xml(getXmlFromFileResource(path)));
   }
 
+  protected void testGetJsonString(String path, String expected) throws Exception {
+    mockMvc
+        .perform(get(path))
+        .andExpect(status().isOk())
+        .andExpect(
+            content().contentType(ContentType.APPLICATION_JSON.getMimeType() + ";charset=UTF-8"))
+        .andExpect(content().string(expected));
+  }
+
   protected void testNotFound(String path) throws Exception {
     mockMvc.perform(get(path)).andExpect(status().isNotFound());
+  }
+
+  protected void testInternalError(String path) throws Exception {
+    mockMvc.perform(get(path)).andExpect(status().is(500));
   }
 
   protected void testDeleteNotFound(String path) throws Exception {

@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.alias.UrlAliasService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.cudami.server.model.LocalizedUrlAliasBuilder;
 import de.digitalcollections.cudami.server.model.SearchPageResponseBuilder;
@@ -16,6 +17,7 @@ import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -274,5 +276,33 @@ class UrlAliasControllerTest extends BaseControllerTest {
     when(urlAliasService.findMainLink(any(UUID.class), eq("imprint"))).thenReturn(expected);
 
     testJson(path);
+  }
+
+  @DisplayName("throws an exception, when the service fails on generating a slug")
+  @Test
+  public void exceptionOnSlugGeneration() throws Exception {
+    when(urlAliasService.generateSlug(any(Locale.class), any(String.class), any(UUID.class)))
+        .thenThrow(new CudamiServiceException("foo"));
+
+    testInternalError("/v5/urlaliases/slug/de_DE/label/12345678-1234-1234-1234-123456789012");
+  }
+
+  @DisplayName("returns 404 when trying to generate a slug for a nonexisting website uuid")
+  @Test
+  public void slugForNonexistingWebsiteUuid() throws Exception {
+    when(urlAliasService.generateSlug(any(Locale.class), any(String.class), any(UUID.class)))
+        .thenReturn(null);
+
+    testNotFound("/v5/urlaliases/slug/de_DE/label/12345678-1234-1234-1234-123456789012");
+  }
+
+  @DisplayName("returns a generated slug")
+  @Test
+  public void generateSlue() throws Exception {
+    when(urlAliasService.generateSlug(any(Locale.class), any(String.class), any(UUID.class)))
+        .thenReturn("hurz");
+
+    testGetJsonString(
+        "/v5/urlaliases/slug/de_DE/label/12345678-1234-1234-1234-123456789012", "hurz");
   }
 }

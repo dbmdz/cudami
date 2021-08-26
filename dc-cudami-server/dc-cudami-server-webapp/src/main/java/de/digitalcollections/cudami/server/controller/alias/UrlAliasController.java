@@ -205,10 +205,10 @@ public class UrlAliasController {
       value = {
         "/v5/urlaliases/slug/{pLocale}/{label}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
-      produces = MediaType.APPLICATION_JSON_VALUE)
+      produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
   public ResponseEntity<String> generateSlug(
       @Parameter(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>.")
-          @RequestParam(name = "pLocale", required = true)
+          @PathVariable(name = "pLocale")
           Locale pLocale,
       @Parameter(
               name = "label",
