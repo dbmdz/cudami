@@ -7,8 +7,24 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.MDC;
 import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
 
 public class RequestIdLoggingInterceptor implements HandlerInterceptor {
+  /** Clear MDC to avoid data leaking between two requests handled by the same thread. */
+  @Override
+  public void postHandle(
+      @NonNull HttpServletRequest request,
+      @NonNull HttpServletResponse response,
+      @NonNull Object handler,
+      ModelAndView modelAndView)
+      throws Exception {
+    MDC.clear();
+  }
+
+  /**
+   * Register the request identifier (if received from client/frontend server) in the logging
+   * context.
+   */
   @Override
   @SuppressFBWarnings(value = {"HRS_REQUEST_PARAMETER_TO_HTTP_HEADER"})
   public boolean preHandle(
