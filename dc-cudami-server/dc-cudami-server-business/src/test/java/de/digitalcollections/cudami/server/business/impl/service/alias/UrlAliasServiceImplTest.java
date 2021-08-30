@@ -15,6 +15,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Cudam
 import de.digitalcollections.cudami.server.business.impl.alias.SlugGenerator;
 import de.digitalcollections.model.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.alias.UrlAlias;
+import de.digitalcollections.cudami.server.business.impl.service.identifiable.alias.SlugGenerator;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;

@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.client.alias;
+package de.digitalcollections.cudami.client.identifiable.alias;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiBaseClient;

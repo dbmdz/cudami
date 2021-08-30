@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.server.business.impl.alias;
+package de.digitalcollections.cudami.server.business.impl.service.identifiable.alias;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;

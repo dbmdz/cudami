@@ -1,11 +1,11 @@
-package de.digitalcollections.cudami.server.controller.alias;
+package de.digitalcollections.cudami.server.controller.identifiable.alias;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-import de.digitalcollections.cudami.server.business.api.service.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.cudami.server.model.LocalizedUrlAliasBuilder;
 import de.digitalcollections.cudami.server.model.SearchPageResponseBuilder;
