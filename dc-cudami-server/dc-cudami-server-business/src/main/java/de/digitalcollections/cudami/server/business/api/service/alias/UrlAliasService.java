@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.server.business.api.service.alias;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
-import de.digitalcollections.model.alias.LocalizedUrlAliases;
-import de.digitalcollections.model.alias.UrlAlias;
+import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
+import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.List;

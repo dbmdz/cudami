@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.model;
 
-import de.digitalcollections.model.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.IdentifiableType;
+import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.EntityType;
 import java.time.LocalDateTime;
 import java.util.Locale;
