@@ -5,6 +5,12 @@ cudami:
     language: en
     locale: en_US
   repositoryFolderPath: '~/cudami/fileResources'
+  urlalias:
+    generation:
+      excludes: [DIGITAL_OBJECT]
+    website:
+      default:
+        uuid: 123e4567-e89b-12d3-a456-426614174000
 
 iiif:
   image:
