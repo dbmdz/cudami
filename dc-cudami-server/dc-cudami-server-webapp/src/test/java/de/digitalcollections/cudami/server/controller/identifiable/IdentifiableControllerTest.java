@@ -8,10 +8,10 @@ import de.digitalcollections.cudami.server.business.api.service.alias.UrlAliasSe
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.cudami.server.model.UrlAliasBuilder;
-import de.digitalcollections.model.alias.LocalizedUrlAliases;
-import de.digitalcollections.model.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableType;
+import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
+import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.EntityType;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;

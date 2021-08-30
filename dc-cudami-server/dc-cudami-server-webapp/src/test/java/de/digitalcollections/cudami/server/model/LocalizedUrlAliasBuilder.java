@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.model;
 
-import de.digitalcollections.model.alias.LocalizedUrlAliases;
-import de.digitalcollections.model.alias.UrlAlias;
+import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
+import de.digitalcollections.model.identifiable.alias.UrlAlias;
 
 public class LocalizedUrlAliasBuilder {
 
