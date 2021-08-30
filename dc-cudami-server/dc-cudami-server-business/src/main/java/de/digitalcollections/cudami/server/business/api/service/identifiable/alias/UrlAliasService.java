@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.server.business.api.service.alias;
+package de.digitalcollections.cudami.server.business.api.service.identifiable.alias;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;

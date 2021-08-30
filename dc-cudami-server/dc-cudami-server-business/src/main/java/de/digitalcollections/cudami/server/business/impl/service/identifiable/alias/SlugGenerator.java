@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.server.business.impl.alias;
+package de.digitalcollections.cudami.server.business.impl.service.identifiable.alias;
 
 import com.ibm.icu.text.Transliterator;
 import de.digitalcollections.cudami.server.backend.api.repository.alias.UrlAliasRepository;

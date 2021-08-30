@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.backend.api.repository.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
-import de.digitalcollections.cudami.server.business.impl.alias.SlugGenerator;
+import de.digitalcollections.cudami.server.business.impl.service.identifiable.alias.SlugGenerator;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;

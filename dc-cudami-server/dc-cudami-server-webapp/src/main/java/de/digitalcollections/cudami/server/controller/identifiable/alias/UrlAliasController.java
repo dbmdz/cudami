@@ -1,7 +1,7 @@
-package de.digitalcollections.cudami.server.controller.alias;
+package de.digitalcollections.cudami.server.controller.identifiable.alias;
 
-import de.digitalcollections.cudami.server.business.api.service.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.controller.ControllerException;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
