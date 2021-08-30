@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClien
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifierTypesClient;
 import de.digitalcollections.cudami.client.identifiable.agent.CudamiFamilyNamesClient;
 import de.digitalcollections.cudami.client.identifiable.agent.CudamiGivenNamesClient;
+import de.digitalcollections.cudami.client.identifiable.alias.CudamiUrlAliasClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiArticlesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiCollectionsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiDigitalObjectsClient;
@@ -54,6 +55,7 @@ public class CudamiClient {
   private final CudamiProjectsClient cudamiProjectsClient;
   private final CudamiRenderingTemplatesClient cudamiRenderingTemplatesClient;
   private final CudamiTopicsClient cudamiTopicsClient;
+  private final CudamiUrlAliasClient cudamiUrlAliasClient;
   private final CudamiUsersClient cudamiUsersClient;
   private final CudamiWebpagesClient cudamiWebpagesClient;
   private final CudamiWebsitesClient cudamiWebsitesClient;
@@ -100,6 +102,7 @@ public class CudamiClient {
     this.cudamiRenderingTemplatesClient =
         new CudamiRenderingTemplatesClient(http, cudamiServerUrl, mapper);
     this.cudamiTopicsClient = new CudamiTopicsClient(http, cudamiServerUrl, mapper);
+    this.cudamiUrlAliasClient = new CudamiUrlAliasClient(http, cudamiServerUrl, mapper);
     this.cudamiUsersClient = new CudamiUsersClient(http, cudamiServerUrl, mapper);
     this.cudamiWebpagesClient = new CudamiWebpagesClient(http, cudamiServerUrl, mapper);
     this.cudamiWebsitesClient = new CudamiWebsitesClient(http, cudamiServerUrl, mapper);
@@ -188,6 +191,10 @@ public class CudamiClient {
 
   public CudamiTopicsClient forTopics() {
     return cudamiTopicsClient;
+  }
+
+  public CudamiUrlAliasClient forUrlAliases() {
+    return cudamiUrlAliasClient;
   }
 
   public CudamiUsersClient forUsers() {
