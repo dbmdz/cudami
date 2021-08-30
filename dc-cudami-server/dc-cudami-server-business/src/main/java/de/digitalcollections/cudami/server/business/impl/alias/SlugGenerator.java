@@ -3,14 +3,18 @@ package de.digitalcollections.cudami.server.business.impl.alias;
 import com.ibm.icu.text.Transliterator;
 import de.digitalcollections.cudami.server.backend.api.repository.alias.UrlAliasRepository;
 import java.util.Locale;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+@Service
 public class SlugGenerator {
 
   private final UrlAliasRepository urlAliasRepository;
 
   private final Transliterator transliterator;
 
+  @Autowired
   public SlugGenerator(UrlAliasRepository urlAliasRepository) {
     this.urlAliasRepository = urlAliasRepository;
     transliterator = Transliterator.getInstance("de-ASCII");
