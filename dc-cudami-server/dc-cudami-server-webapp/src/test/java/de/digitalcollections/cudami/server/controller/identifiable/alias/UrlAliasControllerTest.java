@@ -298,11 +298,20 @@ class UrlAliasControllerTest extends BaseControllerTest {
 
   @DisplayName("returns a generated slug")
   @Test
-  public void generateSlue() throws Exception {
+  public void generateSlug() throws Exception {
     when(urlAliasService.generateSlug(any(Locale.class), any(String.class), any(UUID.class)))
         .thenReturn("hurz");
 
     testGetJsonString(
         "/v5/urlaliases/slug/de_DE/label/12345678-1234-1234-1234-123456789012", "hurz");
+  }
+
+  @DisplayName("returns a generated slug, when no website id is provided")
+  @Test
+  public void generateSlugWithoutWebsiteId() throws Exception {
+    when(urlAliasService.generateSlug(any(Locale.class), any(String.class), eq(null)))
+        .thenReturn("hurz");
+
+    testGetJsonString("/v5/urlaliases/slug/de_DE/label", "hurz");
   }
 }

@@ -71,14 +71,10 @@ public class CudamiUrlAliasClient extends CudamiBaseClient<UrlAlias> {
   }
 
   public String generateSlug(Locale locale, String label, UUID websiteUuid) throws HttpException {
+    if (websiteUuid == null) {
+      return doGetRequestForString(String.format("/v5/urlaliases/slug/%s/%s", locale, label));
+    }
     return doGetRequestForString(
         String.format("/v5/urlaliases/slug/%s/%s/%s", locale, label, websiteUuid));
   }
-
-  /* TODO
-
-  public LocalizedUrlAlias appendUrlAliases(UUID uuid) throws HttpException;
-  public LocalizedUrlAlias getLocalizedUrlAliases(UUID uuid) throws HttpException;
-   */
-
 }
