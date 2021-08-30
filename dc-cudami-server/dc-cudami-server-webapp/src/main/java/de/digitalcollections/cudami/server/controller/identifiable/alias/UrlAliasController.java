@@ -203,7 +203,8 @@ public class UrlAliasController {
   @Operation(summary = "Get a slug for language and label and, if given, website_uuid")
   @GetMapping(
       value = {
-        "/v5/urlaliases/slug/{pLocale}/{label}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+        "/v5/urlaliases/slug/{pLocale}/{label}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v5/urlaliases/slug/{pLocale}/{label}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
   public ResponseEntity<String> generateSlug(
@@ -218,8 +219,9 @@ public class UrlAliasController {
           String label,
       @Parameter(
               description =
-                  "UUID of the website (or null, if the default website shall be used), e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
-          @PathVariable("website_uuid")
+                  "UUID of the website (or not provided, if the default website shall be used), e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>",
+              required = false)
+          @PathVariable(value = "website_uuid", required = false)
           UUID websiteUuid)
       throws ControllerException {
 
