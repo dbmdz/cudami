@@ -1,7 +1,7 @@
 {
   "created": "2021-08-17T15:18:01.000001",
   "lastPublished": "2021-08-17T15:18:01.000001",
-  "mainAlias": true,
+  "primary": true,
   "slug": "hurz",
   "targetLanguage": "de",
   "targetIdentifiableType": "ENTITY",
