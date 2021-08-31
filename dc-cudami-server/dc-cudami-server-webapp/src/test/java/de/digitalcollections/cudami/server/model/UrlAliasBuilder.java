@@ -25,8 +25,8 @@ public class UrlAliasBuilder {
     return this;
   }
 
-  public UrlAliasBuilder isMainAlias() {
-    urlAlias.setMainAlias(true);
+  public UrlAliasBuilder isPrimary() {
+    urlAlias.setPrimary(true);
     return this;
   }
 

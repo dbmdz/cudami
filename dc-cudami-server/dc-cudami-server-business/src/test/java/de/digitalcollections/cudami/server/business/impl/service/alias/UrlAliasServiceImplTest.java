@@ -421,7 +421,7 @@ class UrlAliasServiceImplTest {
     if (setUuid) {
       urlAlias.setUuid(UUID.randomUUID());
     }
-    urlAlias.setMainAlias(false);
+    urlAlias.setPrimary(false);
     urlAlias.setTargetUuid(UUID.randomUUID());
     urlAlias.setSlug(slug);
     urlAlias.setTargetIdentifiableType(IdentifiableType.ENTITY);
@@ -435,7 +435,7 @@ class UrlAliasServiceImplTest {
 
   private UrlAlias deepCopy(UrlAlias urlAlias) {
     UrlAlias copy = new UrlAlias();
-    copy.setMainAlias(urlAlias.isMainAlias());
+    copy.setPrimary(urlAlias.isPrimary());
     copy.setTargetLanguage(urlAlias.getTargetLanguage());
     copy.setUuid(urlAlias.getUuid());
     copy.setCreated(urlAlias.getCreated());

@@ -94,7 +94,7 @@ public class UrlAliasRepositoryImplTest {
     assertThat(actual.getUuid()).isNotNull();
     assertThat(actual.getCreated()).isNotNull();
     assertThat(actual.getLastPublished()).isNull();
-    assertFalse(actual.isMainAlias());
+    assertFalse(actual.isPrimary());
     this.firstUrlAlias = actual;
   }
 
@@ -111,7 +111,7 @@ public class UrlAliasRepositoryImplTest {
   @Test
   public void update() throws UrlAliasRepositoryException {
     this.firstUrlAlias.setLastPublished(LocalDateTime.now());
-    this.firstUrlAlias.setMainAlias(true);
+    this.firstUrlAlias.setPrimary(true);
     this.firstUrlAlias.setTargetIdentifiableType(IdentifiableType.ENTITY);
     this.firstUrlAlias.setTargetEntityType(EntityType.COLLECTION);
     UrlAlias updated = this.repo.update(this.firstUrlAlias);
@@ -142,7 +142,7 @@ public class UrlAliasRepositoryImplTest {
     anotherMainLink.setTargetUuid(this.firstUrlAlias.getTargetUuid());
     anotherMainLink.setTargetLanguage(Locale.ENGLISH);
     anotherMainLink.setSlug("another_main_link");
-    anotherMainLink.setMainAlias(true);
+    anotherMainLink.setPrimary(true);
     anotherMainLink = this.repo.save(anotherMainLink);
 
     LocalizedUrlAliases allLinks = this.repo.findAllForTarget(this.firstUrlAlias.getTargetUuid()),
