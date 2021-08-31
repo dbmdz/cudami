@@ -87,7 +87,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
         "{\n"
             + "  \"created\": \"2021-08-17T15:18:01.000001\",\n"
             + "  \"lastPublished\": \"2021-08-17T15:18:01.000001\",\n"
-            + "  \"mainAlias\": true,\n"
+            + "  \"primary\": true,\n"
             + "  \"slug\": \"hurz\",\n"
             + "  \"targetLanguage\": \"de\",\n"
             + "  \"targetIdentifiableType\": \"ENTITY\",\n"
