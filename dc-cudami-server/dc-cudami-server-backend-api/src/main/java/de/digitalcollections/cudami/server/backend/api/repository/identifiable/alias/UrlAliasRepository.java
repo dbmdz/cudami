@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.server.backend.api.repository.alias;
+package de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;

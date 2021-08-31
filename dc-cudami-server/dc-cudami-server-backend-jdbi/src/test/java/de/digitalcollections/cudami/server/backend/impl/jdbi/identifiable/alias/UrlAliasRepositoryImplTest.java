@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.server.backend.impl.jdbi.alias;
+package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;

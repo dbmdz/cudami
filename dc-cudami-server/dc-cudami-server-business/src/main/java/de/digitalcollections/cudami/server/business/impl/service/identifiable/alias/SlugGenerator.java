@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.alias;
 
 import com.ibm.icu.text.Transliterator;
-import de.digitalcollections.cudami.server.backend.api.repository.alias.UrlAliasRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import java.util.Locale;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

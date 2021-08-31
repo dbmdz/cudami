@@ -1,7 +1,7 @@
-package de.digitalcollections.cudami.server.backend.impl.jdbi.alias;
+package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias;
 
-import de.digitalcollections.cudami.server.backend.api.repository.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
@@ -71,7 +71,10 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
 
   public static String getSelectFields() {
     return PROPERTY_COLUMN_MAPPING.values().stream()
-        .map(col -> String.format("%1$s.%2$s %3$s_%2$s", TABLE_ALIAS, col, MAPPING_PREFIX))
+        .map(
+            col ->
+                String.format(
+                    "%1$s.%2$s %3$s_%2$s", TABLE_ALIAS, col.replace("\"", ""), MAPPING_PREFIX))
         .collect(Collectors.joining(", "));
   }
 
