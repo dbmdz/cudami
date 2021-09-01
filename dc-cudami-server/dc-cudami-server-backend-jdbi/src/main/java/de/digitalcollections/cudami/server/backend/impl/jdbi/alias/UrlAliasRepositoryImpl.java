@@ -3,8 +3,8 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.alias;
 import de.digitalcollections.cudami.server.backend.api.repository.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
-import de.digitalcollections.model.alias.LocalizedUrlAliases;
-import de.digitalcollections.model.alias.UrlAlias;
+import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
+import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.time.LocalDateTime;
@@ -34,7 +34,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     PROPERTY_COLUMN_MAPPING = new LinkedHashMap<>(10);
     PROPERTY_COLUMN_MAPPING.put("created", "created");
     PROPERTY_COLUMN_MAPPING.put("lastPublished", "last_published");
-    PROPERTY_COLUMN_MAPPING.put("mainAlias", "main_alias");
+    PROPERTY_COLUMN_MAPPING.put("primary", "\"primary\"");
     PROPERTY_COLUMN_MAPPING.put("slug", "slug");
     PROPERTY_COLUMN_MAPPING.put("targetIdentifiableType", "target_identifiable_type");
     PROPERTY_COLUMN_MAPPING.put("targetEntityType", "target_entity_type");
@@ -51,7 +51,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    return List.of("created", "lastPublished", "mainAlias", "slug", "targetLanguage");
+    return List.of("created", "lastPublished", "\"primary\"", "slug", "targetLanguage");
   }
 
   @Override
@@ -158,7 +158,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
       return new LocalizedUrlAliases();
     }
     String sql =
-        "SELECT * FROM " + TABLE_NAME + " WHERE target_uuid = :uuid ORDER BY main_alias, slug;";
+        "SELECT * FROM " + TABLE_NAME + " WHERE target_uuid = :uuid ORDER BY \"primary\", slug;";
     try {
       UrlAlias[] resultset =
           this.dbi.withHandle(
@@ -186,7 +186,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     String sql =
         "SELECT * FROM "
             + TABLE_NAME
-            + " WHERE website_uuid = :uuid AND main_alias = true AND target_uuid = "
+            + " WHERE website_uuid = :uuid AND \"primary\" = true AND target_uuid = "
             + innerSel;
     Map<String, Object> bindings = Map.of("uuid", websiteUuid, "slug", slug);
     try {
