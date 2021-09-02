@@ -1,22 +1,16 @@
-package de.digitalcollections.cudami.server.business.impl.service.alias;
+package de.digitalcollections.cudami.server.business.impl.service.identifiable.alias;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.digitalcollections.commons.web.SlugGenerator;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
-import de.digitalcollections.cudami.server.business.impl.alias.SlugGenerator;
-import de.digitalcollections.model.alias.LocalizedUrlAliases;
-import de.digitalcollections.model.alias.UrlAlias;
-import de.digitalcollections.cudami.server.business.impl.service.identifiable.alias.SlugGenerator;
-import de.digitalcollections.cudami.server.business.impl.service.identifiable.alias.UrlAliasServiceImpl;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
@@ -24,6 +18,8 @@ import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
@@ -345,19 +341,6 @@ class UrlAliasServiceImplTest {
     assertThat(service.generateSlug(Locale.GERMAN, "label", websiteUuid)).isEqualTo(expected);
   }
 
-  @DisplayName(
-      "uses the default website UUID for slug generation, when no website UUID was provided")
-  @Test
-  public void useDefaultWebsiteUuidForSlugGeneration()
-      throws CudamiServiceException, UrlAliasRepositoryException {
-    UUID defaultWebsiteUuid = UUID.randomUUID();
-    service.setDefaultWebsiteUuid(defaultWebsiteUuid);
-
-    service.generateSlug(Locale.GERMAN, "label", null);
-
-    verify(repo, times(1)).hasUrlAlias(eq(defaultWebsiteUuid), any(String.class));
-  }
-
   @DisplayName("throws an exception, when the query for existance of a slug leads to an exception")
   @Test
   public void throwsExceptionWhenSlugQueryFails() throws UrlAliasRepositoryException {
@@ -371,28 +354,12 @@ class UrlAliasServiceImplTest {
         });
   }
 
-  @DisplayName("generates slugs with language suffix for non default locale, when possible")
-  @Test
-  public void generateSlugWithLanguageSuffix()
-      throws UrlAliasRepositoryException, CudamiServiceException {
-    String expected = "label-en";
-    UUID websiteUuid = UUID.randomUUID();
-    service.setDefaultLocale(Locale.GERMAN);
-
-    when(slugGenerator.generateSlug(eq("label"))).thenReturn("label");
-    when(repo.hasUrlAlias(eq(websiteUuid), eq("label"))).thenReturn(true);
-    when(repo.hasUrlAlias(eq(websiteUuid), eq("label-en"))).thenReturn(false);
-
-    assertThat(service.generateSlug(Locale.ENGLISH, "label", websiteUuid)).isEqualTo(expected);
-  }
-
   @DisplayName("generates slugs with numeric suffix for default locale")
   @Test
   public void generateSlugWithNumericSuffixForDefaultLocale()
       throws UrlAliasRepositoryException, CudamiServiceException {
     String expected = "label-2";
     UUID websiteUuid = UUID.randomUUID();
-    service.setDefaultLocale(Locale.GERMAN);
 
     when(slugGenerator.generateSlug(eq("label"))).thenReturn("label");
     when(repo.hasUrlAlias(eq(websiteUuid), eq("label"))).thenReturn(true);
@@ -400,24 +367,6 @@ class UrlAliasServiceImplTest {
     when(repo.hasUrlAlias(eq(websiteUuid), eq("label-2"))).thenReturn(false);
 
     assertThat(service.generateSlug(Locale.GERMAN, "label", websiteUuid)).isEqualTo(expected);
-  }
-
-  @DisplayName(
-      "generates slugs with numeric suffix for non-default locale, when localized slug already exists")
-  @Test
-  public void generateSlugWithNumericSuffixForNonDefaultLocaleButOccupiedLocalizedSlug()
-      throws UrlAliasRepositoryException, CudamiServiceException {
-    String expected = "label-2";
-    UUID websiteUuid = UUID.randomUUID();
-    service.setDefaultLocale(Locale.GERMAN);
-
-    when(slugGenerator.generateSlug(eq("label"))).thenReturn("label");
-    when(repo.hasUrlAlias(eq(websiteUuid), eq("label"))).thenReturn(true);
-    when(repo.hasUrlAlias(eq(websiteUuid), eq("label-en"))).thenReturn(true);
-    when(repo.hasUrlAlias(eq(websiteUuid), eq("label-1"))).thenReturn(true);
-    when(repo.hasUrlAlias(eq(websiteUuid), eq("label-2"))).thenReturn(false);
-
-    assertThat(service.generateSlug(Locale.ENGLISH, "label", websiteUuid)).isEqualTo(expected);
   }
 
   // -------------------------------------------------------------------------
@@ -434,11 +383,20 @@ class UrlAliasServiceImplTest {
     urlAlias.setLastPublished(LocalDateTime.now());
     urlAlias.setCreated(LocalDateTime.now());
     urlAlias.setTargetLanguage(Locale.forLanguageTag("de"));
-
-    Website website = new Website();
-    website.setUuid(UUID.randomUUID());
-    urlAlias.setWebsite(website);
+    urlAlias.setWebsite(createWebsite(UUID.randomUUID()));
     return urlAlias;
+  }
+
+  private Website createWebsite(UUID uuid) {
+    Website website = new Website();
+    website.setUuid(uuid);
+    String dummyUrl = "http://" + uuid + "/";
+    try {
+      website.setUrl(new URL(dummyUrl));
+    } catch (MalformedURLException e) {
+      throw new RuntimeException("Cannot create dummy URL=" + dummyUrl + ": " + e, e);
+    }
+    return website;
   }
 
   private UrlAlias deepCopy(UrlAlias urlAlias) {
