@@ -215,31 +215,33 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
       innerSel.append(" AND website_uuid ").append(websiteUuid != null ? "= :uuid" : "IS NULL");
     }
     innerSel.append(")");
-    String sql =
-        "SELECT "
-            + getSelectFields(true)
-            + " FROM "
-            + TABLE_NAME
-            + " AS "
-            + TABLE_ALIAS
-            + this.websitesJoin
-            + " WHERE "
-            + TABLE_ALIAS
-            + ".primary = true AND "
-            + (useWebsite ? TABLE_ALIAS + ".website_uuid = :uuid AND " : "")
-            + TABLE_ALIAS
-            + ".target_uuid = "
-            + innerSel.toString();
     Map<String, Object> bindings = new HashMap<>();
     bindings.put("slug", slug);
+    StringBuilder sql =
+        new StringBuilder(
+            "SELECT "
+                + getSelectFields(true)
+                + " FROM "
+                + TABLE_NAME
+                + " AS "
+                + TABLE_ALIAS
+                + this.websitesJoin
+                + " WHERE "
+                + TABLE_ALIAS
+                + ".primary = true AND "
+                + TABLE_ALIAS
+                + ".target_uuid IN "
+                + innerSel.toString());
     if (useWebsite) {
+      sql.append(" AND " + TABLE_ALIAS + ".website_uuid ")
+          .append(websiteUuid != null ? "= :uuid" : "IS NULL");
       bindings.put("uuid", websiteUuid);
     }
     try {
       UrlAlias[] resultset =
           this.dbi.withHandle(
               h ->
-                  h.createQuery(sql)
+                  h.createQuery(sql.toString())
                       .bindMap(bindings)
                       .reduceRows(this::mapRowToUrlAlias)
                       .toArray(UrlAlias[]::new));
