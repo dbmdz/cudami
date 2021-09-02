@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
@@ -49,26 +50,29 @@ public class UrlAliasRepositoryImplTest {
   @Autowired Jdbi jdbi;
   @Autowired WebsiteRepository websiteRepository;
 
-  UUID websiteUuid = UUID.randomUUID();
-  UrlAlias firstUrlAlias = this.getNewUrlAliasObject();
-
-  UrlAlias secondUrlAlias;
+  Website website;
+  UrlAlias urlAliasWithoutWebsite;
+  UrlAlias urlAliasWithWebsite;
 
   @BeforeAll
   public void setupTest() throws MalformedURLException {
     this.repo = new UrlAliasRepositoryImpl(this.jdbi);
     this.prepareWebsite();
+    this.urlAliasWithoutWebsite = this.getNewUrlAliasObject();
+    this.urlAliasWithWebsite = this.getNewUrlAliasObject();
+    this.urlAliasWithWebsite.setWebsite(this.website);
+    this.urlAliasWithWebsite.setSlug("impressum-with-website");
   }
 
   private void prepareWebsite() throws MalformedURLException {
     // to meet the foreign key constraints we must do some preparation
-    Website website = new Website(new URL("https://my-first-website.com"));
-    website.setUuid(this.websiteUuid);
-    website.setCreated(LocalDateTime.now());
-    website.setRefId(13);
-    website.setLastModified(LocalDateTime.now());
-    website.setLabel("Test website");
-    this.websiteRepository.save(website);
+    this.website = new Website(new URL("https://my-first-website.com"));
+    this.website.setUuid(UUID.randomUUID());
+    this.website.setCreated(LocalDateTime.now());
+    this.website.setRefId(13);
+    this.website.setLastModified(LocalDateTime.now());
+    this.website.setLabel("Test website");
+    this.websiteRepository.save(this.website);
   }
 
   private UrlAlias getNewUrlAliasObject() {
@@ -193,52 +197,59 @@ public class UrlAliasRepositoryImplTest {
   @Order(1)
   @Test
   public void save() throws UrlAliasRepositoryException {
-    assertThat(this.firstUrlAlias.getUuid()).isNull();
-    assertThat(this.firstUrlAlias.getCreated()).isNull();
-    assertThat(this.firstUrlAlias.getLastPublished()).isNull();
+    assertThat(this.urlAliasWithWebsite.getUuid()).isNull();
+    assertThat(this.urlAliasWithWebsite.getCreated()).isNull();
+    assertThat(this.urlAliasWithWebsite.getLastPublished()).isNull();
 
-    UrlAlias actual = this.repo.save(this.firstUrlAlias);
+    UrlAlias actual = this.repo.save(this.urlAliasWithWebsite);
 
     assertThat(actual.getUuid()).isNotNull();
     assertThat(actual.getCreated()).isNotNull();
     assertThat(actual.getLastPublished()).isNull();
     assertFalse(actual.isPrimary());
-    this.firstUrlAlias = actual;
+    assertEquals(actual.getWebsite().getUuid(), this.website.getUuid());
+    assertEquals(actual.getWebsite().getLabel(), this.website.getLabel());
+    assertEquals(actual.getWebsite().getUrl(), this.website.getUrl());
+    this.urlAliasWithWebsite = actual;
   }
 
   @DisplayName("Retrieve object by UUID")
   @Order(2)
   @Test
   public void findOne() throws UrlAliasRepositoryException {
-    UrlAlias found = this.repo.findOne(this.firstUrlAlias.getUuid());
-    assertThat(found).isEqualTo(this.firstUrlAlias);
+    UrlAlias found = this.repo.findOne(this.urlAliasWithWebsite.getUuid());
+    assertEquals(found, this.urlAliasWithWebsite);
   }
 
   @DisplayName("Update an UrlAlias object")
   @Order(3)
   @Test
   public void update() throws UrlAliasRepositoryException {
-    this.firstUrlAlias.setLastPublished(LocalDateTime.now());
-    this.firstUrlAlias.setPrimary(true);
-    this.firstUrlAlias.setTargetIdentifiableType(IdentifiableType.ENTITY);
-    this.firstUrlAlias.setTargetEntityType(EntityType.COLLECTION);
-    UrlAlias updated = this.repo.update(this.firstUrlAlias);
+    this.urlAliasWithoutWebsite = this.repo.save(this.urlAliasWithoutWebsite);
+    this.urlAliasWithoutWebsite.setLastPublished(LocalDateTime.now());
+    this.urlAliasWithoutWebsite.setPrimary(true);
+    this.urlAliasWithoutWebsite.setTargetIdentifiableType(IdentifiableType.ENTITY);
+    this.urlAliasWithoutWebsite.setTargetEntityType(EntityType.COLLECTION);
+    UrlAlias updated = this.repo.update(this.urlAliasWithoutWebsite);
 
-    assertThat(updated).isEqualTo(this.firstUrlAlias);
+    assertThat(updated).isEqualTo(this.urlAliasWithoutWebsite);
   }
 
   @DisplayName("Retrieve LocalizedUrlAliases for target UUID")
   @Order(4)
   @Test
   public void findAllForTarget() throws UrlAliasRepositoryException {
-    this.secondUrlAlias = this.getNewUrlAliasObject();
-    this.secondUrlAlias.setSlug("wir_ueber_uns");
-    this.secondUrlAlias.setTargetUuid(this.firstUrlAlias.getTargetUuid());
-    this.secondUrlAlias.setTargetIdentifiableType(IdentifiableType.RESOURCE);
-    this.secondUrlAlias = this.repo.save(this.secondUrlAlias);
+    this.urlAliasWithWebsite = this.getNewUrlAliasObject();
+    this.urlAliasWithWebsite.setSlug("wir_ueber_uns");
+    this.urlAliasWithWebsite.setTargetUuid(this.urlAliasWithoutWebsite.getTargetUuid());
+    this.urlAliasWithWebsite.setTargetIdentifiableType(IdentifiableType.RESOURCE);
+    this.urlAliasWithWebsite.setWebsite(this.website);
+    this.urlAliasWithWebsite = this.repo.save(this.urlAliasWithWebsite);
 
-    LocalizedUrlAliases actual = this.repo.findAllForTarget(this.firstUrlAlias.getTargetUuid());
-    LocalizedUrlAliases expected = new LocalizedUrlAliases(this.secondUrlAlias, this.firstUrlAlias);
+    LocalizedUrlAliases actual =
+        this.repo.findAllForTarget(this.urlAliasWithoutWebsite.getTargetUuid());
+    LocalizedUrlAliases expected =
+        new LocalizedUrlAliases(this.urlAliasWithWebsite, this.urlAliasWithoutWebsite);
     assertTrue(actual.equals(expected));
   }
 
@@ -247,19 +258,25 @@ public class UrlAliasRepositoryImplTest {
   @Test
   public void findMainLinks() throws UrlAliasRepositoryException {
     UrlAlias anotherMainLink = this.getNewUrlAliasObject();
-    anotherMainLink.setTargetUuid(this.firstUrlAlias.getTargetUuid());
+    anotherMainLink.setTargetUuid(this.urlAliasWithoutWebsite.getTargetUuid());
     anotherMainLink.setTargetLanguage(Locale.ENGLISH);
     anotherMainLink.setSlug("another_main_link");
     anotherMainLink.setPrimary(true);
+    anotherMainLink.setWebsite(this.website);
     anotherMainLink = this.repo.save(anotherMainLink);
 
-    LocalizedUrlAliases allLinks = this.repo.findAllForTarget(this.firstUrlAlias.getTargetUuid()),
-        mainLinks = this.repo.findMainLinks(this.websiteUuid, "wir_ueber_uns");
+    LocalizedUrlAliases
+        allLinks = this.repo.findAllForTarget(this.urlAliasWithoutWebsite.getTargetUuid()),
+        mainLinksWithWebsite =
+            this.repo.findPrimaryLinksForWebsite(this.website.getUuid(), "wir_ueber_uns"),
+        mainLinksWithoutWebsite = this.repo.findAllPrimaryLinks("wir_ueber_uns");
 
     assertThat(allLinks.flatten().size()).isEqualTo(3);
-    assertThat(mainLinks.flatten().size()).isEqualTo(2);
-    assertThat(mainLinks.get(Locale.GERMAN).get(0)).isEqualTo(this.firstUrlAlias);
-    assertThat(mainLinks.get(Locale.ENGLISH).get(0)).isEqualTo(anotherMainLink);
+    assertThat(mainLinksWithWebsite.flatten().size()).isEqualTo(1);
+    assertThat(mainLinksWithoutWebsite.flatten().size()).isEqualTo(2);
+    assertThat(mainLinksWithoutWebsite.get(Locale.GERMAN).get(0))
+        .isEqualTo(this.urlAliasWithoutWebsite);
+    assertThat(mainLinksWithoutWebsite.get(Locale.ENGLISH).get(0)).isEqualTo(anotherMainLink);
   }
 
   @DisplayName("Generic search method")
@@ -276,7 +293,7 @@ public class UrlAliasRepositoryImplTest {
     assertThat(searchPageResponse.getContent().size()).isEqualTo(1);
     assertTrue(searchPageResponse.getContent().get(0).containsKey(Locale.GERMAN));
     assertThat(searchPageResponse.getContent().get(0).get(Locale.GERMAN))
-        .isEqualTo(List.of(this.secondUrlAlias));
+        .isEqualTo(List.of(this.urlAliasWithWebsite));
   }
 
   @DisplayName("Check method hasUrlAlias")
@@ -284,16 +301,19 @@ public class UrlAliasRepositoryImplTest {
   @Test
   public void hasUrlAlias() throws UrlAliasRepositoryException {
     assertThrows(
-        UrlAliasRepositoryException.class, () -> this.repo.hasUrlAlias(this.websiteUuid, ""));
-    assertTrue(this.repo.hasUrlAlias(this.websiteUuid, this.firstUrlAlias.getSlug()));
-    assertFalse(this.repo.hasUrlAlias(this.websiteUuid, "does_not_exist"));
+        UrlAliasRepositoryException.class, () -> this.repo.hasUrlAlias(this.website.getUuid(), ""));
+    assertFalse(
+        this.repo.hasUrlAlias(this.website.getUuid(), this.urlAliasWithoutWebsite.getSlug()));
+    assertTrue(this.repo.hasUrlAlias(null, this.urlAliasWithoutWebsite.getSlug()));
+    assertTrue(this.repo.hasUrlAlias(this.website.getUuid(), this.urlAliasWithWebsite.getSlug()));
+    assertFalse(this.repo.hasUrlAlias(this.website.getUuid(), "does_not_exist"));
   }
 
   @DisplayName("Delete an UrlAlias")
   @Order(8)
   @Test
   public void delete() throws UrlAliasRepositoryException {
-    int count = this.repo.delete(List.of(this.firstUrlAlias.getUuid()));
+    int count = this.repo.delete(List.of(this.urlAliasWithoutWebsite.getUuid()));
     assertThat(count).isEqualTo(1);
   }
 }

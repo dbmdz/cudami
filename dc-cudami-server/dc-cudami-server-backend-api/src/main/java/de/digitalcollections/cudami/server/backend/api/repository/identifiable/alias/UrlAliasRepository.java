@@ -33,14 +33,23 @@ public interface UrlAliasRepository {
   LocalizedUrlAliases findAllForTarget(UUID uuid) throws UrlAliasRepositoryException;
 
   /**
-   * Retrieve the main links corresponding to a slug.
+   * Retrieve all primary links corresponding to a slug. The owning website is ignored.
    *
-   * @param websiteUuid the owning website's UUID
-   * @param slug the slug to retrieve the main alias for
-   * @return all {@code UrlAlias}es with {@code isMainAlias() == true}
+   * @param slug the slug to retrieve the primary aliases for
+   * @return all {@code UrlAlias}es with {@code isPrimary() == true}
    * @throws UrlAliasRepositoryException
    */
-  LocalizedUrlAliases findMainLinks(UUID websiteUuid, String slug)
+  LocalizedUrlAliases findAllPrimaryLinks(String slug) throws UrlAliasRepositoryException;
+
+  /**
+   * Retrieve the primary links corresponding to a slug.
+   *
+   * @param websiteUuid the owning website's UUID, can be {@code null} and will be selected as is
+   * @param slug the slug to retrieve the primary aliases for
+   * @return all {@code UrlAlias}es with {@code isPrimary() == true}
+   * @throws UrlAliasRepositoryException
+   */
+  LocalizedUrlAliases findPrimaryLinksForWebsite(UUID websiteUuid, String slug)
       throws UrlAliasRepositoryException;
 
   /**
