@@ -237,11 +237,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
       "returns a 404, when the parameters for retrieving a main link, are invalid and so don't match the endpoint URLs")
   @ParameterizedTest
   @ValueSource(
-      strings = {
-        "/v5/urlaliases/12345678-1234-1234-1234-123456789012/",
-        "/v5/urlaliases//slug",
-        "/v5/urlaliases/foo/slug"
-      })
+      strings = {"/v5/urlaliases/12345678-1234-1234-1234-123456789012/", "/v5/urlaliases/foo/slug"})
   public void invalidParamtersForMainLink(String path) throws Exception {
     testNotFound(path);
   }
@@ -252,7 +248,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
   public void nonexistingMainLink() throws Exception {
     when(urlAliasService.findMainLink(any(UUID.class), eq("notexisting"))).thenReturn(null);
 
-    testNotFound("/v5/urlalises/12345678-1234-1234-1234-123456789012/notexisting");
+    testNotFound("/v5/urlaliases/12345678-1234-1234-1234-123456789012/notexisting");
   }
 
   @DisplayName("can return a mainLink for a given webpage/slug pair")
@@ -274,6 +270,28 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .build());
 
     when(urlAliasService.findMainLink(any(UUID.class), eq("imprint"))).thenReturn(expected);
+
+    testJson(path);
+  }
+
+  @DisplayName("can return a mainLink for a given slug but empty website_uuid")
+  @ParameterizedTest
+  @ValueSource(strings = {"/v5/urlaliases//imprint"})
+  public void existingMainLinkForEmptyWebsiteUuid(String path) throws Exception {
+    LocalizedUrlAliases expected = new LocalizedUrlAliases();
+    expected.add(
+        new UrlAliasBuilder()
+            .createdAt("2021-08-17T15:18:01.000001")
+            .lastPublishedAt("2021-08-17T15:18:01.000001")
+            .isPrimary()
+            .withSlug("imprint")
+            .withTargetLanguage("en")
+            .withTargetType(IdentifiableType.RESOURCE, null)
+            .withTargetUuid("23456789-2345-2345-2345-234567890123")
+            .withUuid("12345678-1234-1234-1234-123456789012")
+            .build());
+
+    when(urlAliasService.findMainLink(eq(null), eq("imprint"))).thenReturn(expected);
 
     testJson(path);
   }
