@@ -10,6 +10,7 @@ import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.cudami.server.model.LocalizedUrlAliasBuilder;
 import de.digitalcollections.cudami.server.model.SearchPageResponseBuilder;
 import de.digitalcollections.cudami.server.model.UrlAliasBuilder;
+import de.digitalcollections.cudami.server.model.WebsiteBuilder;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
@@ -55,7 +56,8 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .withTargetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
             .withTargetUuid("23456789-2345-2345-2345-234567890123")
             .withUuid("12345678-1234-1234-1234-123456789012")
-            .withWebsiteUuid("87654321-4321-4321-4321-876543210987")
+            .withWebsite(
+                new WebsiteBuilder().withUuid("87654321-4321-4321-4321-876543210987").build())
             .build();
     when(urlAliasService.findOne(any(UUID.class))).thenReturn(expectedUrlAlias);
 
@@ -114,7 +116,8 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .withTargetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
             .withTargetUuid("23456789-2345-2345-2345-234567890123")
             .withUuid("12345678-1234-1234-1234-123456789012")
-            .withWebsiteUuid("87654321-4321-4321-4321-876543210987")
+            .withWebsite(
+                new WebsiteBuilder().withUuid("87654321-4321-4321-4321-876543210987").build())
             .build();
     when(urlAliasService.create(any(UrlAlias.class))).thenReturn(expectedUrlAlias);
 
@@ -148,7 +151,8 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .withTargetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
             .withTargetUuid("23456789-2345-2345-2345-234567890123")
             .withUuid("12345678-1234-1234-1234-123456789012")
-            .withWebsiteUuid("87654321-4321-4321-4321-876543210987")
+            .withWebsite(
+                new WebsiteBuilder().withUuid("87654321-4321-4321-4321-876543210987").build())
             .build();
     when(urlAliasService.update(any(UrlAlias.class))).thenReturn(expectedUrlAlias);
 
@@ -163,7 +167,13 @@ class UrlAliasControllerTest extends BaseControllerTest {
             + "  \"targetEntityType\": \"COLLECTION\",\n"
             + "  \"uuid\": \"12345678-1234-1234-1234-123456789012\",\n"
             + "  \"targetUuid\": \"23456789-2345-2345-2345-234567890123\",\n"
-            + "  \"websiteUuid\": \"87654321-4321-4321-4321-876543210987\"\n"
+            + "  \"website\": {\n"
+            + "     \"identifiers\":[],\n"
+            + "     \"type\":\"ENTITY\",\n"
+            + "     \"uuid\":\"87654321-4321-4321-4321-876543210987\",\n"
+            + "     \"entityType\":\"WEBSITE\",\n"
+            + "     \"refId\":0\n"
+            + "  }\n"
             + "}";
 
     testPutJson(path, body, "/v5/urlaliases/12345678-1234-1234-1234-123456789012.json");
@@ -223,7 +233,10 @@ class UrlAliasControllerTest extends BaseControllerTest {
                                     .withTargetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
                                     .withTargetUuid("23456789-2345-2345-2345-234567890123")
                                     .withUuid("12345678-1234-1234-1234-123456789012")
-                                    .withWebsiteUuid("87654321-4321-4321-4321-876543210987")
+                                    .withWebsite(
+                                        new WebsiteBuilder()
+                                            .withUuid("87654321-4321-4321-4321-876543210987")
+                                            .build())
                                     .build())
                             .build()))
                 .build();
@@ -234,31 +247,30 @@ class UrlAliasControllerTest extends BaseControllerTest {
   }
 
   @DisplayName(
-      "returns a 404, when the parameters for retrieving a main link, are invalid and so don't match the endpoint URLs")
+      "returns a 404, when the parameters for retrieving the primary links, are invalid and so don't match the endpoint URLs")
   @ParameterizedTest
   @ValueSource(
       strings = {
-        "/v5/urlaliases/12345678-1234-1234-1234-123456789012/",
-        "/v5/urlaliases//slug",
-        "/v5/urlaliases/foo/slug"
+        "/v5/urlaliases/primary//12345678-1234-1234-1234-123456789012",
+        "/v5/urlaliases/primary/slug/invalid-uuid"
       })
-  public void invalidParamtersForMainLink(String path) throws Exception {
+  public void invalidParametersForPrimaryLinks(String path) throws Exception {
     testNotFound(path);
   }
 
   @DisplayName(
-      "returns a 404 for a main link, when no main link for a given webpage/slug pair exists")
+      "returns a 404 for primary links, when no primary links for a given slug/webpage tuple exist")
   @Test
-  public void nonexistingMainLink() throws Exception {
-    when(urlAliasService.findMainLink(any(UUID.class), eq("notexisting"))).thenReturn(null);
+  public void nonexistingPrimaryLinks() throws Exception {
+    when(urlAliasService.findPrimaryLinks(any(UUID.class), eq("notexisting"))).thenReturn(null);
 
-    testNotFound("/v5/urlalises/12345678-1234-1234-1234-123456789012/notexisting");
+    testNotFound("/v5/urlaliases/primary/notexisting/12345678-1234-1234-1234-123456789012");
   }
 
-  @DisplayName("can return a mainLink for a given webpage/slug pair")
+  @DisplayName("can return the primary links for a given slug/webpage tuple")
   @ParameterizedTest
-  @ValueSource(strings = {"/v5/urlaliases/87654321-4321-4321-4321-876543210987/imprint"})
-  public void existingMainLink(String path) throws Exception {
+  @ValueSource(strings = {"/v5/urlaliases/primary/imprint/87654321-4321-4321-4321-876543210987"})
+  public void existingPrimaryLinks(String path) throws Exception {
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     expected.add(
         new UrlAliasBuilder()
@@ -270,12 +282,35 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .withTargetType(IdentifiableType.RESOURCE, null)
             .withTargetUuid("23456789-2345-2345-2345-234567890123")
             .withUuid("12345678-1234-1234-1234-123456789012")
-            .withWebsiteUuid("87654321-4321-4321-4321-876543210987")
+            .withWebsite(
+                new WebsiteBuilder().withUuid("87654321-4321-4321-4321-876543210987").build())
             .build());
 
-    when(urlAliasService.findMainLink(any(UUID.class), eq("imprint"))).thenReturn(expected);
+    when(urlAliasService.findPrimaryLinks(any(UUID.class), eq("imprint"))).thenReturn(expected);
 
-    testJson(path);
+    testJson(path, "/v5/urlaliases/primary_imprint_87654321-4321-4321-4321-876543210987.json");
+  }
+
+  @DisplayName("can return the primary links for a given slug but empty website_uuid")
+  @ParameterizedTest
+  @ValueSource(strings = {"/v5/urlaliases/primary/imprint"})
+  public void existingPrimaryLinksForEmptyWebsiteUuid(String path) throws Exception {
+    LocalizedUrlAliases expected = new LocalizedUrlAliases();
+    expected.add(
+        new UrlAliasBuilder()
+            .createdAt("2021-08-17T15:18:01.000001")
+            .lastPublishedAt("2021-08-17T15:18:01.000001")
+            .isPrimary()
+            .withSlug("imprint")
+            .withTargetLanguage("en")
+            .withTargetType(IdentifiableType.RESOURCE, null)
+            .withTargetUuid("23456789-2345-2345-2345-234567890123")
+            .withUuid("12345678-1234-1234-1234-123456789012")
+            .build());
+
+    when(urlAliasService.findPrimaryLinks(eq(null), eq("imprint"))).thenReturn(expected);
+
+    testJson(path, "/v5/urlaliases/primary_imprint.json");
   }
 
   @DisplayName("throws an exception, when the service fails on generating a slug")

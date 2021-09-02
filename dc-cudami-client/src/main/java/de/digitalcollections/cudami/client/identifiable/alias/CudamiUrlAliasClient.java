@@ -27,9 +27,15 @@ public class CudamiUrlAliasClient extends CudamiBaseClient<UrlAlias> {
   }
 
   public LocalizedUrlAliases findAllLinks(UUID websiteUuid, String slug) throws HttpException {
+    if (websiteUuid == null) {
+      return (LocalizedUrlAliases)
+          doGetRequestForObject(
+              String.format("/v5/urlaliases/%s", slug), LocalizedUrlAliases.class);
+    }
+
     return (LocalizedUrlAliases)
         doGetRequestForObject(
-            String.format("/v5/urlaliases/%s/%s", websiteUuid, slug), LocalizedUrlAliases.class);
+            String.format("/v5/urlaliases/%s/%s", slug, websiteUuid), LocalizedUrlAliases.class);
   }
 
   public UrlAlias save(UrlAlias urlAlias) throws HttpException {

@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.model;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.EntityType;
+import de.digitalcollections.model.identifiable.entity.Website;
 import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.UUID;
@@ -56,8 +57,8 @@ public class UrlAliasBuilder {
     return this;
   }
 
-  public UrlAliasBuilder withWebsiteUuid(String websiteUuid) {
-    urlAlias.setWebsiteUuid(UUID.fromString(websiteUuid));
+  public UrlAliasBuilder withWebsite(Website website) {
+    urlAlias.setWebsite(website);
     return this;
   }
 }
