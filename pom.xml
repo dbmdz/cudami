@@ -83,7 +83,7 @@
     <version.javax.servlet-api>4.0.1</version.javax.servlet-api>
     <version.junit>5.7.2</version.junit>
     <version.logstash-logback-encoder>6.6</version.logstash-logback-encoder>
-    <version.mockito-core>3.12.0</version.mockito-core>
+    <version.mockito-core>3.12.4</version.mockito-core>
     <version.openjson>1.0.12</version.openjson>
     <version.passay>1.6.1</version.passay>
     <version.postgresql>42.2.23</version.postgresql>
@@ -95,7 +95,7 @@
     <version.githook-maven-plugin>1.0.5</version.githook-maven-plugin>
     <version.jacoco-maven-plugin>0.8.7</version.jacoco-maven-plugin>
     <version.maven-failsafe-plugin>3.0.0-M5</version.maven-failsafe-plugin>
-    <version.maven-fmt-plugin>2.11</version.maven-fmt-plugin>
+    <version.maven-fmt-plugin>2.12</version.maven-fmt-plugin>
     <version.maven-gpg-plugin>3.0.1</version.maven-gpg-plugin>
     <version.maven-surefire-plugin>3.0.0-M5</version.maven-surefire-plugin>
     <version.nexus-staging-maven-plugin>1.6.8</version.nexus-staging-maven-plugin>
