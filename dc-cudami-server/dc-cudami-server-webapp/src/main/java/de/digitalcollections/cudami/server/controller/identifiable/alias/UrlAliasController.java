@@ -171,25 +171,25 @@ public class UrlAliasController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @Operation(summary = "Get the main UrlAlias for a given website uuid and slug")
+  @Operation(summary = "Get the primary LocalizedUrlAliases for a given website uuid and slug")
   @GetMapping(
       value = {
-        "/v5/urlaliases/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}/{slug}",
-        "/v5/urlaliases//{slug}"
+        "/v5/urlaliases/primary/{slug}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v5/urlaliases/primary/{slug}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<LocalizedUrlAliases> getMainUrlAlias(
+      @Parameter(description = "the slug of the URL, e.g. <tt>imprint</tt>") @PathVariable("slug")
+          String slug,
       @Parameter(
               description =
-                  "UUID of the website, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+                  "UUID of the website if given (otherwise not set), e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable(value = "website_uuid", required = false)
-          UUID websiteUuid,
-      @Parameter(description = "the slug of the URL, e.g. <tt>imprint</tt>") @PathVariable("slug")
-          String slug)
+          UUID websiteUuid)
       throws ControllerException {
     LocalizedUrlAliases result;
     try {
-      result = urlAliasService.findMainLink(websiteUuid, slug);
+      result = urlAliasService.findPrimaryLinks(websiteUuid, slug);
     } catch (CudamiServiceException e) {
       throw new ControllerException(e);
     }

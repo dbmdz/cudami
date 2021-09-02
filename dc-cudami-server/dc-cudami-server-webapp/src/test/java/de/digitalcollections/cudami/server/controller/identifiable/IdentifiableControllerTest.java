@@ -8,6 +8,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.cudami.server.model.UrlAliasBuilder;
+import de.digitalcollections.cudami.server.model.WebsiteBuilder;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
@@ -70,7 +71,8 @@ public class IdentifiableControllerTest extends BaseControllerTest {
             .withTargetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
             .withTargetUuid("23456789-2345-2345-2345-234567890123")
             .withUuid("12345678-1234-1234-1234-123456789012")
-            .withWebsiteUuid("87654321-4321-4321-4321-876543210987")
+            .withWebsite(
+                new WebsiteBuilder().withUuid("87654321-4321-4321-4321-876543210987").build())
             .build();
     UrlAlias urlAlias2 =
         new UrlAliasBuilder()
@@ -82,7 +84,8 @@ public class IdentifiableControllerTest extends BaseControllerTest {
             .withTargetType(IdentifiableType.ENTITY, EntityType.DIGITAL_OBJECT)
             .withTargetUuid("23456789-2345-2345-2345-234567890124")
             .withUuid("12345678-1234-1234-1234-123456789012")
-            .withWebsiteUuid("87654321-4321-4321-4321-876543210987")
+            .withWebsite(
+                new WebsiteBuilder().withUuid("87654321-4321-4321-4321-876543210987").build())
             .build();
     expected.add(urlAlias1, urlAlias2);
     when(urlAliasService.findLocalizedUrlAliases(any(UUID.class))).thenReturn(expected);
