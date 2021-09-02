@@ -174,14 +174,15 @@ public class UrlAliasController {
   @Operation(summary = "Get the main UrlAlias for a given website uuid and slug")
   @GetMapping(
       value = {
-        "/v5/urlaliases/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}/{slug}"
+        "/v5/urlaliases/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}/{slug}",
+        "/v5/urlaliases//{slug}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<LocalizedUrlAliases> getMainUrlAlias(
       @Parameter(
               description =
                   "UUID of the website, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
-          @PathVariable("website_uuid")
+          @PathVariable(value = "website_uuid", required = false)
           UUID websiteUuid,
       @Parameter(description = "the slug of the URL, e.g. <tt>imprint</tt>") @PathVariable("slug")
           String slug)
