@@ -209,11 +209,12 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
 
   protected LocalizedUrlAliases findMainLinks(boolean useWebsite, UUID websiteUuid, String slug)
       throws UrlAliasRepositoryException {
-    String innerSel =
-        "(SELECT target_uuid FROM "
-            + TABLE_NAME
-            + " WHERE slug = :slug"
-            + (useWebsite ? " AND website_uuid = :uuid)" : ")");
+    StringBuilder innerSel =
+        new StringBuilder("(SELECT target_uuid FROM " + TABLE_NAME + " WHERE slug = :slug");
+    if (useWebsite) {
+      innerSel.append(" AND website_uuid ").append(websiteUuid != null ? "= :uuid" : "IS NULL");
+    }
+    innerSel.append(")");
     String sql =
         "SELECT "
             + getSelectFields(true)
@@ -228,7 +229,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
             + (useWebsite ? TABLE_ALIAS + ".website_uuid = :uuid AND " : "")
             + TABLE_ALIAS
             + ".target_uuid = "
-            + innerSel;
+            + innerSel.toString();
     Map<String, Object> bindings = new HashMap<>();
     bindings.put("slug", slug);
     if (useWebsite) {
