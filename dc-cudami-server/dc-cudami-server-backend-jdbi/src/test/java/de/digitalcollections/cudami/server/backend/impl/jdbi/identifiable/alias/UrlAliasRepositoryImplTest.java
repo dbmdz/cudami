@@ -73,7 +73,7 @@ public class UrlAliasRepositoryImplTest {
 
   private UrlAlias getNewUrlAliasObject() {
     UrlAlias urlAlias = new UrlAlias();
-    urlAlias.setWebsiteUuid(this.websiteUuid);
+    // FIXME urlAlias.setWebsiteUuid(this.websiteUuid);
     urlAlias.setSlug("impressum");
     urlAlias.setTargetLanguage(Locale.GERMAN);
     urlAlias.setTargetIdentifiableType(IdentifiableType.RESOURCE);
