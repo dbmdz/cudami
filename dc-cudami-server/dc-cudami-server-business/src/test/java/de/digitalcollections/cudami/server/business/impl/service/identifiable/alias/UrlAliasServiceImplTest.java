@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.digitalcollections.commons.web.SlugGenerator;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
@@ -248,10 +249,11 @@ class UrlAliasServiceImplTest {
     assertThat(service.findLocalizedUrlAliases(UUID.randomUUID())).isEqualTo(expected);
   }
 
+  // FIXME: website_uuid can be null, too
   @DisplayName(
-      "raises a ServiceException when trying to get a mainlink with a missing website uuid")
+      "raises a ServiceException when trying to get the primary links with a missing website uuid")
   @Test
-  public void raiseExceptionForMainlinkWithMissingUuid() throws CudamiServiceException {
+  public void raiseExceptionForPrimaryLinksWithMissingUuid() throws CudamiServiceException {
     assertThrows(
         CudamiServiceException.class,
         () -> {
@@ -260,9 +262,9 @@ class UrlAliasServiceImplTest {
   }
 
   @DisplayName(
-      "raises a ServiceException when trying to get a mainlink with a missing or empty slug")
+      "raises a ServiceException when trying to get the primary links with a missing or empty slug")
   @Test
-  public void raiseExceptionForMainlinkWithMissingOrEmptySlug() throws CudamiServiceException {
+  public void raiseExceptionForPrimaryLinksWithMissingOrEmptySlug() throws CudamiServiceException {
     assertThrows(
         CudamiServiceException.class,
         () -> {
@@ -276,9 +278,9 @@ class UrlAliasServiceImplTest {
   }
 
   @DisplayName(
-      "raises a ServiceException when retriving a mainLink leads to an exception in the repository")
+      "raises a ServiceException when retriving the primary links leads to an exception in the repository")
   @Test
-  public void raiseExceptionWhenRetrievingMainLinkLeadsToAnException()
+  public void raiseExceptionWhenRetrievingPrimaryLinksLeadsToAnException()
       throws UrlAliasRepositoryException {
     when(repo.findPrimaryLinksForWebsite(any(UUID.class), any(String.class)))
         .thenThrow(new NullPointerException("foo"));
@@ -290,9 +292,9 @@ class UrlAliasServiceImplTest {
         });
   }
 
-  @DisplayName("can return a mainLink")
+  @DisplayName("can return primary links")
   @Test
-  public void returnMainLink() throws CudamiServiceException, UrlAliasRepositoryException {
+  public void returnPrimaryLinks() throws CudamiServiceException, UrlAliasRepositoryException {
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     expected.add(createUrlAlias("hützligrütz", true));
     when(repo.findPrimaryLinksForWebsite(any(UUID.class), any(String.class))).thenReturn(expected);
