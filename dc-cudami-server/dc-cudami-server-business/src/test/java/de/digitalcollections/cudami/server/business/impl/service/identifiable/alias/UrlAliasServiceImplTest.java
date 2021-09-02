@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import de.digitalcollections.commons.web.SlugGenerator;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
@@ -256,7 +255,7 @@ class UrlAliasServiceImplTest {
     assertThrows(
         CudamiServiceException.class,
         () -> {
-          service.findMainLink(null, "hützligrütz");
+          service.findPrimaryLinks(null, "hützligrütz");
         });
   }
 
@@ -267,12 +266,12 @@ class UrlAliasServiceImplTest {
     assertThrows(
         CudamiServiceException.class,
         () -> {
-          service.findMainLink(UUID.randomUUID(), null);
+          service.findPrimaryLinks(UUID.randomUUID(), null);
         });
     assertThrows(
         CudamiServiceException.class,
         () -> {
-          service.findMainLink(UUID.randomUUID(), "");
+          service.findPrimaryLinks(UUID.randomUUID(), "");
         });
   }
 
@@ -281,13 +280,13 @@ class UrlAliasServiceImplTest {
   @Test
   public void raiseExceptionWhenRetrievingMainLinkLeadsToAnException()
       throws UrlAliasRepositoryException {
-    when(repo.findMainLinks(any(UUID.class), any(String.class)))
+    when(repo.findPrimaryLinksForWebsite(any(UUID.class), any(String.class)))
         .thenThrow(new NullPointerException("foo"));
 
     assertThrows(
         CudamiServiceException.class,
         () -> {
-          service.findMainLink(UUID.randomUUID(), "hützligrütz");
+          service.findPrimaryLinks(UUID.randomUUID(), "hützligrütz");
         });
   }
 
@@ -296,9 +295,9 @@ class UrlAliasServiceImplTest {
   public void returnMainLink() throws CudamiServiceException, UrlAliasRepositoryException {
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     expected.add(createUrlAlias("hützligrütz", true));
-    when(repo.findMainLinks(any(UUID.class), any(String.class))).thenReturn(expected);
+    when(repo.findPrimaryLinksForWebsite(any(UUID.class), any(String.class))).thenReturn(expected);
 
-    assertThat(service.findMainLink(UUID.randomUUID(), "hützligrütz")).isEqualTo(expected);
+    assertThat(service.findPrimaryLinks(UUID.randomUUID(), "hützligrütz")).isEqualTo(expected);
   }
 
   @DisplayName(
