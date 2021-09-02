@@ -127,7 +127,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
   }
 
   @Override
-  public LocalizedUrlAliases findMainLink(UUID websiteUuid, String slug)
+  public LocalizedUrlAliases findPrimaryLinks(UUID websiteUuid, String slug)
       throws CudamiServiceException {
     if (websiteUuid == null) {
       throw new CudamiServiceException("Missing websiteUuid");
@@ -137,7 +137,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
     }
 
     try {
-      return repository.findMainLinks(websiteUuid, slug);
+      return repository.findPrimaryLinksForWebsite(websiteUuid, slug);
     } catch (Exception e) {
       throw new CudamiServiceException(
           "Could not find mainLink for websiteUuid=" + websiteUuid + ", slug=" + slug + ": " + e,
