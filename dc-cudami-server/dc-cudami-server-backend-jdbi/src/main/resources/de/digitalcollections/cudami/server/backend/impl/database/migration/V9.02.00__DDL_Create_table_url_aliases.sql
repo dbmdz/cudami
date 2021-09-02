@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS url_aliases (
   uuid UUID PRIMARY KEY,
-  website_uuid UUID NOT NULL,
+  website_uuid UUID,
   slug VARCHAR(256) NOT NULL,
   "primary" BOOLEAN NOT NULL,
   last_published TIMESTAMP DEFAULT NULL,

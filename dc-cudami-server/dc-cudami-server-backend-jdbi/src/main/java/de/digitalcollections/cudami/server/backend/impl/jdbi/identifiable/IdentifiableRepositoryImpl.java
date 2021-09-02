@@ -688,7 +688,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             + ","
             + SQL_PREVIEW_IMAGE_FIELDS_PI
             + ", "
-            + UrlAliasRepositoryImpl.getSelectFields()
+            + UrlAliasRepositoryImpl.getSelectFields(false) // TODO
             + " FROM "
             + (innerQuery != null ? "(" + innerQuery + ")" : tableName)
             + " AS "
@@ -771,7 +771,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                 + ","
                 + SQL_PREVIEW_IMAGE_FIELDS_PI
                 + ", "
-                + UrlAliasRepositoryImpl.getSelectFields()
+                + UrlAliasRepositoryImpl.getSelectFields(false) // TODO
                 + " FROM "
                 + tableName
                 + " AS "
