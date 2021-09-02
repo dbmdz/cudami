@@ -10,7 +10,13 @@
       "targetEntityType": "COLLECTION",
       "targetUuid": "23456789-2345-2345-2345-234567890123",
       "uuid": "12345678-1234-1234-1234-123456789012",
-      "websiteUuid": "87654321-4321-4321-4321-876543210987"
+      "website": {
+        "identifiers": [],
+        "type": "ENTITY",
+        "uuid": "87654321-4321-4321-4321-876543210987",
+        "entityType": "WEBSITE",
+        "refId": 0
+      }
     },
     {
       "created": "2021-08-17T15:18:01.000002",
@@ -22,7 +28,13 @@
       "targetEntityType": "DIGITAL_OBJECT",
       "targetUuid": "23456789-2345-2345-2345-234567890124",
       "uuid": "12345678-1234-1234-1234-123456789012",
-      "websiteUuid": "87654321-4321-4321-4321-876543210987"
+      "website": {
+        "identifiers": [],
+        "type": "ENTITY",
+        "uuid": "87654321-4321-4321-4321-876543210987",
+        "entityType": "WEBSITE",
+        "refId": 0
+      }
     }
   ]
 }
