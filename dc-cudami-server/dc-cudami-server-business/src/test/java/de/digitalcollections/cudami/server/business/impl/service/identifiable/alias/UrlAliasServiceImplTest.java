@@ -249,16 +249,20 @@ class UrlAliasServiceImplTest {
     assertThat(service.findLocalizedUrlAliases(UUID.randomUUID())).isEqualTo(expected);
   }
 
-  // FIXME: website_uuid can be null, too
   @DisplayName(
-      "raises a ServiceException when trying to get the primary links with a missing website uuid")
+      "falls back to generic primary links when trying to get the primary links with a missing website uuid")
   @Test
-  public void raiseExceptionForPrimaryLinksWithMissingUuid() throws CudamiServiceException {
-    assertThrows(
-        CudamiServiceException.class,
-        () -> {
-          service.findPrimaryLinks(null, "hützligrütz");
-        });
+  public void genericPrimaryLinksForPrimaryLinksWithMissingUuid()
+      throws CudamiServiceException, UrlAliasRepositoryException {
+    UUID uuid = UUID.randomUUID();
+    String slug = "hützligrütz";
+
+    LocalizedUrlAliases expected = new LocalizedUrlAliases();
+    expected.add(createUrlAlias("hützligrütz", true));
+    when(repo.findPrimaryLinksForWebsite(eq(uuid), eq(slug))).thenReturn(null);
+    when(repo.findPrimaryLinksForWebsite(eq(null), eq(slug))).thenReturn(expected);
+
+    assertThat(service.findPrimaryLinks(uuid, slug)).isEqualTo(expected);
   }
 
   @DisplayName(
