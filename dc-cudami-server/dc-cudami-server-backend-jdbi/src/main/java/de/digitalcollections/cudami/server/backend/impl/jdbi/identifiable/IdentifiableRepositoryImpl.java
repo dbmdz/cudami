@@ -15,6 +15,7 @@ import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.paging.Direction;
@@ -24,6 +25,7 @@ import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.text.LocalizedText;
 import java.net.URI;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -309,6 +311,15 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       }
       if (rowView.getColumn(UrlAliasRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
         UrlAlias urlAlias = rowView.getRow(UrlAlias.class);
+        Website website =
+            new Website(
+                rowView.getColumn(UrlAliasRepositoryImpl.WEBSITESALIAS + "_url", URL.class));
+        website.setUuid(
+            rowView.getColumn(UrlAliasRepositoryImpl.WEBSITESALIAS + "_uuid", UUID.class));
+        website.setLabel(
+            rowView.getColumn(
+                UrlAliasRepositoryImpl.WEBSITESALIAS + "_label", LocalizedText.class));
+        urlAlias.setWebsite(website);
         if (identifiable.getLocalizedUrlAliases() == null) {
           identifiable.setLocalizedUrlAliases(new LocalizedUrlAliases(urlAlias));
         } else {
@@ -678,8 +689,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       StringBuilder innerQuery,
       final Map<String, Object> argumentMappings,
       String orderBy) {
-    final String urlAliasTableName = UrlAliasRepositoryImpl.TABLE_NAME;
-    final String urlAliasTableAlias = UrlAliasRepositoryImpl.TABLE_ALIAS;
+    final String urlAliasName = UrlAliasRepositoryImpl.TABLE_NAME;
+    final String urlAliasAlias = UrlAliasRepositoryImpl.TABLE_ALIAS;
     final String sql =
         "SELECT "
             + fieldsSql
@@ -688,7 +699,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             + ","
             + SQL_PREVIEW_IMAGE_FIELDS_PI
             + ", "
-            + UrlAliasRepositoryImpl.getSelectFields(false) // TODO
+            + UrlAliasRepositoryImpl.getSelectFields(true)
             + " FROM "
             + (innerQuery != null ? "(" + innerQuery + ")" : tableName)
             + " AS "
@@ -701,14 +712,15 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             + tableAlias
             + ".previewfileresource = file.uuid"
             + " LEFT JOIN "
-            + urlAliasTableName
+            + urlAliasName
             + " AS "
-            + urlAliasTableAlias
+            + urlAliasAlias
             + " ON "
             + this.tableAlias
             + ".uuid = "
-            + urlAliasTableAlias
+            + urlAliasAlias
             + ".target_uuid"
+            + UrlAliasRepositoryImpl.WEBSITESJOIN
             + (orderBy != null ? " " + orderBy : "");
 
     List<I> result =
@@ -760,8 +772,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       String sqlSelectAllFieldsJoins,
       Filtering filtering,
       final Map<String, Object> argumentMappings) {
-    final String urlAliasTableName = UrlAliasRepositoryImpl.TABLE_NAME;
-    final String urlAliasTableAlias = UrlAliasRepositoryImpl.TABLE_ALIAS;
+    final String urlAliasName = UrlAliasRepositoryImpl.TABLE_NAME;
+    final String urlAliasAlias = UrlAliasRepositoryImpl.TABLE_ALIAS;
     StringBuilder sql =
         new StringBuilder(
             "SELECT"
@@ -771,7 +783,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                 + ","
                 + SQL_PREVIEW_IMAGE_FIELDS_PI
                 + ", "
-                + UrlAliasRepositoryImpl.getSelectFields(false) // TODO
+                + UrlAliasRepositoryImpl.getSelectFields(true)
                 + " FROM "
                 + tableName
                 + " AS "
@@ -784,14 +796,15 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                 + tableAlias
                 + ".previewfileresource = file.uuid"
                 + " LEFT JOIN "
-                + urlAliasTableName
+                + urlAliasName
                 + " AS "
-                + urlAliasTableAlias
+                + urlAliasAlias
                 + " ON "
                 + this.tableAlias
                 + ".uuid = "
-                + urlAliasTableAlias
-                + ".target_uuid");
+                + urlAliasAlias
+                + ".target_uuid"
+                + UrlAliasRepositoryImpl.WEBSITESJOIN);
     addFiltering(filtering, sql);
 
     I result =

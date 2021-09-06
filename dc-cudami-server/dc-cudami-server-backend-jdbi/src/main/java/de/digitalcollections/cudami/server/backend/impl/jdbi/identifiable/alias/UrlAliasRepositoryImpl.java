@@ -34,7 +34,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
   public static final String TABLE_ALIAS = "ua";
   public static final String MAPPING_PREFIX = "ua";
 
-  private static final String WEBSITESALIAS = "ws";
+  public static final String WEBSITESALIAS = "webs";
 
   private static final Map<String, String> PROPERTY_COLUMN_MAPPING;
 
@@ -73,7 +73,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     return selectFields.collect(Collectors.joining(", "));
   }
 
-  private final String websitesJoin =
+  public static final String WEBSITESJOIN =
       String.format(
           " LEFT JOIN websites %1$s ON %1$s.uuid = %2$s.website_uuid ", WEBSITESALIAS, TABLE_ALIAS);
 
@@ -88,7 +88,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     if (urlAliasUuids.isEmpty()) {
       return 0;
     }
-    String sql = "DELETE FROM " + TABLE_NAME + " WHERE uuid in (<aliasUuids>);";
+    String sql = "DELETE FROM " + this.tableName + " WHERE uuid in (<aliasUuids>);";
     try {
       return this.dbi.withHandle(
           h -> h.createUpdate(sql).bindList("aliasUuids", urlAliasUuids).execute());
@@ -112,14 +112,14 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
   public SearchPageResponse<LocalizedUrlAliases> find(SearchPageRequest searchPageRequest)
       throws UrlAliasRepositoryException {
     StringBuilder commonSql =
-        new StringBuilder(" FROM " + TABLE_NAME + " AS " + TABLE_ALIAS + this.websitesJoin);
+        new StringBuilder(" FROM " + this.tableName + " AS " + this.tableAlias + WEBSITESJOIN);
     Map<String, Object> bindings = new HashMap<>();
 
     this.addFiltering(searchPageRequest, commonSql);
     if (StringUtils.hasText(searchPageRequest.getQuery())) {
       commonSql
           .append(commonSql.toString().matches("(?i).+\\s+WHERE .*") ? " AND " : " WHERE ")
-          .append(TABLE_ALIAS + ".slug like '%' || :searchTerm || '%' ");
+          .append(this.tableAlias + ".slug like '%' || :searchTerm || '%' ");
       bindings.put("searchTerm", searchPageRequest.getQuery());
     }
 
@@ -174,12 +174,12 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
         "SELECT "
             + getSelectFields(true)
             + " FROM "
-            + TABLE_NAME
+            + this.tableName
             + " AS "
-            + TABLE_ALIAS
-            + this.websitesJoin
+            + this.tableAlias
+            + WEBSITESJOIN
             + " WHERE "
-            + TABLE_ALIAS
+            + this.tableAlias
             + ".target_uuid = :uuid ORDER BY \"primary\", slug;";
     try {
       UrlAlias[] resultset =
@@ -210,7 +210,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
   protected LocalizedUrlAliases findMainLinks(boolean useWebsite, UUID websiteUuid, String slug)
       throws UrlAliasRepositoryException {
     StringBuilder innerSel =
-        new StringBuilder("(SELECT target_uuid FROM " + TABLE_NAME + " WHERE slug = :slug");
+        new StringBuilder("(SELECT target_uuid FROM " + this.tableName + " WHERE slug = :slug");
     if (useWebsite) {
       innerSel.append(" AND website_uuid ").append(websiteUuid != null ? "= :uuid" : "IS NULL");
     }
@@ -222,18 +222,18 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
             "SELECT "
                 + getSelectFields(true)
                 + " FROM "
-                + TABLE_NAME
+                + this.tableName
                 + " AS "
-                + TABLE_ALIAS
-                + this.websitesJoin
+                + this.tableAlias
+                + WEBSITESJOIN
                 + " WHERE "
-                + TABLE_ALIAS
+                + this.tableAlias
                 + ".primary = true AND "
-                + TABLE_ALIAS
+                + this.tableAlias
                 + ".target_uuid IN "
                 + innerSel.toString());
     if (useWebsite) {
-      sql.append(" AND " + TABLE_ALIAS + ".website_uuid ")
+      sql.append(" AND " + this.tableAlias + ".website_uuid ")
           .append(websiteUuid != null ? "= :uuid" : "IS NULL");
       bindings.put("uuid", websiteUuid);
     }
@@ -273,11 +273,11 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
         "SELECT "
             + getSelectFields(true)
             + " FROM "
-            + TABLE_NAME
+            + this.tableName
             + " AS "
-            + TABLE_ALIAS
-            + this.websitesJoin
-            + String.format(" WHERE %s.uuid = :uuid;", TABLE_ALIAS);
+            + this.tableAlias
+            + WEBSITESJOIN
+            + String.format(" WHERE %s.uuid = :uuid;", this.tableAlias);
     try {
       return this.dbi.withHandle(
           h ->
@@ -313,7 +313,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
 
   @Override
   protected String getColumnName(String modelProperty) {
-    return TABLE_ALIAS + "." + PROPERTY_COLUMN_MAPPING.get(modelProperty);
+    return this.tableAlias + "." + PROPERTY_COLUMN_MAPPING.get(modelProperty);
   }
 
   private String getColumnsForInsert() {
@@ -343,7 +343,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
               h ->
                   h.createQuery(
                           "SELECT uuid FROM "
-                              + TABLE_NAME
+                              + this.tableName
                               + " WHERE website_uuid "
                               + (websiteUuid != null ? "= :websiteUuid " : "IS NULL ")
                               + "AND slug = :slug;")
@@ -361,7 +361,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
   private void mapRowToUrlAlias(Map<UUID, UrlAlias> map, RowView row) {
     UrlAlias alias =
         map.compute(
-            row.getColumn(MAPPING_PREFIX + "_uuid", UUID.class),
+            row.getColumn(this.mappingPrefix + "_uuid", UUID.class),
             (uuid, urlAlias) -> urlAlias != null ? urlAlias : row.getRow(UrlAlias.class));
     if (alias != null && row.getColumn(WEBSITESALIAS + "_uuid", UUID.class) != null) {
       Website website = new Website(row.getColumn(WEBSITESALIAS + "_url", URL.class));
@@ -382,7 +382,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     urlAlias.setCreated(LocalDateTime.now());
     String sql =
         "INSERT INTO "
-            + TABLE_NAME
+            + this.tableName
             + " ("
             + this.getColumnsForInsert()
             + ") VALUES ("
@@ -414,7 +414,11 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
       return null;
     }
     String sql =
-        "UPDATE " + TABLE_NAME + " SET " + this.getAssignmentsForUpdate() + " WHERE uuid = :uuid;";
+        "UPDATE "
+            + this.tableName
+            + " SET "
+            + this.getAssignmentsForUpdate()
+            + " WHERE uuid = :uuid;";
     try {
       int affected =
           this.dbi.withHandle(
