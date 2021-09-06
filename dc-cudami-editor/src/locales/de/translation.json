@@ -210,6 +210,7 @@
     "password": "Passwort",
     "passwordChangeInfo": "Wenn Sie das Passwort des Benutzers ändern wollen, füllen Sie bitte die folgenden beiden Felder aus.",
     "pattern": "Muster",
+    "previewImage": "Vorschaubild",
     "refId": "Referenz-ID",
     "removeFrom": {
       "collection": "aus Sammlung entfernen"

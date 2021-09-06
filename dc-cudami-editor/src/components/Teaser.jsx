@@ -14,7 +14,7 @@ const Teaser = ({
   updatePreviewImage,
 }) => {
   return (
-    <Card className="bg-light">
+    <Card className="bg-light mb-0">
       <CardBody>
         <Row>
           <Col sm="2">
