@@ -22,9 +22,18 @@ const ActionButtons = ({formId}) => {
   })
 
   const {t} = useTranslation()
+  const buttonClasses = classNames({
+    border: !inView,
+    'border-white': !inView,
+  })
   const buttons = (
     <ButtonGroup>
-      <Button color="primary" form={formId} type="submit">
+      <Button
+        className={buttonClasses}
+        color="primary"
+        form={formId}
+        type="submit"
+      >
         {t('save')}
       </Button>
     </ButtonGroup>
