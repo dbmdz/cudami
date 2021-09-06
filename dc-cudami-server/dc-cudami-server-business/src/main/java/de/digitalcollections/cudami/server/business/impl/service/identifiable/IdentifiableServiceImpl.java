@@ -2,10 +2,14 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
+import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.paging.Direction;
@@ -24,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service("identifiableService")
 public class IdentifiableServiceImpl<I extends Identifiable> implements IdentifiableService<I> {
@@ -31,6 +36,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableServiceImpl.class);
 
   @Autowired private LocaleService localeService;
+  @Autowired private UrlAliasService urlAliasService;
 
   protected IdentifiableRepository<I> repository;
 
@@ -166,10 +172,22 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-  //  @Transactional(readOnly = false)
+  @Transactional(
+      readOnly = false,
+      rollbackFor = {IdentifiableServiceException.class, RuntimeException.class})
   public I save(I identifiable) throws IdentifiableServiceException {
     try {
-      return repository.save(identifiable);
+      I saved_identifiable = this.repository.save(identifiable);
+      LocalizedUrlAliases savedUrlAliases = new LocalizedUrlAliases();
+      for (UrlAlias urlAlias : identifiable.getLocalizedUrlAliases().flatten()) {
+        UrlAlias savedAlias = this.urlAliasService.create(urlAlias);
+        savedUrlAliases.add(savedAlias);
+      }
+      saved_identifiable.setLocalizedUrlAliases(savedUrlAliases);
+      return saved_identifiable;
+    } catch (CudamiServiceException e) {
+      LOGGER.error(String.format("Cannot save UrlAliases for: %s", identifiable), e);
+      throw new IdentifiableServiceException(e.getMessage());
     } catch (Exception e) {
       LOGGER.error("Cannot save identifiable " + identifiable + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
