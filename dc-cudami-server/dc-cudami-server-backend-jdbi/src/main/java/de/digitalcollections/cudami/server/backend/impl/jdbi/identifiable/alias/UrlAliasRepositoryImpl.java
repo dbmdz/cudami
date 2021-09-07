@@ -379,7 +379,9 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     if (urlAlias.getUuid() == null) {
       urlAlias.setUuid(UUID.randomUUID());
     }
-    urlAlias.setCreated(LocalDateTime.now());
+    if (urlAlias.getCreated() == null) {
+      urlAlias.setCreated(LocalDateTime.now());
+    }
     String sql =
         "INSERT INTO "
             + this.tableName

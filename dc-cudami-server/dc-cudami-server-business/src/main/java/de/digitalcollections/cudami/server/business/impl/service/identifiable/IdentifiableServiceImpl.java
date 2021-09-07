@@ -62,7 +62,15 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-  public boolean delete(List<UUID> uuids) {
+  @Transactional(rollbackFor = {RuntimeException.class, IdentifiableServiceException.class})
+  public boolean delete(List<UUID> uuids) throws IdentifiableServiceException {
+    for (UUID uuid : uuids) {
+      try {
+        this.urlAliasService.deleteAllForTarget(uuid);
+      } catch (CudamiServiceException e) {
+        throw new IdentifiableServiceException("Error while removing UrlAliases. Rollback.", e);
+      }
+    }
     return repository.delete(uuids);
   }
 
@@ -172,19 +180,22 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-  @Transactional(
-      readOnly = false,
-      rollbackFor = {IdentifiableServiceException.class, RuntimeException.class})
+  @Transactional(rollbackFor = {IdentifiableServiceException.class, RuntimeException.class})
   public I save(I identifiable) throws IdentifiableServiceException {
     try {
-      I saved_identifiable = this.repository.save(identifiable);
-      LocalizedUrlAliases savedUrlAliases = new LocalizedUrlAliases();
-      for (UrlAlias urlAlias : identifiable.getLocalizedUrlAliases().flatten()) {
-        UrlAlias savedAlias = this.urlAliasService.create(urlAlias);
-        savedUrlAliases.add(savedAlias);
+      I savedIdentifiable = this.repository.save(identifiable);
+      if (identifiable.getLocalizedUrlAliases() != null) {
+        LocalizedUrlAliases savedUrlAliases = new LocalizedUrlAliases();
+        for (UrlAlias urlAlias : identifiable.getLocalizedUrlAliases().flatten()) {
+          // since we have the identifiable's UUID just here
+          // the targetUuid must be set at this point
+          urlAlias.setTargetUuid(savedIdentifiable.getUuid());
+          UrlAlias savedAlias = this.urlAliasService.create(urlAlias);
+          savedUrlAliases.add(savedAlias);
+        }
+        savedIdentifiable.setLocalizedUrlAliases(savedUrlAliases);
       }
-      saved_identifiable.setLocalizedUrlAliases(savedUrlAliases);
-      return saved_identifiable;
+      return savedIdentifiable;
     } catch (CudamiServiceException e) {
       LOGGER.error(String.format("Cannot save UrlAliases for: %s", identifiable), e);
       throw new IdentifiableServiceException(e.getMessage());
@@ -221,10 +232,21 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-  //  @Transactional(readOnly = false)
+  @Transactional(rollbackFor = {RuntimeException.class, IdentifiableServiceException.class})
   public I update(I identifiable) throws IdentifiableServiceException {
     try {
-      return repository.update(identifiable);
+      I updatedIdentifiable = this.repository.update(identifiable);
+      // UrlAliases
+      this.urlAliasService.deleteAllForTarget(identifiable.getUuid());
+      if (identifiable.getLocalizedUrlAliases() != null) {
+        LocalizedUrlAliases savedLocalizedUrlAliases = new LocalizedUrlAliases();
+        for (UrlAlias urlAlias : identifiable.getLocalizedUrlAliases().flatten()) {
+          UrlAlias savedAlias = this.urlAliasService.create(urlAlias);
+          savedLocalizedUrlAliases.add(savedAlias);
+        }
+        updatedIdentifiable.setLocalizedUrlAliases(savedLocalizedUrlAliases);
+      }
+      return updatedIdentifiable;
     } catch (Exception e) {
       LOGGER.error("Cannot update identifiable " + identifiable + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());

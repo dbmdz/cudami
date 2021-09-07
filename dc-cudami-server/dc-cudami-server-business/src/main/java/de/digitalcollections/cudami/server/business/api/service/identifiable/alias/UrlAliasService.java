@@ -44,6 +44,16 @@ public interface UrlAliasService {
   boolean delete(List<UUID> uuids) throws CudamiServiceException;
 
   /**
+   * Delete all UrlAliases targetting the passed UUID.
+   *
+   * @param uuid the {@code targetUuid} whose UrlAliases should be deleted
+   * @return true if at least one UrlAlias existed and could be deleted of false, if no UrlAlias
+   *     existed at all and thus nothing could be deleted
+   * @throws CudamiServiceException
+   */
+  boolean deleteAllForTarget(UUID uuid) throws CudamiServiceException;
+
+  /**
    * Create an UrlAlias in the database
    *
    * @param urlAlias the UrlAlias (with yet empty UUID)

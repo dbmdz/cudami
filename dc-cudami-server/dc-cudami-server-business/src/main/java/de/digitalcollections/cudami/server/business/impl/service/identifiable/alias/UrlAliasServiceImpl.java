@@ -13,6 +13,7 @@ import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,17 +44,22 @@ public class UrlAliasServiceImpl implements UrlAliasService {
   }
 
   @Override
-  public boolean delete(UUID uuid) throws CudamiServiceException {
-    return delete(List.of(uuid));
-  }
-
-  @Override
   public boolean delete(List<UUID> uuids) throws CudamiServiceException {
     try {
       return repository.delete(uuids) > 0;
     } catch (UrlAliasRepositoryException e) {
       throw new CudamiServiceException("Cannot delete UrlAliases by uuids: " + e, e);
     }
+  }
+
+  @Override
+  public boolean deleteAllForTarget(UUID uuid) throws CudamiServiceException {
+    if (uuid == null) {
+      return false;
+    }
+    LocalizedUrlAliases urlAliases = this.findLocalizedUrlAliases(uuid);
+    return this.delete(
+        urlAliases.flatten().stream().map(ua -> ua.getUuid()).collect(Collectors.toList()));
   }
 
   @Override

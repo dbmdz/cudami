@@ -67,8 +67,12 @@ public class DigitalObjectController {
   public ResponseEntity delete(
       @Parameter(example = "", description = "UUID of the digital object") @PathVariable("uuid")
           UUID uuid) {
-    boolean successful = digitalObjectService.delete(uuid);
-
+    boolean successful;
+    try {
+      successful = digitalObjectService.delete(uuid);
+    } catch (IdentifiableServiceException e) {
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
     }
