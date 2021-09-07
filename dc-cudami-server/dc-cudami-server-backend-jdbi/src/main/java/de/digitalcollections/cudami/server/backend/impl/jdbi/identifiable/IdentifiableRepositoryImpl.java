@@ -705,33 +705,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     return result;
   }
 
-  protected Integer retrieveNextSortIndexForParentChildren(
-      Jdbi dbi, String tableName, String columNameParentUuid, UUID parentUuid) {
-    // first child: max gets no results (= null)):
-    Integer sortIndex =
-        dbi.withHandle(
-            (Handle h) ->
-                h.createQuery(
-                        "SELECT MAX(sortIndex) + 1 FROM "
-                            + tableName
-                            + " WHERE "
-                            + columNameParentUuid
-                            + " = :parent_uuid")
-                    .bind("parent_uuid", parentUuid)
-                    .mapTo(Integer.class)
-                    .findOne()
-                    .orElse(null));
-    if (sortIndex == null) {
-      return 0;
-    }
-    return sortIndex;
-  }
-
   public I retrieveOne(String fieldsSql, String sqlSelectAllFieldsJoins, Filtering filtering) {
     Map<String, Object> argumentMappings = new HashMap<>(0);
     return retrieveOne(fieldsSql, sqlSelectAllFieldsJoins, filtering, argumentMappings);
   }
-
+  
   public I retrieveOne(
       String fieldsSql,
       String sqlSelectAllFieldsJoins,
