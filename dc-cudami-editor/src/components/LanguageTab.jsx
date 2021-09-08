@@ -1,9 +1,15 @@
 import {publish} from 'pubsub-js'
 import {useTranslation} from 'react-i18next'
-import {FaTrashAlt} from 'react-icons/fa'
+import {FaExclamationCircle, FaTrashAlt} from 'react-icons/fa'
 import {Button, NavItem, NavLink} from 'reactstrap'
 
-const LanguageTab = ({activeLanguage, enableRemove, language, toggle}) => {
+const LanguageTab = ({
+  activeLanguage,
+  enableRemove,
+  invalid = false,
+  language,
+  toggle,
+}) => {
   const {t} = useTranslation()
   return (
     <NavItem>
@@ -16,6 +22,9 @@ const LanguageTab = ({activeLanguage, enableRemove, language, toggle}) => {
           }
         }}
       >
+        {invalid && (
+          <FaExclamationCircle className="mr-2" color="#dc3545" size="16" />
+        )}
         {language ? t(`languageNames:${language}`) : `(${t('notSpecified')})`}
         {enableRemove && (
           <Button

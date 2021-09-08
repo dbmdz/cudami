@@ -83,7 +83,16 @@ const UserForm = ({allRoles, apiContextPath = '/', uuid}) => {
             <h1>{uuid ? t('editUser', {email}) : t('createUser')}</h1>
           </Col>
           <Col xs="6" sm="3">
-            <ActionButtons formId={formId} />
+            <ActionButtons
+              disabled={[
+                email,
+                firstname,
+                lastname,
+                passwords.pwd1,
+                passwords.pwd2,
+              ].some((field) => !field)}
+              formId={formId}
+            />
           </Col>
         </Row>
         <Row form>
@@ -158,7 +167,7 @@ const UserForm = ({allRoles, apiContextPath = '/', uuid}) => {
               onChange={(v) => setPasswords({...passwords, pwd1: v})}
               required={!uuid}
               type="password"
-              value={passwords?.pwd1 ?? ''}
+              value={passwords.pwd1 ?? ''}
             />
           </Col>
           <Col>
@@ -168,7 +177,7 @@ const UserForm = ({allRoles, apiContextPath = '/', uuid}) => {
               onChange={(v) => setPasswords({...passwords, pwd2: v})}
               required={!uuid}
               type="password"
-              value={passwords?.pwd2 ?? ''}
+              value={passwords.pwd2 ?? ''}
             />
           </Col>
         </Row>

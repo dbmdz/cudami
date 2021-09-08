@@ -62,7 +62,7 @@ class IdentifiableForm extends Component {
       },
       existingLanguages: props.existingLanguages ?? [props.activeLanguage],
       identifiable: null,
-      invalidLanguages: [],
+      invalidLanguages: props.existingLanguages ? [] : [props.activeLanguage],
     }
   }
 
@@ -105,22 +105,26 @@ class IdentifiableForm extends Component {
   }
 
   addLanguage = (selectedLanguage) => {
+    const {
+      availableLanguages,
+      existingLanguages,
+      identifiable,
+      invalidLanguages,
+    } = this.state
     this.setState({
       activeLanguage: selectedLanguage.name,
-      availableLanguages: this.state.availableLanguages.filter(
+      availableLanguages: availableLanguages.filter(
         (language) => language.name !== selectedLanguage.name
       ),
-      existingLanguages: [
-        ...this.state.existingLanguages,
-        selectedLanguage.name,
-      ],
+      existingLanguages: [...existingLanguages, selectedLanguage.name],
       identifiable: {
-        ...this.state.identifiable,
+        ...identifiable,
         label: {
-          ...this.state.identifiable.label,
+          ...identifiable.label,
           [selectedLanguage.name]: '',
         },
       },
+      invalidLanguages: [...invalidLanguages, selectedLanguage.name],
     })
   }
 
@@ -157,13 +161,21 @@ class IdentifiableForm extends Component {
       website: WebsiteForm,
     }
     const FormComponent = FORM_COMPONENT_MAPPING[this.props.type]
+    const {
+      activeLanguage,
+      availableLanguages,
+      existingLanguages,
+      identifiable,
+      invalidLanguages,
+    } = this.state
     return (
       <FormComponent
-        activeLanguage={this.state.activeLanguage}
-        canAddLanguage={this.state.availableLanguages.length > 0}
-        existingLanguages={this.state.existingLanguages}
+        activeLanguage={activeLanguage}
+        canAddLanguage={availableLanguages.length > 0}
+        existingLanguages={existingLanguages}
         formId={`${kebabCase(this.props.type)}-form`}
-        identifiable={this.state.identifiable}
+        identifiable={identifiable}
+        invalidLanguages={invalidLanguages}
         onAddLanguage={() => this.toggleDialog('addLanguage')}
         onSubmit={this.submitIdentifiable}
         onToggleLanguage={this.toggleLanguage}
@@ -172,29 +184,15 @@ class IdentifiableForm extends Component {
     )
   }
 
+  getInvalidLanguages = (identifiable) =>
+    this.state.existingLanguages.filter((l) => !identifiable.label[l])
+
   isEmptyContent = (content) => {
     return (
       content.length === 1 &&
       content[0].type === 'paragraph' &&
       !content[0].content
     )
-  }
-
-  isFormValid = () => {
-    let invalidLanguages = []
-    const label = this.state.identifiable.label
-    for (let language in label) {
-      if (label[language] === '') {
-        invalidLanguages.push(language)
-      }
-    }
-    if (invalidLanguages.length > 0) {
-      this.setState({
-        invalidLanguages,
-      })
-      return false
-    }
-    return true
   }
 
   removeLanguage = (language) => {
@@ -232,31 +230,29 @@ class IdentifiableForm extends Component {
   }
 
   submitIdentifiable = async () => {
-    if (this.isFormValid()) {
-      const {apiContextPath, parentType, parentUuid, type} = this.props
-      const identifiable = {
-        ...this.state.identifiable,
-        description: this.cleanUpJson(this.state.identifiable.description),
-      }
-      if (identifiable.text) {
-        identifiable.text = this.cleanUpJson(this.state.identifiable.text)
-      }
-      const {error = false, uuid} = await (identifiable.uuid
-        ? updateIdentifiable(apiContextPath, identifiable, type)
-        : saveIdentifiable(apiContextPath, identifiable, type, {
-            parentType,
-            parentUuid,
-          }))
-      if (error) {
-        return this.setState({
-          feedbackMessage: {
-            color: 'danger',
-            key: 'submitOfFormFailed',
-          },
-        })
-      }
-      window.location.href = `${apiContextPath}${typeToEndpointMapping[type]}/${uuid}`
+    const {apiContextPath, parentType, parentUuid, type} = this.props
+    const identifiable = {
+      ...this.state.identifiable,
+      description: this.cleanUpJson(this.state.identifiable.description),
     }
+    if (identifiable.text) {
+      identifiable.text = this.cleanUpJson(this.state.identifiable.text)
+    }
+    const {error = false, uuid} = await (identifiable.uuid
+      ? updateIdentifiable(apiContextPath, identifiable, type)
+      : saveIdentifiable(apiContextPath, identifiable, type, {
+          parentType,
+          parentUuid,
+        }))
+    if (error) {
+      return this.setState({
+        feedbackMessage: {
+          color: 'danger',
+          key: 'submitOfFormFailed',
+        },
+      })
+    }
+    window.location.href = `${apiContextPath}${typeToEndpointMapping[type]}/${uuid}`
   }
 
   toggleLanguage = (activeLanguage) => {
@@ -280,11 +276,12 @@ class IdentifiableForm extends Component {
         ...this.state.identifiable,
         ...identifiable,
       },
+      invalidLanguages: this.getInvalidLanguages(identifiable),
     })
   }
 
   render() {
-    const {apiContextPath, uiLocale} = this.props
+    const {apiContextPath, type, uiLocale} = this.props
     const {
       activeLanguage,
       availableLanguages,
@@ -297,6 +294,10 @@ class IdentifiableForm extends Component {
     if (!identifiable) {
       return null
     }
+    const shouldNotRenderLabelWarning =
+      !invalidLanguages.length ||
+      /* FIXME: little hack for the FileResourceUploadForm, there will never be a filled label */
+      (type === 'fileResource' && !identifiable.uuid)
     return (
       <AppContext.Provider
         value={{
@@ -306,8 +307,11 @@ class IdentifiableForm extends Component {
         }}
       >
         <div className="identifiable-editor">
-          {invalidLanguages.length > 0 && (
-            <FormErrors invalidLanguages={invalidLanguages} />
+          {shouldNotRenderLabelWarning || (
+            <FeedbackMessage
+              className="mb-2"
+              message={{color: 'warning', key: 'labelNotFilled'}}
+            />
           )}
           {feedbackMessage && (
             <FeedbackMessage

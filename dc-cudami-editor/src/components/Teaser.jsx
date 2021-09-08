@@ -32,6 +32,7 @@ const Teaser = ({
               onChange={(label) => {
                 onUpdate('label', label)
               }}
+              required
               value={label}
             />
             <EditorWithLabel
