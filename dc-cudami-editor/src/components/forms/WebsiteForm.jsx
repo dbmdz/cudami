@@ -13,6 +13,7 @@ const WebsiteForm = ({
   existingLanguages,
   formId,
   identifiable,
+  invalidLanguages,
   onAddLanguage,
   onSubmit,
   onToggleLanguage,
@@ -36,7 +37,10 @@ const WebsiteForm = ({
           </h1>
         </Col>
         <Col xs="6" sm="3">
-          <ActionButtons formId={formId} />
+          <ActionButtons
+            disabled={invalidLanguages.length > 0 || !identifiable.url}
+            formId={formId}
+          />
         </Col>
       </Row>
       <Row>
@@ -67,6 +71,7 @@ const WebsiteForm = ({
               <LanguageTab
                 activeLanguage={activeLanguage}
                 enableRemove={existingLanguages.length > 1}
+                invalid={invalidLanguages.includes(language)}
                 key={language}
                 language={language}
                 toggle={onToggleLanguage}

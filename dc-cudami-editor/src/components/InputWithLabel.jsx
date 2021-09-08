@@ -19,6 +19,7 @@ const InputWithLabel = ({
       </Label>
       <Input
         id={id}
+        invalid={required && !value}
         onChange={(evt) => onChange(evt.target.value)}
         readOnly={readOnly}
         required={required}

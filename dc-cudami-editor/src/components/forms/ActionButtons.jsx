@@ -11,7 +11,7 @@ const ActionButtonsInNavbar = ({buttons, navbar}) => {
   )
 }
 
-const ActionButtons = ({formId}) => {
+const ActionButtons = ({disabled = false, formId}) => {
   const navbar = document.querySelector('.navbar')
   const {inView, ref} = useInView({
     delay: 100,
@@ -31,6 +31,7 @@ const ActionButtons = ({formId}) => {
       <Button
         className={buttonClasses}
         color="primary"
+        disabled={disabled}
         form={formId}
         type="submit"
       >

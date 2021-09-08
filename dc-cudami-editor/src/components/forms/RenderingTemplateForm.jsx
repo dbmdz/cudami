@@ -90,7 +90,7 @@ const RenderingTemplateForm = ({apiContextPath = '/', uuid}) => {
             </h1>
           </Col>
           <Col xs="6" sm="3">
-            <ActionButtons formId={formId} />
+            <ActionButtons disabled={!name} formId={formId} />
           </Col>
         </Row>
         <Row>

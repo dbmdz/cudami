@@ -23,6 +23,7 @@ const ArticleForm = ({
   existingLanguages,
   formId,
   identifiable,
+  invalidLanguages,
   onAddLanguage,
   onSubmit,
   onToggleLanguage,
@@ -42,7 +43,10 @@ const ArticleForm = ({
           <h1>{identifiable.uuid ? t('editArticle') : t('createArticle')}</h1>
         </Col>
         <Col xs="6" sm="3">
-          <ActionButtons formId={formId} />
+          <ActionButtons
+            disabled={invalidLanguages.length > 0}
+            formId={formId}
+          />
         </Col>
       </Row>
       <Row>
@@ -65,6 +69,7 @@ const ArticleForm = ({
               <LanguageTab
                 activeLanguage={activeLanguage}
                 enableRemove={existingLanguages.length > 1}
+                invalid={invalidLanguages.includes(language)}
                 key={language}
                 language={language}
                 toggle={onToggleLanguage}

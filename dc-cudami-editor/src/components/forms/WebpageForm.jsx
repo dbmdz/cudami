@@ -28,6 +28,7 @@ const WebpageForm = ({
   existingLanguages,
   formId,
   identifiable,
+  invalidLanguages,
   onAddLanguage,
   onSubmit,
   onToggleLanguage,
@@ -60,7 +61,10 @@ const WebpageForm = ({
             <h1>{uuid ? t('editWebpage') : t('createWebpage')}</h1>
           </Col>
           <Col xs="6" sm="3">
-            <ActionButtons formId={formId} />
+            <ActionButtons
+              disabled={invalidLanguages.length > 0}
+              formId={formId}
+            />
           </Col>
         </Row>
         <Row>
@@ -114,6 +118,7 @@ const WebpageForm = ({
                 <LanguageTab
                   activeLanguage={activeLanguage}
                   enableRemove={existingLanguages.length > 1}
+                  invalid={invalidLanguages.includes(language)}
                   key={language}
                   language={language}
                   toggle={onToggleLanguage}

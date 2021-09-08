@@ -13,6 +13,7 @@ const TopicForm = ({
   existingLanguages,
   formId,
   identifiable,
+  invalidLanguages,
   onAddLanguage,
   onSubmit,
   onToggleLanguage,
@@ -32,7 +33,10 @@ const TopicForm = ({
           <h1>{identifiable.uuid ? t('editTopic') : t('createTopic')}</h1>
         </Col>
         <Col xs="6" sm="3">
-          <ActionButtons formId={formId} />
+          <ActionButtons
+            disabled={invalidLanguages.length > 0}
+            formId={formId}
+          />
         </Col>
       </Row>
       <Row>
@@ -55,6 +59,7 @@ const TopicForm = ({
               <LanguageTab
                 activeLanguage={activeLanguage}
                 enableRemove={existingLanguages.length > 1}
+                invalid={invalidLanguages.includes(language)}
                 key={language}
                 language={language}
                 toggle={onToggleLanguage}

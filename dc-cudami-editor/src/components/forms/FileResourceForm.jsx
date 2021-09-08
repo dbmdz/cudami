@@ -14,6 +14,7 @@ const FileResourceForm = ({
   existingLanguages,
   formId,
   identifiable,
+  invalidLanguages,
   onAddLanguage,
   onSubmit,
   onToggleLanguage,
@@ -36,7 +37,10 @@ const FileResourceForm = ({
           <h1>{t('editFileResource', {name: identifiable.filename})}</h1>
         </Col>
         <Col xs="6" sm="3">
-          <ActionButtons formId={formId} />
+          <ActionButtons
+            disabled={invalidLanguages.length > 0}
+            formId={formId}
+          />
         </Col>
       </Row>
       <Row>
@@ -57,6 +61,7 @@ const FileResourceForm = ({
               <LanguageTab
                 activeLanguage={activeLanguage}
                 enableRemove={existingLanguages.length > 1}
+                invalid={invalidLanguages.includes(language)}
                 key={language}
                 language={language}
                 toggle={onToggleLanguage}
