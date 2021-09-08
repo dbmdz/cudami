@@ -3,6 +3,8 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.plugins;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.commons.jdbi.JsonbArgumentFactory;
 import de.digitalcollections.commons.jdbi.JsonbColumnMapperFactory;
+import de.digitalcollections.commons.jdbi.LocaleArgumentFactory;
+import de.digitalcollections.commons.jdbi.LocaleColumnMapperFactory;
 import de.digitalcollections.model.geo.CoordinateLocation;
 import de.digitalcollections.model.identifiable.entity.CustomAttributes;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
@@ -31,6 +33,7 @@ public class JsonbJdbiPlugin implements JdbiPlugin {
     db.registerArgument(new JsonbArgumentFactory<>(RenderingHints.class, objectMapper));
     db.registerArgument(new JsonbArgumentFactory<>(RenderingHintsPreviewImage.class, objectMapper));
     db.registerArgument(new JsonbArgumentFactory<>(TimeValue.class, objectMapper));
+    db.registerArgument(new LocaleArgumentFactory());
 
     // column mapper
     db.registerColumnMapper(new JsonbColumnMapperFactory(CoordinateLocation.class, objectMapper));
@@ -42,5 +45,6 @@ public class JsonbJdbiPlugin implements JdbiPlugin {
     db.registerColumnMapper(
         new JsonbColumnMapperFactory(RenderingHintsPreviewImage.class, objectMapper));
     db.registerColumnMapper(new JsonbColumnMapperFactory(TimeValue.class, objectMapper));
+    db.registerColumnMapper(new LocaleColumnMapperFactory());
   }
 }

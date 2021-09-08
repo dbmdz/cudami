@@ -73,6 +73,8 @@ public interface HeadwordService {
 
   List<Entity> getRelatedEntities(UUID headwordUuid);
 
+  PageResponse<Entity> getRelatedEntities(UUID uuid, PageRequest pageRequest);
+
   default List<FileResource> getRelatedFileResources(Headword headword) {
     if (headword == null) {
       return null;
@@ -81,6 +83,8 @@ public interface HeadwordService {
   }
 
   List<FileResource> getRelatedFileResources(UUID headwordUuid);
+
+  PageResponse<FileResource> getRelatedFileResources(UUID uuid, PageRequest pageRequest);
 
   Headword save(Headword headword) throws ServiceException;
 

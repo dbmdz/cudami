@@ -107,8 +107,19 @@ public class HeadwordServiceImpl implements HeadwordService {
   }
 
   @Override
+  public PageResponse<Entity> getRelatedEntities(UUID headwordUuid, PageRequest pageRequest) {
+    return repository.getRelatedEntities(headwordUuid, pageRequest);
+  }
+
+  @Override
   public List<FileResource> getRelatedFileResources(UUID headwordUuid) {
     return repository.getRelatedFileResources(headwordUuid);
+  }
+
+  @Override
+  public PageResponse<FileResource> getRelatedFileResources(
+      UUID headwordUuid, PageRequest pageRequest) {
+    return repository.getRelatedFileResources(headwordUuid, pageRequest);
   }
 
   @Override
