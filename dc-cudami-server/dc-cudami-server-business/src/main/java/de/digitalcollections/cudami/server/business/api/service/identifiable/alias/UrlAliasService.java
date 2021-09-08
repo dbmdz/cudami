@@ -37,21 +37,34 @@ public interface UrlAliasService {
    * Delete a list of UrlAliases by their UUIDs
    *
    * @param uuids a List of UUIDs
-   * @return true if at least one UrlAlias existed and could be deleted of false, if no UrlAlias
+   * @return true if at least one UrlAlias existed and could be deleted or false, if no UrlAlias
    *     existed at all and thus nothing could be deleted
    * @throws CudamiServiceException
    */
   boolean delete(List<UUID> uuids) throws CudamiServiceException;
 
   /**
-   * Delete all UrlAliases targetting the passed UUID.
+   * Delete all UrlAliases targetting the passed UUID except those that have already been published.
    *
    * @param uuid the {@code targetUuid} whose UrlAliases should be deleted
-   * @return true if at least one UrlAlias existed and could be deleted of false, if no UrlAlias
+   * @return true if at least one UrlAlias existed and could be deleted or false, if no UrlAlias
    *     existed at all and thus nothing could be deleted
    * @throws CudamiServiceException
    */
-  boolean deleteAllForTarget(UUID uuid) throws CudamiServiceException;
+  default boolean deleteAllForTarget(UUID uuid) throws CudamiServiceException {
+    return this.deleteAllForTarget(uuid, false);
+  }
+
+  /**
+   * Delete all UrlAliases targetting the passed UUID except those that have already been published.
+   *
+   * @param uuid the {@code targetUuid} whose UrlAliases should be deleted
+   * @param force if {@code true} remove published ones as well
+   * @return true if at least one UrlAlias existed and could be deleted or false, if no UrlAlias
+   *     existed at all and thus nothing could be deleted
+   * @throws CudamiServiceException
+   */
+  boolean deleteAllForTarget(UUID uuid, boolean force) throws CudamiServiceException;
 
   /**
    * Create an UrlAlias in the database

@@ -66,7 +66,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   public boolean delete(List<UUID> uuids) throws IdentifiableServiceException {
     for (UUID uuid : uuids) {
       try {
-        this.urlAliasService.deleteAllForTarget(uuid);
+        this.urlAliasService.deleteAllForTarget(uuid, true);
       } catch (CudamiServiceException e) {
         throw new IdentifiableServiceException("Error while removing UrlAliases. Rollback.", e);
       }
@@ -239,13 +239,19 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       // UrlAliases
       this.urlAliasService.deleteAllForTarget(identifiable.getUuid());
       if (identifiable.getLocalizedUrlAliases() != null) {
-        LocalizedUrlAliases savedLocalizedUrlAliases = new LocalizedUrlAliases();
         for (UrlAlias urlAlias : identifiable.getLocalizedUrlAliases().flatten()) {
-          UrlAlias savedAlias = this.urlAliasService.create(urlAlias);
-          savedLocalizedUrlAliases.add(savedAlias);
+          if (urlAlias.getUuid() != null && urlAlias.getLastPublished() != null) {
+            // these haven't been removed from DB so we must update them
+            this.urlAliasService.update(urlAlias);
+          } else {
+            this.urlAliasService.create(urlAlias);
+          }
         }
-        updatedIdentifiable.setLocalizedUrlAliases(savedLocalizedUrlAliases);
       }
+      LocalizedUrlAliases savedLocalizedUrlAliases =
+          this.urlAliasService.findLocalizedUrlAliases(updatedIdentifiable.getUuid());
+      updatedIdentifiable.setLocalizedUrlAliases(savedLocalizedUrlAliases);
+      //////
       return updatedIdentifiable;
     } catch (Exception e) {
       LOGGER.error("Cannot update identifiable " + identifiable + ": ", e);

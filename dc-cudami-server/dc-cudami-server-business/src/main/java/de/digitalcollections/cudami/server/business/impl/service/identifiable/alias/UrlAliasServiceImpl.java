@@ -10,16 +10,22 @@ import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.cudami.server.business.impl.alias.SlugGenerator;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /** Service implementation for UrlAlias handling. */
 @Service
 public class UrlAliasServiceImpl implements UrlAliasService {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(UrlAliasServiceImpl.class);
 
   private final SlugGenerator slugGenerator;
   private final UrlAliasRepository repository;
@@ -31,15 +37,20 @@ public class UrlAliasServiceImpl implements UrlAliasService {
   }
 
   @Override
-  public UrlAlias findOne(UUID uuid) throws CudamiServiceException {
-    if (uuid == null) {
-      return null;
+  public UrlAlias create(UrlAlias urlAlias) throws CudamiServiceException {
+    if (urlAlias == null) {
+      throw new CudamiServiceException("Cannot create an empty UrlAlias");
     }
-
+    // for updates of identifiables we save UrlAliases *with* UUID
+    //    if (urlAlias.getUuid() != null) {
+    //      throw new CudamiServiceException("Cannot create an UrlAlias, when its UUID is already
+    // set!");
+    //    }
+    this.checkPublication(urlAlias);
     try {
-      return repository.findOne(uuid);
+      return repository.save(urlAlias);
     } catch (Exception e) {
-      throw new CudamiServiceException("Cannot findOne with uuid=" + uuid + ": " + e, e);
+      throw new CudamiServiceException("Cannot save urlAlias: " + e, e);
     }
   }
 
@@ -53,47 +64,17 @@ public class UrlAliasServiceImpl implements UrlAliasService {
   }
 
   @Override
-  public boolean deleteAllForTarget(UUID uuid) throws CudamiServiceException {
+  @Transactional(rollbackFor = {RuntimeException.class, CudamiServiceException.class})
+  public boolean deleteAllForTarget(UUID uuid, boolean force) throws CudamiServiceException {
     if (uuid == null) {
       return false;
     }
     LocalizedUrlAliases urlAliases = this.findLocalizedUrlAliases(uuid);
     return this.delete(
-        urlAliases.flatten().stream().map(ua -> ua.getUuid()).collect(Collectors.toList()));
-  }
-
-  @Override
-  public UrlAlias create(UrlAlias urlAlias) throws CudamiServiceException {
-    if (urlAlias == null) {
-      throw new CudamiServiceException("Cannot create an empty UrlAlias");
-    }
-
-    if (urlAlias.getUuid() != null) {
-      throw new CudamiServiceException("Cannot create an UrlAlias, when its UUID is already set!");
-    }
-
-    try {
-      return repository.save(urlAlias);
-    } catch (Exception e) {
-      throw new CudamiServiceException("Cannot save urlAlias: " + e, e);
-    }
-  }
-
-  @Override
-  public UrlAlias update(UrlAlias urlAlias) throws CudamiServiceException {
-    if (urlAlias == null) {
-      throw new CudamiServiceException("Cannot update an empty UrlAlias");
-    }
-
-    if (urlAlias.getUuid() == null) {
-      throw new CudamiServiceException("Cannot update an UrlAlias with empty UUID");
-    }
-
-    try {
-      return repository.update(urlAlias);
-    } catch (Exception e) {
-      throw new CudamiServiceException("Cannot update urlAlias: " + e, e);
-    }
+        urlAliases.flatten().stream()
+            .filter(ua -> force || ua.getLastPublished() == null)
+            .map(ua -> ua.getUuid())
+            .collect(Collectors.toList()));
   }
 
   @Override
@@ -115,6 +96,19 @@ public class UrlAliasServiceImpl implements UrlAliasService {
     } catch (Exception e) {
       throw new CudamiServiceException(
           "Cannot find LocalizedUrlAliases for identifiable with uuid=" + uuid + ": " + e, e);
+    }
+  }
+
+  @Override
+  public UrlAlias findOne(UUID uuid) throws CudamiServiceException {
+    if (uuid == null) {
+      return null;
+    }
+
+    try {
+      return repository.findOne(uuid);
+    } catch (Exception e) {
+      throw new CudamiServiceException("Cannot findOne with uuid=" + uuid + ": " + e, e);
     }
   }
 
@@ -185,6 +179,45 @@ public class UrlAliasServiceImpl implements UrlAliasService {
             e);
       }
       suffixId++;
+    }
+  }
+
+  private void checkPublication(UrlAlias urlAlias) throws CudamiServiceException {
+    if (urlAlias.getLastPublished() != null) {
+      if (urlAlias.getUuid() != null) {
+        // Only the primary flag can change
+        UrlAlias publishedAlias = this.findOne(urlAlias.getUuid());
+        publishedAlias.setPrimary(urlAlias.isPrimary());
+        if (!urlAlias.equals(publishedAlias)) {
+          // there are more changes than permitted
+          throw new CudamiServiceException(
+              String.format(
+                  "Error: Attempt to change an already published Alias. UUID: %s",
+                  urlAlias.getUuid()));
+        }
+      }
+    } else {
+      // no publishing date yet
+      if (urlAlias.isPrimary()) {
+        urlAlias.setLastPublished(LocalDateTime.now());
+      }
+    }
+  }
+
+  @Override
+  public UrlAlias update(UrlAlias urlAlias) throws CudamiServiceException {
+    if (urlAlias == null) {
+      throw new CudamiServiceException("Cannot update an empty UrlAlias");
+    }
+    if (urlAlias.getUuid() == null) {
+      throw new CudamiServiceException("Cannot update an UrlAlias with empty UUID");
+    }
+
+    this.checkPublication(urlAlias);
+    try {
+      return repository.update(urlAlias);
+    } catch (Exception e) {
+      throw new CudamiServiceException("Cannot update urlAlias: " + e, e);
     }
   }
 }
