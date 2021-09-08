@@ -36,11 +36,10 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
   private static final Logger LOGGER = LoggerFactory.getLogger(HeadwordRepositoryImpl.class);
 
   public static final String MAPPING_PREFIX = "hword";
-  public static final String SQL_INSERT_FIELDS = " uuid, created, label, language, last_modified";
-  public static final String SQL_INSERT_VALUES =
-      " :uuid, :created, :label, :language, :lastModified";
+  public static final String SQL_INSERT_FIELDS = " uuid, created, label, locale, last_modified";
+  public static final String SQL_INSERT_VALUES = " :uuid, :created, :label, :locale, :lastModified";
   public static final String SQL_REDUCED_FIELDS_HW =
-      " hw.uuid hword_uuid, hw.label hword_label, hw.language hword_locale,"
+      " hw.uuid hword_uuid, hw.label hword_label, hw.locale hword_locale,"
           + " hw.created hword_created, hw.last_modified hword_lastModified";
   public static final String SQL_FULL_FIELDS_HW = SQL_REDUCED_FIELDS_HW;
   public static final String TABLE_ALIAS = "hw";
@@ -88,9 +87,9 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
     dbi.withHandle(
         h ->
             h.createUpdate(
-                    "DELETE FROM " + tableName + " WHERE label = :label AND language = :language")
+                    "DELETE FROM " + tableName + " WHERE label = :label AND locale = :locale")
                 .bind("label", label)
-                .bind("language", locale)
+                .bind("locale", locale)
                 .execute());
   }
 
@@ -282,7 +281,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
       case "lastModified":
         return tableAlias + ".last_modified";
       case "locale":
-        return tableAlias + ".language";
+        return tableAlias + ".locale";
       case "uuid":
         return tableAlias + ".uuid";
       default:
@@ -292,7 +291,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
 
   @Override
   public List<Locale> getLanguages() {
-    String query = "SELECT DISTINCT language FROM " + tableName;
+    String query = "SELECT DISTINCT locale FROM " + tableName;
     List<Locale> result = dbi.withHandle(h -> h.createQuery(query).mapTo(Locale.class).list());
     return result;
   }
@@ -304,7 +303,20 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
   }
 
   @Override
+  public PageResponse<Entity> getRelatedEntities(UUID headwordUuid, PageRequest pageRequest) {
+    throw new UnsupportedOperationException(
+        "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
   public List<FileResource> getRelatedFileResources(UUID headwordUuid) {
+    throw new UnsupportedOperationException(
+        "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
+  public PageResponse<FileResource> getRelatedFileResources(
+      UUID headwordUuid, PageRequest pageRequest) {
     throw new UnsupportedOperationException(
         "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
   }
@@ -388,12 +400,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
             + SQL_INSERT_VALUES
             + ")";
 
-    dbi.withHandle(
-        h ->
-            h.createUpdate(sql)
-                .bind("language", headword.getLocale().getLanguage())
-                .bindBean(headword)
-                .execute());
+    dbi.withHandle(h -> h.createUpdate(sql).bindBean(headword).execute());
 
     return headword;
   }

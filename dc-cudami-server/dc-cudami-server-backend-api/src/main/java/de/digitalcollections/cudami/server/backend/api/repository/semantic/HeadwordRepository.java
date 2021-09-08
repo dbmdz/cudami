@@ -94,7 +94,11 @@ public interface HeadwordRepository {
 
   List<Entity> getRelatedEntities(UUID headwordUuid);
 
+  PageResponse<Entity> getRelatedEntities(UUID headwordUuid, PageRequest pageRequest);
+
   List<FileResource> getRelatedFileResources(UUID headwordUuid);
+
+  PageResponse<FileResource> getRelatedFileResources(UUID headwordUuid, PageRequest pageRequest);
 
   /**
    * Save a Headword.
