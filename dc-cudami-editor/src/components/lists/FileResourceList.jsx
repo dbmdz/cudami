@@ -57,7 +57,7 @@ const FileResourceList = ({
               sizeInBytes,
               uuid,
             },
-            index
+            index,
           ) => (
             <tr key={uuid}>
               <td className="text-right">
@@ -95,7 +95,7 @@ const FileResourceList = ({
                 />
               </td>
             </tr>
-          )
+          ),
         )}
       </tbody>
     </Table>

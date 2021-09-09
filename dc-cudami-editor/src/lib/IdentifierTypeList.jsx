@@ -7,6 +7,6 @@ export default function ({apiContextPath, id, uiLocale}) {
   initI18n(uiLocale)
   ReactDOM.render(
     <PagedIdentifierTypeList apiContextPath={apiContextPath} />,
-    document.getElementById(id)
+    document.getElementById(id),
   )
 }

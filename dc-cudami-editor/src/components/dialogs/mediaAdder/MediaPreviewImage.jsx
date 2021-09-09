@@ -11,7 +11,7 @@ const handleClick = (onUpdate) => {
     (_msg, {previewImage}) => {
       onUpdate(previewImage.uri, previewImage.uuid)
       unsubscribe(token)
-    }
+    },
   )
   publish('editor.show-preview-image-dialog', {
     enableMetadata: false,

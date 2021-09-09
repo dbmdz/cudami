@@ -64,7 +64,7 @@ class MediaSelector extends Component {
           [Object.keys(this.props.fileResource.label)[0]]: newValue,
         },
       },
-      additionalFields
+      additionalFields,
     )
   }
 
@@ -82,7 +82,7 @@ class MediaSelector extends Component {
       const response = await uploadFile(
         this.context.apiContextPath,
         file,
-        (progress) => this.setState({progress})
+        (progress) => this.setState({progress}),
       )
       onChange({
         ...response,
@@ -245,7 +245,7 @@ class MediaSelector extends Component {
                     mediaType,
                     searchTerm,
                     pageNumber,
-                    pageSize
+                    pageSize,
                   )
                 }
               />

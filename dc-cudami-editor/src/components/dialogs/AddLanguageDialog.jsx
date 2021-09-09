@@ -19,7 +19,7 @@ class AddLanguageDialog extends Component {
   addLanguage = () => {
     const {addLanguage, availableLanguages} = this.props
     const selectedLanguage = availableLanguages.filter(
-      (language) => language.name === this.state.selectedLanguage
+      (language) => language.name === this.state.selectedLanguage,
     )[0]
     addLanguage(selectedLanguage)
     this.destroy()

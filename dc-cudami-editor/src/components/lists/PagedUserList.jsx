@@ -32,7 +32,7 @@ const PagedUserList = ({apiContextPath = '/'}) => {
     const successful = await changeUserStatus(
       apiContextPath,
       user.uuid,
-      !user.enabled
+      !user.enabled,
     )
     if (!successful) {
       return setFeedbackMessage({
@@ -91,7 +91,7 @@ const PagedUserList = ({apiContextPath = '/'}) => {
                 <th className="text-center">{t('lastname')}</th>
                 <th className="text-center">{t('firstname')}</th>
                 <th className="text-center">{`${t('username')} / ${t(
-                  'email'
+                  'email',
                 )}`}</th>
                 <th className="text-center">{t('roles')}</th>
                 <th className="text-center">{t('status')}</th>
@@ -142,7 +142,7 @@ const PagedUserList = ({apiContextPath = '/'}) => {
                       </ActionButtons>
                     </td>
                   </tr>
-                )
+                ),
               )}
             </tbody>
           </Table>

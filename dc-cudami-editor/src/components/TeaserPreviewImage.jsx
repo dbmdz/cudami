@@ -18,7 +18,7 @@ const handleClick = (
   currentPreviewImage,
   currentRenderingHints,
   language,
-  onUpdate
+  onUpdate,
 ) => {
   const token = subscribe(
     'editor.update-preview-image',
@@ -28,11 +28,11 @@ const handleClick = (
         previewImageRenderingHints: updateRenderingHints(
           currentRenderingHints,
           renderingHints,
-          language
+          language,
         ),
       })
       unsubscribe(token)
-    }
+    },
   )
   const message = 'editor.show-preview-image-dialog'
   if (currentPreviewImage && currentRenderingHints) {
@@ -57,7 +57,7 @@ const handleClick = (
 const updateRenderingHints = (
   currentRenderingHints = {},
   {altText, caption, openLinkInNewWindow, targetLink, title},
-  language
+  language,
 ) => {
   const renderingHints = {
     altText: {
@@ -116,7 +116,7 @@ const TeaserPreviewImage = ({
                   previewImage,
                   previewImageRenderingHints,
                   language,
-                  onUpdate
+                  onUpdate,
                 )
               }}
               tag="a"
@@ -156,7 +156,7 @@ const TeaserPreviewImage = ({
                   previewImage,
                   previewImageRenderingHints,
                   language,
-                  onUpdate
+                  onUpdate,
                 )
               }}
               size="sm"

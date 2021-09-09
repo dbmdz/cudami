@@ -36,7 +36,7 @@ const WebpageItem = forwardRef(
       type,
       widths,
     },
-    ref
+    ref,
   ) => {
     const {
       label,
@@ -122,7 +122,7 @@ const WebpageItem = forwardRef(
         </td>
       </tr>
     )
-  }
+  },
 )
 
 WebpageItem.displayName = 'WebpageItem'

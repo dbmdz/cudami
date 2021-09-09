@@ -148,7 +148,7 @@ class AddAttachedIdentifiablesDialog extends Component {
                           searchTerm,
                           type,
                           pageNumber,
-                          pageSize
+                          pageSize,
                         )
                       }
                     />
@@ -184,7 +184,7 @@ class AddAttachedIdentifiablesDialog extends Component {
                 {identifiables.map(
                   (
                     {label, previewImage, previewImageRenderingHints, uuid},
-                    index
+                    index,
                   ) => (
                     <ListGroupItem key={uuid}>
                       <Row>
@@ -215,7 +215,7 @@ class AddAttachedIdentifiablesDialog extends Component {
                         </Col>
                       </Row>
                     </ListGroupItem>
-                  )
+                  ),
                 )}
               </ListGroup>
             )}

@@ -54,7 +54,7 @@ const CorporateBodyList = ({
               previewImageRenderingHints,
               uuid,
             },
-            index
+            index,
           ) => (
             <tr key={uuid}>
               <td className="text-right">
@@ -93,7 +93,7 @@ const CorporateBodyList = ({
                 />
               </td>
             </tr>
-          )
+          ),
         )}
       </tbody>
     </Table>

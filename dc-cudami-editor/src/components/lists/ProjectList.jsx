@@ -54,7 +54,7 @@ const ProjectList = ({
               previewImageRenderingHints,
               uuid,
             },
-            index
+            index,
           ) => (
             <tr key={uuid}>
               <td className="text-right">
@@ -93,7 +93,7 @@ const ProjectList = ({
                 />
               </td>
             </tr>
-          )
+          ),
         )}
       </tbody>
     </Table>

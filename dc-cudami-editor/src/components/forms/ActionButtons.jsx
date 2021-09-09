@@ -7,7 +7,7 @@ import {Button, ButtonGroup, NavItem} from 'reactstrap'
 const ActionButtonsInNavbar = ({buttons, navbar}) => {
   return createPortal(
     <NavItem className="border-left ml-2 pl-3">{buttons}</NavItem>,
-    navbar.querySelector('.navbar-nav')
+    navbar.querySelector('.navbar-nav'),
   )
 }
 

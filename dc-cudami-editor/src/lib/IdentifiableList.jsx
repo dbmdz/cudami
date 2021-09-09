@@ -36,6 +36,6 @@ export default function ({
       type={type}
       uiLocale={uiLocale}
     />,
-    document.getElementById(id)
+    document.getElementById(id),
   )
 }

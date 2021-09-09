@@ -42,7 +42,7 @@ class IdentifierSearch extends Component {
     this.setState({loading: true})
     const {fixedIdentifiers, namespace, setFeedbackMessage, type} = this.props
     const isFixedIdentifier = fixedIdentifiers.some(
-      (i) => i.namespace === namespace
+      (i) => i.namespace === namespace,
     )
     const result = await (isFixedIdentifier
       ? loadIdentifiable(this.context.apiContextPath, type, this.state.id)
@@ -50,7 +50,7 @@ class IdentifierSearch extends Component {
           this.context.apiContextPath,
           this.state.id,
           namespace,
-          type
+          type,
         ))
     const isEmptyResult = Object.keys(result).length === 0
     if (isEmptyResult) {
@@ -101,7 +101,7 @@ class IdentifierSearch extends Component {
                   {getLabelValue(
                     result.label,
                     this.props.activeLanguage,
-                    this.context.defaultLanguage
+                    this.context.defaultLanguage,
                   )}
                 </Col>
               </Row>

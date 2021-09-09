@@ -23,6 +23,6 @@ export default function ({
         uuid={uuid}
       />
     ),
-    document.getElementById(id)
+    document.getElementById(id),
   )
 }

@@ -23,7 +23,7 @@ export default inputRules({
       /^(\d+)\.\s$/,
       schema.nodes.ordered_list,
       (match) => ({order: +match[1]}),
-      (match, node) => node.childCount + node.attrs.order === +match[1]
+      (match, node) => node.childCount + node.attrs.order === +match[1],
     ),
 
     // * bullet list
@@ -36,7 +36,7 @@ export default inputRules({
     textblockTypeInputRule(
       new RegExp('^(#{1,6})\\s$'),
       schema.nodes.heading,
-      (match) => ({level: match[1].length})
+      (match) => ({level: match[1].length}),
     ),
   ],
 })

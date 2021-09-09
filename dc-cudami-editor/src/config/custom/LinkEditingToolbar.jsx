@@ -21,7 +21,7 @@ class LinkEditingToolbar {
     const token = subscribe('editor.add-link', (_msg, data) => {
       const {link, selection, view} = this
       view.dispatch(
-        view.state.tr.removeMark(selection.from, selection.to, link)
+        view.state.tr.removeMark(selection.from, selection.to, link),
       )
       link.attrs = data
       view.dispatch(view.state.tr.addMark(selection.from, selection.to, link))

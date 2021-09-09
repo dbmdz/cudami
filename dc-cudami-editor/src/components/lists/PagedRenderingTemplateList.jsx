@@ -22,7 +22,7 @@ const PagedRenderingTemplateList = ({apiContextPath = '/'}) => {
   const [defaultLanguage, setDefaultLanguage] = useState('')
   useEffect(() => {
     loadDefaultLanguage(apiContextPath).then((defaultLanguage) =>
-      setDefaultLanguage(defaultLanguage)
+      setDefaultLanguage(defaultLanguage),
     )
   }, [])
   const {t} = useTranslation()

@@ -10,7 +10,7 @@ class VideoView {
     dom.classList.add(
       'd-inline-block',
       'position-relative',
-      `width-${parseInt(width)}`
+      `width-${parseInt(width)}`,
     )
     if (alignment) {
       dom.classList.add(`alignment-${alignment}`)

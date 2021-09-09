@@ -3,7 +3,7 @@ const IdentifierList = ({identifiers, identifierTypes}) => (
     {identifiers.map(({id, namespace}) => (
       <li className="list-inline-item" key={`${namespace}:${id}`}>{`${
         identifierTypes.find(
-          (identifierType) => identifierType.namespace === namespace
+          (identifierType) => identifierType.namespace === namespace,
         )?.label ?? namespace
       }: ${id}`}</li>
     ))}

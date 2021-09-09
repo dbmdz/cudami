@@ -36,7 +36,7 @@ class AddLinkDialog extends Component {
           editing,
         })
         this.props.onToggle()
-      }
+      },
     )
   }
 
@@ -44,8 +44,8 @@ class AddLinkDialog extends Component {
     publish(
       'editor.add-link',
       mapValues(this.state.attributes, (value) =>
-        value !== '' ? value : undefined
-      )
+        value !== '' ? value : undefined,
+      ),
     )
     this.destroy()
   }

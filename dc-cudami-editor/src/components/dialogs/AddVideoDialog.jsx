@@ -48,14 +48,14 @@ class AddVideoDialog extends Component {
           },
         })
         this.props.onToggle()
-      }
+      },
     )
   }
 
   async componentDidMount() {
     const newFileResource = await loadIdentifiable(
       this.context.apiContextPath,
-      'fileResource'
+      'fileResource',
     )
     const initialFileResource = {
       ...newFileResource,
@@ -73,7 +73,7 @@ class AddVideoDialog extends Component {
   addVideoToEditor = (resourceId) => {
     const data = {
       ...mapValues(this.state.attributes, (value) =>
-        value !== '' ? value : undefined
+        value !== '' ? value : undefined,
       ),
       resourceId,
       url: this.state.fileResource.uri,
@@ -123,7 +123,7 @@ class AddVideoDialog extends Component {
     if (!resourceId) {
       const {uuid} = await saveFileResource(
         this.context.apiContextPath,
-        this.state.fileResource
+        this.state.fileResource,
       )
       resourceId = uuid
     } else if (this.state.doUpdateRequest) {

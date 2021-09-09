@@ -26,6 +26,6 @@ export default function ({
       uiLocale={uiLocale}
       uuid={uuid}
     />,
-    document.getElementById(id)
+    document.getElementById(id),
   )
 }
