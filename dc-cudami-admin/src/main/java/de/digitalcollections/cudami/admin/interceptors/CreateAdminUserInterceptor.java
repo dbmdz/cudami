@@ -52,7 +52,7 @@ public class CreateAdminUserInterceptor implements HandlerInterceptor, MessageSo
     if (doCreateAdminUser != null) {
       boolean createAdminUser = (boolean) doCreateAdminUser;
       if (createAdminUser) {
-        modelAndView.setView(new RedirectView("/setup/adminUser", true));
+        modelAndView.setView(new RedirectView("/setup/admin", true));
         String message =
             messageSource.getMessage(
                 "msg.create_a_new_admin_user", null, LocaleContextHolder.getLocale());
