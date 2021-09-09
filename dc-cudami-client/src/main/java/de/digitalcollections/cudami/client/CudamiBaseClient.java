@@ -610,7 +610,38 @@ public class CudamiBaseClient<T extends Object> {
    * @return the filter criterias as request string
    */
   private String getFilterParamsAsString(List<FilterCriterion> filterCriterias) {
-    return filterCriterias.stream().map(Object::toString).collect(Collectors.joining("&"));
+    return filterCriterias.stream()
+        .map(this::filterCriterionToUrlParam)
+        .collect(Collectors.joining("&"));
+  }
+
+  private String filterCriterionToUrlParam(FilterCriterion filterCriterion) {
+    if (filterCriterion.getOperation() == null) {
+      return "";
+    }
+    String criterion = filterCriterion.getFieldName() + "=" + filterCriterion.getOperation() + ":";
+    switch (filterCriterion.getOperation().getOperandCount()) {
+      case SINGLEVALUE:
+        criterion +=
+            URLEncoder.encode(filterCriterion.getValue().toString(), StandardCharsets.UTF_8);
+        break;
+      case MIN_MAX_VALUES:
+        criterion +=
+            URLEncoder.encode(filterCriterion.getMinValue().toString(), StandardCharsets.UTF_8)
+                + ","
+                + URLEncoder.encode(
+                    filterCriterion.getMaxValue().toString(), StandardCharsets.UTF_8);
+        break;
+      case MULTIVALUE:
+        criterion +=
+            filterCriterion.getValues().stream()
+                .map(value -> URLEncoder.encode(value.toString(), StandardCharsets.UTF_8))
+                .collect(Collectors.joining(","));
+        break;
+      default:
+        break;
+    }
+    return criterion;
   }
 
   /**
