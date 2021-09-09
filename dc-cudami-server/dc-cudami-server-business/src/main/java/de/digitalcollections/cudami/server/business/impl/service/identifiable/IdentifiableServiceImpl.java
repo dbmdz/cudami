@@ -74,6 +74,47 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     return repository.delete(uuids);
   }
 
+  protected void ensureDefaultAliasesExist(I identifiable) throws IdentifiableServiceException {
+    if (
+    /*TODO: DigitalObject*/ false) {
+      return;
+    }
+    LocalizedUrlAliases urlAliases = identifiable.getLocalizedUrlAliases();
+    if (urlAliases == null) {
+      urlAliases = new LocalizedUrlAliases();
+      identifiable.setLocalizedUrlAliases(urlAliases);
+    }
+    for (Locale lang : identifiable.getLabel().getLocales()) {
+      if (!urlAliases.containsKey(lang)
+          || urlAliases.get(lang).stream().allMatch(alias -> alias.getWebsite() != null)) {
+        // there is not any default alias (w/o website); create one
+        UrlAlias defaultAlias = new UrlAlias();
+        defaultAlias.setTargetIdentifiableType(identifiable.getType());
+        defaultAlias.setTargetLanguage(lang);
+        defaultAlias.setTargetUuid(identifiable.getUuid());
+        if (identifiable instanceof Entity) {
+          defaultAlias.setTargetEntityType(((Entity) identifiable).getEntityType());
+        }
+        defaultAlias.setPrimary(!urlAliases.containsKey(lang));
+        try {
+          defaultAlias.setSlug(
+              this.urlAliasService.generateSlug(lang, identifiable.getLabel().getText(lang), null));
+        } catch (CudamiServiceException e) {
+          throw new IdentifiableServiceException("An error occured during slug generation.", e);
+        }
+        urlAliases.add(defaultAlias);
+      }
+
+      // check that a primary alias exists for this language
+      if (!urlAliases.get(lang).stream().anyMatch(alias -> alias.isPrimary())) {
+        throw new IdentifiableServiceException(
+            String.format(
+                "There is not any primary alias for language '%s' of identifiable '%s'.",
+                lang, identifiable.getUuid()));
+      }
+    }
+  }
+
   @Override
   public PageResponse<I> find(PageRequest pageRequest) {
     setDefaultSorting(pageRequest);
@@ -184,9 +225,11 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   public I save(I identifiable) throws IdentifiableServiceException {
     try {
       I savedIdentifiable = this.repository.save(identifiable);
-      if (identifiable.getLocalizedUrlAliases() != null) {
+      savedIdentifiable.setLocalizedUrlAliases(identifiable.getLocalizedUrlAliases());
+      this.ensureDefaultAliasesExist(savedIdentifiable);
+      if (savedIdentifiable.getLocalizedUrlAliases() != null) {
         LocalizedUrlAliases savedUrlAliases = new LocalizedUrlAliases();
-        for (UrlAlias urlAlias : identifiable.getLocalizedUrlAliases().flatten()) {
+        for (UrlAlias urlAlias : savedIdentifiable.getLocalizedUrlAliases().flatten()) {
           // since we have the identifiable's UUID just here
           // the targetUuid must be set at this point
           urlAlias.setTargetUuid(savedIdentifiable.getUuid());
@@ -238,13 +281,14 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       I updatedIdentifiable = this.repository.update(identifiable);
       // UrlAliases
       this.urlAliasService.deleteAllForTarget(identifiable.getUuid());
+      this.ensureDefaultAliasesExist(identifiable);
       if (identifiable.getLocalizedUrlAliases() != null) {
         for (UrlAlias urlAlias : identifiable.getLocalizedUrlAliases().flatten()) {
           if (urlAlias.getUuid() != null && urlAlias.getLastPublished() != null) {
             // these haven't been removed from DB so we must update them
             this.urlAliasService.update(urlAlias);
           } else {
-            this.urlAliasService.create(urlAlias);
+            this.urlAliasService.create(urlAlias, true);
           }
         }
       }

@@ -37,15 +37,14 @@ public class UrlAliasServiceImpl implements UrlAliasService {
   }
 
   @Override
-  public UrlAlias create(UrlAlias urlAlias) throws CudamiServiceException {
+  public UrlAlias create(UrlAlias urlAlias, boolean force) throws CudamiServiceException {
     if (urlAlias == null) {
       throw new CudamiServiceException("Cannot create an empty UrlAlias");
     }
-    // for updates of identifiables we save UrlAliases *with* UUID
-    //    if (urlAlias.getUuid() != null) {
-    //      throw new CudamiServiceException("Cannot create an UrlAlias, when its UUID is already
-    // set!");
-    //    }
+    if (!force && urlAlias.getUuid() != null) {
+      throw new CudamiServiceException("Cannot create an UrlAlias, when its UUID is already set!");
+    }
+
     this.checkPublication(urlAlias);
     try {
       return repository.save(urlAlias);

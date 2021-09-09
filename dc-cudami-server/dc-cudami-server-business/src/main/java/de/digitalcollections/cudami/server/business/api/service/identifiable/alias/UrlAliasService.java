@@ -67,13 +67,25 @@ public interface UrlAliasService {
   boolean deleteAllForTarget(UUID uuid, boolean force) throws CudamiServiceException;
 
   /**
-   * Create an UrlAlias in the database
+   * Create an UrlAlias in the database (with validation)
    *
    * @param urlAlias the UrlAlias (with yet empty UUID)
    * @return the persisted UrlAlias with its generated UUID
    * @throws CudamiServiceException
    */
-  UrlAlias create(UrlAlias urlAlias) throws CudamiServiceException;
+  default UrlAlias create(UrlAlias urlAlias) throws CudamiServiceException {
+    return this.create(urlAlias, false);
+  }
+
+  /**
+   * Create an UrlAlias in the database
+   *
+   * @param urlAlias the UrlAlias (with yet empty UUID)
+   * @param force if true, do not validate
+   * @return the persisted UrlAlias with its generated UUID
+   * @throws CudamiServiceException
+   */
+  UrlAlias create(UrlAlias urlAlias, boolean force) throws CudamiServiceException;
 
   /**
    * Updates an UrlAlias in the database
