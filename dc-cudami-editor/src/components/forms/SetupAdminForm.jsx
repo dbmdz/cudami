@@ -2,10 +2,9 @@ import '../../polyfills'
 
 import {useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
-import {Alert, Col, Form, FormGroup, Label, Row} from 'reactstrap'
+import {Col, Form, Row} from 'reactstrap'
 
 import {loadUser, saveOrUpdateUser, typeToEndpointMapping} from '../../api'
-import CheckboxWithLabel from '../CheckboxWithLabel'
 import FeedbackMessage from '../FeedbackMessage'
 import InputWithLabel from '../InputWithLabel'
 import ActionButtons from './ActionButtons'
@@ -29,9 +28,9 @@ const submitData = async (context, user, passwords) => {
   }
 }
 
-const UserForm = ({allRoles, apiContextPath = '/', uuid}) => {
+const UserForm = ({apiContextPath = '/'}) => {
   useEffect(() => {
-    loadUser(apiContextPath, {uuid}).then((user) => {
+    loadUser(apiContextPath, {admin: true}).then((user) => {
       setUser(user)
     })
   }, [])
@@ -42,13 +41,8 @@ const UserForm = ({allRoles, apiContextPath = '/', uuid}) => {
   if (!user) {
     return null
   }
-  const updateRoles = (role, selected) => {
-    return allRoles.filter((r) => {
-      return r === role ? selected : roles.includes(r)
-    })
-  }
-  const {email, enabled, firstname, lastname, roles} = user
-  const formId = 'user-form'
+  const {email, firstname, lastname} = user
+  const formId = 'setup-admin-form'
   return (
     <>
       {feedbackMessage && (
@@ -75,19 +69,10 @@ const UserForm = ({allRoles, apiContextPath = '/', uuid}) => {
       >
         <Row form>
           <Col xs="6" sm="9">
-            <h1>{uuid ? t('editUser', {email}) : t('createUser')}</h1>
+            <h1>{t('createUser')}</h1>
           </Col>
           <Col xs="6" sm="3">
-            <ActionButtons
-              disabled={[
-                email,
-                firstname,
-                lastname,
-                passwords.pwd1,
-                passwords.pwd2,
-              ].some((field) => !field)}
-              formId={formId}
-            />
+            <ActionButtons formId={formId} />
           </Col>
         </Row>
         <Row form>
@@ -97,9 +82,6 @@ const UserForm = ({allRoles, apiContextPath = '/', uuid}) => {
         </Row>
         <Row form>
           <Col sm="12">
-            {uuid && (
-              <InputWithLabel id="uuid" label="ID" readOnly value={uuid} />
-            )}
             <InputWithLabel
               id="email"
               label={`${t('username')} / ${t('email')}`}
@@ -129,40 +111,15 @@ const UserForm = ({allRoles, apiContextPath = '/', uuid}) => {
             />
           </Col>
         </Row>
-        <FormGroup>
-          <Label className="font-weight-bold">{t('roles')}</Label>
-          {allRoles.map((role) => (
-            <CheckboxWithLabel
-              checked={roles.includes(role)}
-              key={role}
-              label={role}
-              onChange={(isChecked) =>
-                setUser({
-                  ...user,
-                  roles: updateRoles(role, isChecked),
-                })
-              }
-            />
-          ))}
-        </FormGroup>
-        <FormGroup>
-          <Label className="font-weight-bold">{t('status')}</Label>
-          <CheckboxWithLabel
-            checked={enabled}
-            label={t('activated')}
-            onChange={(isChecked) => setUser({...user, enabled: isChecked})}
-          />
-        </FormGroup>
-        {uuid && <Alert color="info">{t('passwordChangeInfo')}</Alert>}
         <Row form>
           <Col>
             <InputWithLabel
               id="pwd1"
               labelKey="password"
               onChange={(v) => setPasswords({...passwords, pwd1: v})}
-              required={!uuid}
+              required
               type="password"
-              value={passwords.pwd1 ?? ''}
+              value={passwords?.pwd1 ?? ''}
             />
           </Col>
           <Col>
@@ -170,9 +127,9 @@ const UserForm = ({allRoles, apiContextPath = '/', uuid}) => {
               id="pwd2"
               labelKey="confirmPassword"
               onChange={(v) => setPasswords({...passwords, pwd2: v})}
-              required={!uuid}
+              required
               type="password"
-              value={passwords.pwd2 ?? ''}
+              value={passwords?.pwd2 ?? ''}
             />
           </Col>
         </Row>

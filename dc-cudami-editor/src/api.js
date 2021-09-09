@@ -191,6 +191,19 @@ export async function loadRootIdentifiables(
   }
 }
 
+export async function loadUser(contextPath, {admin = false, uuid = 'new'}) {
+  const url = `${contextPath}api/${typeToEndpointMapping.user}/${uuid}?admin=${admin}`
+  try {
+    const response = await fetch(url)
+    if (!response.ok) {
+      return {}
+    }
+    return await response.json()
+  } catch (err) {
+    return {}
+  }
+}
+
 export async function removeAttachedIdentifiable(
   contextPath,
   parentType,
