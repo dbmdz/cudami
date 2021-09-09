@@ -49,14 +49,14 @@ class AddImageDialog extends Component {
           },
         })
         this.props.onToggle()
-      }
+      },
     )
   }
 
   async componentDidMount() {
     const newFileResource = await loadIdentifiable(
       this.context.apiContextPath,
-      'fileResource'
+      'fileResource',
     )
     const initialFileResource = {
       ...newFileResource,
@@ -74,7 +74,7 @@ class AddImageDialog extends Component {
   addImageToEditor = (resourceId) => {
     const data = {
       ...mapValues(this.state.attributes, (value) =>
-        value !== '' ? value : undefined
+        value !== '' ? value : undefined,
       ),
       resourceId,
       url: this.state.fileResource.uri,
@@ -115,7 +115,7 @@ class AddImageDialog extends Component {
     if (!resourceId) {
       const {uuid} = await saveFileResource(
         this.context.apiContextPath,
-        this.state.fileResource
+        this.state.fileResource,
       )
       resourceId = uuid
     } else if (this.state.doUpdateRequest) {

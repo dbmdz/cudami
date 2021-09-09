@@ -79,7 +79,7 @@ class PagedIdentifiableList extends Component {
   activateChangeOfOrder = async () => {
     const {content, pageSize, totalElements} = await this.loadIdentifiables(
       0,
-      this.state.totalElements
+      this.state.totalElements,
     )
     this.setState({
       changeOfOrderActive: true,
@@ -97,7 +97,7 @@ class PagedIdentifiableList extends Component {
       parentType,
       parentUuid,
       type,
-      uuid
+      uuid,
     )
     return successful
   }
@@ -109,7 +109,7 @@ class PagedIdentifiableList extends Component {
       identifiables,
       parentType,
       parentUuid,
-      type
+      type,
     )
     return successful
   }
@@ -118,7 +118,7 @@ class PagedIdentifiableList extends Component {
     const {content, pageSize, totalElements} = await this.loadIdentifiables(
       0,
       this.pageSize,
-      this.state.searchTerm
+      this.state.searchTerm,
     )
     this.setState({
       identifiables: content,
@@ -217,7 +217,7 @@ class PagedIdentifiableList extends Component {
     if (addedSuccessfully) {
       const removedSuccessfully = await this.removeIdentifiable(
         parentUuid,
-        uuid
+        uuid,
       )
       if (removedSuccessfully) {
         this.setState({
@@ -232,7 +232,7 @@ class PagedIdentifiableList extends Component {
               targetName: getLabelValue(
                 targetLabel,
                 activeLanguage,
-                defaultLanguage
+                defaultLanguage,
               ),
             },
           },
@@ -256,7 +256,7 @@ class PagedIdentifiableList extends Component {
     const {label, uuid} = identifiables[removeIndex]
     const successful = await this.removeIdentifiable(
       this.props.parentUuid,
-      uuid
+      uuid,
     )
     if (!successful) {
       return console.error('an error occured while removing the identifiable')
@@ -286,7 +286,7 @@ class PagedIdentifiableList extends Component {
         type,
         pageNumber,
         pageSize,
-        this.state.searchTerm
+        this.state.searchTerm,
       )
     }
     return await loadRootIdentifiables(
@@ -294,7 +294,7 @@ class PagedIdentifiableList extends Component {
       type,
       pageNumber,
       pageSize,
-      this.state.searchTerm
+      this.state.searchTerm,
     )
   }
 
@@ -305,7 +305,7 @@ class PagedIdentifiableList extends Component {
       parentType,
       parentUuid,
       type,
-      uuid
+      uuid,
     )
     return successful
   }
@@ -317,7 +317,7 @@ class PagedIdentifiableList extends Component {
       this.state.identifiables,
       parentType,
       parentUuid,
-      type
+      type,
     )
     if (!successful) {
       return this.setState({
@@ -352,7 +352,7 @@ class PagedIdentifiableList extends Component {
 
   updatePage = async ({selected}) => {
     const {content, pageSize, totalElements} = await this.loadIdentifiables(
-      selected
+      selected,
     )
     this.setState({
       identifiables: content,

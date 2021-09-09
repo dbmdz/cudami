@@ -114,7 +114,7 @@ class IdentifiableForm extends Component {
     this.setState({
       activeLanguage: selectedLanguage.name,
       availableLanguages: availableLanguages.filter(
-        (language) => language.name !== selectedLanguage.name
+        (language) => language.name !== selectedLanguage.name,
       ),
       existingLanguages: [...existingLanguages, selectedLanguage.name],
       identifiable: {
@@ -142,7 +142,7 @@ class IdentifiableForm extends Component {
           [language]: doc,
         }
       },
-      {}
+      {},
     )
     if (Object.keys(cleanedJson).length > 0) {
       return cleanedJson
@@ -211,7 +211,7 @@ class IdentifiableForm extends Component {
             name: language,
           },
         ],
-        'displayName'
+        'displayName',
       ),
       existingLanguages: existingLanguages.filter((l) => l != language),
       identifiable: {

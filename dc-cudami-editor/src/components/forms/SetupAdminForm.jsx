@@ -13,7 +13,7 @@ const submitData = async (context, user, passwords) => {
   const {error, json} = await saveOrUpdateUser(
     context,
     user,
-    Object.values(passwords).every((pwd) => pwd) ? passwords : null
+    Object.values(passwords).every((pwd) => pwd) ? passwords : null,
   )
   if (!error) {
     return {uuid: json.uuid}
@@ -59,7 +59,7 @@ const UserForm = ({apiContextPath = '/'}) => {
           const {message, uuid} = await submitData(
             apiContextPath,
             user,
-            passwords
+            passwords,
           )
           if (message) {
             return setFeedbackMessage(message)

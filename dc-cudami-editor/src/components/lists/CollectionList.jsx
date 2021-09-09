@@ -56,7 +56,7 @@ const CollectionList = ({
               publicationStart,
               uuid,
             },
-            index
+            index,
           ) => {
             const publicationEndDate =
               publicationEnd && new Date(publicationEnd)
@@ -103,7 +103,7 @@ const CollectionList = ({
                 </td>
               </tr>
             )
-          }
+          },
         )}
       </tbody>
     </Table>

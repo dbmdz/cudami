@@ -39,7 +39,7 @@ class AddIframeDialog extends Component {
           editing,
         })
         this.props.onToggle()
-      }
+      },
     )
   }
 
@@ -47,8 +47,8 @@ class AddIframeDialog extends Component {
     publish(
       'editor.add-iframe',
       mapValues(this.state.attributes, (value) =>
-        value !== '' ? value : undefined
-      )
+        value !== '' ? value : undefined,
+      ),
     )
     this.destroy()
   }

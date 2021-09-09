@@ -11,7 +11,7 @@ const RemoveLanguageDialog = ({isOpen, onConfirm, toggle}) => {
       (_msg, language) => {
         setLanguage(language)
         toggle()
-      }
+      },
     )
     return () => unsubscribe(token)
   }, [])

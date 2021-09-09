@@ -53,7 +53,7 @@ const IdentifierTypeForm = ({apiContextPath = '/', uuid}) => {
             apiContextPath,
             identifierType,
             type,
-            uuid
+            uuid,
           )
           if (error) {
             return setFeedbackMessage({

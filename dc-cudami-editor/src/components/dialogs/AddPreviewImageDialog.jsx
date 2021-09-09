@@ -43,7 +43,7 @@ class AddPreviewImageDialog extends Component {
           enableMetadata = true,
           enableRenderingHints = true,
           uuid,
-        } = {}
+        } = {},
       ) => {
         this.setState({
           attributes: {
@@ -65,14 +65,14 @@ class AddPreviewImageDialog extends Component {
           },
         })
         this.props.onToggle()
-      }
+      },
     )
   }
 
   async componentDidMount() {
     const newFileResource = await loadIdentifiable(
       this.context.apiContextPath,
-      'fileResource'
+      'fileResource',
     )
     const initialFileResource = {
       ...newFileResource,
@@ -119,12 +119,12 @@ class AddPreviewImageDialog extends Component {
     if (!fileResource.uuid) {
       fileResource = await saveFileResource(
         this.context.apiContextPath,
-        this.state.fileResource
+        this.state.fileResource,
       )
     } else if (this.state.doUpdateRequest) {
       fileResource = await updateFileResource(
         this.context.apiContextPath,
-        this.state.fileResource
+        this.state.fileResource,
       )
     }
     return fileResource

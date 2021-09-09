@@ -70,7 +70,7 @@ const PagedIdentifierTypeList = ({apiContextPath = '/'}) => {
                       />
                     </td>
                   </tr>
-                )
+                ),
               )}
             </tbody>
           </Table>

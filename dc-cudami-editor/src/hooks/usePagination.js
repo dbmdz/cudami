@@ -14,7 +14,7 @@ const usePagination = (apiContextPath, type) => {
       context,
       type,
       pageNumber,
-      pageSize
+      pageSize,
     )
     return {
       numberOfPages: Math.ceil(totalElements / pageSize),

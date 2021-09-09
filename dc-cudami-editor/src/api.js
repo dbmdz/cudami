@@ -23,7 +23,7 @@ export async function addAttachedIdentifiable(
   parentType,
   parentUuid,
   type,
-  uuid
+  uuid,
 ) {
   const url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}/${uuid}`
   try {
@@ -41,7 +41,7 @@ export async function addAttachedIdentifiables(
   identifiables,
   parentType,
   parentUuid,
-  type
+  type,
 ) {
   const url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}`
   try {
@@ -105,7 +105,7 @@ export async function loadAttachedIdentifiables(
   type,
   pageNumber,
   pageSize,
-  searchTerm
+  searchTerm,
 ) {
   let url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}?pageNumber=${pageNumber}&pageSize=${pageSize}`
   if (searchTerm) {
@@ -167,7 +167,7 @@ export async function loadRootIdentifiables(
   type,
   pageNumber,
   pageSize,
-  searchTerm
+  searchTerm,
 ) {
   let url = `${contextPath}api/${typeToEndpointMapping[type]}?pageNumber=${pageNumber}&pageSize=${pageSize}`
   if (searchTerm) {
@@ -209,7 +209,7 @@ export async function removeAttachedIdentifiable(
   parentType,
   parentUuid,
   type,
-  uuid
+  uuid,
 ) {
   const url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}/${uuid}`
   try {
@@ -230,7 +230,7 @@ export async function saveIdentifiable(
   contextPath,
   identifiable,
   type,
-  {parentType, parentUuid} = {}
+  {parentType, parentUuid} = {},
 ) {
   let url = `${contextPath}api/${typeToEndpointMapping[type]}`
   if (parentType && parentUuid) {
@@ -268,7 +268,7 @@ export async function saveOrUpdateUser(contextPath, user, passwords) {
   }
   if (passwords) {
     const paramList = Object.entries(passwords).map(
-      ([k, v]) => `${k}=${encodeURIComponent(v)}`
+      ([k, v]) => `${k}=${encodeURIComponent(v)}`,
     )
     url += `?${paramList.join('&')}`
   }
@@ -298,7 +298,7 @@ export async function searchIdentifiables(
   searchTerm,
   type,
   pageNumber = 0,
-  pageSize = 10
+  pageSize = 10,
 ) {
   const url = `${contextPath}api/${typeToEndpointMapping[type]}/search?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
   try {
@@ -321,7 +321,7 @@ export async function searchMedia(
   mediaType,
   searchTerm,
   pageNumber = 0,
-  pageSize = 10
+  pageSize = 10,
 ) {
   const url = `${contextPath}api/fileresources/type/${mediaType}?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
   try {
@@ -344,7 +344,7 @@ export async function updateAttachedIdentifiablesOrder(
   identifiables,
   parentType,
   parentUuid,
-  type
+  type,
 ) {
   const url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}`
   try {

@@ -52,7 +52,7 @@ const WebsiteList = ({
               url,
               uuid,
             },
-            index
+            index,
           ) => (
             <tr key={uuid}>
               <td className="text-right">
@@ -90,7 +90,7 @@ const WebsiteList = ({
                 />
               </td>
             </tr>
-          )
+          ),
         )}
       </tbody>
     </Table>

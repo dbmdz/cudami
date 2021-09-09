@@ -29,7 +29,7 @@ class Autocomplete extends Component {
     `${getLabelValue(
       label,
       this.props.activeLanguage,
-      this.context.defaultLanguage
+      this.context.defaultLanguage,
     )}`
 
   onChange = (_, {newValue: searchTerm}) => {
@@ -54,7 +54,7 @@ class Autocomplete extends Component {
       this.context.apiContextPath,
       searchTerm,
       0,
-      this.maxElements
+      this.maxElements,
     )
     this.setState({
       loading: false,
@@ -95,7 +95,7 @@ class Autocomplete extends Component {
           {getLabelValue(
             label,
             this.props.activeLanguage,
-            this.context.defaultLanguage
+            this.context.defaultLanguage,
           )}
         </Col>
       </Row>
